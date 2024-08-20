@@ -1,7 +1,7 @@
 import { __experimentalHeading as Heading } from '@wordpress/components';
 
 import { ItemSelectQueryType } from './item-select-query-type';
-import { getBlocksConfig } from '../../../utils/localized-data';
+import { getBlocksConfig } from '../../../utils/localized-block-data';
 
 interface FieldShortcodeSelectNewProps {
 	onSelectItem: ( config: BlockConfig, data: RemoteDataQueryInput ) => void;

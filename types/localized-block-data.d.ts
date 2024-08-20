@@ -30,7 +30,7 @@ interface BlocksConfig {
 	[ blockName: string ]: BlockConfig;
 }
 
-interface LocalizedData {
+interface LocalizedBlockData {
 	config: BlocksConfig;
 	rest_url: string;
 }

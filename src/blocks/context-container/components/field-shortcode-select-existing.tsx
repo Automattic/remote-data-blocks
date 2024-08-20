@@ -1,7 +1,7 @@
 import { __experimentalHeading as Heading } from '@wordpress/components';
 
 import { FieldSelectionFromAvailableBindings } from './field-shortcode-select-field';
-import { getBlocksConfig } from '../../../utils/localized-data';
+import { getBlocksConfig } from '../../../utils/localized-block-data';
 import { useExistingRemoteData } from '../hooks/use-existing-remote-data';
 
 interface FieldShortcodeSelectExistingProps {

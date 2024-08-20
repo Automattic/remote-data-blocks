@@ -6,7 +6,7 @@ import { formatTypeSettings } from './components/field-shortcode';
 import { Edit } from './edit';
 import { withBlockBinding } from './hooks/with-block-binding';
 import { Save } from './save';
-import { getBlocksConfig } from '../../utils/localized-data';
+import { getBlocksConfig } from '../../utils/localized-block-data';
 import './style.scss';
 
 // Register a unique block definition for each of the context blocks.
