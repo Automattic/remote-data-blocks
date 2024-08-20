@@ -26,12 +26,22 @@ class BlockRegistration {
 				return isset( $input_var['overrides'] );
 			} );
 
+			// Set available bindings from the display query output mappings.
+			$available_bindings = [];
+			foreach ( $config['queries']['__DISPLAY__']->output_variables['mappings'] ?? [] as $key => $mapping ) {
+				$available_bindings[ $key ] = [
+					'name' => $mapping['name'],
+					'type' => $mapping['type'],
+				];
+			}
+
 			$remote_data_blocks_config[ $block_name ] = [
-				'loop'      => $config['loop'],
-				'name'      => $block_name,
-				'overrides' => $overrides,
-				'panels'    => $config['panels'],
-				'settings'  => [
+				'availableBindings' => $available_bindings,
+				'loop'              => $config['loop'],
+				'name'              => $block_name,
+				'overrides'         => $overrides,
+				'panels'            => $config['panels'],
+				'settings'          => [
 					'category' => 'remote-data-blocks',
 					'title'    => $config['title'],
 				],

@@ -25,9 +25,26 @@ vi.mock( '@wordpress/components', () => ( {
 describe( 'withBlockBinding', () => {
 	const MockBlockEdit = vi.fn( () => <div data-testid="mock-block-edit" /> );
 	const WrappedComponent = withBlockBinding( MockBlockEdit );
+	const testBlockConfig = {
+		config: {
+			'test-block': {
+				availableBindings: { field1: { name: 'Field 1', type: 'string' } },
+				loop: false,
+				name: 'test-block',
+				overrides: {},
+				panels: [],
+				settings: {
+					category: 'widget',
+					title: 'Test block',
+				},
+			},
+		},
+		rest_url: 'http://example.com/wp-json',
+	};
 
 	beforeEach( () => {
 		vi.useFakeTimers();
+		window.REMOTE_DATA_BLOCKS = testBlockConfig;
 	} );
 
 	afterEach( () => {
@@ -55,7 +72,6 @@ describe( 'withBlockBinding', () => {
 
 	it( 'renders BoundBlockEdit when remote data is available', async () => {
 		const remoteData = {
-			availableBindings: { field1: { name: 'Field 1' } },
 			results: [ { field1: 'value1' } ],
 		};
 		render(
@@ -79,7 +95,6 @@ describe( 'withBlockBinding', () => {
 
 	it( 'does not render BoundBlockEdit for synced pattern without enabled overrides', () => {
 		const remoteData = {
-			availableBindings: { field1: { name: 'Field 1' } },
 			results: [ { field1: 'value1' } ],
 		};
 		render(
@@ -118,7 +133,6 @@ describe( 'withBlockBinding', () => {
 			context: {
 				[ REMOTE_DATA_CONTEXT_KEY ]: {
 					results: [ { title: 'New Title' } ],
-					availableBindings: { title: { name: 'Title' } },
 				},
 			},
 			name: 'test-block',
@@ -158,7 +172,6 @@ describe( 'withBlockBinding', () => {
 			context: {
 				[ REMOTE_DATA_CONTEXT_KEY ]: {
 					results: [ { title: 'Matching Title' } ],
-					availableBindings: { title: { name: 'Title' } },
 				},
 			},
 			name: 'test-block',

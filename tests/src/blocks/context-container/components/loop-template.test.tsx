@@ -6,7 +6,6 @@ import { LoopTemplate } from '../../../../../src/blocks/context-container/compon
 describe( 'LoopTemplate', () => {
 	const mockGetInnerBlocks = () => [];
 	const mockRemoteData: RemoteData = {
-		availableBindings: {},
 		blockName: 'test-block',
 		isCollection: true,
 		metadata: {},
@@ -23,7 +22,6 @@ describe( 'LoopTemplate', () => {
 
 	it( 'renders "No results found" when there are no results', () => {
 		const emptyRemoteData: RemoteData = {
-			availableBindings: {},
 			blockName: 'test-block',
 			isCollection: true,
 			metadata: {},

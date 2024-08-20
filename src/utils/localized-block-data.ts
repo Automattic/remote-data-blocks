@@ -1,3 +1,7 @@
+export function getBlockAvailableBindings( blockName: string ): AvailableBindings {
+	return getBlockConfig( blockName )?.availableBindings ?? {};
+}
+
 export function getBlockConfig( blockName: string ): BlockConfig | undefined {
 	return window.REMOTE_DATA_BLOCKS?.config?.[ blockName ];
 }

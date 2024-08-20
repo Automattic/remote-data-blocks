@@ -6,6 +6,7 @@ import { useContext, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { getMismatchedAttributes } from '../../../utils/block-binding';
+import { getBlockAvailableBindings } from '../../../utils/localized-block-data';
 import { ContextControls } from '../components/context-controls';
 import {
 	BLOCK_BINDING_SOURCE,
@@ -17,6 +18,7 @@ import { LoopIndexContext } from '../context/loop-index-context';
 
 interface BoundBlockEditProps {
 	attributes: ContextInnerBlockAttributes;
+	availableBindings: AvailableBindings;
 	blockName: string;
 	children: JSX.Element;
 	loopIndex: number;
@@ -25,8 +27,7 @@ interface BoundBlockEditProps {
 }
 
 function BoundBlockEdit( props: BoundBlockEditProps ) {
-	const { attributes, blockName, loopIndex, remoteData, setAttributes } = props;
-	const availableBindings = remoteData?.availableBindings ?? {};
+	const { attributes, availableBindings, blockName, loopIndex, remoteData, setAttributes } = props;
 	const existingBindings = attributes.metadata?.bindings ?? {};
 
 	function removeBinding( target: string ) {
@@ -72,8 +73,8 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 				<PanelBody title={ __( 'Remote Data', 'remote-data-blocks' ) }>
 					<ContextControls
 						attributes={ attributes }
+						availableBindings={ availableBindings }
 						blockName={ blockName }
-						remoteData={ remoteData }
 						updateBinding={ updateBinding }
 					/>
 				</PanelBody>
@@ -87,7 +88,7 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 	return ( props: BlockEditProps< ContextInnerBlockAttributes > ) => {
 		const { attributes, context, name, setAttributes } = props;
 		const remoteData = context[ REMOTE_DATA_CONTEXT_KEY ] as RemoteData | undefined;
-		const availableBindings = remoteData?.availableBindings ?? {};
+		const availableBindings = getBlockAvailableBindings( name );
 		const hasAvailableBindings = Boolean( Object.keys( availableBindings ).length );
 
 		// If the block does not have a remote data context, render it as usual.
@@ -134,6 +135,7 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 		return (
 			<BoundBlockEdit
 				attributes={ mergedAttributes }
+				availableBindings={ availableBindings }
 				blockName={ name }
 				loopIndex={ index }
 				remoteData={ remoteData }
