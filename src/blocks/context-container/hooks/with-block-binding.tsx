@@ -88,7 +88,7 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 	return ( props: BlockEditProps< ContextInnerBlockAttributes > ) => {
 		const { attributes, context, name, setAttributes } = props;
 		const remoteData = context[ REMOTE_DATA_CONTEXT_KEY ] as RemoteData | undefined;
-		const availableBindings = getBlockAvailableBindings( name );
+		const availableBindings = getBlockAvailableBindings( remoteData?.blockName ?? '' );
 		const hasAvailableBindings = Boolean( Object.keys( availableBindings ).length );
 
 		// If the block does not have a remote data context, render it as usual.
