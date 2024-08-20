@@ -72,6 +72,7 @@ describe( 'withBlockBinding', () => {
 
 	it( 'renders BoundBlockEdit when remote data is available', async () => {
 		const remoteData = {
+			blockName: 'test-block',
 			results: [ { field1: 'value1' } ],
 		};
 		render(
@@ -95,6 +96,7 @@ describe( 'withBlockBinding', () => {
 
 	it( 'does not render BoundBlockEdit for synced pattern without enabled overrides', () => {
 		const remoteData = {
+			blockName: 'test-block',
 			results: [ { field1: 'value1' } ],
 		};
 		render(
@@ -132,6 +134,7 @@ describe( 'withBlockBinding', () => {
 			},
 			context: {
 				[ REMOTE_DATA_CONTEXT_KEY ]: {
+					blockName: 'test-block',
 					results: [ { title: 'New Title' } ],
 				},
 			},
@@ -171,6 +174,7 @@ describe( 'withBlockBinding', () => {
 			},
 			context: {
 				[ REMOTE_DATA_CONTEXT_KEY ]: {
+					blockName: 'test-block',
 					results: [ { title: 'Matching Title' } ],
 				},
 			},
