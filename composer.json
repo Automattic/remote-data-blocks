@@ -1,0 +1,29 @@
+{
+  "name": "automattic/remote-data-blocks",
+  "authors": [
+    {
+      "name": "WPVIP"
+    }
+  ],
+  "scripts": {
+    "phpcs": "phpcs",
+    "phpcs-fix": "phpcbf",
+    "test": "./vendor/bin/phpunit"
+  },
+  "require": {
+    "galbar/jsonpath": "^3.0",
+    "guzzlehttp/guzzle": "^7.8",
+    "kevinrob/guzzle-cache-middleware": "^5.1",
+    "psr/log": "^3.0"
+  },
+  "require-dev": {
+    "automattic/vipwpcs": "^3.0",
+    "phpcompatibility/phpcompatibility-wp": "^2.1",
+    "phpunit/phpunit": "^11"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  }
+}

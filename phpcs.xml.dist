@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<ruleset name="VIP-Go-mu-plugins">
+	<description>Custom ruleset for VIP Go mu-plugins</description>
+
+	<!-- For help in understanding this file: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Annotated-ruleset.xml -->
+	<!-- For help in using PHPCS: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Usage -->
+
+	<!-- What to scan -->
+	<file>.</file>
+
+	<!-- Ignoring Files and Folders:
+		https://github.com/squizlabs/PHP_CodeSniffer/wiki/Advanced-Usage#ignoring-files-and-folders -->
+
+	<!-- Submodules - these should have their own PHPCS configurations -->
+
+	<!-- Other directories -->
+	<exclude-pattern>\.git/*</exclude-pattern>
+	<exclude-pattern>/build/*</exclude-pattern>
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+	<exclude-pattern>/vendor/*</exclude-pattern>
+
+	<!-- How to scan -->
+	<!-- Strip the file paths down to the relevant bit -->
+	<arg name="basepath" value="."/>
+	<!-- Enables parallel processing when available for faster results. -->
+	<arg name="parallel" value="8"/>
+	<!-- Limit to PHP files -->
+	<arg name="extensions" value="php"/>
+	<arg value="s"/>
+
+	<!-- Rules: Check PHP version compatibility - see
+		https://github.com/PHPCompatibility/PHPCompatibilityWP -->
+	<rule ref="PHPCompatibilityWP"/>
+	<!-- For help in understanding this testVersion:
+		https://github.com/PHPCompatibility/PHPCompatibility#sniffing-your-code-for-compatibility-with-specific-php-versions -->
+	<config name="testVersion" value="7.4-"/>
+
+	<!-- Rules: WordPress Coding Standards - see
+		https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards -->
+	<!-- WordPress-Extra includes WordPress-Core -->
+	<rule ref="WordPress-Extra"/>
+	<!-- For help in understanding these custom sniff properties:
+		https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/wiki/Customizable-sniff-properties -->
+	<config name="minimum_supported_wp_version" value="5.8"/>
+
+	<!-- Rules: Check VIP Coding Standards - see
+		https://github.com/Automattic/VIP-Coding-Standards/ -->
+	<rule ref="WordPress-VIP-Go">
+		<!-- These disallow anonymous functions as action callbacks -->
+		<exclude name="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket" />
+		<exclude name="PEAR.Functions.FunctionCallSignature.MultipleArguments" />
+		<exclude name="PEAR.Functions.FunctionCallSignature.CloseBracketLine" />
+
+		<!-- Allow short array syntax -->
+		<exclude name="Universal.Arrays.DisallowShortArraySyntax.Found" />
+
+		<!-- Do not enforce 'class-' prefix -->
+		<exclude name="WordPress.Files.FileName.InvalidClassFileName" />
+
+		<!-- Allow short ternaries -->
+		<exclude name="Universal.Operators.DisallowShortTernary.Found" />
+
+		<!-- Generates too many false positives -->
+		<exclude name="WordPress.WP.CapitalPDangit.Misspelled" />
+
+		<!-- We use trigger_error extensively -->
+		<exclude name="WordPress.PHP.DevelopmentFunctions.error_log_trigger_error" />
+
+		<exclude name="Universal.NamingConventions.NoReservedKeywordParameterNames" />
+	</rule>
+
+	<!-- Relax a few rules for tests and example code -->
+	<rule ref="Generic.Files.OneObjectStructurePerFile.MultipleFound">
+		<exclude-pattern>/example/*</exclude-pattern>
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+
+	<rule ref="Universal.Files.SeparateFunctionsFromOO.Mixed">
+		<exclude-pattern>/example/*</exclude-pattern>
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+
+	<rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+
+	<!-- These functions are new via the Interactivity API and are auto-escaped -->
+	<rule ref="WordPress.Security.EscapeOutput">
+		<properties>
+			<property name="customAutoEscapedFunctions" type="array">
+				<element value="get_block_wrapper_attributes" />
+				<element value="wp_interactivity_data_wp_context" />
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.WP.Capabilities">
+		<properties>
+			<property name="custom_capabilities" type="array">
+				<element value="view_query_monitor" />
+			</property>
+		</properties>
+	</rule>
+
+</ruleset>

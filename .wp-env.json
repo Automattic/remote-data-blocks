@@ -1,0 +1,14 @@
+{
+  "config": {
+    "WP_DEBUG_DISPLAY": true,
+    "WP_DEVELOPMENT_MODE": "plugin",
+    "WP_ENVIRONMENT_TYPE": "development",
+    "WP_REDIS_HOST": "host.docker.internal"
+  },
+  "plugins": [
+    ".",
+    "./example",
+    "https://downloads.wordpress.org/plugin/query-monitor.3.16.4.zip",
+    "https://downloads.wordpress.org/plugin/redis-cache.2.5.3.zip"
+  ]
+}

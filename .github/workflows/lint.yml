@@ -1,0 +1,69 @@
+name: Static analysis
+on:
+  pull_request:
+  push:
+    branches:
+      - trunk
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Setup Node.js
+        uses: Automattic/vip-actions/nodejs-setup@trunk
+        with:
+          node-version-file: .nvmrc
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run CSS lint
+        run: npm run lint:css
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Check types
+        run: npm run check-types
+
+  phpcs:
+    name: PHPCS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Setup Node.js
+        uses: Automattic/vip-actions/nodejs-setup@trunk
+        with:
+          node-version-file: .nvmrc
+
+      - name: Install dependencies
+        run: composer install
+
+      - name: Run PHPLint
+        run: npm run lint:php
+
+      - name: Run PHPCS
+        run: npm run lint:phpcs
+
+  dependaban:
+    name: Dependaban
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: Automattic/vip-actions/dependaban@trunk

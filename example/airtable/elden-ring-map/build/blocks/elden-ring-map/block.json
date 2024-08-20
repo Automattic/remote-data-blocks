@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "remote-data-blocks/elden-ring-map",
+  "usesContext": [
+    "remote-data-blocks/remoteData"
+  ],
+  "version": "0.1.0",
+  "title": "Elden Ring Map",
+  "category": "widgets",
+  "icon": "location-alt",
+  "description": "Elden Ring Map",
+  "example": {},
+  "supports": {
+    "html": false,
+    "inserter": false
+  },
+  "textdomain": "remote-data-blocks",
+  "editorScript": [
+    "file:./index.js",
+    "leaflet-script"
+  ],
+  "editorStyle": [
+    "leaflet-style"
+  ],
+  "viewScript": "file:./view.js"
+}

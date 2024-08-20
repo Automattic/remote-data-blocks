@@ -1,0 +1,78 @@
+/**
+ * The following styles get applied inside the editor only.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
+
+.remote-data-blocks-search-result {
+	text-align: left;
+	width: 100%;
+}
+
+.remote-data-blocks-menu-item {
+	height: initial;
+
+	.components-menu-item__item {
+		width: 100%;
+	}
+}
+
+.remote-data-blocks-search-field {
+	word-wrap: break-word;
+	white-space: pre-wrap;
+}
+
+.remote-data-blocks-loading-overlay {
+	align-items: center;
+	background-color: rgba(255, 255, 255, 0.25);
+	display: flex;
+	height: 100%;
+	justify-content: center;
+	left: 0;
+	pointer-events: none;
+	position: absolute;
+	top: 0;
+	width: 100%;
+	z-index: 1;
+}
+
+.remote-data-blocks-button-group {
+	display: flex;
+	gap: 0.75em;
+}
+
+.remote-data-blocks-existing-item,
+.remote-data-blocks-meta-item,
+.remote-data-blocks-new-item {
+	margin: 1em 0;
+}
+
+h4.remote-data-blocks-new-item-heading {
+	margin: 0.5em 0;
+}
+
+/* Field shortcode */
+
+remote-data-blocks-inline-field {
+	background-color: #bfdbfe;
+	border-radius: 0.5rem;
+	padding: 0.15rem 0.35rem;
+}
+
+.rich-text:focus remote-data-blocks-inline-field[data-rich-text-format-boundary] {
+	background-color: #bae6fd;
+	border-radius: 0.5rem;
+}
+
+.remote-data-blocks-inline-field-choice-link {
+	color: #00f;
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.remote-data-blocks-inline-field-selected-icon {
+	display: inline-block;
+	height: 20px;
+	vertical-align: bottom;
+	width: 20px;
+}

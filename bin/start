@@ -1,0 +1,66 @@
+#!/bin/sh
+
+set -e
+root_dir=$(pwd)
+script_dir=$(dirname "$0")
+
+# Cleanup after trapping SIGINT (Ctrl+C) and SIGTERM signals
+cleanup() {
+    echo "Caught SIGINT signal. Shutting down..."
+    kill $BACKEND_PID 2>/dev/null || true
+    docker compose -f "$root_dir/docker-compose.overrides.yml" down
+    exit 0
+}
+
+setup_object_cache() {
+    echo "Setting up object cache..."
+    docker compose -f "$root_dir/docker-compose.overrides.yml" up -d
+    npx wp-env run cli -- wp redis enable
+}
+
+composer install
+
+# Monolith via wp-env
+if [ "$1" = "monolith" ]; then
+    # npx looks in node_modules/.bin first
+    npx wp-env start
+    setup_object_cache
+    npm start
+    exit 0
+fi
+
+# Monolith w/xdebug via wp-env
+if [ "$1" = "monolith-xdebug" ]; then
+    npx wp-env start --xdebug
+    setup_object_cache
+    npm start
+    exit 0
+fi
+
+# Decoupled via wp-env
+if [ "$1" = "decoupled" ]; then
+    if [ ! -d "$root_dir/../wp-components" ]; then
+        echo "The wp-components repo does not exist. Please clone at sibling level to this repo."
+        exit 1
+    fi
+
+    trap 'cleanup' SIGINT SIGTERM
+    cd ./bin/wp-env/decoupled
+
+    npx wp-env start
+    setup_object_cache
+    npx wp-env run cli -- wp rewrite structure '/%postname%/'
+
+    if [ $? -ne 0 ]; then
+        cleanup
+        exit 1
+    fi
+
+    npm start &
+    BACKEND_PID=$!
+    cd "$root_dir/../wp-components" && npm install && npm run build &&  ./.frontend-env/start react-next
+    exit 0
+fi
+
+echo "Error: can't start the unknown!"
+exit 1

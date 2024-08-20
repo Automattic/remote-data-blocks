@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "module": "es6",
+    "moduleResolution": "bundler",
+    "noImplicitAny": true,
+    "noUncheckedIndexedAccess": true,
+    "outDir": "./build/",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "target": "es5",
+    "typeRoots": [ "./types", "./node_modules/@types" ]
+  },
+  "include": [ "./types/*.d.ts", "./example/**/*", "./src/**/*", "./tests/**/*" ]
+}
