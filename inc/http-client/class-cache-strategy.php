@@ -8,6 +8,8 @@ use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
 use RemoteDataBlocks\Logging\LoggerManager;
 
 class CacheStrategy extends GreedyCacheStrategy {
+	const HEADER_TTL = 'X-RemoteDataBlocks-TTL';
+
 	protected $logger;
 
 	public function __construct( CacheStorageInterface $cache = null, $default_ttl, KeyValueHttpHeader $vary_headers = null ) {
