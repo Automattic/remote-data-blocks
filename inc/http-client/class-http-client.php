@@ -10,12 +10,12 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\Utils;
-use Kevinrob\GuzzleCache\CacheMiddleware;
 use Kevinrob\GuzzleCache\KeyValueHttpHeader;
 use Kevinrob\GuzzleCache\Storage\WordPressObjectCacheStorage;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
+use RemoteDataBlocks\HttpClient\CacheMiddleware;
 use RemoteDataBlocks\HttpClient\CacheStrategy;
 use RemoteDataBlocks\Logging\LoggerManager;
 
