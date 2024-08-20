@@ -61,6 +61,10 @@ class RemoteData {
 		$block_config = ConfigurationLoader::get_configuration( $block_name );
 		$query        = $block_config['queries'][ $query_key ];
 
+		// The frontend might send more input variables than the query needs or
+		// expects, so only include those defined by the query.
+		$query_input = array_intersect_key( $query_input, $query->input_variables );
+
 		$query_runner = $query->get_query_runner();
 		$query_result = $query_runner->execute( $query_input );
 

@@ -1,4 +1,4 @@
-import { getRestUrl } from '../../../utils/localized-data';
+import { getRestUrl } from '../../../utils/localized-block-data';
 
 export const BLOCK_BINDING_SOURCE = 'remote-data/binding';
 export const PATTERN_OVERRIDES_BINDING_SOURCE = 'core/pattern-overrides';

@@ -22,12 +22,12 @@ class ConfigurationLoader {
 	public static function init() {
 		self::$logger = LoggerManager::instance();
 
-		add_action( 'init', [ __CLASS__, 'register_remote_blocks' ], 10, 0 );
+		add_action( 'init', [ __CLASS__, 'register_remote_data_blocks' ], 10, 0 );
 	}
 
-	public static function register_remote_blocks() {
+	public static function register_remote_data_blocks() {
 		// Allow other plugins to register their blocks.
-		do_action( 'register_remote_blocks' );
+		do_action( 'register_remote_data_blocks' );
 	}
 
 	/**

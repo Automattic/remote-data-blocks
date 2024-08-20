@@ -2,6 +2,7 @@ import { Spinner } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 
+import { getBlockAvailableBindings } from '../../../utils/localized-block-data';
 import { DISPLAY_QUERY_KEY } from '../config/constants';
 import { useRemoteData } from '../hooks/use-remote-data';
 
@@ -56,22 +57,25 @@ type FieldSelectionWithFieldsProps = Omit< FieldSelectionProps, 'fields' | 'fiel
 
 export function FieldSelectionFromAvailableBindings( props: FieldSelectionWithFieldsProps ) {
 	const supportedBindingTypes = [ 'id', 'number', 'string' ];
-	const fields = Object.entries( props.remoteData.availableBindings ).reduce<
-		FieldSelectionProps[ 'fields' ]
-	>( ( acc, [ fieldName, binding ] ) => {
-		const fieldValue = props.remoteData.results[ 0 ]?.[ fieldName ] ?? '';
-		if ( ! fieldValue || ! supportedBindingTypes.includes( binding.type ) ) {
-			return acc;
-		}
+	const availableBindings = getBlockAvailableBindings( props.remoteData.blockName );
 
-		return {
-			...acc,
-			[ fieldName ]: {
-				name: binding.name,
-				value: fieldValue,
-			},
-		};
-	}, {} );
+	const fields = Object.entries( availableBindings ).reduce< FieldSelectionProps[ 'fields' ] >(
+		( acc, [ fieldName, binding ] ) => {
+			const fieldValue = props.remoteData.results[ 0 ]?.[ fieldName ] ?? '';
+			if ( ! fieldValue || ! supportedBindingTypes.includes( binding.type ) ) {
+				return acc;
+			}
+
+			return {
+				...acc,
+				[ fieldName ]: {
+					name: binding.name,
+					value: fieldValue,
+				},
+			};
+		},
+		{}
+	);
 
 	return <FieldSelection { ...props } fields={ fields } fieldType="field" />;
 }

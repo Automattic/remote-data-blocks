@@ -15,7 +15,6 @@ async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< Re
 	}
 
 	return {
-		availableBindings: body.available_bindings,
 		blockName: body.block_name,
 		isCollection: body.is_collection,
 		metadata: body.metadata,

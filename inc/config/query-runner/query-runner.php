@@ -108,25 +108,15 @@ class QueryRunner implements QueryRunnerInterface {
 			$logger->warning( sprintf( 'Query error: %s', esc_html( $response_data['errors'][0]['message'] ) ) );
 		}
 
-		// Set available bindings, hiding fields that are irrelevant to frontend.
-		$available_bindings = [];
-		foreach ( $this->query_context->output_variables['mappings'] ?? [] as $key => $mapping ) {
-			$available_bindings[ $key ] = [
-				'name' => $mapping['name'],
-				'type' => $mapping['type'],
-			];
-		}
-
 		// This method always returns an array, even if it's a single item. This
 		// ensures a consistent response shape. The requestor is expected to inspect
 		// is_collection and unwrap if necessary.
 		$results = $this->map_fields( $response_data, $is_collection );
 
 		return [
-			'available_bindings' => $available_bindings,
-			'is_collection'      => $is_collection,
-			'metadata'           => $this->query_context->get_metadata( $response, $results ),
-			'results'            => $results,
+			'is_collection' => $is_collection,
+			'metadata'      => $this->query_context->get_metadata( $response, $results ),
+			'results'       => $results,
 		];
 	}
 

@@ -112,7 +112,6 @@ class QueryRunnerTest extends TestCase {
 		$result       = $query_runner->execute( $input_variables );
 
 		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'available_bindings', $result );
 		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
 	}
@@ -190,15 +189,8 @@ class QueryRunnerTest extends TestCase {
 		$result       = $query_runner->execute( $input_variables );
 
 		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'available_bindings', $result );
 		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
 		$this->assertFalse( $result['is_collection'] );
-		$this->assertEquals( [
-			'test' => [
-				'name' => 'Test Field',
-				'type' => 'string',
-			],
-		], $result['available_bindings'] );
 	}
 }

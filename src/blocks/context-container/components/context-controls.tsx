@@ -2,19 +2,17 @@ import { SelectControl } from '@wordpress/components';
 
 interface ContextControlsProps {
 	attributes: ContextInnerBlockAttributes;
+	availableBindings: AvailableBindings;
 	blockName: string;
-	remoteData: RemoteData;
 	updateBinding: ( target: string, field?: string ) => void;
 }
 
 export function ContextControls( props: ContextControlsProps ) {
-	const { attributes, blockName, remoteData, updateBinding } = props;
+	const { attributes, availableBindings, blockName, updateBinding } = props;
 
-	const contextOptions = Object.entries( remoteData.availableBindings ).map(
-		( [ key, mapping ] ) => {
-			return { label: mapping.name, value: key };
-		}
-	);
+	const contextOptions = Object.entries( availableBindings ).map( ( [ key, mapping ] ) => {
+		return { label: mapping.name, value: key };
+	} );
 
 	switch ( blockName ) {
 		case 'core/heading':

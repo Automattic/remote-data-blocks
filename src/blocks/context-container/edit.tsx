@@ -12,12 +12,11 @@ import { DISPLAY_QUERY_KEY } from './config/constants';
 import { usePatterns } from './hooks/use-patterns';
 import { useRemoteData } from './hooks/use-remote-data';
 import { hasRemoteDataChanged } from '../../utils/block-binding';
-import { getBlocksConfig } from '../../utils/localized-data';
+import { getBlockConfig } from '../../utils/localized-block-data';
 import './editor.scss';
 
 export function Edit( props: BlockEditProps< ContextBlockAttributes > ) {
-	const blocksConfig = getBlocksConfig();
-	const blockConfig = blocksConfig[ props.name ];
+	const blockConfig = getBlockConfig( props.name );
 
 	if ( ! blockConfig ) {
 		throw new Error( `Block configuration not found for block: ${ props.name }` );

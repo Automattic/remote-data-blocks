@@ -29,4 +29,4 @@ function register_airtable_events_block() {
 	ConfigurationLoader::register_loop_block( 'Airtable Event List', $airtable_list_events_query );
 	ConfigurationLoader::register_page( $block_name, 'airtable-event' );
 }
-add_action( 'register_remote_blocks', __NAMESPACE__ . '\\register_airtable_events_block' );
+add_action( 'register_remote_data_blocks', __NAMESPACE__ . '\\register_airtable_events_block' );

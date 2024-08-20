@@ -1,3 +1,6 @@
+type RemoteDataBinding = Pick< RemoteDataResultFields, 'name' | 'type' >;
+type AvailableBindings = Record< string, RemoteDataBinding >;
+
 interface InputVariableOverrides {
 	name: string;
 	overrides: QueryInputOverride[];
@@ -12,8 +15,7 @@ interface InputVariable {
 }
 
 interface BlockConfig {
-	category: string;
-	description: string;
+	availableBindings: AvailableBindings;
 	loop: boolean;
 	name: string;
 	overrides: Record< string, InputVariableOverrides >;
@@ -23,14 +25,18 @@ interface BlockConfig {
 		query_key: string;
 		type: string;
 	}[];
-	title: string;
+	settings: {
+		category: string;
+		description?: string;
+		title: string;
+	};
 }
 
 interface BlocksConfig {
 	[ blockName: string ]: BlockConfig;
 }
 
-interface LocalizedData {
+interface LocalizedBlockData {
 	config: BlocksConfig;
 	rest_url: string;
 }

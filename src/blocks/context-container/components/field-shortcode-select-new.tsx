@@ -1,7 +1,7 @@
 import { __experimentalHeading as Heading } from '@wordpress/components';
 
 import { ItemSelectQueryType } from './item-select-query-type';
-import { getBlocksConfig } from '../../../utils/localized-data';
+import { getBlocksConfig } from '../../../utils/localized-block-data';
 
 interface FieldShortcodeSelectNewProps {
 	onSelectItem: ( config: BlockConfig, data: RemoteDataQueryInput ) => void;
@@ -15,7 +15,7 @@ export function FieldShortcodeSelectNew( props: FieldShortcodeSelectNewProps ) {
 				.map( blockConfig => (
 					<div className="remote-data-blocks-new-item" key={ blockConfig.name }>
 						<Heading className="remote-data-blocks-new-item-heading" level="4">
-							{ blockConfig.title }
+							{ blockConfig.settings.title }
 						</Heading>
 						<ItemSelectQueryType
 							blockConfig={ blockConfig }

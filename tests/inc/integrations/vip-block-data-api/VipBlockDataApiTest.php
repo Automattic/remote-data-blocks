@@ -24,34 +24,8 @@ class VipBlockDataApiTest extends TestCase {
 		'name'        => 'remote-data-blocks/events',
 		'attributes'  => [
 			'remoteData' => [
-				'availableBindings' => [
-					'id'       => [
-						'name'  => 'Event ID',
-						'path'  => '$.id',
-						'type'  => 'id',
-						'value' => 'rec9H65WdbaeuxxaU',
-					],
-					'title'    => [
-						'name'  => 'Title',
-						'path'  => '$.fields.Activity',
-						'type'  => 'string',
-						'value' => 'Happy hour & networking',
-					],
-					'location' => [
-						'name'  => 'Location',
-						'path'  => '$.fields.Location',
-						'type'  => 'string',
-						'value' => "President's dining hall",
-					],
-					'type'     => [
-						'name'  => 'Type',
-						'path'  => '$.fields.Type',
-						'type'  => 'string',
-						'value' => 'Networking',
-					],
-				],
-				'blockName'         => 'remote-data-blocks/events',
-				'queryInput'        => [
+				'blockName'  => 'remote-data-blocks/events',
+				'queryInput' => [
 					'event_id' => 'rec9H65WdbaeuxxaU',
 				],
 			],
@@ -98,34 +72,8 @@ class VipBlockDataApiTest extends TestCase {
 		'blockName'    => 'remote-data-blocks/events',
 		'attrs'        => [
 			'remoteData' => [
-				'availableBindings' => [
-					'id'       => [
-						'name'  => 'Event ID',
-						'path'  => '$.id',
-						'type'  => 'id',
-						'value' => 'rec9H65WdbaeuxxaU',
-					],
-					'title'    => [
-						'name'  => 'Title',
-						'path'  => '$.fields.Activity',
-						'type'  => 'string',
-						'value' => 'Happy hour & networking',
-					],
-					'location' => [
-						'name'  => 'Location',
-						'path'  => '$.fields.Location',
-						'type'  => 'string',
-						'value' => "President's dining hall",
-					],
-					'type'     => [
-						'name'  => 'Type',
-						'path'  => '$.fields.Type',
-						'type'  => 'string',
-						'value' => 'Networking',
-					],
-				],
-				'blockName'         => 'remote-data-blocks/events',
-				'queryInput'        => [
+				'blockName'  => 'remote-data-blocks/events',
+				'queryInput' => [
 					'event_id' => 'rec9H65WdbaeuxxaU',
 				],
 			],

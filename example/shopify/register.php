@@ -58,4 +58,4 @@ function register_shopify_block() {
 		]
 	);
 }
-add_action( 'register_remote_blocks', __NAMESPACE__ . '\\register_shopify_block' );
+add_action( 'register_remote_data_blocks', __NAMESPACE__ . '\\register_shopify_block' );

@@ -1,7 +1,7 @@
 import { __experimentalHeading as Heading } from '@wordpress/components';
 
 import { FieldSelectionFromMetaFields } from './field-shortcode-select-field';
-import { getBlocksConfig } from '../../../utils/localized-data';
+import { getBlocksConfig } from '../../../utils/localized-block-data';
 import { useExistingRemoteData } from '../hooks/use-existing-remote-data';
 
 interface FieldShortcodeSelectMetaProps {
@@ -25,7 +25,7 @@ export function FieldShortcodeSelectMeta( props: FieldShortcodeSelectMetaProps )
 			{ remoteDatas.map( remoteData => (
 				<div className="remote-data-blocks-meta-item" key={ remoteData.blockName }>
 					<Heading className="remote-data-blocks-item-heading" level="4">
-						{ blockConfigs[ remoteData.blockName ]?.title ?? remoteData.blockName }
+						{ blockConfigs[ remoteData.blockName ]?.settings.title ?? remoteData.blockName }
 					</Heading>
 
 					<FieldSelectionFromMetaFields
