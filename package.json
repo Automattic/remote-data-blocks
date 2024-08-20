@@ -66,7 +66,7 @@
     "@wordpress/notices": "5.5.0",
     "@wordpress/plugins": "7.5.0",
     "@wordpress/rich-text": "7.5.0",
-    "@wordpress/scripts": "27.9.0",
+    "@wordpress/scripts": "28.5.0",
     "@wordpress/url": "4.5.0",
     "eslint": "8.57.0",
     "fork-ts-checker-webpack-plugin": "9.0.2",
