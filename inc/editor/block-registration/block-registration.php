@@ -5,13 +5,28 @@ namespace RemoteDataBlocks\Editor;
 defined( 'ABSPATH' ) || exit();
 
 use RemoteDataBlocks\REST\RemoteData;
-
+use WP_Block_Editor_Context;
 use function register_block_pattern;
 use function register_block_type;
 
 class BlockRegistration {
-	public static function init() {
+	public static $block_category = [
+		'icon'  => null,
+		'slug'  => 'remote-data-blocks',
+		'title' => 'Remote Data Blocks',
+	];
+
+	public static function init(): void {
 		add_action( 'init', [ __CLASS__, 'register_blocks' ], 50, 0 );
+		add_filter( 'block_categories_all', [ __CLASS__, 'add_block_category' ], 10, 2 );
+	}
+
+	public static function add_block_category( array $block_categories, WP_Block_Editor_Context $editor_context ): array {
+		if ( ! empty( $editor_context->post ) ) {
+			array_push( $block_categories, self::$block_category );
+		}
+
+		return $block_categories;
 	}
 
 	public static function register_blocks() {
