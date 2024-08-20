@@ -145,4 +145,4 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 			</BoundBlockEdit>
 		);
 	};
-}, 'withToolbarButton' );
+}, 'withBlockBinding' );
