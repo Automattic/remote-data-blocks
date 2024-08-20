@@ -8,16 +8,12 @@ interface RemoteDataResultFields {
 	value: string;
 }
 
-type RemoteDataBinding = Pick< RemoteDataResultFields, 'name' | 'type' >;
-type AvailableBindings = Record< string, RemoteDataBinding >;
-
 interface QueryInputOverride {
 	target: string;
 	type: 'query_var' | 'url';
 }
 
 interface RemoteData {
-	availableBindings: AvailableBindings;
 	blockName: string;
 	isCollection: boolean;
 	metadata: Record< string, RemoteDataResultFields >;
@@ -72,11 +68,9 @@ interface RemoteDataApiResult {
 }
 
 interface RemoteDataApiResponseBody {
-	available_bindings: AvailableBindings;
 	block_name: string;
 	is_collection: boolean;
 	metadata: Record< string, RemoteDataResultFields >;
-	query_key: string;
 	query_input: RemoteDataQueryInput;
 	result_id: string;
 	results: RemoteDataApiResult[];
