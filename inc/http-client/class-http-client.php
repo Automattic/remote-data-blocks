@@ -13,10 +13,10 @@ use GuzzleHttp\Promise\Utils;
 use Kevinrob\GuzzleCache\CacheMiddleware;
 use Kevinrob\GuzzleCache\KeyValueHttpHeader;
 use Kevinrob\GuzzleCache\Storage\WordPressObjectCacheStorage;
-use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
+use RemoteDataBlocks\HttpClient\CacheStrategy;
 use RemoteDataBlocks\Logging\LoggerManager;
 
 defined( 'ABSPATH' ) || exit();
@@ -100,7 +100,7 @@ class HttpClient {
 
 		$this->handler_stack->push(
 			new CacheMiddleware(
-				new GreedyCacheStrategy(
+				new CacheStrategy(
 					new WordPressObjectCacheStorage( self::WP_OBJECT_CACHE_GROUP ),
 					self::CACHE_TTL_IN_SECONDS,
 					new KeyValueHttpHeader( self::CACHE_INVALIDATING_REQUEST_HEADERS )
