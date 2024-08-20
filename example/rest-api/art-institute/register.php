@@ -16,4 +16,4 @@ function register_aic_block() {
 	ConfigurationLoader::register_block( 'Art Institute of Chicago', $get_art_query );
 	ConfigurationLoader::register_list_panel( 'Art Institute of Chicago', 'List art', $search_art_query );
 }
-add_action( 'register_remote_blocks', __NAMESPACE__ . '\\register_aic_block' );
+add_action( 'register_remote_data_blocks', __NAMESPACE__ . '\\register_aic_block' );

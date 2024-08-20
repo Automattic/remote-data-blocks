@@ -37,4 +37,4 @@ function register_airtable_elden_ring_map_block() {
 	wp_register_script( 'leaflet-script', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [], '1.9.4', true );
 	register_block_type( $elden_ring_map_block_path );
 }
-add_action( 'register_remote_blocks', __NAMESPACE__ . '\\register_airtable_elden_ring_map_block' );
+add_action( 'register_remote_data_blocks', __NAMESPACE__ . '\\register_airtable_elden_ring_map_block' );
