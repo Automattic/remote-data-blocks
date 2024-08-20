@@ -15,7 +15,7 @@ export function PlaceholderSingle( props: PlaceholderSingleProps ) {
 	return (
 		<Placeholder
 			icon={ cloud }
-			label={ blockConfig.title }
+			label={ blockConfig.settings.title }
 			instructions={ __( 'This block requires selection of a single item for display.' ) }
 		>
 			<ItemSelectQueryType blockConfig={ blockConfig } onSelect={ onSelect } />

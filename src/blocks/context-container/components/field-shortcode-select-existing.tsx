@@ -27,7 +27,7 @@ export function FieldShortcodeSelectExisting( props: FieldShortcodeSelectExistin
 			{ remoteDatas.map( remoteData => (
 				<div className="remote-data-blocks-existing-item" key={ remoteData.blockName }>
 					<Heading className="remote-data-blocks-item-heading" level="4">
-						{ blockConfigs[ remoteData.blockName ]?.title ?? remoteData.blockName }
+						{ blockConfigs[ remoteData.blockName ]?.settings.title ?? remoteData.blockName }
 					</Heading>
 
 					<FieldSelectionFromAvailableBindings

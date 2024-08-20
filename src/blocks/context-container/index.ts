@@ -12,16 +12,14 @@ import './style.scss';
 // Register a unique block definition for each of the context blocks.
 Object.values( getBlocksConfig() ).forEach( blockConfig => {
 	registerBlockType< ContextBlockAttributes >( blockConfig.name, {
+		...blockConfig.settings,
 		attributes: {
 			remoteData: {
 				type: 'object',
 			},
 		},
-		category: blockConfig.category,
-		description: blockConfig.description,
 		edit: Edit,
 		save: Save,
-		title: blockConfig.title,
 	} );
 } );
 

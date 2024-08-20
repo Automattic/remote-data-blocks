@@ -12,8 +12,6 @@ interface InputVariable {
 }
 
 interface BlockConfig {
-	category: string;
-	description: string;
 	loop: boolean;
 	name: string;
 	overrides: Record< string, InputVariableOverrides >;
@@ -23,7 +21,11 @@ interface BlockConfig {
 		query_key: string;
 		type: string;
 	}[];
-	title: string;
+	settings: {
+		category: string;
+		description?: string;
+		title: string;
+	};
 }
 
 interface BlocksConfig {

@@ -27,12 +27,14 @@ class BlockRegistration {
 			} );
 
 			$remote_data_blocks_config[ $block_name ] = [
-				'category'  => 'widgets',
 				'loop'      => $config['loop'],
 				'name'      => $block_name,
 				'overrides' => $overrides,
 				'panels'    => $config['panels'],
-				'title'     => $config['title'],
+				'settings'  => [
+					'category' => 'remote-data-blocks',
+					'title'    => $config['title'],
+				],
 			];
 
 			$block_options = [

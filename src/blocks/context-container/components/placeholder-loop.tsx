@@ -9,7 +9,9 @@ interface PlaceholderLoopProps {
 
 export function PlaceholderLoop( props: PlaceholderLoopProps ) {
 	const {
-		blockConfig: { title },
+		blockConfig: {
+			settings: { title },
+		},
 		onSelect,
 	} = props;
 

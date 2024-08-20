@@ -15,7 +15,7 @@ export function FieldShortcodeSelectNew( props: FieldShortcodeSelectNewProps ) {
 				.map( blockConfig => (
 					<div className="remote-data-blocks-new-item" key={ blockConfig.name }>
 						<Heading className="remote-data-blocks-new-item-heading" level="4">
-							{ blockConfig.title }
+							{ blockConfig.settings.title }
 						</Heading>
 						<ItemSelectQueryType
 							blockConfig={ blockConfig }
