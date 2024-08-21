@@ -1,8 +1,8 @@
 import { ButtonGroup } from '@wordpress/components';
 
-import { InputPanel } from './input-panel';
-import { ListPanel } from './list-panel';
-import { SearchPanel } from './search-panel';
+import { InputModal } from './modals/input-modal';
+import { ListModal } from './modals/list-modal';
+import { SearchModal } from './modals/search-modal';
 
 interface ItemSelectQueryTypeProps {
 	blockConfig: BlockConfig;
@@ -18,19 +18,21 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 	return (
 		<ButtonGroup className="remote-data-blocks-button-group">
 			{ panels.map( panel => {
+				const title = panel.name;
 				const panelProps = {
 					blockName,
 					onSelect,
-					panel,
+					queryKey: panel.query_key,
+					title,
 				};
 
 				switch ( panel.type ) {
 					case 'search':
-						return <SearchPanel key={ panel.name } { ...panelProps } />;
+						return <SearchModal key={ panel.name } { ...panelProps } />;
 					case 'list':
-						return <ListPanel key={ panel.name } { ...panelProps } />;
+						return <ListModal key={ panel.name } { ...panelProps } />;
 					case 'input':
-						return <InputPanel key={ panel.name } { ...panelProps } />;
+						return <InputModal key={ panel.name } inputs={ panel.inputs } { ...panelProps } />;
 				}
 
 				return null;
