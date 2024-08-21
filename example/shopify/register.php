@@ -2,12 +2,12 @@
 
 namespace RemoteDataBlocks\Example\Shopify;
 
+use RemoteDataBlocks\Config\ShopifyDatasource;
 use RemoteDataBlocks\Editor\ConfigurationLoader;
 use RemoteDataBlocks\Logging\LoggerManager;
 use function add_action;
 
 require_once __DIR__ . '/inc/interactivity-store/interactivity-store.php';
-require_once __DIR__ . '/inc/queries/class-shopify-datasource.php';
 require_once __DIR__ . '/inc/queries/class-shopify-add-to-cart-mutation.php';
 require_once __DIR__ . '/inc/queries/class-shopify-create-cart-mutation.php';
 require_once __DIR__ . '/inc/queries/class-shopify-get-product-query.php';
@@ -17,6 +17,7 @@ require_once __DIR__ . '/inc/queries/class-shopify-search-products-query.php';
 function register_shopify_block() {
 	$block_name   = 'Shopify Product';
 	$access_token = \RemoteDataBlocks\Example\get_access_token( 'shopify' );
+	$store_name   = 'stoph-test';
 
 	if ( empty( $access_token ) ) {
 		$logger = LoggerManager::instance();
@@ -24,7 +25,7 @@ function register_shopify_block() {
 		return;
 	}
 
-	$shopify_datasource            = new ShopifyDatasource( $access_token );
+	$shopify_datasource            = new ShopifyDatasource( $access_token, $store_name );
 	$shopify_search_products_query = new ShopifySearchProductsQuery( $shopify_datasource );
 	$shopify_get_product_query     = new ShopifyGetProductQuery( $shopify_datasource );
 

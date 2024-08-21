@@ -1,15 +1,15 @@
 <?php
 
-namespace RemoteDataBlocks\Example\Shopify;
+namespace RemoteDataBlocks\Config;
 
 use RemoteDataBlocks\Config\HttpDatasource;
 use function plugins_url;
 
 class ShopifyDatasource extends HttpDatasource {
-	public function __construct( private string $access_token ) {}
+	public function __construct( private string $access_token, private string $store_name ) {}
 
 	public function get_endpoint(): string {
-		return 'https://stoph-test.myshopify.com/api/2024-04/graphql.json';
+		return 'https://' . $this->store_name . '.myshopify.com/api/2024-04/graphql.json';
 	}
 
 	public function get_request_headers(): array {
