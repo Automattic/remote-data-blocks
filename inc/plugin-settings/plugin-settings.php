@@ -19,8 +19,8 @@ class PluginSettings {
 
 	public static function add_options_page() {
 		add_options_page(
-			'Remote Data Blocks Settings',
-			'Remote Data Blocks Settings',
+			__( 'Remote Data Blocks Settings', 'remote-data-blocks' ),
+			__( 'Remote Data Blocks', 'remote-data-blocks' ),
 			'manage_options',
 			'remote-data-blocks-settings',
 			[ __CLASS__, 'settings_page_content' ]
