@@ -16,12 +16,13 @@ class BlockPatterns {
 			return;
 		}
 
+		self::$templates['columns']   = file_get_contents( __DIR__ . '/templates/columns.html', false );
 		self::$templates['heading']   = file_get_contents( __DIR__ . '/templates/heading.html', false );
 		self::$templates['image']     = file_get_contents( __DIR__ . '/templates/image.html', false );
 		self::$templates['paragraph'] = file_get_contents( __DIR__ . '/templates/paragraph.html', false );
 	}
 
-	private static function generate_attribute_bindings( array $bindings ): string {
+	private static function generate_attribute_bindings( array $bindings ): array {
 		$attributes = [
 			'metadata' => [
 				'bindings' => [],
@@ -44,7 +45,15 @@ class BlockPatterns {
 			$attributes['metadata']['name'] = $binding[1];
 		}
 
-		return wp_json_encode( $attributes );
+		return $attributes;
+	}
+
+	private static function populate_template( string $template_name, array $attributes ): string {
+		if ( ! isset( self::$templates[ $template_name ] ) ) {
+			return '';
+		}
+
+		return sprintf( self::$templates[ $template_name ], wp_json_encode( $attributes ) );
 	}
 
 	public static function register_default_block_pattern( string $block_name, string $block_title, QueryContext $display_query ): void {
@@ -74,15 +83,21 @@ class BlockPatterns {
 			$name = isset( $var['name'] ) ? $var['name'] : $field;
 
 			switch ( $var['type'] ) {
-				case 'price':
 				case 'string':
 					// Attempt to autodetect headings.
 					$normalized_name = trim( strtolower( $name ) );
-					if ( in_array( $normalized_name, [ 'head', 'heading', 'name', 'title' ], true ) ) {
+					$heading_names   = [ 'head', 'header', 'heading', 'name', 'title' ];
+					if ( null === $bindings['heading']['content'] && in_array( $normalized_name, $heading_names, true ) ) {
 						$bindings['heading']['content'] = [ $field, $name ];
 						break;
 					}
 
+					$bindings['paragraphs'][] = [
+						'content' => [ $field, $name ],
+					];
+					break;
+
+				case 'price':
 					$bindings['paragraphs'][] = [
 						'content' => [ $field, $name ],
 					];
@@ -100,16 +115,24 @@ class BlockPatterns {
 
 		$content = '';
 
-		if ( ! empty( $bindings['heading']['content'] ) ) {
-			$content .= sprintf( self::$templates['heading'], self::generate_attribute_bindings( $bindings['heading'] ) );
+		// If there is no heading, use the first paragraph.
+		if ( empty( $bindings['heading']['content'] ) && ! empty( $bindings['paragraphs'] ) ) {
+			$bindings['heading']['content'] = array_shift( $bindings['paragraphs'] )['content'];
 		}
 
-		if ( ! empty( $bindings['image']['url'] ) ) {
-			$content .= sprintf( self::$templates['image'], self::generate_attribute_bindings( $bindings['image'] ) );
+		if ( ! empty( $bindings['heading']['content'] ) ) {
+			$content .= self::populate_template( 'heading', self::generate_attribute_bindings( $bindings['heading'] ) );
 		}
 
 		foreach ( $bindings['paragraphs'] as $paragraph ) {
-			$content .= sprintf( self::$templates['paragraph'], self::generate_attribute_bindings( $paragraph ) );
+			$content .= self::populate_template( 'paragraph', self::generate_attribute_bindings( $paragraph ) );
+		}
+
+		// If there is an image URL, create two-column layout with left-aligned image.
+		if ( ! empty( $bindings['image']['url'] ) ) {
+			$image_bindings = self::generate_attribute_bindings( $bindings['image'] );
+			$image_content  = self::populate_template( 'image', $image_bindings );
+			$content        = sprintf( self::$templates['columns'], $image_content, $content );
 		}
 
 		register_block_pattern(
