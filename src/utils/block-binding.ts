@@ -1,5 +1,5 @@
 import { isObjectWithStringKeys } from './type-narrowing';
-import { BLOCK_BINDING_SOURCE } from '../blocks/context-container/config/constants';
+import { BLOCK_BINDING_SOURCE } from '../config/constants';
 
 function getAttributeValue( attributes: unknown, key: string | undefined | null ): string {
 	if ( ! key || ! isObjectWithStringKeys( attributes ) ) {

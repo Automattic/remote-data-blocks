@@ -1,12 +1,12 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { REMOTE_DATA_CONTEXT_KEY } from '../../../../../src/blocks/context-container/config/constants';
+import { withBlockBinding } from '../../../../../src/blocks/context-container/hooks/with-block-binding';
 import {
 	BLOCK_BINDING_SOURCE,
 	PATTERN_OVERRIDES_CONTEXT_KEY,
-	REMOTE_DATA_CONTEXT_KEY,
-} from '../../../../../src/blocks/context-container/config/constants';
-import { withBlockBinding } from '../../../../../src/blocks/context-container/hooks/with-block-binding';
+} from '../../../../../src/config/constants';
 
 // Minimal mocking for WordPress dependencies
 vi.mock( '@wordpress/block-editor', () => ( {
