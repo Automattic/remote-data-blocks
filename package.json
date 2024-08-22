@@ -74,8 +74,12 @@
     "phplint": "2.0.5",
     "prettier": "npm:wp-prettier@2.8.5",
     "react": "18.3.1",
+    "stylelint": "14.16.1",
     "ts-loader": "9.5.1",
     "typescript": "5.5.4",
     "vitest": "2.0.5"
+  },
+  "stylelint": {
+    "extends": "./node_modules/@wordpress/scripts/config/.stylelintrc.json"
   }
 }
