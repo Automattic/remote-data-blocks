@@ -206,7 +206,6 @@ class ConfigurationLoader {
 				'type'      => $type,
 			]
 		);
-
 	}
 
 	public static function register_query( string $block_title, QueryContext $query ): void {
