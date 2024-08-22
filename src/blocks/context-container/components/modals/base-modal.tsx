@@ -14,6 +14,7 @@ export interface BaseModalProps {
 export function BaseModal( props: BaseModalProps ) {
 	return (
 		<Modal
+			className="remote-data-blocks-modal"
 			headerActions={
 				<>
 					{ props.headerImage && (
