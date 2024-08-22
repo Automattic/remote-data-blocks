@@ -11,28 +11,29 @@ interface ItemSelectQueryTypeProps {
 
 export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 	const {
-		blockConfig: { name: blockName, panels },
+		blockConfig: { name: blockName, selectors },
 		onSelect,
 	} = props;
 
 	return (
 		<ButtonGroup className="remote-data-blocks-button-group">
-			{ panels.map( panel => {
-				const title = panel.name;
-				const panelProps = {
+			{ selectors.map( selector => {
+				const title = selector.name;
+				const selectorProps = {
 					blockName,
+					headerImage: selector.image_url,
 					onSelect,
-					queryKey: panel.query_key,
+					queryKey: selector.query_key,
 					title,
 				};
 
-				switch ( panel.type ) {
+				switch ( selector.type ) {
 					case 'search':
-						return <SearchModal key={ panel.name } { ...panelProps } />;
+						return <SearchModal key={ title } { ...selectorProps } />;
 					case 'list':
-						return <ListModal key={ panel.name } { ...panelProps } />;
+						return <ListModal key={ title } { ...selectorProps } />;
 					case 'input':
-						return <InputModal key={ panel.name } inputs={ panel.inputs } { ...panelProps } />;
+						return <InputModal key={ title } inputs={ selector.inputs } { ...selectorProps } />;
 				}
 
 				return null;

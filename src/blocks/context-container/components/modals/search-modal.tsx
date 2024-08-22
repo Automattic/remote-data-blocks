@@ -5,6 +5,7 @@ import { useSearchResults } from '../../hooks/use-search-results';
 
 interface SearchModalProps {
 	blockName: string;
+	headerImage?: string;
 	onSelect: ( data: RemoteDataQueryInput ) => void;
 	queryKey: string;
 	title: string;
@@ -22,10 +23,7 @@ export function SearchModal( props: SearchModalProps ) {
 		<ItemListModal
 			blockName={ blockName }
 			buttonText="Search for an item"
-			loading={ loading }
-			onSelect={ onSelect }
-			results={ results }
-			searchControl={
+			headerActions={
 				<SearchControl
 					value={ searchTerms }
 					label="Search"
@@ -34,6 +32,10 @@ export function SearchModal( props: SearchModalProps ) {
 					onKeyDown={ onKeyDown }
 				/>
 			}
+			headerImage={ props.headerImage }
+			loading={ loading }
+			onSelect={ onSelect }
+			results={ results }
 			title={ title }
 		/>
 	);

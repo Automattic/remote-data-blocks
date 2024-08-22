@@ -32,7 +32,7 @@ describe( 'withBlockBinding', () => {
 				loop: false,
 				name: 'test-block',
 				overrides: {},
-				panels: [],
+				selectors: [],
 				settings: {
 					category: 'widget',
 					title: 'Test block',

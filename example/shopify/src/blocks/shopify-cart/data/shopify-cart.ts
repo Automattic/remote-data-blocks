@@ -25,7 +25,7 @@ export async function createCart(
 ): Promise< Pick< ViewState, 'cartId' | 'checkoutUrl' > > {
 	const results = await apiFetch( state.restUrl, {
 		block_name: state.blockName,
-		query_key: '__CREATE_CART__',
+		query_key: 'RemoteDataBlocks\\Example\\Shopify\\ShopifyCreateCartMutation',
 		query_input: {},
 	} );
 	if ( ! results[ 0 ]?.result?.cart_id?.value || ! results[ 0 ]?.result?.checkout_url?.value ) {
@@ -45,7 +45,7 @@ export async function addToCart(
 ): Promise< string > {
 	const results = await apiFetch( state.restUrl, {
 		block_name: state.blockName,
-		query_key: '__ADD_TO_CART__',
+		query_key: 'RemoteDataBlocks\\Example\\Shopify\\ShopifyAddToCartMutation',
 		query_input: { cart_id: state.cartId, variant_id: context.variantId, quantity },
 	} );
 
@@ -65,7 +65,7 @@ export async function removeFromCart( state: ViewState, context: ViewContext ): 
 
 	await apiFetch( state.restUrl, {
 		block_name: state.blockName,
-		query_key: '__REMOVE_FROM_CART__',
+		query_key: 'RemoteDataBlocks\\Example\\Shopify\\ShopifyRemoveFromCartMutation',
 		query_input: { cart_id: state.cartId, line_id: lineId },
 	} );
 }

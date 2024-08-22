@@ -55,7 +55,7 @@ class BlockRegistration {
 				'loop'              => $config['loop'],
 				'name'              => $block_name,
 				'overrides'         => $overrides,
-				'panels'            => $config['panels'],
+				'selectors'         => $config['selectors'],
 				'settings'          => [
 					'category' => 'remote-data-blocks',
 					'title'    => $config['title'],

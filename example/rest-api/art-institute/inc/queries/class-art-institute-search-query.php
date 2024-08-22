@@ -7,7 +7,7 @@ use RemoteDataBlocks\Config\QueryContext;
 
 class ArtInstituteOfChicagoSearchArtQuery extends QueryContext {
 	public array $input_variables = [
-		'query' => [
+		'search_terms' => [
 			'type' => 'string',
 		],
 	];
@@ -50,8 +50,9 @@ class ArtInstituteOfChicagoSearchArtQuery extends QueryContext {
 	}
 
 	public function get_endpoint( $input_variables ): string {
-		$query = 'dogs';
+		$query = $input_variables['search_terms'];
+		$endpoint = $this->get_datasource()->get_endpoint() . '/search';
 
-		return $this->get_datasource()->get_endpoint() . '/search?q=' . $query;
+		return add_query_arg( [ 'q' => $query ], $endpoint );
 	}
 }

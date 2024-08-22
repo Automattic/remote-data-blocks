@@ -6,6 +6,7 @@ import { __ } from '../../../../utils/i18n';
 import { useModalState } from '../../hooks/use-modal-state';
 
 interface InputModalProps {
+	headerImage?: string;
 	inputs: InputVariable[];
 	onSelect: ( data: RemoteDataQueryInput ) => void;
 	title: string;
@@ -33,6 +34,7 @@ export function InputModal( props: InputModalProps ) {
 		<ModalWithButtonTrigger
 			buttonText="Provide manual input"
 			buttonVariant="secondary"
+			headerImage={ props.headerImage }
 			isOpen={ isOpen }
 			onClose={ close }
 			onOpen={ open }

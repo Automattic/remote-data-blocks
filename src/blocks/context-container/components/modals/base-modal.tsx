@@ -4,6 +4,7 @@ import { __ } from '../../../../utils/i18n';
 
 export interface BaseModalProps {
 	children: JSX.Element;
+	headerActions?: JSX.Element;
 	headerImage?: string;
 	onClose: () => void;
 	size?: 'small' | 'medium' | 'large' | 'fill';
@@ -13,6 +14,18 @@ export interface BaseModalProps {
 export function BaseModal( props: BaseModalProps ) {
 	return (
 		<Modal
+			headerActions={
+				<>
+					{ props.headerImage && (
+						<img
+							alt={ props.title }
+							src={ props.headerImage }
+							style={ { height: '90%', marginRight: '2em', objectFit: 'contain' } }
+						/>
+					) }
+					{ props.headerActions }
+				</>
+			}
 			onRequestClose={ props.onClose }
 			size={ props.size ?? 'large' }
 			style={ { display: 'flex', height: '100%' } }

@@ -31,4 +31,8 @@ class AirtableEldenRingListMapsQuery extends QueryContext {
 	public function get_endpoint( $input_variables ): string {
 		return $this->get_datasource()->get_endpoint() . '/' . AirtableEldenRingMapDatasource::MAPS_TABLE;
 	}
+
+	public function get_query_name(): string {
+		return 'List maps';
+	}
 }

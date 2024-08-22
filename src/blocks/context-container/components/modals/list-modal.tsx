@@ -3,6 +3,7 @@ import { useRemoteData } from '../../hooks/use-remote-data';
 
 interface ListModalProps {
 	blockName: string;
+	headerImage?: string;
 	onSelect: ( data: RemoteDataQueryInput ) => void;
 	queryKey: string;
 	title: string;
@@ -17,6 +18,7 @@ export function ListModal( props: ListModalProps ) {
 		<ItemListModal
 			blockName={ blockName }
 			buttonText="Select an item from a list"
+			headerImage={ props.headerImage }
 			loading={ loading }
 			onOpen={ () => void execute( {} ) }
 			onSelect={ onSelect }

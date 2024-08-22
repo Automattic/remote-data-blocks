@@ -63,4 +63,8 @@ class ShopifySearchProductsQuery extends GraphqlQueryContext {
 			}
 		}';
 	}
+
+	public function get_query_name(): string {
+		return 'Search products';
+	}
 }
