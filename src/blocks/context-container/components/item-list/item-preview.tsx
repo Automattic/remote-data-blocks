@@ -1,5 +1,6 @@
 import { __experimentalUseBlockPreview as useBlockPreview } from '@wordpress/block-editor';
 import { BlockInstance } from '@wordpress/blocks';
+import { memo } from '@wordpress/element';
 
 interface ItemPreviewProps {
 	blocks: BlockInstance[];
@@ -15,7 +16,7 @@ interface ItemPreviewProps {
 // duplicate.
 //
 // This is a mimick of the PostTemplate component from Gutenberg core.
-export function ItemPreview( props: ItemPreviewProps ) {
+export function UnmemoizedItemPreview( props: ItemPreviewProps ) {
 	const { blocks, isHidden = false, onSelect } = props;
 	const blockPreviewProps = useBlockPreview( { blocks, props: {} } );
 
@@ -37,3 +38,5 @@ export function ItemPreview( props: ItemPreviewProps ) {
 		/>
 	);
 }
+
+export const ItemPreview = memo( UnmemoizedItemPreview );

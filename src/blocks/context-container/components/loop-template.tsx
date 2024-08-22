@@ -8,8 +8,8 @@ import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
+import { ItemPreview } from './item-list/item-preview';
 import { LoopTemplateInnerBlocks } from './loop-template-inner-blocks';
-import { MemoizedLoopTemplatePreview } from './loop-template-preview';
 import { LoopIndexContext } from '../context/loop-index-context';
 
 interface LoopTemplateProps {
@@ -39,16 +39,16 @@ export function LoopTemplate( props: LoopTemplateProps ) {
 	// This ensures that when it is displayed again, the cached rendering of the
 	// block preview is used, instead of having to re-render the preview from scratch.
 	return (
-		<ul>
+		<ul className="remote-data-blocks-loop-template">
 			{ remoteData.results.map( ( result, index ) => {
 				const isActive = index === activeBlockIndex;
 				return (
 					<LoopIndexContext.Provider key={ `template-${ index }` } value={ { index } }>
 						<LoopTemplateInnerBlocks isActive={ isActive } />
-						<MemoizedLoopTemplatePreview
+						<ItemPreview
 							blocks={ getInnerBlocks( result ) }
 							isHidden={ isActive }
-							onActive={ () => setActiveBlockIndex( index ) }
+							onSelect={ () => setActiveBlockIndex( index ) }
 						/>
 					</LoopIndexContext.Provider>
 				);
