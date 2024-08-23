@@ -22,6 +22,7 @@ import { useForm } from '../../hooks/useForm';
 import PasswordInputControl from '../../settings/PasswordInputControl';
 import { useSettingsContext } from '../../settings/hooks/useSettingsNav';
 import { SelectOption } from '../../types/input';
+import { SlugInput } from '../SlugInput';
 import { useDataSources } from '../hooks/useDataSources';
 import { AirtableConfig } from '../types';
 
@@ -35,6 +36,7 @@ const initialState: AirtableFormState = {
 	token: '',
 	base: '',
 	table: '',
+	slug: '',
 };
 
 const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState => {
@@ -45,6 +47,7 @@ const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState
 		token: config.token,
 		base: config.base,
 		table: config.table,
+		slug: config.slug,
 	};
 };
 
@@ -64,7 +67,8 @@ export const AirtableSettings = ( {
 	config,
 }: AirtableSettingsProps ) => {
 	const { goToMainScreen } = useSettingsContext();
-	const { updateDataSource, addDataSource } = useDataSources( false );
+	const { updateDataSource, addDataSource, slugConflicts, loadingSlugConflicts } =
+		useDataSources( false );
 
 	const { state, handleOnChange } = useForm< AirtableFormState >( {
 		initialValues: getInitialStateFromConfig( config ),
@@ -82,6 +86,10 @@ export const AirtableSettings = ( {
 		bases ? state.base : ''
 	);
 
+	const handleSaveError = ( error: unknown ) => {
+		console.error( error );
+	};
+
 	const onSaveClick = () => {
 		if ( ! state.base || ! state.table ) {
 			// TODO: Error handling
@@ -94,12 +102,13 @@ export const AirtableSettings = ( {
 			token: state.token,
 			base: state.base,
 			table: state.table,
+			slug: state.slug,
 		};
 
 		if ( mode === 'add' ) {
-			void addDataSource( airtableConfig ).then( goToMainScreen );
+			void addDataSource( airtableConfig ).then( goToMainScreen ).catch( handleSaveError );
 		}
-		void updateDataSource( airtableConfig ).then( goToMainScreen );
+		void updateDataSource( airtableConfig ).then( goToMainScreen ).catch( handleSaveError );
 	};
 
 	const onTokenInputChange: InputChangeCallback = ( token: string | undefined ) => {
@@ -116,6 +125,14 @@ export const AirtableSettings = ( {
 		}
 	};
 
+	/**
+	 * Handle the slug change. Only accepts valid slugs which only contain alphanumeric characters and dashes.
+	 * @param slug The slug to set.
+	 */
+	const onSlugChange = ( slug: string | undefined ) => {
+		handleOnChange( 'slug', slug ?? '' );
+	};
+
 	const connectionMessage = useMemo( () => {
 		if ( fetchingUserId ) {
 			return __( 'Checking connection...', 'remote-data-blocks' );
@@ -126,6 +143,18 @@ export const AirtableSettings = ( {
 		}
 		return '';
 	}, [ fetchingUserId, userId, userIdError ] );
+
+	const shouldAllowSubmit = useMemo( () => {
+		return (
+			bases === null ||
+			tables === null ||
+			! state.base ||
+			! state.table ||
+			! state.slug ||
+			loadingSlugConflicts ||
+			slugConflicts
+		);
+	}, [ bases, tables, state.base, state.table, state.slug, loadingSlugConflicts, slugConflicts ] );
 
 	const basesHelpText = useMemo( () => {
 		if ( userId ) {
@@ -210,6 +239,9 @@ export const AirtableSettings = ( {
 						: __( 'Edit Airtable Data Source' ) }
 				</Heading>
 				<PanelRow>
+					<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
+				</PanelRow>
+				<PanelRow>
 					<PasswordInputControl
 						label={ __( 'Airtable Access Token', 'remote-data-blocks' ) }
 						onChange={ onTokenInputChange }
@@ -241,11 +273,7 @@ export const AirtableSettings = ( {
 				</PanelRow>
 			</PanelBody>
 			<ButtonGroup>
-				<Button
-					variant="primary"
-					onClick={ onSaveClick }
-					disabled={ bases === null || tables === null || ! state.base || ! state.table }
-				>
+				<Button variant="primary" onClick={ onSaveClick } disabled={ shouldAllowSubmit }>
 					{ __( 'Save', 'remote-data-blocks' ) }
 				</Button>
 			</ButtonGroup>

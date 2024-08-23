@@ -5,6 +5,7 @@ export type DataSourceType = ( typeof SUPPORTED_SERVICES )[ number ];
 interface BaseDataSourceConfig {
 	uuid: string;
 	service: DataSourceType;
+	slug: string;
 }
 
 export interface DataSourceQueryMappingValue {

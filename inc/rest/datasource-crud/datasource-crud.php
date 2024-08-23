@@ -12,6 +12,41 @@ class DatasourceCRUD {
 		return preg_match( '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $maybe_uuid );
 	}
 
+	/**
+	 * Validate the slug to verify
+	 * - is not empty
+	 * - only contains lowercase alphanumeric characters and hyphens
+	 * - is not already taken
+	 *
+	 * @param string $slug The slug to validate.
+	 * @param string [$uuid] The UUID of the data source to exclude from the check.
+	 * @return WP_Error|true Returns true if the slug is valid, or a WP_Error object if not.
+	 */
+	public static function validate_slug( string $slug, string $uuid = '' ): WP_Error|true {
+		if ( empty( $slug ) ) {
+			return new WP_Error( 'missing_slug', __( 'Missing slug.', 'remote-data-blocks' ) );
+		}
+
+		if ( ! preg_match( '/^[a-z0-9-]+$/', $slug ) ) {
+			return new WP_Error( 'invalid_slug', __( 'Invalid slug.', 'remote-data-blocks' ) );
+		}
+
+		$data_sources = self::get_data_sources();
+		$data_sources = array_filter( $data_sources, function ( $source ) use ( $uuid ) {
+			return $source->uuid !== $uuid;
+		} );
+
+		$slug_exists = array_filter( $data_sources, function ( $source ) use ( $slug ) {
+			return $source->slug === $slug;
+		} );
+
+		if ( ! empty( $slug_exists ) ) {
+			return new WP_Error( 'slug_already_taken', __( 'Slug already taken.', 'remote-data-blocks' ) );
+		}
+
+		return true;
+	}
+
 	public static function validate_source( $source ) {
 		if ( ! is_object( $source ) ) {
 			return new WP_Error( 'invalid_data_source', __( 'Invalid data source.', 'remote-data-blocks' ) );
@@ -21,8 +56,15 @@ class DatasourceCRUD {
 			return new WP_Error( 'missing_uuid', __( 'Missing UUID.', 'remote-data-blocks' ) );
 		}
 
+		
 		if ( ! self::is_uuid4( $source->uuid ) ) {
 			return new WP_Error( 'invalid_uuid', __( 'Invalid UUID.', 'remote-data-blocks' ) );
+		}
+
+		$slug_validation = self::validate_slug( $source->slug, $source->uuid );
+
+		if ( is_wp_error( $slug_validation ) ) {
+			return $slug_validation;
 		}
 
 		if ( ! in_array( $source->service, self::DATA_SOURCE_TYPES ) ) {
@@ -40,6 +82,7 @@ class DatasourceCRUD {
 				'service' => 'airtable',
 				'base'    => sanitize_text_field( $source->base ),
 				'table'   => sanitize_text_field( $source->table ),
+				'slug'    => sanitize_text_field( $source->slug ),
 			];
 		}
 
@@ -54,6 +97,7 @@ class DatasourceCRUD {
 				'store'   => sanitize_text_field( $source->store ),
 				'token'   => sanitize_text_field( $source->token ),
 				'service' => 'shopify',
+				'slug'    => sanitize_text_field( $source->slug ),
 			];
 		}
 
