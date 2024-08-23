@@ -1,11 +1,13 @@
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
 	__experimentalHeading as Heading,
+	__experimentalText as Text,
 	Button,
 	PanelBody,
 	PanelRow,
 	ButtonGroup,
 	Spinner,
+	Flex,
 } from '@wordpress/components';
 import { DialogInputEvent } from '@wordpress/components/src/confirm-dialog/types';
 import { useState } from '@wordpress/element';
@@ -15,6 +17,7 @@ import AddDataSourceModal from './AddDataSourceModal';
 import { useDataSources } from './hooks/useDataSources';
 import { DataSourceType } from './types';
 import { useSettingsContext } from '../settings/hooks/useSettingsNav';
+import { toTitleCase } from '../utils/string';
 
 const DataSourceList = () => {
 	const { dataSources, loadingDataSources, deleteDataSource, fetchDataSources } = useDataSources();
@@ -74,12 +77,10 @@ const DataSourceList = () => {
 							const { uuid } = source;
 							return (
 								<li key={ uuid } className="data-source-list-item">
-									{
-										source.service === 'airtable' && `Airtable Data Source: ${ uuid }`
-										// TODO: base & table are stored as opaque IDs, we should display a friendly name from the Airtable API
-									}
-									{ source.service === 'shopify' &&
-										`Shopify Store: ${ source.store } -- Data Source: ${ uuid }` }
+									<Flex>
+										<Text>{ source.slug }</Text>
+									</Flex>
+									<Text>{ toTitleCase( source.service ) }</Text>
 									<ConfirmDialog
 										isOpen={ deleteDialogOpen }
 										onCancel={ onCancelDeleteDialog }
