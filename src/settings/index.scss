@@ -34,17 +34,6 @@
 		margin-bottom: 0;
 	}
 
-	.data-source-list {
-		margin: 0;
-	}
-
-	.data-source-list .data-source-list-item {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
 	table {
 		width: 100%;
 		border-collapse: collapse;
@@ -52,7 +41,7 @@
 		th {
 			text-align: left;
 			background-color: #007cba; // WordPress blue background for table headers
-			color: #ffffff; // White text color for better contrast
+			color: #fff; // White text color for better contrast
 			padding: 0.5rem;
 		}
 
@@ -65,11 +54,19 @@
 		}
 	}
 
-	.data-source-list td:last-child,
-	.data-source-list th:last-child {
-		width: 1%;
-		white-space: nowrap;
-		text-align: right;
-		padding-right: 0;
+	.data-source-list {
+
+		td:last-child,
+		th:last-child {
+			width: 1%;
+			white-space: nowrap;
+			text-align: right;
+			padding-right: 0;
+		}
+
+		.data-source-meta {
+			display: flex;
+			gap: 0.5rem;
+		}
 	}
 }
