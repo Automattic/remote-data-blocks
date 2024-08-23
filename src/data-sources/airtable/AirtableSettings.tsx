@@ -276,6 +276,9 @@ export const AirtableSettings = ( {
 				<Button variant="primary" onClick={ onSaveClick } disabled={ shouldAllowSubmit }>
 					{ __( 'Save', 'remote-data-blocks' ) }
 				</Button>
+				<Button variant="secondary" onClick={ goToMainScreen }>
+					{ __( 'Cancel', 'vip-cb' ) }
+				</Button>
 			</ButtonGroup>
 		</Panel>
 	);
