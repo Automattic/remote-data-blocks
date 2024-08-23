@@ -255,9 +255,9 @@ export const AirtableSettings = ( {
 						label={ __( 'Airtable Access Token', 'remote-data-blocks' ) }
 						onChange={ onTokenInputChange }
 						value={ state.token }
+						help={ connectionMessage }
 					/>
 				</PanelRow>
-				<PanelRow>{ connectionMessage }</PanelRow>
 				<PanelRow>
 					<SelectControl
 						id="base"
