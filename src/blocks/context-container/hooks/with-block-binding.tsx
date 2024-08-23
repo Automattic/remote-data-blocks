@@ -5,15 +5,15 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { useContext, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { getMismatchedAttributes } from '../../../utils/block-binding';
-import { getBlockAvailableBindings } from '../../../utils/localized-block-data';
-import { ContextControls } from '../components/context-controls';
 import {
 	BLOCK_BINDING_SOURCE,
 	PATTERN_OVERRIDES_BINDING_SOURCE,
 	PATTERN_OVERRIDES_CONTEXT_KEY,
-	REMOTE_DATA_CONTEXT_KEY,
-} from '../config/constants';
+} from '../../../config/constants';
+import { getMismatchedAttributes } from '../../../utils/block-binding';
+import { getBlockAvailableBindings } from '../../../utils/localized-block-data';
+import { ContextControls } from '../components/context-controls';
+import { REMOTE_DATA_CONTEXT_KEY } from '../config/constants';
 import { LoopIndexContext } from '../context/loop-index-context';
 
 interface BoundBlockEditProps {

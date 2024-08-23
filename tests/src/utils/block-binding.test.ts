@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { BLOCK_BINDING_SOURCE } from '../../../src/blocks/context-container/config/constants';
+import { BLOCK_BINDING_SOURCE } from '../../../src/config/constants';
 import {
 	getBoundAttributeEntries,
 	getMismatchedAttributes,

@@ -79,6 +79,14 @@ class QueryContext implements HttpQueryContext {
 	}
 
 	/**
+	 * Override this method to specify a custom image URL for this query that will
+	 * represent it in the UI.
+	 */
+	public function get_image_url(): string|null {
+		return $this->get_datasource()->get_image_url();
+	}
+
+	/**
 	 * Override this method to provide different or additional metadata for this
 	 * query. This method is called after the query is run or is returned from
 	 * cache. These variables will be available as bindings for field shortcodes.
@@ -136,6 +144,14 @@ class QueryContext implements HttpQueryContext {
 	 */
 	public function get_request_body( array $input_variables ): array|null {
 		return null;
+	}
+
+	/**
+	 * Override this method to specify a name that represents this query in the
+	 * block editor.
+	 */
+	public function get_query_name(): string {
+		return 'Query';
 	}
 
 	/**

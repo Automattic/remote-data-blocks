@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Example\Shopify;
 
 use RemoteDataBlocks\Config\HttpDatasource;
+use function plugins_url;
 
 class ShopifyDatasource extends HttpDatasource {
 	public function __construct( private string $access_token ) {}
@@ -16,5 +17,9 @@ class ShopifyDatasource extends HttpDatasource {
 			'Content-Type'                      => 'application/json',
 			'X-Shopify-Storefront-Access-Token' => $this->access_token,
 		];
+	}
+
+	public function get_image_url(): string {
+		return plugins_url( '../../assets/shopify_logo_black.png', __FILE__ );
 	}
 }

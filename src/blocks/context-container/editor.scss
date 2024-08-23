@@ -4,24 +4,6 @@
  * Replace them with your own styles or remove the file completely.
  */
 
-.remote-data-blocks-search-result {
-	text-align: left;
-	width: 100%;
-}
-
-.remote-data-blocks-menu-item {
-	height: initial;
-
-	.components-menu-item__item {
-		width: 100%;
-	}
-}
-
-.remote-data-blocks-search-field {
-	word-wrap: break-word;
-	white-space: pre-wrap;
-}
-
 .remote-data-blocks-loading-overlay {
 	align-items: center;
 	background-color: rgba(255, 255, 255, 0.25);
@@ -49,6 +31,20 @@
 
 h4.remote-data-blocks-new-item-heading {
 	margin: 0.5em 0;
+}
+
+// Loop template
+.remote-data-blocks-loop-template {
+	list-style: none;
+	padding: 0;
+}
+
+// Block previews inside selector modals
+.remote-data-blocks-modal {
+	// Column gap
+	.wp-block-columns {
+		gap: 2em;
+	}
 }
 
 /* Field shortcode */

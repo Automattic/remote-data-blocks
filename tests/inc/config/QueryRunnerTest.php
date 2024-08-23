@@ -29,6 +29,10 @@ class QueryRunnerTest extends TestCase {
 				return $this->endpoint;
 			}
 
+			public function get_image_url(): null {
+				return null;
+			}
+
 			public function get_request_headers(): array {
 				return $this->headers;
 			}
@@ -57,6 +61,10 @@ class QueryRunnerTest extends TestCase {
 				return $this->http_datasource->get_endpoint();
 			}
 
+			public function get_image_url(): null {
+				return null;
+			}
+
 			public function get_metadata( ResponseInterface $response, array $query_results ): array {
 				return [];
 			}
@@ -71,6 +79,10 @@ class QueryRunnerTest extends TestCase {
 
 			public function get_request_body( array $input_variables ): array|null {
 				return $this->request_body;
+			}
+
+			public function get_query_name(): string {
+				return 'Query';
 			}
 
 			public function get_query_runner(): QueryRunnerInterface {

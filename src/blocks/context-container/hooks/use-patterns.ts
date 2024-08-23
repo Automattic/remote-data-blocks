@@ -10,7 +10,7 @@ import { useState } from '@wordpress/element';
 
 import { getBoundAttributeEntries, getMismatchedAttributes } from '../../../utils/block-binding';
 
-function cloneBlockWithAttributes(
+export function cloneBlockWithAttributes(
 	block: BlockInstance,
 	attributes: Record< string, string >
 ): BlockInstance {
@@ -38,6 +38,7 @@ export function usePatterns( blockName: string, rootClientId: string ) {
 				cloneBlockWithAttributes( block, result )
 			);
 		},
+		getPatternsByBlockTypes,
 		getSupportedPatterns: ( result?: Record< string, string > ): BlockPattern[] => {
 			const supportedPatterns = getPatternsByBlockTypes( blockName, rootClientId );
 

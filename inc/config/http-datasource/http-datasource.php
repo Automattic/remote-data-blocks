@@ -46,4 +46,12 @@ abstract class HttpDatasource implements HttpDatasourceConfig {
 	 * @return array Associative array of request headers.
 	 */
 	abstract public function get_request_headers(): array;
+
+	/**
+	 * An optional image URL that can represent the datasource in the block editor
+	 * (e.g., in modals or in the block inspector).
+	 */
+	public function get_image_url(): string|null {
+		return null;
+	}
 }
