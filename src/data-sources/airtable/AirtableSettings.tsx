@@ -272,7 +272,7 @@ export const AirtableSettings = ( {
 					/>
 				</PanelRow>
 			</PanelBody>
-			<ButtonGroup>
+			<ButtonGroup className="settings-form-cta-button-group">
 				<Button variant="primary" onClick={ onSaveClick } disabled={ shouldAllowSubmit }>
 					{ __( 'Save', 'remote-data-blocks' ) }
 				</Button>

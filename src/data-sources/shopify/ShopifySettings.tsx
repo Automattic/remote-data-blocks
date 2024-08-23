@@ -115,7 +115,7 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 				</PanelRow>
 				<PanelRow>{ connectionMessage }</PanelRow>
 			</PanelBody>
-			<ButtonGroup>
+			<ButtonGroup className="settings-form-cta-button-group">
 				<Button
 					variant="primary"
 					// eslint-disable-next-line @typescript-eslint/no-misused-promises

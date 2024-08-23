@@ -63,15 +63,17 @@ const DataSourceList = () => {
 			</PanelRow>
 			<hr />
 			<PanelRow>
-				<Heading level={ 3 }>{ __( 'Available Data Sources', 'remote-data-blocks' ) }</Heading>
+				<Heading className="data-source-list-heading" level={ 3 }>
+					{ __( 'Available Data Sources', 'remote-data-blocks' ) }
+				</Heading>
 			</PanelRow>
 			<PanelRow>
-				<ul>
+				<ul className="data-source-list">
 					{ dataSources.map( source => {
 						if ( [ 'airtable', 'shopify' ].includes( source.service ) ) {
 							const { uuid } = source;
 							return (
-								<li key={ uuid }>
+								<li key={ uuid } className="data-source-list-item">
 									{
 										source.service === 'airtable' && `Airtable Data Source: ${ uuid }`
 										// TODO: base & table are stored as opaque IDs, we should display a friendly name from the Airtable API

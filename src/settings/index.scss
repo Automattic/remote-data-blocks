@@ -5,7 +5,42 @@
 		min-width: 300px;
 	}
 
+	.components-text-control__input {
+		min-width: 290px;
+	}
+
 	.components-select-control__input {
 		min-width: 332px;
+	}
+
+	.components-button-group {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	.components-button-group.settings-form-cta-button-group {
+		margin: 0.5rem;
+	}
+
+	.data-source-list-heading {
+		margin-bottom: 0;
+	}
+
+	.data-source-list {
+		margin: 0;
+	}
+
+	.data-source-list .data-source-list-item {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 0.5rem;
+	}
+}
+
+.add-data-source-modal {
+	.components-button-group {
+		display: flex;
+		gap: 0.5rem;
 	}
 }
