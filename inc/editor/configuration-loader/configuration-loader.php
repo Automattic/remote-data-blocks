@@ -69,8 +69,13 @@ class ConfigurationLoader {
 			'description' => '',
 			'name'        => $block_name,
 			'loop'        => false,
-			'panels'      => [
+			'patterns'    => [],
+			'queries'     => [
+				'__DISPLAY__' => $display_query,
+			],
+			'selectors'   => [
 				[
+					'image_url' => $display_query->get_image_url(),
 					'inputs'    => array_map( function ( $slug, $input_var ) {
 						return [
 							'name'     => $input_var['name'] ?? $slug,
@@ -84,17 +89,7 @@ class ConfigurationLoader {
 					'type'      => 'input',
 				],
 			],
-			'patterns'    => [],
-			'queries'     => [
-				'__DISPLAY__' => $display_query,
-			],
 			'title'       => $block_title,
-		];
-
-		self::$configurations[ $block_name ]['panels'][] = [
-			'name'      => '',
-			'query_key' => '__DISPLAY__',
-			'type'      => '',
 		];
 	}
 
@@ -179,80 +174,68 @@ class ConfigurationLoader {
 		add_rewrite_rule( $rewrite_rule, $rewrite_rule_target, 'top' );
 	}
 
-	private static function register_panel( string $block_title, string $panel_name, string $panel_type, QueryContext $query = null ): void {
+	private static function register_selector( string $block_title, string $type, QueryContext $query = null ): void {
 		$block_name = self::get_block_name( $block_title );
 		$config     = self::get_configuration( $block_name );
+		$query_key  = $query::class;
 
 		if ( null === $config ) {
 			return;
 		}
-
-		// Generate a query key for this panel, unique to the block. We could create
-		// persistent IDs more formally, but this is a simple method that doesn't
-		// put too much burden on the user.
-		$query_key = sprintf( '__PANEL__%s', sanitize_title( $panel_name ) );
-		if ( isset( $config['queries'][ $query_key ] ) ) {
-			self::$logger->error( sprintf( 'Panel %s has already been registered', $panel_name ) );
-			return;
-		}
-
-		switch ( $panel_type ) {
-			case 'list':
-				break;
-
-			case 'search':
-				if ( ! isset( $query->input_variables['search_terms'] ) ) {
-					self::$logger->error( 'Search panel query must have a "search_terms" input variable' );
-					return;
-				}
-
-				break;
-
-			default:
-				self::$logger->error( 'Invalid panel type' );
-				return;
-		}
-
-		array_unshift(
-			self::$configurations[ $block_name ]['panels'],
-			[
-				'inputs'    => [],
-				'name'      => $panel_name,
-				'query_key' => $query_key,
-				'type'      => $panel_type,
-			]
-		);
 
 		// Verify mappings.
 		if ( null !== $query ) {
 			$to_query = $config['queries']['__DISPLAY__'];
 			foreach ( array_keys( $to_query->input_variables ) as $to ) {
 				if ( ! isset( $query->output_variables['mappings'][ $to ] ) ) {
-					self::$logger->error( sprintf( 'Cannot map key "%s" from query "%s"', esc_html( $to ), $query::class ) );
+					self::$logger->error( sprintf( 'Cannot map key "%s" from query "%s"', esc_html( $to ), $query_key ) );
 					return;
 				}
 			}
-			self::$configurations[ $block_name ]['queries'][ $query_key ] = $query;
+
+			self::register_query( $block_title, $query );
 		}
+
+		array_unshift(
+			self::$configurations[ $block_name ]['selectors'],
+			[
+				'image_url' => $query->get_image_url(),
+				'inputs'    => [],
+				'name'      => $query->get_query_name(),
+				'query_key' => $query_key,
+				'type'      => $type,
+			]
+		);
 	}
 
-	public static function register_list_panel( string $block_title, string $panel_name, QueryContext $query ): void {
-		self::register_panel( $block_title, $panel_name, 'list', $query );
-	}
-
-	public static function register_query( string $block_title, string $query_name, QueryContext $query ): void {
+	public static function register_query( string $block_title, QueryContext $query ): void {
 		$block_name = self::get_block_name( $block_title );
 		$config     = self::get_configuration( $block_name );
+		$query_key  = $query::class;
 
 		if ( null === $config ) {
 			return;
 		}
 
-		self::$configurations[ $block_name ]['queries'][ $query_name ] = $query;
+		if ( isset( $config['queries'][ $query_key ] ) ) {
+			self::$logger->error( sprintf( 'Query %s has already been registered', $query_key ) );
+			return;
+		}
+
+		self::$configurations[ $block_name ]['queries'][ $query_key ] = $query;
 	}
 
-	public static function register_search_panel( string $block_title, string $panel_name, QueryContext $query ): void {
-		self::register_panel( $block_title, $panel_name, 'search', $query );
+	public static function register_list_query( string $block_title, QueryContext $query ): void {
+		self::register_selector( $block_title, 'list', $query );
+	}
+
+	public static function register_search_query( string $block_title, QueryContext $query ): void {
+		if ( ! isset( $query->input_variables['search_terms'] ) ) {
+			self::$logger->error( sprintf( 'A search query must have a "search_terms" input variable: %s', $query::class ) );
+			return;
+		}
+
+		self::register_selector( $block_title, 'search', $query );
 	}
 
 	public static function unregister_all(): void {

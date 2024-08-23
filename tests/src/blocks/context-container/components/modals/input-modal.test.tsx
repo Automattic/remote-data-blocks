@@ -1,47 +1,41 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { InputPanel } from '../../../../../src/blocks/context-container/components/input-panel';
+import { InputModal } from '../../../../../../src/blocks/context-container/components/modals/input-modal';
 
-describe( 'InputPanel', () => {
+describe( 'InputModal', () => {
 	const mockOnSelect = vi.fn();
-	const mockPanel = {
+	const defaultProps = {
 		inputs: [
 			{ slug: 'input1', name: 'Input 1', required: true, type: 'text' },
 			{ slug: 'input2', name: 'Input 2', required: false, type: 'text' },
 		] as InputVariable[],
-		name: 'Test Panel',
-		query_key: 'test_query',
-	};
-
-	const defaultProps = {
-		blockName: 'test-block',
 		onSelect: mockOnSelect,
-		panel: mockPanel,
+		title: 'Test Modal',
 	};
 
 	afterEach( cleanup );
 
 	it( 'renders the "Provide manual input" button', () => {
-		render( <InputPanel { ...defaultProps } /> );
+		render( <InputModal { ...defaultProps } /> );
 		expect( screen.getByText( 'Provide manual input' ) ).toBeInTheDocument();
 	} );
 
 	it( 'opens the modal when the button is clicked', () => {
-		render( <InputPanel { ...defaultProps } /> );
+		render( <InputModal { ...defaultProps } /> );
 		fireEvent.click( screen.getByText( 'Provide manual input' ) );
-		expect( screen.getByText( 'Test Panel' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Test Modal' ) ).toBeInTheDocument();
 	} );
 
 	it( 'renders input fields in the modal', () => {
-		render( <InputPanel { ...defaultProps } /> );
+		render( <InputModal { ...defaultProps } /> );
 		fireEvent.click( screen.getByText( 'Provide manual input' ) );
 		expect( screen.getByLabelText( 'Input 1' ) ).toBeInTheDocument();
 		expect( screen.getByLabelText( 'Input 2' ) ).toBeInTheDocument();
 	} );
 
 	it( 'updates input state when values are entered', () => {
-		render( <InputPanel { ...defaultProps } /> );
+		render( <InputModal { ...defaultProps } /> );
 		fireEvent.click( screen.getByText( 'Provide manual input' ) );
 
 		const input1 = screen.getByLabelText( 'Input 1' );
@@ -54,7 +48,7 @@ describe( 'InputPanel', () => {
 	} );
 
 	it( 'calls onSelect with input values when Save is clicked', () => {
-		render( <InputPanel { ...defaultProps } /> );
+		render( <InputModal { ...defaultProps } /> );
 		fireEvent.click( screen.getByText( 'Provide manual input' ) );
 
 		fireEvent.change( screen.getByLabelText( 'Input 1' ), { target: { value: 'Test Value 1' } } );

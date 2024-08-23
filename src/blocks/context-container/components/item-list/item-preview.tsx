@@ -2,10 +2,10 @@ import { __experimentalUseBlockPreview as useBlockPreview } from '@wordpress/blo
 import { BlockInstance } from '@wordpress/blocks';
 import { memo } from '@wordpress/element';
 
-interface LoopTemplatePreviewProps {
+interface ItemPreviewProps {
 	blocks: BlockInstance[];
-	isHidden: boolean;
-	onActive: () => void;
+	isHidden?: boolean;
+	onSelect: () => void;
 }
 
 // Use the experimental block preview hook to render a preview of blocks when
@@ -16,27 +16,27 @@ interface LoopTemplatePreviewProps {
 // duplicate.
 //
 // This is a mimick of the PostTemplate component from Gutenberg core.
-export function LoopTemplatePreview( { blocks, isHidden, onActive }: LoopTemplatePreviewProps ) {
-	const blockPreviewProps = useBlockPreview( {
-		blocks,
-		props: {},
-	} );
+export function UnmemoizedItemPreview( props: ItemPreviewProps ) {
+	const { blocks, isHidden = false, onSelect } = props;
+	const blockPreviewProps = useBlockPreview( { blocks, props: {} } );
 
 	const style = {
+		cursor: 'pointer',
 		display: isHidden ? 'none' : undefined,
+		listStyle: 'none',
 	};
 
 	return (
 		<li
 			{ ...blockPreviewProps }
-			tabIndex={ 0 }
+			onClick={ onSelect }
+			onKeyDown={ onSelect }
 			// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
 			role="button"
-			onClick={ onActive }
-			onKeyDown={ onActive }
 			style={ style }
+			tabIndex={ 0 }
 		/>
 	);
 }
 
-export const MemoizedLoopTemplatePreview = memo( LoopTemplatePreview );
+export const ItemPreview = memo( UnmemoizedItemPreview );

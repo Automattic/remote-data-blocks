@@ -13,9 +13,11 @@ use Psr\Http\Message\ResponseInterface;
 
 interface HttpQueryContext {
 	public function get_endpoint( array $input_variables ): string;
+	public function get_image_url(): string|null;
 	public function get_metadata( ResponseInterface $response, array $query_results ): array;
 	public function get_request_method(): string;
 	public function get_request_headers( array $input_variables ): array;
 	public function get_request_body( array $input_variables ): array|null;
+	public function get_query_name(): string;
 	public function get_query_runner(): QueryRunnerInterface;
 }

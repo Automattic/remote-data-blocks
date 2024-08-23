@@ -37,4 +37,8 @@ class AirtableListEventsQuery extends QueryContext {
 			],
 		],
 	];
+
+	public function get_query_name(): string {
+		return 'List events';
+	}
 }

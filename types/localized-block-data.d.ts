@@ -19,7 +19,8 @@ interface BlockConfig {
 	loop: boolean;
 	name: string;
 	overrides: Record< string, InputVariableOverrides >;
-	panels: {
+	selectors: {
+		image_url?: string;
 		inputs: InputVariable[];
 		name: string;
 		query_key: string;

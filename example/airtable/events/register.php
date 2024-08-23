@@ -25,7 +25,7 @@ function register_airtable_events_block() {
 	$airtable_list_events_query = new AirtableListEventsQuery( $airtable_datasource );
 
 	ConfigurationLoader::register_block( $block_name, $airtable_get_event_query );
-	ConfigurationLoader::register_list_panel( $block_name, 'List events', $airtable_list_events_query );
+	ConfigurationLoader::register_list_query( $block_name, $airtable_list_events_query );
 	ConfigurationLoader::register_loop_block( 'Airtable Event List', $airtable_list_events_query );
 	ConfigurationLoader::register_page( $block_name, 'airtable-event' );
 }
