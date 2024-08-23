@@ -21,6 +21,7 @@ import { AirtableFormState } from './types';
 import { useForm } from '../../hooks/useForm';
 import PasswordInputControl from '../../settings/PasswordInputControl';
 import { useSettingsContext } from '../../settings/hooks/useSettingsNav';
+import { IdName } from '../../types/common';
 import { SelectOption } from '../../types/input';
 import { SlugInput } from '../SlugInput';
 import { useDataSources } from '../hooks/useDataSources';
@@ -34,8 +35,8 @@ export interface AirtableSettingsProps {
 
 const initialState: AirtableFormState = {
 	token: '',
-	base: '',
-	table: '',
+	base: null,
+	table: null,
 	slug: '',
 };
 
@@ -83,7 +84,7 @@ export const AirtableSettings = ( {
 	const { bases, basesError, fetchingBases } = useAirtableApiBases( state.token, userId ?? '' );
 	const { fetchingTables, tables, tablesError } = useAirtableApiTables(
 		state.token,
-		bases ? state.base : ''
+		state.base?.id ?? ''
 	);
 
 	const handleSaveError = ( error: unknown ) => {
@@ -121,7 +122,15 @@ export const AirtableSettings = ( {
 	) => {
 		if ( extra?.event ) {
 			const { id } = extra.event.target;
-			handleOnChange( id, value );
+			let newValue: IdName | null = null;
+			if ( id === 'base' ) {
+				const selectedBase = bases?.find( base => base.id === value );
+				newValue = { id: value, name: selectedBase?.name ?? '' };
+			} else if ( id === 'table' ) {
+				const selectedTable = tables?.find( table => table.id === value );
+				newValue = { id: value, name: selectedTable?.name ?? '' };
+			}
+			handleOnChange( id, newValue );
 		}
 	};
 
@@ -166,7 +175,7 @@ export const AirtableSettings = ( {
 				return __( 'Fetching Bases...' );
 			} else if ( bases ) {
 				if ( state.base ) {
-					const selectedBase = bases.find( ( { id } ) => id === state.base );
+					const selectedBase = bases.find( base => base.id === state.base?.id );
 					return selectedBase
 						? sprintf(
 								__( 'Selected base: %s | id: %s', 'remote-data-blocks' ),
@@ -195,7 +204,7 @@ export const AirtableSettings = ( {
 				return __( 'Fetching tables...', 'remote-data-blocks' );
 			} else if ( tables ) {
 				if ( state.table ) {
-					const selectedTable = tables.find( ( { id } ) => id === state.table );
+					const selectedTable = tables.find( table => table.id === state.table?.id );
 					return selectedTable
 						? sprintf(
 								__( 'Selected table: %s | Fields: %s', 'remote-data-blocks' ),
@@ -253,7 +262,7 @@ export const AirtableSettings = ( {
 					<SelectControl
 						id="base"
 						label={ __( 'Select Base', 'remote-data-blocks' ) }
-						value={ state.base }
+						value={ state.base?.id ?? '' }
 						onChange={ onSelectChange }
 						options={ baseOptions }
 						help={ basesHelpText }
@@ -264,7 +273,7 @@ export const AirtableSettings = ( {
 					<SelectControl
 						id="table"
 						label={ __( 'Select Table', 'remote-data-blocks' ) }
-						value={ state.table }
+						value={ state.table?.id ?? '' }
 						onChange={ onSelectChange }
 						options={ tableOptions }
 						help={ tablesHelpText }

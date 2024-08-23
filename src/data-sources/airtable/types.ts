@@ -15,7 +15,10 @@ export interface AirtableBaseSchema {
 	tables: AirtableTable[];
 }
 
-export type AirtableFormState = Omit< AirtableConfig, 'service' | 'uuid' >;
+export type AirtableFormState = NullableKeys<
+	Omit< AirtableConfig, 'service' | 'uuid' >,
+	'base' | 'table'
+>;
 
 export interface AirtableTable {
 	id: string;

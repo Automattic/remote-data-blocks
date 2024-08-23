@@ -47,6 +47,53 @@ class DatasourceCRUD {
 		return true;
 	}
 
+	private static function validate_airtable_source( $source ) {
+		if ( empty( $source->token ) ) {
+			return new WP_Error( 'missing_token', __( 'Missing token.', 'remote-data-blocks' ) );
+		}
+
+		// Validate base is not empty and is an object with id and name fields with string values
+		if ( empty( $source->base ) ) {
+			return new WP_Error( 'missing_base', __( 'Missing base.', 'remote-data-blocks' ) );
+		}
+
+		if ( empty( $source->base['id'] ) || empty( $source->base['name'] ) ) {
+			return new WP_Error( 'invalid_base', __( 'Invalid base. Must have id and name fields.', 'remote-data-blocks' ) );
+		}
+
+		// Validate table is not empty and is an object with id and name fields with string values
+		if ( empty( $source->table ) ) {
+			return new WP_Error( 'missing_table', __( 'Missing table.', 'remote-data-blocks' ) );
+		}
+
+		if ( empty( $source->table['id'] ) || empty( $source->table['name'] ) ) {
+			return new WP_Error( 'invalid_table', __( 'Invalid table. Must have id and name fields.', 'remote-data-blocks' ) );
+		}
+
+		return (object) [
+			'uuid'    => $source->uuid,
+			'token'   => sanitize_text_field( $source->token ),
+			'service' => 'airtable',
+			'base'    => $source->base,
+			'table'   => $source->table,
+			'slug'    => sanitize_text_field( $source->slug ),
+		];
+	}
+
+	public static function validate_shopify_source( $source ) {
+		if ( empty( $source->token ) ) {
+			return new WP_Error( 'missing_token', __( 'Missing token.', 'remote-data-blocks' ) );
+		}
+
+		return (object) [
+			'uuid'    => $source->uuid,
+			'token'   => sanitize_text_field( $source->token ),
+			'service' => 'shopify',
+			'store'   => sanitize_text_field( $source->store ),
+			'slug'    => sanitize_text_field( $source->slug ),
+		];
+	}
+
 	public static function validate_source( $source ) {
 		if ( ! is_object( $source ) ) {
 			return new WP_Error( 'invalid_data_source', __( 'Invalid data source.', 'remote-data-blocks' ) );
@@ -71,37 +118,14 @@ class DatasourceCRUD {
 			return new WP_Error( 'unsupported_data_source_type', __( 'Unsupported data source type.', 'remote-data-blocks' ) );
 		}
 
-		if ( 'airtable' === $source->service ) {
-			if ( empty( $source->token ) ) {
-				return new WP_Error( 'missing_token', __( 'Missing token.', 'remote-data-blocks' ) );
-			}
-
-			return (object) [
-				'uuid'    => $source->uuid,
-				'token'   => sanitize_text_field( $source->token ),
-				'service' => 'airtable',
-				'base'    => sanitize_text_field( $source->base ),
-				'table'   => sanitize_text_field( $source->table ),
-				'slug'    => sanitize_text_field( $source->slug ),
-			];
+		switch ( $source->service ) {
+			case 'airtable':
+				return self::validate_airtable_source( $source );
+			case 'shopify':
+				return self::validate_shopify_source( $source );
+			default:
+				return new WP_Error( 'unsupported_data_source', __( 'Unsupported data source.', 'remote-data-blocks' ) );
 		}
-
-
-		if ( 'shopify' === $source->service ) {
-			if ( empty( $source->token ) ) {
-				return new WP_Error( 'missing_token', __( 'Missing token.', 'remote-data-blocks' ) );
-			}
-
-			return (object) [
-				'uuid'    => $source->uuid,
-				'store'   => sanitize_text_field( $source->store ),
-				'token'   => sanitize_text_field( $source->token ),
-				'service' => 'shopify',
-				'slug'    => sanitize_text_field( $source->slug ),
-			];
-		}
-
-		return new WP_Error( 'unsupported_data_source', __( 'Unsupported data source.', 'remote-data-blocks' ) );
 	}
 
 	public static function register_new_data_source( $settings ) {
