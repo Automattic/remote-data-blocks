@@ -59,6 +59,10 @@ const DataSourceList = () => {
 		);
 	}
 
+	const getValidDataSources = () => {
+		return dataSources.filter( source => [ 'airtable', 'shopify' ].includes( source.service ) );
+	};
+
 	return (
 		<PanelBody title={ __( 'Configure Data Sources', 'remote-data-blocks' ) }>
 			<PanelRow>
@@ -71,38 +75,44 @@ const DataSourceList = () => {
 				</Heading>
 			</PanelRow>
 			<PanelRow>
-				<ul className="data-source-list">
-					{ dataSources.map( source => {
-						if ( [ 'airtable', 'shopify' ].includes( source.service ) ) {
-							const { uuid } = source;
+				<table className="table data-source-list">
+					<thead className="table-header">
+						<tr>
+							<th style={ { textAlign: 'left' } }>{ __( 'Slug', 'remote-data-blocks' ) }</th>
+							<th style={ { textAlign: 'left' } }>{ __( 'Service', 'remote-data-blocks' ) }</th>
+							<th style={ { textAlign: 'left' } }>{ __( 'Actions', 'remote-data-blocks' ) }</th>
+						</tr>
+					</thead>
+					<tbody className="table-body">
+						{ getValidDataSources().map( source => {
+							const { uuid, slug, service } = source;
 							return (
-								<li key={ uuid } className="data-source-list-item">
-									<Flex>
-										<Text>{ source.slug }</Text>
-									</Flex>
-									<Text>{ toTitleCase( source.service ) }</Text>
-									<ConfirmDialog
-										isOpen={ deleteDialogOpen }
-										onCancel={ onCancelDeleteDialog }
-										onConfirm={ () => void onDeleteConfirm( uuid ) }
-									>
-										{ __( 'Are you sure you want to delete?' ) }
-									</ConfirmDialog>
+								<tr key={ uuid } className="table-row">
+									<td>{ slug }</td>
+									<td>{ toTitleCase( service ) }</td>
+									<td>
+										<ConfirmDialog
+											isOpen={ deleteDialogOpen }
+											onCancel={ onCancelDeleteDialog }
+											onConfirm={ () => void onDeleteConfirm( uuid ) }
+										>
+											{ __( 'Are you sure you want to delete?' ) }
+										</ConfirmDialog>
 
-									<ButtonGroup>
-										<Button variant="tertiary" onClick={ openDeleteDialog }>
-											{ __( 'Delete', 'remote-data-blocks' ) }
-										</Button>
-										<Button variant="primary" onClick={ () => onEditClick( uuid ) }>
-											{ __( 'Edit', 'remote-data-blocks' ) }
-										</Button>
-									</ButtonGroup>
-								</li>
+										<ButtonGroup>
+											<Button variant="tertiary" onClick={ openDeleteDialog }>
+												{ __( 'Delete', 'remote-data-blocks' ) }
+											</Button>
+											<Button variant="primary" onClick={ () => onEditClick( uuid ) }>
+												{ __( 'Edit', 'remote-data-blocks' ) }
+											</Button>
+										</ButtonGroup>
+									</td>
+								</tr>
 							);
-						}
-						return null;
-					} ) }
-				</ul>
+						} ) }
+					</tbody>
+				</table>
 			</PanelRow>
 		</PanelBody>
 	);

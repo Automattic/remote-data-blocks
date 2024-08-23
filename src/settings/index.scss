@@ -44,4 +44,32 @@
 		align-items: center;
 		gap: 0.5rem;
 	}
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+
+		th {
+			text-align: left;
+			background-color: #007cba; // WordPress blue background for table headers
+			color: #ffffff; // White text color for better contrast
+			padding: 0.5rem;
+		}
+
+		td {
+			padding: 0.5rem;
+		}
+
+		tr:nth-child(even) {
+			background-color: #e1f5ff; // Lighter shade of WordPress blue for alternate rows
+		}
+	}
+
+	.data-source-list td:last-child,
+	.data-source-list th:last-child {
+		width: 1%;
+		white-space: nowrap;
+		text-align: right;
+		padding-right: 0;
+	}
 }
