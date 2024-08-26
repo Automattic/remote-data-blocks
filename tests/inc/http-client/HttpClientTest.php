@@ -11,6 +11,8 @@ use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Exception\RequestException;
+use Kevinrob\GuzzleCache\Storage\VolatileRuntimeStorage;
+use RemoteDataBlocks\HttpClient\RdbCacheMiddleware;
 
 class HttpClientTest extends TestCase {
 	private $http_client;
@@ -20,7 +22,9 @@ class HttpClientTest extends TestCase {
 		parent::setUp();
 		$this->mock_handler = new MockHandler();
 		$handler            = HandlerStack::create( $this->mock_handler );
-		$client             = new Client( [ 'handler' => $handler ] );
+
+		$handler->push( HttpClient::get_cache_middleware( new VolatileRuntimeStorage() ), 'phpunit_remote_data_blocks_cache' );
+		$client = new Client( [ 'handler' => $handler ] );
 
 		$this->http_client         = new HttpClient( 'https://api.example.com' );
 		$this->http_client->client = $client;
@@ -36,6 +40,7 @@ class HttpClientTest extends TestCase {
 		$response = $this->http_client->request( 'GET', '/test' );
 		$this->assertEquals( 200, $response->getStatusCode() );
 		$this->assertEquals( 'Success', (string) $response->getBody() );
+		$this->assertEquals( 'MISS', $response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
 	}
 
 	public function testGet() {
@@ -43,6 +48,7 @@ class HttpClientTest extends TestCase {
 		$response = $this->http_client->get( '/test' );
 		$this->assertEquals( 200, $response->getStatusCode() );
 		$this->assertEquals( 'GET Success', (string) $response->getBody() );
+		$this->assertEquals( 'MISS', $response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
 	}
 
 	public function testPost() {
@@ -50,6 +56,7 @@ class HttpClientTest extends TestCase {
 		$response = $this->http_client->post( '/test' );
 		$this->assertEquals( 201, $response->getStatusCode() );
 		$this->assertEquals( 'POST Success', (string) $response->getBody() );
+		$this->assertEquals( 'MISS', $response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
 	}
 
 	public function testRetryDecider() {
@@ -99,9 +106,13 @@ class HttpClientTest extends TestCase {
 		$this->assertEquals( 'fulfilled', $results[0]['state'] );
 		$this->assertEquals( 200, $results[0]['value']->getStatusCode() );
 		$this->assertEquals( 'Response 1', (string) $results[0]['value']->getBody() );
+		$this->assertEquals( 'MISS', $results[0]['value']->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+
 		$this->assertEquals( 'fulfilled', $results[1]['state'] );
 		$this->assertEquals( 201, $results[1]['value']->getStatusCode() );
 		$this->assertEquals( 'Response 2', (string) $results[1]['value']->getBody() );
+		$this->assertEquals( 'MISS', $results[1]['value']->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
 	}
 
 	public function testQueueRequestAndExecuteParallelWithFailures() {
@@ -128,5 +139,527 @@ class HttpClientTest extends TestCase {
 		$this->assertEquals( 'rejected', $results[2]['state'] );
 		$this->assertInstanceOf( ConnectException::class, $results[2]['reason'] );
 		$this->assertEquals( 'Connection Error', $results[2]['reason']->getMessage() );
+	}
+
+	public function testRepeatedGetCallsResultsInCacheHit() {
+		// Set up the mock handler with only one response
+		$this->mock_handler->append( new Response( 200, [], 'Cached Response' ) );
+
+		$this->assertEquals( 1, $this->mock_handler->count(), 'The mock handler should have exactly one request' );
+
+		// Make the first request
+		$first_response = $this->http_client->request( 'GET', '/test' );
+
+		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the first request' );
+
+		// Assert the first response
+		$this->assertEquals( 200, $first_response->getStatusCode() );
+		$this->assertEquals( 'Cached Response', (string) $first_response->getBody() );
+		$this->assertEquals( 'MISS', $first_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		// Make the second request to the same endpoint
+		$second_response = $this->http_client->request( 'GET', '/test' );
+
+		// Assert the second response
+		$this->assertEquals( 200, $second_response->getStatusCode() );
+		$this->assertEquals( 'Cached Response', (string) $second_response->getBody() );
+		$this->assertEquals( 'HIT', $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+	}
+
+	public function testRepeatedGetCallsWithQueryArgumentsResultsInCacheHit() {
+		// Set up the mock handler with only one response
+		$this->mock_handler->append( new Response( 200, [], 'Cached Response' ) );
+
+		$this->assertEquals( 1, $this->mock_handler->count(), 'The mock handler should have exactly one request' );
+
+		// Make the first request
+		$first_response = $this->http_client->request( 'GET', '/test?arg1=value1&arg2=value2' );
+
+		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the first request' );
+
+		// Assert the first response
+		$this->assertEquals( 200, $first_response->getStatusCode() );
+		$this->assertEquals( 'Cached Response', (string) $first_response->getBody() );
+		$this->assertEquals( 'MISS', $first_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		// Make the second request to the same endpoint
+		$second_response = $this->http_client->request( 'GET', '/test?arg1=value1&arg2=value2' );
+
+		// Assert the second response
+		$this->assertEquals( 200, $second_response->getStatusCode() );
+		$this->assertEquals( 'Cached Response', (string) $second_response->getBody() );
+		$this->assertEquals( 'HIT', $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+	}
+
+	public function testSubsequentGetCallsWithDifferentPathsResultsInCacheMiss() {
+		// Set up the mock handler with two identical responses
+		$this->mock_handler->append(
+			new Response( 200, [], 'First Response' ),
+			new Response( 200, [], 'Second Response' )
+		);
+
+		$this->assertEquals( 2, $this->mock_handler->count(), 'The mock handler should have exactly two requests' );
+
+		// Make the first request
+		$first_response = $this->http_client->request( 'GET', '/test0' );
+
+		$this->assertEquals( 1, $this->mock_handler->count(), 'The mock handler should have exactly one request after the first request' );
+
+		// Assert the first response
+		$this->assertEquals( 200, $first_response->getStatusCode() );
+		$this->assertEquals( 'First Response', (string) $first_response->getBody() );
+		$this->assertEquals( 'MISS', $first_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		// Make the second request to the same endpoint
+		$second_response = $this->http_client->request( 'GET', '/test1' );
+
+		// Assert the second response
+		$this->assertEquals( 200, $second_response->getStatusCode() );
+		$this->assertEquals( 'Second Response', (string) $second_response->getBody() );
+		$this->assertEquals( 'MISS', $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the second request' );
+	}
+
+	public function testSubsequentGetCallsWithSamePathAndDifferentQueryArgumentsResultsInCacheMiss() {
+		// Set up the mock handler with two identical responses
+		$this->mock_handler->append(
+			new Response( 200, [], 'First Response' ),
+			new Response( 200, [], 'Second Response' )
+		);
+
+		$this->assertEquals( 2, $this->mock_handler->count(), 'The mock handler should have exactly two requests' );
+
+		// Make the first request
+		$first_response = $this->http_client->request( 'GET', '/test?arg1=value1&arg2=value2' );
+
+		$this->assertEquals( 1, $this->mock_handler->count(), 'The mock handler should have exactly one request after the first request' );
+
+		// Assert the first response
+		$this->assertEquals( 200, $first_response->getStatusCode() );
+		$this->assertEquals( 'First Response', (string) $first_response->getBody() );
+		$this->assertEquals( 'MISS', $first_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		// Make the second request to the same endpoint
+		$second_response = $this->http_client->request( 'GET', '/test?arg1=value1&arg2=value3' );
+
+		// Assert the second response
+		$this->assertEquals( 200, $second_response->getStatusCode() );
+		$this->assertEquals( 'Second Response', (string) $second_response->getBody() );
+		$this->assertEquals( 'MISS', $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the second request' );
+	}
+
+	public function testRepeatedPostRequestsWithEmptyBodyResultsInCacheHit(): void {
+		// Set up the mock handler with one response
+		$this->mock_handler->append( new Response( 200, [], 'Cached Response' ) );
+
+		$this->assertEquals( 1, $this->mock_handler->count(), 'The mock handler should have exactly one request' );
+
+		// Make the first POST request with an empty body
+		$first_response = $this->http_client->post( '/test' );
+
+		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the first request' );
+
+		// Assert the first response
+		$this->assertEquals( 200, $first_response->getStatusCode() );
+		$this->assertEquals( 'Cached Response', (string) $first_response->getBody() );
+		$this->assertEquals( 'MISS', $first_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		// Make the second POST request to the same endpoint with an empty body
+		$second_response = $this->http_client->post( '/test' );
+
+		// Assert the second response
+		$this->assertEquals( 200, $second_response->getStatusCode() );
+		$this->assertEquals( 'Cached Response', (string) $second_response->getBody() );
+		$this->assertEquals( 'HIT', $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should still be empty after the second request' );
+	}
+
+	public function testRepeatedPostRequestsWithSameBodyResultsInCacheHit(): void {
+		// Set up the mock handler with one response
+		$this->mock_handler->append( new Response( 200, [], 'Cached Response' ) );
+
+		$this->assertEquals( 1, $this->mock_handler->count(), 'The mock handler should have exactly one request' );
+
+		// Make the first POST request
+		$first_response = $this->http_client->post( '/test', [ 'body' => 'test data' ] );
+
+		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the first request' );
+
+		// Assert the first response
+		$this->assertEquals( 200, $first_response->getStatusCode() );
+		$this->assertEquals( 'Cached Response', (string) $first_response->getBody() );
+		$this->assertEquals( 'MISS', $first_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		// Make the second POST request to the same endpoint
+		$second_response = $this->http_client->post( '/test', [ 'body' => 'test data' ] );
+
+		// Assert the second response
+		$this->assertEquals( 200, $second_response->getStatusCode() );
+		$this->assertEquals( 'Cached Response', (string) $second_response->getBody() );
+		$this->assertEquals( 'HIT', $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should still be empty after the second request' );
+	}
+
+	public function testRepeatedPostRequestsWithDifferentAuthorizationHeaderResultsInCacheMiss(): void {
+		// Set up the mock handler with two responses
+		$this->mock_handler->append(
+			new Response( 200, [], 'First Response' ),
+			new Response( 200, [], 'Second Response' )
+		);
+
+		$this->assertEquals( 2, $this->mock_handler->count(), 'The mock handler should have exactly two requests' );
+
+		// Make the first POST request with an Authorization header
+		$first_response = $this->http_client->post( '/test', [
+			'headers' => [ 'Authorization' => 'Bearer token1' ],
+			'body'    => 'test data',
+		] );
+
+		$this->assertEquals( 1, $this->mock_handler->count(), 'The mock handler should have one request left after the first request' );
+
+		// Assert the first response
+		$this->assertEquals( 200, $first_response->getStatusCode() );
+		$this->assertEquals( 'First Response', (string) $first_response->getBody() );
+		$this->assertEquals( 'MISS', $first_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		// Make the second POST request to the same endpoint but with a different Authorization header
+		$second_response = $this->http_client->post( '/test', [
+			'headers' => [ 'Authorization' => 'Bearer token2' ],
+			'body'    => 'test data',
+		] );
+
+		// Assert the second response
+		$this->assertEquals( 200, $second_response->getStatusCode() );
+		$this->assertEquals( 'Second Response', (string) $second_response->getBody() );
+		$this->assertEquals( 'MISS', $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the second request' );
+	}
+
+	public function testRepeatedPostRequestsWithDifferentBodyResultsInCacheMiss(): void {
+		// Set up the mock handler with two responses
+		$this->mock_handler->append(
+			new Response( 200, [], 'First Response' ),
+			new Response( 200, [], 'Second Response' )
+		);
+
+		$this->assertEquals( 2, $this->mock_handler->count(), 'The mock handler should have exactly two requests' );
+
+		// Make the first POST request
+		$first_response = $this->http_client->post( '/test', [ 'body' => 'first data' ] );
+
+		$this->assertEquals( 1, $this->mock_handler->count(), 'The mock handler should have one request left after the first request' );
+
+		// Assert the first response
+		$this->assertEquals( 200, $first_response->getStatusCode() );
+		$this->assertEquals( 'First Response', (string) $first_response->getBody() );
+		$this->assertEquals( 'MISS', $first_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		// Make the second POST request to the same endpoint but with different body
+		$second_response = $this->http_client->post( '/test', [ 'body' => 'second data' ] );
+
+		// Assert the second response
+		$this->assertEquals( 200, $second_response->getStatusCode() );
+		$this->assertEquals( 'Second Response', (string) $second_response->getBody() );
+		$this->assertEquals( 'MISS', $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the second request' );
+	}
+
+	public function testRepeatedPostRequestsWithSameGraphqlMutationInBodyResultsInCacheMiss(): void {
+		// Set up the mock handler with two responses
+		$this->mock_handler->append(
+			new Response( 200, [], 'First Response' ),
+			new Response( 200, [], 'Second Response' )
+		);
+
+		$this->assertEquals( 2, $this->mock_handler->count(), 'The mock handler should have exactly two requests' );
+
+		$graphql_mutation = '
+			mutation UpdatePost($id: ID!, $title: String!) {
+				updatePost(input: {id: $id, title: $title}) {
+					post {
+						id
+						title
+					}
+				}
+			}
+		';
+
+		$variables = [
+			'id'    => '1',
+			'title' => 'Updated Title',
+		];
+
+		// Make the first POST request
+		$first_response = $this->http_client->post( '/graphql', [
+			'headers' => [ 'Content-Type' => 'application/json' ],
+			'json'    => [
+				'query'     => $graphql_mutation,
+				'variables' => $variables,
+			],
+		] );
+
+		$this->assertEquals( 1, $this->mock_handler->count(), 'The mock handler should have one request left after the first request' );
+
+		// Assert the first response
+		$this->assertEquals( 200, $first_response->getStatusCode() );
+		$this->assertEquals( 'First Response', (string) $first_response->getBody() );
+		$this->assertEquals( 'MISS', $first_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		// Make the second POST request with the same GraphQL mutation and variables
+		$second_response = $this->http_client->post( '/graphql', [
+			'json' => [
+				'query'     => $graphql_mutation,
+				'variables' => $variables,
+			],
+		] );
+
+		// Assert the second response
+		$this->assertEquals( 200, $second_response->getStatusCode() );
+		$this->assertEquals( 'Second Response', (string) $second_response->getBody() );
+		$this->assertEquals( 'MISS', $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the second request' );
+	}
+
+	public function testRepeatedPostRequestsWithDifferentGraphqlMutationInBodyResultsInCacheMiss(): void {
+		$this->mock_handler->append(
+			new Response( 200, [], 'First Response' ),
+			new Response( 200, [], 'Second Response' )
+		);
+
+		$this->assertEquals( 2, $this->mock_handler->count(), 'The mock handler should have exactly two requests' );
+
+		$first_mutation = '
+			mutation CreatePost($title: String!) {
+				createPost(input: {title: $title}) {
+					post {
+						id
+						title
+					}
+				}
+			}
+		';
+
+		$second_mutation = '
+			mutation UpdatePost($id: ID!, $title: String!) {
+				updatePost(input: {id: $id, title: $title}) {
+					post {
+						id
+						title
+					}
+				}
+			}
+		';
+
+		$variables = [
+			'title' => 'Test Title',
+		];
+
+		// Make the first POST request
+		$first_response = $this->http_client->post( '/graphql', [
+			'headers' => [ 'Content-Type' => 'application/json' ],
+			'json'    => [
+				'query'     => $first_mutation,
+				'variables' => $variables,
+			],
+		] );
+
+		$this->assertEquals( 1, $this->mock_handler->count(), 'The mock handler should have one request left after the first request' );
+
+		// Assert the first response
+		$this->assertEquals( 200, $first_response->getStatusCode() );
+		$this->assertEquals( 'First Response', (string) $first_response->getBody() );
+		$this->assertEquals( 'MISS', $first_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		// Make the second POST request with a different GraphQL mutation
+		$second_response = $this->http_client->post( '/graphql', [
+			'json' => [
+				'query'     => $second_mutation,
+				'variables' => array_merge( $variables, [ 'id' => '1' ] ),
+			],
+		] );
+
+		// Assert the second response
+		$this->assertEquals( 200, $second_response->getStatusCode() );
+		$this->assertEquals( 'Second Response', (string) $second_response->getBody() );
+		$this->assertEquals( 'MISS', $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the second request' );
+	}
+
+	public function testRepeatedPostRequestsWithSameGraphqlQueryInBodyResultsInCacheHit(): void {
+		$this->mock_handler->append( new Response( 200, [], 'First Response' ) );
+
+		$query = '
+			query GetPost($id: ID!) {
+				post(id: $id) {
+					id
+					title
+					content
+				}
+			}
+		';
+
+		$variables = [
+			'id' => '1',
+		];
+
+		// Make the first POST request
+		$first_response = $this->http_client->post( '/graphql', [
+			'headers' => [ 'Content-Type' => 'application/json' ],
+			'json'    => [
+				'query'     => $query,
+				'variables' => $variables,
+			],
+		] );
+
+		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the first request' );
+
+		// Assert the first response
+		$this->assertEquals( 200, $first_response->getStatusCode() );
+		$this->assertEquals( 'First Response', (string) $first_response->getBody() );
+		$this->assertEquals( 'MISS', $first_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		// Make the second POST request with the same GraphQL query
+		$second_response = $this->http_client->post( '/graphql', [
+			'headers' => [ 'Content-Type' => 'application/json' ],
+			'json'    => [
+				'query'     => $query,
+				'variables' => $variables,
+			],
+		] );
+
+		// Assert the second response
+		$this->assertEquals( 200, $second_response->getStatusCode() );
+		$this->assertEquals( 'First Response', (string) $second_response->getBody() );
+		$this->assertEquals( 'HIT', $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the second request' );
+	}
+
+	public function testRepeatedPostRequestsWithDifferentGraphqlQueryInBodyResultsInCacheMiss(): void {
+		$this->mock_handler->append(
+			new Response( 200, [], 'First Response' ),
+			new Response( 200, [], 'Second Response' )
+		);
+
+		$first_query = '
+			query GetPost($id: ID!) {
+				post(id: $id) {
+					id
+					title
+				}
+			}
+		';
+
+		$second_query = '
+			query GetPost($id: ID!) {
+				post(id: $id) {
+					id
+					title
+					content
+				}
+			}
+		';
+
+		$variables = [
+			'id' => '1',
+		];
+
+		// Make the first POST request
+		$first_response = $this->http_client->post( '/graphql', [
+			'headers' => [ 'Content-Type' => 'application/json' ],
+			'json'    => [
+				'query'     => $first_query,
+				'variables' => $variables,
+			],
+		] );
+
+		$this->assertEquals( 1, $this->mock_handler->count(), 'The mock handler should have one response left after the first request' );
+
+		// Assert the first response
+		$this->assertEquals( 200, $first_response->getStatusCode() );
+		$this->assertEquals( 'First Response', (string) $first_response->getBody() );
+		$this->assertEquals( 'MISS', $first_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		// Make the second POST request with a different GraphQL query
+		$second_response = $this->http_client->post( '/graphql', [
+			'headers' => [ 'Content-Type' => 'application/json' ],
+			'json'    => [
+				'query'     => $second_query,
+				'variables' => $variables,
+			],
+		] );
+
+		// Assert the second response
+		$this->assertEquals( 200, $second_response->getStatusCode() );
+		$this->assertEquals( 'Second Response', (string) $second_response->getBody() );
+		$this->assertEquals( 'MISS', $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the second request' );
+	}
+
+	public function testRepeatedPostRequestsWithSameGraphqlQueryAndDifferentVariablesInBodyResultsInCacheMiss(): void {
+		$this->mock_handler->append(
+			new Response( 200, [], 'First Response' ),
+			new Response( 200, [], 'Second Response' )
+		);
+
+		$query = '
+			query GetPost($id: ID!) {
+				post(id: $id) {
+					id
+					title
+					content
+				}
+			}
+		';
+
+		$first_variables = [
+			'id' => '1',
+		];
+
+		$second_variables = [
+			'id' => '2',
+		];
+
+		// Make the first POST request
+		$first_response = $this->http_client->post( '/graphql', [
+			'headers' => [ 'Content-Type' => 'application/json' ],
+			'json'    => [
+				'query'     => $query,
+				'variables' => $first_variables,
+			],
+		] );
+
+		$this->assertEquals( 1, $this->mock_handler->count(), 'The mock handler should have one response left after the first request' );
+
+		// Assert the first response
+		$this->assertEquals( 200, $first_response->getStatusCode() );
+		$this->assertEquals( 'First Response', (string) $first_response->getBody() );
+		$this->assertEquals( 'MISS', $first_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		// Make the second POST request with the same GraphQL query but different variables
+		$second_response = $this->http_client->post( '/graphql', [
+			'headers' => [ 'Content-Type' => 'application/json' ],
+			'json'    => [
+				'query'     => $query,
+				'variables' => $second_variables,
+			],
+		] );
+
+		// Assert the second response
+		$this->assertEquals( 200, $second_response->getStatusCode() );
+		$this->assertEquals( 'Second Response', (string) $second_response->getBody() );
+		$this->assertEquals( 'MISS', $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the second request' );
 	}
 }

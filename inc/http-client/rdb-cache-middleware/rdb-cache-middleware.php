@@ -2,9 +2,7 @@
 
 namespace RemoteDataBlocks\HttpClient;
 
-use Kevinrob\GuzzleCache\CacheMiddleware as GuzzleCacheCacheMiddleware;
-
-class CacheMiddleware extends GuzzleCacheCacheMiddleware {
+class RdbCacheMiddleware extends \Kevinrob\GuzzleCache\CacheMiddleware {
 	// phpcs:ignore WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase
 	protected $httpMethods = [
 		'GET'  => true,
