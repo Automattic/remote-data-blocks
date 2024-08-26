@@ -286,7 +286,7 @@ export const AirtableSettings = ( {
 					{ __( 'Save', 'remote-data-blocks' ) }
 				</Button>
 				<Button variant="secondary" onClick={ goToMainScreen }>
-					{ __( 'Cancel', 'vip-cb' ) }
+					{ __( 'Cancel', 'remote-data-blocks' ) }
 				</Button>
 			</ButtonGroup>
 		</Panel>
