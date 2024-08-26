@@ -21,7 +21,9 @@ import { AirtableFormState } from './types';
 import { useForm } from '../../hooks/useForm';
 import PasswordInputControl from '../../settings/PasswordInputControl';
 import { useSettingsContext } from '../../settings/hooks/useSettingsNav';
+import { IdName } from '../../types/common';
 import { SelectOption } from '../../types/input';
+import { SlugInput } from '../SlugInput';
 import { useDataSources } from '../hooks/useDataSources';
 import { AirtableConfig } from '../types';
 
@@ -33,8 +35,9 @@ export interface AirtableSettingsProps {
 
 const initialState: AirtableFormState = {
 	token: '',
-	base: '',
-	table: '',
+	base: null,
+	table: null,
+	slug: '',
 };
 
 const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState => {
@@ -45,6 +48,7 @@ const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState
 		token: config.token,
 		base: config.base,
 		table: config.table,
+		slug: config.slug,
 	};
 };
 
@@ -64,7 +68,8 @@ export const AirtableSettings = ( {
 	config,
 }: AirtableSettingsProps ) => {
 	const { goToMainScreen } = useSettingsContext();
-	const { updateDataSource, addDataSource } = useDataSources( false );
+	const { updateDataSource, addDataSource, slugConflicts, loadingSlugConflicts } =
+		useDataSources( false );
 
 	const { state, handleOnChange } = useForm< AirtableFormState >( {
 		initialValues: getInitialStateFromConfig( config ),
@@ -79,8 +84,12 @@ export const AirtableSettings = ( {
 	const { bases, basesError, fetchingBases } = useAirtableApiBases( state.token, userId ?? '' );
 	const { fetchingTables, tables, tablesError } = useAirtableApiTables(
 		state.token,
-		bases ? state.base : ''
+		state.base?.id ?? ''
 	);
+
+	const handleSaveError = ( error: unknown ) => {
+		console.error( error );
+	};
 
 	const onSaveClick = () => {
 		if ( ! state.base || ! state.table ) {
@@ -94,12 +103,13 @@ export const AirtableSettings = ( {
 			token: state.token,
 			base: state.base,
 			table: state.table,
+			slug: state.slug,
 		};
 
 		if ( mode === 'add' ) {
-			void addDataSource( airtableConfig ).then( goToMainScreen );
+			void addDataSource( airtableConfig ).then( goToMainScreen ).catch( handleSaveError );
 		}
-		void updateDataSource( airtableConfig ).then( goToMainScreen );
+		void updateDataSource( airtableConfig ).then( goToMainScreen ).catch( handleSaveError );
 	};
 
 	const onTokenInputChange: InputChangeCallback = ( token: string | undefined ) => {
@@ -112,8 +122,24 @@ export const AirtableSettings = ( {
 	) => {
 		if ( extra?.event ) {
 			const { id } = extra.event.target;
-			handleOnChange( id, value );
+			let newValue: IdName | null = null;
+			if ( id === 'base' ) {
+				const selectedBase = bases?.find( base => base.id === value );
+				newValue = { id: value, name: selectedBase?.name ?? '' };
+			} else if ( id === 'table' ) {
+				const selectedTable = tables?.find( table => table.id === value );
+				newValue = { id: value, name: selectedTable?.name ?? '' };
+			}
+			handleOnChange( id, newValue );
 		}
+	};
+
+	/**
+	 * Handle the slug change. Only accepts valid slugs which only contain alphanumeric characters and dashes.
+	 * @param slug The slug to set.
+	 */
+	const onSlugChange = ( slug: string | undefined ) => {
+		handleOnChange( 'slug', slug ?? '' );
 	};
 
 	const connectionMessage = useMemo( () => {
@@ -127,6 +153,18 @@ export const AirtableSettings = ( {
 		return '';
 	}, [ fetchingUserId, userId, userIdError ] );
 
+	const shouldAllowSubmit = useMemo( () => {
+		return (
+			bases === null ||
+			tables === null ||
+			! state.base ||
+			! state.table ||
+			! state.slug ||
+			loadingSlugConflicts ||
+			slugConflicts
+		);
+	}, [ bases, tables, state.base, state.table, state.slug, loadingSlugConflicts, slugConflicts ] );
+
 	const basesHelpText = useMemo( () => {
 		if ( userId ) {
 			if ( basesError ) {
@@ -137,7 +175,7 @@ export const AirtableSettings = ( {
 				return __( 'Fetching Bases...' );
 			} else if ( bases ) {
 				if ( state.base ) {
-					const selectedBase = bases.find( ( { id } ) => id === state.base );
+					const selectedBase = bases.find( base => base.id === state.base?.id );
 					return selectedBase
 						? sprintf(
 								__( 'Selected base: %s | id: %s', 'remote-data-blocks' ),
@@ -166,7 +204,7 @@ export const AirtableSettings = ( {
 				return __( 'Fetching tables...', 'remote-data-blocks' );
 			} else if ( tables ) {
 				if ( state.table ) {
-					const selectedTable = tables.find( ( { id } ) => id === state.table );
+					const selectedTable = tables.find( table => table.id === state.table?.id );
 					return selectedTable
 						? sprintf(
 								__( 'Selected table: %s | Fields: %s', 'remote-data-blocks' ),
@@ -210,18 +248,21 @@ export const AirtableSettings = ( {
 						: __( 'Edit Airtable Data Source' ) }
 				</Heading>
 				<PanelRow>
+					<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
+				</PanelRow>
+				<PanelRow>
 					<PasswordInputControl
 						label={ __( 'Airtable Access Token', 'remote-data-blocks' ) }
 						onChange={ onTokenInputChange }
 						value={ state.token }
+						help={ connectionMessage }
 					/>
 				</PanelRow>
-				<PanelRow>{ connectionMessage }</PanelRow>
 				<PanelRow>
 					<SelectControl
 						id="base"
 						label={ __( 'Select Base', 'remote-data-blocks' ) }
-						value={ state.base }
+						value={ state.base?.id ?? '' }
 						onChange={ onSelectChange }
 						options={ baseOptions }
 						help={ basesHelpText }
@@ -232,7 +273,7 @@ export const AirtableSettings = ( {
 					<SelectControl
 						id="table"
 						label={ __( 'Select Table', 'remote-data-blocks' ) }
-						value={ state.table }
+						value={ state.table?.id ?? '' }
 						onChange={ onSelectChange }
 						options={ tableOptions }
 						help={ tablesHelpText }
@@ -240,13 +281,12 @@ export const AirtableSettings = ( {
 					/>
 				</PanelRow>
 			</PanelBody>
-			<ButtonGroup>
-				<Button
-					variant="primary"
-					onClick={ onSaveClick }
-					disabled={ bases === null || tables === null || ! state.base || ! state.table }
-				>
+			<ButtonGroup className="settings-form-cta-button-group">
+				<Button variant="primary" onClick={ onSaveClick } disabled={ shouldAllowSubmit }>
 					{ __( 'Save', 'remote-data-blocks' ) }
+				</Button>
+				<Button variant="secondary" onClick={ goToMainScreen }>
+					{ __( 'Cancel', 'remote-data-blocks' ) }
 				</Button>
 			</ButtonGroup>
 		</Panel>

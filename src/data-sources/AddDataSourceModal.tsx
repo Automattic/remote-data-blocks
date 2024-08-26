@@ -41,7 +41,11 @@ const AddDataSourceModal = ( { onSubmit }: AddDataSourceModalProps ) => {
 				{ __( 'Add Data Source', 'remote-data-blocks' ) }
 			</Button>
 			{ isOpen && (
-				<Modal title={ __( 'Add a Data Source' ) } onRequestClose={ resetModal }>
+				<Modal
+					title={ __( 'Add a Data Source' ) }
+					onRequestClose={ resetModal }
+					className="add-data-source-modal"
+				>
 					<Panel>
 						<PanelBody>
 							<PanelRow>

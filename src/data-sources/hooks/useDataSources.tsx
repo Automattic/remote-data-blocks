@@ -1,6 +1,6 @@
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore, NoticeStoreActions } from '@wordpress/notices';
 
@@ -12,6 +12,8 @@ export const useDataSources = ( loadOnMount = true ) => {
 	const [ dataSources, setDataSources ] = useState< DataSourceConfig[] >( [] );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch< NoticeStoreActions >( noticesStore );
+	const [ slugConflicts, setSlugConflicts ] = useState< boolean >( false );
+	const [ loadingSlugConflicts, setLoadingSlugConflicts ] = useState< boolean >( false );
 
 	async function fetchDataSources() {
 		setLoadingDataSources( true );
@@ -23,6 +25,24 @@ export const useDataSources = ( loadOnMount = true ) => {
 		}
 		setLoadingDataSources( false );
 	}
+
+	const checkSlugConflict = useCallback(
+		async ( slug: string, uuid: string = '' ) => {
+			setLoadingSlugConflicts( true );
+			try {
+				const conflict = await apiFetch< { exists: boolean } >( {
+					path: `${ REST_BASE_DATA_SOURCES }/slug-conflicts`,
+					method: 'POST',
+					data: { slug, uuid },
+				} );
+				setSlugConflicts( conflict?.exists ?? false );
+			} catch ( error ) {
+				createErrorNotice( __( 'Failed to check slug availability.', 'remote-data-blocks' ) );
+			}
+			setLoadingSlugConflicts( false );
+		},
+		[ setLoadingSlugConflicts, setSlugConflicts, createErrorNotice ]
+	);
 
 	async function updateDataSource( source: DataSourceConfig ) {
 		let result: DataSourceConfig;
@@ -87,5 +107,8 @@ export const useDataSources = ( loadOnMount = true ) => {
 		loadingDataSources,
 		updateDataSource,
 		fetchDataSources,
+		slugConflicts,
+		loadingSlugConflicts,
+		checkSlugConflict,
 	};
 };

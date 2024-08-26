@@ -1,10 +1,12 @@
 import { SUPPORTED_SERVICES } from './constants';
+import { IdName } from '../types/common';
 
 export type DataSourceType = ( typeof SUPPORTED_SERVICES )[ number ];
 
 interface BaseDataSourceConfig {
 	uuid: string;
 	service: DataSourceType;
+	slug: string;
 }
 
 export interface DataSourceQueryMappingValue {
@@ -23,8 +25,8 @@ export interface DataSourceQuery {
 export interface AirtableConfig extends BaseDataSourceConfig {
 	service: 'airtable';
 	token: string;
-	base: string;
-	table: string;
+	base: IdName;
+	table: IdName;
 }
 
 export interface ShopifyConfig extends BaseDataSourceConfig {

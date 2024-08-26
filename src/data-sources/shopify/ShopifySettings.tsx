@@ -14,6 +14,7 @@ import { useShopifyShopName } from './shopify-api-hooks';
 import { useForm } from '../../hooks/useForm';
 import PasswordInputControl from '../../settings/PasswordInputControl';
 import { useSettingsContext } from '../../settings/hooks/useSettingsNav';
+import { SlugInput } from '../SlugInput';
 import { useDataSources } from '../hooks/useDataSources';
 import { ShopifyConfig } from '../types';
 
@@ -28,6 +29,7 @@ export type ShopifyFormState = Omit< ShopifyConfig, 'service' | 'uuid' >;
 const initialState: ShopifyFormState = {
 	store: '',
 	token: '',
+	slug: '',
 };
 
 const getInitialStateFromConfig = ( config?: ShopifyConfig ): ShopifyFormState => {
@@ -37,6 +39,7 @@ const getInitialStateFromConfig = ( config?: ShopifyConfig ): ShopifyFormState =
 	return {
 		store: config.store,
 		token: config.token,
+		slug: config.slug,
 	};
 };
 
@@ -56,6 +59,7 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 			service: 'shopify',
 			store: state.store,
 			token: state.token,
+			slug: state.slug,
 		};
 
 		if ( mode === 'add' ) {
@@ -70,6 +74,14 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 		handleOnChange( 'token', token ?? '' );
 	};
 
+	/**
+	 * Handle the slug change. Only accepts valid slugs which only contain alphanumeric characters and dashes.
+	 * @param slug The slug to set.
+	 */
+	const onSlugChange = ( slug: string | undefined ) => {
+		handleOnChange( 'slug', slug ?? '' );
+	};
+
 	return (
 		<Panel>
 			<PanelBody>
@@ -78,6 +90,9 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 						? __( 'Add a new Shopify Data Source' )
 						: __( 'Edit Shopify Data Source' ) }
 				</Heading>
+				<PanelRow>
+					<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
+				</PanelRow>
 				<PanelRow>
 					<TextControl
 						label={ __( 'Shopify Store Name', 'remote-data-blocks' ) }
@@ -100,13 +115,16 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 				</PanelRow>
 				<PanelRow>{ connectionMessage }</PanelRow>
 			</PanelBody>
-			<ButtonGroup>
+			<ButtonGroup className="settings-form-cta-button-group">
 				<Button
 					variant="primary"
 					// eslint-disable-next-line @typescript-eslint/no-misused-promises
 					onClick={ onSaveClick }
 				>
 					{ __( 'Save', 'remote-data-blocks' ) }
+				</Button>
+				<Button variant="secondary" onClick={ goToMainScreen }>
+					{ __( 'Cancel', 'remote-data-blocks' ) }
 				</Button>
 			</ButtonGroup>
 		</Panel>

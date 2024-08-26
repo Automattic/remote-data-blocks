@@ -1,3 +1,11 @@
+.add-data-source-modal {
+
+	.components-button-group {
+		display: flex;
+		gap: 0.5rem;
+	}
+}
+
 #remote-data-blocks-settings {
 	max-width: 1200px;
 
@@ -5,7 +13,60 @@
 		min-width: 300px;
 	}
 
+	.components-text-control__input {
+		min-width: 290px;
+	}
+
 	.components-select-control__input {
 		min-width: 332px;
+	}
+
+	.components-button-group {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	.components-button-group.settings-form-cta-button-group {
+		margin: 0.5rem;
+	}
+
+	.data-source-list-heading {
+		margin-bottom: 0;
+	}
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+
+		th {
+			text-align: left;
+			background-color: #007cba; // WordPress blue background for table headers
+			color: #fff; // White text color for better contrast
+			padding: 0.5rem;
+		}
+
+		td {
+			padding: 0.5rem;
+		}
+
+		tr:nth-child(even) {
+			background-color: #e1f5ff; // Lighter shade of WordPress blue for alternate rows
+		}
+	}
+
+	.data-source-list {
+
+		td:last-child,
+		th:last-child {
+			width: 1%;
+			white-space: nowrap;
+			text-align: right;
+			padding-right: 0;
+		}
+
+		.data-source-meta {
+			display: flex;
+			gap: 0.5rem;
+		}
 	}
 }
