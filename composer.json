@@ -14,7 +14,8 @@
     "galbar/jsonpath": "^3.0",
     "guzzlehttp/guzzle": "^7.8",
     "kevinrob/guzzle-cache-middleware": "^5.1",
-    "psr/log": "^3.0"
+    "psr/log": "^3.0",
+    "webonyx/graphql-php": "^15.12"
   },
   "require-dev": {
     "automattic/vipwpcs": "^3.0",
