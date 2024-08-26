@@ -5,9 +5,14 @@ namespace RemoteDataBlocks\Editor;
 defined( 'ABSPATH' ) || exit();
 
 use Error;
+use RemoteDataBlocks\Config\AirtableDatasource;
+use RemoteDataBlocks\Config\HttpDatasourceConfig;
 use RemoteDataBlocks\Config\QueryContext;
+use RemoteDataBlocks\Config\ShopifyDatasource;
 use RemoteDataBlocks\Logging\Logger;
 use RemoteDataBlocks\Logging\LoggerManager;
+use RemoteDataBlocks\REST\DatasourceCRUD;
+use WP_Error;
 
 use function add_action;
 use function do_action;
@@ -28,6 +33,8 @@ class ConfigurationLoader {
 	public static function register_remote_data_blocks() {
 		// Allow other plugins to register their blocks.
 		do_action( 'register_remote_data_blocks' );
+
+		self::register_blocks_for_dynamic_data_sources();
 	}
 
 	/**
@@ -244,5 +251,45 @@ class ConfigurationLoader {
 		}
 
 		self::$configurations = [];
+	}
+
+	// TODO: Move everything below to its own class maybe...?
+
+	private static function get_datasource_from_config( object $source ): HttpDatasourceConfig|WP_Error {
+		try {
+			switch ( $source->service ) {
+				case 'airtable':
+					return new AirtableDatasource( $source->token, $source->base?->id, $source->table?->id );
+				case 'shopify':
+					return new ShopifyDatasource( $source->token, $source->store );
+				default:
+					return new WP_Error( 'unsupported_data_source', __( 'Unsupported data source.', 'remote-data-blocks' ), $source );
+			}
+		} catch ( Error $e ) {
+			return new WP_Error( 'invalid_data_source', $e->getMessage(), $source );
+		}
+	}
+
+	private static function register_blocks_for_dynamic_data_sources(): void {
+		$data_sources_from_config = DatasourceCRUD::get_data_sources();
+
+		foreach ( $data_sources_from_config as $_source ) {
+			$datasource = self::get_datasource_from_config( $_source );
+			if ( $datasource instanceof WP_Error ) {
+				self::$logger->error( $datasource->get_error_message() );
+				continue;
+			}
+
+			// TODO: Store these as settings and iteratively call these against each config:
+			$block_name    = 'RDB ' . $_source->service . ' ' . $_source->slug; // TODO: more friendly name
+			$query_context = new QueryContext( $datasource );
+
+			self::register_block( $block_name, $query_context );
+
+			self::$logger->debug( sprintf( 'Registered "%s" block for dynamic data source: %s', $block_name, $_source->uuid ) );
+			// self::register_list_query( $block_name, $query_context );
+			// self::register_loop_block( $block_name . ' List', $query_context );
+			// self::register_page( $block_name, '...' );
+		}
 	}
 }
