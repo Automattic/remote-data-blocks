@@ -103,6 +103,7 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 
 	public function fetch( RequestInterface $request ) {
 		if ( $this->should_bypass_cache( $request ) ) {
+			$this->logger->debug( 'Cache Bypass: ' . self::getRequestString( $request ) );
 			return null;
 		}
 
@@ -116,13 +117,22 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 		return $result;
 	}
 
-	public function cache( RequestInterface $request, $response ) {
-		$result = parent::cache( $request, $response );
-		if ( false === $result ) {
-			$this->logger->debug( 'Did not cache: ' . self::getRequestString( $request ) );
+	public function cache( RequestInterface $request, $response ): bool {
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+		$cache_ttl = $this->defaultTtl;
+
+		// Negative TTL indicates disabled caching.
+		if ( $cache_ttl < 0 ) {
+			$this->logger->debug( 'Did not cache (negative TTL): ' . self::getRequestString( $request ) );
 			return false;
 		}
-		$this->logger->debug( 'Cached: ' . self::getRequestString( $request ) );
+
+		$result = parent::cache( $request, $response );
+		if ( false === $result ) {
+			$this->logger->debug( 'Did not cache (uncacheable): ' . self::getRequestString( $request ) );
+			return false;
+		}
+		$this->logger->debug( 'Cached (TTL=' . $cache_ttl . '): ' . self::getRequestString( $request ) );
 		return $result;
 	}
 }

@@ -12,6 +12,7 @@ namespace RemoteDataBlocks\Config;
 use Psr\Http\Message\ResponseInterface;
 
 interface HttpQueryContext {
+	public function get_cache_ttl( array $input_variables ): null|int;
 	public function get_endpoint( array $input_variables ): string;
 	public function get_image_url(): string|null;
 	public function get_metadata( ResponseInterface $response, array $query_results ): array;

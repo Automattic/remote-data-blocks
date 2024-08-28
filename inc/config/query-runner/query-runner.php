@@ -84,7 +84,12 @@ class QueryRunner implements QueryRunnerInterface {
 			RequestOptions::JSON    => $body,
 		];
 
-		$this->http_client->init( $endpoint_base );
+		$client_options = [
+			// This is a custom option ignored by GuzzleHttp\Client, so it is prefixed with '__'.
+			'__default_cache_ttl' => $this->query_context->get_cache_ttl( $input_variables ),
+		];
+
+		$this->http_client->init( $endpoint_base, $headers, $client_options );
 
 		try {
 			$response = $this->http_client->request( $method, $uri, $options );

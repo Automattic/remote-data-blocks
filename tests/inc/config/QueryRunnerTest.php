@@ -57,6 +57,10 @@ class QueryRunnerTest extends TestCase {
 				$this->http_client     = new HttpClient();
 			}
 
+			public function get_cache_ttl( array $input_variables ): null {
+				return null;
+			}
+
 			public function get_endpoint( array $input_variables = [] ): string {
 				return $this->http_datasource->get_endpoint();
 			}
