@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "602205d4ff58fe8b3c133227a0bbdb79",
+    "content-hash": "1ac471b4a05ba8c0848fedb37c3afbd0",
     "packages": [
         {
             "name": "galbar/jsonpath",
@@ -381,6 +381,253 @@
                 }
             ],
             "time": "2024-07-18T11:15:46+00:00"
+        },
+        {
+            "name": "infinityloop-dev/graphpinator-common",
+            "version": "v2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/graphpql/graphpinator-common.git",
+                "reference": "fbe087fb00cdd023b3c584cd6bf403c77d0fd5be"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/graphpql/graphpinator-common/zipball/fbe087fb00cdd023b3c584cd6bf403c77d0fd5be",
+                "reference": "fbe087fb00cdd023b3c584cd6bf403c77d0fd5be",
+                "shasum": ""
+            },
+            "require": {
+                "infinityloop-dev/utils": "^2.3",
+                "php": ">=8.0"
+            },
+            "require-dev": {
+                "infection/infection": "^0.27",
+                "infinityloop-dev/coding-standard": "^0.2",
+                "phpstan/phpstan": "^1.10",
+                "phpunit/phpunit": "^10.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Graphpinator\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Václav Pelíšek",
+                    "homepage": "https://www.peldax.com",
+                    "role": "lead"
+                }
+            ],
+            "description": "Common structures for GraPHPinator: GraphQL server implementation for PHP.",
+            "homepage": "https://www.infinityloop.dev/",
+            "support": {
+                "issues": "https://github.com/graphpql/graphpinator-common/issues",
+                "source": "https://github.com/graphpql/graphpinator-common/tree/v2.0"
+            },
+            "time": "2023-11-10T12:38:41+00:00"
+        },
+        {
+            "name": "infinityloop-dev/graphpinator-parser",
+            "version": "v1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/graphpql/graphpinator-parser.git",
+                "reference": "760e1473312c2933ffee68fccef2b96c902597b6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/graphpql/graphpinator-parser/zipball/760e1473312c2933ffee68fccef2b96c902597b6",
+                "reference": "760e1473312c2933ffee68fccef2b96c902597b6",
+                "shasum": ""
+            },
+            "require": {
+                "infinityloop-dev/graphpinator-common": "^2.0",
+                "infinityloop-dev/graphpinator-tokenizer": "^1.2",
+                "infinityloop-dev/utils": "^2.0",
+                "php": ">=8.0"
+            },
+            "require-dev": {
+                "infection/infection": "^0.27",
+                "infinityloop-dev/coding-standard": "^0.2",
+                "phpstan/phpstan": "^1.10",
+                "phpunit/phpunit": "^10.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Graphpinator\\Parser\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Václav Pelíšek",
+                    "homepage": "https://www.peldax.com",
+                    "role": "lead"
+                }
+            ],
+            "description": "Parser subproject for GraPHPinator: GraphQL server implementation for PHP.",
+            "homepage": "https://github.com/graphpql",
+            "support": {
+                "issues": "https://github.com/graphpql/graphpinator-parser/issues",
+                "source": "https://github.com/graphpql/graphpinator-parser/tree/v1.2"
+            },
+            "time": "2023-11-10T14:47:00+00:00"
+        },
+        {
+            "name": "infinityloop-dev/graphpinator-source",
+            "version": "v1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/graphpql/graphpinator-source.git",
+                "reference": "d0a2429560f3e110d03e2ff0c123373a1b779be2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/graphpql/graphpinator-source/zipball/d0a2429560f3e110d03e2ff0c123373a1b779be2",
+                "reference": "d0a2429560f3e110d03e2ff0c123373a1b779be2",
+                "shasum": ""
+            },
+            "require": {
+                "infinityloop-dev/graphpinator-common": "^2.0",
+                "php": ">=8.1"
+            },
+            "require-dev": {
+                "infection/infection": "^0.27",
+                "infinityloop-dev/coding-standard": "^0.2",
+                "phpstan/phpstan": "^1.10",
+                "phpunit/phpunit": "^10.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Graphpinator\\Source\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Václav Pelíšek",
+                    "homepage": "https://www.peldax.com",
+                    "role": "lead"
+                }
+            ],
+            "description": "Source subproject for GraPHPinator: GraphQL server implementation for PHP.",
+            "homepage": "https://www.infinityloop.dev/",
+            "support": {
+                "issues": "https://github.com/graphpql/graphpinator-source/issues",
+                "source": "https://github.com/graphpql/graphpinator-source/tree/v1.1"
+            },
+            "time": "2023-11-10T13:14:05+00:00"
+        },
+        {
+            "name": "infinityloop-dev/graphpinator-tokenizer",
+            "version": "v1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/graphpql/graphpinator-tokenizer.git",
+                "reference": "20af497ce3fd89b43bfbe993107c4b481576cb3d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/graphpql/graphpinator-tokenizer/zipball/20af497ce3fd89b43bfbe993107c4b481576cb3d",
+                "reference": "20af497ce3fd89b43bfbe993107c4b481576cb3d",
+                "shasum": ""
+            },
+            "require": {
+                "infinityloop-dev/graphpinator-common": "^2.0",
+                "infinityloop-dev/graphpinator-source": "^1.0",
+                "php": ">=8.1"
+            },
+            "require-dev": {
+                "infection/infection": "^0.27",
+                "infinityloop-dev/coding-standard": "^0.2",
+                "phpstan/phpstan": "^1.10",
+                "phpunit/phpunit": "^10.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Graphpinator\\Tokenizer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Václav Pelíšek",
+                    "homepage": "https://www.peldax.com",
+                    "role": "lead"
+                }
+            ],
+            "description": "Tokenizer subproject for GraPHPinator: GraphQL server implementation for PHP.",
+            "homepage": "https://www.infinityloop.dev/",
+            "support": {
+                "issues": "https://github.com/graphpql/graphpinator-tokenizer/issues",
+                "source": "https://github.com/graphpql/graphpinator-tokenizer/tree/v1.2"
+            },
+            "time": "2023-11-10T13:55:56+00:00"
+        },
+        {
+            "name": "infinityloop-dev/utils",
+            "version": "v2.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/graphpql/utils.git",
+                "reference": "88d67d3f86013d9a1e1694f21444235e489af005"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/graphpql/utils/zipball/88d67d3f86013d9a1e1694f21444235e489af005",
+                "reference": "88d67d3f86013d9a1e1694f21444235e489af005",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": ">=8.1"
+            },
+            "require-dev": {
+                "infection/infection": "^0.27",
+                "infinityloop-dev/coding-standard": "^0.2",
+                "phpstan/phpstan": "^1.10",
+                "phpunit/phpunit": "^10.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Infinityloop\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Václav Pelíšek",
+                    "homepage": "https://www.peldax.com"
+                }
+            ],
+            "description": "Common utils for infinityloop packages.",
+            "homepage": "https://www.infinityloop.dev/",
+            "support": {
+                "issues": "https://github.com/graphpql/utils/issues",
+                "source": "https://github.com/graphpql/utils/tree/v2.3.1"
+            },
+            "time": "2024-03-16T14:35:34+00:00"
         },
         {
             "name": "kevinrob/guzzle-cache-middleware",
@@ -787,80 +1034,6 @@
                 }
             ],
             "time": "2024-04-18T09:32:20+00:00"
-        },
-        {
-            "name": "webonyx/graphql-php",
-            "version": "v15.12.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/webonyx/graphql-php.git",
-                "reference": "7bcd31d1dcf67781ed5cb493b22c519c539c05e6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/webonyx/graphql-php/zipball/7bcd31d1dcf67781ed5cb493b22c519c539c05e6",
-                "reference": "7bcd31d1dcf67781ed5cb493b22c519c539c05e6",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "ext-mbstring": "*",
-                "php": "^7.4 || ^8"
-            },
-            "require-dev": {
-                "amphp/amp": "^2.6",
-                "amphp/http-server": "^2.1",
-                "dms/phpunit-arraysubset-asserts": "dev-master",
-                "ergebnis/composer-normalize": "^2.28",
-                "friendsofphp/php-cs-fixer": "3.59.3",
-                "mll-lab/php-cs-fixer-config": "^5",
-                "nyholm/psr7": "^1.5",
-                "phpbench/phpbench": "^1.2",
-                "phpstan/extension-installer": "^1.1",
-                "phpstan/phpstan": "1.11.5",
-                "phpstan/phpstan-phpunit": "1.4.0",
-                "phpstan/phpstan-strict-rules": "1.6.0",
-                "phpunit/phpunit": "^9.5 || ^10.5.21",
-                "psr/http-message": "^1 || ^2",
-                "react/http": "^1.6",
-                "react/promise": "^2.0 || ^3.0",
-                "rector/rector": "^1.0",
-                "symfony/polyfill-php81": "^1.23",
-                "symfony/var-exporter": "^5 || ^6 || ^7",
-                "thecodingmachine/safe": "^1.3 || ^2"
-            },
-            "suggest": {
-                "amphp/http-server": "To leverage async resolving with webserver on AMPHP platform",
-                "psr/http-message": "To use standard GraphQL server",
-                "react/promise": "To leverage async resolving on React PHP platform"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "GraphQL\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "A PHP port of GraphQL reference implementation",
-            "homepage": "https://github.com/webonyx/graphql-php",
-            "keywords": [
-                "api",
-                "graphql"
-            ],
-            "support": {
-                "issues": "https://github.com/webonyx/graphql-php/issues",
-                "source": "https://github.com/webonyx/graphql-php/tree/v15.12.5"
-            },
-            "funding": [
-                {
-                    "url": "https://opencollective.com/webonyx-graphql-php",
-                    "type": "open_collective"
-                }
-            ],
-            "time": "2024-06-23T11:30:58+00:00"
         }
     ],
     "packages-dev": [

@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\HttpClient;
 
-use GraphQL\Language\AST\OperationDefinitionNode;
+use Graphpinator\Parser\Parser as GraphpinatorParser;
 use Kevinrob\GuzzleCache\KeyValueHttpHeader;
 use Kevinrob\GuzzleCache\Storage\CacheStorageInterface;
 use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
@@ -40,25 +40,15 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 		}
 
 		try {
-			$document = \GraphQL\Language\Parser::parse( $query );
+			$parsed = GraphpinatorParser::parseString( $query ); 
 		} catch ( \Exception $e ) {
 			return false;
 		}
 
-		/**
-		 * Adapted from \GraphQL\Utils\AST::getOperationAST
-		 * That function only returns a value if there is only a single operation in the document.
-		 * This function is more lenient and will return true if there is at least one mutation in the document.
-		 *
-		 * @see https://github.com/webonyx/graphql-php/blob/7e80dc0bce7e9156a4aa6ca5ceae84337ccec660/src/Utils/AST.php#L568-L596
-		 * @see https://webonyx.github.io/graphql-php/class-reference/#graphqlutilsast
-		 */
-		foreach ( $document->definitions->getIterator() as $node ) {
-			if ( ! $node instanceof OperationDefinitionNode ) {
-				continue;
-			}
+		$operations = $parsed->getOperations();
 
-			if ( 'mutation' === $node->operation ) {
+		foreach ( $operations as $operation ) {
+			if ( $operation->getType() === 'mutation' ) {
 				return true;
 			}
 		}
