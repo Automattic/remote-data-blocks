@@ -72,11 +72,13 @@ class HttpClient {
 		return new WordPressObjectCacheStorage( self::WP_OBJECT_CACHE_GROUP );
 	}
 
-	public static function get_cache_middleware( CacheStorageInterface $cache_storage ): callable {
+	public static function get_cache_middleware( CacheStorageInterface $cache_storage, array $cache_options ): callable {
+		$cache_ttl = $cache_options['ttl'] ?? self::CACHE_TTL_IN_SECONDS;
+
 		return new RdbCacheMiddleware(
 			new RdbCacheStrategy(
 				$cache_storage,
-				self::CACHE_TTL_IN_SECONDS,
+				$cache_ttl,
 				new KeyValueHttpHeader( self::CACHE_INVALIDATING_REQUEST_HEADERS )
 			)
 		);
@@ -89,7 +91,7 @@ class HttpClient {
 	 * @param array  $headers
 	 * @param array  $options
 	 */
-	public function init( string $base_uri, array $headers = [], array $options = [] ): void {
+	public function init( string $base_uri, array $headers = [], array $options = [], array $client_options = [] ): void {
 		$this->base_uri = $base_uri;
 		$this->headers  = $headers;
 		$this->options  = $options;
@@ -113,7 +115,7 @@ class HttpClient {
 			return $request;
 		} ) );
 
-		$cache_middleware = self::get_cache_middleware( self::get_cache_storage() );
+		$cache_middleware = self::get_cache_middleware( self::get_cache_storage(), $client_options['cache_options'] ?? [] );
 		$this->handler_stack->push( $cache_middleware, 'remote_data_blocks_cache' );
 
 		$this->handler_stack->push( Middleware::log(

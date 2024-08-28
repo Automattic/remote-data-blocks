@@ -84,7 +84,13 @@ class QueryRunner implements QueryRunnerInterface {
 			RequestOptions::JSON    => $body,
 		];
 
-		$this->http_client->init( $endpoint_base );
+		$client_options = [
+			'cache_options' => [
+				'ttl' => $this->query_context->get_cache_ttl( $input_variables ),
+			],
+		];
+
+		$this->http_client->init( $endpoint_base, [], [], $client_options );
 
 		try {
 			$response = $this->http_client->request( $method, $uri, $options );

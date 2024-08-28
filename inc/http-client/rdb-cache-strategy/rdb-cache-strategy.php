@@ -103,6 +103,7 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 
 	public function fetch( RequestInterface $request ) {
 		if ( $this->should_bypass_cache( $request ) ) {
+			$this->logger->debug( 'Cache Bypass: ' . self::getRequestString( $request ) );
 			return null;
 		}
 
@@ -116,13 +117,19 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 		return $result;
 	}
 
-	public function cache( RequestInterface $request, $response ) {
+	public function cache( RequestInterface $request, $response ): bool {
+		// Negative TTL indicates disabled caching.
+		if ( $this->defaultTtl < 0 ) {
+			$this->logger->debug( 'Cache disabled with negative TTL: ' . self::getRequestString( $request ) );
+			return false;
+		}
+
 		$result = parent::cache( $request, $response );
 		if ( false === $result ) {
 			$this->logger->debug( 'Did not cache: ' . self::getRequestString( $request ) );
 			return false;
 		}
-		$this->logger->debug( 'Cached: ' . self::getRequestString( $request ) );
+		$this->logger->debug( 'Cached (TTL:' . $this->defaultTtl . '): ' . self::getRequestString( $request ) );
 		return $result;
 	}
 }

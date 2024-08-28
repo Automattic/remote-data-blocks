@@ -160,4 +160,14 @@ class QueryContext implements HttpQueryContext {
 	public function get_query_runner(): QueryRunnerInterface {
 		return new QueryRunner( $this );
 	}
+
+	/**
+		* Override this method to define the cache object TTL for this query. Return
+		* -1 to disable caching. Return null to use the default cache TTL.
+		*
+		* @return int|null The cache object TTL in seconds.
+	 */
+	public function get_cache_ttl( array $input_variables ): null|int {
+		return null;
+	}
 }
