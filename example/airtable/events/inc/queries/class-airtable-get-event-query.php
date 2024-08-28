@@ -55,4 +55,8 @@ class AirtableGetEventQuery extends QueryContext {
 	public function get_endpoint( $input_variables ): string {
 		return $this->get_datasource()->get_endpoint() . '/' . $input_variables['event_id'];
 	}
+
+	public function get_cache_ttl( array $input_variables ): int {
+		return -1;
+	}
 }
