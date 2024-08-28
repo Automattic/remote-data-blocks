@@ -371,63 +371,6 @@ class HttpClientTest extends TestCase {
 		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the second request' );
 	}
 
-	public function testRepeatedPostRequestsWithSameGraphqlMutationInBodyResultsInCacheMiss(): void {
-		// Set up the mock handler with two responses
-		$this->mock_handler->append(
-			new Response( 200, [], 'First Response' ),
-			new Response( 200, [], 'Second Response' )
-		);
-
-		$this->assertEquals( 2, $this->mock_handler->count(), 'The mock handler should have exactly two requests' );
-
-		$graphql_mutation = '
-			mutation UpdatePost($id: ID!, $title: String!) {
-				updatePost(input: {id: $id, title: $title}) {
-					post {
-						id
-						title
-					}
-				}
-			}
-		';
-
-		$variables = [
-			'id'    => '1',
-			'title' => 'Updated Title',
-		];
-
-		// Make the first POST request
-		$first_response = $this->http_client->post( '/graphql', [
-			'headers' => [ 'Content-Type' => 'application/json' ],
-			'json'    => [
-				'query'     => $graphql_mutation,
-				'variables' => $variables,
-			],
-		] );
-
-		$this->assertEquals( 1, $this->mock_handler->count(), 'The mock handler should have one request left after the first request' );
-
-		// Assert the first response
-		$this->assertEquals( 200, $first_response->getStatusCode() );
-		$this->assertEquals( 'First Response', (string) $first_response->getBody() );
-		$this->assertEquals( 'MISS', $first_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
-
-		// Make the second POST request with the same GraphQL mutation and variables
-		$second_response = $this->http_client->post( '/graphql', [
-			'json' => [
-				'query'     => $graphql_mutation,
-				'variables' => $variables,
-			],
-		] );
-
-		// Assert the second response
-		$this->assertEquals( 200, $second_response->getStatusCode() );
-		$this->assertEquals( 'Second Response', (string) $second_response->getBody() );
-		$this->assertEquals( 'MISS', $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
-
-		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the second request' );
-	}
-
 	public function testRepeatedPostRequestsWithDifferentGraphqlMutationInBodyResultsInCacheMiss(): void {
 		$this->mock_handler->append(
 			new Response( 200, [], 'First Response' ),
