@@ -32,7 +32,7 @@ abstract class GraphqlQueryContext extends QueryContext {
 	abstract public function get_query(): string;
 
 	/**
-	 * Override this method to define the GraphQL query document.
+	 * Override this method to define the GraphQL query variables.
 	 *
 	 * @return array The GraphQL query variables.
 	 */

@@ -2,9 +2,9 @@
 
 namespace RemoteDataBlocks\Example\Shopify;
 
-use RemoteDataBlocks\Config\GraphqlQueryContext;
+use RemoteDataBlocks\Config\GraphqlMutationContext;
 
-class ShopifyCreateCartMutation extends GraphqlQueryContext {
+class ShopifyCreateCartMutation extends GraphqlMutationContext {
 	public array $input_variables = [];
 
 	public array $output_variables = [
@@ -24,7 +24,7 @@ class ShopifyCreateCartMutation extends GraphqlQueryContext {
 		],
 	];
 
-	public function get_query(): string {
+	public function get_mutation(): string {
 		return '
 			mutation CreateShoppingCart {
 				cartCreate {
