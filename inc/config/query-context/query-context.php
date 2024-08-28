@@ -168,6 +168,14 @@ class QueryContext implements HttpQueryContext {
 		* @return int|null The cache object TTL in seconds.
 	 */
 	public function get_cache_ttl( array $input_variables ): null|int {
+		// For most HTTP requests, we only want to cache GET requests. This is
+		// overridden for GraphQL queries when using GraphqlQueryContext
+		if ( 'GET' !== strtoupper( $this->get_request_method() ) ) {
+			// Disable caching.
+			return -1;
+		}
+
+		// Use default cache TTL.
 		return null;
 	}
 }

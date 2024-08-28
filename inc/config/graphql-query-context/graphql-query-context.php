@@ -51,4 +51,15 @@ abstract class GraphqlQueryContext extends QueryContext {
 			'variables' => empty( $variables ) ? null : $variables,
 		];
 	}
+
+	/**
+		* Override this method to define the cache object TTL for this query. Return
+		* -1 to disable caching. Return null to use the default cache TTL.
+		*
+		* @return int|null The cache object TTL in seconds.
+	 */
+	public function get_cache_ttl( array $input_variables ): null {
+		// Use default cache TTL.
+		return null;
+	}
 }
