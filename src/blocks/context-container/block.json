@@ -6,7 +6,7 @@
   "title": "Context Container",
   "category": "widgets",
   "icon": "cloud",
-  "description": "Example block scaffolded with Create Block tool.",
+  "description": "Remote Data Container",
   "example": {},
   "providesContext": {
     "remote-data-blocks/remoteData": "remoteData"
