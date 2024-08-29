@@ -2,6 +2,7 @@
 // on whether you pass the `--experimental-modules` flag. If you do, it exports
 // an array of two configurations instead of a single configuration object.
 const [ scriptConfig, moduleConfig ] = require( '@wordpress/scripts/config/webpack.config' );
+const path = require( 'path' );
 
 // This function modernizes the configuration object to support TypeScript. It
 // also allows for additional scripts to be added to the entry point. Blocks are
@@ -29,6 +30,13 @@ function modernize( config, additionalScripts = {}, additionalPlugins = [] ) {
 			] ),
 		},
 		plugins: [ ...config.plugins, ...additionalPlugins ],
+		resolve: {
+			...config.resolve,
+			alias: {
+				...config.resolve.alias,
+				'@': path.resolve( __dirname, 'src/' ),
+			},
+		},
 	};
 }
 

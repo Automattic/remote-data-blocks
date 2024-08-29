@@ -1,5 +1,5 @@
-import { SUPPORTED_SERVICES } from './constants';
-import { IdName } from '../types/common';
+import { SUPPORTED_SERVICES } from '@/data-sources/constants';
+import { IdName } from '@/types/common';
 
 export type DataSourceType = ( typeof SUPPORTED_SERVICES )[ number ];
 

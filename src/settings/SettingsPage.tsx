@@ -1,10 +1,10 @@
 import { Panel } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
-import Notices from './Notices';
-import { SettingsContext, useDataSourceRouter } from './hooks/useSettingsNav';
-import DataSourceList from '../data-sources/DataSourceList';
-import DataSourceSettings from '../data-sources/DataSourceSettings';
+import DataSourceList from '@/data-sources/DataSourceList';
+import DataSourceSettings from '@/data-sources/DataSourceSettings';
+import Notices from '@/settings/Notices';
+import { SettingsContext, useDataSourceRouter } from '@/settings/hooks/useSettingsNav';
 
 function versionAndBuild() {
 	const localized = window.REMOTE_DATA_BLOCKS_SETTINGS;

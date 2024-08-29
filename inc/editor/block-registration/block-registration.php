@@ -34,7 +34,7 @@ class BlockRegistration {
 		$scripts_to_localize       = [];
 
 		foreach ( ConfigurationLoader::get_block_names() as $block_name ) {
-			$block_path = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/context-container';
+			$block_path = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-container';
 			$config     = ConfigurationLoader::get_configuration( $block_name );
 
 			$overrides = array_filter( $config['queries']['__DISPLAY__']->input_variables, function ( $input_var ) {
