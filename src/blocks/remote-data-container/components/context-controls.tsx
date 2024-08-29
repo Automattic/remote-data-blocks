@@ -1,5 +1,10 @@
 import { SelectControl } from '@wordpress/components';
 
+import {
+	IMAGE_FIELD_TYPES,
+	TEXT_FIELD_TYPES,
+} from '@/blocks/remote-data-container/config/constants';
+
 interface ContextControlsProps {
 	attributes: ContextInnerBlockAttributes;
 	availableBindings: AvailableBindings;
@@ -10,9 +15,17 @@ interface ContextControlsProps {
 export function ContextControls( props: ContextControlsProps ) {
 	const { attributes, availableBindings, blockName, updateBinding } = props;
 
-	const contextOptions = Object.entries( availableBindings ).map( ( [ key, mapping ] ) => {
-		return { label: mapping.name, value: key };
-	} );
+	const imageContextOptions = Object.entries( availableBindings )
+		.filter( ( [ _key, mapping ] ) => IMAGE_FIELD_TYPES.includes( mapping.type ) )
+		.map( ( [ key, mapping ] ) => {
+			return { label: mapping.name, value: key };
+		} );
+
+	const textContextOptions = Object.entries( availableBindings )
+		.filter( ( [ _key, mapping ] ) => TEXT_FIELD_TYPES.includes( mapping.type ) )
+		.map( ( [ key, mapping ] ) => {
+			return { label: mapping.name, value: key };
+		} );
 
 	switch ( blockName ) {
 		case 'core/heading':
@@ -21,7 +34,7 @@ export function ContextControls( props: ContextControlsProps ) {
 				<SelectControl
 					label="Content"
 					name="content"
-					options={ [ { label: 'Select a field', value: '' }, ...contextOptions ] }
+					options={ [ { label: 'Select a field', value: '' }, ...textContextOptions ] }
 					onChange={ updateBinding.bind( null, 'content' ) }
 					value={ attributes.metadata?.bindings?.content?.args?.field }
 				/>
@@ -33,14 +46,14 @@ export function ContextControls( props: ContextControlsProps ) {
 					<SelectControl
 						label="Image URL"
 						name="image_url"
-						options={ [ { label: 'Select a field', value: '' }, ...contextOptions ] }
+						options={ [ { label: 'Select a field', value: '' }, ...imageContextOptions ] }
 						onChange={ updateBinding.bind( null, 'url' ) }
 						value={ attributes.metadata?.bindings?.url?.args?.field }
 					/>
 					<SelectControl
 						label="Image alt text"
 						name="image_alt"
-						options={ [ { label: 'Select a field', value: '' }, ...contextOptions ] }
+						options={ [ { label: 'Select a field', value: '' }, ...imageContextOptions ] }
 						onChange={ updateBinding.bind( null, 'alt' ) }
 						value={ attributes.metadata?.bindings?.alt?.args?.field }
 					/>
