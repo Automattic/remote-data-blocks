@@ -1,7 +1,7 @@
 import { cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { LoopTemplateInnerBlocks } from '../../../../../src/blocks/context-container/components/loop-template-inner-blocks';
+import { LoopTemplateInnerBlocks } from '../../../../../src/blocks/remote-data-container/components/loop-template-inner-blocks';
 
 describe( 'LoopTemplateInnerBlocks', () => {
 	afterEach( cleanup );

@@ -24,7 +24,7 @@ export function Edit( props: BlockEditProps< ContextBlockAttributes > ) {
 
 	const rootClientId = props.clientId;
 	const blockProps = useBlockProps( {
-		className: 'remote-data-blocks-context-container',
+		className: 'remote-data-container',
 	} );
 
 	const {

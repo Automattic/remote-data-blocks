@@ -1,12 +1,12 @@
 {
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
-  "name": "remote-data-blocks/context-container",
+  "name": "remote-data-blocks/container",
   "version": "0.1.0",
-  "title": "Context Container",
+  "title": "Remote Data Container",
   "category": "widgets",
   "icon": "cloud",
-  "description": "Example block scaffolded with Create Block tool.",
+  "description": "A container and context provider for Remote Data Blocks",
   "example": {},
   "providesContext": {
     "remote-data-blocks/remoteData": "remoteData"

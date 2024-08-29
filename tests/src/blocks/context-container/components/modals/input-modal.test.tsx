@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { InputModal } from '../../../../../../src/blocks/context-container/components/modals/input-modal';
+import { InputModal } from '../../../../../../src/blocks/remote-data-container/components/modals/input-modal';
 
 describe( 'InputModal', () => {
 	const mockOnSelect = vi.fn();
