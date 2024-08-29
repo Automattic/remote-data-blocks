@@ -4,9 +4,9 @@ import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { RichTextFormat, insertObject, WPFormat, WPFormatEditProps } from '@wordpress/rich-text';
 
-import { FieldShortcodeSelectField } from './field-shortcode-select-field';
-import { FieldShortcodeSelectFieldPopover } from './field-shortcode-select-field-popover';
-import { FieldShortcodeSelectTabs } from './field-shortcode-select-tabs';
+import { FieldShortcodeSelectField } from '@/blocks/remote-data-container/components/field-shortcode/select-field';
+import { FieldShortcodeSelectFieldPopover } from '@/blocks/remote-data-container/components/field-shortcode/select-field-popover';
+import { FieldShortcodeSelectTabs } from '@/blocks/remote-data-container/components/field-shortcode/select-tabs';
 
 const formatName = 'remote-data-blocks/inline-field';
 

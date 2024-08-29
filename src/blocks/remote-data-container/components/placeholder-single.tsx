@@ -2,7 +2,7 @@ import { Placeholder } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { cloud } from '@wordpress/icons';
 
-import { ItemSelectQueryType } from './item-select-query-type';
+import { ItemSelectQueryType } from '@/blocks/remote-data-container/components/item-select-query-type';
 
 interface PlaceholderSingleProps {
 	blockConfig: BlockConfig;

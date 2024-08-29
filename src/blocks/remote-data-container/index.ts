@@ -2,11 +2,11 @@ import { registerBlockType } from '@wordpress/blocks';
 import { addFilter } from '@wordpress/hooks';
 import { registerFormatType } from '@wordpress/rich-text';
 
-import { formatTypeSettings } from './components/field-shortcode';
-import { Edit } from './edit';
-import { withBlockBinding } from './hooks/with-block-binding';
-import { Save } from './save';
-import { getBlocksConfig } from '../../utils/localized-block-data';
+import { formatTypeSettings } from '@/blocks/remote-data-container/components/field-shortcode/field-shortcode';
+import { Edit } from '@/blocks/remote-data-container/edit';
+import { withBlockBinding } from '@/blocks/remote-data-container/hooks/with-block-binding';
+import { Save } from '@/blocks/remote-data-container/save';
+import { getBlocksConfig } from '@/utils/localized-block-data';
 import './style.scss';
 
 // Register a unique block definition for each of the context blocks.

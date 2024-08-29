@@ -10,13 +10,13 @@ import {
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { __ } from '@wordpress/i18n';
 
-import { useShopifyShopName } from './shopify-api-hooks';
-import { useForm } from '../../hooks/useForm';
-import PasswordInputControl from '../../settings/PasswordInputControl';
-import { useSettingsContext } from '../../settings/hooks/useSettingsNav';
-import { SlugInput } from '../SlugInput';
-import { useDataSources } from '../hooks/useDataSources';
-import { ShopifyConfig } from '../types';
+import { SlugInput } from '@/data-sources/SlugInput';
+import { useDataSources } from '@/data-sources/hooks/useDataSources';
+import { useShopifyShopName } from '@/data-sources/shopify/shopify-api-hooks';
+import { ShopifyConfig } from '@/data-sources/types';
+import { useForm } from '@/hooks/useForm';
+import PasswordInputControl from '@/settings/PasswordInputControl';
+import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
 export interface ShopifySettingsProps {
 	mode: 'add' | 'edit';

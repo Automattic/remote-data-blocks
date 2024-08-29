@@ -2,9 +2,9 @@ import { Spinner } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 
-import { getBlockAvailableBindings } from '../../../utils/localized-block-data';
-import { DISPLAY_QUERY_KEY } from '../config/constants';
-import { useRemoteData } from '../hooks/use-remote-data';
+import { DISPLAY_QUERY_KEY } from '@/blocks/remote-data-container/config/constants';
+import { useRemoteData } from '@/blocks/remote-data-container/hooks/use-remote-data';
+import { getBlockAvailableBindings } from '@/utils/localized-block-data';
 
 interface FieldSelectionProps {
 	fields: Record< string, { name: string; value: string } >;

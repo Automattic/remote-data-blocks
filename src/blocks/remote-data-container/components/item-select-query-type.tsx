@@ -1,8 +1,8 @@
 import { ButtonGroup } from '@wordpress/components';
 
-import { InputModal } from './modals/input-modal';
-import { ListModal } from './modals/list-modal';
-import { SearchModal } from './modals/search-modal';
+import { InputModal } from '@/blocks/remote-data-container/components/modals/input-modal';
+import { ListModal } from '@/blocks/remote-data-container/components/modals/list-modal';
+import { SearchModal } from '@/blocks/remote-data-container/components/modals/search-modal';
 
 interface ItemSelectQueryTypeProps {
 	blockConfig: BlockConfig;

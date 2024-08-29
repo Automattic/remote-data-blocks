@@ -1,6 +1,6 @@
 import { Button, Modal } from '@wordpress/components';
 
-import { __ } from '../../../../utils/i18n';
+import { __ } from '@/utils/i18n';
 
 export interface BaseModalProps {
 	children: JSX.Element;

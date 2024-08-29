@@ -1,7 +1,7 @@
-import { ModalWithButtonTrigger } from './base-modal';
-import { __ } from '../../../../utils/i18n';
-import { useModalState } from '../../hooks/use-modal-state';
-import { ItemList } from '../item-list/item-list';
+import { ItemList } from '@/blocks/remote-data-container/components/item-list/item-list';
+import { ModalWithButtonTrigger } from '@/blocks/remote-data-container/components/modals/base-modal';
+import { useModalState } from '@/blocks/remote-data-container/hooks/use-modal-state';
+import { __ } from '@/utils/i18n';
 
 export interface ItemListModalProps {
 	blockName: string;

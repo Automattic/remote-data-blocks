@@ -9,7 +9,7 @@ import {
 } from '@wordpress/components';
 import { WPFormat, useAnchor } from '@wordpress/rich-text';
 
-import { FieldShortcodeSelectField } from './field-shortcode-select-field';
+import { FieldShortcodeSelectField } from '@/blocks/remote-data-container/components/field-shortcode/select-field';
 
 interface FieldShortcodeSelectFieldPopoverProps {
 	contentRef: React.RefObject< HTMLElement >;

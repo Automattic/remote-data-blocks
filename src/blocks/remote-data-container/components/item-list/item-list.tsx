@@ -1,8 +1,11 @@
 import { Spinner } from '@wordpress/components';
 
-import { ItemPreview } from './item-preview';
-import { __ } from '../../../../utils/i18n';
-import { cloneBlockWithAttributes, usePatterns } from '../../hooks/use-patterns';
+import { ItemPreview } from '@/blocks/remote-data-container/components/item-list/item-preview';
+import {
+	cloneBlockWithAttributes,
+	usePatterns,
+} from '@/blocks/remote-data-container/hooks/use-patterns';
+import { __ } from '@/utils/i18n';
 
 interface ItemListProps {
 	blockName: string;

@@ -1,10 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { BLOCK_BINDING_SOURCE } from '../../../src/config/constants';
-import {
-	getBoundAttributeEntries,
-	getMismatchedAttributes,
-} from '../../../src/utils/block-binding';
+import { BLOCK_BINDING_SOURCE } from '@/config/constants';
+import { getBoundAttributeEntries, getMismatchedAttributes } from '@/utils/block-binding';
 
 describe( 'block-binding utils', () => {
 	describe( 'getBoundAttributeEntries', () => {

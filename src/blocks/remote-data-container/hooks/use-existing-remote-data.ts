@@ -1,7 +1,7 @@
 import { BlockEditorStoreSelectors, store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
-import { getBlocksConfig } from '../../../utils/localized-block-data';
+import { getBlocksConfig } from '@/utils/localized-block-data';
 
 // In contrast to `useRemoteData`, this hook is used to retrieve existing remote
 // from all blocks in the editors. This is useful when we want to display a list

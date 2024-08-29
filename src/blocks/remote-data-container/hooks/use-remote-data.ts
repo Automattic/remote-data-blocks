@@ -1,7 +1,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { useState } from '@wordpress/element';
 
-import { REMOTE_DATA_REST_API_URL } from '../config/constants';
+import { REMOTE_DATA_REST_API_URL } from '@/blocks/remote-data-container/config/constants';
 
 async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< RemoteData | null > {
 	const { body } = await apiFetch< RemoteDataApiResponse >( {

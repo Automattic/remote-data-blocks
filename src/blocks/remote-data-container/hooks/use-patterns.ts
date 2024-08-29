@@ -8,7 +8,7 @@ import { BlockInstance, cloneBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
-import { getBoundAttributeEntries, getMismatchedAttributes } from '../../../utils/block-binding';
+import { getBoundAttributeEntries, getMismatchedAttributes } from '@/utils/block-binding';
 
 export function cloneBlockWithAttributes(
 	block: BlockInstance,

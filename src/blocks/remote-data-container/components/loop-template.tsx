@@ -8,9 +8,9 @@ import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { ItemPreview } from './item-list/item-preview';
-import { LoopTemplateInnerBlocks } from './loop-template-inner-blocks';
-import { LoopIndexContext } from '../context/loop-index-context';
+import { ItemPreview } from '@/blocks/remote-data-container/components/item-list/item-preview';
+import { LoopTemplateInnerBlocks } from '@/blocks/remote-data-container/components/loop-template-inner-blocks';
+import { LoopIndexContext } from '@/blocks/remote-data-container/context/loop-index-context';
 
 interface LoopTemplateProps {
 	getInnerBlocks: (

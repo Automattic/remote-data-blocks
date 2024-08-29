@@ -1,4 +1,4 @@
-import { AirtableConfig } from '../types';
+import { AirtableConfig } from '@/data-sources/types';
 
 export interface AirtableBase {
 	id: string;

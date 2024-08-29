@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from '@wordpress/element';
 
-import { useRemoteData } from './use-remote-data';
+import { useRemoteData } from '@/blocks/remote-data-container/hooks/use-remote-data';
 
 export interface UseSearchResultsInput {
 	allowEmptySearchTerms?: boolean;

@@ -1,5 +1,5 @@
-import { ItemListModal } from './item-list-modal';
-import { useRemoteData } from '../../hooks/use-remote-data';
+import { ItemListModal } from '@/blocks/remote-data-container/components/modals/item-list-modal';
+import { useRemoteData } from '@/blocks/remote-data-container/hooks/use-remote-data';
 
 interface ListModalProps {
 	blockName: string;
