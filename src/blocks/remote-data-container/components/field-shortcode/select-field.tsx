@@ -2,7 +2,10 @@ import { Spinner } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 
-import { DISPLAY_QUERY_KEY } from '@/blocks/remote-data-container/config/constants';
+import {
+	DISPLAY_QUERY_KEY,
+	TEXT_FIELD_TYPES,
+} from '@/blocks/remote-data-container/config/constants';
 import { useRemoteData } from '@/blocks/remote-data-container/hooks/use-remote-data';
 import { getBlockAvailableBindings } from '@/utils/localized-block-data';
 
@@ -56,13 +59,12 @@ export function FieldSelection( props: FieldSelectionProps ) {
 type FieldSelectionWithFieldsProps = Omit< FieldSelectionProps, 'fields' | 'fieldType' >;
 
 export function FieldSelectionFromAvailableBindings( props: FieldSelectionWithFieldsProps ) {
-	const supportedBindingTypes = [ 'id', 'number', 'string' ];
 	const availableBindings = getBlockAvailableBindings( props.remoteData.blockName );
 
 	const fields = Object.entries( availableBindings ).reduce< FieldSelectionProps[ 'fields' ] >(
 		( acc, [ fieldName, binding ] ) => {
 			const fieldValue = props.remoteData.results[ 0 ]?.[ fieldName ] ?? '';
-			if ( ! fieldValue || ! supportedBindingTypes.includes( binding.type ) ) {
+			if ( ! fieldValue || ! TEXT_FIELD_TYPES.includes( binding.type ) ) {
 				return acc;
 			}
 
