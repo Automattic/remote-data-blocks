@@ -36,12 +36,15 @@ interface MetaFieldSelection extends FieldSelection {
 	selectedField: 'last_updated' | 'total_count';
 }
 
-interface ContextBinding {
+interface RemoteDataBlockBindingArgs {
+	field: string;
+	label?: string;
+	name: string;
+}
+
+interface RemoteDataBlockBinding {
 	source: string;
-	args: {
-		blockName: string;
-		field: string;
-	};
+	args: RemoteDataBlockBindingArgs;
 }
 
 interface ContextInnerBlockAttributes {
@@ -49,7 +52,7 @@ interface ContextInnerBlockAttributes {
 	content?: string | RichTextData;
 	index?: number;
 	metadata?: {
-		bindings?: Record< string, ContextBinding >;
+		bindings?: Record< string, RemoteDataBlockBinding >;
 		name?: string;
 	};
 	url?: string | RichTextData;

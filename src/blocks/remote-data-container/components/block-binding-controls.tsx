@@ -1,61 +1,113 @@
-import { SelectControl } from '@wordpress/components';
+import { CheckboxControl, SelectControl } from '@wordpress/components';
 
-import {
-	IMAGE_FIELD_TYPES,
-	TEXT_FIELD_TYPES,
-} from '@/blocks/remote-data-container/config/constants';
+import { TEXT_FIELD_TYPES } from '@/blocks/remote-data-container/config/constants';
+
+interface BlockBindingFieldControlProps {
+	availableBindings: AvailableBindings;
+	fieldTypes: string[];
+	label: string;
+	target: string;
+	updateFieldBinding: ( target: string, field: string ) => void;
+	value: string;
+}
+
+export function BlockBindingFieldControl( props: BlockBindingFieldControlProps ) {
+	const { availableBindings, fieldTypes, label, target, updateFieldBinding, value } = props;
+	const options = Object.entries( availableBindings )
+		.filter( ( [ _key, mapping ] ) => fieldTypes.includes( mapping.type ) )
+		.map( ( [ key, mapping ] ) => {
+			return { label: mapping.name, value: key };
+		} );
+
+	return (
+		<SelectControl
+			label={ label }
+			name={ target }
+			options={ [ { label: 'Select a field', value: '' }, ...options ] }
+			onChange={ ( field: string ) => updateFieldBinding( target, field ) }
+			value={ value }
+		/>
+	);
+}
 
 interface BlockBindingControlsProps {
 	attributes: ContextInnerBlockAttributes;
 	availableBindings: AvailableBindings;
 	blockName: string;
-	updateBinding: ( target: string, field?: string ) => void;
+	removeBinding: ( target: string ) => void;
+	updateBinding: ( target: string, args: Omit< RemoteDataBlockBindingArgs, 'name' > ) => void;
 }
 
 export function BlockBindingControls( props: BlockBindingControlsProps ) {
-	const { attributes, availableBindings, blockName, updateBinding } = props;
+	const { attributes, availableBindings, blockName, removeBinding, updateBinding } = props;
+	const contentArgs = attributes.metadata?.bindings?.content?.args;
+	const contentField = contentArgs?.field ?? '';
+	const imageAltField = attributes.metadata?.bindings?.image_alt?.args?.field ?? '';
+	const imageUrlField = attributes.metadata?.bindings?.image_url?.args?.field ?? '';
 
-	const imageContextOptions = Object.entries( availableBindings )
-		.filter( ( [ _key, mapping ] ) => IMAGE_FIELD_TYPES.includes( mapping.type ) )
-		.map( ( [ key, mapping ] ) => {
-			return { label: mapping.name, value: key };
-		} );
+	function updateFieldBinding( target: string, field: string ): void {
+		if ( ! field ) {
+			removeBinding( target );
+			return;
+		}
 
-	const textContextOptions = Object.entries( availableBindings )
-		.filter( ( [ _key, mapping ] ) => TEXT_FIELD_TYPES.includes( mapping.type ) )
-		.map( ( [ key, mapping ] ) => {
-			return { label: mapping.name, value: key };
-		} );
+		const args = attributes.metadata?.bindings?.[ target ]?.args ?? {};
+		updateBinding( target, { ...args, field } );
+	}
+
+	function updateFieldLabel( showLabel: boolean ): void {
+		if ( ! contentField ) {
+			// Form input should be disabled in this state, but check anyway.
+			return;
+		}
+
+		const label = showLabel
+			? Object.entries( availableBindings ).find( ( [ key ] ) => key === contentField )?.[ 1 ]?.name
+			: undefined;
+		updateBinding( 'content', { ...contentArgs, field: contentField, label } );
+	}
 
 	switch ( blockName ) {
 		case 'core/heading':
 		case 'core/paragraph':
 			return (
-				<SelectControl
-					label="Content"
-					name="content"
-					options={ [ { label: 'Select a field', value: '' }, ...textContextOptions ] }
-					onChange={ updateBinding.bind( null, 'content' ) }
-					value={ attributes.metadata?.bindings?.content?.args?.field }
-				/>
+				<>
+					<BlockBindingFieldControl
+						availableBindings={ availableBindings }
+						fieldTypes={ TEXT_FIELD_TYPES }
+						label="Content"
+						target="content"
+						updateFieldBinding={ updateFieldBinding }
+						value={ contentField }
+					/>
+					<CheckboxControl
+						checked={ Boolean( contentArgs?.label ) }
+						disabled={ ! contentField }
+						label="Show label"
+						name="show_label"
+						onChange={ updateFieldLabel }
+					/>
+				</>
 			);
 
 		case 'core/image':
 			return (
 				<>
-					<SelectControl
+					<BlockBindingFieldControl
+						availableBindings={ availableBindings }
+						fieldTypes={ [ 'image_url' ] }
 						label="Image URL"
-						name="image_url"
-						options={ [ { label: 'Select a field', value: '' }, ...imageContextOptions ] }
-						onChange={ updateBinding.bind( null, 'url' ) }
-						value={ attributes.metadata?.bindings?.url?.args?.field }
+						target="image_url"
+						updateFieldBinding={ updateFieldBinding }
+						value={ imageUrlField }
 					/>
-					<SelectControl
+					<BlockBindingFieldControl
+						availableBindings={ availableBindings }
+						fieldTypes={ [ 'image_alt' ] }
 						label="Image alt text"
-						name="image_alt"
-						options={ [ { label: 'Select a field', value: '' }, ...imageContextOptions ] }
-						onChange={ updateBinding.bind( null, 'alt' ) }
-						value={ attributes.metadata?.bindings?.alt?.args?.field }
+						target="image_alt"
+						updateFieldBinding={ updateFieldBinding }
+						value={ imageAltField }
 					/>
 				</>
 			);

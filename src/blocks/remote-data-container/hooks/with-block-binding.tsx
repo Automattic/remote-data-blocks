@@ -21,13 +21,12 @@ interface BoundBlockEditProps {
 	availableBindings: AvailableBindings;
 	blockName: string;
 	children: JSX.Element;
-	loopIndex: number;
-	remoteData: RemoteData;
+	remoteDataName: string;
 	setAttributes: ( attributes: ContextInnerBlockAttributes ) => void;
 }
 
 function BoundBlockEdit( props: BoundBlockEditProps ) {
-	const { attributes, availableBindings, blockName, loopIndex, remoteData, setAttributes } = props;
+	const { attributes, availableBindings, blockName, remoteDataName, setAttributes } = props;
 	const existingBindings = attributes.metadata?.bindings ?? {};
 
 	function removeBinding( target: string ) {
@@ -41,16 +40,8 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 		} );
 	}
 
-	function updateBinding( target: string, field?: string ) {
-		// Remove binding if it was unselected.
-		if ( ! field ) {
-			removeBinding( target );
-			return;
-		}
-
-		const fieldValue = remoteData.results?.[ loopIndex ]?.[ field ] ?? '';
+	function updateBinding( target: string, args: Omit< RemoteDataBlockBindingArgs, 'name' > ) {
 		setAttributes( {
-			[ target ]: fieldValue,
 			metadata: {
 				...attributes.metadata,
 				bindings: {
@@ -58,12 +49,12 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 					[ target ]: {
 						source: BLOCK_BINDING_SOURCE,
 						args: {
-							blockName,
-							field,
+							...args,
+							name: remoteDataName, // Remote Data Block name
 						},
 					},
 				},
-				name: availableBindings[ field ]?.name, // Changes block name in list view.
+				name: availableBindings[ args.field ]?.name, // Changes block name in list view.
 			},
 		} );
 	}
@@ -76,6 +67,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 						attributes={ attributes }
 						availableBindings={ availableBindings }
 						blockName={ blockName }
+						removeBinding={ removeBinding }
 						updateBinding={ updateBinding }
 					/>
 				</PanelBody>
@@ -115,7 +107,7 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 		const patternOverrides = context[ PATTERN_OVERRIDES_CONTEXT_KEY ] as string[] | undefined;
 		const { index } = useContext( LoopIndexContext );
 		const isInSyncedPattern = Boolean( patternOverrides );
-		const hasEnabledOverrides = Object.values( props.attributes.metadata?.bindings ?? {} ).some(
+		const hasEnabledOverrides = Object.values( attributes.metadata?.bindings ?? {} ).some(
 			binding => binding.source === PATTERN_OVERRIDES_BINDING_SOURCE
 		);
 
@@ -138,8 +130,7 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 				attributes={ mergedAttributes }
 				availableBindings={ availableBindings }
 				blockName={ name }
-				loopIndex={ index }
-				remoteData={ remoteData }
+				remoteDataName={ remoteData?.blockName ?? '' }
 				setAttributes={ setAttributes }
 			>
 				<BlockEdit { ...props } attributes={ mergedAttributes } />
