@@ -39,6 +39,7 @@ interface MetaFieldSelection extends FieldSelection {
 interface ContextBinding {
 	source: string;
 	args: {
+		blockName: string;
 		field: string;
 	};
 }
