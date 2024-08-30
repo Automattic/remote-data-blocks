@@ -15,7 +15,7 @@ import { LoopIndexContext } from '@/blocks/remote-data-container/context/loop-in
 interface LoopTemplateProps {
 	getInnerBlocks: (
 		result: Record< string, string >
-	) => BlockInstance< ContextInnerBlockAttributes >[];
+	) => BlockInstance< RemoteDataInnerBlockAttributes >[];
 	remoteData: RemoteData;
 }
 

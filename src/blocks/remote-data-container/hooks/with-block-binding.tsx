@@ -17,12 +17,12 @@ import { getMismatchedAttributes } from '@/utils/block-binding';
 import { getBlockAvailableBindings } from '@/utils/localized-block-data';
 
 interface BoundBlockEditProps {
-	attributes: ContextInnerBlockAttributes;
+	attributes: RemoteDataInnerBlockAttributes;
 	availableBindings: AvailableBindings;
 	blockName: string;
 	children: JSX.Element;
 	remoteDataName: string;
-	setAttributes: ( attributes: ContextInnerBlockAttributes ) => void;
+	setAttributes: ( attributes: RemoteDataInnerBlockAttributes ) => void;
 }
 
 function BoundBlockEdit( props: BoundBlockEditProps ) {
@@ -78,7 +78,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 }
 
 export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
-	return ( props: BlockEditProps< ContextInnerBlockAttributes > ) => {
+	return ( props: BlockEditProps< RemoteDataInnerBlockAttributes > ) => {
 		const { attributes, context, name, setAttributes } = props;
 		const remoteData = context[ REMOTE_DATA_CONTEXT_KEY ] as RemoteData | undefined;
 		const availableBindings = getBlockAvailableBindings( remoteData?.blockName ?? '' );
@@ -118,7 +118,7 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 
 		// If the block has a binding and the attributes do not match their expected
 		// values, update and merge the attributes.
-		const mergedAttributes = useMemo< ContextInnerBlockAttributes >( () => {
+		const mergedAttributes = useMemo< RemoteDataInnerBlockAttributes >( () => {
 			return {
 				...attributes,
 				...getMismatchedAttributes( attributes, remoteData.results, index ),

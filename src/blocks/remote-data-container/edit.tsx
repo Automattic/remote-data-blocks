@@ -15,7 +15,7 @@ import { hasRemoteDataChanged } from '@/utils/block-binding';
 import { getBlockConfig } from '@/utils/localized-block-data';
 import './editor.scss';
 
-export function Edit( props: BlockEditProps< ContextBlockAttributes > ) {
+export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	const blockConfig = getBlockConfig( props.name );
 
 	if ( ! blockConfig ) {

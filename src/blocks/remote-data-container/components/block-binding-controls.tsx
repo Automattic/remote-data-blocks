@@ -31,7 +31,7 @@ export function BlockBindingFieldControl( props: BlockBindingFieldControlProps )
 }
 
 interface BlockBindingControlsProps {
-	attributes: ContextInnerBlockAttributes;
+	attributes: RemoteDataInnerBlockAttributes;
 	availableBindings: AvailableBindings;
 	blockName: string;
 	removeBinding: ( target: string ) => void;

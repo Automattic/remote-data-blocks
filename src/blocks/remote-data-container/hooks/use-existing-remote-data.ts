@@ -17,7 +17,7 @@ export function useExistingRemoteData(): RemoteData[] {
 
 		return blocks
 			.map( clientId => {
-				const block = getBlocksByClientId< ContextBlockAttributes >( clientId )[ 0 ];
+				const block = getBlocksByClientId< RemoteDataBlockAttributes >( clientId )[ 0 ];
 				return block?.attributes?.remoteData;
 			} )
 			.filter( ( maybeRemoteData ): maybeRemoteData is RemoteData => Boolean( maybeRemoteData ) );

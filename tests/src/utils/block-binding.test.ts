@@ -7,7 +7,7 @@ describe( 'block-binding utils', () => {
 	describe( 'getBoundAttributeEntries', () => {
 		it( 'should return bound attribute entries', () => {
 			const name = 'test/block';
-			const attributes: ContextInnerBlockAttributes = {
+			const attributes: RemoteDataInnerBlockAttributes = {
 				metadata: {
 					bindings: {
 						content: { source: BLOCK_BINDING_SOURCE, args: { name, field: 'title' } },
@@ -26,7 +26,7 @@ describe( 'block-binding utils', () => {
 		} );
 
 		it( 'should return an empty array when no bindings are present', () => {
-			const attributes: ContextInnerBlockAttributes = {};
+			const attributes: RemoteDataInnerBlockAttributes = {};
 
 			const result = getBoundAttributeEntries( attributes );
 
@@ -37,7 +37,7 @@ describe( 'block-binding utils', () => {
 	describe( 'getMismatchedAttributes', () => {
 		it( 'should return mismatched attributes', () => {
 			const name = 'test/block';
-			const attributes: ContextInnerBlockAttributes = {
+			const attributes: RemoteDataInnerBlockAttributes = {
 				content: 'Old content',
 				url: 'https://old-url.com',
 				alt: 'Old alt',
@@ -61,7 +61,7 @@ describe( 'block-binding utils', () => {
 
 		it( 'should return an empty object when no mismatches are found', () => {
 			const name = 'test/block';
-			const attributes: ContextInnerBlockAttributes = {
+			const attributes: RemoteDataInnerBlockAttributes = {
 				content: 'Title: Current content',
 				url: 'https://current-url.com',
 				metadata: {
@@ -84,7 +84,7 @@ describe( 'block-binding utils', () => {
 
 		it( 'should handle missing results', () => {
 			const name = 'test/block';
-			const attributes: ContextInnerBlockAttributes = {
+			const attributes: RemoteDataInnerBlockAttributes = {
 				content: 'Old content',
 				url: 'https://old-url.com',
 				metadata: {
@@ -106,7 +106,7 @@ describe( 'block-binding utils', () => {
 
 		it( 'should handle missing label', () => {
 			const name = 'test/block';
-			const attributes: ContextInnerBlockAttributes = {
+			const attributes: RemoteDataInnerBlockAttributes = {
 				content: 'My Title',
 				metadata: {
 					bindings: {
