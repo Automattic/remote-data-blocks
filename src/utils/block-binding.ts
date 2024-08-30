@@ -14,9 +14,25 @@ function getAttributeValue( attributes: unknown, key: string | undefined | null 
 	return attributes[ key ]?.toString() ?? '';
 }
 
+function getExpectedAttributeValue(
+	result?: Record< string, string >,
+	args?: RemoteDataBlockBindingArgs
+): string | null {
+	if ( ! args?.field || ! result?.[ args.field ] ) {
+		return null;
+	}
+
+	let expectedValue = result[ args.field ];
+	if ( args.label ) {
+		expectedValue = `${ args.label }: ${ expectedValue }`;
+	}
+
+	return expectedValue ?? null;
+}
+
 export function getBoundAttributeEntries(
 	attributes: ContextInnerBlockAttributes
-): [ string, ContextBinding ][] {
+): [ string, RemoteDataBlockBinding ][] {
 	return Object.entries( attributes.metadata?.bindings ?? {} ).filter(
 		( [ _target, binding ] ) => binding.source === BLOCK_BINDING_SOURCE
 	);
@@ -31,7 +47,7 @@ export function getMismatchedAttributes(
 		getBoundAttributeEntries( attributes )
 			.map( ( [ target, binding ] ) => [
 				target,
-				results[ index ]?.[ binding.args.field ] ?? null, // null signals a bad binding, ignore
+				getExpectedAttributeValue( results[ index ], binding.args ),
 			] )
 			.filter(
 				( [ target, value ] ) => null !== value && value !== getAttributeValue( attributes, target )
