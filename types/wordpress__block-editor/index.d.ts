@@ -27,7 +27,7 @@ declare module '@wordpress/block-editor' {
 
 	// Incomplete type for our use case.
 	interface BlockPattern {
-		blocks: BlockInstance< ContextInnerBlockAttributes >[];
+		blocks: BlockInstance< RemoteDataInnerBlockAttributes >[];
 		name: string;
 		title: string;
 	}

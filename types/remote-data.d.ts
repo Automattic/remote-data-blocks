@@ -47,7 +47,7 @@ interface RemoteDataBlockBinding {
 	args: RemoteDataBlockBindingArgs;
 }
 
-interface ContextInnerBlockAttributes {
+interface RemoteDataInnerBlockAttributes {
 	alt?: string | RichTextData;
 	content?: string | RichTextData;
 	index?: number;

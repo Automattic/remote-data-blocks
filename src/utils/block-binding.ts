@@ -31,7 +31,7 @@ function getExpectedAttributeValue(
 }
 
 export function getBoundAttributeEntries(
-	attributes: ContextInnerBlockAttributes
+	attributes: RemoteDataInnerBlockAttributes
 ): [ string, RemoteDataBlockBinding ][] {
 	return Object.entries( attributes.metadata?.bindings ?? {} ).filter(
 		( [ _target, binding ] ) => binding.source === BLOCK_BINDING_SOURCE
@@ -39,10 +39,10 @@ export function getBoundAttributeEntries(
 }
 
 export function getMismatchedAttributes(
-	attributes: ContextInnerBlockAttributes,
+	attributes: RemoteDataInnerBlockAttributes,
 	results: RemoteData[ 'results' ],
 	index = 0
-): Partial< ContextInnerBlockAttributes > {
+): Partial< RemoteDataInnerBlockAttributes > {
 	return Object.fromEntries(
 		getBoundAttributeEntries( attributes )
 			.map( ( [ target, binding ] ) => [
@@ -52,7 +52,7 @@ export function getMismatchedAttributes(
 			.filter(
 				( [ target, value ] ) => null !== value && value !== getAttributeValue( attributes, target )
 			)
-	) as Partial< ContextInnerBlockAttributes >;
+	) as Partial< RemoteDataInnerBlockAttributes >;
 }
 
 export function hasRemoteDataChanged( one: RemoteData, two: RemoteData ): boolean {

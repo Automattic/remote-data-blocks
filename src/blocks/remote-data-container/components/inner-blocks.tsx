@@ -7,7 +7,7 @@ interface InnerBlocksProps {
 	blockConfig: BlockConfig;
 	getInnerBlocks: (
 		result: Record< string, string >
-	) => BlockInstance< ContextInnerBlockAttributes >[];
+	) => BlockInstance< RemoteDataInnerBlockAttributes >[];
 	remoteData: RemoteData;
 }
 

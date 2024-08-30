@@ -33,8 +33,8 @@ export function usePatterns( blockName: string, rootClientId: string ) {
 	return {
 		getInnerBlocks: (
 			result: Record< string, string >
-		): BlockInstance< ContextInnerBlockAttributes >[] => {
-			return getBlocks< ContextInnerBlockAttributes >( rootClientId ).map( block =>
+		): BlockInstance< RemoteDataInnerBlockAttributes >[] => {
+			return getBlocks< RemoteDataInnerBlockAttributes >( rootClientId ).map( block =>
 				cloneBlockWithAttributes( block, result )
 			);
 		},
