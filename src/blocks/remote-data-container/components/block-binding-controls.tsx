@@ -5,14 +5,14 @@ import {
 	TEXT_FIELD_TYPES,
 } from '@/blocks/remote-data-container/config/constants';
 
-interface ContextControlsProps {
+interface BlockBindingControlsProps {
 	attributes: ContextInnerBlockAttributes;
 	availableBindings: AvailableBindings;
 	blockName: string;
 	updateBinding: ( target: string, field?: string ) => void;
 }
 
-export function ContextControls( props: ContextControlsProps ) {
+export function BlockBindingControls( props: BlockBindingControlsProps ) {
 	const { attributes, availableBindings, blockName, updateBinding } = props;
 
 	const imageContextOptions = Object.entries( availableBindings )

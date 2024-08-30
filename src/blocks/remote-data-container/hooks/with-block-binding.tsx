@@ -5,7 +5,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { useContext, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { ContextControls } from '@/blocks/remote-data-container/components/context-controls';
+import { BlockBindingControls } from '@/blocks/remote-data-container/components/block-binding-controls';
 import { REMOTE_DATA_CONTEXT_KEY } from '@/blocks/remote-data-container/config/constants';
 import { LoopIndexContext } from '@/blocks/remote-data-container/context/loop-index-context';
 import {
@@ -72,7 +72,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Remote Data', 'remote-data-blocks' ) }>
-					<ContextControls
+					<BlockBindingControls
 						attributes={ attributes }
 						availableBindings={ availableBindings }
 						blockName={ blockName }
