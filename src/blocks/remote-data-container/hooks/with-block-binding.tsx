@@ -58,6 +58,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 					[ target ]: {
 						source: BLOCK_BINDING_SOURCE,
 						args: {
+							blockName,
 							field,
 						},
 					},

@@ -24,10 +24,10 @@ describe( 'withBlockBinding', () => {
 	const WrappedComponent = withBlockBinding( MockBlockEdit );
 	const testBlockConfig = {
 		config: {
-			'test-block': {
+			'test/block': {
 				availableBindings: { field1: { name: 'Field 1', type: 'string' } },
 				loop: false,
-				name: 'test-block',
+				name: 'test/block',
 				overrides: {},
 				selectors: [],
 				settings: {
@@ -55,7 +55,7 @@ describe( 'withBlockBinding', () => {
 			<WrappedComponent
 				attributes={ {} }
 				context={ {} }
-				name="test-block"
+				name="test/block"
 				setAttributes={ () => {} }
 				clientId="test-client-id"
 				isSelected={ false }
@@ -69,14 +69,14 @@ describe( 'withBlockBinding', () => {
 
 	it( 'renders BoundBlockEdit when remote data is available', async () => {
 		const remoteData = {
-			blockName: 'test-block',
+			blockName: 'test/block',
 			results: [ { field1: 'value1' } ],
 		};
 		render(
 			<WrappedComponent
 				attributes={ {} }
 				context={ { [ REMOTE_DATA_CONTEXT_KEY ]: remoteData } }
-				name="test-block"
+				name="test/block"
 				setAttributes={ () => {} }
 				clientId="test-client-id"
 				isSelected={ false }
@@ -93,7 +93,7 @@ describe( 'withBlockBinding', () => {
 
 	it( 'does not render BoundBlockEdit for synced pattern without enabled overrides', () => {
 		const remoteData = {
-			blockName: 'test-block',
+			blockName: 'test/block',
 			results: [ { field1: 'value1' } ],
 		};
 		render(
@@ -103,7 +103,7 @@ describe( 'withBlockBinding', () => {
 					[ REMOTE_DATA_CONTEXT_KEY ]: remoteData,
 					[ PATTERN_OVERRIDES_CONTEXT_KEY ]: [ 'test-pattern' ],
 				} }
-				name="test-block"
+				name="test/block"
 				setAttributes={ () => {} }
 				clientId="test-client-id"
 				isSelected={ false }
@@ -124,18 +124,18 @@ describe( 'withBlockBinding', () => {
 					bindings: {
 						content: {
 							source: BLOCK_BINDING_SOURCE,
-							args: { field: 'title' },
+							args: { blockName: 'test/block', field: 'title' },
 						},
 					},
 				},
 			},
 			context: {
 				[ REMOTE_DATA_CONTEXT_KEY ]: {
-					blockName: 'test-block',
+					blockName: 'test/block',
 					results: [ { title: 'New Title' } ],
 				},
 			},
-			name: 'test-block',
+			name: 'test/block',
 			setAttributes: mockSetAttributes,
 			clientId: 'test-client-id',
 			isSelected: false,
@@ -164,18 +164,18 @@ describe( 'withBlockBinding', () => {
 					bindings: {
 						content: {
 							source: BLOCK_BINDING_SOURCE,
-							args: { field: 'title' },
+							args: { blockName: 'test/block', field: 'title' },
 						},
 					},
 				},
 			},
 			context: {
 				[ REMOTE_DATA_CONTEXT_KEY ]: {
-					blockName: 'test-block',
+					blockName: 'test/block',
 					results: [ { title: 'Matching Title' } ],
 				},
 			},
-			name: 'test-block',
+			name: 'test/block',
 			setAttributes: mockSetAttributes,
 			clientId: 'test-client-id',
 			isSelected: false,

@@ -6,7 +6,7 @@ import { LoopTemplate } from '@/blocks/remote-data-container/components/loop-tem
 describe( 'LoopTemplate', () => {
 	const mockGetInnerBlocks = () => [];
 	const mockRemoteData: RemoteData = {
-		blockName: 'test-block',
+		blockName: 'test/block',
 		isCollection: true,
 		metadata: {},
 		queryInput: {},
@@ -22,7 +22,7 @@ describe( 'LoopTemplate', () => {
 
 	it( 'renders "No results found" when there are no results', () => {
 		const emptyRemoteData: RemoteData = {
-			blockName: 'test-block',
+			blockName: 'test/block',
 			isCollection: true,
 			metadata: {},
 			queryInput: {},
