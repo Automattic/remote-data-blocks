@@ -23,11 +23,11 @@ interface RemoteData {
 	results: Record< string, string >[];
 }
 
-interface ContextBlockAttributes {
+interface RemoteDataBlockAttributes {
 	remoteData: RemoteData;
 }
 
-interface FieldSelection extends ContextBlockAttributes {
+interface FieldSelection extends RemoteDataBlockAttributes {
 	selectedField: string;
 	type: 'field' | 'meta';
 }
