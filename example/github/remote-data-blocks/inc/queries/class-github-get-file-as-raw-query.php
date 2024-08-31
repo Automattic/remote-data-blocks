@@ -58,10 +58,4 @@ class GitHubGetFileAsRawQuery extends QueryContext {
 	public function get_endpoint( array $input_variables ): string {
 		return $input_variables['url'];
 	}
-
-	public function get_request_headers( array $input_variables ): array {
-		return [
-			'Accept' => 'application/vnd.github+json',
-		];
-	}
 }

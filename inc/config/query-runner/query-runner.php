@@ -100,8 +100,6 @@ class QueryRunner implements QueryRunnerInterface {
 		// The body is a stream... if we need to read it in chunks, etc. we can do so here.
 		$response_data = $response->getBody()->getContents();
 
-		$is_collection = $this->query_context->output_variables['is_collection'] ?? false;
-
 		if ( isset( $response_data['errors'][0]['message'] ) ) {
 			$logger = LoggerManager::instance();
 			$logger->warning( sprintf( 'Query error: %s', esc_html( $response_data['errors'][0]['message'] ) ) );
@@ -110,7 +108,7 @@ class QueryRunner implements QueryRunnerInterface {
 		$results = $this->query_context->get_results( $response_data, $input_variables );
 
 		return [
-			'is_collection' => $is_collection,
+			'is_collection' => $this->query_context->is_collection(),
 			'metadata'      => $this->query_context->get_metadata( $response, $results ),
 			'results'       => $results,
 		];
