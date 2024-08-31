@@ -23,11 +23,11 @@ interface RemoteData {
 	results: Record< string, string >[];
 }
 
-interface ContextBlockAttributes {
+interface RemoteDataBlockAttributes {
 	remoteData: RemoteData;
 }
 
-interface FieldSelection extends ContextBlockAttributes {
+interface FieldSelection extends RemoteDataBlockAttributes {
 	selectedField: string;
 	type: 'field' | 'meta';
 }
@@ -36,19 +36,23 @@ interface MetaFieldSelection extends FieldSelection {
 	selectedField: 'last_updated' | 'total_count';
 }
 
-interface ContextBinding {
-	source: string;
-	args: {
-		field: string;
-	};
+interface RemoteDataBlockBindingArgs {
+	field: string;
+	label?: string;
+	name: string;
 }
 
-interface ContextInnerBlockAttributes {
+interface RemoteDataBlockBinding {
+	source: string;
+	args: RemoteDataBlockBindingArgs;
+}
+
+interface RemoteDataInnerBlockAttributes {
 	alt?: string | RichTextData;
 	content?: string | RichTextData;
 	index?: number;
 	metadata?: {
-		bindings?: Record< string, ContextBinding >;
+		bindings?: Record< string, RemoteDataBlockBinding >;
 		name?: string;
 	};
 	url?: string | RichTextData;

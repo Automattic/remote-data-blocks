@@ -214,6 +214,11 @@ class BlockBindings {
 		$field_name = $source_args['field'];
 		$index      = $source_args['index'] ?? 0; // Index is only set for loop queries.
 
+		if ( isset( $source_args['name'] ) && $source_args['name'] !== $block_name ) {
+			self::log_error( 'Block binding belongs to a different remote data block', $block_name, $field_name );
+			return null;
+		}
+
 		$query_results = self::execute_query( $block_context, $field_name );
 
 		if ( ! isset( $query_results['results'][ $index ]['result'][ $field_name ]['value'] ) ) {
@@ -221,7 +226,13 @@ class BlockBindings {
 			return null;
 		}
 
-		return $query_results['results'][ $index ]['result'][ $field_name ]['value'];
+		// Prepend label to value if provided.
+		$value = $query_results['results'][ $index ]['result'][ $field_name ]['value'];
+		if ( ! empty( $source_args['label'] ?? '' ) ) {
+			return sprintf( '%s: %s', $source_args['label'], $value );
+		}
+
+		return $value;
 	}
 
 	public static function loop_block_render_callback( array $attributes, string $content, WP_Block $block ): string {

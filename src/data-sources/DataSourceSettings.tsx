@@ -1,9 +1,9 @@
 import { __ } from '@wordpress/i18n';
 
-import { AirtableSettings } from './airtable/AirtableSettings';
-import { useDataSources } from './hooks/useDataSources';
-import { ShopifySettings } from './shopify/ShopifySettings';
-import { useSettingsContext } from '../settings/hooks/useSettingsNav';
+import { AirtableSettings } from '@/data-sources/airtable/AirtableSettings';
+import { useDataSources } from '@/data-sources/hooks/useDataSources';
+import { ShopifySettings } from '@/data-sources/shopify/ShopifySettings';
+import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
 interface DataSourceEditSettings {
 	uuid: string;

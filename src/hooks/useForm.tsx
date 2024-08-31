@@ -1,6 +1,6 @@
 import { useReducer, useState } from '@wordpress/element';
 
-import { isNonEmptyObj, constructObjectWithValues } from '../utils/object';
+import { isNonEmptyObj, constructObjectWithValues } from '@/utils/object';
 
 type ValidationRuleFn = ( v: unknown ) => string | null;
 

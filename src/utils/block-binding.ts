@@ -1,5 +1,5 @@
-import { isObjectWithStringKeys } from './type-narrowing';
-import { BLOCK_BINDING_SOURCE } from '../config/constants';
+import { BLOCK_BINDING_SOURCE } from '@/config/constants';
+import { isObjectWithStringKeys } from '@/utils/type-narrowing';
 
 function getAttributeValue( attributes: unknown, key: string | undefined | null ): string {
 	if ( ! key || ! isObjectWithStringKeys( attributes ) ) {
@@ -14,29 +14,45 @@ function getAttributeValue( attributes: unknown, key: string | undefined | null 
 	return attributes[ key ]?.toString() ?? '';
 }
 
+function getExpectedAttributeValue(
+	result?: Record< string, string >,
+	args?: RemoteDataBlockBindingArgs
+): string | null {
+	if ( ! args?.field || ! result?.[ args.field ] ) {
+		return null;
+	}
+
+	let expectedValue = result[ args.field ];
+	if ( args.label ) {
+		expectedValue = `${ args.label }: ${ expectedValue }`;
+	}
+
+	return expectedValue ?? null;
+}
+
 export function getBoundAttributeEntries(
-	attributes: ContextInnerBlockAttributes
-): [ string, ContextBinding ][] {
+	attributes: RemoteDataInnerBlockAttributes
+): [ string, RemoteDataBlockBinding ][] {
 	return Object.entries( attributes.metadata?.bindings ?? {} ).filter(
 		( [ _target, binding ] ) => binding.source === BLOCK_BINDING_SOURCE
 	);
 }
 
 export function getMismatchedAttributes(
-	attributes: ContextInnerBlockAttributes,
+	attributes: RemoteDataInnerBlockAttributes,
 	results: RemoteData[ 'results' ],
 	index = 0
-): Partial< ContextInnerBlockAttributes > {
+): Partial< RemoteDataInnerBlockAttributes > {
 	return Object.fromEntries(
 		getBoundAttributeEntries( attributes )
 			.map( ( [ target, binding ] ) => [
 				target,
-				results[ index ]?.[ binding.args.field ] ?? null, // null signals a bad binding, ignore
+				getExpectedAttributeValue( results[ index ], binding.args ),
 			] )
 			.filter(
 				( [ target, value ] ) => null !== value && value !== getAttributeValue( attributes, target )
 			)
-	) as Partial< ContextInnerBlockAttributes >;
+	) as Partial< RemoteDataInnerBlockAttributes >;
 }
 
 export function hasRemoteDataChanged( one: RemoteData, two: RemoteData ): boolean {

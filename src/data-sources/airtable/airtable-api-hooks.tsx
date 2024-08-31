@@ -1,8 +1,8 @@
 import { useDebounce } from '@wordpress/compose';
 import { useEffect, useMemo, useCallback } from '@wordpress/element';
 
-import { AirtableApi } from './api';
-import { useQuery } from '../../hooks/useQuery';
+import { AirtableApi } from '@/data-sources/airtable/api';
+import { useQuery } from '@/hooks/useQuery';
 
 export const useAirtableApiUserId = ( token: string ) => {
 	const api = useMemo( () => new AirtableApi( token ), [ token ] );

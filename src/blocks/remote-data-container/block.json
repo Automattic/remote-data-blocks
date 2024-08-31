@@ -1,0 +1,26 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "remote-data-blocks/container",
+  "version": "0.1.0",
+  "title": "Remote Data Container",
+  "category": "widgets",
+  "icon": "cloud",
+<<<<<<< HEAD:src/blocks/context-container/block.json
+  "description": "Remote Data Container",
+=======
+  "description": "A container and context provider for Remote Data Blocks",
+>>>>>>> trunk:src/blocks/remote-data-container/block.json
+  "example": {},
+  "providesContext": {
+    "remote-data-blocks/remoteData": "remoteData"
+  },
+  "supports": {
+    "html": false,
+    "interactivity": true
+  },
+  "textdomain": "remote-data-blocks",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css"
+}

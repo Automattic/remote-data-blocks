@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from '@wordpress/element';
 
-import { SUPPORTED_SERVICES } from '../../data-sources/constants';
-import { DataSourceType } from '../../data-sources/types';
+import { SUPPORTED_SERVICES } from '@/data-sources/constants';
+import { DataSourceType } from '@/data-sources/types';
 
 interface DataSourceNavState {
 	screen: 'addDataSource' | 'editDataSource' | 'dataSourceList';

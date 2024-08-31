@@ -1,6 +1,6 @@
 import { registerPlugin } from '@wordpress/plugins';
 
-import PatternEditorSettingsPanel from './PatternEditorSettingsPanel';
+import PatternEditorSettingsPanel from '@/pattern-editor/PatternEditorSettingsPanel';
 
 registerPlugin( 'remote-data-blocks-settings', {
 	render: PatternEditorSettingsPanel,
