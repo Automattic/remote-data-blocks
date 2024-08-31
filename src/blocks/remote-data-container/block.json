@@ -6,11 +6,7 @@
   "title": "Remote Data Container",
   "category": "widgets",
   "icon": "cloud",
-<<<<<<< HEAD:src/blocks/context-container/block.json
-  "description": "Remote Data Container",
-=======
   "description": "A container and context provider for Remote Data Blocks",
->>>>>>> trunk:src/blocks/remote-data-container/block.json
   "example": {},
   "providesContext": {
     "remote-data-blocks/remoteData": "remoteData"
