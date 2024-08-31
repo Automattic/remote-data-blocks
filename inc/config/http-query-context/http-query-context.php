@@ -20,4 +20,5 @@ interface HttpQueryContext {
 	public function get_request_body( array $input_variables ): array|null;
 	public function get_query_name(): string;
 	public function get_query_runner(): QueryRunnerInterface;
+	public function get_results( string $response_data, array $input_variables ): array;
 }
