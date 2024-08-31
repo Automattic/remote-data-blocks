@@ -212,6 +212,9 @@ class QueryContext implements HttpQueryContext {
 			: ( $field_value[0] ?? $default_value );
 
 		switch ( $field_type ) {
+			case 'base64':
+				return base64_decode( $field_value_single );
+				
 			case 'price':
 				return sprintf( '$%s', number_format( $field_value_single, 2 ) );
 

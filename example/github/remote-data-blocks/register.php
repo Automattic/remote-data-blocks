@@ -8,20 +8,21 @@ use function add_action;
 
 require_once __DIR__ . '/inc/queries/class-github-datasource.php';
 require_once __DIR__ . '/inc/queries/class-github-get-file-as-html-query.php';
+require_once __DIR__ . '/inc/queries/class-github-get-file-as-raw-query.php';
 require_once __DIR__ . '/inc/queries/class-github-list-files-query.php';
 
-function register_github_file_block() {
-	$repo_owner  = 'Automattic';
-	$repo_name   = 'remote-data-blocks';
-	$branch      = 'trunk';
+function register_github_file_as_raw_block() {
+	$repo_owner = 'Automattic';
+	$repo_name  = 'remote-data-blocks';
+	$branch     = 'trunk';
 
-	$block_name  = sprintf( 'GitHub File (%s/%s)', $repo_owner, $repo_name );
+	$block_name = sprintf( 'GitHub File (%s/%s)', $repo_owner, $repo_name );
 
-	$github_datasource             = new GitHubDatasource( $repo_owner, $repo_name, $branch );
-	$github_get_file_as_html_query = new GitHubGetFileAsHtmlQuery( $github_datasource );
-	$github_get_list_files_query   = new GitHubListFilesQuery( $github_datasource );
+	$github_datasource            = new GitHubDatasource( $repo_owner, $repo_name, $branch );
+	$github_get_file_as_raw_query = new GitHubGetFileAsRawQuery( $github_datasource );
+	$github_get_list_files_query  = new GitHubListFilesQuery( $github_datasource );
 
-    ConfigurationLoader::register_block( $block_name, $github_get_file_as_html_query );
+	ConfigurationLoader::register_block( $block_name, $github_get_file_as_raw_query );
 	ConfigurationLoader::register_list_query( $block_name, $github_get_list_files_query );
 
 	$block_pattern1 = file_get_contents( __DIR__ . '/inc/patterns/file-picker.html' );
@@ -32,4 +33,28 @@ function register_github_file_block() {
 	$logger = LoggerManager::instance();
 	$logger->info( sprintf( 'Registered %s block (branch: %s)', $block_name, $branch ) );
 }
-add_action( 'register_remote_data_blocks', __NAMESPACE__ . '\\register_github_file_block' );
+add_action( 'register_remote_data_blocks', __NAMESPACE__ . '\\register_github_file_as_raw_block' );
+
+function register_github_file_as_html_block() {
+	$repo_owner = 'Automattic';
+	$repo_name  = 'remote-data-blocks';
+	$branch     = 'trunk';
+
+	$block_name = sprintf( 'GitHub File As HTML (%s/%s)', $repo_owner, $repo_name );
+
+	$github_datasource             = new GitHubDatasource( $repo_owner, $repo_name, $branch );
+	$github_get_file_as_html_query = new GitHubGetFileAsHtmlQuery( $github_datasource );
+	$github_get_list_files_query   = new GitHubListFilesQuery( $github_datasource );
+
+	ConfigurationLoader::register_block( $block_name, $github_get_file_as_html_query );
+	ConfigurationLoader::register_list_query( $block_name, $github_get_list_files_query );
+
+	$block_pattern1 = file_get_contents( __DIR__ . '/inc/patterns/file-picker.html' );
+	$block_pattern2 = file_get_contents( __DIR__ . '/inc/patterns/file-render.html' );
+	ConfigurationLoader::register_block_pattern( $block_name, 'remote-data-blocks/github-file-picker', $block_pattern1, [ 'title' => 'GitHub File Picker' ] );
+	ConfigurationLoader::register_block_pattern( $block_name, 'remote-data-blocks/github-file-render', $block_pattern2, [ 'title' => 'GitHub File Render' ] );
+
+	$logger = LoggerManager::instance();
+	$logger->info( sprintf( 'Registered %s block (branch: %s)', $block_name, $branch ) );
+}
+add_action( 'register_remote_data_blocks', __NAMESPACE__ . '\\register_github_file_as_html_block' );

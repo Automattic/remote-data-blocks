@@ -10,15 +10,15 @@ class GitHubGetFileAsHtmlQuery extends QueryContext {
 			'name' => 'File Path',
 			'type' => 'string',
 		],
-		'sha' => [
+		'sha'       => [
 			'name' => 'SHA',
 			'type' => 'string',
 		],
-		'size' => [
+		'size'      => [
 			'name' => 'Size',
 			'type' => 'number',
 		],
-		'url' => [
+		'url'       => [
 			'name' => 'URL',
 			'type' => 'string',
 		],
@@ -32,22 +32,22 @@ class GitHubGetFileAsHtmlQuery extends QueryContext {
 				'path' => '$.content',
 				'type' => 'string',
 			],
-			'file_path' => [
+			'file_path'    => [
 				'name' => 'File Path',
 				'path' => '$.path',
 				'type' => 'string',
 			],
-			'sha' => [
+			'sha'          => [
 				'name' => 'SHA',
 				'path' => '$.sha',
 				'type' => 'string',
 			],
-			'size' => [
+			'size'         => [
 				'name' => 'Size',
 				'path' => '$.size',
 				'type' => 'number',
 			],
-			'url' => [
+			'url'          => [
 				'name' => 'URL',
 				'path' => '$.url',
 				'type' => 'string',
@@ -76,33 +76,33 @@ class GitHubGetFileAsHtmlQuery extends QueryContext {
 			[
 				'result' => [
 					'file_content' => [
-						'name' => 'File Content',
-						'path' => '$.content',
-						'type' => 'string',
+						'name'  => 'File Content',
+						'path'  => '$.content',
+						'type'  => 'string',
 						'value' => $response_data,
 					],
-					'file_path' => [
-						'name' => 'File Path',
-						'path' => '$.path',
-						'type' => 'string',
+					'file_path'    => [
+						'name'  => 'File Path',
+						'path'  => '$.path',
+						'type'  => 'string',
 						'value' => $input_variables['file_path'],
 					],
-					'sha' => [
-						'name' => 'SHA',
-						'path' => '$.sha',
-						'type' => 'string',
+					'sha'          => [
+						'name'  => 'SHA',
+						'path'  => '$.sha',
+						'type'  => 'string',
 						'value' => $input_variables['sha'],
 					],
-					'size' => [
-						'name' => 'Size',
-						'path' => '$.size',
-						'type' => 'number',
+					'size'         => [
+						'name'  => 'Size',
+						'path'  => '$.size',
+						'type'  => 'number',
 						'value' => $input_variables['size'],
 					],
-					'url' => [
-						'name' => 'URL',
-						'path' => '$.url',
-						'type' => 'string',
+					'url'          => [
+						'name'  => 'URL',
+						'path'  => '$.url',
+						'type'  => 'string',
 						'value' => $input_variables['url'],
 					],
 				],

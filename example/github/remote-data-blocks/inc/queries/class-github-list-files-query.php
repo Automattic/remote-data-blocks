@@ -12,7 +12,7 @@ class GitHubListFilesQuery extends QueryContext {
 	];
 
 	public array $output_variables = [
-		'root_path'     => "$.tree[?(@.path =~ /\\.md$/)]",
+		'root_path'     => '$.tree[?(@.path =~ /\\.md$/)]',
 		'is_collection' => true,
 		'mappings'      => [
 			'file_path' => [
@@ -20,17 +20,17 @@ class GitHubListFilesQuery extends QueryContext {
 				'path' => '$.path',
 				'type' => 'string',
 			],
-			'sha' => [
+			'sha'       => [
 				'name' => 'SHA',
 				'path' => '$.sha',
 				'type' => 'string',
 			],
-			'size' => [
+			'size'      => [
 				'name' => 'Size',
 				'path' => '$.size',
 				'type' => 'number',
 			],
-			'url' => [
+			'url'       => [
 				'name' => 'URL',
 				'path' => '$.url',
 				'type' => 'string',

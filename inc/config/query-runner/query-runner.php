@@ -114,5 +114,5 @@ class QueryRunner implements QueryRunnerInterface {
 			'metadata'      => $this->query_context->get_metadata( $response, $results ),
 			'results'       => $results,
 		];
-	}	
+	}   
 }
