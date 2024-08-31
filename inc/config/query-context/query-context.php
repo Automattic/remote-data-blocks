@@ -165,12 +165,13 @@ class QueryContext implements HttpQueryContext {
 	public function get_results( string $response_data, array $input_variables ): array {
 		$root             = $response_data;
 		$output_variables = $this->output_variables;
+		$is_collection    = $output_variables['is_collection'] ?? false;
 
 		if ( ! empty( $output_variables['root_path'] ) ) {
 			$json = new JsonObject( $root );
 			$root = $json->get( $output_variables['root_path'] );
 		} else {
-			$root = $output_variables['is_collection'] ? $root : [ $root ];
+			$root = $is_collection ? $root : [ $root ];
 		}
 
 		if ( empty( $root ) || empty( $output_variables['mappings'] ) ) {

@@ -7,8 +7,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use RemoteDataBlocks\Config\QueryRunner;
 use RemoteDataBlocks\Config\QueryRunnerInterface;
-use RemoteDataBlocks\Config\HttpQueryContext;
 use RemoteDataBlocks\Config\HttpDatasourceConfig;
+use RemoteDataBlocks\Config\QueryContext;
 use RemoteDataBlocks\HttpClient;
 use WP_Error;
 
@@ -20,6 +20,8 @@ class QueryRunnerTest extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
+
+		$this->http_client = $this->createMock( HttpClient::class );
 
 		$this->http_datasource = new class() implements HttpDatasourceConfig {
 			private $endpoint = 'https://api.example.com';
@@ -46,15 +48,15 @@ class QueryRunnerTest extends TestCase {
 			}
 		};
 
-		$this->query_context = new class($this->http_datasource) implements HttpQueryContext {
+		$this->query_context = new class($this->http_datasource, $this->http_client) extends QueryContext {
 			private $http_datasource;
 			private $http_client;
 			private $request_method = 'GET';
 			private $request_body   = [ 'query' => 'test' ];
 
-			public function __construct( HttpDatasourceConfig $http_datasource ) {
+			public function __construct( HttpDatasourceConfig $http_datasource, HttpClient $http_client ) {
 				$this->http_datasource = $http_datasource;
-				$this->http_client     = new HttpClient();
+				$this->http_client     = $http_client;
 			}
 
 			public function get_endpoint( array $input_variables = [] ): string {
@@ -89,10 +91,6 @@ class QueryRunnerTest extends TestCase {
 				return new QueryRunner( $this, $this->http_client );
 			}
 
-			public function set_http_client( HttpClient $http_client ): void {
-				$this->http_client = $http_client;
-			}
-
 			public function set_request_method( string $method ): void {
 				$this->request_method = $method;
 			}
@@ -103,9 +101,6 @@ class QueryRunnerTest extends TestCase {
 
 			public array $output_variables = [];
 		};
-
-		$this->http_client = $this->createMock( HttpClient::class );
-		$this->query_context->set_http_client( $this->http_client );
 	}
 
 	public function testExecuteSuccessfulRequest() {
