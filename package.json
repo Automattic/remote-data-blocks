@@ -70,7 +70,7 @@
     "@wordpress/url": "4.6.0",
     "eslint": "8.57.0",
     "fork-ts-checker-webpack-plugin": "9.0.2",
-    "happy-dom": "15.0.0",
+    "happy-dom": "15.7.3",
     "phplint": "2.0.5",
     "prettier": "npm:wp-prettier@2.8.5",
     "react": "18.3.1",
