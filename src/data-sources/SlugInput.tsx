@@ -4,8 +4,8 @@ import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import React from 'react';
 
-import { useDataSources } from './hooks/useDataSources';
-import { sanitizeDatasourceSlug } from './utils';
+import { useDataSources } from '@/data-sources/hooks/useDataSources';
+import { sanitizeDatasourceSlug } from '@/data-sources/utils';
 
 interface SlugInputProps {
 	slug: string;

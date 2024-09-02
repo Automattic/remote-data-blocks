@@ -10,7 +10,7 @@ import {
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { DataSourceType } from './types';
+import { DataSourceType } from '@/data-sources/types';
 
 interface AddDataSourceModalProps {
 	onSubmit: ( service: DataSourceType ) => void;

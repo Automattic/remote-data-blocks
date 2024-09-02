@@ -60,7 +60,7 @@ class VipBlockDataApi {
 		return $resolved_block;
 	}
 
-	// Hacky dance to match up the data (from DB) with the context key core expects in context-container block.json
+	// Hacky dance to match up the data (from DB) with the context key core expects in remote-data-container block.json
 	private static function extract_block_context( array $parsed_block ): array {
 		$attrs[ BlockBindings::$context_name ] = $parsed_block['attrs']['remoteData'];
 		unset( $parsed_block['attrs']['remoteData'] );

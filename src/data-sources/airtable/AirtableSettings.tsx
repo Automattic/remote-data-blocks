@@ -12,20 +12,20 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
+import { SlugInput } from '@/data-sources/SlugInput';
 import {
 	useAirtableApiBases,
 	useAirtableApiTables,
 	useAirtableApiUserId,
-} from './airtable-api-hooks';
-import { AirtableFormState } from './types';
-import { useForm } from '../../hooks/useForm';
-import PasswordInputControl from '../../settings/PasswordInputControl';
-import { useSettingsContext } from '../../settings/hooks/useSettingsNav';
-import { IdName } from '../../types/common';
-import { SelectOption } from '../../types/input';
-import { SlugInput } from '../SlugInput';
-import { useDataSources } from '../hooks/useDataSources';
-import { AirtableConfig } from '../types';
+} from '@/data-sources/airtable/airtable-api-hooks';
+import { AirtableFormState } from '@/data-sources/airtable/types';
+import { useDataSources } from '@/data-sources/hooks/useDataSources';
+import { AirtableConfig } from '@/data-sources/types';
+import { useForm } from '@/hooks/useForm';
+import PasswordInputControl from '@/settings/PasswordInputControl';
+import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
+import { IdName } from '@/types/common';
+import { SelectOption } from '@/types/input';
 
 export interface AirtableSettingsProps {
 	mode: 'add' | 'edit';

@@ -4,8 +4,8 @@ import { useEffect, useState, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore, NoticeStoreActions } from '@wordpress/notices';
 
-import { REST_BASE_DATA_SOURCES } from '../constants';
-import { DataSourceConfig } from '../types';
+import { REST_BASE_DATA_SOURCES } from '@/data-sources/constants';
+import { DataSourceConfig } from '@/data-sources/types';
 
 export const useDataSources = ( loadOnMount = true ) => {
 	const [ loadingDataSources, setLoadingDataSources ] = useState< boolean >( false );

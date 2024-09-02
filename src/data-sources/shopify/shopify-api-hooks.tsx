@@ -2,8 +2,8 @@ import { useDebounce } from '@wordpress/compose';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
-import { ShopifyApi } from './shopify-api';
-import { useQuery } from '../../hooks/useQuery';
+import { ShopifyApi } from '@/data-sources/shopify/shopify-api';
+import { useQuery } from '@/hooks/useQuery';
 
 export interface ShopifyConnection {
 	shopName: string | null;

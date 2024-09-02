@@ -12,12 +12,12 @@ import { DialogInputEvent } from '@wordpress/components/src/confirm-dialog/types
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import AddDataSourceModal from './AddDataSourceModal';
-import { useDataSources } from './hooks/useDataSources';
-import { DataSourceConfig, DataSourceType } from './types';
-import { Tag } from '../components/tag';
-import { useSettingsContext } from '../settings/hooks/useSettingsNav';
-import { toTitleCase } from '../utils/string';
+import { Tag } from '@/components/tag';
+import AddDataSourceModal from '@/data-sources/AddDataSourceModal';
+import { useDataSources } from '@/data-sources/hooks/useDataSources';
+import { DataSourceConfig, DataSourceType } from '@/data-sources/types';
+import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
+import { toTitleCase } from '@/utils/string';
 
 const DataSourceList = () => {
 	const { dataSources, loadingDataSources, deleteDataSource, fetchDataSources } = useDataSources();

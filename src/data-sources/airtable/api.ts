@@ -1,6 +1,11 @@
 import { __, sprintf } from '@wordpress/i18n';
 
-import { AirtableBasesResult, AirtableBase, AirtableBaseSchema, AirtableTable } from './types';
+import {
+	AirtableBasesResult,
+	AirtableBase,
+	AirtableBaseSchema,
+	AirtableTable,
+} from '@/data-sources/airtable/types';
 
 export class AirtableApi {
 	private static BASE_URL = 'https://api.airtable.com/v0';
