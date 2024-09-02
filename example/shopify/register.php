@@ -3,6 +3,8 @@
 namespace RemoteDataBlocks\Example\Shopify;
 
 use RemoteDataBlocks\Config\ShopifyDatasource;
+use RemoteDataBlocks\Config\ShopifyGetProductQuery;
+use RemoteDataBlocks\Config\ShopifySearchProductsQuery;
 use RemoteDataBlocks\Editor\ConfigurationLoader;
 use RemoteDataBlocks\Logging\LoggerManager;
 use function add_action;
@@ -10,9 +12,7 @@ use function add_action;
 require_once __DIR__ . '/inc/interactivity-store/interactivity-store.php';
 require_once __DIR__ . '/inc/queries/class-shopify-add-to-cart-mutation.php';
 require_once __DIR__ . '/inc/queries/class-shopify-create-cart-mutation.php';
-require_once __DIR__ . '/inc/queries/class-shopify-get-product-query.php';
 require_once __DIR__ . '/inc/queries/class-shopify-remove-from-cart-mutation.php';
-require_once __DIR__ . '/inc/queries/class-shopify-search-products-query.php';
 
 function register_shopify_block() {
 	$block_name   = 'Shopify Product';

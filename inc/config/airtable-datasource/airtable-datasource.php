@@ -5,6 +5,8 @@ namespace RemoteDataBlocks\Config;
 use RemoteDataBlocks\Config\HttpDatasource;
 
 class AirtableDatasource extends HttpDatasource {
+	use DynamicDatasource;
+
 	private $tables;
 
 	public function __construct( private string $access_token, private string $base, mixed $tables ) {

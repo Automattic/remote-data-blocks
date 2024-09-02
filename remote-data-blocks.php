@@ -26,6 +26,9 @@ define( 'REMOTE_DATA_BLOCKS__REST_NAMESPACE', 'remote-data-blocks/v1' );
 require_once __DIR__ . '/inc/autoloader.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
+// TODO: Figure out autoloader for this:
+require_once __DIR__ . '/inc/config/dynamic-datasource-trait.php';
+
 // Other editor modifications
 Editor\AdminNotices::init();
 Editor\BlockBindings::init();
