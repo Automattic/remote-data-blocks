@@ -13,7 +13,7 @@ class TestQueryContext extends QueryContext {
 	public function __construct( private QueryRunnerInterface $mock_qr ) {
 		parent::__construct( new HttpDatasource( [
 			'endpoint' => 'https://api.example.com',
-			'headers' => [ 'Content-Type' => 'application/json' ],
+			'headers'  => [ 'Content-Type' => 'application/json' ],
 		] ) );
 	}
 

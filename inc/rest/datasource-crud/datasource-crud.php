@@ -91,21 +91,21 @@ class DatasourceCRUD {
 		}
 
 		return [
-			'uuid'    => $source->uuid,
-			'token'   => sanitize_text_field( $source->token ),
-			'service' => 'airtable',
-			'base'    => $source->base,
-			'table'   => $source->table,
-			'slug'    => sanitize_text_field( $source->slug ),
+			'uuid'            => $source->uuid,
+			'token'           => sanitize_text_field( $source->token ),
+			'service'         => 'airtable',
+			'base'            => $source->base,
+			'table'           => $source->table,
+			'slug'            => sanitize_text_field( $source->slug ),
 			// quick hack to transform data to our experimental format
-			'friendly_name' => sanitize_text_field( $source->slug ),
-			'uid'     => hash( 'sha256', $source->slug ),
-			'endpoint' => 'https://api.airtable.com/v0/' . $source->base['id'] . '/' . $source->table['id'],
+			'friendly_name'   => sanitize_text_field( $source->slug ),
+			'uid'             => hash( 'sha256', $source->slug ),
+			'endpoint'        => 'https://api.airtable.com/v0/' . $source->base['id'] . '/' . $source->table['id'],
 			'request_headers' => [
 				'Authorization' => 'Bearer ' . $source->token,
-				'Content-Type' => 'application/json',
+				'Content-Type'  => 'application/json',
 			],
-			'image_url' => null,
+			'image_url'       => null,
 		];
 	}
 
@@ -115,20 +115,20 @@ class DatasourceCRUD {
 		}
 
 		return [
-			'uuid'    => $source->uuid,
-			'token'   => sanitize_text_field( $source->token ),
-			'service' => 'shopify',
-			'store'   => sanitize_text_field( $source->store ),
-			'slug'    => sanitize_text_field( $source->slug ),
+			'uuid'            => $source->uuid,
+			'token'           => sanitize_text_field( $source->token ),
+			'service'         => 'shopify',
+			'store'           => sanitize_text_field( $source->store ),
+			'slug'            => sanitize_text_field( $source->slug ),
 			// quick hack totransform data to our experimental format
-			'friendly_name' => sanitize_text_field( $source->slug ),
-			'uid'     => hash( 'sha256', $source->slug ),
-			'endpoint' => 'https://' . $source->store . '.myshopify.com/api/2024-04/graphql.json',
+			'friendly_name'   => sanitize_text_field( $source->slug ),
+			'uid'             => hash( 'sha256', $source->slug ),
+			'endpoint'        => 'https://' . $source->store . '.myshopify.com/api/2024-04/graphql.json',
 			'request_headers' => [
-				'Content-Type' => 'application/json',
+				'Content-Type'                      => 'application/json',
 				'X-Shopify-Storefront-Access-Token' => $source->token,
 			],
-			'image_url' => plugins_url( '../../assets/shopify_logo_black.png', __FILE__ ),
+			'image_url'       => plugins_url( '../../assets/shopify_logo_black.png', __FILE__ ),
 		];
 	}
 

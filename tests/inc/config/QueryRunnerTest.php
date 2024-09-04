@@ -24,7 +24,7 @@ class QueryRunnerTest extends TestCase {
 
 		$this->http_datasource = new HttpDatasource( [
 			'endpoint' => 'https://api.example.com',
-			'headers' => [ 'Content-Type' => 'application/json' ],
+			'headers'  => [ 'Content-Type' => 'application/json' ],
 		] );
 
 		$this->query_context = new class($this->http_datasource) implements HttpQueryContext {

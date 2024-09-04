@@ -10,9 +10,9 @@ require_once __DIR__ . '/inc/queries/class-art-institute-search-query.php';
 
 function register_aic_block() {
 	$config = [
-		'friendly_name' => 'Art Institute of Chicago',
-		'uid' => 'aic_artworks',
-		'endpoint' => 'https://api.artic.edu/api/v1/artworks',
+		'friendly_name'   => 'Art Institute of Chicago',
+		'uid'             => 'aic_artworks',
+		'endpoint'        => 'https://api.artic.edu/api/v1/artworks',
 		'request_headers' => [
 			'Content-Type' => 'application/json',
 		],

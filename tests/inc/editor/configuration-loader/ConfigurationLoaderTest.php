@@ -14,7 +14,7 @@ class ConfigurationLoaderTest extends TestCase {
 	public function testIsRegisteredBlockReturnsTrueForRegisteredBlock() {
 		$http_datasource = new HttpDatasource( [
 			'endpoint' => 'https://api.example.com',
-			'headers' => [ 'Content-Type' => 'application/json' ],
+			'headers'  => [ 'Content-Type' => 'application/json' ],
 		] );
 		ConfigurationLoader::register_block( 'some_slick_block', new QueryContext( $http_datasource ) );
 		$this->assertTrue( ConfigurationLoader::is_registered_block( 'remote-data-blocks/some_slick_block' ) );

@@ -9,15 +9,15 @@ require_once __DIR__ . '/inc/queries/class-get-zip-code-query.php';
 
 function register_zipcode_block() {
 	$config = [
-		'friendly_name' => 'zippopotam.us',
-		'uid' => 'zippopotamus',
-		'endpoint' => 'https://api.zippopotam.us/us/90210',
+		'friendly_name'   => 'zippopotam.us',
+		'uid'             => 'zippopotamus',
+		'endpoint'        => 'https://api.zippopotam.us/us/90210',
 		'request_headers' => [
 			'Content-Type' => 'application/json',
 		],
 	];
 
-	$zipcode_query      = new GetZipCodeQuery( new HttpDatasource( $config ) );
+	$zipcode_query = new GetZipCodeQuery( new HttpDatasource( $config ) );
 
 	ConfigurationLoader::register_block( 'Zip Code', $zipcode_query );
 }
