@@ -7,11 +7,14 @@ use RemoteDataBlocks\Config\QueryContext;
 use RemoteDataBlocks\Config\QueryRunnerInterface;
 use RemoteDataBlocks\Editor\ConfigurationLoader;
 use RemoteDataBlocks\Test\MockQueryRunner;
-use RemoteDataBlocks\Test\TestDatasource;
+use RemoteDataBlocks\Config\HttpDatasource;
 
 class TestQueryContext extends QueryContext {
 	public function __construct( private QueryRunnerInterface $mock_qr ) {
-		parent::__construct( new TestDatasource() );
+		parent::__construct( new HttpDatasource( [
+			'endpoint' => 'https://api.example.com',
+			'headers' => [ 'Content-Type' => 'application/json' ],
+		] ) );
 	}
 
 	public function get_query_runner(): QueryRunnerInterface {

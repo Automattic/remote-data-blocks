@@ -32,8 +32,6 @@ class ConfigurationLoader {
 	public static function register_remote_data_blocks() {
 		// Allow other plugins to register their blocks.
 		do_action( 'register_remote_data_blocks' );
-
-		self::register_blocks_for_dynamic_data_sources();
 	}
 
 	/**

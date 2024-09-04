@@ -1,57 +1,77 @@
 <?php
 
-/**
- * HttpDatasource class
- *
- * @package remote-data-blocks
- * @since 0.1.0
- */
-
 namespace RemoteDataBlocks\Config;
 
 defined( 'ABSPATH' ) || exit();
 
 /**
- * Base class used to define a Remote Data Blocks Datasource for an HTTP API. It
- * defines the properties of an API that will be shared by queries against that
- * API.
+ * HttpDatasource class
  *
- * Assumptions:
- * - The API speaks valid JSON, both for request and response bodies.
- * - The API returns 2XX for successful requests.
- * - The API returns 3XX for redirects with a maximum of 5 redirects.
- * - The API returns 4XX or 5XX for unrecoverable errors, in which case the
- *   response should be ignored.
+ * Implements the HttpDatasourceInterface to define a generic HTTP datasource.
  *
- * If you are a WPVIP customer, datasources are automatically provided by VIP.
- * Only extend this class if you have custom datasources not provided by VIP.
+ * @package remote-data-blocks
+ * @since 0.1.0
  */
-abstract class HttpDatasource implements HttpDatasourceConfig {
+class HttpDatasource implements HttpDatasourceInterface {
 
 	/**
-	 * Get the endpoint for the query. Note that the query configuration has an
-	 * opportunity to change / override the endpoint at request time. For REST
-	 * APIs, a useful pattern is for the datasource to define a base endpoint and
-	 * the query config to target a specific resource.
+	 * Configuration object for this HTTP datasource.
+	 *
+	 * @var array
+	 */
+	private array $config;
+
+	/**
+	 * Constructor for the HttpDatasource.
+	 *
+	 * @param array $config The configuration object for this HTTP datasource.
+	 */
+	public function __construct( array $config ) {
+		$this->config = $config;
+	}
+
+	/**
+	 * Get a human-readable name for this datasource.
+	 *
+	 * @return string The friendly name of the datasource.
+	 */
+	public function get_friendly_name(): string {
+		return $this->config['friendly_name'];
+	}
+
+	/**
+	 * Get a unique identifier for this datasource.
+	 *
+	 * @return string The unique identifier of the datasource.
+	 */
+	public function get_uid(): string {
+		return hash( 'sha256', $this->config['uid'] );
+	}
+
+	/**
+	 * Get the endpoint for the query.
 	 *
 	 * @return string The endpoint for the query.
 	 */
-	abstract public function get_endpoint(): string;
+	public function get_endpoint(): string {
+		return $this->config['endpoint'];
+	}
 
 	/**
-	 * Get the request headers. Override this method to provide authorization or
-	 * other custom request headers. Note that the query configuration can override
-	 * or extend these headers at request time.
+	 * Get the request headers.
 	 *
 	 * @return array Associative array of request headers.
 	 */
-	abstract public function get_request_headers(): array;
+	public function get_request_headers(): array {
+		return $this->config['request_headers'] ?? [];
+	}
 
 	/**
-	 * An optional image URL that can represent the datasource in the block editor
-	 * (e.g., in modals or in the block inspector).
+	 * Get the optional image URL for the datasource.
+	 *
+	 * @return string|null The image URL or null if not set.
 	 */
-	public function get_image_url(): string|null {
-		return null;
+	public function get_image_url(): ?string {
+		return $this->config['image_url'] ?? null;
 	}
 }
