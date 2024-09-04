@@ -39,6 +39,6 @@ class AirtableEldenRingListLocationsQuery extends QueryContext {
 	];
 
 	public function get_endpoint( array $input_variables ): string {
-		return $this->get_datasource()->get_endpoint() . '?filterByFormula=FIND%28%27' . $input_variables['map_name'] . '%27%2C%20%7BMap%7D%29%3E0';
+		return $this->get_datasource()->get_endpoint() . '/tblc82R9msH4Yh6ZX?filterByFormula=FIND%28%27' . $input_variables['map_name'] . '%27%2C%20%7BMap%7D%29%3E0';
 	}
 }

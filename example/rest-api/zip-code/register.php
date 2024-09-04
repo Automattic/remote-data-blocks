@@ -11,7 +11,7 @@ function register_zipcode_block() {
 	$config = [
 		'friendly_name'   => 'zippopotam.us',
 		'uid'             => 'zippopotamus',
-		'endpoint'        => 'https://api.zippopotam.us/us/90210',
+		'endpoint'        => 'https://api.zippopotam.us/us/',
 		'request_headers' => [
 			'Content-Type' => 'application/json',
 		],

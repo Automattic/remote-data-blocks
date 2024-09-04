@@ -35,7 +35,7 @@ function register_shopify_block() {
 			'Content-Type'                      => 'application/json',
 			'X-Shopify-Storefront-Access-Token' => $access_token,
 		],
-		'image_url'       => plugins_url( '../../assets/shopify_logo_black.png', __FILE__ ),
+		'image_url'       => plugins_url( './assets/shopify_logo_black.png', __FILE__ ),
 	];
 
 	$block_pattern = file_get_contents( __DIR__ . '/inc/patterns/product-teaser.html' );

@@ -128,7 +128,7 @@ class DatasourceCRUD {
 				'Content-Type'                      => 'application/json',
 				'X-Shopify-Storefront-Access-Token' => $source->token,
 			],
-			'image_url'       => plugins_url( '../../assets/shopify_logo_black.png', __FILE__ ),
+			'image_url'       => null,
 		];
 	}
 
