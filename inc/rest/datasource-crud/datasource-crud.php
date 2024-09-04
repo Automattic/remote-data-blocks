@@ -4,6 +4,26 @@ namespace RemoteDataBlocks\REST;
 
 use WP_Error;
 
+/**
+ * Handles CRUD operations for remote data sources.
+ *
+ * This class manages the configuration of remote data sources for the Remote Data Blocks plugin.
+ * It provides methods for validating, creating, reading, updating, and deleting data source entries.
+ *
+ * Core data structure:
+ * The class uses a WordPress option to store an array of data source objects. Each object represents
+ * a remote data source with the following structure:
+ * {
+ *     uuid: string,    // Unique identifier for the data source
+ *     slug: string,    // URL-friendly name for the data source
+ *     service: string, // Type of service (e.g., 'airtable', 'shopify')
+ *     token: string,   // Authentication token for the service
+ *     // Additional fields specific to each service type
+ * }
+ *
+ * The array of these objects is stored in the WordPress options table under the key defined
+ * by CONFIG_OPTION_NAME.
+ */
 class DatasourceCRUD {
 	const CONFIG_OPTION_NAME = 'remote_data_blocks_config';
 	const DATA_SOURCE_TYPES  = [ 'airtable', 'shopify' ];
@@ -70,13 +90,22 @@ class DatasourceCRUD {
 			return new WP_Error( 'invalid_table', __( 'Invalid table. Must have id and name fields.', 'remote-data-blocks' ) );
 		}
 
-		return (object) [
+		return [
 			'uuid'    => $source->uuid,
 			'token'   => sanitize_text_field( $source->token ),
 			'service' => 'airtable',
 			'base'    => $source->base,
 			'table'   => $source->table,
 			'slug'    => sanitize_text_field( $source->slug ),
+			// quick hack to transform data to our experimental format
+			'friendly_name' => sanitize_text_field( $source->slug ),
+			'uid'     => hash( 'sha256', $source->slug ),
+			'endpoint' => 'https://api.airtable.com/v0/' . $source->base['id'] . '/' . $source->table['id'],
+			'request_headers' => [
+				'Authorization' => 'Bearer ' . $source->token,
+				'Content-Type' => 'application/json',
+			],
+			'image_url' => null,
 		];
 	}
 
@@ -85,12 +114,21 @@ class DatasourceCRUD {
 			return new WP_Error( 'missing_token', __( 'Missing token.', 'remote-data-blocks' ) );
 		}
 
-		return (object) [
+		return [
 			'uuid'    => $source->uuid,
 			'token'   => sanitize_text_field( $source->token ),
 			'service' => 'shopify',
 			'store'   => sanitize_text_field( $source->store ),
 			'slug'    => sanitize_text_field( $source->slug ),
+			// quick hack totransform data to our experimental format
+			'friendly_name' => sanitize_text_field( $source->slug ),
+			'uid'     => hash( 'sha256', $source->slug ),
+			'endpoint' => 'https://' . $source->store . '.myshopify.com/api/2024-04/graphql.json',
+			'request_headers' => [
+				'Content-Type' => 'application/json',
+				'X-Shopify-Storefront-Access-Token' => $source->token,
+			],
+			'image_url' => plugins_url( '../../assets/shopify_logo_black.png', __FILE__ ),
 		];
 	}
 
@@ -158,8 +196,16 @@ class DatasourceCRUD {
 		return (array) get_option( self::CONFIG_OPTION_NAME, [] );
 	}
 
-	public static function get_data_sources() {
-		return self::get_config() ?? [];
+	public static function get_data_sources( string $service = '' ) {
+		$data_sources = self::get_config();
+
+		if ( $service ) {
+			return array_filter( $data_sources, function ( $config ) use ( $service ) {
+				return $config->service === $service;
+			} );
+		}
+
+		return $data_sources;
 	}
 
 	public static function get_item_by_uuid( $data_sources, string $uuid ) {

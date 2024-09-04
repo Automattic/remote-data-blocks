@@ -6,12 +6,8 @@ defined( 'ABSPATH' ) || exit();
 
 use Error;
 use RemoteDataBlocks\Config\QueryContext;
-use RemoteDataBlocks\Config\ShopifyDatasource;
-use RemoteDataBlocks\Config\ShopifyGetProductQuery;
-use RemoteDataBlocks\Config\ShopifySearchProductsQuery;
 use RemoteDataBlocks\Logging\Logger;
 use RemoteDataBlocks\Logging\LoggerManager;
-use RemoteDataBlocks\REST\DatasourceCRUD;
 
 use function add_action;
 use function do_action;
@@ -248,34 +244,5 @@ class ConfigurationLoader {
 		}
 
 		self::$configurations = [];
-	}
-
-	private static function register_blocks_for_dynamic_data_sources(): void {
-		$data_sources_from_config = DatasourceCRUD::get_data_sources();
-
-		foreach ( $data_sources_from_config as $_source ) {
-			switch ( $_source->service ) {
-				case 'shopify':
-					$datasource = new ShopifyDatasource( $_source->token, $_source->store );
-					$datasource->set_uuid( $_source->uuid );
-					$datasource->set_slug( $_source->slug );
-					self::register_blocks_for_shopify_data_source( $datasource );
-					break;
-				default:
-					break;
-			}
-		}
-	}
-
-	private static function register_blocks_for_shopify_data_source( ShopifyDatasource $datasource ): void {
-			$block_name = 'Shopify ' . $datasource->get_store_name();
-
-			$shopify_get_product_query = new ShopifyGetProductQuery( $datasource );
-			self::register_block( $block_name, $shopify_get_product_query );
-			self::$logger->debug( sprintf( 'Registered "%s" block for dynamic data source - %s', $block_name, $datasource->get_slug() ) );
-
-			$shopify_search_products_query = new ShopifySearchProductsQuery( $datasource );
-			self::register_search_query( $block_name, $shopify_search_products_query );
-			self::$logger->debug( sprintf( 'Registered "%s" _search query_ block for dynamic data source - %s', $block_name, $datasource->get_slug() ) );
 	}
 }

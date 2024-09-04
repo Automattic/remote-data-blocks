@@ -22,6 +22,11 @@ define( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION', '0.1.0' );
 
 define( 'REMOTE_DATA_BLOCKS__REST_NAMESPACE', 'remote-data-blocks/v1' );
 
+// Datasource services
+define( 'REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE', 'airtable' );
+define( 'REMOTE_DATA_BLOCKS_GITHUB_SERVICE', 'github' );
+define( 'REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE', 'shopify' );
+
 // Autoloader
 require_once __DIR__ . '/inc/autoloader.php';
 require_once __DIR__ . '/vendor/autoload.php';
