@@ -123,7 +123,7 @@ class DatasourceCRUD {
 			// quick hack totransform data to our experimental format
 			'friendly_name'   => sanitize_text_field( $source->slug ),
 			'uid'             => hash( 'sha256', $source->slug ),
-			'endpoint'        => 'https://' . $source->store . '.myshopify.com/api/2024-04/graphql.json',
+			'endpoint'        => 'https://' . $source->store . '.myshopify.com/api/2024-07/graphql.json',
 			'request_headers' => [
 				'Content-Type'                      => 'application/json',
 				'X-Shopify-Storefront-Access-Token' => $source->token,

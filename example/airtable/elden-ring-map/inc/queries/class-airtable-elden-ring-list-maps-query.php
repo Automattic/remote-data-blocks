@@ -29,7 +29,7 @@ class AirtableEldenRingListMapsQuery extends QueryContext {
 	];
 
 	public function get_endpoint( $input_variables ): string {
-		return $this->get_datasource()->get_endpoint() . '/tblS3OYo8tZOg04CP';
+		return $this->get_datasource()->get_endpoint();
 	}
 
 	public function get_query_name(): string {

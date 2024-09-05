@@ -45,7 +45,7 @@ class HttpDatasource implements HttpDatasourceInterface {
 	 * @return string The unique identifier of the datasource.
 	 */
 	public function get_uid(): string {
-		return hash( 'sha256', $this->config['uid'] );
+		return $this->config['uid'];
 	}
 
 	/**

@@ -18,7 +18,6 @@ require_once __DIR__ . '/inc/queries/class-shopify-remove-from-cart-mutation.php
 require_once __DIR__ . '/inc/queries/class-shopify-search-products-query.php';
 
 function register_shopify_block() {
-	$block_name   = 'hardcode example';
 	$access_token = \RemoteDataBlocks\Example\get_access_token( 'shopify' );
 
 	if ( empty( $access_token ) ) {
@@ -28,9 +27,9 @@ function register_shopify_block() {
 	}
 
 	$config = [
-		'friendly_name'   => $block_name,
+		'friendly_name'   => 'hardcode example',
 		'uid'             => 'stoph-test',
-		'endpoint'        => 'https://stoph-test.myshopify.com/api/2024-04/graphql.json',
+		'endpoint'        => 'https://stoph-test.myshopify.com/api/2024-07/graphql.json',
 		'request_headers' => [
 			'Content-Type'                      => 'application/json',
 			'X-Shopify-Storefront-Access-Token' => $access_token,

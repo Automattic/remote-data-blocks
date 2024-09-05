@@ -21,20 +21,29 @@ function register_airtable_elden_ring_map_block() {
 		$logger->warning( sprintf( '%s is not defined, cannot register %s block', 'EXAMPLE_AIRTABLE_ELDEN_RING_ACCESS_TOKEN', $block_name ) );
 		return;
 	}
-	
-	$config = [
-		'friendly_name'   => $block_name,
-		'uid'             => 'appqI3sJ9R2NcML8Y',
-		'endpoint'        => 'https://api.airtable.com/v0/appqI3sJ9R2NcML8Y',
+
+	$locations_config = [
+		'friendly_name'   => $block_name . ' (Locations)',
+		'uid'             => 'appqI3sJ9R2NcML8Y/tblc82R9msH4Yh6ZX',
+		'endpoint'        => 'https://api.airtable.com/v0/appqI3sJ9R2NcML8Y/tblc82R9msH4Yh6ZX',
 		'request_headers' => [
 			'Authorization' => "Bearer {$access_token}",
 			'Content-Type'  => 'application/json',
 		],
 	];
 
-	$datasource           = new HttpDatasource( $config );
-	$list_locations_query = new AirtableEldenRingListLocationsQuery( $datasource );
-	$list_maps_query      = new AirtableEldenRingListMapsQuery( $datasource );
+	$maps_config = [
+		'friendly_name'   => $block_name . ' (Maps)',
+		'uid'             => 'appqI3sJ9R2NcML8Y/tblS3OYo8tZOg04CP',
+		'endpoint'        => 'https://api.airtable.com/v0/appqI3sJ9R2NcML8Y/tblS3OYo8tZOg04CP',
+		'request_headers' => [
+			'Authorization' => "Bearer {$access_token}",
+			'Content-Type'  => 'application/json',
+		],
+	];
+	
+	$list_locations_query = new AirtableEldenRingListLocationsQuery( new HttpDatasource( $locations_config ) );
+	$list_maps_query      = new AirtableEldenRingListMapsQuery( new HttpDatasource( $maps_config ) );
 
 	ConfigurationLoader::register_block( $block_name, $list_locations_query );
 	ConfigurationLoader::register_list_query( $block_name, $list_maps_query );
