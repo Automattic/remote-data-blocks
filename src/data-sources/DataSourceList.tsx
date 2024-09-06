@@ -14,6 +14,7 @@ import { __ } from '@wordpress/i18n';
 
 import { Tag } from '@/components/tag';
 import AddDataSourceModal from '@/data-sources/AddDataSourceModal';
+import { SUPPORTED_SERVICES } from '@/data-sources/constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig, DataSourceType } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
@@ -60,7 +61,7 @@ const DataSourceList = () => {
 	}
 
 	const getValidDataSources = () => {
-		return dataSources.filter( source => [ 'airtable', 'shopify' ].includes( source.service ) );
+		return dataSources.filter( source => SUPPORTED_SERVICES.includes( source.service ) );
 	};
 
 	const renderDataSourceMeta = ( source: DataSourceConfig ) => {
@@ -77,6 +78,19 @@ const DataSourceList = () => {
 			return (
 				<>
 					<Tag id="shopify-store" label="Store" value={ source.store } />
+				</>
+			);
+		}
+
+		if ( source.service === 'google-sheets' ) {
+			return (
+				<>
+					<Tag
+						id="google-sheets-spreadsheet"
+						label="Spreadsheet"
+						value={ source.spreadsheet.name }
+					/>
+					<Tag id="google-sheets-sheet" label="Sheet" value={ source.sheet.name } />
 				</>
 			);
 		}
