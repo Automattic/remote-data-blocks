@@ -98,19 +98,91 @@ class QueryRunner implements QueryRunnerInterface {
 		}
 
 		// The body is a stream... if we need to read it in chunks, etc. we can do so here.
-		$response_data = $response->getBody()->getContents();
+		$raw_response_data = $response->getBody()->getContents();
 
-		if ( isset( $response_data['errors'][0]['message'] ) ) {
+		if ( isset( $raw_response_data['errors'][0]['message'] ) ) {
 			$logger = LoggerManager::instance();
-			$logger->warning( sprintf( 'Query error: %s', esc_html( $response_data['errors'][0]['message'] ) ) );
+			$logger->warning( sprintf( 'Query error: %s', esc_html( $raw_response_data['errors'][0]['message'] ) ) );
 		}
 
-		$results = $this->query_context->get_results( $response_data, $input_variables );
+		// Optionally process the raw response data using query context custom logic.
+		$response_data = $this->query_context->process_response( $raw_response_data, $input_variables );
+
+		// This method always returns an array, even if it's a single item. This
+		// ensures a consistent response shape. The requestor is expected to inspect
+		// is_collection and unwrap if necessary.
+		$results = $this->map_fields( $response_data );
 
 		return [
 			'is_collection' => $this->query_context->is_collection(),
 			'metadata'      => $this->query_context->get_metadata( $response, $results ),
 			'results'       => $results,
 		];
-	}   
+	}
+
+	private function get_field_value( array|string $field_value, string $default_value = '', string $field_type = 'string' ): string {
+		$field_value_single = is_array( $field_value ) && count( $field_value ) > 1
+			? $field_value
+			: ( $field_value[0] ?? $default_value );
+
+		switch ( $field_type ) {
+			case 'base64':
+				return base64_decode( $field_value_single );
+
+			case 'html':
+				return $field_value_single;
+
+			case 'price':
+				return sprintf( '$%s', number_format( $field_value_single, 2 ) );
+
+			case 'string':
+				return wp_strip_all_tags( $field_value_single );
+		}
+
+		return $field_value_single;
+	}
+
+	private function map_fields( $response_data ): array|null {
+		$root             = $response_data;
+		$output_variables = $this->query_context->output_variables;
+
+		if ( ! empty( $output_variables['root_path'] ) ) {
+			$json = new JsonObject( $root );
+			$root = $json->get( $output_variables['root_path'] );
+		} else {
+			$root = $this->query_context->is_collection() ? $root : [ $root ];
+		}
+
+		if ( empty( $root ) || empty( $output_variables['mappings'] ) ) {
+			return $root;
+		}
+
+		// Loop over the returned items in the query result.
+		return array_map( function ( $item ) use ( $output_variables ) {
+			$json = new JsonObject( $item );
+
+			// Loop over the output variables and extract the values from the item.
+			$result = array_map( function ( $mapping ) use ( $json ) {
+				if ( array_key_exists( 'generate', $mapping ) && is_callable( $mapping['generate'] ) ) {
+					$field_value_single = $mapping['generate']( json_decode( $json->getJson(), true ) );
+				} else {
+					$field_path  = $mapping['path'] ?? null;
+					$field_value = $field_path ? $json->get( $field_path ) : '';
+
+					// JSONPath always returns values in an array, even if there's only one value.
+					// Because we're mostly interested in single values for field mapping, unwrap the array if it's only one item.
+					$field_value_single = self::get_field_value( $field_value, $mapping['defaultValue'] ?? '', $mapping['type'] );
+				}
+
+				return array_merge( $mapping, [
+					'value' => $field_value_single,
+				] );
+			}, $output_variables['mappings'] );
+
+			// Nest result property to reserve additional meta in the future.
+			return [
+				'result' => $result,
+			];
+		}, $root );
+	}
 }

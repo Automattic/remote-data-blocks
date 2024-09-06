@@ -30,7 +30,7 @@ class GitHubGetFileAsHtmlQuery extends QueryContext {
 			'file_content' => [
 				'name' => 'File Content',
 				'path' => '$.content',
-				'type' => 'string',
+				'type' => 'html',
 			],
 			'file_path'    => [
 				'name' => 'File Path',
@@ -71,42 +71,15 @@ class GitHubGetFileAsHtmlQuery extends QueryContext {
 		];
 	}
 
-	public function get_results( string $response_data, array $input_variables ): array {
-		return [
+	public function process_response( string $html_response_data, array $input_variables ): string {
+		return json_encode(
 			[
-				'result' => [
-					'file_content' => [
-						'name'  => 'File Content',
-						'path'  => '$.content',
-						'type'  => 'string',
-						'value' => $response_data,
-					],
-					'file_path'    => [
-						'name'  => 'File Path',
-						'path'  => '$.path',
-						'type'  => 'string',
-						'value' => $input_variables['file_path'],
-					],
-					'sha'          => [
-						'name'  => 'SHA',
-						'path'  => '$.sha',
-						'type'  => 'string',
-						'value' => $input_variables['sha'],
-					],
-					'size'         => [
-						'name'  => 'Size',
-						'path'  => '$.size',
-						'type'  => 'number',
-						'value' => $input_variables['size'],
-					],
-					'url'          => [
-						'name'  => 'URL',
-						'path'  => '$.url',
-						'type'  => 'string',
-						'value' => $input_variables['url'],
-					],
-				],
-			],
-		];
+				'content'   => $html_response_data,
+				'file_path' => $input_variables['file_path'],
+				'sha'       => $input_variables['sha'],
+				'size'      => $input_variables['size'],
+				'url'       => $input_variables['url'],
+			]
+		) ?? '';
 	}
 }
