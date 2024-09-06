@@ -21,5 +21,5 @@ interface HttpQueryContext {
 	public function get_query_name(): string;
 	public function get_query_runner(): QueryRunnerInterface;
 	public function is_collection(): bool;
-	public function process_response( string $raw_response_data, array $input_variables ): string;
+	public function process_response( string $raw_response_data, array $input_variables ): string|array|object|null;
 }
