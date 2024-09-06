@@ -7,8 +7,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use RemoteDataBlocks\Config\QueryRunner;
 use RemoteDataBlocks\Config\QueryRunnerInterface;
-use RemoteDataBlocks\Config\HttpQueryContext;
 use RemoteDataBlocks\Config\HttpDatasourceConfig;
+use RemoteDataBlocks\Config\QueryContext;
 use RemoteDataBlocks\HttpClient;
 use WP_Error;
 
@@ -20,6 +20,8 @@ class QueryRunnerTest extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
+
+		$this->http_client = $this->createMock( HttpClient::class );
 
 		$this->http_datasource = new class() implements HttpDatasourceConfig {
 			private $endpoint = 'https://api.example.com';
@@ -46,15 +48,16 @@ class QueryRunnerTest extends TestCase {
 			}
 		};
 
-		$this->query_context = new class($this->http_datasource) implements HttpQueryContext {
+		$this->query_context = new class($this->http_datasource, $this->http_client) extends QueryContext {
 			private $http_datasource;
 			private $http_client;
 			private $request_method = 'GET';
 			private $request_body   = [ 'query' => 'test' ];
+			private $response_data  = null;
 
-			public function __construct( HttpDatasourceConfig $http_datasource ) {
+			public function __construct( HttpDatasourceConfig $http_datasource, HttpClient $http_client ) {
 				$this->http_datasource = $http_datasource;
-				$this->http_client     = new HttpClient();
+				$this->http_client     = $http_client;
 			}
 
 			public function get_endpoint( array $input_variables = [] ): string {
@@ -89,8 +92,12 @@ class QueryRunnerTest extends TestCase {
 				return new QueryRunner( $this, $this->http_client );
 			}
 
-			public function set_http_client( HttpClient $http_client ): void {
-				$this->http_client = $http_client;
+			public function process_response( string $raw_response_data, array $input_variables ): string|array|object|null {
+				if ( null !== $this->response_data ) {
+					return $this->response_data;
+				}
+
+				return $raw_response_data;
 			}
 
 			public function set_request_method( string $method ): void {
@@ -101,11 +108,12 @@ class QueryRunnerTest extends TestCase {
 				$this->request_body = $body;
 			}
 
+			public function set_response_data( string|array|object|null $data ): void {
+				$this->response_data = $data;
+			}
+
 			public array $output_variables = [];
 		};
-
-		$this->http_client = $this->createMock( HttpClient::class );
-		$this->query_context->set_http_client( $this->http_client );
 	}
 
 	public function testExecuteSuccessfulRequest() {
@@ -181,7 +189,7 @@ class QueryRunnerTest extends TestCase {
 		$input_variables = [ 'key' => 'value' ];
 
 		$response_body = $this->createMock( \Psr\Http\Message\StreamInterface::class );
-		$response_body->method( 'getContents' )->willReturn( wp_json_encode( [ 'data' => 'test' ] ) );
+		$response_body->method( 'getContents' )->willReturn( wp_json_encode( [ 'test' => 'test value' ] ) );
 
 		$response = new Response( 200, [], $response_body );
 
@@ -192,6 +200,7 @@ class QueryRunnerTest extends TestCase {
 			'mappings'      => [
 				'test' => [
 					'name' => 'Test Field',
+					'path' => '$.test',
 					'type' => 'string',
 				],
 			],
@@ -204,5 +213,151 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
 		$this->assertFalse( $result['is_collection'] );
+
+		$expected_result = [
+			'result' => [
+				'test' => [
+					'name'  => 'Test Field',
+					'path'  => '$.test',
+					'type'  => 'string',
+					'value' => 'test value',
+				],
+			],
+		];
+
+		$this->assertIsArray( $result['results'] );
+		$this->assertCount( 1, $result['results'] );
+		$this->assertEquals( $expected_result, $result['results'][0] );
+	}
+
+	public function testExecuteSuccessfulResponseWithJsonStringResponseData() {
+		$response_body = $this->createMock( \Psr\Http\Message\StreamInterface::class );
+		$response      = new Response( 200, [], $response_body );
+
+		$this->http_client->method( 'request' )->willReturn( $response );
+
+		$this->query_context->set_response_data( '{"test":"overridden in process_response as JSON string"}' );
+		$this->query_context->output_variables = [
+			'is_collection' => false,
+			'mappings'      => [
+				'test' => [
+					'name' => 'Test Field',
+					'path' => '$.test',
+					'type' => 'string',
+				],
+			],
+		];
+
+		$query_runner = $this->query_context->get_query_runner();
+		$result       = $query_runner->execute( [] );
+
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'is_collection', $result );
+		$this->assertArrayHasKey( 'results', $result );
+		$this->assertFalse( $result['is_collection'] );
+
+		$expected_result = [
+			'result' => [
+				'test' => [
+					'name'  => 'Test Field',
+					'path'  => '$.test',
+					'type'  => 'string',
+					'value' => 'overridden in process_response as JSON string',
+				],
+			],
+		];
+
+		$this->assertIsArray( $result['results'] );
+		$this->assertCount( 1, $result['results'] );
+		$this->assertEquals( $expected_result, $result['results'][0] );
+	}
+
+	public function testExecuteSuccessfulResponseWithArrayResponseData() {
+		$response_body = $this->createMock( \Psr\Http\Message\StreamInterface::class );
+		$response      = new Response( 200, [], $response_body );
+
+		$this->http_client->method( 'request' )->willReturn( $response );
+
+		$this->query_context->set_response_data( [ 'test' => 'overridden in process_response as array' ] );
+		$this->query_context->output_variables = [
+			'is_collection' => false,
+			'mappings'      => [
+				'test' => [
+					'name' => 'Test Field',
+					'path' => '$.test',
+					'type' => 'string',
+				],
+			],
+		];
+
+		$query_runner = $this->query_context->get_query_runner();
+		$result       = $query_runner->execute( [] );
+
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'is_collection', $result );
+		$this->assertArrayHasKey( 'results', $result );
+		$this->assertFalse( $result['is_collection'] );
+
+		$expected_result = [
+			'result' => [
+				'test' => [
+					'name'  => 'Test Field',
+					'path'  => '$.test',
+					'type'  => 'string',
+					'value' => 'overridden in process_response as array',
+				],
+			],
+		];
+
+		$this->assertIsArray( $result['results'] );
+		$this->assertCount( 1, $result['results'] );
+		$this->assertEquals( $expected_result, $result['results'][0] );
+	}
+
+	public function testExecuteSuccessfulResponseWithObjectResponseData() {
+		$response_body = $this->createMock( \Psr\Http\Message\StreamInterface::class );
+		$response      = new Response( 200, [], $response_body );
+
+		$response = new Response( 200, [], $response_body );
+
+		$this->http_client->method( 'request' )->willReturn( $response );
+
+		$response_data       = new \stdClass();
+		$response_data->test = 'overridden in process_response as object';
+
+		$this->query_context->set_response_data( $response_data );
+		$this->query_context->output_variables = [
+			'is_collection' => false,
+			'mappings'      => [
+				'test' => [
+					'name' => 'Test Field',
+					'path' => '$.test',
+					'type' => 'string',
+				],
+			],
+		];
+
+		$query_runner = $this->query_context->get_query_runner();
+		$result       = $query_runner->execute( [] );
+
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'is_collection', $result );
+		$this->assertArrayHasKey( 'results', $result );
+		$this->assertFalse( $result['is_collection'] );
+
+		$expected_result = [
+			'result' => [
+				'test' => [
+					'name'  => 'Test Field',
+					'path'  => '$.test',
+					'type'  => 'string',
+					'value' => 'overridden in process_response as object',
+				],
+			],
+		];
+
+		$this->assertIsArray( $result['results'] );
+		$this->assertCount( 1, $result['results'] );
+		$this->assertEquals( $expected_result, $result['results'][0] );
 	}
 }
