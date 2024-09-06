@@ -169,8 +169,6 @@ class QueryRunner implements QueryRunnerInterface {
 					$field_path  = $mapping['path'] ?? null;
 					$field_value = $field_path ? $json->get( $field_path ) : '';
 
-					error_log( print_r( $field_value, true ) );
-					error_log( print_r( $mapping, true ) );
 					// JSONPath always returns values in an array, even if there's only one value.
 					// Because we're mostly interested in single values for field mapping, unwrap the array if it's only one item.
 					$field_value_single = self::get_field_value( $field_value, $mapping['defaultValue'] ?? '', $mapping['type'] );
