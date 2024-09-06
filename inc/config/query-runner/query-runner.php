@@ -109,13 +109,16 @@ class QueryRunner implements QueryRunnerInterface {
 		// Optionally process the raw response data using query context custom logic.
 		$response_data = $this->query_context->process_response( $raw_response_data, $input_variables );
 
+		// Determine if the response data is expected to be a collection.
+		$is_collection = $this->query_context->is_response_data_collection();
+
 		// This method always returns an array, even if it's a single item. This
 		// ensures a consistent response shape. The requestor is expected to inspect
 		// is_collection and unwrap if necessary.
-		$results = $this->map_fields( $response_data );
+		$results = $this->map_fields( $response_data, $is_collection );
 
 		return [
-			'is_collection' => $this->query_context->is_collection(),
+			'is_collection' => $is_collection,
 			'metadata'      => $this->query_context->get_metadata( $response, $results ),
 			'results'       => $results,
 		];
@@ -148,9 +151,10 @@ class QueryRunner implements QueryRunnerInterface {
 	 * the query.
 	 *
 	 * @param string|array|object|null $response_data The response data to map. Can be JSON string, PHP associative array, PHP object, or null.
+	 * @param bool $is_collection Whether the response data is a collection.
 	 * @return array|null The mapped fields.
 	 */
-	private function map_fields( string|array|object|null $response_data ): ?array {
+	private function map_fields( string|array|object|null $response_data, bool $is_collection ): ?array {
 		$root             = $response_data;
 		$output_variables = $this->query_context->output_variables;
 
@@ -158,7 +162,7 @@ class QueryRunner implements QueryRunnerInterface {
 			$json = new JsonObject( $root );
 			$root = $json->get( $output_variables['root_path'] );
 		} else {
-			$root = $this->query_context->is_collection() ? $root : [ $root ];
+			$root = $is_collection ? $root : [ $root ];
 		}
 
 		if ( empty( $root ) || empty( $output_variables['mappings'] ) ) {

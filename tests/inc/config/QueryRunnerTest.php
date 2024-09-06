@@ -189,7 +189,7 @@ class QueryRunnerTest extends TestCase {
 		$input_variables = [ 'key' => 'value' ];
 
 		$response_body = $this->createMock( \Psr\Http\Message\StreamInterface::class );
-		$response_body->method( 'getContents' )->willReturn( wp_json_encode( [ 'data' => 'test' ] ) );
+		$response_body->method( 'getContents' )->willReturn( wp_json_encode( [ 'test' => 'test value' ] ) );
 
 		$response = new Response( 200, [], $response_body );
 
@@ -200,6 +200,7 @@ class QueryRunnerTest extends TestCase {
 			'mappings'      => [
 				'test' => [
 					'name' => 'Test Field',
+					'path' => '$.test',
 					'type' => 'string',
 				],
 			],
@@ -212,6 +213,152 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
 		$this->assertFalse( $result['is_collection'] );
+
+		$expected_result = [
+			'result' => [
+				'test' => [
+					'name'  => 'Test Field',
+					'path'  => '$.test',
+					'type'  => 'string',
+					'value' => 'test value',
+				],
+			],
+		];
+
+		$this->assertIsArray( $result['results'] );
+		$this->assertCount( 1, $result['results'] );
+		$this->assertEquals( $expected_result, $result['results'][0] );
+	}
+
+	public function testExecuteSuccessfulResponseWithJsonStringResponseData() {
+		$response_body = $this->createMock( \Psr\Http\Message\StreamInterface::class );
+		$response      = new Response( 200, [], $response_body );
+
+		$this->http_client->method( 'request' )->willReturn( $response );
+
+		$this->query_context->set_response_data( '{"test":"overridden in process_response as JSON string"}' );
+		$this->query_context->output_variables = [
+			'is_collection' => false,
+			'mappings'      => [
+				'test' => [
+					'name' => 'Test Field',
+					'path' => '$.test',
+					'type' => 'string',
+				],
+			],
+		];
+
+		$query_runner = $this->query_context->get_query_runner();
+		$result       = $query_runner->execute( [] );
+
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'is_collection', $result );
+		$this->assertArrayHasKey( 'results', $result );
+		$this->assertFalse( $result['is_collection'] );
+
+		$expected_result = [
+			'result' => [
+				'test' => [
+					'name'  => 'Test Field',
+					'path'  => '$.test',
+					'type'  => 'string',
+					'value' => 'overridden in process_response as JSON string',
+				],
+			],
+		];
+
+		$this->assertIsArray( $result['results'] );
+		$this->assertCount( 1, $result['results'] );
+		$this->assertEquals( $expected_result, $result['results'][0] );
+	}
+
+	public function testExecuteSuccessfulResponseWithArrayResponseData() {
+		$response_body = $this->createMock( \Psr\Http\Message\StreamInterface::class );
+		$response      = new Response( 200, [], $response_body );
+
+		$this->http_client->method( 'request' )->willReturn( $response );
+
+		$this->query_context->set_response_data( [ 'test' => 'overridden in process_response as array' ] );
+		$this->query_context->output_variables = [
+			'is_collection' => false,
+			'mappings'      => [
+				'test' => [
+					'name' => 'Test Field',
+					'path' => '$.test',
+					'type' => 'string',
+				],
+			],
+		];
+
+		$query_runner = $this->query_context->get_query_runner();
+		$result       = $query_runner->execute( [] );
+
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'is_collection', $result );
+		$this->assertArrayHasKey( 'results', $result );
+		$this->assertFalse( $result['is_collection'] );
+
+		$expected_result = [
+			'result' => [
+				'test' => [
+					'name'  => 'Test Field',
+					'path'  => '$.test',
+					'type'  => 'string',
+					'value' => 'overridden in process_response as array',
+				],
+			],
+		];
+
+		$this->assertIsArray( $result['results'] );
+		$this->assertCount( 1, $result['results'] );
+		$this->assertEquals( $expected_result, $result['results'][0] );
+	}
+
+	public function testExecuteSuccessfulResponseWithObjectResponseData() {
+		$response_body = $this->createMock( \Psr\Http\Message\StreamInterface::class );
+		$response      = new Response( 200, [], $response_body );
+
+		$response = new Response( 200, [], $response_body );
+
+		$this->http_client->method( 'request' )->willReturn( $response );
+
+		$response_data       = new \stdClass();
+		$response_data->test = 'overridden in process_response as object';
+
+		$this->query_context->set_response_data( $response_data );
+		$this->query_context->output_variables = [
+			'is_collection' => false,
+			'mappings'      => [
+				'test' => [
+					'name' => 'Test Field',
+					'path' => '$.test',
+					'type' => 'string',
+				],
+			],
+		];
+
+		$query_runner = $this->query_context->get_query_runner();
+		$result       = $query_runner->execute( [] );
+
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'is_collection', $result );
+		$this->assertArrayHasKey( 'results', $result );
+		$this->assertFalse( $result['is_collection'] );
+
+		$expected_result = [
+			'result' => [
+				'test' => [
+					'name'  => 'Test Field',
+					'path'  => '$.test',
+					'type'  => 'string',
+					'value' => 'overridden in process_response as object',
+				],
+			],
+		];
+
+		$this->assertIsArray( $result['results'] );
+		$this->assertCount( 1, $result['results'] );
+		$this->assertEquals( $expected_result, $result['results'][0] );
 	}
 
 	public function testExecuteSuccessfulResponseWithJsonStringResponseData() {
