@@ -11,6 +11,7 @@ namespace RemoteDataBlocks\Config;
 
 use Exception;
 use GuzzleHttp\RequestOptions;
+use JsonPath\JsonObject;
 use RemoteDataBlocks\HttpClient;
 use RemoteDataBlocks\Logging\LoggerManager;
 use WP_Error;
