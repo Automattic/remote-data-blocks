@@ -124,12 +124,12 @@ class DatasourceCRUD {
 		}
 
 		return (object) [
-			'uuid'    => $source->uuid,
-			'service' => 'google-sheets',
+			'uuid'        => $source->uuid,
+			'service'     => 'google-sheets',
 			'credentials' => $service_account_key,
 			'spreadsheet' => $source->spreadsheet,
-			'sheet' => $source->sheet,
-			'slug'    => sanitize_text_field( $source->slug ),
+			'sheet'       => $source->sheet,
+			'slug'        => sanitize_text_field( $source->slug ),
 		];
 	}
 
