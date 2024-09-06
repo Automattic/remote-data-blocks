@@ -143,6 +143,12 @@ class QueryRunner implements QueryRunnerInterface {
 		return $field_value_single;
 	}
 
+	/**
+	 * Map the fields from the response data to the output variables.
+	 *
+	 * @param string $response_data The response data in JSON format from the query.
+	 * @return array|null
+	 */
 	private function map_fields( $response_data ): array|null {
 		$root             = $response_data;
 		$output_variables = $this->query_context->output_variables;

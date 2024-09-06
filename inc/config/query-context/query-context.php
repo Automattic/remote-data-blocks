@@ -165,6 +165,10 @@ class QueryContext implements HttpQueryContext {
 		return $this->output_variables['is_collection'] ?? false;
 	}
 
+	/**
+	 * Override this method to process the raw response data from the query
+	 * before it is mapped into a result by the query runner.
+	 */
 	public function process_response( string $raw_response_data, array $input_variables ): string {
 		return $raw_response_data;
 	}
