@@ -71,15 +71,13 @@ class GitHubGetFileAsHtmlQuery extends QueryContext {
 		];
 	}
 
-	public function process_response( string $html_response_data, array $input_variables ): string {
-		return json_encode(
-			[
-				'content'   => $html_response_data,
-				'file_path' => $input_variables['file_path'],
-				'sha'       => $input_variables['sha'],
-				'size'      => $input_variables['size'],
-				'url'       => $input_variables['url'],
-			]
-		) ?? '';
+	public function process_response( string $html_response_data, array $input_variables ): string|array|object|null {
+		return [
+			'content'   => $html_response_data,
+			'file_path' => $input_variables['file_path'],
+			'sha'       => $input_variables['sha'],
+			'size'      => $input_variables['size'],
+			'url'       => $input_variables['url'],
+		];
 	}
 }
