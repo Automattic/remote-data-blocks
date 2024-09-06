@@ -106,6 +106,7 @@ class QueryRunner implements QueryRunnerInterface {
 			$logger->warning( sprintf( 'Query error: %s', esc_html( $raw_response_data['errors'][0]['message'] ) ) );
 		}
 
+		// Optionally process the raw response data using query context custom logic.
 		$response_data = $this->query_context->process_response( $raw_response_data, $input_variables );
 
 		// This method always returns an array, even if it's a single item. This
