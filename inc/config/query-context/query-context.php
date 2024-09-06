@@ -10,7 +10,6 @@
 namespace RemoteDataBlocks\Config;
 
 use Psr\Http\Message\ResponseInterface;
-use JsonPath\JsonObject;
 
 defined( 'ABSPATH' ) || exit();
 
@@ -162,70 +161,11 @@ class QueryContext implements HttpQueryContext {
 		return new QueryRunner( $this );
 	}
 
-	public function get_results( string $response_data, array $input_variables ): array {
-		$root             = $response_data;
-		$output_variables = $this->output_variables;
-
-		if ( ! empty( $output_variables['root_path'] ) ) {
-			$json = new JsonObject( $root );
-			$root = $json->get( $output_variables['root_path'] );
-		} else {
-			$root = $this->is_collection() ? $root : [ $root ];
-		}
-
-		if ( empty( $root ) || empty( $output_variables['mappings'] ) ) {
-			return $root;
-		}
-
-		// Loop over the returned items in the query result.
-		return array_map( function ( $item ) use ( $output_variables ) {
-			$json = new JsonObject( $item );
-
-			// Loop over the output variables and extract the values from the item.
-			$result = array_map( function ( $mapping ) use ( $json ) {
-				if ( array_key_exists( 'generate', $mapping ) && is_callable( $mapping['generate'] ) ) {
-					$field_value_single = $mapping['generate']( json_decode( $json->getJson(), true ) );
-				} else {
-					$field_path  = $mapping['path'] ?? null;
-					$field_value = $field_path ? $json->get( $field_path ) : '';
-
-					// JSONPath always returns values in an array, even if there's only one value.
-					// Because we're mostly interested in single values for field mapping, unwrap the array if it's only one item.
-					$field_value_single = self::get_field_value( $field_value, $mapping['defaultValue'] ?? '', $mapping['type'] );
-				}
-
-				return array_merge( $mapping, [
-					'value' => $field_value_single,
-				] );
-			}, $output_variables['mappings'] );
-
-			// Nest result property to reserve additional meta in the future.
-			return [
-				'result' => $result,
-			];
-		}, $root );
-	}
-
-	private function get_field_value( array|string $field_value, string $default_value = '', string $field_type = 'string' ): string {
-		$field_value_single = is_array( $field_value ) && count( $field_value ) > 1
-			? $field_value
-			: ( $field_value[0] ?? $default_value );
-
-		switch ( $field_type ) {
-			case 'base64':
-				return base64_decode( $field_value_single );
-				
-			case 'price':
-				return sprintf( '$%s', number_format( $field_value_single, 2 ) );
-
-			case 'string':
-				return wp_strip_all_tags( $field_value_single );
-		}
-
-		return $field_value_single;
-	}
-
 	public function is_collection(): bool {
 		return $this->output_variables['is_collection'] ?? false;
+	}
+
+	public function process_response( string $raw_response_data, array $input_variables ): string {
+		return $raw_response_data;
 	}
 }
