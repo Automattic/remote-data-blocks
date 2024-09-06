@@ -99,14 +99,18 @@ class QueryRunner implements QueryRunnerInterface {
 		}
 
 		// The body is a stream... if we need to read it in chunks, etc. we can do so here.
-		$response_data = $response->getBody()->getContents();
+		$raw_response_data = $response->getBody()->getContents();
 
-		$is_collection = $this->query_context->output_variables['is_collection'] ?? false;
-
-		if ( isset( $response_data['errors'][0]['message'] ) ) {
+		if ( isset( $raw_response_data['errors'][0]['message'] ) ) {
 			$logger = LoggerManager::instance();
-			$logger->warning( sprintf( 'Query error: %s', esc_html( $response_data['errors'][0]['message'] ) ) );
+			$logger->warning( sprintf( 'Query error: %s', esc_html( $raw_response_data['errors'][0]['message'] ) ) );
 		}
+
+		// Optionally process the raw response data using query context custom logic.
+		$response_data = $this->query_context->process_response( $raw_response_data, $input_variables );
+
+		// Determine if the response data is expected to be a collection.
+		$is_collection = $this->query_context->is_response_data_collection();
 
 		// This method always returns an array, even if it's a single item. This
 		// ensures a consistent response shape. The requestor is expected to inspect
@@ -126,6 +130,12 @@ class QueryRunner implements QueryRunnerInterface {
 			: ( $field_value[0] ?? $default_value );
 
 		switch ( $field_type ) {
+			case 'base64':
+				return base64_decode( $field_value_single );
+
+			case 'html':
+				return $field_value_single;
+
 			case 'price':
 				return sprintf( '$%s', number_format( $field_value_single, 2 ) );
 
@@ -136,7 +146,15 @@ class QueryRunner implements QueryRunnerInterface {
 		return $field_value_single;
 	}
 
-	private function map_fields( $response_data, $is_collection = false ): array|null {
+	/**
+	 * Map fields from the response data using the output variables defined by
+	 * the query.
+	 *
+	 * @param string|array|object|null $response_data The response data to map. Can be JSON string, PHP associative array, PHP object, or null.
+	 * @param bool $is_collection Whether the response data is a collection.
+	 * @return array|null The mapped fields.
+	 */
+	private function map_fields( string|array|object|null $response_data, bool $is_collection ): ?array {
 		$root             = $response_data;
 		$output_variables = $this->query_context->output_variables;
 
