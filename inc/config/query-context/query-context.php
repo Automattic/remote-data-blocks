@@ -10,7 +10,6 @@
 namespace RemoteDataBlocks\Config;
 
 use Psr\Http\Message\ResponseInterface;
-use JsonPath\JsonObject;
 
 defined( 'ABSPATH' ) || exit();
 
