@@ -115,7 +115,7 @@ class QueryRunner implements QueryRunnerInterface {
 		// This method always returns an array, even if it's a single item. This
 		// ensures a consistent response shape. The requestor is expected to inspect
 		// is_collection and unwrap if necessary.
-		$results = $this->map_fields( $response_data, $is_collection);
+		$results = $this->map_fields( $response_data, $is_collection );
 
 		return [
 			'is_collection' => $is_collection,
