@@ -163,15 +163,6 @@ class QueryContext implements HttpQueryContext {
 	}
 
 	/**
-	 * Override this method to determine whether a response is a collection at runtime.
-	 *
-	 * @return bool
-	 */
-	public function is_collection(): bool {
-		return $this->output_variables['is_collection'] ?? false;
-	}
-
-	/**
 	 * Override this method to process the raw response data from the query before
 	 * it is passed to the query runner and the output variables are extracted. The
 	 * result can be  a JSON string, a PHP associative array, a PHP object, or null.
@@ -182,5 +173,14 @@ class QueryContext implements HttpQueryContext {
 	 */
 	public function process_response( string $raw_response_data, array $input_variables ): string|array|object|null {
 		return $raw_response_data;
+	}
+
+	/**
+	 * Authoritative truth of whether output is expected to be a collection.
+	 *
+	 * @return bool
+	 */
+	final public function is_response_data_collection(): bool {
+		return $this->output_variables['is_collection'] ?? false;
 	}
 }

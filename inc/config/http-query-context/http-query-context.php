@@ -20,6 +20,6 @@ interface HttpQueryContext {
 	public function get_request_body( array $input_variables ): array|null;
 	public function get_query_name(): string;
 	public function get_query_runner(): QueryRunnerInterface;
-	public function is_collection(): bool;
+	public function is_response_data_collection(): bool;
 	public function process_response( string $raw_response_data, array $input_variables ): string|array|object|null;
 }
