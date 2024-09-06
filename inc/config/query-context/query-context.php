@@ -127,6 +127,7 @@ class QueryContext implements HttpQueryContext {
 	/**
 	 * Override this method to specify custom request headers for this query.
 	 *
+	 * @param array $input_variables The input variables for this query.
 	 * @return array
 	 */
 	public function get_request_headers( array $input_variables ): array {
@@ -142,7 +143,7 @@ class QueryContext implements HttpQueryContext {
 	 * @param array $input_variables The input variables for this query.
 	 * @return array|null
 	 */
-	public function get_request_body( array $input_variables ): array|null {
+	public function get_request_body( array $input_variables ): ?array {
 		return null;
 	}
 
@@ -159,5 +160,27 @@ class QueryContext implements HttpQueryContext {
 	 */
 	public function get_query_runner(): QueryRunnerInterface {
 		return new QueryRunner( $this );
+	}
+
+	/**
+	 * Override this method to process the raw response data from the query before
+	 * it is passed to the query runner and the output variables are extracted. The
+	 * result can be  a JSON string, a PHP associative array, a PHP object, or null.
+	 *
+	 * @param string $raw_response_data The raw response data.
+	 * @param array  $input_variables   The input variables for this query.
+	 * @return string|array|object|null
+	 */
+	public function process_response( string $raw_response_data, array $input_variables ): string|array|object|null {
+		return $raw_response_data;
+	}
+
+	/**
+	 * Authoritative truth of whether output is expected to be a collection.
+	 *
+	 * @return bool
+	 */
+	final public function is_response_data_collection(): bool {
+		return $this->output_variables['is_collection'] ?? false;
 	}
 }
