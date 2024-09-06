@@ -2,11 +2,12 @@
 
 namespace RemoteDataBlocks\REST;
 
+use RemoteDataBlocks\Config\Auth\GoogleServiceAccountKey;
 use WP_Error;
 
 class DatasourceCRUD {
 	const CONFIG_OPTION_NAME = 'remote_data_blocks_config';
-	const DATA_SOURCE_TYPES  = [ 'airtable', 'shopify' ];
+	const DATA_SOURCE_TYPES  = [ 'airtable', 'shopify', 'google-sheets' ];
 
 	public static function is_uuid4( string $maybe_uuid ) {
 		return preg_match( '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $maybe_uuid );
@@ -94,6 +95,44 @@ class DatasourceCRUD {
 		];
 	}
 
+	public static function validate_google_sheets_source( $source ) {
+		$service_account_key = GoogleServiceAccountKey::from_array( $source->credentials );
+		if ( is_wp_error( $service_account_key ) ) {
+			return $service_account_key;
+		}
+
+		// Validate spreadsheet is not empty and is an object with id and name fields with string values
+		if ( empty( $source->spreadsheet ) ) {
+			return new WP_Error( 'missing_spreadsheet', __( 'Missing spreadsheet.', 'remote-data-blocks' ) );
+		}
+
+		if ( empty( $source->spreadsheet['id'] ) || empty( $source->spreadsheet['name'] ) ) {
+			return new WP_Error( 'invalid_spreadsheet', __( 'Invalid spreadsheet. Must have id and name fields.', 'remote-data-blocks' ) );
+		}
+
+		// Validate sheet is not empty and is an object with id integer and name string fields
+		if ( empty( $source->sheet ) ) {
+			return new WP_Error( 'missing_sheet', __( 'Missing sheet.', 'remote-data-blocks' ) );
+		}
+
+		if ( ! isset( $source->sheet['id'] ) || ! is_int( $source->sheet['id'] ) ) {
+			return new WP_Error( 'invalid_sheet', __( 'Invalid sheet. Must have id field with integer value.', 'remote-data-blocks' ) );
+		}
+
+		if ( empty( $source->sheet['name'] ) ) {
+			return new WP_Error( 'missing_sheet_name', __( 'Missing sheet name.', 'remote-data-blocks' ) );
+		}
+
+		return (object) [
+			'uuid'    => $source->uuid,
+			'service' => 'google-sheets',
+			'credentials' => $service_account_key,
+			'spreadsheet' => $source->spreadsheet,
+			'sheet' => $source->sheet,
+			'slug'    => sanitize_text_field( $source->slug ),
+		];
+	}
+
 	public static function validate_source( $source ) {
 		if ( ! is_object( $source ) ) {
 			return new WP_Error( 'invalid_data_source', __( 'Invalid data source.', 'remote-data-blocks' ) );
@@ -123,6 +162,8 @@ class DatasourceCRUD {
 				return self::validate_airtable_source( $source );
 			case 'shopify':
 				return self::validate_shopify_source( $source );
+			case 'google-sheets':
+				return self::validate_google_sheets_source( $source );
 			default:
 				return new WP_Error( 'unsupported_data_source', __( 'Unsupported data source.', 'remote-data-blocks' ) );
 		}
