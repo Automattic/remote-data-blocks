@@ -13,8 +13,8 @@ class QueryContextTest extends TestCase {
 	private $query_context;
 
 	protected function setUp(): void {
-			$this->datasource    = new TestDatasource();
-			$this->query_context = new QueryContext( $this->datasource );
+		$this->datasource    = new TestDatasource();
+		$this->query_context = new QueryContext( $this->datasource );
 	}
 
 	public function testGetEndpoint() {
