@@ -189,7 +189,7 @@ class QueryRunnerTest extends TestCase {
 		$input_variables = [ 'key' => 'value' ];
 
 		$response_body = $this->createMock( \Psr\Http\Message\StreamInterface::class );
-		$response_body->method( 'getContents' )->willReturn( wp_json_encode( [ 'data' => 'test' ] ) );
+		$response_body->method( 'getContents' )->willReturn( wp_json_encode( [ 'test' => 'test value' ] ) );
 
 		$response = new Response( 200, [], $response_body );
 
@@ -200,6 +200,7 @@ class QueryRunnerTest extends TestCase {
 			'mappings'      => [
 				'test' => [
 					'name' => 'Test Field',
+					'path' => '$.test',
 					'type' => 'string',
 				],
 			],
@@ -212,6 +213,21 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
 		$this->assertFalse( $result['is_collection'] );
+
+		$expected_result = [
+			'result' => [
+				'test' => [
+					'name'  => 'Test Field',
+					'path'  => '$.test',
+					'type'  => 'string',
+					'value' => 'test value',
+				],
+			],
+		];
+
+		$this->assertIsArray( $result['results'] );
+		$this->assertCount( 1, $result['results'] );
+		$this->assertEquals( $expected_result, $result['results'][0] );
 	}
 
 	public function testExecuteSuccessfulResponseWithJsonStringResponseData() {
