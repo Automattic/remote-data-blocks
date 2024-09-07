@@ -15,10 +15,10 @@ class QueryContextTest extends TestCase {
 	protected function setUp(): void {
 		$this->datasource    = new HttpDatasource( [
 			'endpoint' => 'https://api.example.com',
-			'headers'  => [ 'Content-Type' => 'application/json' ],
+			'request_headers'  => [ 'Content-Type' => 'application/json' ],
 		] );
 
-		$this->query_context = new QueryContext( $this->datasource );
+        $this->query_context = new QueryContext( $this->datasource );
 	}
 
 	public function testGetEndpoint() {

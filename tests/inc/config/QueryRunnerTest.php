@@ -24,7 +24,7 @@ class QueryRunnerTest extends TestCase {
 
 		$this->http_datasource = new HttpDatasource( [
 			'endpoint' => 'https://api.example.com',
-			'headers'  => [ 'Content-Type' => 'application/json' ],
+			'request_headers'  => [ 'Content-Type' => 'application/json' ],
 		] );
 
 		$this->http_client = $this->createMock( HttpClient::class );
