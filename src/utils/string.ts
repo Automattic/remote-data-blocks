@@ -9,6 +9,10 @@ export const toTitleCase = ( str: string ): string => {
 	} );
 };
 
+export const slugToTitleCase = ( slug: string ): string => {
+	return slug.replace( /-/g, ' ' ).replace( /\b\w/g, char => char.toUpperCase() );
+};
+
 /**
  * Casts a string to JSON
  * @param value string to cast

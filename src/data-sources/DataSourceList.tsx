@@ -18,7 +18,7 @@ import { SUPPORTED_SERVICES } from '@/data-sources/constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig, DataSourceType } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
-import { toTitleCase } from '@/utils/string';
+import { slugToTitleCase } from '@/utils/string';
 
 const DataSourceList = () => {
 	const { dataSources, loadingDataSources, deleteDataSource, fetchDataSources } = useDataSources();
@@ -128,7 +128,7 @@ const DataSourceList = () => {
 										<Text>{ slug }</Text>
 									</td>
 									<td>
-										<Text>{ toTitleCase( service ) }</Text>
+										<Text>{ slugToTitleCase( service ) }</Text>
 									</td>
 									<td>
 										<div className="data-source-meta">{ renderDataSourceMeta( source ) }</div>
