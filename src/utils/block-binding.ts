@@ -1,4 +1,5 @@
 import { BLOCK_BINDING_SOURCE } from '@/config/constants';
+import { getClassName } from '@/utils/string';
 import { isObjectWithStringKeys } from '@/utils/type-narrowing';
 
 function getAttributeValue( attributes: unknown, key: string | undefined | null ): string {
@@ -24,7 +25,8 @@ function getExpectedAttributeValue(
 
 	let expectedValue = result[ args.field ];
 	if ( args.label ) {
-		expectedValue = `${ args.label }: ${ expectedValue }`;
+		const labelClass = getClassName( 'block-label' );
+		expectedValue = `<span class="${ labelClass }">${ args.label }</span> ${ expectedValue }`;
 	}
 
 	return expectedValue ?? null;
