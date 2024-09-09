@@ -40,6 +40,20 @@ export function getBoundAttributeEntries(
 	);
 }
 
+export function getBoundBlockClassName( attributes: RemoteDataInnerBlockAttributes ): string {
+	const existingClassNames = ( attributes.className ?? '' )
+		.split( /\s/ )
+		.filter( className => ! className.startsWith( 'rdb-block-data-' ) );
+	const classNames = new Set< string | undefined >( [
+		...existingClassNames,
+		...getBoundAttributeEntries( attributes ).map( ( [ _target, binding ] ) =>
+			getClassName( `block-data-${ binding.args.field }` )
+		),
+	] );
+
+	return Array.from( classNames.values() ).filter( Boolean ).join( ' ' );
+}
+
 export function getMismatchedAttributes(
 	attributes: RemoteDataInnerBlockAttributes,
 	results: RemoteData[ 'results' ],
