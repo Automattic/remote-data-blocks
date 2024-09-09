@@ -12,8 +12,26 @@
     "remote-data-blocks/remoteData": "remoteData"
   },
   "supports": {
+    "background": {
+      "backgroundImage": true,
+      "backgroundSize": true
+    },
+    "className": true,
+    "color": {
+      "background": true
+    },
     "html": false,
-    "interactivity": true
+    "interactivity": true,
+    "shadow": true,
+    "spacing": {
+      "margin": true,
+      "padding": true
+    },
+    "typography": {
+      "fontSize": true,
+      "lineHeight": true,
+      "textAlign": true
+    }
   },
   "textdomain": "remote-data-blocks",
   "editorScript": "file:./index.js",
