@@ -35,4 +35,4 @@ Remote Data Blocks is a WordPress plugin that brings an assortment of flexible, 
 
 6. Use the blocks to display dynamic content from various sources directly in your posts or pages.
 
-Developers! You can [extend](docs/extending.md) the plugin by creating new datasources and queries.
+_Developers! You can [extend](https://github.com/Automattic/remote-data-blocks/blob/trunk/docs/extending.md) the plugin by creating new datasources and queries._
