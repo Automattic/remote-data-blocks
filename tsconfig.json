@@ -15,7 +15,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "es5",
+    "target": "es6",
     "typeRoots": [ "./types", "./node_modules/@types" ]
   },
   "include": [ "./types/*.d.ts", "./example/**/*", "./src/**/*", "./tests/**/*" ]
