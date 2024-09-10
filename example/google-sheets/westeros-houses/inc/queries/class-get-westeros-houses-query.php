@@ -15,14 +15,14 @@ class GetWesterosHousesQuery extends QueryContext {
 
 	public array $input_variables = [
 		'row_id' => [
-			'name' => 'Row ID',
+			'name'      => 'Row ID',
 			'overrides' => [
 				[
 					'target' => 'utm_content',
 					'type'   => 'query_var',
 				],
 			],
-			'type' => 'id',
+			'type'      => 'id',
 		],
 	];
 
@@ -64,14 +64,14 @@ class GetWesterosHousesQuery extends QueryContext {
 
 	public function process_response( string $raw_response_data, array $input_variables ): string|array|object|null {
 		$parsed_response_data = json_decode( $raw_response_data, true );
-		$selected_row = null;
-		$row_id = $input_variables['row_id'];
+		$selected_row         = null;
+		$row_id               = $input_variables['row_id'];
 
 		if ( isset( $parsed_response_data['values'] ) && is_array( $parsed_response_data['values'] ) ) {
 			$raw_selected_row = $parsed_response_data['values'][ $row_id ];
 			if ( is_array( $raw_selected_row ) ) {
-				$selected_row = array_combine( self::COLUMNS, $raw_selected_row );
-				$selected_row = array_combine( self::COLUMNS, $selected_row );
+				$selected_row          = array_combine( self::COLUMNS, $raw_selected_row );
+				$selected_row          = array_combine( self::COLUMNS, $selected_row );
 				$selected_row['RowId'] = $row_id;
 			}
 		}

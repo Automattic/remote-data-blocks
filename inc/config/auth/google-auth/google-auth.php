@@ -55,21 +55,26 @@ class GoogleAuth {
 
 		if ( ! $no_cache ) {
 			// Cache the token
-			$cache_key = 'google_auth_token_' . $service_account_key->client_email;
+			$cache_key    = 'google_auth_token_' . $service_account_key->client_email;
 			$cached_token = wp_cache_get( $cache_key );
 
-			if ( $cached_token !== false ) {
+			if ( false !== $cached_token ) {
 				return $cached_token;
 			}
 		}
 
-		$jwt = self::generate_jwt( $service_account_key, $scope );
+		$jwt       = self::generate_jwt( $service_account_key, $scope );
 		$token_uri = $service_account_key->token_uri;
 
 		$token = self::get_token_using_jwt( $jwt, $token_uri );
 
 		if ( ! is_wp_error( $token ) ) {
-			wp_cache_set( $cache_key, $token, '', self::TOKEN_EXPIRY_SECONDS / 2 );
+			wp_cache_set(
+				$cache_key,
+				$token,
+				'oauth-tokens',
+				3000, // 50 minutes
+			);
 		}
 
 		return $token;

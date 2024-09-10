@@ -19,7 +19,7 @@ class ListWesterosHousesQuery extends QueryContext {
 		'root_path'     => '$.values[*]',
 		'is_collection' => true,
 		'mappings'      => [
-			'row_id'     => [
+			'row_id'    => [
 				'name' => 'Row ID',
 				'path' => '$.RowId',
 				'type' => 'id',
@@ -60,8 +60,8 @@ class ListWesterosHousesQuery extends QueryContext {
 			array_shift( $values ); // Drop the first row
 
 			$parsed_response_data['values'] = array_map(
-				function( $row, $index ) {
-					$combined = array_combine( self::COLUMNS, $row );
+				function ( $row, $index ) {
+					$combined          = array_combine( self::COLUMNS, $row );
 					$combined['RowId'] = $index + 1; // Add rowId field, starting from 1
 					return $combined;
 				},
