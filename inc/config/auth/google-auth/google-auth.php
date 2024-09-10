@@ -16,6 +16,11 @@ class GoogleAuth {
 		'https://www.googleapis.com/auth/spreadsheets.readonly', // Sheets Readonly
 	];
 
+	const GOOGLE_SHEETS_SCOPES = [
+		'https://www.googleapis.com/auth/drive.readonly', // Drive Readonly
+		'https://www.googleapis.com/auth/spreadsheets.readonly', // Sheets Readonly
+	];
+
 	private static function get_allowed_scopes( array $scopes ): array {
 		return array_values( array_intersect( $scopes, self::ALLOWED_SCOPES ) );
 	}
@@ -47,10 +52,23 @@ class GoogleAuth {
 			return $service_account_key;
 		}
 
-		$jwt       = self::generate_jwt( $service_account_key, $scope );
+		$cache_key = 'google_auth_token_' . $service_account_key->client_email;
+		$cached_token = wp_cache_get( $cache_key );
+
+		if ( $cached_token !== false ) {
+			return $cached_token;
+		}
+
+		$jwt = self::generate_jwt( $service_account_key, $scope );
 		$token_uri = $service_account_key->token_uri;
 
-		return self::get_token_using_jwt( $jwt, $token_uri );
+		$token = self::get_token_using_jwt( $jwt, $token_uri );
+
+		if ( ! is_wp_error( $token ) ) {
+			wp_cache_set( $cache_key, $token, '', self::TOKEN_EXPIRY_SECONDS / 2 );
+		}
+
+		return $token;
 	}
 
 	private static function get_token_using_jwt( string $jwt, string $token_uri ): WP_Error|string {
