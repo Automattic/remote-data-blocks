@@ -1,8 +1,6 @@
-# How the Data Flows
+# How It Works
 
-This document outlines the data flow within the Remote Data Blocks WordPress plugin, explaining how data moves from external sources to the Gutenberg editor and finally to frontend render targets.
-
-## Data Flow Steps
+At a high level, step by step, here is what is happening:
 
 1. **Block Insertion**:
 
