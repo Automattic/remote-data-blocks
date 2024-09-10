@@ -1,4 +1,4 @@
-# Extending Remote Data Blocks: Developer Guide
+# Remote Data Blocks: Extending the Plugin
 
 Remote Data Blocks is designed to be extensible, allowing developers to create new data sources and queries. This guide will walk you through the process of extending the core plugin.
 
@@ -6,22 +6,20 @@ Remote Data Blocks is designed to be extensible, allowing developers to create n
 
 To create a new data source:
 
-1. Create a new PHP class that extends the base datasource class.
+1. Create a new PHP class that extends the `HttpDatasource` class.
 2. Implement the required methods for fetching and processing data.
 
 Example:
 
 ```php
-namespace YourNamespace;
+class YourCustomDatasource extends HttpDatasource {
+	public function get_endpoint(): string {
+        // Implement your endpoint logic here
+	}
 
-class YourCustomDatasource extends \RemoteDataBlocks\Queries\Datasource {
-    public function fetch_data( $query_args ) {
-        // Implement your data fetching logic here
-    }
-
-    public function process_results( $results ) {
-        // Process and format the fetched data
-    }
+	public function get_request_headers(): array {
+        // Implement your headers logic here
+	}
 }
 ```
 
@@ -29,20 +27,25 @@ class YourCustomDatasource extends \RemoteDataBlocks\Queries\Datasource {
 
 To create a new query:
 
-1. Create a new PHP class that extends the base query class.
-2. Implement the required methods for executing the query and formatting results.
+1. Create a new PHP class that extends the `QueryContext` class.
+2. Implement the required input and output variables for executing the query.
+3. Optionally implement overrides of base class methods if needed.
 
 Example:
 
 ```php
-namespace YourNamespace;
-class YourCustomQuery extends \RemoteDataBlocks\Queries\Query {
-    public function execute($input) {
-        // Implement your query execution logic here
-    }
+class YourCustomQuery extends QueryContext {
+    public array $input_variables = [
+        // Implement your input variables here
+    ];
 
-    public function format_results($results) {
-        // Format the query results
+    public array $output_variables = [
+        // Implement your output variables here
+    ];
+
+    public function get_endpoint( array $input_variables ): string {
+        // Optionally implemented override of datasource endpoint logic here
+        // eg, to add additional query parameters
     }
 }
 ```
@@ -57,20 +60,18 @@ To register your new block:
 Example:
 
 ```php
-namespace YourNamespace;
-
 use RemoteDataBlocks\Editor\ConfigurationLoader;
 
 function register_your_custom_block() {
     $block_name = 'Your Custom Block';
     $your_datasource = new YourCustomDatasource();
-    $your_query = new YourCustomQuery($your_datasource);
-    ConfigurationLoader::register_block($block_name, $your_query);
-    ConfigurationLoader::register_list_query($block_name, $your_query);
-    $block_pattern = file_get_contents(DIR . '/your-pattern.html');
-    ConfigurationLoader::register_block_pattern($block_name, 'your-namespace/your-pattern', $block_pattern);
+    $your_query = new YourCustomQuery( $your_datasource );
+    ConfigurationLoader::register_block( $block_name, $your_query );
+    ConfigurationLoader::register_list_query( $block_name, $your_query );
+    $block_pattern = file_get_contents( __DIR__ . '/your-pattern.html' );
+    ConfigurationLoader::register_block_pattern( $block_name, 'your-namespace/your-pattern', $block_pattern );
 }
-add_action('register_remote_data_blocks', 'YourNamespace\\register_your_custom_block');
+add_action( 'register_remote_data_blocks', 'YourNamespace\\register_your_custom_block' );
 ```
 
 ## 4. Creating Block Patterns
