@@ -1,4 +1,4 @@
-# Remote Data Blocks: Core Concepts
+# Core Concepts
 
 Remote Data Blocks is a WordPress plugin that enhances the Gutenberg editor by providing flexible, data-enrichable blocks. These blocks allow authors to seamlessly integrate local WordPress data, remote data, and custom layouts within the block editor.
 

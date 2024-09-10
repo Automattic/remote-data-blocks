@@ -1,8 +1,8 @@
-# Remote Data Blocks: Extending the Plugin
+# Extending
 
 Remote Data Blocks is designed to be extensible, allowing developers to create new data sources and queries. This guide will walk you through the process of extending the core plugin.
 
-## 1. Creating a New Data Source
+## 1. Create a New Data Source
 
 To create a new data source:
 
@@ -23,7 +23,7 @@ class YourCustomDatasource extends HttpDatasource {
 }
 ```
 
-## 2. Creating a New Query
+## 2. Create a New Query
 
 To create a new query:
 
@@ -50,7 +50,7 @@ class YourCustomQuery extends QueryContext {
 }
 ```
 
-## 3. Registering Your New Block
+## 3. Register Your New Block
 
 To register your new block:
 
@@ -74,7 +74,7 @@ function register_your_custom_block() {
 add_action( 'register_remote_data_blocks', 'YourNamespace\\register_your_custom_block' );
 ```
 
-## 4. Creating Block Patterns
+## 4. Create Block Patterns
 
 Create HTML patterns for your block to define how the data should be displayed. Use the Remote Data Blocks binding syntax to connect data to your pattern.
 
