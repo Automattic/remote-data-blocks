@@ -34,7 +34,8 @@ class GoogleAuth {
 	 */
 	public static function generate_token_from_service_account_key(
 		array $raw_service_account_key,
-		array $scopes
+		array $scopes,
+		bool $no_cache = false
 	): WP_Error|string {
 		$filtered_scopes = self::get_allowed_scopes( $scopes );
 
@@ -52,11 +53,14 @@ class GoogleAuth {
 			return $service_account_key;
 		}
 
-		$cache_key = 'google_auth_token_' . $service_account_key->client_email;
-		$cached_token = wp_cache_get( $cache_key );
+		if ( ! $no_cache ) {
+			// Cache the token
+			$cache_key = 'google_auth_token_' . $service_account_key->client_email;
+			$cached_token = wp_cache_get( $cache_key );
 
-		if ( $cached_token !== false ) {
-			return $cached_token;
+			if ( $cached_token !== false ) {
+				return $cached_token;
+			}
 		}
 
 		$jwt = self::generate_jwt( $service_account_key, $scope );

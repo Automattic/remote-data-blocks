@@ -42,7 +42,7 @@ class AuthController extends WP_REST_Controller {
 		}
 
 		if ( 'service_account' === $type ) {
-			$token = GoogleAuth::generate_token_from_service_account_key( $credentials, $scopes );
+			$token = GoogleAuth::generate_token_from_service_account_key( $credentials, $scopes, true );
 			if ( is_wp_error( $token ) ) {
 				return rest_ensure_response( $token );
 			}
