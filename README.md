@@ -1,6 +1,6 @@
 # Remote Data Blocks
 
-Remote Data Blocks is a WordPress plugin that brings an assortment of flexible, data-enrichable WordPress blocks to your Gutenberg Editor. The blocks are designed to make local data, remote data, and layout seamless, smooth, and productive so you can get your content to your customers your way.
+Remote Data Blocks is a WordPress plugin that brings an assortment of flexible, data-enrichable WordPress blocks into Gutenberg. These blocks make it easy for authors to mix local WordPress data, remote data, and layouts in the block editor.
 
 ## Setup
 
