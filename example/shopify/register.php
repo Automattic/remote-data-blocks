@@ -27,13 +27,9 @@ function register_shopify_block() {
 		return;
 	}
 
-	$block_pattern = file_get_contents( __DIR__ . '/inc/patterns/product-teaser.html' );
-
 	$shopify_datasource            = new ShopifyDatasource( $access_token, $store_name );
 	$shopify_search_products_query = new ShopifySearchProductsQuery( $shopify_datasource );
 	$shopify_get_product_query     = new ShopifyGetProductQuery( $shopify_datasource );
-
-	$block_name = 'Shopify (' . $shopify_datasource->get_display_name() . ')';
 
 	ConfigurationLoader::register_block( $block_name, $shopify_get_product_query );
 	ConfigurationLoader::register_search_query( $block_name, $shopify_search_products_query );
@@ -42,6 +38,7 @@ function register_shopify_block() {
 	ConfigurationLoader::register_query( $block_name, new ShopifyAddToCartMutation( $shopify_datasource ) );
 	ConfigurationLoader::register_query( $block_name, new ShopifyRemoveFromCartMutation( $shopify_datasource ) );
 
+	$block_pattern = file_get_contents( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/inc/integrations/shopify/patterns/product-teaser.html' );
 	ConfigurationLoader::register_block_pattern( $block_name, 'remote-data-blocks/shopify-product-teaser', $block_pattern, [ 'title' => 'Shopify Product Teaser' ] );
 
 	register_block_type( __DIR__ . '/build/blocks/shopify-cart' );

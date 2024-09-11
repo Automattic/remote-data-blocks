@@ -21,8 +21,7 @@ class ConfigurationLoader {
 
 	public static function init() {
 		self::$logger = LoggerManager::instance();
-		self::register_integrations();
-
+		
 		add_action( 'init', [ __CLASS__, 'register_remote_data_blocks' ], 10, 0 );
 	}
 
@@ -237,11 +236,6 @@ class ConfigurationLoader {
 		}
 
 		self::register_selector( $block_title, 'search', $query );
-	}
-
-	public static function register_integrations(): void {
-		// Allow other plugins to register their integrations.
-		do_action( 'register_remote_data_blocks_integrations' );
 	}
 
 	public static function unregister_all(): void {
