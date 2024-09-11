@@ -91,13 +91,13 @@ class DatasourceCRUD {
 		}
 
 		return [
-			'uuid'            => $source->uuid,
-			'token'           => sanitize_text_field( $source->token ),
-			'service'         => 'airtable',
-			'display_name'    => sanitize_text_field( $source->slug ), // TODO: rename slug on frontend
-			'base'            => $source->base,
-			'table'           => $source->table,
-			'uid'             => hash( 'sha256', $source->base ),
+			'uuid'         => $source->uuid,
+			'token'        => sanitize_text_field( $source->token ),
+			'service'      => 'airtable',
+			'display_name' => sanitize_text_field( $source->slug ), // TODO: rename slug on frontend
+			'base'         => $source->base,
+			'table'        => $source->table,
+			'uid'          => hash( 'sha256', $source->base ),
 		];
 	}
 
@@ -107,13 +107,13 @@ class DatasourceCRUD {
 		}
 
 		return [
-			'uuid'            => $source->uuid,
-			'token'           => sanitize_text_field( $source->token ),
-			'service'         => 'shopify',
-			'display_name'    => sanitize_text_field( $source->slug ), // TODO: rename slug on frontend
-			'store'           => sanitize_text_field( $source->store ),
-			'slug'            => sanitize_text_field( $source->slug ),
-			'uid'             => hash( 'sha256', $source->store ),
+			'uuid'         => $source->uuid,
+			'token'        => sanitize_text_field( $source->token ),
+			'service'      => 'shopify',
+			'display_name' => sanitize_text_field( $source->slug ), // TODO: rename slug on frontend
+			'store'        => sanitize_text_field( $source->store ),
+			'slug'         => sanitize_text_field( $source->slug ),
+			'uid'          => hash( 'sha256', $source->store ),
 		];
 	}
 
