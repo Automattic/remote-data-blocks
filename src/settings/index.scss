@@ -6,7 +6,7 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 16px 20px;
+	padding: 24px 20px;
 }
 
 #remote-data-blocks-settings {
@@ -57,6 +57,36 @@ div.components-card-header {
 	svg {
 		margin-left: 4px;
 	}
+}
+
+.data-sources-loader {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	min-height: 250px;
+}
+
+.components-placeholder.data-sources-placeholder {
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	box-shadow: none;
+	min-height: 250px;
+}
+
+.components-placeholder__label {
+	flex-direction: column;
+
+	svg {
+		width: 40px;
+		height: 40px;
+		margin-bottom: 12px;
+	}
+}
+
+.components-placeholder__instructions {
+	color: #757575
 }
 
 .add-data-source-dropdown-content {

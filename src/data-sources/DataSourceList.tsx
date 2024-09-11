@@ -4,10 +4,12 @@ import {
 	Button,
 	ButtonGroup,
 	Spinner,
+	Placeholder,
 } from '@wordpress/components';
 import { DialogInputEvent } from '@wordpress/components/src/confirm-dialog/types';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { info } from '@wordpress/icons';
 
 import { Tag } from '@/components/tag';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
@@ -42,10 +44,21 @@ const DataSourceList = () => {
 
 	if ( loadingDataSources ) {
 		return (
-			<>
-				{ __( 'Loading data sources...', 'remote-data-blocks' ) }
+			<div className="data-sources-loader">
 				<Spinner />
-			</>
+				<p> { __( 'Loading data sources...', 'remote-data-blocks' ) } </p>
+			</div>
+		);
+	}
+
+	if ( dataSources.length === 0 ) {
+		return (
+			<Placeholder
+				className="data-sources-placeholder"
+				icon={ info }
+				label={ __( 'No data source found.', 'remote-data-blocks' ) }
+				instructions={ __( 'Use “Add” button to add data source.', 'remote-data-blocks' ) }
+			/>
 		);
 	}
 
