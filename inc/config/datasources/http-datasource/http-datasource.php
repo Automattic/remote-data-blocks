@@ -12,27 +12,27 @@ namespace RemoteDataBlocks\Config;
  */
 abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInterface {
 	/**
-	 * @inheritdoc
+	 * @inheritDoc
 	 */
 	abstract public function get_display_name(): string;
 
 	/**
-	 * @inheritdoc
+	 * @inheritDoc
 	 */
 	abstract public function get_uid(): string;
 
 	/**
-	 * @inheritdoc
+	 * @inheritDoc
 	 */
 	abstract public function get_endpoint(): string;
 
 	/**
-	 * @inheritdoc
+	 * @inheritDoc
 	 */
 	abstract public function get_request_headers(): array;
 
 	/**
-	 * @inheritdoc
+	 * @inheritDoc
 	 */
 	public function get_image_url(): ?string {
 		return null;

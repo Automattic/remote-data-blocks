@@ -4,6 +4,8 @@ namespace RemoteDataBlocks\Config;
 
 use function plugins_url;
 
+defined( 'ABSPATH' ) || exit();
+
 class ShopifyDatasource extends HttpDatasource {
 	public function __construct( private string $access_token, private string $store_name ) {}
 
