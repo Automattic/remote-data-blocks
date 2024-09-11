@@ -5,13 +5,13 @@ import {
 	ButtonGroup,
 	Spinner,
 	Placeholder,
+	Icon,
 } from '@wordpress/components';
 import { DialogInputEvent } from '@wordpress/components/src/confirm-dialog/types';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { info } from '@wordpress/icons';
+import { edit, info, trash } from '@wordpress/icons';
 
-import { Tag } from '@/components/tag';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
@@ -67,34 +67,31 @@ const DataSourceList = () => {
 	};
 
 	const renderDataSourceMeta = ( source: DataSourceConfig ) => {
-		if ( source.service === 'airtable' ) {
-			return (
-				<>
-					<Tag id="airtable-base" label="Base" value={ source.base.name } />
-					<Tag id="airtable-table" label="Table" value={ source.table.name } />
-				</>
-			);
+		const tags = [];
+		switch ( source.service ) {
+			case 'airtable':
+				tags.push( source.base.name, source.table.name );
+				break;
+			case 'shopify':
+				tags.push( source.store );
+				break;
 		}
 
-		if ( source.service === 'shopify' ) {
-			return (
-				<>
-					<Tag id="shopify-store" label="Store" value={ source.store } />
-				</>
-			);
-		}
-
-		return null;
+		return tags.map( ( tag, index ) => (
+			<span key={ index } className="data-source-meta">
+				{ tag }
+			</span>
+		) );
 	};
 
 	return (
 		<table className="table data-source-list">
 			<thead className="table-header">
 				<tr>
-					<th style={ { textAlign: 'left' } }>{ __( 'Slug', 'remote-data-blocks' ) }</th>
-					<th style={ { textAlign: 'left' } }>{ __( 'Service', 'remote-data-blocks' ) }</th>
-					<th style={ { textAlign: 'left' } }>{ __( 'Meta', 'remote-data-blocks' ) }</th>
-					<th style={ { textAlign: 'left' } }>{ __( 'Actions', 'remote-data-blocks' ) }</th>
+					<th>{ __( 'Slug', 'remote-data-blocks' ) }</th>
+					<th>{ __( 'Service', 'remote-data-blocks' ) }</th>
+					<th>{ __( 'Meta', 'remote-data-blocks' ) }</th>
+					<th className="data-source-actions">{ __( 'Actions', 'remote-data-blocks' ) }</th>
 				</tr>
 			</thead>
 			<tbody className="table-body">
@@ -103,15 +100,13 @@ const DataSourceList = () => {
 					return (
 						<tr key={ uuid } className="table-row">
 							<td>
-								<Text>{ slug }</Text>
+								<Text className="data-source-slug">{ slug }</Text>
 							</td>
 							<td>
 								<Text>{ toTitleCase( service ) }</Text>
 							</td>
-							<td>
-								<div className="data-source-meta">{ renderDataSourceMeta( source ) }</div>
-							</td>
-							<td>
+							<td> { renderDataSourceMeta( source ) } </td>
+							<td className="data-source-actions">
 								<ConfirmDialog
 									isOpen={ deleteDialogOpen }
 									onCancel={ onCancelDeleteDialog }
@@ -120,12 +115,12 @@ const DataSourceList = () => {
 									{ __( 'Are you sure you want to delete?' ) }
 								</ConfirmDialog>
 
-								<ButtonGroup>
-									<Button variant="tertiary" onClick={ openDeleteDialog }>
-										{ __( 'Delete', 'remote-data-blocks' ) }
+								<ButtonGroup className="data-source-actions">
+									<Button variant="secondary" onClick={ () => onEditClick( uuid ) }>
+										<Icon icon={ edit } />
 									</Button>
-									<Button variant="primary" onClick={ () => onEditClick( uuid ) }>
-										{ __( 'Edit', 'remote-data-blocks' ) }
+									<Button variant="secondary" onClick={ openDeleteDialog }>
+										<Icon icon={ trash } />
 									</Button>
 								</ButtonGroup>
 							</td>
