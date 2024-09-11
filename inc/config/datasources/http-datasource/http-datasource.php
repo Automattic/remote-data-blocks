@@ -2,8 +2,6 @@
 
 namespace RemoteDataBlocks\Config;
 
-defined( 'ABSPATH' ) || exit();
-
 /**
  * HttpDatasource class
  *
@@ -12,66 +10,31 @@ defined( 'ABSPATH' ) || exit();
  * @package remote-data-blocks
  * @since 0.1.0
  */
-class HttpDatasource implements DatasourceInterface, HttpDatasourceInterface {
-
+abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInterface {
 	/**
-	 * Configuration object for this HTTP datasource.
-	 *
-	 * @var array
+	 * @inheritdoc
 	 */
-	private array $config;
+	abstract public function get_display_name(): string;
 
 	/**
-	 * Constructor for the HttpDatasource.
-	 *
-	 * @param array $config The configuration object for this HTTP datasource.
+	 * @inheritdoc
 	 */
-	public function __construct( array $config ) {
-		$this->config = $config;
-	}
+	abstract public function get_uid(): string;
 
 	/**
-	 * Get a human-readable name for this datasource.
-	 *
-	 * @return string The display name of the datasource.
+	 * @inheritdoc
 	 */
-	public function get_display_name(): string {
-		return $this->config['display_name'];
-	}
+	abstract public function get_endpoint(): string;
 
 	/**
-	 * Get a unique identifier for this datasource.
-	 *
-	 * @return string The unique identifier of the datasource.
+	 * @inheritdoc
 	 */
-	public function get_uid(): string {
-		return $this->config['uid'];
-	}
+	abstract public function get_request_headers(): array;
 
 	/**
-	 * Get the endpoint for the query.
-	 *
-	 * @return string The endpoint for the query.
-	 */
-	public function get_endpoint(): string {
-		return $this->config['endpoint'];
-	}
-
-	/**
-	 * Get the request headers.
-	 *
-	 * @return array Associative array of request headers.
-	 */
-	public function get_request_headers(): array {
-		return $this->config['request_headers'] ?? [];
-	}
-
-	/**
-	 * Get the optional image URL for the datasource.
-	 *
-	 * @return string|null The image URL or null if not set.
+	 * @inheritdoc
 	 */
 	public function get_image_url(): ?string {
-		return $this->config['image_url'] ?? null;
+		return null;
 	}
 }

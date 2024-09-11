@@ -2,16 +2,21 @@
 
 namespace RemoteDataBlocks\Config;
 
-use RemoteDataBlocks\Config\HttpDatasource;
 use function plugins_url;
 
 class ShopifyDatasource extends HttpDatasource {
-	use DynamicDatasource;
-
 	public function __construct( private string $access_token, private string $store_name ) {}
 
 	public function get_store_name(): string {
 		return $this->store_name;
+	}
+
+	public function get_display_name(): string {
+		return 'Shopify (' . $this->store_name . ')';
+	}
+
+	public function get_uid(): string {
+		return hash( 'sha256', $this->store_name );
 	}
 
 	public function get_endpoint(): string {

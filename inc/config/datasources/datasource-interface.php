@@ -9,8 +9,6 @@
 
 namespace RemoteDataBlocks\Config;
 
-defined( 'ABSPATH' ) || exit();
-
 /**
  * Interface used to define a Remote Data Blocks Datasource. It defines the
  * properties of a datasource that will be shared by queries against that
@@ -20,14 +18,6 @@ defined( 'ABSPATH' ) || exit();
  * Only implement this interface if you have additional custom datasources.
  */
 interface DatasourceInterface {
-
-	/**
-	 * Constructor for the Datasource.
-	 *
-	 * @param array $config The configuration object for this datasource.
-	 */
-	public function __construct( array $config );
-
 	/**
 	 * Get a human-readable name for this datasource.
 	 *
@@ -41,10 +31,10 @@ interface DatasourceInterface {
 	/**
 	 * Get a unique identifier for this datasource.
 	 *
-	 * This method should return a globally unique identifier for the datasource's
+	 * This method should return a sha256 hash of the unique parts of the datasource's
 	 * configuration that can be used to identify the datasource authoritatively.
 	 *
-	 * @return string Globally unique identifier of the datasource.
+	 * @return string sha256 hash of the datasource's unique identifier.
 	 */
 	public function get_uid(): string;
 

@@ -22,7 +22,7 @@ class AirtableEldenRingListLocationsQuery extends QueryContext {
 			],
 			'map_name' => [
 				'name' => 'Name',
-				'path' => '$.fields.Name',
+				'path' => '$.fields.MapName',
 				'type' => 'string',
 			],
 			'title'    => [

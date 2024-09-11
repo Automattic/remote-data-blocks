@@ -9,8 +9,6 @@
 
 namespace RemoteDataBlocks\Config;
 
-defined( 'ABSPATH' ) || exit();
-
 /**
  * Interface used to define a Remote Data Blocks Datasource for an HTTP API. It
  * defines the properties of an API that will be shared by queries against that
@@ -27,14 +25,6 @@ defined( 'ABSPATH' ) || exit();
  * Only implement this interface if you have custom datasources not provided by VIP.
  */
 interface HttpDatasourceInterface {
-
-	/**
-	 * Constructor for the HttpDatasource.
-	 *
-	 * @param array $config The configuration object for this HTTP datasource.
-	 */
-	public function __construct( array $config );
-
 	/**
 	 * Get the endpoint for the query. Note that the query configuration has an
 	 * opportunity to change / override the endpoint at request time. For REST

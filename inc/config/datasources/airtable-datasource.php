@@ -2,11 +2,9 @@
 
 namespace RemoteDataBlocks\Config;
 
-use RemoteDataBlocks\Config\HttpDatasource;
+defined( 'ABSPATH' ) || exit();
 
 class AirtableDatasource extends HttpDatasource {
-	use DynamicDatasource;
-
 	private $tables;
 
 	public function __construct( private string $access_token, private string $base, mixed $tables ) {
@@ -26,6 +24,14 @@ class AirtableDatasource extends HttpDatasource {
 
 	public function get_table( string $variation = '' ): string {
 		return $this->tables[ $variation ] ?? '';
+	}
+
+	public function get_display_name(): string {
+		return 'Airtable';
+	}
+
+	public function get_uid(): string {
+		return hash( 'sha256', $this->base );
 	}
 
 	public function get_endpoint( string $variation = '' ): string {
