@@ -12,22 +12,4 @@
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  */
 
-/**
- * This file may also contain CSS overrides that are difficult or impossible to
- * implement using `theme.json` alone. For example, each bound inner block of a
- * Remote Data Block has a class name corresponding to the field it is bound to.
- *
- * Therefore, a Remote Data Block named "Shopify Product" containing a paragraph
- * block bound to a field named `description` can be targeted with a selector:
- *
- * .wp-block-remote-data-blocks-shopify-product p.rdb-block-data-description {
- *   /* styles here * /
- * }
- *
- * However, note that these styles do not get applied in the editor. For simple
- * styles, using `theme.json` and the `css` property is recommended.
- */
-
-.wp-block-remote-data-blocks-shopify-product p.rdb-block-data-price {
-	font-weight: 700;
-}
+/* This file is not enqueued and exists only to provide the theme manifest. */

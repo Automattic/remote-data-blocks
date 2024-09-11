@@ -10,14 +10,15 @@ use function wp_get_theme;
 defined( 'ABSPATH' ) || exit();
 
 /**
- * Enqueue the child theme stylesheet.
+ * Enqueue the Remote Data Blocks styles.
  */
-function remote_data_blocks_example_theme_enqueue_styles() {
+function remote_data_blocks_example_theme_enqueue_block_styles() {
 	wp_enqueue_style(
 		'remote-data-blocks-example-theme-style',
-		get_stylesheet_directory_uri() . '/style.css',
+		get_stylesheet_directory_uri() . '/style-remote-data-blocks.css',
 		[],
 		wp_get_theme()->get( 'Version' )
 	);
 }
-add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\\remote_data_blocks_example_theme_enqueue_styles', 15, 0 );
+add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\\remote_data_blocks_example_theme_enqueue_block_styles', 15, 0 );
+add_action( 'enqueue_block_editor_assets', __NAMESPACE__ . '\\remote_data_blocks_example_theme_enqueue_block_styles', 15, 0 );
