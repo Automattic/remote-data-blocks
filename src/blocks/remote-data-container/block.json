@@ -16,10 +16,7 @@
       "backgroundImage": true,
       "backgroundSize": true
     },
-    "className": true,
-    "color": {
-      "background": true
-    },
+    "color": {},
     "html": false,
     "interactivity": true,
     "shadow": true,
