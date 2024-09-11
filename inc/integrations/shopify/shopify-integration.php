@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Integrations\Shopify;
 
-use RemoteDataBlocks\Config\HttpDatasource;
+use RemoteDataBlocks\Config\ShopifyDatasource;
 use RemoteDataBlocks\Config\ShopifyGetProductQuery;
 use RemoteDataBlocks\Config\ShopifySearchProductsQuery;
 use RemoteDataBlocks\Editor\ConfigurationLoader;
@@ -36,7 +36,7 @@ class ShopifyIntegration {
     }
 
     private static function register_blocks_for_shopify_data_source( array $config ): void {
-        $shopify_datasource            = new HttpDatasource( $config );
+        $shopify_datasource            = new ShopifyDatasource();
         $shopify_search_products_query = new ShopifySearchProductsQuery( $shopify_datasource );
         $shopify_get_product_query     = new ShopifyGetProductQuery( $shopify_datasource );
 
