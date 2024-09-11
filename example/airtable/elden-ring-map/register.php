@@ -23,7 +23,7 @@ function register_airtable_elden_ring_map_block() {
 	}
 
 	$locations_config = [
-		'friendly_name'   => $block_name . ' (Locations)',
+		'display_name'   => $block_name . ' (Locations)',
 		'uid'             => 'appqI3sJ9R2NcML8Y/tblc82R9msH4Yh6ZX',
 		'endpoint'        => 'https://api.airtable.com/v0/appqI3sJ9R2NcML8Y/tblc82R9msH4Yh6ZX',
 		'request_headers' => [
@@ -33,7 +33,7 @@ function register_airtable_elden_ring_map_block() {
 	];
 
 	$maps_config = [
-		'friendly_name'   => $block_name . ' (Maps)',
+		'display_name'   => $block_name . ' (Maps)',
 		'uid'             => 'appqI3sJ9R2NcML8Y/tblS3OYo8tZOg04CP',
 		'endpoint'        => 'https://api.airtable.com/v0/appqI3sJ9R2NcML8Y/tblS3OYo8tZOg04CP',
 		'request_headers' => [

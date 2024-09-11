@@ -12,7 +12,7 @@ defined( 'ABSPATH' ) || exit();
  * @package remote-data-blocks
  * @since 0.1.0
  */
-class HttpDatasource implements HttpDatasourceInterface {
+class HttpDatasource implements DatasourceInterface, HttpDatasourceInterface {
 
 	/**
 	 * Configuration object for this HTTP datasource.
@@ -33,10 +33,10 @@ class HttpDatasource implements HttpDatasourceInterface {
 	/**
 	 * Get a human-readable name for this datasource.
 	 *
-	 * @return string The friendly name of the datasource.
+	 * @return string The display name of the datasource.
 	 */
-	public function get_friendly_name(): string {
-		return $this->config['friendly_name'];
+	public function get_display_name(): string {
+		return $this->config['display_name'];
 	}
 
 	/**

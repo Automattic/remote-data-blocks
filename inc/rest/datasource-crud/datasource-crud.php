@@ -15,7 +15,7 @@ use WP_Error;
  * a remote data source with the following structure:
  * {
  *     uuid: string,    // Unique identifier for the data source
- *     slug: string,    // URL-friendly name for the data source
+ *     slug: string,    // URL-display name for the data source
  *     service: string, // Type of service (e.g., 'airtable', 'shopify')
  *     token: string,   // Authentication token for the service
  *     // Additional fields specific to each service type
@@ -98,7 +98,7 @@ class DatasourceCRUD {
 			'table'           => $source->table,
 			'slug'            => sanitize_text_field( $source->slug ),
 			// quick hack to transform data to our experimental format
-			'friendly_name'   => sanitize_text_field( $source->slug ),
+			'display_name'   => sanitize_text_field( $source->slug ),
 			'uid'             => hash( 'sha256', $source->slug ),
 			'endpoint'        => 'https://api.airtable.com/v0/' . $source->base['id'] . '/' . $source->table['id'],
 			'request_headers' => [
@@ -121,7 +121,7 @@ class DatasourceCRUD {
 			'store'           => sanitize_text_field( $source->store ),
 			'slug'            => sanitize_text_field( $source->slug ),
 			// quick hack totransform data to our experimental format
-			'friendly_name'   => sanitize_text_field( $source->slug ),
+			'display_name'   => sanitize_text_field( $source->slug ),
 			'uid'             => hash( 'sha256', $source->slug ),
 			'endpoint'        => 'https://' . $source->store . '.myshopify.com/api/2024-07/graphql.json',
 			'request_headers' => [

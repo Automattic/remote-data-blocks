@@ -21,7 +21,7 @@ function register_airtable_events_block() {
 	}
 
 	$config = [
-		'friendly_name'   => $block_name,
+		'display_name'   => $block_name,
 		'uid'             => 'appVQ2PAl95wQSo9S/tblyGtuxblLtmoqMI',
 		'endpoint'        => 'https://api.airtable.com/v0/appVQ2PAl95wQSo9S/tblyGtuxblLtmoqMI',
 		'request_headers' => [

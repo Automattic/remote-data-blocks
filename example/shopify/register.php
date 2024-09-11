@@ -27,7 +27,7 @@ function register_shopify_block() {
 	}
 
 	$config = [
-		'friendly_name'   => 'hardcode example',
+		'display_name'   => 'hardcode example',
 		'uid'             => 'stoph-test',
 		'endpoint'        => 'https://stoph-test.myshopify.com/api/2024-07/graphql.json',
 		'request_headers' => [
@@ -66,7 +66,7 @@ function register_blocks_for_shopify_data_source( array $config, string $block_p
 	$shopify_search_products_query = new ShopifySearchProductsQuery( $shopify_datasource );
 	$shopify_get_product_query     = new ShopifyGetProductQuery( $shopify_datasource );
 
-	$block_name = 'Shopify (' . $shopify_datasource->get_friendly_name() . ')';
+	$block_name = 'Shopify (' . $shopify_datasource->get_display_name() . ')';
 
 	ConfigurationLoader::register_block( $block_name, $shopify_get_product_query );
 	ConfigurationLoader::register_search_query( $block_name, $shopify_search_products_query );
