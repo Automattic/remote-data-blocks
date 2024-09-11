@@ -29,7 +29,9 @@ class PluginSettings {
 
 	public static function settings_page_content() {
 		printf(
-			'<div class="wrap" id="remote-data-blocks-settings">%s</div>',
+			'<div id="remote-data-blocks-settings-wrapper">
+				<div id="remote-data-blocks-settings">%s</div>
+			</div>',
 			esc_html__( 'Loading…', 'remote-data-blocks' )
 		);
 	}

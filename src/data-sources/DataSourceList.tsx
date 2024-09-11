@@ -1,10 +1,7 @@
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
-	__experimentalHeading as Heading,
 	__experimentalText as Text,
 	Button,
-	PanelBody,
-	PanelRow,
 	ButtonGroup,
 	Spinner,
 } from '@wordpress/components';
@@ -13,9 +10,8 @@ import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { Tag } from '@/components/tag';
-import AddDataSourceModal from '@/data-sources/AddDataSourceModal';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
-import { DataSourceConfig, DataSourceType } from '@/data-sources/types';
+import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import { toTitleCase } from '@/utils/string';
 
@@ -31,12 +27,6 @@ const DataSourceList = () => {
 	};
 
 	const openDeleteDialog = () => setDeleteDialogOpen( true );
-
-	const onServiceTypeSelected = ( serviceToAdd: DataSourceType ) => {
-		const newUrl = new URL( window.location.href );
-		newUrl.searchParams.set( 'addDataSource', serviceToAdd );
-		pushState( newUrl );
-	};
 
 	const onEditClick = ( uuidToEdit: string ) => {
 		const newUrl = new URL( window.location.href );
@@ -85,65 +75,52 @@ const DataSourceList = () => {
 	};
 
 	return (
-		<PanelBody title={ __( 'Configure Data Sources', 'remote-data-blocks' ) }>
-			<PanelRow>
-				<AddDataSourceModal onSubmit={ onServiceTypeSelected } />
-			</PanelRow>
-			<hr />
-			<PanelRow>
-				<Heading className="data-source-list-heading" level={ 3 }>
-					{ __( 'Available Data Sources', 'remote-data-blocks' ) }
-				</Heading>
-			</PanelRow>
-			<PanelRow>
-				<table className="table data-source-list">
-					<thead className="table-header">
-						<tr>
-							<th style={ { textAlign: 'left' } }>{ __( 'Slug', 'remote-data-blocks' ) }</th>
-							<th style={ { textAlign: 'left' } }>{ __( 'Service', 'remote-data-blocks' ) }</th>
-							<th style={ { textAlign: 'left' } }>{ __( 'Meta', 'remote-data-blocks' ) }</th>
-							<th style={ { textAlign: 'left' } }>{ __( 'Actions', 'remote-data-blocks' ) }</th>
-						</tr>
-					</thead>
-					<tbody className="table-body">
-						{ getValidDataSources().map( source => {
-							const { uuid, slug, service } = source;
-							return (
-								<tr key={ uuid } className="table-row">
-									<td>
-										<Text>{ slug }</Text>
-									</td>
-									<td>
-										<Text>{ toTitleCase( service ) }</Text>
-									</td>
-									<td>
-										<div className="data-source-meta">{ renderDataSourceMeta( source ) }</div>
-									</td>
-									<td>
-										<ConfirmDialog
-											isOpen={ deleteDialogOpen }
-											onCancel={ onCancelDeleteDialog }
-											onConfirm={ () => void onDeleteConfirm( uuid ) }
-										>
-											{ __( 'Are you sure you want to delete?' ) }
-										</ConfirmDialog>
+		<table className="table data-source-list">
+			<thead className="table-header">
+				<tr>
+					<th style={ { textAlign: 'left' } }>{ __( 'Slug', 'remote-data-blocks' ) }</th>
+					<th style={ { textAlign: 'left' } }>{ __( 'Service', 'remote-data-blocks' ) }</th>
+					<th style={ { textAlign: 'left' } }>{ __( 'Meta', 'remote-data-blocks' ) }</th>
+					<th style={ { textAlign: 'left' } }>{ __( 'Actions', 'remote-data-blocks' ) }</th>
+				</tr>
+			</thead>
+			<tbody className="table-body">
+				{ getValidDataSources().map( source => {
+					const { uuid, slug, service } = source;
+					return (
+						<tr key={ uuid } className="table-row">
+							<td>
+								<Text>{ slug }</Text>
+							</td>
+							<td>
+								<Text>{ toTitleCase( service ) }</Text>
+							</td>
+							<td>
+								<div className="data-source-meta">{ renderDataSourceMeta( source ) }</div>
+							</td>
+							<td>
+								<ConfirmDialog
+									isOpen={ deleteDialogOpen }
+									onCancel={ onCancelDeleteDialog }
+									onConfirm={ () => void onDeleteConfirm( uuid ) }
+								>
+									{ __( 'Are you sure you want to delete?' ) }
+								</ConfirmDialog>
 
-										<ButtonGroup>
-											<Button variant="tertiary" onClick={ openDeleteDialog }>
-												{ __( 'Delete', 'remote-data-blocks' ) }
-											</Button>
-											<Button variant="primary" onClick={ () => onEditClick( uuid ) }>
-												{ __( 'Edit', 'remote-data-blocks' ) }
-											</Button>
-										</ButtonGroup>
-									</td>
-								</tr>
-							);
-						} ) }
-					</tbody>
-				</table>
-			</PanelRow>
-		</PanelBody>
+								<ButtonGroup>
+									<Button variant="tertiary" onClick={ openDeleteDialog }>
+										{ __( 'Delete', 'remote-data-blocks' ) }
+									</Button>
+									<Button variant="primary" onClick={ () => onEditClick( uuid ) }>
+										{ __( 'Edit', 'remote-data-blocks' ) }
+									</Button>
+								</ButtonGroup>
+							</td>
+						</tr>
+					);
+				} ) }
+			</tbody>
+		</table>
 	);
 };
 

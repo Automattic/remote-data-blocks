@@ -56,16 +56,6 @@ const PatternEditorSettingsPanel = () => {
 
 	const isSynced = syncStatus !== 'unsynced';
 
-	console.log( {
-		categoryIds,
-		isSynced,
-		postContent,
-		postId,
-		postMeta,
-		postType,
-		syncStatus,
-	} );
-
 	return (
 		<PluginDocumentSettingPanel
 			name="pattern-editor-settings-panel"
