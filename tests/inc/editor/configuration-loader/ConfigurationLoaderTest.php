@@ -4,7 +4,7 @@ namespace RemoteDataBlocks\Editor;
 
 use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\Config\QueryContext;
-use RemoteDataBlocks\Config\HttpDatasource;
+use RemoteDataBlocks\Test\TestDatasource;
 
 class ConfigurationLoaderTest extends TestCase {
 	public function testIsRegisteredBlockReturnsFalseWhenNoConfigurations() {
@@ -12,11 +12,7 @@ class ConfigurationLoaderTest extends TestCase {
 	}
 
 	public function testIsRegisteredBlockReturnsTrueForRegisteredBlock() {
-		$http_datasource = new HttpDatasource( [
-			'endpoint' => 'https://api.example.com',
-			'request_headers'  => [ 'Content-Type' => 'application/json' ],
-		] );
-		ConfigurationLoader::register_block( 'some_slick_block', new QueryContext( $http_datasource ) );
+		ConfigurationLoader::register_block( 'some_slick_block', new QueryContext( new TestDatasource() ) );
 		$this->assertTrue( ConfigurationLoader::is_registered_block( 'remote-data-blocks/some_slick_block' ) );
 	}
 }

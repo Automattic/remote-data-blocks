@@ -7,8 +7,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use RemoteDataBlocks\Config\QueryRunner;
 use RemoteDataBlocks\Config\QueryRunnerInterface;
-use RemoteDataBlocks\Config\HttpDatasource;
-use RemoteDataBlocks\Config\HttpDatasourceInterface;
+use RemoteDataBlocks\Config\HttpDatasourceConfig;
 use RemoteDataBlocks\Config\QueryContext;
 use RemoteDataBlocks\HttpClient;
 use WP_Error;
@@ -22,13 +21,33 @@ class QueryRunnerTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->http_datasource = new HttpDatasource( [
-			'endpoint' => 'https://api.example.com',
-			'request_headers'  => [ 'Content-Type' => 'application/json' ],
-		] );
-
 		$this->http_client = $this->createMock( HttpClient::class );
-		
+
+		$this->http_datasource = new class() implements HttpDatasourceConfig {
+			private $endpoint = 'https://api.example.com';
+			private $headers  = [ 'Content-Type' => 'application/json' ];
+
+			public function get_endpoint(): string {
+				return $this->endpoint;
+			}
+
+			public function get_image_url(): null {
+				return null;
+			}
+
+			public function get_request_headers(): array {
+				return $this->headers;
+			}
+
+			public function set_endpoint( string $endpoint ): void {
+				$this->endpoint = $endpoint;
+			}
+
+			public function set_headers( array $headers ): void {
+				$this->headers = $headers;
+			}
+		};
+
 		$this->query_context = new class($this->http_datasource, $this->http_client) extends QueryContext {
 			private $http_datasource;
 			private $http_client;
@@ -36,7 +55,7 @@ class QueryRunnerTest extends TestCase {
 			private $request_body   = [ 'query' => 'test' ];
 			private $response_data  = null;
 
-			public function __construct( HttpDatasource $http_datasource, HttpClient $http_client ) {
+			public function __construct( HttpDatasourceConfig $http_datasource, HttpClient $http_client ) {
 				$this->http_datasource = $http_datasource;
 				$this->http_client     = $http_client;
 			}
@@ -81,10 +100,6 @@ class QueryRunnerTest extends TestCase {
 				return $raw_response_data;
 			}
 
-			public function set_http_datasource( HttpDatasourceInterface $http_datasource ): void {
-				$this->http_datasource = $http_datasource;
-			}
-
 			public function set_request_method( string $method ): void {
 				$this->request_method = $method;
 			}
@@ -124,7 +139,7 @@ class QueryRunnerTest extends TestCase {
 	public function testExecuteInvalidScheme() {
 		$input_variables = [ 'key' => 'value' ];
 
-		$this->query_context->set_http_datasource( new HttpDatasource( [ 'endpoint' => 'http://api.example.com' ] ) );
+		$this->http_datasource->set_endpoint( 'http://api.example.com' );
 
 		$query_runner = $this->query_context->get_query_runner();
 		$result       = $query_runner->execute( $input_variables );
@@ -136,7 +151,7 @@ class QueryRunnerTest extends TestCase {
 	public function testExecuteInvalidHost() {
 		$input_variables = [ 'key' => 'value' ];
 
-		$this->query_context->set_http_datasource( new HttpDatasource( [ 'endpoint' => 'https://' ] ) );
+		$this->http_datasource->set_endpoint( 'https://' );
 
 		$query_runner = $this->query_context->get_query_runner();
 		$result       = $query_runner->execute( $input_variables );

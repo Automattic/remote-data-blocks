@@ -57,15 +57,15 @@ class QueryContext implements HttpQueryContext {
 	/**
 	 * Constructor.
 	 *
-	 * @param HttpDatasourceInterface $datasource      The datasource that this query will use.
+	 * @param HttpDatasource $datasource The datasource that this query will use.
 	 */
-	public function __construct( private HttpDatasourceInterface $datasource ) {
+	public function __construct( private HttpDatasource $datasource ) {
 	}
 
 	/**
 	 * Get the datasource associated with this query.
 	 */
-	protected function get_datasource(): HttpDatasourceInterface {
+	protected function get_datasource(): HttpDatasource {
 		return $this->datasource;
 	}
 
