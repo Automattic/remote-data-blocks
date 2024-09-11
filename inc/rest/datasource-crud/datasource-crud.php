@@ -94,18 +94,10 @@ class DatasourceCRUD {
 			'uuid'            => $source->uuid,
 			'token'           => sanitize_text_field( $source->token ),
 			'service'         => 'airtable',
+			'display_name'    => sanitize_text_field( $source->slug ), // TODO: rename slug on frontend
 			'base'            => $source->base,
 			'table'           => $source->table,
-			'slug'            => sanitize_text_field( $source->slug ),
-			// quick hack to transform data to our experimental format
-			'display_name'    => sanitize_text_field( $source->slug ),
-			'uid'             => hash( 'sha256', $source->slug ),
-			'endpoint'        => 'https://api.airtable.com/v0/' . $source->base['id'] . '/' . $source->table['id'],
-			'request_headers' => [
-				'Authorization' => 'Bearer ' . $source->token,
-				'Content-Type'  => 'application/json',
-			],
-			'image_url'       => null,
+			'uid'             => hash( 'sha256', $source->base ),
 		];
 	}
 
@@ -118,17 +110,10 @@ class DatasourceCRUD {
 			'uuid'            => $source->uuid,
 			'token'           => sanitize_text_field( $source->token ),
 			'service'         => 'shopify',
+			'display_name'    => sanitize_text_field( $source->slug ), // TODO: rename slug on frontend
 			'store'           => sanitize_text_field( $source->store ),
 			'slug'            => sanitize_text_field( $source->slug ),
-			// quick hack totransform data to our experimental format
-			'display_name'    => sanitize_text_field( $source->slug ),
-			'uid'             => hash( 'sha256', $source->slug ),
-			'endpoint'        => 'https://' . $source->store . '.myshopify.com/api/2024-07/graphql.json',
-			'request_headers' => [
-				'Content-Type'                      => 'application/json',
-				'X-Shopify-Storefront-Access-Token' => $source->token,
-			],
-			'image_url'       => null,
+			'uid'             => hash( 'sha256', $source->store ),
 		];
 	}
 

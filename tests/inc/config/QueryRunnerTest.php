@@ -7,9 +7,10 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use RemoteDataBlocks\Config\QueryRunner;
 use RemoteDataBlocks\Config\QueryRunnerInterface;
-use RemoteDataBlocks\Config\HttpDatasourceConfig;
+use RemoteDataBlocks\Config\HttpDatasource;
 use RemoteDataBlocks\Config\QueryContext;
 use RemoteDataBlocks\HttpClient;
+use RemoteDataBlocks\Test\TestDatasource;
 use WP_Error;
 
 class QueryRunnerTest extends TestCase {
@@ -23,16 +24,12 @@ class QueryRunnerTest extends TestCase {
 
 		$this->http_client = $this->createMock( HttpClient::class );
 
-		$this->http_datasource = new class() implements HttpDatasourceConfig {
-			private $endpoint = 'https://api.example.com';
+		$this->http_datasource = new class() extends TestDatasource {
+			private $endpoint = 'https://example.com/api';
 			private $headers  = [ 'Content-Type' => 'application/json' ];
 
 			public function get_endpoint(): string {
 				return $this->endpoint;
-			}
-
-			public function get_image_url(): null {
-				return null;
 			}
 
 			public function get_request_headers(): array {
@@ -55,7 +52,7 @@ class QueryRunnerTest extends TestCase {
 			private $request_body   = [ 'query' => 'test' ];
 			private $response_data  = null;
 
-			public function __construct( HttpDatasourceConfig $http_datasource, HttpClient $http_client ) {
+			public function __construct( HttpDatasource $http_datasource, HttpClient $http_client ) {
 				$this->http_datasource = $http_datasource;
 				$this->http_client     = $http_client;
 			}
