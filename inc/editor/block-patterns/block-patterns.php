@@ -97,6 +97,7 @@ class BlockPatterns {
 					];
 					break;
 
+				case 'base64':
 				case 'price':
 					$bindings['paragraphs'][] = [
 						'content' => [ $field, $name ],
