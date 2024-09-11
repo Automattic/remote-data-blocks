@@ -15,6 +15,14 @@ class GitHubDatasource extends HttpDatasource {
 		$this->ref        = $ref;
 	}
 
+	public function get_display_name(): string {
+		return 'GitHub';
+	}
+
+	public function get_uid(): string {
+		return hash( 'sha256', $this->repo_owner . $this->repo_name . $this->ref );
+	}
+
 	public function get_endpoint(): string {
 		return sprintf(
 			'https://api.github.com/repos/%s/%s/git/trees/%s?recursive=1',

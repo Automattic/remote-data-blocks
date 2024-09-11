@@ -1,10 +1,12 @@
 <?php
 
-namespace RemoteDataBlocks\Integrations\Shopify;
+namespace RemoteDataBlocks\Integrations;
 
 use RemoteDataBlocks\Config\AirtableDatasource;
 use RemoteDataBlocks\Logging\LoggerManager;
 use RemoteDataBlocks\REST\DatasourceCRUD;
+
+require_once __DIR__ . '/datasources/airtable-datasource.php';
 
 class AirtableIntegration {
 	public static function init(): void {
