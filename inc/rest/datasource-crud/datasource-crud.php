@@ -98,7 +98,7 @@ class DatasourceCRUD {
 			'table'           => $source->table,
 			'slug'            => sanitize_text_field( $source->slug ),
 			// quick hack to transform data to our experimental format
-			'display_name'   => sanitize_text_field( $source->slug ),
+			'display_name'    => sanitize_text_field( $source->slug ),
 			'uid'             => hash( 'sha256', $source->slug ),
 			'endpoint'        => 'https://api.airtable.com/v0/' . $source->base['id'] . '/' . $source->table['id'],
 			'request_headers' => [
@@ -121,7 +121,7 @@ class DatasourceCRUD {
 			'store'           => sanitize_text_field( $source->store ),
 			'slug'            => sanitize_text_field( $source->slug ),
 			// quick hack totransform data to our experimental format
-			'display_name'   => sanitize_text_field( $source->slug ),
+			'display_name'    => sanitize_text_field( $source->slug ),
 			'uid'             => hash( 'sha256', $source->slug ),
 			'endpoint'        => 'https://' . $source->store . '.myshopify.com/api/2024-07/graphql.json',
 			'request_headers' => [

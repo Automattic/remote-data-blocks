@@ -41,6 +41,7 @@ Editor\QueryOverrides::init();
 Editor\PatternEditor::init();
 
 // Integrations
+Integrations\AirtableIntegration::init();
 Integrations\ShopifyIntegration::init();
 Integrations\VipBlockDataApi::init();
 
