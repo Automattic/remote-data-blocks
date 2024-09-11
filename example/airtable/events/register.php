@@ -2,11 +2,11 @@
 
 namespace RemoteDataBlocks\Example\Airtable\Events;
 
-use RemoteDataBlocks\Config\HttpDatasource;
 use RemoteDataBlocks\Editor\ConfigurationLoader;
 use RemoteDataBlocks\Logging\LoggerManager;
 use function add_action;
 
+require_once __DIR__ . '/inc/queries/class-airtable-events-datasource.php';
 require_once __DIR__ . '/inc/queries/class-airtable-get-event-query.php';
 require_once __DIR__ . '/inc/queries/class-airtable-list-events-query.php';
 
@@ -20,17 +20,7 @@ function register_airtable_events_block() {
 		return;
 	}
 
-	$config = [
-		'display_name'   => $block_name,
-		'uid'             => 'appVQ2PAl95wQSo9S/tblyGtuxblLtmoqMI',
-		'endpoint'        => 'https://api.airtable.com/v0/appVQ2PAl95wQSo9S/tblyGtuxblLtmoqMI',
-		'request_headers' => [
-			'Authorization' => "Bearer {$access_token}",
-			'Content-Type'  => 'application/json',
-		],
-	];
-
-	$airtable_datasource        = new HttpDatasource( $config );
+	$airtable_datasource        = new AirtableEventsDatasource( $access_token );
 	$airtable_get_event_query   = new AirtableGetEventQuery( $airtable_datasource );
 	$airtable_list_events_query = new AirtableListEventsQuery( $airtable_datasource );
 

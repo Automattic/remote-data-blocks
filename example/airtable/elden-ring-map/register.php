@@ -2,13 +2,13 @@
 
 namespace RemoteDataBlocks\Example\Airtable\EldenRingMap;
 
-use RemoteDataBlocks\Config\HttpDatasource;
 use RemoteDataBlocks\Editor\ConfigurationLoader;
 use RemoteDataBlocks\Logging\LoggerManager;
 use function register_block_type;
 use function wp_register_script;
 use function wp_register_style;
 
+require_once __DIR__ . '/inc/queries/class-airtable-elden-ring-map-datasource.php';
 require_once __DIR__ . '/inc/queries/class-airtable-elden-ring-list-locations-query.php';
 require_once __DIR__ . '/inc/queries/class-airtable-elden-ring-list-maps-query.php';
 
@@ -22,28 +22,9 @@ function register_airtable_elden_ring_map_block() {
 		return;
 	}
 
-	$locations_config = [
-		'display_name'   => $block_name . ' (Locations)',
-		'uid'             => 'appqI3sJ9R2NcML8Y/tblc82R9msH4Yh6ZX',
-		'endpoint'        => 'https://api.airtable.com/v0/appqI3sJ9R2NcML8Y/tblc82R9msH4Yh6ZX',
-		'request_headers' => [
-			'Authorization' => "Bearer {$access_token}",
-			'Content-Type'  => 'application/json',
-		],
-	];
-
-	$maps_config = [
-		'display_name'   => $block_name . ' (Maps)',
-		'uid'             => 'appqI3sJ9R2NcML8Y/tblS3OYo8tZOg04CP',
-		'endpoint'        => 'https://api.airtable.com/v0/appqI3sJ9R2NcML8Y/tblS3OYo8tZOg04CP',
-		'request_headers' => [
-			'Authorization' => "Bearer {$access_token}",
-			'Content-Type'  => 'application/json',
-		],
-	];
-	
-	$list_locations_query = new AirtableEldenRingListLocationsQuery( new HttpDatasource( $locations_config ) );
-	$list_maps_query      = new AirtableEldenRingListMapsQuery( new HttpDatasource( $maps_config ) );
+	$elden_ring_datasource = new AirtableEldenRingMapDatasource( $access_token );
+	$list_locations_query  = new AirtableEldenRingListLocationsQuery( $elden_ring_datasource );
+	$list_maps_query       = new AirtableEldenRingListMapsQuery( $elden_ring_datasource );
 
 	ConfigurationLoader::register_block( $block_name, $list_locations_query );
 	ConfigurationLoader::register_list_query( $block_name, $list_maps_query );
