@@ -260,29 +260,10 @@ class BlockBindings {
 		// by the binding source to render the correct result.
 		foreach ( array_keys( $query_results['results'] ) as $index ) {
 
-			// Loop over the inner blocks of the template and update the bindings.
-			foreach ( $loop_template as $inner_block ) {
-				if ( ! isset( $inner_block['attrs']['metadata']['bindings'] ) ) {
-					// No bindings to update.
-					$block->parsed_block['innerBlocks'][] = $inner_block;
-					continue;
-				}
-
-				// Update bindings with the result index.
-				foreach ( $inner_block['attrs']['metadata']['bindings'] as $target => $binding ) {
-					if ( ! isset( $binding['source'] ) || $binding['source'] !== self::$binding_source ) {
-						// Not our binding.
-						continue;
-					}
-
-					// Add the result index to the binding args so that it can be read by
-					// our binding source.
-					$inner_block['attrs']['metadata']['bindings'][ $target ]['args']['index'] = $index;
-				}
-
-				// Push in the updated inner block.
-				$block->parsed_block['innerBlocks'][] = $inner_block;
-			}
+			// Loop over the inner blocks of the template and update the bindings to
+			// include the current index.
+			$updated_inner_blocks               = self::add_loop_index_to_inner_blocks( $loop_template, $index );
+			$block->parsed_block['innerBlocks'] = array_merge( $block->parsed_block['innerBlocks'], $updated_inner_blocks );
 
 			// We don't care too much what the content is, we just need to make sure
 			// it's there so that it can be looped over by WP_Block#render.
@@ -295,6 +276,35 @@ class BlockBindings {
 		// Render the updated block but set dynamic to false so that we don't have
 		// recursion.
 		return $updated_block->render( [ 'dynamic' => false ] );
+	}
+
+	/**
+	 * Recursively add the loop index to the bindings of the inner blocks.
+	 *
+	 * @param array $inner_blocks The inner blocks to update.
+	 * @param int   $index        The loop index.
+	 * @return array The updated inner blocks.
+	 */
+	private static function add_loop_index_to_inner_blocks( array $inner_blocks, int $index ): array {
+		foreach ( $inner_blocks as &$inner_block ) {
+			// Update bindings with the result index.
+			foreach ( $inner_block['attrs']['metadata']['bindings'] ?? [] as $target => $binding ) {
+				if ( ! isset( $binding['source'] ) || $binding['source'] !== self::$binding_source ) {
+					continue; // Not our binding.
+				}
+
+				// Add the loop index to the binding args so that it can be read by
+				// our binding source.
+				$inner_block['attrs']['metadata']['bindings'][ $target ]['args']['index'] = $index;
+			}
+
+			// If this block has inner blocks, recurse.
+			if ( isset( $inner_block['innerBlocks'] ) ) {
+				$inner_block['innerBlocks'] = self::add_loop_index_to_inner_blocks( $inner_block['innerBlocks'], $index );
+			}
+		}
+
+		return $inner_blocks;
 	}
 
 	public static function log_error( string $message, string $block_name, string $operation_name = 'unknown' ): void {
