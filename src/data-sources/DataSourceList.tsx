@@ -1,13 +1,12 @@
 import {
-	__experimentalConfirmDialog as ConfirmDialog,
 	__experimentalText as Text,
 	Button,
 	ButtonGroup,
 	Spinner,
 	Placeholder,
 	Icon,
+	Modal,
 } from '@wordpress/components';
-import { DialogInputEvent } from '@wordpress/components/src/confirm-dialog/types';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { edit, info, trash } from '@wordpress/icons';
@@ -19,26 +18,24 @@ import { toTitleCase } from '@/utils/string';
 
 const DataSourceList = () => {
 	const { dataSources, loadingDataSources, deleteDataSource, fetchDataSources } = useDataSources();
-	const [ deleteDialogOpen, setDeleteDialogOpen ] = useState( false );
+	const [ dataSourceToDelete, setDataSourceToDelete ] = useState< DataSourceConfig | null >( null );
 	const { pushState } = useSettingsContext();
 
-	const onCancelDeleteDialog = ( event: DialogInputEvent ) => {
-		if ( event?.type === 'click' ) {
-			setDeleteDialogOpen( false );
-		}
+	const onCancelDeleteDialog = () => {
+		setDataSourceToDelete( null );
 	};
 
-	const openDeleteDialog = () => setDeleteDialogOpen( true );
+	const onDeleteDataSource = ( source: DataSourceConfig ) => setDataSourceToDelete( source );
 
-	const onEditClick = ( uuidToEdit: string ) => {
+	const onEditDataSource = ( uuidToEdit: string ) => {
 		const newUrl = new URL( window.location.href );
 		newUrl.searchParams.set( 'editDataSource', uuidToEdit );
 		pushState( newUrl );
 	};
 
-	const onDeleteConfirm = async ( uuid: string ) => {
+	const onConfirmDeleteDataSource = async ( uuid: string ) => {
 		await deleteDataSource( uuid ).catch( () => null );
-		setDeleteDialogOpen( false );
+		setDataSourceToDelete( null );
 		await fetchDataSources().catch( () => null );
 	};
 
@@ -85,50 +82,79 @@ const DataSourceList = () => {
 	};
 
 	return (
-		<table className="table data-source-list">
-			<thead className="table-header">
-				<tr>
-					<th>{ __( 'Slug', 'remote-data-blocks' ) }</th>
-					<th>{ __( 'Service', 'remote-data-blocks' ) }</th>
-					<th>{ __( 'Meta', 'remote-data-blocks' ) }</th>
-					<th className="data-source-actions">{ __( 'Actions', 'remote-data-blocks' ) }</th>
-				</tr>
-			</thead>
-			<tbody className="table-body">
-				{ getValidDataSources().map( source => {
-					const { uuid, slug, service } = source;
-					return (
-						<tr key={ uuid } className="table-row">
-							<td>
-								<Text className="data-source-slug">{ slug }</Text>
-							</td>
-							<td>
-								<Text>{ toTitleCase( service ) }</Text>
-							</td>
-							<td> { renderDataSourceMeta( source ) } </td>
-							<td className="data-source-actions">
-								<ConfirmDialog
-									isOpen={ deleteDialogOpen }
-									onCancel={ onCancelDeleteDialog }
-									onConfirm={ () => void onDeleteConfirm( uuid ) }
-								>
-									{ __( 'Are you sure you want to delete?' ) }
-								</ConfirmDialog>
+		<div className="data-source-list-wrapper">
+			<table className="table data-source-list">
+				<thead className="table-header">
+					<tr>
+						<th>{ __( 'Slug', 'remote-data-blocks' ) }</th>
+						<th>{ __( 'Service', 'remote-data-blocks' ) }</th>
+						<th>{ __( 'Meta', 'remote-data-blocks' ) }</th>
+						<th className="data-source-actions">{ __( 'Actions', 'remote-data-blocks' ) }</th>
+					</tr>
+				</thead>
+				<tbody className="table-body">
+					{ getValidDataSources().map( source => {
+						const { uuid, slug, service } = source;
+						return (
+							<tr key={ uuid } className="table-row">
+								<td>
+									<Text className="data-source-slug">{ slug }</Text>
+								</td>
+								<td>
+									<Text>{ toTitleCase( service ) }</Text>
+								</td>
+								<td> { renderDataSourceMeta( source ) } </td>
+								<td className="data-source-actions">
+									<ButtonGroup className="data-source-actions">
+										<Button variant="secondary" onClick={ () => onEditDataSource( uuid ) }>
+											<Icon icon={ edit } />
+										</Button>
+										<Button variant="secondary" onClick={ () => onDeleteDataSource( source ) }>
+											<Icon icon={ trash } />
+										</Button>
+									</ButtonGroup>
+								</td>
+							</tr>
+						);
+					} ) }
+				</tbody>
+			</table>
 
-								<ButtonGroup className="data-source-actions">
-									<Button variant="secondary" onClick={ () => onEditClick( uuid ) }>
-										<Icon icon={ edit } />
-									</Button>
-									<Button variant="secondary" onClick={ openDeleteDialog }>
-										<Icon icon={ trash } />
-									</Button>
-								</ButtonGroup>
-							</td>
-						</tr>
-					);
-				} ) }
-			</tbody>
-		</table>
+			{ dataSourceToDelete && (
+				<Modal
+					className="confirm-delete-data-source-modal"
+					title="Delete Data Source"
+					size="medium"
+					onRequestClose={ () => {
+						onCancelDeleteDialog();
+					} }
+					isDismissible={ true }
+					focusOnMount
+					shouldCloseOnEsc={ true }
+					shouldCloseOnClickOutside={ true }
+				>
+					<p>
+						Are you sure you want to delete
+						<strong> &ldquo;{ toTitleCase( dataSourceToDelete.service ) }&rdquo; </strong>
+						data source with slug
+						<strong> &ldquo;{ dataSourceToDelete.slug }&rdquo;</strong>?
+					</p>
+
+					<div className="action-buttons">
+						<Button variant="link" onClick={ onCancelDeleteDialog }>
+							Cancel
+						</Button>
+						<Button
+							variant="primary"
+							isDestructive
+							onClick={ () => void onConfirmDeleteDataSource( dataSourceToDelete.uuid ) }
+						>
+							Confirm
+						</Button>
+					</div>
+				</Modal>
+			) }
+		</div>
 	);
 };
 
