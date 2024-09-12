@@ -110,11 +110,11 @@ const DataSourceList = () => {
 					<tbody className="table-body">
 						{ getValidDataSources().map( source => {
 							// @ts-expect-error temporary fix for the display_name property
-							const { uuid, service, display_name } = source;
+							const { uuid, service, display_name: displayName } = source;
 							return (
 								<tr key={ uuid } className="table-row">
 									<td>
-										<Text>{ display_name }</Text>
+										<Text>{ displayName }</Text>
 									</td>
 									<td>
 										<Text>{ toTitleCase( service ) }</Text>
