@@ -110,21 +110,12 @@ class DatasourceController extends WP_REST_Controller {
 		return rest_ensure_response( $result );
 	}
 
+	/**
+	 * @deprecated Hew will remove. Or else.
+	 */
 	public function item_slug_conflicts( $request ) {
-		$slug = $request->get_param( 'slug' );
-		$uuid = $request->get_param( 'uuid' ) ?? '';
-		if ( empty( $slug ) ) {
-			return new \WP_Error(
-				'missing_slug',
-				__( 'Missing slug parameter.', 'remote-data-blocks' ),
-				array( 'status' => 400 )
-			);
-		}
-		$validation_status = DatasourceCRUD::validate_slug( $slug, $uuid );
-		$result            = [
-			'exists' => true !== $validation_status,
-		];
-		return rest_ensure_response( $result );
+		_deprecated_function( __METHOD__, '6.6.1' );
+		return \rest_ensure_response( [ 'exists' => false ] );
 	}
 
 	// These all require manage_options for now, but we can adjust as needed

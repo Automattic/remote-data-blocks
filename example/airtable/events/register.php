@@ -2,17 +2,19 @@
 
 namespace RemoteDataBlocks\Example\Airtable\Events;
 
+use RemoteDataBlocks\Config\AirtableDatasource;
 use RemoteDataBlocks\Editor\ConfigurationLoader;
 use RemoteDataBlocks\Logging\LoggerManager;
 use function add_action;
 
-require_once __DIR__ . '/inc/queries/class-airtable-events-datasource.php';
 require_once __DIR__ . '/inc/queries/class-airtable-get-event-query.php';
 require_once __DIR__ . '/inc/queries/class-airtable-list-events-query.php';
 
 function register_airtable_events_block() {
 	$block_name   = 'Airtable Event';
 	$access_token = \RemoteDataBlocks\Example\get_access_token( 'airtable_events' );
+	$base         = 'appVQ2PAl95wQSo9S';
+	$table        = 'tblyGtuxblLtmoqMI';
 
 	if ( empty( $access_token ) ) {
 		$logger = LoggerManager::instance();
@@ -20,7 +22,7 @@ function register_airtable_events_block() {
 		return;
 	}
 
-	$airtable_datasource        = new AirtableEventsDatasource( $access_token );
+	$airtable_datasource        = new AirtableDatasource( $access_token, $base, $table );
 	$airtable_get_event_query   = new AirtableGetEventQuery( $airtable_datasource );
 	$airtable_list_events_query = new AirtableListEventsQuery( $airtable_datasource );
 

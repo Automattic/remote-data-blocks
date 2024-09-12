@@ -4,47 +4,32 @@ namespace RemoteDataBlocks\REST;
 
 use WP_Error;
 
+/**
+ * Handles CRUD operations for remote data sources.
+ *
+ * This class manages the configuration of remote data sources for the Remote Data Blocks plugin.
+ * It provides methods for validating, creating, reading, updating, and deleting data source entries.
+ *
+ * Core data structure:
+ * The class uses a WordPress option to store an array of data source objects. Each object represents
+ * a remote data source with the following structure:
+ * {
+ *     uuid: string,    // Unique identifier for the data source
+ *     slug: string,    // URL-display name for the data source
+ *     service: string, // Type of service (e.g., 'airtable', 'shopify')
+ *     token: string,   // Authentication token for the service
+ *     // Additional fields specific to each service type
+ * }
+ *
+ * The array of these objects is stored in the WordPress options table under the key defined
+ * by CONFIG_OPTION_NAME.
+ */
 class DatasourceCRUD {
 	const CONFIG_OPTION_NAME = 'remote_data_blocks_config';
 	const DATA_SOURCE_TYPES  = [ 'airtable', 'shopify' ];
 
 	public static function is_uuid4( string $maybe_uuid ) {
 		return preg_match( '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $maybe_uuid );
-	}
-
-	/**
-	 * Validate the slug to verify
-	 * - is not empty
-	 * - only contains lowercase alphanumeric characters and hyphens
-	 * - is not already taken
-	 *
-	 * @param string $slug The slug to validate.
-	 * @param string [$uuid] The UUID of the data source to exclude from the check.
-	 * @return WP_Error|true Returns true if the slug is valid, or a WP_Error object if not.
-	 */
-	public static function validate_slug( string $slug, string $uuid = '' ): WP_Error|true {
-		if ( empty( $slug ) ) {
-			return new WP_Error( 'missing_slug', __( 'Missing slug.', 'remote-data-blocks' ) );
-		}
-
-		if ( ! preg_match( '/^[a-z0-9-]+$/', $slug ) ) {
-			return new WP_Error( 'invalid_slug', __( 'Invalid slug.', 'remote-data-blocks' ) );
-		}
-
-		$data_sources = self::get_data_sources();
-		$data_sources = array_filter( $data_sources, function ( $source ) use ( $uuid ) {
-			return $source->uuid !== $uuid;
-		} );
-
-		$slug_exists = array_filter( $data_sources, function ( $source ) use ( $slug ) {
-			return $source->slug === $slug;
-		} );
-
-		if ( ! empty( $slug_exists ) ) {
-			return new WP_Error( 'slug_already_taken', __( 'Slug already taken.', 'remote-data-blocks' ) );
-		}
-
-		return true;
 	}
 
 	private static function validate_airtable_source( $source ) {
@@ -70,13 +55,14 @@ class DatasourceCRUD {
 			return new WP_Error( 'invalid_table', __( 'Invalid table. Must have id and name fields.', 'remote-data-blocks' ) );
 		}
 
-		return (object) [
-			'uuid'    => $source->uuid,
-			'token'   => sanitize_text_field( $source->token ),
-			'service' => 'airtable',
-			'base'    => $source->base,
-			'table'   => $source->table,
-			'slug'    => sanitize_text_field( $source->slug ),
+		return [
+			'uuid'         => $source->uuid,
+			'token'        => sanitize_text_field( $source->token ),
+			'service'      => 'airtable',
+			'display_name' => sanitize_text_field( $source->slug ), // TODO: rename slug on frontend
+			'base'         => $source->base,
+			'table'        => $source->table,
+			'uid'          => hash( 'sha256', $source->base ),
 		];
 	}
 
@@ -85,12 +71,13 @@ class DatasourceCRUD {
 			return new WP_Error( 'missing_token', __( 'Missing token.', 'remote-data-blocks' ) );
 		}
 
-		return (object) [
-			'uuid'    => $source->uuid,
-			'token'   => sanitize_text_field( $source->token ),
-			'service' => 'shopify',
-			'store'   => sanitize_text_field( $source->store ),
-			'slug'    => sanitize_text_field( $source->slug ),
+		return [
+			'uuid'         => $source->uuid,
+			'token'        => sanitize_text_field( $source->token ),
+			'service'      => 'shopify',
+			'display_name' => sanitize_text_field( $source->slug ), // TODO: rename slug on frontend
+			'store'        => sanitize_text_field( $source->store ),
+			'uid'          => hash( 'sha256', $source->store ),
 		];
 	}
 
@@ -106,12 +93,6 @@ class DatasourceCRUD {
 		
 		if ( ! self::is_uuid4( $source->uuid ) ) {
 			return new WP_Error( 'invalid_uuid', __( 'Invalid UUID.', 'remote-data-blocks' ) );
-		}
-
-		$slug_validation = self::validate_slug( $source->slug, $source->uuid );
-
-		if ( is_wp_error( $slug_validation ) ) {
-			return $slug_validation;
 		}
 
 		if ( ! in_array( $source->service, self::DATA_SOURCE_TYPES ) ) {
@@ -158,8 +139,16 @@ class DatasourceCRUD {
 		return (array) get_option( self::CONFIG_OPTION_NAME, [] );
 	}
 
-	public static function get_data_sources() {
-		return self::get_config() ?? [];
+	public static function get_data_sources( string $service = '' ) {
+		$data_sources = self::get_config();
+
+		if ( $service ) {
+			return array_filter( $data_sources, function ( $config ) use ( $service ) {
+				return $config->service === $service;
+			} );
+		}
+
+		return $data_sources;
 	}
 
 	public static function get_item_by_uuid( $data_sources, string $uuid ) {

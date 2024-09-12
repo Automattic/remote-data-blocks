@@ -1,8 +1,6 @@
 <?php
 
-namespace RemoteDataBlocks\Example\Shopify;
-
-use RemoteDataBlocks\Config\GraphqlQueryContext;
+namespace RemoteDataBlocks\Config;
 
 class ShopifySearchProductsQuery extends GraphqlQueryContext {
 	public array $input_variables = [
