@@ -32,11 +32,20 @@ export function ItemList( props: ItemListProps ) {
 		return <p>{ __( props.noResultsText ) }</p>;
 	}
 
-	return props.results.map( ( result, index ) => {
-		const blocks = pattern?.blocks.map( block => cloneBlockWithAttributes( block, result ) ) ?? [];
+	return (
+		<ul>
+			{ props.results.map( ( result, index ) => {
+				const blocks =
+					pattern?.blocks.map( block => cloneBlockWithAttributes( block, result ) ) ?? [];
 
-		return (
-			<ItemPreview key={ index } blocks={ blocks } onSelect={ () => props.onSelect( result ) } />
-		);
-	} );
+				return (
+					<ItemPreview
+						key={ index }
+						blocks={ blocks }
+						onSelect={ () => props.onSelect( result ) }
+					/>
+				);
+			} ) }
+		</ul>
+	);
 }
