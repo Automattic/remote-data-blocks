@@ -49,6 +49,7 @@ interface RemoteDataBlockBinding {
 
 interface RemoteDataInnerBlockAttributes {
 	alt?: string | RichTextData;
+	className?: string;
 	content?: string | RichTextData;
 	index?: number;
 	metadata?: {
