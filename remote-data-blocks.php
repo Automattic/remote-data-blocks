@@ -40,6 +40,9 @@ Editor\FieldShortcode::init();
 Editor\QueryOverrides::init();
 Editor\PatternEditor::init();
 
+// Load Settings Page
+PluginSettings::init();
+
 // Integrations
 Integrations\AirtableIntegration::init();
 Integrations\ShopifyIntegration::init();
@@ -48,5 +51,4 @@ Integrations\VipBlockDataApi::init();
 // REST endpoints
 REST\RemoteData::init();
 
-// Load Settings Page
-PluginSettings::init();
+

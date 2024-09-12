@@ -34,11 +34,11 @@ class ShopifyIntegration {
 	}
 
 	private static function register_blocks_for_shopify_data_source( array $config ): void {
-		$shopify_datasource            = new ShopifyDatasource( $config['access_token'], $config['store_name'] );
+		$shopify_datasource            = new ShopifyDatasource( $config['token'], $config['store'] );
 		$shopify_search_products_query = new ShopifySearchProductsQuery( $shopify_datasource );
 		$shopify_get_product_query     = new ShopifyGetProductQuery( $shopify_datasource );
 
-		$block_name    = 'Shopify (' . $shopify_datasource->get_display_name() . ')';
+		$block_name    = $shopify_datasource->get_display_name();
 		$block_pattern = file_get_contents( __DIR__ . '/inc/patterns/product-teaser.html' );
 
 		ConfigurationLoader::register_block( $block_name, $shopify_get_product_query );
