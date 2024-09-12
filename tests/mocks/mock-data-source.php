@@ -8,10 +8,6 @@ class TestDatasource extends HttpDatasource {
 		return 'Test Datasource';
 	}
 
-	public function get_uid(): string {
-		return 'test-datasource';
-	}
-
 	public function get_endpoint(): string {
 		return 'https://example.com/api';
 	}

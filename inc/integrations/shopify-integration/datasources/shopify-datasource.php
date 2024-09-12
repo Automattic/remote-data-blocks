@@ -16,11 +16,7 @@ class ShopifyDatasource extends HttpDatasource {
 	public function get_display_name(): string {
 		return 'Shopify (' . $this->store_name . ')';
 	}
-
-	public function get_uid(): string {
-		return hash( 'sha256', $this->store_name );
-	}
-
+	
 	public function get_endpoint(): string {
 		return 'https://' . $this->store_name . '.myshopify.com/api/2024-04/graphql.json';
 	}

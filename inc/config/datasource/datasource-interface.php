@@ -29,16 +29,6 @@ interface DatasourceInterface {
 	public function get_display_name(): string;
 
 	/**
-	 * Get a unique identifier for this datasource.
-	 *
-	 * This method should return a sha256 hash of the unique parts of the datasource's
-	 * configuration that can be used to identify the datasource authoritatively.
-	 *
-	 * @return string sha256 hash of the datasource's unique identifier.
-	 */
-	public function get_uid(): string;
-
-	/**
 	 * An optional image URL that can represent the datasource in the block editor
 	 * (e.g., in modals or in the block inspector).
 	 *

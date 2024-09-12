@@ -19,11 +19,6 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 	/**
 	 * @inheritDoc
 	 */
-	abstract public function get_uid(): string;
-
-	/**
-	 * @inheritDoc
-	 */
 	abstract public function get_endpoint(): string;
 
 	/**

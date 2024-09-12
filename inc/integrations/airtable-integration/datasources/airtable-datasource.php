@@ -30,10 +30,6 @@ class AirtableDatasource extends HttpDatasource {
 		return 'Airtable';
 	}
 
-	public function get_uid(): string {
-		return hash( 'sha256', $this->base );
-	}
-
 	public function get_endpoint( string $variation = '' ): string {
 		$url   = 'https://api.airtable.com/v0/' . $this->get_base();
 		$table = $this->get_table( $variation );
