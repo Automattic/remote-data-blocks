@@ -33,8 +33,8 @@ const DataSourceList = () => {
 		pushState( newUrl );
 	};
 
-	const onConfirmDeleteDataSource = async ( uuid: string ) => {
-		await deleteDataSource( uuid ).catch( () => null );
+	const onConfirmDeleteDataSource = async ( source: DataSourceConfig ) => {
+		await deleteDataSource( source ).catch( () => null );
 		setDataSourceToDelete( null );
 		await fetchDataSources().catch( () => null );
 	};
@@ -147,7 +147,7 @@ const DataSourceList = () => {
 						<Button
 							variant="primary"
 							isDestructive
-							onClick={ () => void onConfirmDeleteDataSource( dataSourceToDelete.uuid ) }
+							onClick={ () => void onConfirmDeleteDataSource( dataSourceToDelete ) }
 						>
 							Confirm
 						</Button>
