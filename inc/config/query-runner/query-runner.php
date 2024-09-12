@@ -19,12 +19,12 @@ use WP_Error;
 defined( 'ABSPATH' ) || exit();
 
 /**
- * Class that executes a query using QueryContext.
+ * Class that executes a query using HttpQueryContext.
  */
 class QueryRunner implements QueryRunnerInterface {
 
 	public function __construct(
-		private HttpQueryContext $query_context,
+		private HttpQueryContextInterface $query_context,
 		private HttpClient $http_client = new HttpClient()
 	) {
 	}

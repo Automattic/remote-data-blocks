@@ -27,14 +27,14 @@ class YourCustomDatasource extends HttpDatasource {
 
 To create a new query:
 
-1. Create a new PHP class that extends the `QueryContext` class.
+1. Create a new PHP class that extends the `HttpQueryContext` class.
 2. Implement the required input and output variables for executing the query.
 3. Optionally implement overrides of base class methods if needed.
 
 Example:
 
 ```php
-class YourCustomQuery extends QueryContext {
+class YourCustomQuery extends HttpQueryContext {
     public array $input_variables = [
         // Implement your input variables here
     ];
