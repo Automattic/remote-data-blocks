@@ -10,5 +10,6 @@
     "./example",
     "https://downloads.wordpress.org/plugin/query-monitor.3.16.4.zip",
     "https://downloads.wordpress.org/plugin/redis-cache.2.5.3.zip"
-  ]
+  ],
+  "themes": [ "./example/theme" ]
 }
