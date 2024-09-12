@@ -1,5 +1,6 @@
 import { SUPPORTED_SERVICES } from '@/data-sources/constants';
-import { IdName } from '@/types/common';
+import { NumberIdName, StringIdName } from '@/types/common';
+import { GoogleServiceAccountKey } from '@/types/google';
 
 export type DataSourceType = ( typeof SUPPORTED_SERVICES )[ number ];
 
@@ -25,8 +26,8 @@ export interface DataSourceQuery {
 export interface AirtableConfig extends BaseDataSourceConfig {
 	service: 'airtable';
 	token: string;
-	base: IdName;
-	table: IdName;
+	base: StringIdName;
+	table: StringIdName;
 }
 
 export interface ShopifyConfig extends BaseDataSourceConfig {
@@ -35,4 +36,11 @@ export interface ShopifyConfig extends BaseDataSourceConfig {
 	token: string;
 }
 
-export type DataSourceConfig = AirtableConfig | ShopifyConfig;
+export interface GoogleSheetsConfig extends BaseDataSourceConfig {
+	service: 'google-sheets';
+	credentials: GoogleServiceAccountKey;
+	spreadsheet: StringIdName;
+	sheet: NumberIdName;
+}
+
+export type DataSourceConfig = AirtableConfig | ShopifyConfig | GoogleSheetsConfig;

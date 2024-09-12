@@ -4,7 +4,7 @@ import { registerFormatType } from '@wordpress/rich-text';
 
 import { formatTypeSettings } from '@/blocks/remote-data-container/components/field-shortcode/field-shortcode';
 import { Edit } from '@/blocks/remote-data-container/edit';
-import { withBlockBinding } from '@/blocks/remote-data-container/hooks/with-block-binding';
+import { withBlockBinding } from '@/blocks/remote-data-container/filters/with-block-binding';
 import { Save } from '@/blocks/remote-data-container/save';
 import { getBlocksConfig } from '@/utils/localized-block-data';
 import './style.scss';

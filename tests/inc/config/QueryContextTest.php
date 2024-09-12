@@ -3,7 +3,7 @@
 namespace RemoteDataBlocks\Tests\Config;
 
 use PHPUnit\Framework\TestCase;
-use RemoteDataBlocks\Config\QueryContext;
+use RemoteDataBlocks\Config\HttpQueryContext;
 use RemoteDataBlocks\Test\TestDatasource;
 use GuzzleHttp\Psr7\Response;
 
@@ -14,12 +14,12 @@ class QueryContextTest extends TestCase {
 
 	protected function setUp(): void {
 		$this->datasource    = new TestDatasource();
-		$this->query_context = new QueryContext( $this->datasource );
+		$this->query_context = new HttpQueryContext( $this->datasource );
 	}
 
 	public function testGetEndpoint() {
 		$result = $this->query_context->get_endpoint( [] );
-		$this->assertEquals( 'https://example.com', $result );
+		$this->assertEquals( 'https://example.com/api', $result );
 	}
 
 	public function testGetImageUrl() {
@@ -72,7 +72,7 @@ class QueryContextTest extends TestCase {
 	}
 
 	public function testCustomProcessResponse() {
-		$custom_query_context = new class($this->datasource) extends QueryContext {
+		$custom_query_context = new class($this->datasource) extends HttpQueryContext {
 			public function process_response( string $raw_response_data, array $input_variables ): string {
 				// Convert HTML to JSON
 				$dom = new \DOMDocument();

@@ -4,7 +4,7 @@ namespace RemoteDataBlocks\Editor;
 
 defined( 'ABSPATH' ) || exit();
 
-use RemoteDataBlocks\Config\QueryContext;
+use RemoteDataBlocks\Config\QueryContextInterface;
 
 use function register_block_pattern;
 
@@ -56,7 +56,7 @@ class BlockPatterns {
 		return sprintf( self::$templates[ $template_name ], wp_json_encode( $attributes ) );
 	}
 
-	public static function register_default_block_pattern( string $block_name, string $block_title, QueryContext $display_query ): void {
+	public static function register_default_block_pattern( string $block_name, string $block_title, QueryContextInterface $display_query ): void {
 		// If there are no mappings, we can't generate a pattern.
 		if ( empty( $display_query->output_variables['mappings'] ) ) {
 			return;

@@ -57,7 +57,7 @@ class BlockRegistration {
 				'overrides'         => $overrides,
 				'selectors'         => $config['selectors'],
 				'settings'          => [
-					'category' => 'remote-data-blocks',
+					'category' => 'Remote Data Blocks',
 					'title'    => $config['title'],
 				],
 			];

@@ -3,13 +3,13 @@
 namespace RemoteDataBlocks\Integrations;
 
 use PHPUnit\Framework\TestCase;
-use RemoteDataBlocks\Config\QueryContext;
+use RemoteDataBlocks\Config\HttpQueryContext;
 use RemoteDataBlocks\Config\QueryRunnerInterface;
 use RemoteDataBlocks\Editor\ConfigurationLoader;
 use RemoteDataBlocks\Test\MockQueryRunner;
 use RemoteDataBlocks\Test\TestDatasource;
 
-class TestQueryContext extends QueryContext {
+class TestQueryContext extends HttpQueryContext {
 	public function __construct( private QueryRunnerInterface $mock_qr ) {
 		parent::__construct( new TestDatasource() );
 	}
