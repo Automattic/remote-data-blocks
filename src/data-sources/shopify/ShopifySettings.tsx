@@ -1,11 +1,13 @@
 import {
 	Button,
 	ButtonGroup,
-	__experimentalHeading as Heading,
 	TextControl,
 	Panel,
 	PanelBody,
 	PanelRow,
+	Card,
+	CardHeader,
+	CardBody,
 } from '@wordpress/components';
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { __ } from '@wordpress/i18n';
@@ -83,50 +85,54 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 	};
 
 	return (
-		<Panel>
-			<PanelBody>
-				<Heading>
-					{ mode === 'add'
-						? __( 'Add a new Shopify Data Source' )
-						: __( 'Edit Shopify Data Source' ) }
-				</Heading>
-				<PanelRow>
-					<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
-				</PanelRow>
-				<PanelRow>
-					<TextControl
-						label={ __( 'Shopify Store Name', 'remote-data-blocks' ) }
-						onChange={ store => {
-							handleOnChange( 'store', store ?? '' );
-						} }
-						size={ 20 }
-						value={ state.store }
-						autoComplete="off"
-					/>
-				</PanelRow>
-				<PanelRow>
-					<PasswordInputControl
-						label={ __( 'Shopify Access Token', 'remote-data-blocks' ) }
-						onChange={ onTokenInputChange }
-						// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-						size={ 999 as any }
-						value={ state.token }
-					/>
-				</PanelRow>
-				<PanelRow>{ connectionMessage }</PanelRow>
-			</PanelBody>
-			<ButtonGroup className="settings-form-cta-button-group">
-				<Button
-					variant="primary"
-					// eslint-disable-next-line @typescript-eslint/no-misused-promises
-					onClick={ onSaveClick }
-				>
-					{ __( 'Save', 'remote-data-blocks' ) }
-				</Button>
-				<Button variant="secondary" onClick={ goToMainScreen }>
-					{ __( 'Cancel', 'remote-data-blocks' ) }
-				</Button>
-			</ButtonGroup>
-		</Panel>
+		<Card>
+			<CardHeader>
+				<h2>
+					{ mode === 'add' ? __( 'Add Shopify Data Source' ) : __( 'Edit Shopify Data Source' ) }
+				</h2>
+			</CardHeader>
+			<CardBody>
+				<Panel>
+					<PanelBody>
+						<PanelRow>
+							<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
+						</PanelRow>
+						<PanelRow>
+							<TextControl
+								label={ __( 'Shopify Store Name', 'remote-data-blocks' ) }
+								onChange={ store => {
+									handleOnChange( 'store', store ?? '' );
+								} }
+								size={ 20 }
+								value={ state.store }
+								autoComplete="off"
+							/>
+						</PanelRow>
+						<PanelRow>
+							<PasswordInputControl
+								label={ __( 'Shopify Access Token', 'remote-data-blocks' ) }
+								onChange={ onTokenInputChange }
+								// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+								size={ 999 as any }
+								value={ state.token }
+							/>
+						</PanelRow>
+						<PanelRow>{ connectionMessage }</PanelRow>
+					</PanelBody>
+					<ButtonGroup className="settings-form-cta-button-group">
+						<Button
+							variant="primary"
+							// eslint-disable-next-line @typescript-eslint/no-misused-promises
+							onClick={ onSaveClick }
+						>
+							{ __( 'Save', 'remote-data-blocks' ) }
+						</Button>
+						<Button variant="secondary" onClick={ goToMainScreen }>
+							{ __( 'Cancel', 'remote-data-blocks' ) }
+						</Button>
+					</ButtonGroup>
+				</Panel>
+			</CardBody>
+		</Card>
 	);
 };

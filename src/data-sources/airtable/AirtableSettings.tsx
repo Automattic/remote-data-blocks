@@ -1,11 +1,13 @@
 import {
 	Button,
 	ButtonGroup,
-	__experimentalHeading as Heading,
 	SelectControl,
 	Panel,
 	PanelBody,
 	PanelRow,
+	Card,
+	CardHeader,
+	CardBody,
 } from '@wordpress/components';
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { useEffect, useMemo, useState } from '@wordpress/element';
@@ -240,55 +242,59 @@ export const AirtableSettings = ( {
 	}, [ tables ] );
 
 	return (
-		<Panel>
-			<PanelBody>
-				<Heading>
-					{ mode === 'add'
-						? __( 'Add a new Airtable Data Source' )
-						: __( 'Edit Airtable Data Source' ) }
-				</Heading>
-				<PanelRow>
-					<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
-				</PanelRow>
-				<PanelRow>
-					<PasswordInputControl
-						label={ __( 'Airtable Access Token', 'remote-data-blocks' ) }
-						onChange={ onTokenInputChange }
-						value={ state.token }
-						help={ connectionMessage }
-					/>
-				</PanelRow>
-				<PanelRow>
-					<SelectControl
-						id="base"
-						label={ __( 'Select Base', 'remote-data-blocks' ) }
-						value={ state.base?.id ?? '' }
-						onChange={ onSelectChange }
-						options={ baseOptions }
-						help={ basesHelpText }
-						disabled={ fetchingBases || ! bases?.length }
-					/>
-				</PanelRow>
-				<PanelRow>
-					<SelectControl
-						id="table"
-						label={ __( 'Select Table', 'remote-data-blocks' ) }
-						value={ state.table?.id ?? '' }
-						onChange={ onSelectChange }
-						options={ tableOptions }
-						help={ tablesHelpText }
-						disabled={ fetchingTables || ! tables?.length }
-					/>
-				</PanelRow>
-			</PanelBody>
-			<ButtonGroup className="settings-form-cta-button-group">
-				<Button variant="primary" onClick={ onSaveClick } disabled={ shouldAllowSubmit }>
-					{ __( 'Save', 'remote-data-blocks' ) }
-				</Button>
-				<Button variant="secondary" onClick={ goToMainScreen }>
-					{ __( 'Cancel', 'remote-data-blocks' ) }
-				</Button>
-			</ButtonGroup>
-		</Panel>
+		<Card>
+			<CardHeader>
+				<h2>
+					{ mode === 'add' ? __( 'Add Airtable Data Source' ) : __( 'Edit Airtable Data Source' ) }
+				</h2>
+			</CardHeader>
+			<CardBody>
+				<Panel>
+					<PanelBody>
+						<PanelRow>
+							<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
+						</PanelRow>
+						<PanelRow>
+							<PasswordInputControl
+								label={ __( 'Airtable Access Token', 'remote-data-blocks' ) }
+								onChange={ onTokenInputChange }
+								value={ state.token }
+								help={ connectionMessage }
+							/>
+						</PanelRow>
+						<PanelRow>
+							<SelectControl
+								id="base"
+								label={ __( 'Select Base', 'remote-data-blocks' ) }
+								value={ state.base?.id ?? '' }
+								onChange={ onSelectChange }
+								options={ baseOptions }
+								help={ basesHelpText }
+								disabled={ fetchingBases || ! bases?.length }
+							/>
+						</PanelRow>
+						<PanelRow>
+							<SelectControl
+								id="table"
+								label={ __( 'Select Table', 'remote-data-blocks' ) }
+								value={ state.table?.id ?? '' }
+								onChange={ onSelectChange }
+								options={ tableOptions }
+								help={ tablesHelpText }
+								disabled={ fetchingTables || ! tables?.length }
+							/>
+						</PanelRow>
+					</PanelBody>
+					<ButtonGroup className="settings-form-cta-button-group">
+						<Button variant="primary" onClick={ onSaveClick } disabled={ shouldAllowSubmit }>
+							{ __( 'Save', 'remote-data-blocks' ) }
+						</Button>
+						<Button variant="secondary" onClick={ goToMainScreen }>
+							{ __( 'Cancel', 'remote-data-blocks' ) }
+						</Button>
+					</ButtonGroup>
+				</Panel>
+			</CardBody>
+		</Card>
 	);
 };
