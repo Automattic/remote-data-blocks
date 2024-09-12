@@ -1,21 +1,7 @@
-import {
-	Card,
-	CardHeader,
-	CardBody,
-	MenuGroup,
-	MenuItem,
-	Dropdown,
-	Button,
-	Icon,
-} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { chevronDown } from '@wordpress/icons';
 
-import AirtableIcon from './icons/airtable';
-import ShopifyIcon from './icons/shopify';
 import DataSourceList from '@/data-sources/DataSourceList';
 import DataSourceSettings from '@/data-sources/DataSourceSettings';
-import { DataSourceType } from '@/data-sources/types';
 import Notices from '@/settings/Notices';
 import { SettingsContext, useDataSourceRouter } from '@/settings/hooks/useSettingsNav';
 
@@ -34,43 +20,6 @@ function versionAndBuild() {
 const SettingsPage = () => {
 	const settingsContext = useDataSourceRouter();
 
-	const AddDataSourceDropdown = () => (
-		<Dropdown
-			className="add-data-source-dropdown"
-			contentClassName="add-data-source-dropdown-content"
-			focusOnMount={ false }
-			popoverProps={ { placement: 'bottom-end' } }
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Button
-					className="add-data-source-btn"
-					variant="primary"
-					onClick={ onToggle }
-					aria-expanded={ isOpen }
-				>
-					Add <Icon icon={ chevronDown } size={ 18 } />
-				</Button>
-			) }
-			renderContent={ () => (
-				<MenuGroup>
-					<MenuItem icon={ AirtableIcon } iconPosition="left" onClick={ onAddDataSource }>
-						Airtable
-					</MenuItem>
-					<MenuItem icon={ ShopifyIcon } iconPosition="left" onClick={ onAddDataSource }>
-						Shopify
-					</MenuItem>
-				</MenuGroup>
-			) }
-		/>
-	);
-
-	function onAddDataSource( event: React.MouseEvent ) {
-		const dataSource = event.currentTarget.textContent?.toLowerCase() as DataSourceType;
-		const newUrl = new URL( window.location.href );
-
-		newUrl.searchParams.set( 'addDataSource', dataSource );
-		window.location.href = newUrl.href;
-	}
-
 	return (
 		<>
 			<div className="page-title">
@@ -83,19 +32,11 @@ const SettingsPage = () => {
 				<SettingsContext.Provider value={ settingsContext }>
 					<Notices />
 
-					<Card>
-						<CardHeader>
-							<h2>{ __( 'Data Sources', 'remote-data-blocks' ) }</h2>
-							<AddDataSourceDropdown />
-						</CardHeader>
-						<CardBody>
-							{ [ 'addDataSource', 'editDataSource' ].includes( settingsContext.screen ) ? (
-								<DataSourceSettings />
-							) : (
-								<DataSourceList />
-							) }
-						</CardBody>
-					</Card>
+					{ [ 'addDataSource', 'editDataSource' ].includes( settingsContext.screen ) ? (
+						<DataSourceSettings />
+					) : (
+						<DataSourceList />
+					) }
 				</SettingsContext.Provider>
 			</div>
 		</>
