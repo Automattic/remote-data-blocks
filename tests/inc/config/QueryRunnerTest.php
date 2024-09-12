@@ -61,7 +61,7 @@ class QueryRunnerTest extends TestCase {
 				return $this->http_datasource->get_endpoint();
 			}
 
-			public function get_image_url(): null {
+			public function get_image_url(): ?string {
 				return null;
 			}
 
