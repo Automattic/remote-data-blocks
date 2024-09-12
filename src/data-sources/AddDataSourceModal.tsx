@@ -55,6 +55,7 @@ const AddDataSourceModal = ( { onSubmit }: AddDataSourceModalProps ) => {
 										{ label: __( 'Choose a Service' ), value: '' },
 										{ label: 'Airtable', value: 'airtable' },
 										{ label: 'Shopify', value: 'shopify' },
+										{ label: 'Google Sheets', value: 'google-sheets' },
 									] }
 									onChange={ value => setSelectedService( value as DataSourceType ) }
 								/>

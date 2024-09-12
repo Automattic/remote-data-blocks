@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks;
 
 use RemoteDataBlocks\REST\DatasourceController;
+use RemoteDataBlocks\REST\AuthController;
 use function wp_get_environment_type;
 use function wp_is_development_mode;
 
@@ -37,6 +38,9 @@ class PluginSettings {
 	public static function init_rest_routes() {
 		$controller = new DatasourceController();
 		$controller->register_routes();
+
+		$auth_controller = new AuthController();
+		$auth_controller->register_routes();
 	}
 
 	public static function enqueue_settings_assets( $admin_page ) {

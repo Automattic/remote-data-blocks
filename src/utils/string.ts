@@ -27,3 +27,32 @@ export function toTitleCase( str: string ): string {
 		return txt.charAt( 0 ).toUpperCase() + txt.substring( 1 ).toLowerCase();
 	} );
 }
+
+export const slugToTitleCase = ( slug: string ): string => {
+	return slug.replace( /-/g, ' ' ).replace( /\b\w/g, char => char.toUpperCase() );
+};
+
+/**
+ * Casts a string to JSON
+ * @param value string to cast
+ * @returns parsed JSON or null
+ */
+export function safeParseJSON< T = unknown >( value: unknown ): T | null {
+	if ( 'undefined' === typeof value || null === value ) {
+		return null;
+	}
+
+	if ( 'string' === typeof value && value.trim().length === 0 ) {
+		return null;
+	}
+
+	if ( 'string' === typeof value ) {
+		try {
+			return JSON.parse( value ) as T;
+		} catch ( error ) {
+			return null;
+		}
+	}
+
+	return null;
+}
