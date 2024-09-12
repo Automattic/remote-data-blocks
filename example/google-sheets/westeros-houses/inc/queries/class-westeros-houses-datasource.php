@@ -21,6 +21,10 @@ class WesterosHousesDatasource extends HttpDatasource {
 			'1EHdQg53Doz0B-ImrGz_hTleYeSvkVIk_NSJCOM1FQk0/values/Houses';
 	}
 
+	public function get_display_name(): string {
+		return 'Westeros Houses';
+	}
+
 	public function get_request_headers(): array {
 		$access_token = GoogleAuth::generate_token_from_service_account_key(
 			$this->credentials,

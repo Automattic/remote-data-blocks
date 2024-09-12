@@ -11,7 +11,7 @@ require_once __DIR__ . '/inc/queries/class-list-westeros-houses-query.php';
 require_once __DIR__ . '/inc/queries/class-get-westeros-houses-query.php';
 
 function register_westeros_houses_block() {
-	$block_name   = 'Westeros Houses';
+	$block_name   = 'Westeros House';
 	$access_token = \RemoteDataBlocks\Example\get_access_token( 'google_sheets_westeros_houses' );
 
 	if ( empty( $access_token ) ) {
