@@ -50,5 +50,3 @@ Integrations\VipBlockDataApi::init();
 
 // REST endpoints
 REST\RemoteData::init();
-
-
