@@ -3,9 +3,9 @@
 namespace RemoteDataBlocks\Example\ArtInstituteOfChicago;
 
 use RemoteDataBlocks\Config\HttpDatasource;
-use RemoteDataBlocks\Config\QueryContext;
+use RemoteDataBlocks\Config\HttpQueryContext;
 
-class ArtInstituteOfChicagoGetArtQuery extends QueryContext {
+class ArtInstituteOfChicagoGetArtQuery extends HttpQueryContext {
 	public array $input_variables = [
 		'id' => [
 			'type' => 'id',
