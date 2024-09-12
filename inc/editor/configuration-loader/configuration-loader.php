@@ -21,7 +21,7 @@ class ConfigurationLoader {
 
 	public static function init() {
 		self::$logger = LoggerManager::instance();
-		
+
 		add_action( 'init', [ __CLASS__, 'register_remote_data_blocks' ], 10, 0 );
 	}
 
