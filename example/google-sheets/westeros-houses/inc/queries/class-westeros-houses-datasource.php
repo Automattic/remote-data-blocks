@@ -36,4 +36,8 @@ class WesterosHousesDatasource extends HttpDatasource {
 			'Content-Type'  => 'application/json',
 		];
 	}
+
+	public function get_display_name(): string {
+		return 'Westeros Houses';
+	}
 }
