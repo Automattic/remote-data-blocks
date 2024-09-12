@@ -21,4 +21,4 @@ function remote_data_blocks_example_theme_enqueue_block_styles() {
 	);
 }
 add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\\remote_data_blocks_example_theme_enqueue_block_styles', 15, 0 );
-add_action( 'enqueue_block_editor_assets', __NAMESPACE__ . '\\remote_data_blocks_example_theme_enqueue_block_styles', 15, 0 );
+add_action( 'enqueue_block_assets', __NAMESPACE__ . '\\remote_data_blocks_example_theme_enqueue_block_styles', 15, 0 );
