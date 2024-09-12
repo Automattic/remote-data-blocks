@@ -15,27 +15,22 @@ class AirtableEldenRingListLocationsQuery extends QueryContext {
 		'root_path'     => '$.records[*]',
 		'is_collection' => true,
 		'mappings'      => [
-			'id'       => [
+			'id'    => [
 				'name' => 'Location ID',
 				'path' => '$.id',
 				'type' => 'id',
 			],
-			'map_name' => [
-				'name' => 'Map Name',
-				'path' => '$.fields.MapName',
-				'type' => 'string',
-			],
-			'title'    => [
+			'title' => [
 				'name' => 'Name',
 				'path' => '$.fields.Name',
 				'type' => 'string',
 			],
-			'x'        => [
+			'x'     => [
 				'name' => 'x',
 				'path' => '$.fields.x',
 				'type' => 'string',
 			],
-			'y'        => [
+			'y'     => [
 				'name' => 'y',
 				'path' => '$.fields.y',
 				'type' => 'string',
@@ -44,6 +39,6 @@ class AirtableEldenRingListLocationsQuery extends QueryContext {
 	];
 
 	public function get_endpoint( array $input_variables ): string {
-		return $this->get_datasource()->get_endpoint( 'locations' ) . '?filterByFormula=FIND%28%27' . $input_variables['map_name'] . '%27%2C%20%7BMap%7D%29%3E0';
+		return $this->get_datasource()->get_endpoint() . '/' . AirtableEldenRingMapDatasource::LOCATIONS_TABLE . '?filterByFormula=FIND%28%27' . $input_variables['map_name'] . '%27%2C%20%7BMap%7D%29%3E0';
 	}
 }

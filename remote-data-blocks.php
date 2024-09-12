@@ -44,7 +44,6 @@ Editor\PatternEditor::init();
 PluginSettings::init();
 
 // Integrations
-Integrations\AirtableIntegration::init();
 Integrations\ShopifyIntegration::init();
 Integrations\VipBlockDataApi::init();
 
