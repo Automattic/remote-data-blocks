@@ -1,4 +1,5 @@
 import { BLOCK_BINDING_SOURCE } from '@/config/constants';
+import { getClassName } from '@/utils/string';
 import { isObjectWithStringKeys } from '@/utils/type-narrowing';
 
 function getAttributeValue( attributes: unknown, key: string | undefined | null ): string {
@@ -24,7 +25,8 @@ function getExpectedAttributeValue(
 
 	let expectedValue = result[ args.field ];
 	if ( args.label ) {
-		expectedValue = `${ args.label }: ${ expectedValue }`;
+		const labelClass = getClassName( 'block-label' );
+		expectedValue = `<span class="${ labelClass }">${ args.label }</span> ${ expectedValue }`;
 	}
 
 	return expectedValue ?? null;
@@ -36,6 +38,20 @@ export function getBoundAttributeEntries(
 	return Object.entries( attributes.metadata?.bindings ?? {} ).filter(
 		( [ _target, binding ] ) => binding.source === BLOCK_BINDING_SOURCE
 	);
+}
+
+export function getBoundBlockClassName( attributes: RemoteDataInnerBlockAttributes ): string {
+	const existingClassNames = ( attributes.className ?? '' )
+		.split( /\s/ )
+		.filter( className => ! className.startsWith( 'rdb-block-data-' ) );
+	const classNames = new Set< string | undefined >( [
+		...existingClassNames,
+		...getBoundAttributeEntries( attributes ).map( ( [ _target, binding ] ) =>
+			getClassName( `block-data-${ binding.args.field }` )
+		),
+	] );
+
+	return Array.from( classNames.values() ).filter( Boolean ).join( ' ' );
 }
 
 export function getMismatchedAttributes(
