@@ -20,6 +20,11 @@ class AirtableEldenRingListLocationsQuery extends HttpQueryContext {
 				'path' => '$.id',
 				'type' => 'id',
 			],
+			'map_name' => [
+				'name' => 'Name',
+				'path' => '$.fields.Name',
+				'type' => 'string',
+			],
 			'title' => [
 				'name' => 'Name',
 				'path' => '$.fields.Name',
