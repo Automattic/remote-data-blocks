@@ -1,6 +1,6 @@
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch } from '@wordpress/data';
-import { useEffect, useState, useCallback } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore, NoticeStoreActions } from '@wordpress/notices';
 
@@ -18,7 +18,7 @@ export const useDataSources = ( loadOnMount = true ) => {
 	async function fetchDataSources() {
 		setLoadingDataSources( true );
 		try {
-			const sources = ( await apiFetch( { path: REST_BASE_DATA_SOURCES } ) ) || [];
+			const sources = Object.values( ( await apiFetch( { path: REST_BASE_DATA_SOURCES } ) ) || {} );
 			setDataSources( sources as DataSourceConfig[] );
 		} catch ( error ) {
 			createErrorNotice( __( 'Failed to load Data Sources.', 'remote-data-blocks' ) );

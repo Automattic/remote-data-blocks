@@ -27,13 +27,13 @@ class DatasourceController extends WP_REST_Controller {
 		// get_item
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/(?P<uuid>[\w-]+)',
+			'/' . $this->rest_base . '/(?P<uid>[\w-]+)',
 			[
 				'methods'             => 'GET',
 				'callback'            => [ $this, 'get_item' ],
 				'permission_callback' => [ $this, 'get_item_permissions_check' ],
 				'args'                => [
-					'uuid' => [
+					'uid' => [
 						'type'     => 'string',
 						'required' => true,
 					],
@@ -55,7 +55,7 @@ class DatasourceController extends WP_REST_Controller {
 		// update_item
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/(?P<uuid>[\w-]+)',
+			'/' . $this->rest_base . '/(?P<uid>[\w-]+)',
 			[
 				'methods'             => 'PUT',
 				'callback'            => [ $this, 'update_item' ],
@@ -66,7 +66,7 @@ class DatasourceController extends WP_REST_Controller {
 		// delete_item
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/(?P<uuid>[\w-]+)',
+			'/' . $this->rest_base . '/(?P<uid>[\w-]+)',
 			[
 				'methods'             => 'DELETE',
 				'callback'            => [ $this, 'delete_item' ],
@@ -96,35 +96,26 @@ class DatasourceController extends WP_REST_Controller {
 	}
 
 	public function get_item( $request ) {
-		$response = DatasourceCRUD::get_item_by_uuid( DatasourceCRUD::get_data_sources(), $request->get_param( 'uuid' ) );
+		$response = DatasourceCRUD::get_item_by_uid( DatasourceCRUD::get_data_sources(), $request->get_param( 'uid' ) );
 		return rest_ensure_response( $response );
 	}
 
 	public function update_item( $request ) {
-		$item = DatasourceCRUD::update_item_by_uuid( $request->get_param( 'uuid' ), $request->get_json_params() );
+		$item = DatasourceCRUD::update_item_by_uid( DatasourceCRUD::get_data_sources(), $request->get_param( 'uid' ), $request->get_json_params() );
 		return rest_ensure_response( $item );
 	}
 
 	public function delete_item( $request ) {
-		$result = DatasourceCRUD::delete_item_by_uuid( $request->get_param( 'uuid' ) );
+		$result = DatasourceCRUD::delete_item_by_uid( DatasourceCRUD::get_data_sources(), $request->get_param( 'uid' ) );
 		return rest_ensure_response( $result );
 	}
 
+	/**
+	 * @deprecated Hew will remove. Or else.
+	 */
 	public function item_slug_conflicts( $request ) {
-		$slug = $request->get_param( 'slug' );
-		$uuid = $request->get_param( 'uuid' ) ?? '';
-		if ( empty( $slug ) ) {
-			return new \WP_Error(
-				'missing_slug',
-				__( 'Missing slug parameter.', 'remote-data-blocks' ),
-				array( 'status' => 400 )
-			);
-		}
-		$validation_status = DatasourceCRUD::validate_slug( $slug, $uuid );
-		$result            = [
-			'exists' => true !== $validation_status,
-		];
-		return rest_ensure_response( $result );
+		_deprecated_function( __METHOD__, '6.6.1' );
+		return \rest_ensure_response( [ 'exists' => false ] );
 	}
 
 	// These all require manage_options for now, but we can adjust as needed

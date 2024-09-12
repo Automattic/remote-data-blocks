@@ -39,7 +39,7 @@ class ShopifyIntegration {
 		$shopify_get_product_query     = new ShopifyGetProductQuery( $shopify_datasource );
 
 		$block_name    = $shopify_datasource->get_display_name();
-		$block_pattern = file_get_contents( __DIR__ . '/inc/patterns/product-teaser.html' );
+		$block_pattern = file_get_contents( __DIR__ . '/patterns/product-teaser.html' );
 
 		ConfigurationLoader::register_block( $block_name, $shopify_get_product_query );
 		ConfigurationLoader::register_search_query( $block_name, $shopify_search_products_query );

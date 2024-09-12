@@ -35,7 +35,7 @@ export const SlugInput: React.FC< SlugInputProps > = ( { slug, onChange, uuid } 
 
 	return (
 		<TextControl
-			label={ __( 'Slug', 'remote-data-blocks' ) }
+			label={ __( 'Display Name', 'remote-data-blocks' ) }
 			value={ slug }
 			onChange={ onSlugChange }
 			help={ __(
