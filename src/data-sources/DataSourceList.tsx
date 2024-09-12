@@ -140,7 +140,7 @@ const DataSourceList = () => {
 						<thead className="table-header">
 							<tr>
 								<th>{ __( 'Slug', 'remote-data-blocks' ) }</th>
-								<th>{ __( 'Service', 'remote-data-blocks' ) }</th>
+								<th>{ __( 'Data Source', 'remote-data-blocks' ) }</th>
 								<th>{ __( 'Meta', 'remote-data-blocks' ) }</th>
 								<th className="data-source-actions">{ __( 'Actions', 'remote-data-blocks' ) }</th>
 							</tr>

@@ -2,9 +2,6 @@ import {
 	Button,
 	ButtonGroup,
 	TextControl,
-	Panel,
-	PanelBody,
-	PanelRow,
 	Card,
 	CardHeader,
 	CardBody,
@@ -85,53 +82,51 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 	};
 
 	return (
-		<Card>
+		<Card className="add-update-data-source-card">
 			<CardHeader>
 				<h2>
 					{ mode === 'add' ? __( 'Add Shopify Data Source' ) : __( 'Edit Shopify Data Source' ) }
 				</h2>
 			</CardHeader>
 			<CardBody>
-				<Panel>
-					<PanelBody>
-						<PanelRow>
-							<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
-						</PanelRow>
-						<PanelRow>
-							<TextControl
-								label={ __( 'Shopify Store Name', 'remote-data-blocks' ) }
-								onChange={ store => {
-									handleOnChange( 'store', store ?? '' );
-								} }
-								size={ 20 }
-								value={ state.store }
-								autoComplete="off"
-							/>
-						</PanelRow>
-						<PanelRow>
-							<PasswordInputControl
-								label={ __( 'Shopify Access Token', 'remote-data-blocks' ) }
-								onChange={ onTokenInputChange }
-								// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-								size={ 999 as any }
-								value={ state.token }
-							/>
-						</PanelRow>
-						<PanelRow>{ connectionMessage }</PanelRow>
-					</PanelBody>
-					<ButtonGroup className="settings-form-cta-button-group">
-						<Button
-							variant="primary"
-							// eslint-disable-next-line @typescript-eslint/no-misused-promises
-							onClick={ onSaveClick }
-						>
-							{ __( 'Save', 'remote-data-blocks' ) }
-						</Button>
-						<Button variant="secondary" onClick={ goToMainScreen }>
-							{ __( 'Cancel', 'remote-data-blocks' ) }
-						</Button>
-					</ButtonGroup>
-				</Panel>
+				<form>
+					<div className="form-group">
+						<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
+					</div>
+
+					<div className="form-group">
+						<TextControl
+							label={ __( 'Store Name', 'remote-data-blocks' ) }
+							onChange={ store => {
+								handleOnChange( 'store', store ?? '' );
+							} }
+							size={ 20 }
+							value={ state.store }
+							autoComplete="off"
+						/>
+					</div>
+
+					<div className="form-group">
+						<PasswordInputControl
+							label={ __( 'Access Token', 'remote-data-blocks' ) }
+							onChange={ onTokenInputChange }
+							value={ state.token }
+						/>
+					</div>
+
+					<div className="form-group">{ connectionMessage }</div>
+
+					<div className="form-group">
+						<ButtonGroup className="form-actions">
+							<Button variant="primary" onClick={ () => void onSaveClick() }>
+								{ __( 'Save', 'remote-data-blocks' ) }
+							</Button>
+							<Button variant="secondary" onClick={ goToMainScreen }>
+								{ __( 'Cancel', 'remote-data-blocks' ) }
+							</Button>
+						</ButtonGroup>
+					</div>
+				</form>
 			</CardBody>
 		</Card>
 	);

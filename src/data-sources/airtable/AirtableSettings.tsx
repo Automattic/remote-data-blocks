@@ -2,9 +2,6 @@ import {
 	Button,
 	ButtonGroup,
 	SelectControl,
-	Panel,
-	PanelBody,
-	PanelRow,
 	Card,
 	CardHeader,
 	CardBody,
@@ -242,58 +239,66 @@ export const AirtableSettings = ( {
 	}, [ tables ] );
 
 	return (
-		<Card>
+		<Card className="add-update-data-source-card">
 			<CardHeader>
 				<h2>
 					{ mode === 'add' ? __( 'Add Airtable Data Source' ) : __( 'Edit Airtable Data Source' ) }
 				</h2>
 			</CardHeader>
 			<CardBody>
-				<Panel>
-					<PanelBody>
-						<PanelRow>
-							<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
-						</PanelRow>
-						<PanelRow>
-							<PasswordInputControl
-								label={ __( 'Airtable Access Token', 'remote-data-blocks' ) }
-								onChange={ onTokenInputChange }
-								value={ state.token }
-								help={ connectionMessage }
-							/>
-						</PanelRow>
-						<PanelRow>
-							<SelectControl
-								id="base"
-								label={ __( 'Select Base', 'remote-data-blocks' ) }
-								value={ state.base?.id ?? '' }
-								onChange={ onSelectChange }
-								options={ baseOptions }
-								help={ basesHelpText }
-								disabled={ fetchingBases || ! bases?.length }
-							/>
-						</PanelRow>
-						<PanelRow>
-							<SelectControl
-								id="table"
-								label={ __( 'Select Table', 'remote-data-blocks' ) }
-								value={ state.table?.id ?? '' }
-								onChange={ onSelectChange }
-								options={ tableOptions }
-								help={ tablesHelpText }
-								disabled={ fetchingTables || ! tables?.length }
-							/>
-						</PanelRow>
-					</PanelBody>
-					<ButtonGroup className="settings-form-cta-button-group">
-						<Button variant="primary" onClick={ onSaveClick } disabled={ shouldAllowSubmit }>
-							{ __( 'Save', 'remote-data-blocks' ) }
-						</Button>
-						<Button variant="secondary" onClick={ goToMainScreen }>
-							{ __( 'Cancel', 'remote-data-blocks' ) }
-						</Button>
-					</ButtonGroup>
-				</Panel>
+				<form>
+					<div className="form-group">
+						<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
+					</div>
+
+					<div className="form-group">
+						<PasswordInputControl
+							label={ __( 'Access Token', 'remote-data-blocks' ) }
+							onChange={ onTokenInputChange }
+							value={ state.token }
+							help={ connectionMessage }
+						/>
+					</div>
+
+					<div className="form-group">
+						<SelectControl
+							id="base"
+							label={ __( 'Select Base', 'remote-data-blocks' ) }
+							value={ state.base?.id ?? '' }
+							onChange={ onSelectChange }
+							options={ baseOptions }
+							help={ basesHelpText }
+							disabled={ fetchingBases || ! bases?.length }
+						/>
+					</div>
+
+					<div className="form-group">
+						<SelectControl
+							id="table"
+							label={ __( 'Select Table', 'remote-data-blocks' ) }
+							value={ state.table?.id ?? '' }
+							onChange={ onSelectChange }
+							options={ tableOptions }
+							help={ tablesHelpText }
+							disabled={ fetchingTables || ! tables?.length }
+						/>
+					</div>
+
+					<div className="form-group">
+						<ButtonGroup className="form-actions">
+							<Button
+								variant="primary"
+								onClick={ () => void onSaveClick() }
+								disabled={ shouldAllowSubmit }
+							>
+								{ __( 'Save', 'remote-data-blocks' ) }
+							</Button>
+							<Button variant="secondary" onClick={ goToMainScreen }>
+								{ __( 'Cancel', 'remote-data-blocks' ) }
+							</Button>
+						</ButtonGroup>
+					</div>
+				</form>
 			</CardBody>
 		</Card>
 	);
