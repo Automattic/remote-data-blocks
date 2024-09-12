@@ -21,8 +21,8 @@ class AirtableEldenRingListLocationsQuery extends QueryContext {
 				'type' => 'id',
 			],
 			'map_name' => [
-				'name' => 'Name',
-				'path' => '$.fields.Name',
+				'name' => 'Map Name',
+				'path' => '$.fields.MapName',
 				'type' => 'string',
 			],
 			'title'    => [
