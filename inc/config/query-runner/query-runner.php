@@ -24,7 +24,7 @@ defined( 'ABSPATH' ) || exit();
 class QueryRunner implements QueryRunnerInterface {
 
 	public function __construct(
-		private HttpQueryContextInterface $query_context,
+		private HttpQueryContext $query_context,
 		private HttpClient $http_client = new HttpClient()
 	) {
 	}
