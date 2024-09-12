@@ -53,11 +53,9 @@ class GoogleAuth {
 			return $service_account_key;
 		}
 
+		$cache_key = 'google_auth_token_' . $service_account_key->client_email;
 		if ( ! $no_cache ) {
-			// Cache the token
-			$cache_key    = 'google_auth_token_' . $service_account_key->client_email;
-			$cached_token = wp_cache_get( $cache_key );
-
+			$cached_token = wp_cache_get( $cache_key, 'oauth-tokens' );
 			if ( false !== $cached_token ) {
 				return $cached_token;
 			}
