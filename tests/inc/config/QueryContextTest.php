@@ -19,7 +19,7 @@ class QueryContextTest extends TestCase {
 
 	public function testGetEndpoint() {
 		$result = $this->query_context->get_endpoint( [] );
-		$this->assertEquals( 'https://example.com', $result );
+		$this->assertEquals( 'https://example.com/api', $result );
 	}
 
 	public function testGetImageUrl() {
