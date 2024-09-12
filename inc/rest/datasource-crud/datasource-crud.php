@@ -188,10 +188,9 @@ class DatasourceCRUD {
 
 	public static function delete_item_by_uuid( $uuid ) {
 		$data_sources = self::get_data_sources();
-		$data_sources = array_filter( $data_sources, function ( $source ) use ( $uuid ) {
-			return $source->uuid !== $uuid;
-		} );
-		$result       = update_option( self::CONFIG_OPTION_NAME, $data_sources );
+		$index = array_search( $uuid, array_column( $data_sources, 'uuid' ) );
+		array_splice( $data_sources, $index, 1 );
+		$result = update_option( self::CONFIG_OPTION_NAME, $data_sources );
 		if ( true !== $result ) {
 			return new WP_Error( 'failed_to_delete_data_source', __( 'Failed to delete data source.', 'remote-data-blocks' ) );
 		}
