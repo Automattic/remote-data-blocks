@@ -199,8 +199,16 @@ class DatasourceCRUD {
 		return (array) get_option( self::CONFIG_OPTION_NAME, [] );
 	}
 
-	public static function get_data_sources() {
-		return self::get_config() ?? [];
+	public static function get_data_sources( string $service = '' ) {
+		$data_sources = self::get_config();
+
+		if ( $service ) {
+			return array_filter( $data_sources, function ( $config ) use ( $service ) {
+				return $config->service === $service;
+			} );
+		}
+
+		return $data_sources;
 	}
 
 	public static function get_item_by_uuid( $data_sources, string $uuid ) {
