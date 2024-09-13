@@ -163,12 +163,8 @@ export const GoogleSheetsSettings = ( {
 		}
 	};
 
-	/**
-	 * Handle the slug change. Only accepts valid slugs which only contain alphanumeric characters and dashes.
-	 * @param slug The slug to set.
-	 */
-	const onSlugChange = ( slug: string | undefined ) => {
-		handleOnChange( 'slug', slug ?? '' );
+	const onDisplayNameChange = ( displayName: string ) => {
+		handleOnChange( 'display_name', displayName );
 	};
 
 	const credentialsHelpText = useMemo( () => {
@@ -278,7 +274,7 @@ export const GoogleSheetsSettings = ( {
 					<TextControl
 						label={ __( 'Display Name', 'remote-data-blocks' ) }
 						value={ state.display_name }
-						onChange={ onSlugChange }
+						onChange={ onDisplayNameChange }
 					/>
 				</PanelRow>
 				<PanelRow>

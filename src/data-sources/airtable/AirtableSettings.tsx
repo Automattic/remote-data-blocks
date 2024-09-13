@@ -133,12 +133,8 @@ export const AirtableSettings = ( {
 		}
 	};
 
-	/**
-	 * Handle the slug change. Only accepts valid slugs which only contain alphanumeric characters and dashes.
-	 * @param slug The slug to set.
-	 */
-	const onSlugChange = ( slug: string | undefined ) => {
-		handleOnChange( 'slug', slug ?? '' );
+	const onDisplayNameChange = ( displayName: string ) => {
+		handleOnChange( 'display_name', displayName );
 	};
 
 	const connectionMessage = useMemo( () => {
@@ -244,7 +240,7 @@ export const AirtableSettings = ( {
 					<TextControl
 						label={ __( 'Display Name', 'remote-data-blocks' ) }
 						value={ state.display_name }
-						onChange={ onSlugChange }
+						onChange={ onDisplayNameChange }
 						help={ __( 'A display name for this data source', 'remote-data-blocks' ) }
 					/>
 				</PanelRow>
