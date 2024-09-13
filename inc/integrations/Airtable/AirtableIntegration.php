@@ -3,7 +3,7 @@
 namespace RemoteDataBlocks\Integrations\Airtable;
 
 use RemoteDataBlocks\Logging\LoggerManager;
-use RemoteDataBlocks\WpdbStorage\DatasourceCRUD;
+use RemoteDataBlocks\WpdbStorage\DatasourceCrud;
 
 class AirtableIntegration {
 	public static function init(): void {
@@ -11,7 +11,7 @@ class AirtableIntegration {
 	}
 
 	private static function register_dynamic_data_source_blocks(): void {
-		$data_sources = DatasourceCRUD::get_data_sources( REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE );
+		$data_sources = DatasourceCrud::get_data_sources( REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE );
 
 		foreach ( $data_sources as $config ) {
 			// Transform data to our experimental format, which is all array based

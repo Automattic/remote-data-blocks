@@ -5,7 +5,7 @@ namespace RemoteDataBlocks\WpdbStorage;
 use RemoteDataBlocks\Integrations\Google\Auth\GoogleServiceAccountKey;
 use WP_Error;
 
-class DatasourceCRUD {
+class DatasourceCrud {
 	const CONFIG_OPTION_NAME = 'remote_data_blocks_config';
 	const DATA_SOURCE_TYPES  = [ 'airtable', 'shopify', 'google-sheets' ];
 

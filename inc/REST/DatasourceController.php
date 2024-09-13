@@ -87,26 +87,26 @@ class DatasourceController extends WP_REST_Controller {
 	}
 
 	public function create_item( $request ) {
-		$item = DatasourceCRUD::register_new_data_source( $request->get_json_params() );
+		$item = DatasourceCrud::register_new_data_source( $request->get_json_params() );
 		return rest_ensure_response( $item );
 	}
 
 	public function get_items( $request ) {
-		return rest_ensure_response( DatasourceCRUD::get_data_sources() );
+		return rest_ensure_response( DatasourceCrud::get_data_sources() );
 	}
 
 	public function get_item( $request ) {
-		$response = DatasourceCRUD::get_item_by_uuid( DatasourceCRUD::get_data_sources(), $request->get_param( 'uuid' ) );
+		$response = DatasourceCrud::get_item_by_uuid( DatasourceCrud::get_data_sources(), $request->get_param( 'uuid' ) );
 		return rest_ensure_response( $response );
 	}
 
 	public function update_item( $request ) {
-		$item = DatasourceCRUD::update_item_by_uuid( $request->get_param( 'uuid' ), $request->get_json_params() );
+		$item = DatasourceCrud::update_item_by_uuid( $request->get_param( 'uuid' ), $request->get_json_params() );
 		return rest_ensure_response( $item );
 	}
 
 	public function delete_item( $request ) {
-		$result = DatasourceCRUD::delete_item_by_uuid( $request->get_param( 'uuid' ) );
+		$result = DatasourceCrud::delete_item_by_uuid( $request->get_param( 'uuid' ) );
 		return rest_ensure_response( $result );
 	}
 
@@ -120,7 +120,7 @@ class DatasourceController extends WP_REST_Controller {
 				array( 'status' => 400 )
 			);
 		}
-		$validation_status = DatasourceCRUD::validate_slug( $slug, $uuid );
+		$validation_status = DatasourceCrud::validate_slug( $slug, $uuid );
 		$result            = [
 			'exists' => true !== $validation_status,
 		];
