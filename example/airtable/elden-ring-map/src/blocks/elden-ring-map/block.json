@@ -16,5 +16,5 @@
   "textdomain": "remote-data-blocks",
   "editorScript": [ "file:./index.js", "leaflet-script" ],
   "editorStyle": [ "leaflet-style" ],
-  "viewScript": "file:./view.js"
+  "viewScript": [ "file:./view.js" ]
 }

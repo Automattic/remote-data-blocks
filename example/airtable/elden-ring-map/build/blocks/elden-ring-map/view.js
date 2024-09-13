@@ -1,1 +1,1 @@
-(()=>{"use strict"})();
+(()=>{"use strict";console.log("view"),console.log("yoview")})();
