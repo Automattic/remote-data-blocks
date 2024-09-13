@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\REST;
 
-use RemoteDataBlocks\Config\Auth\GoogleServiceAccountKey;
+use RemoteDataBlocks\Integrations\Google\Auth\GoogleServiceAccountKey;
 use WP_Error;
 
 class DatasourceCRUD {

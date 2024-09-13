@@ -1,6 +1,6 @@
 <?php
 
-namespace RemoteDataBlocks\Config\Auth;
+namespace RemoteDataBlocks\Integrations\Google\Auth;
 
 use WP_Error;
 
