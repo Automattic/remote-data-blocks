@@ -5,7 +5,10 @@ export const sanitizeDatasourceSlug = ( slug: string ) => {
 	return slug.replace( /[^a-z0-9-]/g, '' ).toLowerCase();
 };
 
-export function getConnectionMessage( status: string | null, message: string ): JSX.Element {
+export function getConnectionMessage(
+	status: 'success' | 'error' | null,
+	message: string
+): JSX.Element {
 	const StatusIcon = () => {
 		if ( status === 'success' ) {
 			return <CheckIcon />;
@@ -14,6 +17,8 @@ export function getConnectionMessage( status: string | null, message: string ): 
 		if ( status === 'error' ) {
 			return <ErrorIcon />;
 		}
+
+		return null;
 	};
 
 	return (

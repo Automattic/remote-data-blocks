@@ -20,6 +20,7 @@ import {
 import { AirtableFormState } from '@/data-sources/airtable/types';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { AirtableConfig } from '@/data-sources/types';
+import { getConnectionMessage } from '@/data-sources/utils';
 import { useForm } from '@/hooks/useForm';
 import PasswordInputControl from '@/settings/PasswordInputControl';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
@@ -52,11 +53,13 @@ const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState
 };
 
 const defaultSelectBaseOption: SelectOption = {
+	disabled: true,
 	label: '',
 	value: '',
 };
 
 const defaultSelectTableOption: SelectOption = {
+	disabled: true,
 	label: '',
 	value: '',
 };
@@ -143,13 +146,27 @@ export const AirtableSettings = ( {
 
 	const connectionMessage = useMemo( () => {
 		if ( fetchingUserId ) {
-			return __( 'Checking connection...', 'remote-data-blocks' );
+			return __( 'Validating connection...', 'remote-data-blocks' );
 		} else if ( userIdError ) {
-			return __( 'Connection failed. Please check your API key.', 'remote-data-blocks' );
+			return getConnectionMessage(
+				'error',
+				__( 'Connection failed. Please verify your access token.', 'remote-data-blocks' )
+			);
 		} else if ( userId ) {
-			return sprintf( __( 'Connection successful. User ID: %s', 'remote-data-blocks' ), userId );
+			return getConnectionMessage(
+				'success',
+				__( 'Connection successful.', 'remote-data-blocks' )
+			);
 		}
-		return '';
+		return (
+			<span>
+				{ __( 'Provide access token to connect your Airtable', 'remote-data-blocks' ) } (
+				<a href="https://support.airtable.com/docs/creating-personal-access-tokens" target="_label">
+					{ __( 'guide', 'remote-data-blocks' ) }
+				</a>
+				).
+			</span>
+		);
 	}, [ fetchingUserId, userId, userIdError ] );
 
 	const shouldAllowSubmit = useMemo( () => {
@@ -269,6 +286,7 @@ export const AirtableSettings = ( {
 							options={ baseOptions }
 							help={ basesHelpText }
 							disabled={ fetchingBases || ! bases?.length }
+							__next40pxDefaultSize={ true }
 						/>
 					</div>
 
@@ -281,6 +299,7 @@ export const AirtableSettings = ( {
 							options={ tableOptions }
 							help={ tablesHelpText }
 							disabled={ fetchingTables || ! tables?.length }
+							__next40pxDefaultSize={ true }
 						/>
 					</div>
 

@@ -57,5 +57,17 @@ export const useShopifyShopName = ( store: string, token: string ): ShopifyConne
 		}
 	}, [ fetchingShopName, shopNameError, shopName ] );
 
+	if ( ! connectionMessage ) {
+		setConnectionMessage(
+			<span>
+				{ __( 'Provide access token to connect your Shopify store', 'remote-data-blocks' ) } (
+				<a href="https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens/generate-app-access-tokens-admin">
+					{ __( 'guide', 'remote-data-blocks' ) }
+				</a>
+				).
+			</span>
+		);
+	}
+
 	return { shopName, connectionMessage };
 };

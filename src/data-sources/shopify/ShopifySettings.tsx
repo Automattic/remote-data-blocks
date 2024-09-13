@@ -113,17 +113,7 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 							label={ __( 'Access Token', 'remote-data-blocks' ) }
 							onChange={ onTokenInputChange }
 							value={ state.token }
-							help={
-								connectionMessage || (
-									<span>
-										Provide access token to connect to your Shopify store (
-										<a href="https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens/generate-app-access-tokens-admin">
-											guide
-										</a>
-										).
-									</span>
-								)
-							}
+							help={ connectionMessage }
 						/>
 					</div>
 
