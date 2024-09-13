@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Integrations;
 
 use RemoteDataBlocks\Config\AirtableDatasource;
+use RemoteDataBlocks\Logging\LoggerManager;
 use RemoteDataBlocks\REST\DatasourceCRUD;
 
 require_once __DIR__ . '/datasources/airtable-datasource.php';
@@ -28,7 +29,16 @@ class AirtableIntegration {
 	}
 
 	private static function register_blocks_for_airtable_data_source( array $config ): void {
-		$airtable_datasource = new AirtableDatasource( $config['token'], $config['base'], $config['tables'] );
-		// TODO...
+		$logger = LoggerManager::instance();
+		$logger->info( 'Registering Airtable block for: ' . json_encode( $config ) );
+
+		$base_id  = $config['base']['id'] ?? '';
+		$table_id = $config['table']['id'] ?? '';
+		if ( empty( $base_id ) ) {
+			$logger->error( 'Airtable block is missing base ID' );
+		}
+
+		$airtable_datasource = new AirtableDatasource( $config['token'], $base_id, $table_id );
+		// TODO: Block registration & all the rest...  This will only work if there is some mapping configured
 	}
 }
