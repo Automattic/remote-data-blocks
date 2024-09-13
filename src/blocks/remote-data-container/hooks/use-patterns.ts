@@ -4,11 +4,16 @@ import {
 	BlockPattern,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { BlockInstance, cloneBlock } from '@wordpress/blocks';
+import { BlockInstance, cloneBlock, createBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
-import { getBoundAttributeEntries, getMismatchedAttributes } from '@/utils/block-binding';
+import {
+	getBoundAttributeEntries,
+	getMismatchedAttributes,
+	hasBlockBinding,
+	isSyncedPattern,
+} from '@/utils/block-binding';
 
 export function cloneBlockWithAttributes(
 	block: BlockInstance,
@@ -29,10 +34,11 @@ export function cloneBlockWithAttributes(
 
 export function usePatterns( remoteDataBlockName: string, rootClientId: string ) {
 	const { replaceInnerBlocks } = useDispatch< BlockEditorStoreActions >( blockEditorStore );
-	const { getBlocks, getPatternsByBlockTypes } = useSelect< BlockEditorStoreSelectors >(
-		blockEditorStore,
-		[ remoteDataBlockName, rootClientId ]
-	);
+	const { getBlocks, getPatternsByBlockTypes, __experimentalGetAllowedPatterns } =
+		useSelect< BlockEditorStoreSelectors >( blockEditorStore, [
+			remoteDataBlockName,
+			[ remoteDataBlockName, rootClientId ],
+		] );
 	const [ showPatternSelection, setShowPatternSelection ] = useState< boolean >( false );
 
 	return {
@@ -45,7 +51,9 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string )
 		},
 		getPatternsByBlockTypes,
 		getSupportedPatterns: ( result?: Record< string, string > ): BlockPattern[] => {
-			const supportedPatterns = getPatternsByBlockTypes( remoteDataBlockName, rootClientId );
+			const supportedPatterns = __experimentalGetAllowedPatterns( rootClientId ).filter( pattern =>
+				pattern.blocks.some( block => hasBlockBinding( block, remoteDataBlockName ) )
+			);
 
 			// If no result is provided, return the supported patterns as is.
 			if ( ! result ) {
@@ -62,6 +70,15 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string )
 			} ) );
 		},
 		insertPatternBlocks: ( pattern: BlockPattern ): void => {
+			setShowPatternSelection( false );
+
+			// If the pattern is a synced pattern, insert it directly.
+			if ( isSyncedPattern( pattern ) ) {
+				const syncedPattern = createBlock( 'core/block', { ref: pattern.id } );
+				replaceInnerBlocks( rootClientId, [ syncedPattern ] ).catch( () => {} );
+				return;
+			}
+
 			// Clone the pattern blocks with bindings to allow the user to make changes.
 			// We always insert a single representation of the pattern, even if it is a
 			// collection. The InnerBlocksLoop component will handle rendering the rest
@@ -78,7 +95,6 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string )
 				} ) ?? [];
 
 			replaceInnerBlocks( rootClientId, patternBlocks ).catch( () => {} );
-			setShowPatternSelection( false );
 		},
 		removeInnerBlocks: (): void => {
 			replaceInnerBlocks( rootClientId, [] ).catch( () => {} );

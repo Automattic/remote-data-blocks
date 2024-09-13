@@ -18,6 +18,11 @@ vi.mock( '@wordpress/components', () => ( {
 		</div>
 	),
 } ) );
+vi.mock( '@/hooks/useEditedPostAttribute', () => ( {
+	useEditedPostAttribute: () => ( {
+		postType: '',
+	} ),
+} ) );
 
 describe( 'withBlockBinding', () => {
 	const MockBlockEdit = vi.fn( () => <div data-testid="mock-block-edit" /> );

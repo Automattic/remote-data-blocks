@@ -1,77 +1,49 @@
-import { useEntityProp } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
-import {
-	EditorStoreSelectors,
-	PluginDocumentSettingPanel,
-	store as editorStore,
-} from '@wordpress/editor';
-import { __ } from '@wordpress/i18n';
+import { SelectControl } from '@wordpress/components';
+import { PluginDocumentSettingPanel } from '@wordpress/editor';
 
-interface SelectReturnValue {
-	categoryIds: number[];
-	postContent: string;
-	postId?: string;
-	postType: string;
-	syncStatus: string;
-}
+import { PATTERN_BLOCK_TYPE_POST_META_KEY } from '@/config/constants';
+import { useEditedPostAttribute } from '@/hooks/useEditedPostAttribute';
+import { usePostMeta } from '@/hooks/usePostMeta';
+import { __ } from '@/utils/i18n';
+import { getBlocksConfig } from '@/utils/localized-block-data';
 
 export function PatternEditorSettingsPanel() {
-	const { categoryIds, postContent, postId, postType, syncStatus } = useSelect<
-		EditorStoreSelectors,
-		SelectReturnValue
-	>( select => {
-		const { getEditedPostAttribute } = select( editorStore );
+	const { postId, postType } = useEditedPostAttribute( getEditedPostAttribute => ( {
+		postId: getEditedPostAttribute< number >( 'id' ) ?? 0,
+		postType: getEditedPostAttribute< string >( 'type' ) ?? '',
+	} ) );
+	const { postMeta, updatePostMeta } = usePostMeta( postId, postType );
 
-		/**
-		 * We have access to the entirety of WordPress Data in the context of the Pattern Editor sidebar here.
-		 * Inspect:
-		 * `wp.data.select('core/editor').getCurrentPost()`
-		 * To see what's available as a Post Attribute
-		 */
-
-		return {
-			categoryIds: getEditedPostAttribute< number[] >( 'wp_pattern_category' ) ?? [],
-			postContent: getEditedPostAttribute< string >( 'content' ) ?? '',
-			postId: String( getEditedPostAttribute< number >( 'id' ) ),
-			postType: getEditedPostAttribute< string >( 'type' ) ?? '',
-			syncStatus: getEditedPostAttribute< string >( 'wp_pattern_sync_status' ) ?? '',
-		};
-	}, [] );
-
-	const [
-		// This is the post meta for the "saved" version of this post. It's not currently updated in real-time.
-		postMeta,
-
-		// We can use this function to update the post meta if needed.
-		_updatePostMeta,
-	] = useEntityProp( 'postType', 'wp_block', 'meta', postId ) as [
-		Record< string, unknown >,
-		( meta: Record< string, unknown > ) => void,
-		unknown
-	];
-
-	if ( postType !== 'wp_block' ) {
+	if ( ! postId || postType !== 'wp_block' ) {
 		return null;
 	}
 
-	const isSynced = syncStatus !== 'unsynced';
+	const blocksConfig = getBlocksConfig();
+	const blockType = String( postMeta?.[ PATTERN_BLOCK_TYPE_POST_META_KEY ] ?? '' );
 
-	console.log( {
-		categoryIds,
-		isSynced,
-		postContent,
-		postId,
-		postMeta,
-		postType,
-		syncStatus,
+	function updateBlockTypes( newBlockType: string ) {
+		updatePostMeta( { ...postMeta, [ PATTERN_BLOCK_TYPE_POST_META_KEY ]: newBlockType } );
+	}
+
+	const options = Object.entries( blocksConfig ).map( ( [ value, blockConfig ] ) => {
+		return { label: blockConfig.settings.title, value };
 	} );
 
 	return (
 		<PluginDocumentSettingPanel
 			name="pattern-editor-settings-panel"
-			title={ __( 'Remote Data Patterns' ) }
+			title={ __( 'Remote Data Blocks' ) }
 		>
-			<p>Settings for the pattern editor will go here.</p>
+			<>
+				<p>{ __( 'Choose a Remote Data Block type that is associated with this pattern.' ) }</p>
+				<SelectControl
+					label={ __( 'Block type' ) }
+					name="block-types"
+					options={ [ { label: __( 'Select a block' ), value: '' }, ...options ] }
+					onChange={ updateBlockTypes }
+					value={ blockType }
+				/>
+			</>
 		</PluginDocumentSettingPanel>
 	);
 }

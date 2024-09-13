@@ -2,6 +2,9 @@ import { BLOCK_BINDING_SOURCE } from '@/config/constants';
 import { getClassName } from '@/utils/string';
 import { isObjectWithStringKeys } from '@/utils/type-narrowing';
 
+import type { BlockPattern } from '@wordpress/block-editor';
+import type { BlockInstance } from '@wordpress/blocks';
+
 function getAttributeValue( attributes: unknown, key: string | undefined | null ): string {
 	if ( ! key || ! isObjectWithStringKeys( attributes ) ) {
 		return '';
@@ -77,6 +80,23 @@ export function getMismatchedAttributes(
 	) as Partial< RemoteDataInnerBlockAttributes >;
 }
 
+/**
+ * Recursively determine if a block or its inner blocks have any block bindings.
+ */
+export function hasBlockBinding(
+	block: BlockInstance< RemoteDataInnerBlockAttributes >,
+	remoteDataBlockName: string
+): boolean {
+	if ( getBoundAttributeEntries( block.attributes, remoteDataBlockName ).length > 0 ) {
+		return true;
+	}
+
+	return (
+		block.innerBlocks?.some( innerBlock => hasBlockBinding( innerBlock, remoteDataBlockName ) ) ??
+		false
+	);
+}
+
 export function hasRemoteDataChanged( one: RemoteData, two: RemoteData ): boolean {
 	if ( ! one || ! two ) {
 		return true;
@@ -87,4 +107,11 @@ export function hasRemoteDataChanged( one: RemoteData, two: RemoteData ): boolea
 	const { metadata: _removed3, resultId: _removed4, ...clean2 } = two;
 
 	return JSON.stringify( clean1 ) !== JSON.stringify( clean2 );
+}
+
+/**
+ * Determine if a block pattern is a synced pattern / resuable block.
+ */
+export function isSyncedPattern( pattern: BlockPattern ): boolean {
+	return Boolean( pattern.id && pattern.syncStatus !== 'unsynced' );
 }
