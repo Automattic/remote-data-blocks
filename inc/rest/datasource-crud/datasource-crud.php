@@ -226,7 +226,15 @@ class DatasourceCRUD {
 			return false;
 		} );
 	
-		return reset( $filtered );
+		$data_source = reset( $filtered );
+
+		if ( ! $data_source ) {
+			$logger = LoggerManager::instance();
+			$logger->warning( sprintf( 'Data source (slug=%s) was not found.', $slug ) );
+			return null;
+		}
+
+		return $data_source;
 	}
 
 	public static function get_item_by_uuid( $data_sources, string $uuid ) {

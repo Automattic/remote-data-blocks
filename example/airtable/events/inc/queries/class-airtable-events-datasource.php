@@ -12,12 +12,12 @@ class AirtableEventsDatasource extends HttpDatasource {
 	}
 
 	public function get_endpoint(): string {
-		return 'https://api.airtable.com/v0/' . $this->config[ 'base' ][ 'id' ] . '/' . $this->config[ 'table' ][ 'id' ];
+		return 'https://api.airtable.com/v0/' . $this->config['base']['id'] . '/' . $this->config['table']['id'];
 	}
 
 	public function get_request_headers(): array {
 		return [
-			'Authorization' => sprintf( 'Bearer %s', $this->config[ 'token' ] ),
+			'Authorization' => sprintf( 'Bearer %s', $this->config['token'] ),
 			'Content-Type'  => 'application/json',
 		];
 	}
