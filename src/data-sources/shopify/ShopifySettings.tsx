@@ -53,7 +53,7 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 	const { connectionMessage } = useShopifyShopName( state.store, state.token );
 
 	const onSaveClick = async () => {
-		const airtableConfig: ShopifyConfig = {
+		const shopifyConfig: ShopifyConfig = {
 			uuid: uuidFromProps ?? '',
 			service: 'shopify',
 			store: state.store,
@@ -62,23 +62,23 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 		};
 
 		if ( mode === 'add' ) {
-			await addDataSource( airtableConfig );
+			await addDataSource( shopifyConfig );
 		} else {
-			await updateDataSource( airtableConfig );
+			await updateDataSource( shopifyConfig );
 		}
 		goToMainScreen();
 	};
 
-	const onTokenInputChange: InputChangeCallback = ( token: string | undefined ) => {
-		handleOnChange( 'token', token ?? '' );
+	const onDisplayNameChange = ( displayName: string ) => {
+		handleOnChange( 'display_name', displayName );
 	};
 
-	/**
-	 * Handle the slug change. Only accepts valid slugs which only contain alphanumeric characters and dashes.
-	 * @param slug The slug to set.
-	 */
-	const onSlugChange = ( slug: string | undefined ) => {
-		handleOnChange( 'slug', slug ?? '' );
+	const onStoreChange = ( store: string ) => {
+		handleOnChange( 'store', store );
+	};
+
+	const onTokenInputChange: InputChangeCallback = ( token: string | undefined ) => {
+		handleOnChange( 'token', token ?? '' );
 	};
 
 	return (
@@ -93,15 +93,13 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 					<TextControl
 						label={ __( 'Display Name', 'remote-data-blocks' ) }
 						value={ state.display_name }
-						onChange={ onSlugChange }
+						onChange={ onDisplayNameChange }
 					/>
 				</PanelRow>
 				<PanelRow>
 					<TextControl
 						label={ __( 'Shopify Store Name', 'remote-data-blocks' ) }
-						onChange={ store => {
-							handleOnChange( 'store', store ?? '' );
-						} }
+						onChange={ onStoreChange }
 						size={ 20 }
 						value={ state.store }
 						autoComplete="off"

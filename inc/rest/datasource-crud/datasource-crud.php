@@ -33,12 +33,12 @@ class DatasourceCRUD {
 		}
 
 		return (object) [
-			'uuid'    => $source->uuid,
-			'token'   => sanitize_text_field( $source->token ),
-			'service' => 'airtable',
+			'uuid'         => $source->uuid,
+			'token'        => sanitize_text_field( $source->token ),
+			'service'      => 'airtable',
 			'display_name' => sanitize_text_field( $source->display_name ),
-			'base'    => $source->base,
-			'table'   => $source->table,
+			'base'         => $source->base,
+			'table'        => $source->table,
 		];
 	}
 
@@ -48,11 +48,11 @@ class DatasourceCRUD {
 		}
 
 		return (object) [
-			'uuid'    => $source->uuid,
-			'token'   => sanitize_text_field( $source->token ),
-			'service' => 'shopify',
+			'uuid'         => $source->uuid,
+			'token'        => sanitize_text_field( $source->token ),
+			'service'      => 'shopify',
 			'display_name' => sanitize_text_field( $source->display_name ),
-			'store'   => sanitize_text_field( $source->store ),
+			'store'        => sanitize_text_field( $source->store ),
 		];
 	}
 
@@ -85,12 +85,12 @@ class DatasourceCRUD {
 		}
 
 		return (object) [
-			'uuid'        => $source->uuid,
-			'service'     => 'google-sheets',
+			'uuid'         => $source->uuid,
+			'service'      => 'google-sheets',
 			'display_name' => sanitize_text_field( $source->display_name ),
-			'credentials' => $service_account_key,
-			'spreadsheet' => $source->spreadsheet,
-			'sheet'       => $source->sheet,
+			'credentials'  => $service_account_key,
+			'spreadsheet'  => $source->spreadsheet,
+			'sheet'        => $source->sheet,
 		];
 	}
 

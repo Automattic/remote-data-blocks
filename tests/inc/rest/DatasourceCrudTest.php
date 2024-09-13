@@ -2,36 +2,26 @@
 
 use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\REST\DatasourceCRUD;
-use RemoteDataBlocks\Config\Auth\GoogleServiceAccountKey;
 
 class DatasourceCrudTest extends TestCase {
 	protected function tearDown(): void {
 		clear_mocked_options();
 	}
 
-	public function test_validate_slug_with_valid_input() {
-		$this->assertTrue( DatasourceCRUD::validate_slug( 'valid-slug' ) );
-	}
-
-	public function test_validate_slug_with_invalid_input() {
-		$this->assertInstanceOf( WP_Error::class, DatasourceCRUD::validate_slug( '' ) );
-		$this->assertInstanceOf( WP_Error::class, DatasourceCRUD::validate_slug( 'INVALID_SLUG' ) );
-	}
-
 	public function test_validate_airtable_source_with_valid_input() {
 		$valid_source = (object) [
-			'uuid'    => '123e4567-e89b-12d3-a456-426614174000',
-			'token'   => 'valid_token',
-			'service' => 'airtable',
-			'base'    => [
+			'uuid'         => '123e4567-e89b-12d3-a456-426614174000',
+			'token'        => 'valid_token',
+			'service'      => 'airtable',
+			'base'         => [
 				'id'   => 'base_id',
 				'name' => 'Base Name',
 			],
-			'table'   => [
+			'table'        => [
 				'id'   => 'table_id',
 				'name' => 'Table Name',
 			],
-			'slug'    => 'valid-slug',
+			'display_name' => 'Valid Display Name',
 		];
 
 		$result = DatasourceCRUD::validate_airtable_source( $valid_source );
@@ -41,9 +31,9 @@ class DatasourceCrudTest extends TestCase {
 
 	public function test_validate_airtable_source_with_invalid_input() {
 		$invalid_source = (object) [
-			'uuid'    => '123e4567-e89b-12d3-a456-426614174000',
-			'service' => 'airtable',
-			'slug'    => 'valid-slug',
+			'uuid'         => '123e4567-e89b-12d3-a456-426614174000',
+			'service'      => 'airtable',
+			'display_name' => 'Valid Display Name',
 		];
 
 		$this->assertInstanceOf( WP_Error::class, DatasourceCRUD::validate_airtable_source( $invalid_source ) );
@@ -51,11 +41,11 @@ class DatasourceCrudTest extends TestCase {
 
 	public function test_validate_shopify_source_with_valid_input() {
 		$valid_source = (object) [
-			'uuid'    => '123e4567-e89b-12d3-a456-426614174000',
-			'token'   => 'valid_token',
-			'service' => 'shopify',
-			'store'   => 'mystore.myshopify.com',
-			'slug'    => 'valid-slug',
+			'uuid'         => '123e4567-e89b-12d3-a456-426614174000',
+			'token'        => 'valid_token',
+			'service'      => 'shopify',
+			'store'        => 'mystore.myshopify.com',
+			'display_name' => 'Valid Display Name',
 		];
 
 		$result = DatasourceCRUD::validate_shopify_source( $valid_source );
@@ -65,9 +55,9 @@ class DatasourceCrudTest extends TestCase {
 
 	public function test_validate_shopify_source_with_invalid_input() {
 		$invalid_source = (object) [
-			'uuid'    => '123e4567-e89b-12d3-a456-426614174000',
-			'service' => 'shopify',
-			'slug'    => 'valid-slug',
+			'uuid'         => '123e4567-e89b-12d3-a456-426614174000',
+			'service'      => 'shopify',
+			'display_name' => 'Valid Display Name',
 		];
 
 		$this->assertInstanceOf( WP_Error::class, DatasourceCRUD::validate_shopify_source( $invalid_source ) );
@@ -89,18 +79,18 @@ class DatasourceCrudTest extends TestCase {
 		];
 
 		$valid_source = (object) [
-			'uuid'        => '123e4567-e89b-12d3-a456-426614174000',
-			'service'     => 'google-sheets',
-			'credentials' => $valid_credentials,
-			'spreadsheet' => [
+			'uuid'         => '123e4567-e89b-12d3-a456-426614174000',
+			'service'      => 'google-sheets',
+			'credentials'  => $valid_credentials,
+			'spreadsheet'  => [
 				'id'   => 'spreadsheet_id',
 				'name' => 'Spreadsheet Name',
 			],
-			'sheet'       => [
+			'sheet'        => [
 				'id'   => 0,
 				'name' => 'Sheet Name',
 			],
-			'slug'        => 'valid-slug',
+			'display_name' => 'Valid Display Name',
 		];
 
 		$result = DatasourceCRUD::validate_google_sheets_source( $valid_source );
@@ -110,10 +100,10 @@ class DatasourceCrudTest extends TestCase {
 
 	public function test_validate_google_sheets_source_with_invalid_input() {
 		$invalid_source = (object) [
-			'uuid'        => '123e4567-e89b-12d3-a456-426614174000',
-			'service'     => 'google-sheets',
-			'credentials' => [],
-			'slug'        => 'valid-slug',
+			'uuid'         => '123e4567-e89b-12d3-a456-426614174000',
+			'service'      => 'google-sheets',
+			'credentials'  => [],
+			'display_name' => 'Valid Display Name',
 		];
 
 		$this->assertInstanceOf( WP_Error::class, DatasourceCRUD::validate_google_sheets_source( $invalid_source ) );
@@ -121,18 +111,18 @@ class DatasourceCrudTest extends TestCase {
 
 	public function test_validate_source_with_valid_input() {
 		$valid_source = (object) [
-			'uuid'    => '123e4567-e89b-12d3-a456-426614174000',
-			'token'   => 'valid_token',
-			'service' => 'airtable',
-			'base'    => [
+			'uuid'         => '123e4567-e89b-12d3-a456-426614174000',
+			'token'        => 'valid_token',
+			'service'      => 'airtable',
+			'base'         => [
 				'id'   => 'base_id',
 				'name' => 'Base Name',
 			],
-			'table'   => [
+			'table'        => [
 				'id'   => 'table_id',
 				'name' => 'Table Name',
 			],
-			'slug'    => 'valid-slug',
+			'display_name' => 'Valid Display Name',
 		];
 
 		$result = DatasourceCRUD::validate_source( $valid_source );
@@ -143,9 +133,9 @@ class DatasourceCrudTest extends TestCase {
 
 	public function test_validate_source_with_invalid_input() {
 		$invalid_source = (object) [
-			'uuid'    => 'invalid-uuid',
-			'service' => 'unsupported',
-			'slug'    => 'valid-slug',
+			'uuid'         => 'invalid-uuid',
+			'service'      => 'unsupported',
+			'display_name' => 'Valid Display Name',
 		];
 
 		$result = DatasourceCRUD::validate_source( $invalid_source );
@@ -155,17 +145,17 @@ class DatasourceCrudTest extends TestCase {
 
 	public function test_register_new_data_source_with_valid_input() {
 		$valid_source = [
-			'token'   => 'valid_token',
-			'service' => 'airtable',
-			'base'    => [
+			'token'        => 'valid_token',
+			'service'      => 'airtable',
+			'base'         => [
 				'id'   => 'base_id',
 				'name' => 'Base Name',
 			],
-			'table'   => [
+			'table'        => [
 				'id'   => 'table_id',
 				'name' => 'Table Name',
 			],
-			'slug'    => 'valid-slug',
+			'display_name' => 'Valid Display Name',
 		];
 
 		$result = DatasourceCRUD::register_new_data_source( $valid_source );
@@ -175,8 +165,8 @@ class DatasourceCrudTest extends TestCase {
 
 	public function test_register_new_data_source_with_invalid_input() {
 		$invalid_source = [
-			'service' => 'unsupported',
-			'slug'    => 'valid-slug',
+			'service'      => 'unsupported',
+			'display_name' => 'Valid Display Name',
 		];
 
 		$this->assertInstanceOf( WP_Error::class, DatasourceCRUD::register_new_data_source( $invalid_source ) );
@@ -184,24 +174,24 @@ class DatasourceCrudTest extends TestCase {
 
 	public function test_get_data_sources() {
 		$source1 = DatasourceCRUD::register_new_data_source( [
-			'token'   => 'token1',
-			'service' => 'airtable',
-			'base'    => [
+			'token'        => 'token1',
+			'service'      => 'airtable',
+			'base'         => [
 				'id'   => 'base_id1',
 				'name' => 'Base Name 1',
 			],
-			'table'   => [
+			'table'        => [
 				'id'   => 'table_id1',
 				'name' => 'Table Name 1',
 			],
-			'slug'    => 'source-1',
+			'display_name' => 'Source 1',
 		] );
 
 		$source2 = DatasourceCRUD::register_new_data_source( [
-			'token'   => 'token2',
-			'service' => 'shopify',
-			'store'   => 'mystore.myshopify.com',
-			'slug'    => 'source-2',
+			'token'        => 'token2',
+			'service'      => 'shopify',
+			'store'        => 'mystore.myshopify.com',
+			'display_name' => 'Source 2',
 		] );
 
 		set_mocked_option( DatasourceCRUD::CONFIG_OPTION_NAME, [
@@ -214,26 +204,26 @@ class DatasourceCrudTest extends TestCase {
 
 		$airtable_sources = DatasourceCRUD::get_data_sources( 'airtable' );
 		$this->assertCount( 1, $airtable_sources );
-		$this->assertEquals( 'source-1', $airtable_sources[0]->slug );
+		$this->assertEquals( 'Source 1', $airtable_sources[0]->display_name );
 
 		$shopify_sources = DatasourceCRUD::get_data_sources( 'shopify' );
 		$this->assertCount( 1, $shopify_sources );
-		$this->assertEquals( 'source-2', $shopify_sources[0]->slug );
+		$this->assertEquals( 'Source 2', $shopify_sources[0]->display_name );
 	}
 
 	public function test_get_item_by_uuid_with_valid_uuid() {
 		$source = DatasourceCRUD::register_new_data_source( [
-			'token'   => 'token1',
-			'service' => 'airtable',
-			'base'    => [
+			'token'        => 'token1',
+			'service'      => 'airtable',
+			'base'         => [
 				'id'   => 'base_id1',
 				'name' => 'Base Name 1',
 			],
-			'table'   => [
+			'table'        => [
 				'id'   => 'table_id1',
 				'name' => 'Table Name 1',
 			],
-			'slug'    => 'source-1',
+			'display_name' => 'Source 1',
 		] );
 
 		$retrieved_source = DatasourceCRUD::get_item_by_uuid( DatasourceCRUD::get_data_sources(), $source->uuid );
@@ -247,27 +237,27 @@ class DatasourceCrudTest extends TestCase {
 
 	public function test_update_item_by_uuid_with_valid_uuid() {
 		$source = DatasourceCRUD::register_new_data_source( [
-			'token'   => 'token1',
-			'service' => 'airtable',
-			'base'    => [
+			'token'        => 'token1',
+			'service'      => 'airtable',
+			'base'         => [
 				'id'   => 'base_id1',
 				'name' => 'Base Name 1',
 			],
-			'table'   => [
+			'table'        => [
 				'id'   => 'table_id1',
 				'name' => 'Table Name 1',
 			],
-			'slug'    => 'source-1',
+			'display_name' => 'Source 1',
 		] );
 
 		$updated_source = DatasourceCRUD::update_item_by_uuid( $source->uuid, [
-			'token' => 'updated_token',
-			'slug'  => 'updated-slug',
+			'token'        => 'updated_token',
+			'display_name' => 'Updated Display Name',
 		] );
 
 		$this->assertIsObject( $updated_source );
 		$this->assertEquals( 'updated_token', $updated_source->token );
-		$this->assertEquals( 'updated-slug', $updated_source->slug );
+		$this->assertEquals( 'Updated Display Name', $updated_source->display_name );
 	}
 
 	public function test_update_item_by_uuid_with_invalid_uuid() {
@@ -277,17 +267,17 @@ class DatasourceCrudTest extends TestCase {
 
 	public function test_delete_item_by_uuid() {
 		$source = DatasourceCRUD::register_new_data_source( [
-			'token'   => 'token1',
-			'service' => 'airtable',
-			'base'    => [
+			'token'        => 'token1',
+			'service'      => 'airtable',
+			'base'         => [
 				'id'   => 'base_id1',
 				'name' => 'Base Name 1',
 			],
-			'table'   => [
+			'table'        => [
 				'id'   => 'table_id1',
 				'name' => 'Table Name 1',
 			],
-			'slug'    => 'source-1',
+			'display_name' => 'Source 1',
 		] );
 
 		$result = DatasourceCRUD::delete_item_by_uuid( $source->uuid );
