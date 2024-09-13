@@ -30,6 +30,9 @@ jobs:
       - name: Install dependencies
         run: composer install
 
+      - name: Generate autoloader
+        run: composer dump-autoload
+
       - name: Run tests
         run: composer test
 
