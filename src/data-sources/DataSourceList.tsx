@@ -30,26 +30,6 @@ const DataSourceList = () => {
 	const [ dataSourceToDelete, setDataSourceToDelete ] = useState< DataSourceConfig | null >( null );
 	const { pushState } = useSettingsContext();
 
-	if ( loadingDataSources ) {
-		return (
-			<div className="data-sources-loader">
-				<Spinner />
-				<p> { __( 'Loading data sources...', 'remote-data-blocks' ) } </p>
-			</div>
-		);
-	}
-
-	if ( dataSources.length === 0 ) {
-		return (
-			<Placeholder
-				className="data-sources-placeholder"
-				icon={ info }
-				label={ __( 'No data source found.', 'remote-data-blocks' ) }
-				instructions={ __( 'Use “Add” button to add data source.', 'remote-data-blocks' ) }
-			/>
-		);
-	}
-
 	const AddDataSourceDropdown = () => {
 		function onAddDataSource( event: React.MouseEvent ) {
 			const dataSource = event.currentTarget.textContent?.toLowerCase() as DataSourceType;
@@ -129,6 +109,106 @@ const DataSourceList = () => {
 		) );
 	};
 
+	const CardBodyContent = (): JSX.Element => {
+		if ( loadingDataSources ) {
+			return (
+				<div className="data-sources-loader">
+					<Spinner />
+					<p> { __( 'Loading data sources...', 'remote-data-blocks' ) } </p>
+				</div>
+			);
+		}
+
+		if ( dataSources.length === 0 ) {
+			return (
+				<Placeholder
+					className="data-sources-placeholder"
+					icon={ info }
+					label={ __( 'No data source found.', 'remote-data-blocks' ) }
+					instructions={ __( 'Use “Add” button to add data source.', 'remote-data-blocks' ) }
+				/>
+			);
+		}
+
+		return (
+			<div className="data-source-list-wrapper">
+				<table className="table data-source-list">
+					<thead className="table-header">
+						<tr>
+							<th>{ __( 'Slug', 'remote-data-blocks' ) }</th>
+							<th>{ __( 'Data Source', 'remote-data-blocks' ) }</th>
+							<th>{ __( 'Meta', 'remote-data-blocks' ) }</th>
+							<th className="data-source-actions">{ __( 'Actions', 'remote-data-blocks' ) }</th>
+						</tr>
+					</thead>
+					<tbody className="table-body">
+						{ getValidDataSources().map( source => {
+							const { uuid, slug, service } = source;
+							return (
+								<tr key={ uuid } className="table-row">
+									<td>
+										<Text className="data-source-slug">{ slug }</Text>
+									</td>
+									<td>
+										<Text>{ toTitleCase( service ) }</Text>
+									</td>
+									<td> { renderDataSourceMeta( source ) } </td>
+									<td className="data-source-actions">
+										<ButtonGroup className="data-source-actions">
+											<Button variant="secondary" onClick={ () => onEditDataSource( uuid ) }>
+												<Icon icon={ edit } />
+											</Button>
+											<Button variant="secondary" onClick={ () => onDeleteDataSource( source ) }>
+												<Icon icon={ trash } />
+											</Button>
+										</ButtonGroup>
+									</td>
+								</tr>
+							);
+						} ) }
+					</tbody>
+				</table>
+
+				{ dataSourceToDelete && (
+					<Modal
+						className="confirm-delete-data-source-modal"
+						title="Delete Data Source"
+						size="medium"
+						onRequestClose={ () => {
+							onCancelDeleteDialog();
+						} }
+						isDismissible={ true }
+						focusOnMount
+						shouldCloseOnEsc={ true }
+						shouldCloseOnClickOutside={ true }
+					>
+						<p>
+							Are you sure you want to delete
+							<strong> &ldquo;{ toTitleCase( dataSourceToDelete.service ) }&rdquo; </strong>
+							data source with slug
+							<strong> &ldquo;{ dataSourceToDelete.slug }&rdquo;</strong>?
+						</p>
+
+						<div className="action-buttons">
+							<Button variant="link" onClick={ onCancelDeleteDialog }>
+								{ ' ' }
+								Cancel{ ' ' }
+							</Button>
+							<Button
+								variant="primary"
+								isDestructive
+								onClick={ () => void onConfirmDeleteDataSource( dataSourceToDelete ) }
+							>
+								{ ' ' }
+								Confirm{ ' ' }
+							</Button>
+						</div>
+					</Modal>
+				) }
+			</div>
+		);
+	};
+
 	return (
 		<Card>
 			<CardHeader>
@@ -136,79 +216,7 @@ const DataSourceList = () => {
 				<AddDataSourceDropdown />
 			</CardHeader>
 			<CardBody>
-				<div className="data-source-list-wrapper">
-					<table className="table data-source-list">
-						<thead className="table-header">
-							<tr>
-								<th>{ __( 'Slug', 'remote-data-blocks' ) }</th>
-								<th>{ __( 'Data Source', 'remote-data-blocks' ) }</th>
-								<th>{ __( 'Meta', 'remote-data-blocks' ) }</th>
-								<th className="data-source-actions">{ __( 'Actions', 'remote-data-blocks' ) }</th>
-							</tr>
-						</thead>
-						<tbody className="table-body">
-							{ getValidDataSources().map( source => {
-								const { uuid, slug, service } = source;
-								return (
-									<tr key={ uuid } className="table-row">
-										<td>
-											<Text className="data-source-slug">{ slug }</Text>
-										</td>
-										<td>
-											<Text>{ toTitleCase( service ) }</Text>
-										</td>
-										<td> { renderDataSourceMeta( source ) } </td>
-										<td className="data-source-actions">
-											<ButtonGroup className="data-source-actions">
-												<Button variant="secondary" onClick={ () => onEditDataSource( uuid ) }>
-													<Icon icon={ edit } />
-												</Button>
-												<Button variant="secondary" onClick={ () => onDeleteDataSource( source ) }>
-													<Icon icon={ trash } />
-												</Button>
-											</ButtonGroup>
-										</td>
-									</tr>
-								);
-							} ) }
-						</tbody>
-					</table>
-
-					{ dataSourceToDelete && (
-						<Modal
-							className="confirm-delete-data-source-modal"
-							title="Delete Data Source"
-							size="medium"
-							onRequestClose={ () => {
-								onCancelDeleteDialog();
-							} }
-							isDismissible={ true }
-							focusOnMount
-							shouldCloseOnEsc={ true }
-							shouldCloseOnClickOutside={ true }
-						>
-							<p>
-								Are you sure you want to delete
-								<strong> &ldquo;{ toTitleCase( dataSourceToDelete.service ) }&rdquo; </strong>
-								data source with slug
-								<strong> &ldquo;{ dataSourceToDelete.slug }&rdquo;</strong>?
-							</p>
-
-							<div className="action-buttons">
-								<Button variant="link" onClick={ onCancelDeleteDialog }>
-									Cancel
-								</Button>
-								<Button
-									variant="primary"
-									isDestructive
-									onClick={ () => void onConfirmDeleteDataSource( dataSourceToDelete ) }
-								>
-									Confirm
-								</Button>
-							</div>
-						</Modal>
-					) }
-				</div>
+				<CardBodyContent />
 			</CardBody>
 		</Card>
 	);
