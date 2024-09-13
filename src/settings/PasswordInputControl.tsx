@@ -13,7 +13,7 @@ const PasswordInputControl = ( { ...props }: PasswordInputControlProps ) => {
 		<InputControl
 			className="password-input-control"
 			type={ visible ? 'text' : 'password' }
-			prefix={ <Button icon={ lock } /> }
+			prefix={ <Button icon={ lock } tabIndex={ -1 } /> }
 			suffix={
 				<Button
 					icon={ visible ? unseen : seen }
