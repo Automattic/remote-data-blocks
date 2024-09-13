@@ -9,10 +9,6 @@ class DatasourceCRUD {
 	const CONFIG_OPTION_NAME = 'remote_data_blocks_config';
 	const DATA_SOURCE_TYPES  = [ 'airtable', 'shopify', 'google-sheets' ];
 
-	public static function is_uuid4( string $maybe_uuid ) {
-		return preg_match( '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $maybe_uuid );
-	}
-
 	/**
 	 * Validate the slug to verify
 	 * - is not empty
@@ -23,7 +19,7 @@ class DatasourceCRUD {
 	 * @param string [$uuid] The UUID of the data source to exclude from the check.
 	 * @return WP_Error|true Returns true if the slug is valid, or a WP_Error object if not.
 	 */
-	public static function validate_slug( string $slug, string $uuid = '' ): WP_Error|true {
+	public static function validate_slug( string $slug, string $uuid = '' ): WP_Error|bool {
 		if ( empty( $slug ) ) {
 			return new WP_Error( 'missing_slug', __( 'Missing slug.', 'remote-data-blocks' ) );
 		}
@@ -48,7 +44,7 @@ class DatasourceCRUD {
 		return true;
 	}
 
-	private static function validate_airtable_source( $source ) {
+	public static function validate_airtable_source( $source ) {
 		if ( empty( $source->token ) ) {
 			return new WP_Error( 'missing_token', __( 'Missing token.', 'remote-data-blocks' ) );
 		}
@@ -142,8 +138,8 @@ class DatasourceCRUD {
 			return new WP_Error( 'missing_uuid', __( 'Missing UUID.', 'remote-data-blocks' ) );
 		}
 
-		
-		if ( ! self::is_uuid4( $source->uuid ) ) {
+
+		if ( ! wp_is_uuid( $source->uuid ) ) {
 			return new WP_Error( 'invalid_uuid', __( 'Invalid UUID.', 'remote-data-blocks' ) );
 		}
 
@@ -205,9 +201,9 @@ class DatasourceCRUD {
 		$data_sources = apply_filters( 'remote_data_blocks_data_sources', $data_sources );
 
 		if ( $service ) {
-			return array_filter( $data_sources, function ( $config ) use ( $service ) {
+			return array_values( array_filter($data_sources, function ( $config ) use ( $service ) {
 				return $config->service === $service;
-			} );
+			} ) );
 		}
 
 		return $data_sources;
@@ -261,7 +257,7 @@ class DatasourceCRUD {
 		return $new_item;
 	}
 
-	public static function delete_item_by_uuid( $uuid ) {
+	public static function delete_item_by_uuid( string $uuid ): WP_Error|bool {
 		$data_sources = self::get_data_sources();
 		$data_sources = array_filter( $data_sources, function ( $source ) use ( $uuid ) {
 			return $source->uuid !== $uuid;
