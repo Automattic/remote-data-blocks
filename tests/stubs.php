@@ -59,7 +59,7 @@ function wp_cache_set(): bool {
 }
 
 function update_option( string $option, mixed $value ): bool {
-	set_mocked_option($option, $value);
+	set_mocked_option( $option, $value );
 	return true;
 }
 
