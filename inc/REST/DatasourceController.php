@@ -2,6 +2,7 @@
 
 namespace RemoteDataBlocks\REST;
 
+use RemoteDataBlocks\WpdbStorage\DatasourceCrud;
 use WP_REST_Controller;
 
 defined( 'ABSPATH' ) || exit();
