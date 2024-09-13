@@ -3,7 +3,7 @@
 namespace RemoteDataBlocks\Example\GoogleSheets\WesterosHouses;
 
 use RemoteDataBlocks\Config\HttpDatasource;
-use RemoteDataBlocks\Config\Auth\GoogleAuth;
+use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
 
 class WesterosHousesDatasource extends HttpDatasource {
 	private array $credentials;

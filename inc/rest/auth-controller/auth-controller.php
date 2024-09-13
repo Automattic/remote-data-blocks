@@ -4,7 +4,7 @@ namespace RemoteDataBlocks\REST;
 
 use WP_REST_Controller;
 use WP_REST_Request;
-use RemoteDataBlocks\Config\Auth\GoogleAuth;
+use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
 
 defined( 'ABSPATH' ) || exit();
 defined( 'ABSPATH' ) || exit();

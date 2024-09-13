@@ -1,9 +1,9 @@
 <?php
 
-namespace RemoteDataBlocks\Config\Auth;
+namespace RemoteDataBlocks\Integrations\Google\Auth;
 
 use WP_Error;
-use RemoteDataBlocks\Config\Auth\GoogleServiceAccountKey;
+use RemoteDataBlocks\Integrations\Google\Auth\GoogleServiceAccountKey;
 
 class GoogleAuth {
 	const TOKEN_EXPIRY_SECONDS = 3600; // 1 hour
