@@ -19,7 +19,7 @@ class DatasourceCRUD {
 	 * @param string [$uuid] The UUID of the data source to exclude from the check.
 	 * @return WP_Error|true Returns true if the slug is valid, or a WP_Error object if not.
 	 */
-	public static function validate_slug( string $slug, string $uuid = '' ): WP_Error|true {
+	public static function validate_slug( string $slug, string $uuid = '' ): WP_Error|bool {
 		if ( empty( $slug ) ) {
 			return new WP_Error( 'missing_slug', __( 'Missing slug.', 'remote-data-blocks' ) );
 		}
@@ -231,7 +231,7 @@ class DatasourceCRUD {
 		return $new_item;
 	}
 
-	public static function delete_item_by_uuid( $uuid ) {
+	public static function delete_item_by_uuid( string $uuid ): WP_Error|bool {
 		$data_sources = self::get_data_sources();
 		$data_sources = array_filter( $data_sources, function ( $source ) use ( $uuid ) {
 			return $source->uuid !== $uuid;
