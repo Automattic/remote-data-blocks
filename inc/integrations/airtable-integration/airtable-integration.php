@@ -30,7 +30,7 @@ class AirtableIntegration {
 
 	private static function register_blocks_for_airtable_data_source( array $config ): void {
 		$logger = LoggerManager::instance();
-		$logger->info( 'Registering Airtable block for: ' . json_encode( $config ) );
+		$logger->info( 'Registering Airtable block for: ' . wp_json_encode( $config ) ); // TODO: Remove this or make it debug level, etc.
 
 		$base_id  = $config['base']['id'] ?? '';
 		$table_id = $config['table']['id'] ?? '';
