@@ -54,13 +54,13 @@ const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState
 
 const defaultSelectBaseOption: SelectOption = {
 	disabled: true,
-	label: '',
+	label: 'Auto-filled on successful connection.',
 	value: '',
 };
 
 const defaultSelectTableOption: SelectOption = {
 	disabled: true,
-	label: '',
+	label: 'Auto-filled on successful connection.',
 	value: '',
 };
 
@@ -200,13 +200,13 @@ export const AirtableSettings = ( {
 						  )
 						: sprintf( __( 'Invalid base selected: %s', 'remote-data-blocks' ), state.base );
 				}
-				if ( bases.length ) {
-					return '';
-				}
+
 				return __( 'No Bases found' );
 			}
 			return '';
 		}
+
+		return 'Select a base from which to fetch data.';
 	}, [ bases, basesError, fetchingBases, state.base, userId ] );
 
 	const tablesHelpText = useMemo( () => {
@@ -237,6 +237,8 @@ export const AirtableSettings = ( {
 
 			return '';
 		}
+
+		return 'Select a table to attach with this data source.';
 	}, [ bases, fetchingTables, state.base, state.table, tables, tablesError ] );
 
 	useEffect( () => {

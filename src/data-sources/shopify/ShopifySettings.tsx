@@ -120,7 +120,7 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 					<div className="form-group">
 						<TextControl
 							label={ __( 'Store Name', 'remote-data-blocks' ) }
-							placeholder={ __( 'Auto-filled on successful connection', 'remote-data-blocks' ) }
+							placeholder={ __( 'Auto-filled on successful connection.', 'remote-data-blocks' ) }
 							value={ shopName ?? '' }
 							onChange={ () => {} }
 							tabIndex={ -1 }
