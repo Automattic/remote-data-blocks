@@ -137,7 +137,7 @@ class PluginSettings {
 	}
 
 	public static function pre_update_option_remote_data_blocks_config( $new_value, $old_value ) {
-		$encryptor = new \RemoteDataBlocks\Storage\DataEncryption();
+		$encryptor = new \RemoteDataBlocks\WpdbStorage\DataEncryption();
 
 		try {
 			return $encryptor->encrypt( wp_json_encode( $new_value ) );
@@ -152,7 +152,7 @@ class PluginSettings {
 	}
 
 	public static function decrypt_option( $value ) {
-		$decryptor = new \RemoteDataBlocks\Storage\DataEncryption();
+		$decryptor = new \RemoteDataBlocks\WpdbStorage\DataEncryption();
 
 		try {
 			$decrypted = $decryptor->decrypt( $value );

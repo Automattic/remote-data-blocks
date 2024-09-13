@@ -8,10 +8,6 @@ use RemoteDataBlocks\Integrations\Shopify\Queries\ShopifySearchProductsQuery;
 use RemoteDataBlocks\Logging\LoggerManager;
 use RemoteDataBlocks\WpdbStorage\DatasourceCRUD;
 
-require_once __DIR__ . '/datasources/shopify-datasource.php';
-require_once __DIR__ . '/queries/shopify-get-product-query.php';
-require_once __DIR__ . '/queries/shopify-search-products-query.php';
-
 class ShopifyIntegration {
 	public static function init(): void {
 		self::register_dynamic_data_source_blocks();

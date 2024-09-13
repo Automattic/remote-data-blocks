@@ -2,10 +2,10 @@
 
 namespace RemoteDataBlocks\Example\Shopify;
 
-use RemoteDataBlocks\Config\ShopifyDatasource;
-use RemoteDataBlocks\Config\ShopifyGetProductQuery;
-use RemoteDataBlocks\Config\ShopifySearchProductsQuery;
-use RemoteDataBlocks\Editor\ConfigurationLoader;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
+use RemoteDataBlocks\Integrations\Shopify\Queries\ShopifyGetProductQuery;
+use RemoteDataBlocks\Integrations\Shopify\Queries\ShopifySearchProductsQuery;
+use RemoteDataBlocks\Integrations\Shopify\ShopifyDatasource;
 use RemoteDataBlocks\Logging\LoggerManager;
 use function add_action;
 

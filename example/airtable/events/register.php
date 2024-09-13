@@ -2,8 +2,8 @@
 
 namespace RemoteDataBlocks\Example\Airtable\Events;
 
-use RemoteDataBlocks\Config\AirtableDatasource;
-use RemoteDataBlocks\Editor\ConfigurationLoader;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
+use RemoteDataBlocks\Integrations\Airtable\AirtableDatasource;
 use RemoteDataBlocks\Logging\LoggerManager;
 use function add_action;
 
