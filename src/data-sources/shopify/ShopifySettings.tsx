@@ -6,7 +6,6 @@ import {
 	CardHeader,
 	CardBody,
 } from '@wordpress/components';
-import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { __ } from '@wordpress/i18n';
 
 import { SlugInput } from '@/data-sources/SlugInput';
@@ -50,10 +49,10 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 		initialValues: getInitialStateFromConfig( config ),
 	} );
 
-	const { connectionMessage } = useShopifyShopName( state.store, state.token );
+	const { shopName, connectionMessage } = useShopifyShopName( state.store, state.token );
 
 	const onSaveClick = async () => {
-		const airtableConfig: ShopifyConfig = {
+		const shopifyConfig: ShopifyConfig = {
 			uuid: uuidFromProps ?? '',
 			service: 'shopify',
 			store: state.store,
@@ -62,14 +61,14 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 		};
 
 		if ( mode === 'add' ) {
-			await addDataSource( airtableConfig );
+			await addDataSource( shopifyConfig );
 		} else {
-			await updateDataSource( airtableConfig );
+			await updateDataSource( shopifyConfig );
 		}
 		goToMainScreen();
 	};
 
-	const onTokenInputChange: InputChangeCallback = ( token: string | undefined ) => {
+	const onTokenInputChange = ( token: string | undefined ) => {
 		handleOnChange( 'token', token ?? '' );
 	};
 
@@ -96,13 +95,14 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 
 					<div className="form-group">
 						<TextControl
-							label={ __( 'Store Name', 'remote-data-blocks' ) }
+							type="url"
+							label={ __( 'Store URL', 'remote-data-blocks' ) }
 							onChange={ store => {
 								handleOnChange( 'store', store ?? '' );
 							} }
-							size={ 20 }
 							value={ state.store }
 							autoComplete="off"
+							__next40pxDefaultSize={ true }
 						/>
 					</div>
 
@@ -115,6 +115,17 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 					</div>
 
 					<div className="form-group">{ connectionMessage }</div>
+
+					<div className="form-group">
+						<TextControl
+							label={ __( 'Shop Name', 'remote-data-blocks' ) }
+							placeholder={ __( 'Auto-filled on successfull connection', 'remote-data-blocks' ) }
+							value={ shopName ?? '' }
+							onChange={ () => {} }
+							readOnly
+							__next40pxDefaultSize={ true }
+						/>
+					</div>
 
 					<div className="form-group">
 						<ButtonGroup className="form-actions">

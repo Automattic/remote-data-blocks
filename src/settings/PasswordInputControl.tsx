@@ -1,11 +1,7 @@
-import {
-	Button,
-	__experimentalInputControl as InputControl,
-	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
-} from '@wordpress/components';
+import { Button, __experimentalInputControl as InputControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { seen, unseen } from '@wordpress/icons';
+import { lock, seen, unseen } from '@wordpress/icons';
 import { ComponentPropsWithoutRef } from 'react';
 
 type PasswordInputControlProps = ComponentPropsWithoutRef< typeof InputControl >;
@@ -15,24 +11,22 @@ const PasswordInputControl = ( { ...props }: PasswordInputControlProps ) => {
 
 	return (
 		<InputControl
-			{ ...props }
-			suffix={
-				<InputControlSuffixWrapper>
-					<div style={ { display: 'flex' } }>
-						<Button
-							size="small"
-							icon={ visible ? unseen : seen }
-							label={
-								visible
-									? __( 'Hide password', 'remote-data-blocks' )
-									: __( 'Show password', 'remote-data-blocks' )
-							}
-							onClick={ () => setVisible( ! visible ) }
-						/>
-					</div>
-				</InputControlSuffixWrapper>
-			}
+			className="password-input-control"
 			type={ visible ? 'text' : 'password' }
+			prefix={ <Button icon={ lock } /> }
+			suffix={
+				<Button
+					icon={ visible ? unseen : seen }
+					label={
+						visible
+							? __( 'Hide password', 'remote-data-blocks' )
+							: __( 'Show password', 'remote-data-blocks' )
+					}
+					onClick={ () => setVisible( ! visible ) }
+				/>
+			}
+			__next40pxDefaultSize={ true }
+			{ ...props }
 		/>
 	);
 };

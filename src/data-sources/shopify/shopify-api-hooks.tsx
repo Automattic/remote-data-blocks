@@ -43,9 +43,7 @@ export const useShopifyShopName = ( store: string, token: string ): ShopifyConne
 				)
 			);
 		} else if ( shopName ) {
-			setConnectionMessage(
-				__( sprintf( 'Connection successful. Shop Name: %s', shopName ), 'remote-data-blocks' )
-			);
+			setConnectionMessage( __( sprintf( 'Connection successful.' ), 'remote-data-blocks' ) );
 		} else {
 			setConnectionMessage( '' );
 		}
