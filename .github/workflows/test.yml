@@ -28,7 +28,7 @@ jobs:
           php-version: ${{ matrix.php-version }}
 
       - name: Install dependencies
-        run: composer install --prefer-dist && composer test
+        run: composer install --prefer-dist
 
       - name: Run tests
         run: composer test
