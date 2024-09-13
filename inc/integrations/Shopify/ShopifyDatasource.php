@@ -1,6 +1,8 @@
 <?php
 
-namespace RemoteDataBlocks\Config;
+namespace RemoteDataBlocks\Integrations\Shopify;
+
+use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 
 use function plugins_url;
 

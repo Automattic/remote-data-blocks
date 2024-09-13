@@ -5,8 +5,6 @@ namespace RemoteDataBlocks\Integrations\Airtable;
 use RemoteDataBlocks\Logging\LoggerManager;
 use RemoteDataBlocks\WpdbStorage\DatasourceCRUD;
 
-require_once __DIR__ . '/datasources/airtable-datasource.php';
-
 class AirtableIntegration {
 	public static function init(): void {
 		self::register_dynamic_data_source_blocks();

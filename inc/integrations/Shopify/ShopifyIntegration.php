@@ -1,13 +1,12 @@
 <?php
 
-namespace RemoteDataBlocks\Integrations;
+namespace RemoteDataBlocks\Integrations\Shopify;
 
-use RemoteDataBlocks\Config\ShopifyDatasource;
-use RemoteDataBlocks\Config\ShopifyGetProductQuery;
-use RemoteDataBlocks\Config\ShopifySearchProductsQuery;
-use RemoteDataBlocks\Editor\ConfigurationLoader;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
+use RemoteDataBlocks\Integrations\Shopify\Queries\ShopifyGetProductQuery;
+use RemoteDataBlocks\Integrations\Shopify\Queries\ShopifySearchProductsQuery;
 use RemoteDataBlocks\Logging\LoggerManager;
-use RemoteDataBlocks\REST\DatasourceCRUD;
+use RemoteDataBlocks\WpdbStorage\DatasourceCRUD;
 
 require_once __DIR__ . '/datasources/shopify-datasource.php';
 require_once __DIR__ . '/queries/shopify-get-product-query.php';
@@ -39,7 +38,7 @@ class ShopifyIntegration {
 		$shopify_get_product_query     = new ShopifyGetProductQuery( $shopify_datasource );
 
 		$block_name    = $shopify_datasource->get_display_name();
-		$block_pattern = file_get_contents( __DIR__ . '/patterns/product-teaser.html' );
+		$block_pattern = file_get_contents( __DIR__ . '/Patterns/product-teaser.html' );
 
 		ConfigurationLoader::register_block( $block_name, $shopify_get_product_query );
 		ConfigurationLoader::register_search_query( $block_name, $shopify_search_products_query );
