@@ -15,7 +15,7 @@ interface SelectReturnValue {
 	syncStatus: string;
 }
 
-const PatternEditorSettingsPanel = () => {
+export function PatternEditorSettingsPanel() {
 	const { categoryIds, postContent, postId, postType, syncStatus } = useSelect<
 		EditorStoreSelectors,
 		SelectReturnValue
@@ -74,6 +74,4 @@ const PatternEditorSettingsPanel = () => {
 			<p>Settings for the pattern editor will go here.</p>
 		</PluginDocumentSettingPanel>
 	);
-};
-
-export default PatternEditorSettingsPanel;
+}
