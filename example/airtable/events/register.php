@@ -46,7 +46,7 @@ add_filter( 'remote_data_blocks_data_sources', __NAMESPACE__ . '\\add_airtable_e
 
 
 function register_airtable_events_block() {
-	$block_name   = 'Airtable Event';
+	$block_name = 'Airtable Event';
 
 	$airtable_events_data_source_config = DatasourceCRUD::get_data_source_by_slug( 'airtable-events' );
 
