@@ -2,10 +2,10 @@
 
 namespace RemoteDataBlocks\Example\GitHub;
 
-use RemoteDataBlocks\Config\HttpDatasourceConfig;
-use RemoteDataBlocks\Config\QueryContext;
+use RemoteDataBlocks\Config\HttpDatasource;
+use RemoteDataBlocks\Config\HttpQueryContext;
 
-class GitHubListFilesQuery extends QueryContext {   
+class GitHubListFilesQuery extends HttpQueryContext {   
 	public array $input_variables = [
 		'file_extension' => [
 			'name' => 'File Extension',
@@ -40,7 +40,7 @@ class GitHubListFilesQuery extends QueryContext {
 		],
 	];
 
-	public function __construct( private HttpDatasourceConfig $datasource, string $file_extension ) {
+	public function __construct( private HttpDatasource $datasource, string $file_extension ) {
 		parent::__construct( $datasource );
 		$this->output_variables['root_path'] = sprintf( '$.tree[?(@.path =~ /\\.%s$/)]', ltrim( $file_extension, '.' ) );
 	}

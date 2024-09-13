@@ -19,7 +19,7 @@
   "require-dev": {
     "automattic/vipwpcs": "^3.0",
     "phpcompatibility/phpcompatibility-wp": "^2.1",
-    "phpunit/phpunit": "^11"
+    "phpunit/phpunit": "^10"
   },
   "config": {
     "allow-plugins": {

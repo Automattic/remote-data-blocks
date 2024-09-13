@@ -5,7 +5,7 @@ namespace RemoteDataBlocks\Editor;
 defined( 'ABSPATH' ) || exit();
 
 use Error;
-use RemoteDataBlocks\Config\QueryContext;
+use RemoteDataBlocks\Config\QueryContextInterface;
 use RemoteDataBlocks\Logging\Logger;
 use RemoteDataBlocks\Logging\LoggerManager;
 
@@ -56,7 +56,7 @@ class ConfigurationLoader {
 		return isset( self::$configurations[ $block_name ] );
 	}
 
-	public static function register_block( string $block_title, QueryContext $display_query ): void {
+	public static function register_block( string $block_title, QueryContextInterface $display_query ): void {
 		$block_name = self::get_block_name( $block_title );
 		if ( isset( self::$configurations[ $block_name ] ) ) {
 			self::$logger->error( sprintf( 'Block %s has already been registered', $block_name ) );
@@ -93,7 +93,7 @@ class ConfigurationLoader {
 		];
 	}
 
-	public static function register_loop_block( string $block_title, QueryContext $display_query, array $options = [] ): void {
+	public static function register_loop_block( string $block_title, QueryContextInterface $display_query, array $options = [] ): void {
 		$block_name = self::get_block_name( $block_title );
 		self::register_block( $block_title, $display_query, array_merge( $options, [ 'loop' => true ] ) );
 		self::$configurations[ $block_name ]['loop'] = true;
@@ -174,7 +174,7 @@ class ConfigurationLoader {
 		add_rewrite_rule( $rewrite_rule, $rewrite_rule_target, 'top' );
 	}
 
-	private static function register_selector( string $block_title, string $type, QueryContext $query = null ): void {
+	private static function register_selector( string $block_title, string $type, QueryContextInterface $query = null ): void {
 		$block_name = self::get_block_name( $block_title );
 		$config     = self::get_configuration( $block_name );
 		$query_key  = $query::class;
@@ -208,7 +208,7 @@ class ConfigurationLoader {
 		);
 	}
 
-	public static function register_query( string $block_title, QueryContext $query ): void {
+	public static function register_query( string $block_title, QueryContextInterface $query ): void {
 		$block_name = self::get_block_name( $block_title );
 		$config     = self::get_configuration( $block_name );
 		$query_key  = $query::class;
@@ -225,11 +225,11 @@ class ConfigurationLoader {
 		self::$configurations[ $block_name ]['queries'][ $query_key ] = $query;
 	}
 
-	public static function register_list_query( string $block_title, QueryContext $query ): void {
+	public static function register_list_query( string $block_title, QueryContextInterface $query ): void {
 		self::register_selector( $block_title, 'list', $query );
 	}
 
-	public static function register_search_query( string $block_title, QueryContext $query ): void {
+	public static function register_search_query( string $block_title, QueryContextInterface $query ): void {
 		if ( ! isset( $query->input_variables['search_terms'] ) ) {
 			self::$logger->error( sprintf( 'A search query must have a "search_terms" input variable: %s', $query::class ) );
 			return;

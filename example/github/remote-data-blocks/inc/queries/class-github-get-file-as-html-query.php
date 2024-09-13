@@ -2,9 +2,9 @@
 
 namespace RemoteDataBlocks\Example\GitHub;
 
-use RemoteDataBlocks\Config\QueryContext;
+use RemoteDataBlocks\Config\HttpQueryContext;
 
-class GitHubGetFileAsHtmlQuery extends QueryContext {
+class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 	public array $input_variables = [
 		'file_path' => [
 			'name' => 'File Path',

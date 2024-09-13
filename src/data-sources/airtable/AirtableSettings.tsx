@@ -23,7 +23,7 @@ import { AirtableConfig } from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
 import PasswordInputControl from '@/settings/PasswordInputControl';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
-import { IdName } from '@/types/common';
+import { StringIdName } from '@/types/common';
 import { SelectOption } from '@/types/input';
 
 export interface AirtableSettingsProps {
@@ -121,7 +121,7 @@ export const AirtableSettings = ( {
 	) => {
 		if ( extra?.event ) {
 			const { id } = extra.event.target;
-			let newValue: IdName | null = null;
+			let newValue: StringIdName | null = null;
 			if ( id === 'base' ) {
 				const selectedBase = bases?.find( base => base.id === value );
 				newValue = { id: value, name: selectedBase?.name ?? '' };

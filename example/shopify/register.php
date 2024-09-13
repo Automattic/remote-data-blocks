@@ -2,21 +2,22 @@
 
 namespace RemoteDataBlocks\Example\Shopify;
 
+use RemoteDataBlocks\Config\ShopifyDatasource;
+use RemoteDataBlocks\Config\ShopifyGetProductQuery;
+use RemoteDataBlocks\Config\ShopifySearchProductsQuery;
 use RemoteDataBlocks\Editor\ConfigurationLoader;
 use RemoteDataBlocks\Logging\LoggerManager;
 use function add_action;
 
 require_once __DIR__ . '/inc/interactivity-store/interactivity-store.php';
-require_once __DIR__ . '/inc/queries/class-shopify-datasource.php';
 require_once __DIR__ . '/inc/queries/class-shopify-add-to-cart-mutation.php';
 require_once __DIR__ . '/inc/queries/class-shopify-create-cart-mutation.php';
-require_once __DIR__ . '/inc/queries/class-shopify-get-product-query.php';
 require_once __DIR__ . '/inc/queries/class-shopify-remove-from-cart-mutation.php';
-require_once __DIR__ . '/inc/queries/class-shopify-search-products-query.php';
 
 function register_shopify_block() {
-	$block_name   = 'Shopify Product';
+	$block_name   = 'Shopify (hardcode example)';
 	$access_token = \RemoteDataBlocks\Example\get_access_token( 'shopify' );
+	$store_name   = 'stoph-test';
 
 	if ( empty( $access_token ) ) {
 		$logger = LoggerManager::instance();
@@ -24,7 +25,7 @@ function register_shopify_block() {
 		return;
 	}
 
-	$shopify_datasource            = new ShopifyDatasource( $access_token );
+	$shopify_datasource            = new ShopifyDatasource( $access_token, $store_name );
 	$shopify_search_products_query = new ShopifySearchProductsQuery( $shopify_datasource );
 	$shopify_get_product_query     = new ShopifyGetProductQuery( $shopify_datasource );
 
@@ -35,7 +36,7 @@ function register_shopify_block() {
 	ConfigurationLoader::register_query( $block_name, new ShopifyAddToCartMutation( $shopify_datasource ) );
 	ConfigurationLoader::register_query( $block_name, new ShopifyRemoveFromCartMutation( $shopify_datasource ) );
 
-	$block_pattern = file_get_contents( __DIR__ . '/inc/patterns/product-teaser.html' );
+	$block_pattern = file_get_contents( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/inc/integrations/shopify-integration/patterns/product-teaser.html' );
 	ConfigurationLoader::register_block_pattern( $block_name, 'remote-data-blocks/shopify-product-teaser', $block_pattern, [ 'title' => 'Shopify Product Teaser' ] );
 
 	register_block_type( __DIR__ . '/build/blocks/shopify-cart' );

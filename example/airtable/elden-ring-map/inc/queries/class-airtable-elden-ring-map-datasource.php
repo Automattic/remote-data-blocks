@@ -10,6 +10,10 @@ class AirtableEldenRingMapDatasource extends HttpDatasource {
 
 	public function __construct( private string $access_token ) {}
 
+	public function get_display_name(): string {
+		return 'Elden Ring Map';
+	}
+
 	public function get_endpoint(): string {
 		return 'https://api.airtable.com/v0/appqI3sJ9R2NcML8Y';
 	}

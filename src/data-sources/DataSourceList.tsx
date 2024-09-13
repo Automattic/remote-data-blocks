@@ -17,6 +17,7 @@ import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { chevronDown, edit, info, trash } from '@wordpress/icons';
 
+import { SUPPORTED_SERVICES } from './constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig, DataSourceType } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
@@ -107,7 +108,7 @@ const DataSourceList = () => {
 	};
 
 	const getValidDataSources = () => {
-		return dataSources.filter( source => [ 'airtable', 'shopify' ].includes( source.service ) );
+		return dataSources.filter( source => SUPPORTED_SERVICES.includes( source.service ) );
 	};
 
 	const renderDataSourceMeta = ( source: DataSourceConfig ) => {

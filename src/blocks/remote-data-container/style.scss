@@ -1,4 +1,14 @@
-.remote-data-blocks-item-selected {
-	background-color: #f5f5f5;
-	border: dashed 2px #f00;
+/*
+ * The following styles get applied both inside the editor and on the frontend.
+ */
+
+.rdb-block-label {
+	background-color: var(--wp--custom--remote-data-blocks--block-label-background, inherit);
+	color: var(--wp--custom--remote-data-blocks--block-label-color, inherit);
+	font-weight: var(--wp--custom--remote-data-blocks--block-label-weight, 700);
+
+	&::after {
+		content: var(--wp--custom--remote-data-blocks--block-label-suffix-content, ":");
+		display: inline;
+	}
 }

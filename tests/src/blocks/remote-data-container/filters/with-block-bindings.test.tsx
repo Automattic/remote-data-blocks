@@ -2,7 +2,7 @@ import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { REMOTE_DATA_CONTEXT_KEY } from '@/blocks/remote-data-container/config/constants';
-import { withBlockBinding } from '@/blocks/remote-data-container/hooks/with-block-binding';
+import { withBlockBinding } from '@/blocks/remote-data-container/filters/with-block-binding';
 import { BLOCK_BINDING_SOURCE, PATTERN_OVERRIDES_CONTEXT_KEY } from '@/config/constants';
 
 // Minimal mocking for WordPress dependencies
