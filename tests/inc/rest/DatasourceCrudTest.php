@@ -2,7 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\REST\DatasourceCRUD;
-use RemoteDataBlocks\Config\Auth\GoogleServiceAccountKey;
+use RemoteDataBlocks\Integrations\Google\Auth\GoogleServiceAccountKey;
 
 class DatasourceCrudTest extends TestCase {
 	protected function tearDown(): void {
