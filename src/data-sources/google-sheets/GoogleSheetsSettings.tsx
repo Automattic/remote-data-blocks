@@ -1,12 +1,11 @@
 import {
-	Button,
-	ButtonGroup,
+	Card,
+	CardHeader,
+	CardBody,
 	TextareaControl,
-	__experimentalHeading as Heading,
 	SelectControl,
-	Panel,
-	PanelBody,
-	PanelRow,
+	ButtonGroup,
+	Button,
 } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -274,56 +273,66 @@ export const GoogleSheetsSettings = ( {
 	}, [ sheets ] );
 
 	return (
-		<Panel>
-			<PanelBody>
-				<Heading>
+		<Card className="add-update-data-source-card">
+			<CardHeader>
+				<h2>
 					{ mode === 'add'
-						? __( 'Add a new Google Sheets Data Source' )
+						? __( 'Add Google Sheets Data Source' )
 						: __( 'Edit Google Sheets Data Source' ) }
-				</Heading>
-				<PanelRow>
-					<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
-				</PanelRow>
-				<PanelRow>
-					<TextareaControl
-						label={ __( 'Credentials', 'remote-data-blocks' ) }
-						value={ state.credentials }
-						onChange={ onCredentialsChange }
-						help={ credentialsHelpText }
-						rows={ 14 }
-					/>
-				</PanelRow>
-				<PanelRow>
-					<SelectControl
-						id="spreadsheet"
-						label={ __( 'Select Spreadsheet', 'remote-data-blocks' ) }
-						value={ state.spreadsheet?.id ?? '' }
-						onChange={ onSelectChange }
-						options={ spreadsheetOptions }
-						help={ spreadsheetHelpText }
-						disabled={ fetchingToken || ! spreadsheets?.length }
-					/>
-				</PanelRow>
-				<PanelRow>
-					<SelectControl
-						id="sheet"
-						label={ __( 'Select Sheet', 'remote-data-blocks' ) }
-						value={ state.sheet?.id ?? '' }
-						onChange={ onSelectChange }
-						options={ sheetOptions }
-						help={ sheetHelpText }
-						disabled={ fetchingToken || ! sheets?.length }
-					/>
-				</PanelRow>
-			</PanelBody>
-			<ButtonGroup className="settings-form-cta-button-group">
-				<Button variant="primary" onClick={ onSaveClick } disabled={ shouldAllowSubmit }>
-					{ __( 'Save', 'remote-data-blocks' ) }
-				</Button>
-				<Button variant="secondary" onClick={ goToMainScreen }>
-					{ __( 'Cancel', 'remote-data-blocks' ) }
-				</Button>
-			</ButtonGroup>
-		</Panel>
+				</h2>
+			</CardHeader>
+			<CardBody>
+				<form>
+					<div className="form-group">
+						<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
+					</div>
+
+					<div className="form-group">
+						<TextareaControl
+							label={ __( 'Credentials', 'remote-data-blocks' ) }
+							value={ state.credentials }
+							onChange={ onCredentialsChange }
+							help={ credentialsHelpText }
+							rows={ 14 }
+						/>
+					</div>
+
+					<div className="form-group">
+						<SelectControl
+							id="spreadsheet"
+							label={ __( 'Select Spreadsheet', 'remote-data-blocks' ) }
+							value={ state.spreadsheet?.id ?? '' }
+							onChange={ onSelectChange }
+							options={ spreadsheetOptions }
+							help={ spreadsheetHelpText }
+							disabled={ fetchingToken || ! spreadsheets?.length }
+						/>
+					</div>
+
+					<div className="form-group">
+						<SelectControl
+							id="sheet"
+							label={ __( 'Select Sheet', 'remote-data-blocks' ) }
+							value={ state.sheet?.id ?? '' }
+							onChange={ onSelectChange }
+							options={ sheetOptions }
+							help={ sheetHelpText }
+							disabled={ fetchingToken || ! sheets?.length }
+						/>
+					</div>
+
+					<div className="form-group">
+						<ButtonGroup className="form-actions">
+							<Button variant="primary" onClick={ onSaveClick } disabled={ shouldAllowSubmit }>
+								{ __( 'Save', 'remote-data-blocks' ) }
+							</Button>
+							<Button variant="secondary" onClick={ goToMainScreen }>
+								{ __( 'Cancel', 'remote-data-blocks' ) }
+							</Button>
+						</ButtonGroup>
+					</div>
+				</form>
+			</CardBody>
+		</Card>
 	);
 };

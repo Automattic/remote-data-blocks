@@ -23,7 +23,7 @@ import { DataSourceConfig, DataSourceType } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import AirtableIcon from '@/settings/icons/airtable';
 import ShopifyIcon from '@/settings/icons/shopify';
-import { toTitleCase } from '@/utils/string';
+import { slugToTitleCase, toTitleCase } from '@/utils/string';
 
 const DataSourceList = () => {
 	const { dataSources, loadingDataSources, deleteDataSource, fetchDataSources } = useDataSources();
@@ -100,6 +100,9 @@ const DataSourceList = () => {
 			case 'shopify':
 				tags.push( source.store );
 				break;
+			case 'google-sheets':
+				tags.push( source.spreadsheet.name, source.sheet.name );
+				break;
 		}
 
 		return tags.map( ( tag, index ) => (
@@ -150,7 +153,7 @@ const DataSourceList = () => {
 										<Text className="data-source-slug">{ slug }</Text>
 									</td>
 									<td>
-										<Text>{ toTitleCase( service ) }</Text>
+										<Text>{ slugToTitleCase( service ) }</Text>
 									</td>
 									<td> { renderDataSourceMeta( source ) } </td>
 									<td className="data-source-actions">
