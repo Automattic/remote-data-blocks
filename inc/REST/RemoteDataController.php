@@ -4,7 +4,7 @@ namespace RemoteDataBlocks\REST;
 
 defined( 'ABSPATH' ) || exit();
 
-use RemoteDataBlocks\Editor\ConfigurationLoader;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
 use RemoteDataBlocks\Logging\LoggerManager;
 use WP_Error;
 use WP_REST_Request;
