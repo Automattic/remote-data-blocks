@@ -62,7 +62,7 @@ class ListWesterosHousesQuery extends HttpQueryContext {
 			$parsed_response_data['values'] = array_map(
 				function ( $row, $index ) {
 					$combined          = array_combine( self::COLUMNS, $row );
-					$combined['RowId'] = $index + 1; // Add rowId field, starting from 1
+					$combined['RowId'] = $index + 1; // Add row_id field, starting from 1
 					return $combined;
 				},
 				$values,

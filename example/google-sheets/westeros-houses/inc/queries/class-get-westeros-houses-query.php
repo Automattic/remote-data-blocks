@@ -29,7 +29,7 @@ class GetWesterosHousesQuery extends HttpQueryContext {
 	public array $output_variables = [
 		'is_collection' => false,
 		'mappings'      => [
-			'rowId'     => [
+			'row_id'     => [
 				'name' => 'Row ID',
 				'path' => '$.RowId',
 				'type' => 'id',
