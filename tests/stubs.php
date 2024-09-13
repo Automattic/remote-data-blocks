@@ -24,6 +24,14 @@ function sanitize_title( string $title ): string {
 	return strtolower( $title );
 }
 
+function sanitize_text_field( string $text ): string {
+	return $text;
+}
+
+function __( string $text, string $domain = 'default' ): string {
+	return $text;
+}
+
 function wp_strip_all_tags( string $string ): string {
 	return $string;
 }
@@ -51,11 +59,23 @@ function wp_cache_set(): bool {
 }
 
 function update_option( string $option, mixed $value ): bool {
+	set_mocked_option($option, $value);
 	return true;
 }
 
 function get_option( string $option, mixed $default = false ): mixed {
+	if ( isset( $GLOBALS['__mocked_options'][ $option ] ) ) {
+		return $GLOBALS['__mocked_options'][ $option ];
+	}
 	return $default;
+}
+
+function set_mocked_option( string $option, mixed $value ): void {
+	$GLOBALS['__mocked_options'][ $option ] = $value;
+}
+
+function clear_mocked_options(): void {
+	$GLOBALS['__mocked_options'] = [];
 }
 
 function wp_generate_uuid4() {
@@ -72,6 +92,22 @@ function wp_generate_uuid4() {
 	);
 }
 
+function wp_is_uuid( $uuid, $version = null ) {
+	if ( ! is_string( $uuid ) ) {
+		return false;
+	}
+
+	if ( is_numeric( $version ) ) {
+		if ( 4 !== (int) $version ) {
+			throw new Exception( __( 'Only UUID V4 is supported at this time.' ) );
+		}
+		$regex = '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/';
+	} else {
+		$regex = '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/';
+	}
+
+	return (bool) preg_match( $regex, $uuid );
+}
 
 class WP_Error {
 	public $errors             = array();

@@ -9,10 +9,6 @@ class DatasourceCRUD {
 	const CONFIG_OPTION_NAME = 'remote_data_blocks_config';
 	const DATA_SOURCE_TYPES  = [ 'airtable', 'shopify', 'google-sheets' ];
 
-	public static function is_uuid4( string $maybe_uuid ) {
-		return preg_match( '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $maybe_uuid );
-	}
-
 	/**
 	 * Validate the slug to verify
 	 * - is not empty
@@ -48,7 +44,7 @@ class DatasourceCRUD {
 		return true;
 	}
 
-	private static function validate_airtable_source( $source ) {
+	public static function validate_airtable_source( $source ) {
 		if ( empty( $source->token ) ) {
 			return new WP_Error( 'missing_token', __( 'Missing token.', 'remote-data-blocks' ) );
 		}
@@ -142,8 +138,8 @@ class DatasourceCRUD {
 			return new WP_Error( 'missing_uuid', __( 'Missing UUID.', 'remote-data-blocks' ) );
 		}
 
-		
-		if ( ! self::is_uuid4( $source->uuid ) ) {
+
+		if ( ! wp_is_uuid( $source->uuid ) ) {
 			return new WP_Error( 'invalid_uuid', __( 'Invalid UUID.', 'remote-data-blocks' ) );
 		}
 
@@ -203,9 +199,9 @@ class DatasourceCRUD {
 		$data_sources = self::get_config();
 
 		if ( $service ) {
-			return array_filter( $data_sources, function ( $config ) use ( $service ) {
+			return array_values( array_filter($data_sources, function ( $config ) use ( $service ) {
 				return $config->service === $service;
-			} );
+			} ) );
 		}
 
 		return $data_sources;
