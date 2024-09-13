@@ -2,9 +2,9 @@
 
 namespace RemoteDataBlocks\Example\GoogleSheets\WesterosHouses;
 
-use RemoteDataBlocks\Config\QueryContext;
+use RemoteDataBlocks\Config\HttpQueryContext;
 
-class ListWesterosHousesQuery extends QueryContext {
+class ListWesterosHousesQuery extends HttpQueryContext {
 	const COLUMNS = [
 		'House',
 		'Seat',
