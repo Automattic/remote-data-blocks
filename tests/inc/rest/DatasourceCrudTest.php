@@ -159,8 +159,7 @@ class DatasourceCrudTest extends TestCase {
 
 		$result = DatasourceCRUD::register_new_data_source( $valid_source );
 		$this->assertIsObject( $result );
-		$this->assertObjectHasProperty( 'uuid', $result );
-		$this->assertMatchesRegularExpression( '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $result->uuid );
+		$this->assertTrue( wp_is_uuid( $result->uuid ) );
 
 		$invalid_source = [
 			'service' => 'unsupported',
