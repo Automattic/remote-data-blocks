@@ -8,12 +8,12 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-import { SlugInput } from '@/data-sources/SlugInput';
+import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
+import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { useShopifyShopName } from '@/data-sources/shopify/shopify-api-hooks';
 import { ShopifyConfig } from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
-import PasswordInputControl from '@/settings/PasswordInputControl';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
 export interface ShopifySettingsProps {

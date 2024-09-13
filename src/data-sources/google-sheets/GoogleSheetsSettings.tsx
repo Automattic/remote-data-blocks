@@ -11,7 +11,7 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
-import { SlugInput } from '@/data-sources/SlugInput';
+import { SlugInput } from '@/data-sources/components/SlugInput';
 import { GOOGLE_SHEETS_API_SCOPES } from '@/data-sources/constants';
 import { GoogleSheetsFormState } from '@/data-sources/google-sheets/types';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';

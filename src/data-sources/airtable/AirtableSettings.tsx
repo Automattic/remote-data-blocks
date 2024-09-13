@@ -11,18 +11,18 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
-import { SlugInput } from '@/data-sources/SlugInput';
 import {
 	useAirtableApiBases,
 	useAirtableApiTables,
 	useAirtableApiUserId,
 } from '@/data-sources/airtable/airtable-api-hooks';
 import { AirtableFormState } from '@/data-sources/airtable/types';
+import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
+import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { AirtableConfig } from '@/data-sources/types';
 import { getConnectionMessage } from '@/data-sources/utils';
 import { useForm } from '@/hooks/useForm';
-import PasswordInputControl from '@/settings/PasswordInputControl';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import { StringIdName } from '@/types/common';
 import { SelectOption } from '@/types/input';
