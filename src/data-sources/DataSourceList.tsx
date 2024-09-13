@@ -19,7 +19,7 @@ import { chevronDown, edit, info, trash } from '@wordpress/icons';
 
 import { SUPPORTED_SERVICES } from './constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
-import { DataSourceConfig, DataSourceType } from '@/data-sources/types';
+import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import AirtableIcon from '@/settings/icons/airtable';
 import GoogleSheetsIcon from '@/settings/icons/google-sheets';
@@ -75,8 +75,7 @@ const DataSourceList = () => {
 	};
 
 	const AddDataSourceDropdown = () => {
-		function onAddDataSource( event: React.MouseEvent ) {
-			const dataSource = event.currentTarget.textContent?.toLowerCase() as DataSourceType;
+		function onAddDataSource( dataSource: string ) {
 			const newUrl = new URL( window.location.href );
 
 			newUrl.searchParams.set( 'addDataSource', dataSource );
@@ -101,15 +100,20 @@ const DataSourceList = () => {
 				) }
 				renderContent={ () => (
 					<MenuGroup>
-						<MenuItem icon={ AirtableIcon } iconPosition="left" onClick={ onAddDataSource }>
-							Airtable
-						</MenuItem>
-						<MenuItem icon={ ShopifyIcon } iconPosition="left" onClick={ onAddDataSource }>
-							Shopify
-						</MenuItem>
-						<MenuItem icon={ GoogleSheetsIcon } iconPosition="left" onClick={ onAddDataSource }>
-							Google Sheets
-						</MenuItem>
+						{ [
+							{ icon: AirtableIcon, label: 'Airtable', value: 'airtable' },
+							{ icon: GoogleSheetsIcon, label: 'Google Sheets', value: 'google-sheets' },
+							{ icon: ShopifyIcon, label: 'Shopify', value: 'shopify' },
+						].map( ( { icon, label, value } ) => (
+							<MenuItem
+								key={ value }
+								icon={ icon }
+								iconPosition="left"
+								onClick={ () => onAddDataSource( value ) }
+							>
+								{ label }
+							</MenuItem>
+						) ) }
 					</MenuGroup>
 				) }
 			/>
