@@ -3,9 +3,9 @@
 namespace RemoteDataBlocks\Tests\Config;
 
 use PHPUnit\Framework\TestCase;
-use RemoteDataBlocks\Config\HttpQueryContext;
-use RemoteDataBlocks\Test\TestDatasource;
 use GuzzleHttp\Psr7\Response;
+use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
+use RemoteDataBlocks\Tests\TestDatasource;
 
 class QueryContextTest extends TestCase {
 

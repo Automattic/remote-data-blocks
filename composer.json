@@ -5,6 +5,16 @@
       "name": "WPVIP"
     }
   ],
+  "autoload": {
+    "psr-4": {
+      "RemoteDataBlocks\\": "inc/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "RemoteDataBlocks\\Tests\\": "tests/inc/"
+    }
+  },
   "scripts": {
     "phpcs": "phpcs",
     "phpcs-fix": "phpcbf",

@@ -5,12 +5,12 @@ namespace RemoteDataBlocks\Tests\Config;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
-use RemoteDataBlocks\Config\QueryRunner;
-use RemoteDataBlocks\Config\QueryRunnerInterface;
-use RemoteDataBlocks\Config\HttpDatasource;
-use RemoteDataBlocks\Config\HttpQueryContext;
-use RemoteDataBlocks\HttpClient;
-use RemoteDataBlocks\Test\TestDatasource;
+use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
+use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
+use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
+use RemoteDataBlocks\HttpClient\HttpClient;
+use RemoteDataBlocks\Tests\TestDatasource;
 use WP_Error;
 
 class QueryRunnerTest extends TestCase {

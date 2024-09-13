@@ -28,25 +28,24 @@ define( 'REMOTE_DATA_BLOCKS_GITHUB_SERVICE', 'github' );
 define( 'REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE', 'shopify' );
 
 // Autoloader
-require_once __DIR__ . '/inc/autoloader.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
 // Other editor modifications
-Editor\AdminNotices::init();
-Editor\BlockBindings::init();
-Editor\BlockRegistration::init();
-Editor\ConfigurationLoader::init();
-Editor\FieldShortcode::init();
-Editor\QueryOverrides::init();
-Editor\PatternEditor::init();
+Editor\AdminNotices\AdminNotices::init();
+Editor\DataBinding\BlockBindings::init();
+Editor\DataBinding\FieldShortcode::init();
+Editor\DataBinding\QueryOverrides::init();
+Editor\BlockManagement\BlockRegistration::init();
+Editor\BlockManagement\ConfigurationLoader::init();
+Editor\PatternEditor\PatternEditor::init();
 
 // Load Settings Page
-PluginSettings::init();
+PluginSettings\PluginSettings::init();
 
 // Integrations
-Integrations\AirtableIntegration::init();
-Integrations\ShopifyIntegration::init();
-Integrations\VipBlockDataApi::init();
+Integrations\Airtable\AirtableIntegration::init();
+Integrations\Shopify\ShopifyIntegration::init();
+Integrations\VipBlockDataApi\VipBlockDataApi::init();
 
 // REST endpoints
-REST\RemoteData::init();
+REST\RemoteDataController::init();
