@@ -2,15 +2,12 @@
 
 namespace RemoteDataBlocks\REST;
 
+use RemoteDataBlocks\Config\Auth\GoogleServiceAccountKey;
 use WP_Error;
 
 class DatasourceCRUD {
 	const CONFIG_OPTION_NAME = 'remote_data_blocks_config';
-	const DATA_SOURCE_TYPES  = [ 'airtable', 'shopify' ];
-
-	public static function is_uuid4( string $maybe_uuid ) {
-		return preg_match( '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $maybe_uuid );
-	}
+	const DATA_SOURCE_TYPES  = [ 'airtable', 'shopify', 'google-sheets' ];
 
 	/**
 	 * Validate the slug to verify
@@ -22,7 +19,7 @@ class DatasourceCRUD {
 	 * @param string [$uuid] The UUID of the data source to exclude from the check.
 	 * @return WP_Error|true Returns true if the slug is valid, or a WP_Error object if not.
 	 */
-	public static function validate_slug( string $slug, string $uuid = '' ): WP_Error|true {
+	public static function validate_slug( string $slug, string $uuid = '' ): WP_Error|bool {
 		if ( empty( $slug ) ) {
 			return new WP_Error( 'missing_slug', __( 'Missing slug.', 'remote-data-blocks' ) );
 		}
@@ -47,7 +44,7 @@ class DatasourceCRUD {
 		return true;
 	}
 
-	private static function validate_airtable_source( $source ) {
+	public static function validate_airtable_source( $source ) {
 		if ( empty( $source->token ) ) {
 			return new WP_Error( 'missing_token', __( 'Missing token.', 'remote-data-blocks' ) );
 		}
@@ -94,6 +91,44 @@ class DatasourceCRUD {
 		];
 	}
 
+	public static function validate_google_sheets_source( $source ) {
+		$service_account_key = GoogleServiceAccountKey::from_array( $source->credentials );
+		if ( is_wp_error( $service_account_key ) ) {
+			return $service_account_key;
+		}
+
+		// Validate spreadsheet is not empty and is an object with id and name fields with string values
+		if ( empty( $source->spreadsheet ) ) {
+			return new WP_Error( 'missing_spreadsheet', __( 'Missing spreadsheet.', 'remote-data-blocks' ) );
+		}
+
+		if ( empty( $source->spreadsheet['id'] ) || empty( $source->spreadsheet['name'] ) ) {
+			return new WP_Error( 'invalid_spreadsheet', __( 'Invalid spreadsheet. Must have id and name fields.', 'remote-data-blocks' ) );
+		}
+
+		// Validate sheet is not empty and is an object with id integer and name string fields
+		if ( empty( $source->sheet ) ) {
+			return new WP_Error( 'missing_sheet', __( 'Missing sheet.', 'remote-data-blocks' ) );
+		}
+
+		if ( ! isset( $source->sheet['id'] ) || ! is_int( $source->sheet['id'] ) ) {
+			return new WP_Error( 'invalid_sheet', __( 'Invalid sheet. Must have id field with integer value.', 'remote-data-blocks' ) );
+		}
+
+		if ( empty( $source->sheet['name'] ) ) {
+			return new WP_Error( 'missing_sheet_name', __( 'Missing sheet name.', 'remote-data-blocks' ) );
+		}
+
+		return (object) [
+			'uuid'        => $source->uuid,
+			'service'     => 'google-sheets',
+			'credentials' => $service_account_key,
+			'spreadsheet' => $source->spreadsheet,
+			'sheet'       => $source->sheet,
+			'slug'        => sanitize_text_field( $source->slug ),
+		];
+	}
+
 	public static function validate_source( $source ) {
 		if ( ! is_object( $source ) ) {
 			return new WP_Error( 'invalid_data_source', __( 'Invalid data source.', 'remote-data-blocks' ) );
@@ -103,8 +138,8 @@ class DatasourceCRUD {
 			return new WP_Error( 'missing_uuid', __( 'Missing UUID.', 'remote-data-blocks' ) );
 		}
 
-		
-		if ( ! self::is_uuid4( $source->uuid ) ) {
+
+		if ( ! wp_is_uuid( $source->uuid ) ) {
 			return new WP_Error( 'invalid_uuid', __( 'Invalid UUID.', 'remote-data-blocks' ) );
 		}
 
@@ -123,6 +158,8 @@ class DatasourceCRUD {
 				return self::validate_airtable_source( $source );
 			case 'shopify':
 				return self::validate_shopify_source( $source );
+			case 'google-sheets':
+				return self::validate_google_sheets_source( $source );
 			default:
 				return new WP_Error( 'unsupported_data_source', __( 'Unsupported data source.', 'remote-data-blocks' ) );
 		}
@@ -158,8 +195,16 @@ class DatasourceCRUD {
 		return (array) get_option( self::CONFIG_OPTION_NAME, [] );
 	}
 
-	public static function get_data_sources() {
-		return self::get_config() ?? [];
+	public static function get_data_sources( string $service = '' ) {
+		$data_sources = self::get_config();
+
+		if ( $service ) {
+			return array_values( array_filter($data_sources, function ( $config ) use ( $service ) {
+				return $config->service === $service;
+			} ) );
+		}
+
+		return $data_sources;
 	}
 
 	public static function get_item_by_uuid( $data_sources, string $uuid ) {
@@ -186,7 +231,7 @@ class DatasourceCRUD {
 		return $new_item;
 	}
 
-	public static function delete_item_by_uuid( $uuid ) {
+	public static function delete_item_by_uuid( string $uuid ): WP_Error|bool {
 		$data_sources = self::get_data_sources();
 		$data_sources = array_filter( $data_sources, function ( $source ) use ( $uuid ) {
 			return $source->uuid !== $uuid;

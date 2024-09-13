@@ -5,13 +5,9 @@ namespace RemoteDataBlocks\Editor;
 defined( 'ABSPATH' ) || exit();
 
 use Error;
-use RemoteDataBlocks\Config\QueryContext;
-use RemoteDataBlocks\Config\ShopifyDatasource;
-use RemoteDataBlocks\Config\ShopifyGetProductQuery;
-use RemoteDataBlocks\Config\ShopifySearchProductsQuery;
+use RemoteDataBlocks\Config\QueryContextInterface;
 use RemoteDataBlocks\Logging\Logger;
 use RemoteDataBlocks\Logging\LoggerManager;
-use RemoteDataBlocks\REST\DatasourceCRUD;
 
 use function add_action;
 use function do_action;
@@ -32,8 +28,6 @@ class ConfigurationLoader {
 	public static function register_remote_data_blocks() {
 		// Allow other plugins to register their blocks.
 		do_action( 'register_remote_data_blocks' );
-
-		self::register_blocks_for_dynamic_data_sources();
 	}
 
 	/**
@@ -62,7 +56,7 @@ class ConfigurationLoader {
 		return isset( self::$configurations[ $block_name ] );
 	}
 
-	public static function register_block( string $block_title, QueryContext $display_query ): void {
+	public static function register_block( string $block_title, QueryContextInterface $display_query ): void {
 		$block_name = self::get_block_name( $block_title );
 		if ( isset( self::$configurations[ $block_name ] ) ) {
 			self::$logger->error( sprintf( 'Block %s has already been registered', $block_name ) );
@@ -99,7 +93,7 @@ class ConfigurationLoader {
 		];
 	}
 
-	public static function register_loop_block( string $block_title, QueryContext $display_query, array $options = [] ): void {
+	public static function register_loop_block( string $block_title, QueryContextInterface $display_query, array $options = [] ): void {
 		$block_name = self::get_block_name( $block_title );
 		self::register_block( $block_title, $display_query, array_merge( $options, [ 'loop' => true ] ) );
 		self::$configurations[ $block_name ]['loop'] = true;
@@ -180,7 +174,7 @@ class ConfigurationLoader {
 		add_rewrite_rule( $rewrite_rule, $rewrite_rule_target, 'top' );
 	}
 
-	private static function register_selector( string $block_title, string $type, QueryContext $query = null ): void {
+	private static function register_selector( string $block_title, string $type, QueryContextInterface $query = null ): void {
 		$block_name = self::get_block_name( $block_title );
 		$config     = self::get_configuration( $block_name );
 		$query_key  = $query::class;
@@ -214,7 +208,7 @@ class ConfigurationLoader {
 		);
 	}
 
-	public static function register_query( string $block_title, QueryContext $query ): void {
+	public static function register_query( string $block_title, QueryContextInterface $query ): void {
 		$block_name = self::get_block_name( $block_title );
 		$config     = self::get_configuration( $block_name );
 		$query_key  = $query::class;
@@ -231,11 +225,11 @@ class ConfigurationLoader {
 		self::$configurations[ $block_name ]['queries'][ $query_key ] = $query;
 	}
 
-	public static function register_list_query( string $block_title, QueryContext $query ): void {
+	public static function register_list_query( string $block_title, QueryContextInterface $query ): void {
 		self::register_selector( $block_title, 'list', $query );
 	}
 
-	public static function register_search_query( string $block_title, QueryContext $query ): void {
+	public static function register_search_query( string $block_title, QueryContextInterface $query ): void {
 		if ( ! isset( $query->input_variables['search_terms'] ) ) {
 			self::$logger->error( sprintf( 'A search query must have a "search_terms" input variable: %s', $query::class ) );
 			return;
@@ -250,34 +244,5 @@ class ConfigurationLoader {
 		}
 
 		self::$configurations = [];
-	}
-
-	private static function register_blocks_for_dynamic_data_sources(): void {
-		$data_sources_from_config = DatasourceCRUD::get_data_sources();
-
-		foreach ( $data_sources_from_config as $_source ) {
-			switch ( $_source->service ) {
-				case 'shopify':
-					$datasource = new ShopifyDatasource( $_source->token, $_source->store );
-					$datasource->set_uuid( $_source->uuid );
-					$datasource->set_slug( $_source->slug );
-					self::register_blocks_for_shopify_data_source( $datasource );
-					break;
-				default:
-					break;
-			}
-		}
-	}
-
-	private static function register_blocks_for_shopify_data_source( ShopifyDatasource $datasource ): void {
-			$block_name = 'Shopify ' . $datasource->get_store_name();
-
-			$shopify_get_product_query = new ShopifyGetProductQuery( $datasource );
-			self::register_block( $block_name, $shopify_get_product_query );
-			self::$logger->debug( sprintf( 'Registered "%s" block for dynamic data source - %s', $block_name, $datasource->get_slug() ) );
-
-			$shopify_search_products_query = new ShopifySearchProductsQuery( $datasource );
-			self::register_search_query( $block_name, $shopify_search_products_query );
-			self::$logger->debug( sprintf( 'Registered "%s" _search query_ block for dynamic data source - %s', $block_name, $datasource->get_slug() ) );
 	}
 }

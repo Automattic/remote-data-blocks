@@ -13,7 +13,7 @@ import {
 	PATTERN_OVERRIDES_BINDING_SOURCE,
 	PATTERN_OVERRIDES_CONTEXT_KEY,
 } from '@/config/constants';
-import { getMismatchedAttributes } from '@/utils/block-binding';
+import { getBoundBlockClassName, getMismatchedAttributes } from '@/utils/block-binding';
 import { getBlockAvailableBindings } from '@/utils/localized-block-data';
 
 interface BoundBlockEditProps {
@@ -42,6 +42,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 
 	function updateBinding( target: string, args: Omit< RemoteDataBlockBindingArgs, 'name' > ) {
 		setAttributes( {
+			className: getBoundBlockClassName( attributes ),
 			metadata: {
 				...attributes.metadata,
 				bindings: {

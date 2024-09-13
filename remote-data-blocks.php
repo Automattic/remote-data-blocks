@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Remote Data Blocks
- * Plugin URI: https://github.com/Automattic/remote-data-blocks
+ * Plugin URI: https://remotedatablocks.com
  * Description: Integrate external data sources into WordPress blocks, enabling dynamic content from APIs and databases within the block editor and within your content.
  * Author: WPVIP
  * Text Domain: remote-data-blocks
@@ -22,12 +22,14 @@ define( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION', '0.1.0' );
 
 define( 'REMOTE_DATA_BLOCKS__REST_NAMESPACE', 'remote-data-blocks/v1' );
 
+// Datasource services
+define( 'REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE', 'airtable' );
+define( 'REMOTE_DATA_BLOCKS_GITHUB_SERVICE', 'github' );
+define( 'REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE', 'shopify' );
+
 // Autoloader
 require_once __DIR__ . '/inc/autoloader.php';
 require_once __DIR__ . '/vendor/autoload.php';
-
-// TODO: Figure out autoloader for this:
-require_once __DIR__ . '/inc/config/dynamic-datasource-trait.php';
 
 // Other editor modifications
 Editor\AdminNotices::init();
@@ -38,11 +40,13 @@ Editor\FieldShortcode::init();
 Editor\QueryOverrides::init();
 Editor\PatternEditor::init();
 
+// Load Settings Page
+PluginSettings::init();
+
 // Integrations
+Integrations\AirtableIntegration::init();
+Integrations\ShopifyIntegration::init();
 Integrations\VipBlockDataApi::init();
 
 // REST endpoints
 REST\RemoteData::init();
-
-// Load Settings Page
-PluginSettings::init();

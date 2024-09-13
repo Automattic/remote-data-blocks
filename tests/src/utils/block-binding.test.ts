@@ -62,7 +62,7 @@ describe( 'block-binding utils', () => {
 		it( 'should return an empty object when no mismatches are found', () => {
 			const name = 'test/block';
 			const attributes: RemoteDataInnerBlockAttributes = {
-				content: 'Title: Current content',
+				content: '<span class="rdb-block-label">Title</span> Current content',
 				url: 'https://current-url.com',
 				metadata: {
 					bindings: {
@@ -123,7 +123,7 @@ describe( 'block-binding utils', () => {
 			const result = getMismatchedAttributes( attributes, results );
 
 			expect( result ).toEqual( {
-				content: 'Title: My Title',
+				content: '<span class="rdb-block-label">Title</span> My Title',
 			} );
 		} );
 	} );

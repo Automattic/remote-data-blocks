@@ -4,6 +4,8 @@ Remote Data Blocks is a WordPress plugin that brings an assortment of flexible, 
 
 ## Setup
 
+_Required: PHP 8.1+, WordPress 6.6+_
+
 1. Download the [Remote Data Blocks plugin zip file](https://github.com/Automattic/remote-data-blocks/releases/latest/download/remote-data-blocks.zip).
 2. Log in to your WordPress admin panel.
 3. Navigate to Plugins > Add New.

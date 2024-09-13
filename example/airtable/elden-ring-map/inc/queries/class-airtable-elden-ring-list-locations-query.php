@@ -2,9 +2,9 @@
 
 namespace RemoteDataBlocks\Example\Airtable\EldenRingMap;
 
-use RemoteDataBlocks\Config\QueryContext;
+use RemoteDataBlocks\Config\HttpQueryContext;
 
-class AirtableEldenRingListLocationsQuery extends QueryContext {
+class AirtableEldenRingListLocationsQuery extends HttpQueryContext {
 	public array $input_variables = [
 		'map_name' => [
 			'type' => 'string',

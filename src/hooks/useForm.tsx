@@ -2,25 +2,18 @@ import { useReducer, useState } from '@wordpress/element';
 
 import { isNonEmptyObj, constructObjectWithValues } from '@/utils/object';
 
-type ValidationRuleFn = ( v: unknown ) => string | null;
+export type ValidationRuleFn< T > = ( v: T ) => string | null;
 
-const executeValidationRules = (
-	rules: ValidationRuleFn[],
-	// eslint-disable-next-line
-	value: any
-): string | null => {
-	let error: string | null = null;
-	if ( rules ) {
-		rules.some( ( rule ): boolean => {
-			const err: string | null = rule( value );
-			if ( err ) {
-				error = err;
-				return true;
-			}
-			return false;
-		} );
+export type ValidationRules< T > = {
+	[ P in keyof T ]?: ValidationRuleFn< T >;
+};
+
+const executeValidationRules = < T, >( rule: ValidationRuleFn< T >, value: T ): string | null => {
+	const error = rule( value );
+	if ( error ) {
+		return error;
 	}
-	return error;
+	return null;
 };
 
 interface ExecuteAllValidationRules {
@@ -28,9 +21,9 @@ interface ExecuteAllValidationRules {
 	hasError: boolean;
 }
 
-const executeAllValidationRules = (
-	validationRules: { [ x: string ]: ValidationRuleFn[] },
-	values: { [ x: string ]: unknown }
+const executeAllValidationRules = < T, >(
+	validationRules: ValidationRules< T >,
+	values: T
 ): ExecuteAllValidationRules => {
 	const errorsMap = new Map< string, string | null >();
 	let hasError = false;
@@ -38,7 +31,7 @@ const executeAllValidationRules = (
 	Object.entries( validationRules ).forEach( ( [ ruleId, rule ] ) => {
 		if ( Object.prototype.hasOwnProperty.call( values, ruleId ) ) {
 			// eslint-disable-next-line security/detect-object-injection
-			const error = executeValidationRules( rule, values[ ruleId ] );
+			const error = executeValidationRules< T >( rule as ValidationRuleFn< T >, values );
 			errorsMap.set( ruleId, error );
 
 			if ( ! hasError && error !== null ) {
@@ -67,7 +60,7 @@ export interface ValidationFnResponse {
 
 interface UseFormProps< T > {
 	initialValues: T;
-	validationRules?: { [ x: string ]: ValidationRuleFn[] };
+	validationRules?: ValidationRules< T >;
 	submit?: ( state: T, resetForm: () => void ) => void;
 	submitValidationFn?: ( state: T ) => ValidationFnResponse;
 }
@@ -89,7 +82,7 @@ const reducer = < T, >( state: T, action: FormAction< T > ): T => {
 
 export const useForm = < T extends Record< string, unknown > >( {
 	initialValues,
-	validationRules = {},
+	validationRules = {} as ValidationRules< T >,
 	submit,
 	submitValidationFn,
 }: UseFormProps< T > ): UseForm< T > => {
@@ -120,7 +113,7 @@ export const useForm = < T extends Record< string, unknown > >( {
 			setErrors( {
 				...errors,
 				[ id ]: executeValidationRules(
-					validationRules[ id as keyof typeof validationRules ] ?? [],
+					validationRules[ id as keyof typeof validationRules ] ?? ( () => null ),
 					{ ...state, [ id ]: value }
 				),
 			} );
@@ -132,7 +125,7 @@ export const useForm = < T extends Record< string, unknown > >( {
 		setErrors( {
 			...errors,
 			[ id ]: executeValidationRules(
-				validationRules[ id as keyof typeof validationRules ] ?? [],
+				validationRules[ id as keyof typeof validationRules ] ?? ( () => null ),
 				state
 			),
 		} );

@@ -5,8 +5,6 @@ namespace RemoteDataBlocks\Config;
 use RemoteDataBlocks\Config\HttpDatasource;
 
 class AirtableDatasource extends HttpDatasource {
-	use DynamicDatasource;
-
 	private $tables;
 
 	public function __construct( private string $access_token, private string $base, mixed $tables ) {
@@ -22,6 +20,10 @@ class AirtableDatasource extends HttpDatasource {
 
 	public function get_base(): string {
 		return $this->base;
+	}
+
+	public function get_display_name(): string {
+		return 'Airtable: ' . $this->get_base() . ' (' . implode( ', ', array_keys( $this->tables ) ) . ')';
 	}
 
 	public function get_table( string $variation = '' ): string {
