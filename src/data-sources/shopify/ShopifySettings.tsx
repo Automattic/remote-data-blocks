@@ -96,11 +96,13 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 					<div className="form-group">
 						<TextControl
 							type="url"
-							label={ __( 'Store URL', 'remote-data-blocks' ) }
+							label={ __( 'Store Slug', 'remote-data-blocks' ) }
 							onChange={ store => {
 								handleOnChange( 'store', store ?? '' );
 							} }
 							value={ state.store }
+							placeholder="your-shop-name"
+							help={ __( 'Example: https://your-shop-name.myshopify.com', 'remote-data-blocks' ) }
 							autoComplete="off"
 							__next40pxDefaultSize={ true }
 						/>
@@ -111,14 +113,23 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 							label={ __( 'Access Token', 'remote-data-blocks' ) }
 							onChange={ onTokenInputChange }
 							value={ state.token }
+							help={
+								connectionMessage || (
+									<span>
+										Provide access token to connect to your Shopify store (
+										<a href="https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens/generate-app-access-tokens-admin">
+											guide
+										</a>
+										).
+									</span>
+								)
+							}
 						/>
 					</div>
 
-					<div className="form-group">{ connectionMessage }</div>
-
 					<div className="form-group">
 						<TextControl
-							label={ __( 'Shop Name', 'remote-data-blocks' ) }
+							label={ __( 'Store Name', 'remote-data-blocks' ) }
 							placeholder={ __( 'Auto-filled on successfull connection', 'remote-data-blocks' ) }
 							value={ shopName ?? '' }
 							onChange={ () => {} }
