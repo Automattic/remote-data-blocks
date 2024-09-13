@@ -79,9 +79,8 @@ const DataSourceList = () => {
 	const AddDataSourceDropdown = () => {
 		function onAddDataSource( dataSource: string ) {
 			const newUrl = new URL( window.location.href );
-
 			newUrl.searchParams.set( 'addDataSource', dataSource );
-			window.location.href = newUrl.href;
+			pushState( newUrl );
 		}
 
 		return (
