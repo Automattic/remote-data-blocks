@@ -5,6 +5,8 @@ import DataSourceSettings from '@/data-sources/DataSourceSettings';
 import Notices from '@/settings/Notices';
 import { SettingsContext, useDataSourceRouter } from '@/settings/hooks/useSettingsNav';
 
+import './settings-page.scss';
+
 function versionAndBuild() {
 	const localized = window.REMOTE_DATA_BLOCKS_SETTINGS;
 	const version = localized?.version ?? '0.0.0';
@@ -21,7 +23,7 @@ const SettingsPage = () => {
 	const settingsContext = useDataSourceRouter();
 
 	return (
-		<>
+		<div className="rdb-settings-page">
 			<div className="page-title">
 				<h1>{ __( 'Remote Data Blocks', 'remote-data-blocks' ) }</h1>
 				<p className="plugin-version">
@@ -39,7 +41,7 @@ const SettingsPage = () => {
 					) }
 				</SettingsContext.Provider>
 			</div>
-		</>
+		</div>
 	);
 };
 

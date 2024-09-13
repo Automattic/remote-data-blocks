@@ -26,6 +26,8 @@ import GoogleSheetsIcon from '@/settings/icons/google-sheets';
 import ShopifyIcon from '@/settings/icons/shopify';
 import { slugToTitleCase, toTitleCase } from '@/utils/string';
 
+import './data-source-list.scss';
+
 const DataSourceList = () => {
 	const { dataSources, loadingDataSources, deleteDataSource, fetchDataSources } = useDataSources();
 	const [ dataSourceToDelete, setDataSourceToDelete ] = useState< DataSourceConfig | null >( null );
@@ -123,7 +125,7 @@ const DataSourceList = () => {
 	const CardBodyContent = (): JSX.Element => {
 		if ( loadingDataSources ) {
 			return (
-				<div className="data-sources-loader">
+				<div className="card-loader">
 					<Spinner />
 					<p> { __( 'Loading data sources...', 'remote-data-blocks' ) } </p>
 				</div>
@@ -133,7 +135,6 @@ const DataSourceList = () => {
 		if ( dataSources.length === 0 ) {
 			return (
 				<Placeholder
-					className="data-sources-placeholder"
 					icon={ info }
 					label={ __( 'No data source found.', 'remote-data-blocks' ) }
 					instructions={ __( 'Use “Add” button to add data source.', 'remote-data-blocks' ) }
@@ -221,7 +222,7 @@ const DataSourceList = () => {
 	};
 
 	return (
-		<Card>
+		<Card className="data-source-list-card">
 			<CardHeader>
 				<h2>{ __( 'Data Sources', 'remote-data-blocks' ) }</h2>
 				<AddDataSourceDropdown />

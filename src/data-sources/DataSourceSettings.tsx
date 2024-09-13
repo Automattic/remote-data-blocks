@@ -6,6 +6,8 @@ import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { ShopifySettings } from '@/data-sources/shopify/ShopifySettings';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
+import './data-source-settings.scss';
+
 interface DataSourceEditSettings {
 	uuid: string;
 }
