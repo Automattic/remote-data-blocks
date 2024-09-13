@@ -1,7 +1,10 @@
 <?php
 
+namespace RemoteDataBlocks\Tests\WpdbStorage;
+
 use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\WpdbStorage\DatasourceCRUD;
+use WP_Error;
 
 class DatasourceCrudTest extends TestCase {
 	protected function tearDown(): void {
