@@ -81,13 +81,21 @@ function clear_mocked_options(): void {
 function wp_generate_uuid4() {
 	return sprintf(
 		'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
 		mt_rand( 0, 0xffff ),
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
 		mt_rand( 0, 0xffff ),
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
 		mt_rand( 0, 0xffff ),
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
 		mt_rand( 0, 0x0fff ) | 0x4000,
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
 		mt_rand( 0, 0x3fff ) | 0x8000,
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
 		mt_rand( 0, 0xffff ),
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
 		mt_rand( 0, 0xffff ),
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
 		mt_rand( 0, 0xffff )
 	);
 }
