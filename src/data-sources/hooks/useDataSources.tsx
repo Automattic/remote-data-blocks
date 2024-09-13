@@ -105,7 +105,6 @@ export const useDataSources = ( loadOnMount = true ) => {
 
 	function showSnackbar( type: 'success' | 'error', message: string ): void {
 		const SNACKBAR_OPTIONS: Partial< WPNotice > = {
-			explicitDismiss: true,
 			isDismissible: true,
 		};
 
