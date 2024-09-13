@@ -2,15 +2,14 @@ import {
 	Button,
 	ButtonGroup,
 	__experimentalHeading as Heading,
-	TextControl,
 	Panel,
 	PanelBody,
 	PanelRow,
+	TextControl,
 } from '@wordpress/components';
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { __ } from '@wordpress/i18n';
 
-import { SlugInput } from '@/data-sources/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { useShopifyShopName } from '@/data-sources/shopify/shopify-api-hooks';
 import { ShopifyConfig } from '@/data-sources/types';
@@ -29,7 +28,7 @@ export type ShopifyFormState = Omit< ShopifyConfig, 'service' | 'uuid' >;
 const initialState: ShopifyFormState = {
 	store: '',
 	token: '',
-	slug: '',
+	display_name: '',
 };
 
 const getInitialStateFromConfig = ( config?: ShopifyConfig ): ShopifyFormState => {
@@ -39,7 +38,7 @@ const getInitialStateFromConfig = ( config?: ShopifyConfig ): ShopifyFormState =
 	return {
 		store: config.store,
 		token: config.token,
-		slug: config.slug,
+		display_name: config.display_name,
 	};
 };
 
@@ -59,7 +58,7 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 			service: 'shopify',
 			store: state.store,
 			token: state.token,
-			slug: state.slug,
+			display_name: state.display_name,
 		};
 
 		if ( mode === 'add' ) {
@@ -91,7 +90,11 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 						: __( 'Edit Shopify Data Source' ) }
 				</Heading>
 				<PanelRow>
-					<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
+					<TextControl
+						label={ __( 'Display Name', 'remote-data-blocks' ) }
+						value={ state.display_name }
+						onChange={ onSlugChange }
+					/>
 				</PanelRow>
 				<PanelRow>
 					<TextControl

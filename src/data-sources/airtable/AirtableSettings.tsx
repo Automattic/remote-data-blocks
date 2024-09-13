@@ -2,17 +2,17 @@ import {
 	Button,
 	ButtonGroup,
 	__experimentalHeading as Heading,
-	SelectControl,
 	Panel,
 	PanelBody,
 	PanelRow,
+	SelectControl,
+	TextControl,
 } from '@wordpress/components';
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
-import { SlugInput } from '@/data-sources/SlugInput';
 import {
 	useAirtableApiBases,
 	useAirtableApiTables,
@@ -37,7 +37,7 @@ const initialState: AirtableFormState = {
 	token: '',
 	base: null,
 	table: null,
-	slug: '',
+	display_name: '',
 };
 
 const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState => {
@@ -48,7 +48,7 @@ const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState
 		token: config.token,
 		base: config.base,
 		table: config.table,
-		slug: config.slug,
+		display_name: config.display_name,
 	};
 };
 
@@ -68,8 +68,7 @@ export const AirtableSettings = ( {
 	config,
 }: AirtableSettingsProps ) => {
 	const { goToMainScreen } = useSettingsContext();
-	const { updateDataSource, addDataSource, slugConflicts, loadingSlugConflicts } =
-		useDataSources( false );
+	const { updateDataSource, addDataSource } = useDataSources( false );
 
 	const { state, handleOnChange } = useForm< AirtableFormState >( {
 		initialValues: getInitialStateFromConfig( config ),
@@ -103,7 +102,7 @@ export const AirtableSettings = ( {
 			token: state.token,
 			base: state.base,
 			table: state.table,
-			slug: state.slug,
+			display_name: state.display_name,
 		};
 
 		if ( mode === 'add' ) {
@@ -155,15 +154,9 @@ export const AirtableSettings = ( {
 
 	const shouldAllowSubmit = useMemo( () => {
 		return (
-			bases === null ||
-			tables === null ||
-			! state.base ||
-			! state.table ||
-			! state.slug ||
-			loadingSlugConflicts ||
-			slugConflicts
+			bases === null || tables === null || ! state.base || ! state.table || ! state.display_name
 		);
-	}, [ bases, tables, state.base, state.table, state.slug, loadingSlugConflicts, slugConflicts ] );
+	}, [ bases, tables, state.base, state.table, state.display_name ] );
 
 	const basesHelpText = useMemo( () => {
 		if ( userId ) {
@@ -248,7 +241,12 @@ export const AirtableSettings = ( {
 						: __( 'Edit Airtable Data Source' ) }
 				</Heading>
 				<PanelRow>
-					<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
+					<TextControl
+						label={ __( 'Display Name', 'remote-data-blocks' ) }
+						value={ state.display_name }
+						onChange={ onSlugChange }
+						help={ __( 'A display name for this data source', 'remote-data-blocks' ) }
+					/>
 				</PanelRow>
 				<PanelRow>
 					<PasswordInputControl

@@ -73,17 +73,6 @@ class DatasourceController extends WP_REST_Controller {
 				'permission_callback' => [ $this, 'delete_item_permissions_check' ],
 			]
 		);
-
-		// item_slug_conflicts
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/slug-conflicts',
-			[
-				'methods'             => 'POST',
-				'callback'            => [ $this, 'item_slug_conflicts' ],
-				'permission_callback' => [ $this, 'item_slug_conflicts_permissions_check' ],
-			]
-		);
 	}
 
 	public function create_item( $request ) {
@@ -110,23 +99,6 @@ class DatasourceController extends WP_REST_Controller {
 		return rest_ensure_response( $result );
 	}
 
-	public function item_slug_conflicts( $request ) {
-		$slug = $request->get_param( 'slug' );
-		$uuid = $request->get_param( 'uuid' ) ?? '';
-		if ( empty( $slug ) ) {
-			return new \WP_Error(
-				'missing_slug',
-				__( 'Missing slug parameter.', 'remote-data-blocks' ),
-				array( 'status' => 400 )
-			);
-		}
-		$validation_status = DatasourceCRUD::validate_slug( $slug, $uuid );
-		$result            = [
-			'exists' => true !== $validation_status,
-		];
-		return rest_ensure_response( $result );
-	}
-
 	// These all require manage_options for now, but we can adjust as needed
 
 	public function get_item_permissions_check( $request ) {
@@ -146,10 +118,6 @@ class DatasourceController extends WP_REST_Controller {
 	}
 
 	public function delete_item_permissions_check( $request ) {
-		return current_user_can( 'manage_options' );
-	}
-
-	public function item_slug_conflicts_permissions_check( $request ) {
 		return current_user_can( 'manage_options' );
 	}
 }

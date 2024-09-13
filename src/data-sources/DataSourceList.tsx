@@ -1,12 +1,12 @@
 import {
+	Button,
+	ButtonGroup,
 	__experimentalConfirmDialog as ConfirmDialog,
 	__experimentalHeading as Heading,
-	__experimentalText as Text,
-	Button,
 	PanelBody,
 	PanelRow,
-	ButtonGroup,
 	Spinner,
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { DialogInputEvent } from '@wordpress/components/src/confirm-dialog/types';
 import { useState } from '@wordpress/element';
@@ -113,7 +113,9 @@ const DataSourceList = () => {
 				<table className="table data-source-list">
 					<thead className="table-header">
 						<tr>
-							<th style={ { textAlign: 'left' } }>{ __( 'Slug', 'remote-data-blocks' ) }</th>
+							<th style={ { textAlign: 'left' } }>
+								{ __( 'Display Name', 'remote-data-blocks' ) }
+							</th>
 							<th style={ { textAlign: 'left' } }>{ __( 'Service', 'remote-data-blocks' ) }</th>
 							<th style={ { textAlign: 'left' } }>{ __( 'Meta', 'remote-data-blocks' ) }</th>
 							<th style={ { textAlign: 'left' } }>{ __( 'Actions', 'remote-data-blocks' ) }</th>
@@ -121,11 +123,11 @@ const DataSourceList = () => {
 					</thead>
 					<tbody className="table-body">
 						{ getValidDataSources().map( source => {
-							const { uuid, slug, service } = source;
+							const { uuid, service, display_name: displayName } = source;
 							return (
 								<tr key={ uuid } className="table-row">
 									<td>
-										<Text>{ slug }</Text>
+										<Text>{ displayName }</Text>
 									</td>
 									<td>
 										<Text>{ slugToTitleCase( service ) }</Text>

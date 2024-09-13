@@ -1,24 +1,24 @@
 import {
 	Button,
 	ButtonGroup,
-	TextareaControl,
 	__experimentalHeading as Heading,
-	SelectControl,
 	Panel,
 	PanelBody,
 	PanelRow,
+	SelectControl,
+	TextareaControl,
+	TextControl,
 } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
-import { SlugInput } from '@/data-sources/SlugInput';
 import { GOOGLE_SHEETS_API_SCOPES } from '@/data-sources/constants';
 import { GoogleSheetsFormState } from '@/data-sources/google-sheets/types';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import {
-	useGoogleSpreadsheetsOptions,
 	useGoogleSheetsOptions,
+	useGoogleSpreadsheetsOptions,
 } from '@/data-sources/hooks/useGoogleApi';
 import { useGoogleAuth } from '@/data-sources/hooks/useGoogleAuth';
 import { GoogleSheetsConfig } from '@/data-sources/types';
@@ -35,7 +35,7 @@ export interface GoogleSheetsSettingsProps {
 }
 
 const initialState: GoogleSheetsFormState = {
-	slug: '',
+	display_name: '',
 	spreadsheet: null,
 	sheet: null,
 	credentials: '',
@@ -47,7 +47,7 @@ const getInitialStateFromConfig = ( config?: GoogleSheetsConfig ): GoogleSheetsF
 	}
 
 	return {
-		slug: config.slug,
+		display_name: config.display_name,
 		spreadsheet: config.spreadsheet,
 		sheet: config.sheet
 			? {
@@ -88,8 +88,7 @@ export const GoogleSheetsSettings = ( {
 	config,
 }: GoogleSheetsSettingsProps ) => {
 	const { goToMainScreen } = useSettingsContext();
-	const { updateDataSource, addDataSource, slugConflicts, loadingSlugConflicts } =
-		useDataSources( false );
+	const { updateDataSource, addDataSource } = useDataSources( false );
 
 	const { state, errors, handleOnChange } = useForm< GoogleSheetsFormState >( {
 		initialValues: getInitialStateFromConfig( config ),
@@ -125,7 +124,7 @@ export const GoogleSheetsSettings = ( {
 		const data: GoogleSheetsConfig = {
 			uuid: uuidFromProps ?? '',
 			service: 'google-sheets',
-			slug: state.slug,
+			display_name: state.display_name,
 			spreadsheet: state.spreadsheet,
 			sheet: {
 				id: parseInt( state.sheet.id, 10 ),
@@ -197,14 +196,8 @@ export const GoogleSheetsSettings = ( {
 	}, [ fetchingToken, token, tokenError, errors.credentials ] );
 
 	const shouldAllowSubmit = useMemo( () => {
-		return (
-			! state.spreadsheet ||
-			! state.sheet ||
-			! state.credentials ||
-			loadingSlugConflicts ||
-			slugConflicts
-		);
-	}, [ state.spreadsheet, state.sheet, state.credentials, loadingSlugConflicts, slugConflicts ] );
+		return ! state.spreadsheet || ! state.sheet || ! state.credentials;
+	}, [ state.spreadsheet, state.sheet, state.credentials ] );
 
 	const spreadsheetHelpText = useMemo( () => {
 		if ( token ) {
@@ -282,7 +275,11 @@ export const GoogleSheetsSettings = ( {
 						: __( 'Edit Google Sheets Data Source' ) }
 				</Heading>
 				<PanelRow>
-					<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
+					<TextControl
+						label={ __( 'Display Name', 'remote-data-blocks' ) }
+						value={ state.display_name }
+						onChange={ onSlugChange }
+					/>
 				</PanelRow>
 				<PanelRow>
 					<TextareaControl
