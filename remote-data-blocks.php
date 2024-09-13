@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Remote Data Blocks
- * Plugin URI: https://github.com/Automattic/remote-data-blocks
+ * Plugin URI: https://remotedatablocks.com
  * Description: Integrate external data sources into WordPress blocks, enabling dynamic content from APIs and databases within the block editor and within your content.
  * Author: WPVIP
  * Text Domain: remote-data-blocks

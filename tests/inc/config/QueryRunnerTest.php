@@ -8,7 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 use RemoteDataBlocks\Config\QueryRunner;
 use RemoteDataBlocks\Config\QueryRunnerInterface;
 use RemoteDataBlocks\Config\HttpDatasource;
-use RemoteDataBlocks\Config\QueryContext;
+use RemoteDataBlocks\Config\HttpQueryContext;
 use RemoteDataBlocks\HttpClient;
 use RemoteDataBlocks\Test\TestDatasource;
 use WP_Error;
@@ -45,7 +45,7 @@ class QueryRunnerTest extends TestCase {
 			}
 		};
 
-		$this->query_context = new class($this->http_datasource, $this->http_client) extends QueryContext {
+		$this->query_context = new class($this->http_datasource, $this->http_client) extends HttpQueryContext {
 			private $http_datasource;
 			private $http_client;
 			private $request_method = 'GET';
@@ -61,7 +61,7 @@ class QueryRunnerTest extends TestCase {
 				return $this->http_datasource->get_endpoint();
 			}
 
-			public function get_image_url(): null {
+			public function get_image_url(): ?string {
 				return null;
 			}
 
