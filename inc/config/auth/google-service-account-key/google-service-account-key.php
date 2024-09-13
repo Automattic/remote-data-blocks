@@ -29,7 +29,7 @@ class GoogleServiceAccountKey {
 	 * @param array $raw_service_account The raw service account data to validate.
 	 * @return true|WP_Error Returns true if validation passes, or a WP_Error array if validation fails.
 	 */
-	public static function validate( array $raw_service_account_key ): WP_Error|true {
+	public static function validate( array $raw_service_account_key ): WP_Error|bool {
 		if ( ! isset( $raw_service_account_key['type'] ) ) {
 			return new WP_Error( 'missing_type', __( 'type is required', 'remote-data-blocks' ) );
 		}
