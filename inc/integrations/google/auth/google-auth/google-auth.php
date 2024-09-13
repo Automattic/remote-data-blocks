@@ -5,6 +5,12 @@ namespace RemoteDataBlocks\Integrations\Google\Auth;
 use WP_Error;
 use RemoteDataBlocks\Integrations\Google\Auth\GoogleServiceAccountKey;
 
+/**
+ * Google Auth class.
+ *
+ * This class is used to authenticate with Google.
+ * Currently only supports generating access tokens using a service account key.
+ */
 class GoogleAuth {
 	const TOKEN_EXPIRY_SECONDS = 3600; // 1 hour
 	/**
@@ -16,6 +22,11 @@ class GoogleAuth {
 		'https://www.googleapis.com/auth/spreadsheets.readonly', // Sheets Readonly
 	];
 
+	/**
+	 * The scopes required for Google Sheets integration.
+	 * Drive Readonly is required to list all the spreadsheets a user has access to.
+	 * Sheets Readonly is required to read the data from the spreadsheet.
+	 */
 	const GOOGLE_SHEETS_SCOPES = [
 		'https://www.googleapis.com/auth/drive.readonly', // Drive Readonly
 		'https://www.googleapis.com/auth/spreadsheets.readonly', // Sheets Readonly
@@ -78,6 +89,13 @@ class GoogleAuth {
 		return $token;
 	}
 
+	/**
+	 * Get an access token using a JWT.
+	 *
+	 * @param string $jwt The JWT.
+	 * @param string $token_uri The token URI.
+	 * @return WP_Error|string The access token or an error.
+	 */
 	private static function get_token_using_jwt( string $jwt, string $token_uri ): WP_Error|string {
 		$response = wp_remote_post(
 			$token_uri,
@@ -109,6 +127,13 @@ class GoogleAuth {
 		return $response_data['access_token'];
 	}
 
+	/**
+	 * Generate a JWT.
+	 *
+	 * @param GoogleServiceAccountKey $service_account_key The service account key.
+	 * @param string $scope The scope.
+	 * @return string The JWT.
+	 */
 	private static function generate_jwt(
 		GoogleServiceAccountKey $service_account_key,
 		string $scope
@@ -133,6 +158,14 @@ class GoogleAuth {
 		return $base64_url_header . '.' . $base64_url_payload . '.' . $base64_url_signature;
 	}
 
+	/**
+	 * Generate a JWT signature.
+	 *
+	 * @param string $base64_url_header The base64 URL encoded header.
+	 * @param string $base64_url_payload The base64 URL encoded payload.
+	 * @param string $private_key The private key.
+	 * @return string The JWT signature.
+	 */
 	private static function generate_jwt_signature(
 		string $base64_url_header,
 		string $base64_url_payload,
@@ -144,6 +177,11 @@ class GoogleAuth {
 		return $signature;
 	}
 
+	/**
+	 * Generate a JWT header.
+	 *
+	 * @return array The JWT header.
+	 */
 	private static function generate_jwt_header(): array {
 		$header = [
 			'alg' => 'RS256',
@@ -153,6 +191,14 @@ class GoogleAuth {
 		return $header;
 	}
 
+	/**
+	 * Generate a JWT payload.
+	 *
+	 * @param string $client_email The client email.
+	 * @param string $token_uri The token URI.
+	 * @param string $scope The scope.
+	 * @return array The JWT payload.
+	 */
 	private static function generate_jwt_payload(
 		string $client_email,
 		string $token_uri,

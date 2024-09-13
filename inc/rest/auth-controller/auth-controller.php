@@ -9,6 +9,12 @@ use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
 defined( 'ABSPATH' ) || exit();
 defined( 'ABSPATH' ) || exit();
 
+/**
+ * Auth REST API controller.
+ *
+ * Authentication related endpoints for services which require multiple steps before the final
+ * access token is obtained like OAuth2.
+ */
 class AuthController extends WP_REST_Controller {
 	public function __construct() {
 		$this->namespace = REMOTE_DATA_BLOCKS__REST_NAMESPACE;
@@ -16,6 +22,11 @@ class AuthController extends WP_REST_Controller {
 	}
 
 	public function register_routes() {
+		/**
+		 * API to get Google Access Token using a Credentials/Keys JSON file.
+		 * Currently only supports service account keys.
+		 * Could be extended to support OAuth2.0 Client Keys in the future.
+		 */
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/google/token',
@@ -56,6 +67,10 @@ class AuthController extends WP_REST_Controller {
 		);
 	}
 
+	/**
+	 * These all require manage_options for now, but we can adjust as needed.
+	 * Taken from /inc/rest/datasource-controller/datasource-controller.php
+	 */
 	public function get_google_auth_token_permissions_check( $request ) {
 		return current_user_can( 'manage_options' );
 	}
