@@ -22,6 +22,7 @@ import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig, DataSourceType } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import AirtableIcon from '@/settings/icons/airtable';
+import GoogleSheetsIcon from '@/settings/icons/google-sheets';
 import ShopifyIcon from '@/settings/icons/shopify';
 import { slugToTitleCase, toTitleCase } from '@/utils/string';
 
@@ -29,45 +30,6 @@ const DataSourceList = () => {
 	const { dataSources, loadingDataSources, deleteDataSource, fetchDataSources } = useDataSources();
 	const [ dataSourceToDelete, setDataSourceToDelete ] = useState< DataSourceConfig | null >( null );
 	const { pushState } = useSettingsContext();
-
-	const AddDataSourceDropdown = () => {
-		function onAddDataSource( event: React.MouseEvent ) {
-			const dataSource = event.currentTarget.textContent?.toLowerCase() as DataSourceType;
-			const newUrl = new URL( window.location.href );
-
-			newUrl.searchParams.set( 'addDataSource', dataSource );
-			window.location.href = newUrl.href;
-		}
-
-		return (
-			<Dropdown
-				className="add-data-source-dropdown"
-				contentClassName="add-data-source-dropdown-content"
-				focusOnMount={ false }
-				popoverProps={ { placement: 'bottom-end' } }
-				renderToggle={ ( { isOpen, onToggle } ) => (
-					<Button
-						className="add-data-source-btn"
-						variant="primary"
-						onClick={ onToggle }
-						aria-expanded={ isOpen }
-					>
-						Add <Icon icon={ chevronDown } size={ 18 } />
-					</Button>
-				) }
-				renderContent={ () => (
-					<MenuGroup>
-						<MenuItem icon={ AirtableIcon } iconPosition="left" onClick={ onAddDataSource }>
-							Airtable
-						</MenuItem>
-						<MenuItem icon={ ShopifyIcon } iconPosition="left" onClick={ onAddDataSource }>
-							Shopify
-						</MenuItem>
-					</MenuGroup>
-				) }
-			/>
-		);
-	};
 
 	const onCancelDeleteDialog = () => {
 		setDataSourceToDelete( null );
@@ -110,6 +72,48 @@ const DataSourceList = () => {
 				{ tag }
 			</span>
 		) );
+	};
+
+	const AddDataSourceDropdown = () => {
+		function onAddDataSource( event: React.MouseEvent ) {
+			const dataSource = event.currentTarget.textContent?.toLowerCase() as DataSourceType;
+			const newUrl = new URL( window.location.href );
+
+			newUrl.searchParams.set( 'addDataSource', dataSource );
+			window.location.href = newUrl.href;
+		}
+
+		return (
+			<Dropdown
+				className="add-data-source-dropdown"
+				contentClassName="add-data-source-dropdown-content"
+				focusOnMount={ false }
+				popoverProps={ { placement: 'bottom-end' } }
+				renderToggle={ ( { isOpen, onToggle } ) => (
+					<Button
+						className="add-data-source-btn"
+						variant="primary"
+						onClick={ onToggle }
+						aria-expanded={ isOpen }
+					>
+						Add <Icon icon={ chevronDown } size={ 18 } />
+					</Button>
+				) }
+				renderContent={ () => (
+					<MenuGroup>
+						<MenuItem icon={ AirtableIcon } iconPosition="left" onClick={ onAddDataSource }>
+							Airtable
+						</MenuItem>
+						<MenuItem icon={ ShopifyIcon } iconPosition="left" onClick={ onAddDataSource }>
+							Shopify
+						</MenuItem>
+						<MenuItem icon={ GoogleSheetsIcon } iconPosition="left" onClick={ onAddDataSource }>
+							Google Sheets
+						</MenuItem>
+					</MenuGroup>
+				) }
+			/>
+		);
 	};
 
 	const CardBodyContent = (): JSX.Element => {
