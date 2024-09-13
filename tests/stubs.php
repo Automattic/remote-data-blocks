@@ -28,7 +28,7 @@ function sanitize_text_field( string $text ): string {
 	return $text;
 }
 
-function __( string $text, string $domain = 'default' ): string {
+function __( string $text ): string {
 	return $text;
 }
 
@@ -107,7 +107,7 @@ function wp_is_uuid( $uuid, $version = null ) {
 
 	if ( is_numeric( $version ) ) {
 		if ( 4 !== (int) $version ) {
-			throw new Exception( __( 'Only UUID V4 is supported at this time.' ) );
+			throw new Exception( esc_html( 'Only UUID V4 is supported at this time.' ) );
 		}
 		$regex = '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/';
 	} else {

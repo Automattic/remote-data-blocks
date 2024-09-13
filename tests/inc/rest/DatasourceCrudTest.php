@@ -183,7 +183,7 @@ class DatasourceCrudTest extends TestCase {
 	}
 
 	public function test_get_data_sources() {
-		$source1 = DatasourceCRUD::register_new_data_source([
+		$source1 = DatasourceCRUD::register_new_data_source( [
 			'token'   => 'token1',
 			'service' => 'airtable',
 			'base'    => [
@@ -195,19 +195,19 @@ class DatasourceCrudTest extends TestCase {
 				'name' => 'Table Name 1',
 			],
 			'slug'    => 'source-1',
-		]);
+		] );
 
-		$source2 = DatasourceCRUD::register_new_data_source([
+		$source2 = DatasourceCRUD::register_new_data_source( [
 			'token'   => 'token2',
 			'service' => 'shopify',
 			'store'   => 'mystore.myshopify.com',
 			'slug'    => 'source-2',
-		]);
+		] );
 
-		set_mocked_option(DatasourceCRUD::CONFIG_OPTION_NAME, [
+		set_mocked_option( DatasourceCRUD::CONFIG_OPTION_NAME, [
 			$source1,
 			$source2,
-		]);
+		] );
 
 		$all_sources = DatasourceCRUD::get_data_sources();
 		$this->assertCount( 2, $all_sources );
@@ -222,7 +222,7 @@ class DatasourceCrudTest extends TestCase {
 	}
 
 	public function test_get_item_by_uuid_with_valid_uuid() {
-		$source = DatasourceCRUD::register_new_data_source([
+		$source = DatasourceCRUD::register_new_data_source( [
 			'token'   => 'token1',
 			'service' => 'airtable',
 			'base'    => [
@@ -234,7 +234,7 @@ class DatasourceCrudTest extends TestCase {
 				'name' => 'Table Name 1',
 			],
 			'slug'    => 'source-1',
-		]);
+		] );
 
 		$retrieved_source = DatasourceCRUD::get_item_by_uuid( DatasourceCRUD::get_data_sources(), $source->uuid );
 		$this->assertEquals( $source, $retrieved_source );
@@ -246,7 +246,7 @@ class DatasourceCrudTest extends TestCase {
 	}
 
 	public function test_update_item_by_uuid_with_valid_uuid() {
-		$source = DatasourceCRUD::register_new_data_source([
+		$source = DatasourceCRUD::register_new_data_source( [
 			'token'   => 'token1',
 			'service' => 'airtable',
 			'base'    => [
@@ -258,12 +258,12 @@ class DatasourceCrudTest extends TestCase {
 				'name' => 'Table Name 1',
 			],
 			'slug'    => 'source-1',
-		]);
+		] );
 
-		$updated_source = DatasourceCRUD::update_item_by_uuid($source->uuid, [
+		$updated_source = DatasourceCRUD::update_item_by_uuid( $source->uuid, [
 			'token' => 'updated_token',
 			'slug'  => 'updated-slug',
-		]);
+		] );
 
 		$this->assertIsObject( $updated_source );
 		$this->assertEquals( 'updated_token', $updated_source->token );
@@ -276,7 +276,7 @@ class DatasourceCrudTest extends TestCase {
 	}
 
 	public function test_delete_item_by_uuid() {
-		$source = DatasourceCRUD::register_new_data_source([
+		$source = DatasourceCRUD::register_new_data_source( [
 			'token'   => 'token1',
 			'service' => 'airtable',
 			'base'    => [
@@ -288,7 +288,7 @@ class DatasourceCrudTest extends TestCase {
 				'name' => 'Table Name 1',
 			],
 			'slug'    => 'source-1',
-		]);
+		] );
 
 		$result = DatasourceCRUD::delete_item_by_uuid( $source->uuid );
 		$this->assertTrue( $result );
