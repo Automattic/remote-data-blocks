@@ -33,20 +33,25 @@ function getExpectedAttributeValue(
 }
 
 export function getBoundAttributeEntries(
-	attributes: RemoteDataInnerBlockAttributes
+	attributes: RemoteDataInnerBlockAttributes,
+	remoteDataBlockName: string
 ): [ string, RemoteDataBlockBinding ][] {
 	return Object.entries( attributes.metadata?.bindings ?? {} ).filter(
-		( [ _target, binding ] ) => binding.source === BLOCK_BINDING_SOURCE
+		( [ _target, binding ] ) =>
+			binding.source === BLOCK_BINDING_SOURCE && binding.args?.block === remoteDataBlockName
 	);
 }
 
-export function getBoundBlockClassName( attributes: RemoteDataInnerBlockAttributes ): string {
+export function getBoundBlockClassName(
+	attributes: RemoteDataInnerBlockAttributes,
+	remoteDataBlockName: string
+): string {
 	const existingClassNames = ( attributes.className ?? '' )
 		.split( /\s/ )
 		.filter( className => ! className.startsWith( 'rdb-block-data-' ) );
 	const classNames = new Set< string | undefined >( [
 		...existingClassNames,
-		...getBoundAttributeEntries( attributes ).map( ( [ _target, binding ] ) =>
+		...getBoundAttributeEntries( attributes, remoteDataBlockName ).map( ( [ _target, binding ] ) =>
 			getClassName( `block-data-${ binding.args.field }` )
 		),
 	] );
@@ -57,10 +62,11 @@ export function getBoundBlockClassName( attributes: RemoteDataInnerBlockAttribut
 export function getMismatchedAttributes(
 	attributes: RemoteDataInnerBlockAttributes,
 	results: RemoteData[ 'results' ],
+	remoteDataBlockName: string,
 	index = 0
 ): Partial< RemoteDataInnerBlockAttributes > {
 	return Object.fromEntries(
-		getBoundAttributeEntries( attributes )
+		getBoundAttributeEntries( attributes, remoteDataBlockName )
 			.map( ( [ target, binding ] ) => [
 				target,
 				getExpectedAttributeValue( results[ index ], binding.args ),

@@ -124,7 +124,7 @@ describe( 'withBlockBinding', () => {
 					bindings: {
 						content: {
 							source: BLOCK_BINDING_SOURCE,
-							args: { name: 'test/block', field: 'title' },
+							args: { block: 'test/block', field: 'title' },
 						},
 					},
 				},
@@ -164,7 +164,7 @@ describe( 'withBlockBinding', () => {
 					bindings: {
 						content: {
 							source: BLOCK_BINDING_SOURCE,
-							args: { name: 'test/block', field: 'title' },
+							args: { block: 'test/block', field: 'title' },
 						},
 					},
 				},
