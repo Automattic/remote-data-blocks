@@ -4,10 +4,10 @@ namespace RemoteDataBlocks\Editor\BlockManagement;
 
 defined( 'ABSPATH' ) || exit();
 
-use Error;
 use RemoteDataBlocks\Config\QueryContext\QueryContextInterface;
 use RemoteDataBlocks\Logging\Logger;
 use RemoteDataBlocks\Logging\LoggerManager;
+use Error;
 
 use function add_action;
 use function do_action;
