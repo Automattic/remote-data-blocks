@@ -22,7 +22,7 @@ class BlockPatterns {
 		self::$templates['paragraph'] = file_get_contents( __DIR__ . '/templates/paragraph.html', false );
 	}
 
-	private static function generate_attribute_bindings( array $bindings ): array {
+	private static function generate_attribute_bindings( string $block_name, array $bindings ): array {
 		$attributes = [
 			'metadata' => [
 				'bindings' => [],
@@ -38,6 +38,7 @@ class BlockPatterns {
 				'source' => 'remote-data/binding',
 				'args'   => [
 					'field' => $binding[0],
+					'name'  => $block_name,
 				],
 			];
 
@@ -122,16 +123,16 @@ class BlockPatterns {
 		}
 
 		if ( ! empty( $bindings['heading']['content'] ) ) {
-			$content .= self::populate_template( 'heading', self::generate_attribute_bindings( $bindings['heading'] ) );
+			$content .= self::populate_template( 'heading', self::generate_attribute_bindings( $block_name, $bindings['heading'] ) );
 		}
 
 		foreach ( $bindings['paragraphs'] as $paragraph ) {
-			$content .= self::populate_template( 'paragraph', self::generate_attribute_bindings( $paragraph ) );
+			$content .= self::populate_template( 'paragraph', self::generate_attribute_bindings( $block_name, $paragraph ) );
 		}
 
 		// If there is an image URL, create two-column layout with left-aligned image.
 		if ( ! empty( $bindings['image']['url'] ) ) {
-			$image_bindings = self::generate_attribute_bindings( $bindings['image'] );
+			$image_bindings = self::generate_attribute_bindings( $block_name, $bindings['image'] );
 			$image_content  = self::populate_template( 'image', $image_bindings );
 			$content        = sprintf( self::$templates['columns'], $image_content, $content );
 		}

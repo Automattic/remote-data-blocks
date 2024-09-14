@@ -11,13 +11,14 @@ describe( 'block-binding utils', () => {
 				metadata: {
 					bindings: {
 						content: { source: BLOCK_BINDING_SOURCE, args: { name, field: 'title' } },
+						text: { source: BLOCK_BINDING_SOURCE, args: { name: 'test/block2', field: 'text' } },
 						url: { source: BLOCK_BINDING_SOURCE, args: { name, field: 'link' } },
 						alt: { source: 'other', args: { name, field: 'description' } },
 					},
 				},
 			};
 
-			const result = getBoundAttributeEntries( attributes );
+			const result = getBoundAttributeEntries( attributes, name );
 
 			expect( result ).toEqual( [
 				[ 'content', { source: BLOCK_BINDING_SOURCE, args: { name, field: 'title' } } ],
@@ -28,7 +29,7 @@ describe( 'block-binding utils', () => {
 		it( 'should return an empty array when no bindings are present', () => {
 			const attributes: RemoteDataInnerBlockAttributes = {};
 
-			const result = getBoundAttributeEntries( attributes );
+			const result = getBoundAttributeEntries( attributes, 'test/block' );
 
 			expect( result ).toEqual( [] );
 		} );
@@ -51,7 +52,7 @@ describe( 'block-binding utils', () => {
 
 			const results = [ { title: 'New content', link: 'https://new-url.com' } ];
 
-			const result = getMismatchedAttributes( attributes, results );
+			const result = getMismatchedAttributes( attributes, results, name );
 
 			expect( result ).toEqual( {
 				content: 'New content',
@@ -77,7 +78,7 @@ describe( 'block-binding utils', () => {
 
 			const results = [ { title: 'Current content', link: 'https://current-url.com' } ];
 
-			const result = getMismatchedAttributes( attributes, results );
+			const result = getMismatchedAttributes( attributes, results, name );
 
 			expect( result ).toEqual( {} );
 		} );
@@ -97,7 +98,7 @@ describe( 'block-binding utils', () => {
 
 			const results: Record< string, string >[] = [ { title: 'New content' } ];
 
-			const result = getMismatchedAttributes( attributes, results );
+			const result = getMismatchedAttributes( attributes, results, name );
 
 			expect( result ).toEqual( {
 				content: 'New content',
@@ -120,7 +121,7 @@ describe( 'block-binding utils', () => {
 
 			const results: Record< string, string >[] = [ { title: 'My Title' } ];
 
-			const result = getMismatchedAttributes( attributes, results );
+			const result = getMismatchedAttributes( attributes, results, name );
 
 			expect( result ).toEqual( {
 				content: '<span class="rdb-block-label">Title</span> My Title',

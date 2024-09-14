@@ -42,7 +42,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 
 	function updateBinding( target: string, args: Omit< RemoteDataBlockBindingArgs, 'name' > ) {
 		setAttributes( {
-			className: getBoundBlockClassName( attributes ),
+			className: getBoundBlockClassName( attributes, remoteDataName ),
 			metadata: {
 				...attributes.metadata,
 				bindings: {

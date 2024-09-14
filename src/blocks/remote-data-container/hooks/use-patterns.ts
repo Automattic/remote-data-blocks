@@ -12,17 +12,22 @@ import { getBoundAttributeEntries, getMismatchedAttributes } from '@/utils/block
 
 export function cloneBlockWithAttributes(
 	block: BlockInstance,
-	attributes: Record< string, string >
+	attributes: Record< string, string >,
+	remoteDataBlockName: string
 ): BlockInstance {
-	const mismatchedAttributes = getMismatchedAttributes( block.attributes, [ attributes ] );
+	const mismatchedAttributes = getMismatchedAttributes(
+		block.attributes,
+		[ attributes ],
+		remoteDataBlockName
+	);
 	const newInnerBlocks = block.innerBlocks?.map( innerBlock =>
-		cloneBlockWithAttributes( innerBlock, attributes )
+		cloneBlockWithAttributes( innerBlock, attributes, remoteDataBlockName )
 	);
 
 	return cloneBlock( block, mismatchedAttributes, newInnerBlocks );
 }
 
-export function usePatterns( blockName: string, rootClientId: string ) {
+export function usePatterns( remoteDataBlockName: string, rootClientId: string ) {
 	const { replaceInnerBlocks } = useDispatch< BlockEditorStoreActions >( blockEditorStore );
 	const { getBlocks, getPatternsByBlockTypes } = useSelect< BlockEditorStoreSelectors >(
 		blockEditorStore,
@@ -51,7 +56,9 @@ export function usePatterns( blockName: string, rootClientId: string ) {
 			// it can be previewed.
 			return supportedPatterns.map( pattern => ( {
 				...pattern,
-				blocks: pattern.blocks.map( block => cloneBlockWithAttributes( block, result ) ),
+				blocks: pattern.blocks.map( block =>
+					cloneBlockWithAttributes( block, result, remoteDataBlockName )
+				),
 			} ) );
 		},
 		insertPatternBlocks: ( pattern: BlockPattern ): void => {
@@ -61,7 +68,7 @@ export function usePatterns( blockName: string, rootClientId: string ) {
 			// of the collection.
 			const patternBlocks =
 				pattern.blocks.map( block => {
-					const boundAttributes = getBoundAttributeEntries( block.attributes );
+					const boundAttributes = getBoundAttributeEntries( block.attributes, remoteDataBlockName );
 
 					if ( ! boundAttributes.length ) {
 						return block;
