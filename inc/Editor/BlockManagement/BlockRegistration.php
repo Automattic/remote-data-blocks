@@ -7,7 +7,6 @@ defined( 'ABSPATH' ) || exit();
 use RemoteDataBlocks\Editor\BlockPatterns\BlockPatterns;
 use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 use RemoteDataBlocks\REST\RemoteDataController;
-use WP_Block_Editor_Context;
 use function register_block_pattern;
 use function register_block_type;
 
