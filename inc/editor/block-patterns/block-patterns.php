@@ -37,8 +37,8 @@ class BlockPatterns {
 			$attributes['metadata']['bindings'][ $attribute ] = [
 				'source' => 'remote-data/binding',
 				'args'   => [
+					'block' => $block_name,
 					'field' => $binding[0],
-					'name'  => $block_name,
 				],
 			];
 

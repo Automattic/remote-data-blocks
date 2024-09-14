@@ -40,7 +40,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 		} );
 	}
 
-	function updateBinding( target: string, args: Omit< RemoteDataBlockBindingArgs, 'name' > ) {
+	function updateBinding( target: string, args: Omit< RemoteDataBlockBindingArgs, 'block' > ) {
 		setAttributes( {
 			className: getBoundBlockClassName( attributes, remoteDataName ),
 			metadata: {
@@ -51,7 +51,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 						source: BLOCK_BINDING_SOURCE,
 						args: {
 							...args,
-							name: remoteDataName, // Remote Data Block name
+							block: remoteDataName, // Remote Data Block name
 						},
 					},
 				},
@@ -116,7 +116,7 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 		// values, update and merge the attributes.
 		const mergedAttributes = {
 			...attributes,
-			...getMismatchedAttributes( attributes, remoteData.results, index ),
+			...getMismatchedAttributes( attributes, remoteData.results, remoteData.blockName, index ),
 		};
 
 		// If the block is not writable, render it as usual.

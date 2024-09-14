@@ -6,23 +6,23 @@ import { getBoundAttributeEntries, getMismatchedAttributes } from '@/utils/block
 describe( 'block-binding utils', () => {
 	describe( 'getBoundAttributeEntries', () => {
 		it( 'should return bound attribute entries', () => {
-			const name = 'test/block';
+			const block = 'test/block';
 			const attributes: RemoteDataInnerBlockAttributes = {
 				metadata: {
 					bindings: {
-						content: { source: BLOCK_BINDING_SOURCE, args: { name, field: 'title' } },
-						text: { source: BLOCK_BINDING_SOURCE, args: { name: 'test/block2', field: 'text' } },
-						url: { source: BLOCK_BINDING_SOURCE, args: { name, field: 'link' } },
-						alt: { source: 'other', args: { name, field: 'description' } },
+						content: { source: BLOCK_BINDING_SOURCE, args: { block, field: 'title' } },
+						text: { source: BLOCK_BINDING_SOURCE, args: { block: 'test/block2', field: 'text' } },
+						url: { source: BLOCK_BINDING_SOURCE, args: { block, field: 'link' } },
+						alt: { source: 'other', args: { block, field: 'description' } },
 					},
 				},
 			};
 
-			const result = getBoundAttributeEntries( attributes, name );
+			const result = getBoundAttributeEntries( attributes, block );
 
 			expect( result ).toEqual( [
-				[ 'content', { source: BLOCK_BINDING_SOURCE, args: { name, field: 'title' } } ],
-				[ 'url', { source: BLOCK_BINDING_SOURCE, args: { name, field: 'link' } } ],
+				[ 'content', { source: BLOCK_BINDING_SOURCE, args: { block, field: 'title' } } ],
+				[ 'url', { source: BLOCK_BINDING_SOURCE, args: { block, field: 'link' } } ],
 			] );
 		} );
 
@@ -37,22 +37,22 @@ describe( 'block-binding utils', () => {
 
 	describe( 'getMismatchedAttributes', () => {
 		it( 'should return mismatched attributes', () => {
-			const name = 'test/block';
+			const block = 'test/block';
 			const attributes: RemoteDataInnerBlockAttributes = {
 				content: 'Old content',
 				url: 'https://old-url.com',
 				alt: 'Old alt',
 				metadata: {
 					bindings: {
-						content: { source: BLOCK_BINDING_SOURCE, args: { name, field: 'title' } },
-						url: { source: BLOCK_BINDING_SOURCE, args: { name, field: 'link' } },
+						content: { source: BLOCK_BINDING_SOURCE, args: { block, field: 'title' } },
+						url: { source: BLOCK_BINDING_SOURCE, args: { block, field: 'link' } },
 					},
 				},
 			};
 
 			const results = [ { title: 'New content', link: 'https://new-url.com' } ];
 
-			const result = getMismatchedAttributes( attributes, results, name );
+			const result = getMismatchedAttributes( attributes, results, block );
 
 			expect( result ).toEqual( {
 				content: 'New content',
@@ -61,7 +61,7 @@ describe( 'block-binding utils', () => {
 		} );
 
 		it( 'should return an empty object when no mismatches are found', () => {
-			const name = 'test/block';
+			const block = 'test/block';
 			const attributes: RemoteDataInnerBlockAttributes = {
 				content: '<span class="rdb-block-label">Title</span> Current content',
 				url: 'https://current-url.com',
@@ -69,36 +69,36 @@ describe( 'block-binding utils', () => {
 					bindings: {
 						content: {
 							source: BLOCK_BINDING_SOURCE,
-							args: { name, field: 'title', label: 'Title' },
+							args: { block, field: 'title', label: 'Title' },
 						},
-						url: { source: BLOCK_BINDING_SOURCE, args: { name, field: 'link' } },
+						url: { source: BLOCK_BINDING_SOURCE, args: { block, field: 'link' } },
 					},
 				},
 			};
 
 			const results = [ { title: 'Current content', link: 'https://current-url.com' } ];
 
-			const result = getMismatchedAttributes( attributes, results, name );
+			const result = getMismatchedAttributes( attributes, results, block );
 
 			expect( result ).toEqual( {} );
 		} );
 
 		it( 'should handle missing results', () => {
-			const name = 'test/block';
+			const block = 'test/block';
 			const attributes: RemoteDataInnerBlockAttributes = {
 				content: 'Old content',
 				url: 'https://old-url.com',
 				metadata: {
 					bindings: {
-						content: { source: BLOCK_BINDING_SOURCE, args: { name, field: 'title' } },
-						url: { source: BLOCK_BINDING_SOURCE, args: { name, field: 'link' } },
+						content: { source: BLOCK_BINDING_SOURCE, args: { block, field: 'title' } },
+						url: { source: BLOCK_BINDING_SOURCE, args: { block, field: 'link' } },
 					},
 				},
 			};
 
 			const results: Record< string, string >[] = [ { title: 'New content' } ];
 
-			const result = getMismatchedAttributes( attributes, results, name );
+			const result = getMismatchedAttributes( attributes, results, block );
 
 			expect( result ).toEqual( {
 				content: 'New content',
@@ -106,14 +106,14 @@ describe( 'block-binding utils', () => {
 		} );
 
 		it( 'should handle missing label', () => {
-			const name = 'test/block';
+			const block = 'test/block';
 			const attributes: RemoteDataInnerBlockAttributes = {
 				content: 'My Title',
 				metadata: {
 					bindings: {
 						content: {
 							source: BLOCK_BINDING_SOURCE,
-							args: { name, field: 'title', label: 'Title' },
+							args: { block, field: 'title', label: 'Title' },
 						},
 					},
 				},
@@ -121,7 +121,7 @@ describe( 'block-binding utils', () => {
 
 			const results: Record< string, string >[] = [ { title: 'My Title' } ];
 
-			const result = getMismatchedAttributes( attributes, results, name );
+			const result = getMismatchedAttributes( attributes, results, block );
 
 			expect( result ).toEqual( {
 				content: '<span class="rdb-block-label">Title</span> My Title',

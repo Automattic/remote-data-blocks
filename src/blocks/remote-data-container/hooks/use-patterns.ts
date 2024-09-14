@@ -31,7 +31,7 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string )
 	const { replaceInnerBlocks } = useDispatch< BlockEditorStoreActions >( blockEditorStore );
 	const { getBlocks, getPatternsByBlockTypes } = useSelect< BlockEditorStoreSelectors >(
 		blockEditorStore,
-		[ blockName, rootClientId ]
+		[ remoteDataBlockName, rootClientId ]
 	);
 	const [ showPatternSelection, setShowPatternSelection ] = useState< boolean >( false );
 
@@ -40,12 +40,12 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string )
 			result: Record< string, string >
 		): BlockInstance< RemoteDataInnerBlockAttributes >[] => {
 			return getBlocks< RemoteDataInnerBlockAttributes >( rootClientId ).map( block =>
-				cloneBlockWithAttributes( block, result )
+				cloneBlockWithAttributes( block, result, remoteDataBlockName )
 			);
 		},
 		getPatternsByBlockTypes,
 		getSupportedPatterns: ( result?: Record< string, string > ): BlockPattern[] => {
-			const supportedPatterns = getPatternsByBlockTypes( blockName, rootClientId );
+			const supportedPatterns = getPatternsByBlockTypes( remoteDataBlockName, rootClientId );
 
 			// If no result is provided, return the supported patterns as is.
 			if ( ! result ) {

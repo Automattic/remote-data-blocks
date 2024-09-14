@@ -38,7 +38,7 @@ export function getBoundAttributeEntries(
 ): [ string, RemoteDataBlockBinding ][] {
 	return Object.entries( attributes.metadata?.bindings ?? {} ).filter(
 		( [ _target, binding ] ) =>
-			binding.source === BLOCK_BINDING_SOURCE && binding.args?.name === remoteDataBlockName
+			binding.source === BLOCK_BINDING_SOURCE && binding.args?.block === remoteDataBlockName
 	);
 }
 

@@ -33,7 +33,9 @@ export function ItemList( props: ItemListProps ) {
 	}
 
 	return props.results.map( ( result, index ) => {
-		const blocks = pattern?.blocks.map( block => cloneBlockWithAttributes( block, result ) ) ?? [];
+		const blocks =
+			pattern?.blocks.map( block => cloneBlockWithAttributes( block, result, props.blockName ) ) ??
+			[];
 
 		return (
 			<ItemPreview key={ index } blocks={ blocks } onSelect={ () => props.onSelect( result ) } />
