@@ -7,7 +7,6 @@ use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
 use RemoteDataBlocks\Tests\TestDatasource;
 
-require_once REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/inc/Editor/BlockManagement/ConfigurationLoader.php';
 class ConfigurationLoaderTest extends TestCase {
 	public function testIsRegisteredBlockReturnsFalseWhenNoConfigurations() {
 		$this->assertFalse( ConfigurationLoader::is_registered_block( 'nonexistent' ) );
