@@ -33,7 +33,10 @@ jobs:
       - name: Find and report PHP files
         run: |
           echo "PHP files found:"
-          find . -name "*.php" -type f | sort
+          find . -name "*.php" -type f -not -path "./vendor/*" | sort
+
+      - name: Cat autoload_classmap.php
+        run: cat ./vendor/composer/autoload_classmap.php
 
       - name: Run tests
         run: composer test
