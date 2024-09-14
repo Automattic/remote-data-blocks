@@ -27,11 +27,13 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
 
-      - name: Clear Composer cache
-        run: composer clear-cache
-
       - name: Install dependencies
         run: composer install --prefer-dist
+
+      - name: Find and report PHP files
+        run: |
+          echo "PHP files found:"
+          find . -name "*.php" -type f | sort
 
       - name: Run tests
         run: composer test
