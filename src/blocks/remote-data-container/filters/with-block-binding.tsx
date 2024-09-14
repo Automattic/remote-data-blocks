@@ -2,7 +2,7 @@ import { InspectorControls } from '@wordpress/block-editor';
 import { BlockEditProps } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useContext, useMemo } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { BlockBindingControls } from '@/blocks/remote-data-container/components/block-binding-controls';
@@ -112,19 +112,17 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 			binding => binding.source === PATTERN_OVERRIDES_BINDING_SOURCE
 		);
 
-		// If the block is not writable, render it as usual.
-		if ( isInSyncedPattern && ! hasEnabledOverrides ) {
-			return <BlockEdit { ...props } />;
-		}
-
 		// If the block has a binding and the attributes do not match their expected
 		// values, update and merge the attributes.
-		const mergedAttributes = useMemo< RemoteDataInnerBlockAttributes >( () => {
-			return {
-				...attributes,
-				...getMismatchedAttributes( attributes, remoteData.results, index ),
-			};
-		}, [ attributes, remoteData.results, index ] );
+		const mergedAttributes = {
+			...attributes,
+			...getMismatchedAttributes( attributes, remoteData.results, index ),
+		};
+
+		// If the block is not writable, render it as usual.
+		if ( isInSyncedPattern && ! hasEnabledOverrides ) {
+			return <BlockEdit { ...props } attributes={ mergedAttributes } />;
+		}
 
 		return (
 			<BoundBlockEdit
