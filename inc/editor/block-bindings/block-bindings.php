@@ -214,7 +214,7 @@ class BlockBindings {
 		$field_name = $source_args['field'];
 		$index      = $source_args['index'] ?? 0; // Index is only set for loop queries.
 
-		if ( isset( $source_args['name'] ) && $source_args['name'] !== $block_name ) {
+		if ( isset( $source_args['block'] ) && $source_args['block'] !== $block_name ) {
 			self::log_error( 'Block binding belongs to a different remote data block', $block_name, $field_name );
 			return null;
 		}
