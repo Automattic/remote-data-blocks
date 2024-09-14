@@ -4,7 +4,7 @@ namespace RemoteDataBlocks\Example\ZipCode;
 
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 
-class ZipCodeDatasource extends HttpDatasource{
+class ZipCodeDatasource extends HttpDatasource {
 	public function get_display_name(): string {
 		return 'Zip Code Datasource';
 	}
