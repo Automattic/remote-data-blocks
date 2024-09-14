@@ -141,7 +141,7 @@ class BlockPatterns {
 			[
 				'title'      => sprintf( '%s Data', $block_title ),
 				'blockTypes' => [ $block_name ],
-				'categories' => [ 'Remote Data' ],
+				'categories' => [ 'Remote Data Blocks' ],
 				'content'    => $content,
 				'inserter'   => true,
 				'source'     => 'plugin',
