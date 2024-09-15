@@ -2,8 +2,8 @@
 
 namespace RemoteDataBlocks\Example\Airtable\EldenRingMap;
 
-use RemoteDataBlocks\Config\AirtableDatasource;
-use RemoteDataBlocks\Editor\ConfigurationLoader;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
+use RemoteDataBlocks\Integrations\Airtable\AirtableDatasource;
 use RemoteDataBlocks\Logging\LoggerManager;
 use function register_block_type;
 use function wp_register_script;

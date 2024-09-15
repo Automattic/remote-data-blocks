@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Example\ZipCode;
 
-use RemoteDataBlocks\Config\HttpQueryContext;
+use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
 class GetZipCodeQuery extends HttpQueryContext {
 	public array $input_variables = [
