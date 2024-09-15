@@ -33,11 +33,11 @@ jobs:
 
       - name: Run tests
         if: ${{ matrix.php-version != '8.3' }}
-        run: phpunit
+        run: phpunit -c phpunit.xml
 
       - name: Run tests and generate coverage
         if: ${{ matrix.php-version == '8.3' }}
-        run: phpunit --coverage-clover ./coverage/phpunit/clover.xml
+        run: phpunit -c phpunit.xml --coverage-clover ./coverage/phpunit/clover.xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
