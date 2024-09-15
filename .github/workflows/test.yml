@@ -26,9 +26,10 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
+          tools: phpunit
 
       - name: Install dependencies
-        run: composer install --prefer-dist
+        run: composer install --prefer-dist --no-dev
 
       - name: Run tests
         if: ${{ matrix.php-version != '8.3' }}
