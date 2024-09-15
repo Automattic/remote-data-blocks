@@ -2,12 +2,12 @@
 
 namespace RemoteDataBlocks\Example\Airtable\Events;
 
+use RemoteDataBlocks\Config\AirtableDatasource;
 use RemoteDataBlocks\Editor\ConfigurationLoader;
 use RemoteDataBlocks\Logging\LoggerManager;
 use RemoteDataBlocks\REST\DatasourceCRUD;
 use function add_action;
 
-require_once __DIR__ . '/inc/queries/class-airtable-events-datasource.php';
 require_once __DIR__ . '/inc/queries/class-airtable-get-event-query.php';
 require_once __DIR__ . '/inc/queries/class-airtable-list-events-query.php';
 
@@ -19,6 +19,8 @@ require_once __DIR__ . '/inc/queries/class-airtable-list-events-query.php';
  */
 function add_airtable_events_datasource( array $data_sources ): array {
 	$access_token = \RemoteDataBlocks\Example\get_access_token( 'airtable_events' );
+	$base         = 'appVQ2PAl95wQSo9S';
+	$table        = 'tblyGtuxblLtmoqMI';
 
 	if ( empty( $access_token ) ) {
 		return $data_sources;
@@ -48,9 +50,9 @@ add_filter( 'remote_data_blocks_data_sources', __NAMESPACE__ . '\\add_airtable_e
 function register_airtable_events_block() {
 	$block_name = 'Airtable Event';
 
-	$airtable_events_data_source_config = DatasourceCRUD::get_data_source_by_slug( 'airtable-events' );
+	$config = DatasourceCRUD::get_data_source_by_slug( 'airtable-events' );
 
-	$airtable_datasource        = new AirtableEventsDatasource( $airtable_events_data_source_config );
+	$airtable_datasource        = new AirtableDatasource( $config['token'], $config['base']['id'], $config['table']['id'] );
 	$airtable_get_event_query   = new AirtableGetEventQuery( $airtable_datasource );
 	$airtable_list_events_query = new AirtableListEventsQuery( $airtable_datasource );
 

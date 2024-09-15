@@ -35,7 +35,7 @@ interface BlockBindingControlsProps {
 	availableBindings: AvailableBindings;
 	blockName: string;
 	removeBinding: ( target: string ) => void;
-	updateBinding: ( target: string, args: Omit< RemoteDataBlockBindingArgs, 'name' > ) => void;
+	updateBinding: ( target: string, args: Omit< RemoteDataBlockBindingArgs, 'block' > ) => void;
 }
 
 export function BlockBindingControls( props: BlockBindingControlsProps ) {
