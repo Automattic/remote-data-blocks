@@ -27,6 +27,7 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           tools: phpunit
+          coverage: xdebug
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-dev
