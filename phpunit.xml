@@ -15,9 +15,9 @@
     </testsuite>
   </testsuites>
 
-  <coverage>
+  <source>
     <include>
       <directory suffix=".php">inc</directory>
     </include>
-  </coverage>
+  </source>
 </phpunit>
