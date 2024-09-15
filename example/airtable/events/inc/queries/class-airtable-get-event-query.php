@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Example\Airtable\Events;
 
-use RemoteDataBlocks\Config\HttpQueryContext;
+use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
 class AirtableGetEventQuery extends HttpQueryContext {
 	public array $input_variables = [

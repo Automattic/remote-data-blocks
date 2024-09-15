@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Example\ArtInstituteOfChicago;
 
-use RemoteDataBlocks\Editor\ConfigurationLoader;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
 
 require_once __DIR__ . '/inc/queries/class-art-institute-datasource.php';
 require_once __DIR__ . '/inc/queries/class-art-institute-get-query.php';

@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Example\GitHub;
 
-use RemoteDataBlocks\Config\HttpDatasource;
+use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 
 class GitHubDatasource extends HttpDatasource {
 	public string $repo_owner;

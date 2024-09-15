@@ -1,7 +1,7 @@
 <?php
-namespace RemoteDataBlocks\Test;
+namespace RemoteDataBlocks\Tests;
 
-use RemoteDataBlocks\Config\QueryRunnerInterface;
+use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 
 class MockQueryRunner implements QueryRunnerInterface {
 	private $query_results = [];
