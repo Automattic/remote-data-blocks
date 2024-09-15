@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "772ea43038736f0562d8c97f2b089074",
+    "content-hash": "2c861583aca763f81bf8154b4300c674",
     "packages": [
         {
             "name": "galbar/jsonpath",
@@ -629,16 +629,16 @@
         },
         {
             "name": "psr/log",
-            "version": "3.0.0",
+            "version": "3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "fe5ea303b0887d5caefd3d431c3e61ad47037001"
+                "reference": "f16e1d5863e37f8d8c2a01719f5b34baa2b714d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/fe5ea303b0887d5caefd3d431c3e61ad47037001",
-                "reference": "fe5ea303b0887d5caefd3d431c3e61ad47037001",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/f16e1d5863e37f8d8c2a01719f5b34baa2b714d3",
+                "reference": "f16e1d5863e37f8d8c2a01719f5b34baa2b714d3",
                 "shasum": ""
             },
             "require": {
@@ -673,9 +673,9 @@
                 "psr-3"
             ],
             "support": {
-                "source": "https://github.com/php-fig/log/tree/3.0.0"
+                "source": "https://github.com/php-fig/log/tree/3.0.2"
             },
-            "time": "2021-07-14T16:46:02+00:00"
+            "time": "2024-09-11T13:17:53+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
@@ -1851,16 +1851,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "10.5.33",
+            "version": "10.5.34",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "4def7a9cda75af9c2bc179ed53a8e41313e7f7cf"
+                "reference": "3c69d315bdf79080c8e115b69d1961c6905b0e18"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/4def7a9cda75af9c2bc179ed53a8e41313e7f7cf",
-                "reference": "4def7a9cda75af9c2bc179ed53a8e41313e7f7cf",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/3c69d315bdf79080c8e115b69d1961c6905b0e18",
+                "reference": "3c69d315bdf79080c8e115b69d1961c6905b0e18",
                 "shasum": ""
             },
             "require": {
@@ -1932,7 +1932,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.33"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.34"
             },
             "funding": [
                 {
@@ -1948,7 +1948,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-09-09T06:06:56+00:00"
+            "time": "2024-09-13T05:19:38+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -3126,7 +3126,9 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": ">=8.1"
+    },
     "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }

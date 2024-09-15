@@ -134,22 +134,26 @@ const DataSourceList = () => {
 										<div className="data-source-meta">{ renderDataSourceMeta( source ) }</div>
 									</td>
 									<td>
-										<ConfirmDialog
-											isOpen={ deleteDialogOpen }
-											onCancel={ onCancelDeleteDialog }
-											onConfirm={ () => void onDeleteConfirm( uuid ) }
-										>
-											{ __( 'Are you sure you want to delete?' ) }
-										</ConfirmDialog>
+										{ source.uuid && (
+											<>
+												<ConfirmDialog
+													isOpen={ deleteDialogOpen }
+													onCancel={ onCancelDeleteDialog }
+													onConfirm={ () => void onDeleteConfirm( uuid ) }
+												>
+													{ __( 'Are you sure you want to delete?' ) }
+												</ConfirmDialog>
 
-										<ButtonGroup>
-											<Button variant="tertiary" onClick={ openDeleteDialog }>
-												{ __( 'Delete', 'remote-data-blocks' ) }
-											</Button>
-											<Button variant="primary" onClick={ () => onEditClick( uuid ) }>
-												{ __( 'Edit', 'remote-data-blocks' ) }
-											</Button>
-										</ButtonGroup>
+												<ButtonGroup>
+													<Button variant="tertiary" onClick={ openDeleteDialog }>
+														{ __( 'Delete', 'remote-data-blocks' ) }
+													</Button>
+													<Button variant="primary" onClick={ () => onEditClick( uuid ) }>
+														{ __( 'Edit', 'remote-data-blocks' ) }
+													</Button>
+												</ButtonGroup>
+											</>
+										) }
 									</td>
 								</tr>
 							);
