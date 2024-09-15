@@ -5,12 +5,19 @@
   bootstrap="tests/bootstrap.php"
   cacheDirectory=".phpunit.cache"
   colors="true"
-  displayDetailsOnTestsThatTriggerWarnings="true"
   displayDetailsOnTestsThatTriggerDeprecations="true"
+  displayDetailsOnTestsThatTriggerErrors="true"
+  displayDetailsOnTestsThatTriggerWarnings="true"
 >
   <testsuites>
     <testsuite name="Remote Data Blocks Test Suite">
       <directory>tests/</directory>
     </testsuite>
   </testsuites>
+
+  <source>
+    <include>
+      <directory suffix=".php">inc</directory>
+    </include>
+  </source>
 </phpunit>
