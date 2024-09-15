@@ -2,10 +2,10 @@
 
 namespace RemoteDataBlocks\Example\Shopify;
 
-use RemoteDataBlocks\Config\ShopifyDatasource;
-use RemoteDataBlocks\Config\ShopifyGetProductQuery;
-use RemoteDataBlocks\Config\ShopifySearchProductsQuery;
-use RemoteDataBlocks\Editor\ConfigurationLoader;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
+use RemoteDataBlocks\Integrations\Shopify\Queries\ShopifyGetProductQuery;
+use RemoteDataBlocks\Integrations\Shopify\Queries\ShopifySearchProductsQuery;
+use RemoteDataBlocks\Integrations\Shopify\ShopifyDatasource;
 use RemoteDataBlocks\Logging\LoggerManager;
 use function add_action;
 
@@ -36,7 +36,7 @@ function register_shopify_block() {
 	ConfigurationLoader::register_query( $block_name, new ShopifyAddToCartMutation( $shopify_datasource ) );
 	ConfigurationLoader::register_query( $block_name, new ShopifyRemoveFromCartMutation( $shopify_datasource ) );
 
-	$block_pattern = file_get_contents( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/inc/integrations/shopify-integration/patterns/product-teaser.html' );
+	$block_pattern = file_get_contents( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/inc/integrations/shopify/Patterns/product-teaser.html' );
 	ConfigurationLoader::register_block_pattern( $block_name, 'remote-data-blocks/shopify-product-teaser', $block_pattern, [ 'title' => 'Shopify Product Teaser' ] );
 
 	register_block_type( __DIR__ . '/build/blocks/shopify-cart' );

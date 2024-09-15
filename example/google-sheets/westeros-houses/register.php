@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Example\GoogleSheets\WesterosHouses;
 
-use RemoteDataBlocks\Editor\ConfigurationLoader;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
 use RemoteDataBlocks\Logging\LoggerManager;
 use function add_action;
 

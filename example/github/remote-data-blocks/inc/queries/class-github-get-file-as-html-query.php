@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Example\GitHub;
 
-use RemoteDataBlocks\Config\HttpQueryContext;
+use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
 class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 	public array $input_variables = [
