@@ -9,3 +9,5 @@ coverage:
         informational: true
 github_checks:
   annotations: false
+ignore:
+  - 'example'
