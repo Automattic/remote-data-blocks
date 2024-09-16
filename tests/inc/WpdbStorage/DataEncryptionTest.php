@@ -6,40 +6,40 @@ use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\WpdbStorage\DataEncryption;
 
 class DataEncryptionTest extends TestCase {
-	private $dataEncryption;
+	private $data_encryption;
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->dataEncryption = new DataEncryption();
+		$this->data_encryption = new DataEncryption();
 	}
 
 	public function testEncryptAndDecrypt(): void {
-		$originalValue  = 'sensitive data';
-		$encryptedValue = $this->dataEncryption->encrypt( $originalValue );
+		$original_value  = 'sensitive data';
+		$encrypted_value = $this->data_encryption->encrypt( $original_value );
 
-		$this->assertNotEquals( $originalValue, $encryptedValue );
-		$this->assertNotFalse( $encryptedValue );
+		$this->assertNotEquals( $original_value, $encrypted_value );
+		$this->assertNotFalse( $encrypted_value );
 
-		$decryptedValue = $this->dataEncryption->decrypt( $encryptedValue );
+		$decrypted_value = $this->data_encryption->decrypt( $encrypted_value );
 
-		$this->assertSame( $originalValue, $decryptedValue );
+		$this->assertSame( $original_value, $decrypted_value );
 	}
 
 	public function testEncryptWithEmptyString(): void {
-		$encryptedValue = $this->dataEncryption->encrypt( '' );
+		$encrypted_value = $this->data_encryption->encrypt( '' );
 
-		$this->assertNotFalse( $encryptedValue );
-		$this->assertNotEmpty( $encryptedValue );
+		$this->assertNotFalse( $encrypted_value );
+		$this->assertNotEmpty( $encrypted_value );
 
-		$decryptedValue = $this->dataEncryption->decrypt( $encryptedValue );
+		$decrypted_value = $this->data_encryption->decrypt( $encrypted_value );
 
-		$this->assertSame( '', $decryptedValue );
+		$this->assertSame( '', $decrypted_value );
 	}
 
 	public function testDecryptWithInvalidInput(): void {
-		$invalidInput   = 'not_encrypted_data';
-		$decryptedValue = $this->dataEncryption->decrypt( $invalidInput );
+		$invalid_input   = 'not_encrypted_data';
+		$decrypted_value = $this->data_encryption->decrypt( $invalid_input );
 
-		$this->assertSame( $invalidInput, $decryptedValue );
+		$this->assertSame( $invalid_input, $decrypted_value );
 	}
 }
