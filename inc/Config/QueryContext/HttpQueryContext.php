@@ -68,7 +68,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	/**
 	 * Get the datasource associated with this query.
 	 */
-	protected function get_datasource(): HttpDatasource {
+	public function get_datasource(): HttpDatasource {
 		return $this->datasource;
 	}
 

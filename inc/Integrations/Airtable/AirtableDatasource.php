@@ -2,9 +2,10 @@
 
 namespace RemoteDataBlocks\Integrations\Airtable;
 
-use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+use RemoteDataBlocks\Config\Datasource\CompatibleHttpDatasource;
+use function sanitize_title;
 
-class AirtableDatasource extends HttpDatasource {
+class AirtableDatasource extends CompatibleHttpDatasource {
 	private $tables;
 
 	public function __construct( private string $access_token, private string $base, mixed $tables ) {
@@ -23,7 +24,8 @@ class AirtableDatasource extends HttpDatasource {
 	}
 
 	public function get_display_name(): string {
-		return 'Airtable: ' . $this->get_base() . ' (' . implode( ', ', array_keys( $this->tables ) ) . ')';
+		$suffix = count( $this->tables ) > 1 ? ' (' . implode( ', ', array_keys( $this->tables ) ) . ')' : '';
+		return trim( sprintf( 'Airtable: %s %s', $this->get_base(), $suffix ) );
 	}
 
 	public function get_table( string $variation = '' ): string {
@@ -44,5 +46,29 @@ class AirtableDatasource extends HttpDatasource {
 			'Authorization' => sprintf( 'Bearer %s', $this->get_access_token() ),
 			'Content-Type'  => 'application/json',
 		];
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function get_object_representations(): array {
+		$objects = [];
+
+		foreach ( $this->tables as $table ) {
+			$slug = sprintf( 'Airtable: %s %s', $this->get_base(), $table );
+
+			$objects[ $slug ] = (object) [
+				'base'    => [
+					'name' => $this->get_base(),
+				],
+				'service' => 'airtable',
+				'slug'    => $slug,
+				'table'   => [
+					'name' => $table,
+				],
+			];
+		}
+
+		return $objects;
 	}
 }
