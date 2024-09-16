@@ -61,9 +61,10 @@ Example:
 
 ```php
 function register_your_custom_block() {
-    $block_name = 'Your Custom Block';
+    $block_name      = 'Your Custom Block';
     $your_datasource = new YourCustomDatasource();
-    $your_query = new YourCustomQuery( $your_datasource );
+    $your_query      = new YourCustomQuery( $your_datasource );
+
     register_remote_data_block( $block_name, $your_query );
 }
 add_action( 'init', 'YourNamespace\\register_your_custom_block' );
@@ -88,10 +89,12 @@ Example:
 <!-- /wp:group -->
 ```
 
+```php
 function register_your_block_pattern() {
-    $block_name = 'Your Custom Block';
-    $block_pattern = file_get_contents( __DIR__ . '/your-pattern.html' );
+    $block_name    = 'Your Custom Block';
+    $block_pattern = file_get_contents( **DIR** . '/your-pattern.html' );
+
     register_remote_data_block_pattern( $block_name, 'your-namespace/your-pattern', $block_pattern );
 }
 add_action( 'init', 'YourNamespace\\register_your_block_pattern' );
-
+```
