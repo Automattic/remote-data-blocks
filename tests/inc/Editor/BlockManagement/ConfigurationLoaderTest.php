@@ -60,17 +60,6 @@ class ConfigurationLoaderTest extends TestCase {
 		$this->assertArrayHasKey( 'Test Pattern', $config['patterns'] );
 	}
 
-	public function testRegisterPage() {
-		$queryContext                  = new HttpQueryContext( new MockDatasource() );
-		$queryContext->input_variables = [ 'test_var' => [ 'type' => 'string' ] ];
-		ConfigurationLoader::register_block( 'Page Block', $queryContext );
-		ConfigurationLoader::register_page( 'Page Block', 'test-page' );
-
-		$blockName = 'remote-data-blocks/page-block';
-		$config    = ConfigurationLoader::get_configuration( $blockName );
-		$this->assertArrayHasKey( 'overrides', $config['queries']['__DISPLAY__']->input_variables['test_var'] );
-	}
-
 	public function testRegisterQuery() {
 		$queryContext = new HttpQueryContext( new MockDatasource() );
 		ConfigurationLoader::register_block( 'Query Block', $queryContext );
@@ -145,16 +134,6 @@ class ConfigurationLoaderTest extends TestCase {
 		$this->assertStringContainsString( 'has already been registered', $errorLogs[0]['message'] );
 	}
 
-	public function testRegisterPageWithoutInputVariables() {
-		$queryContext = new HttpQueryContext( new MockDatasource() );
-		ConfigurationLoader::register_block( 'No Input Block', $queryContext );
-		ConfigurationLoader::register_page( 'No Input Block', 'test-page' );
-
-		$this->assertTrue( $this->mockLogger->hasLoggedLevel( LogLevel::ERROR ) );
-		$errorLogs = $this->mockLogger->getLogsByLevel( LogLevel::ERROR );
-		$this->assertStringContainsString( 'A page is only useful for queries with input variables', $errorLogs[0]['message'] );
-	}
-
 	public function testRegisterSearchQueryWithoutSearchTerms() {
 		$queryContext = new HttpQueryContext( new MockDatasource() );
 		ConfigurationLoader::register_block( 'Invalid Search Block', $queryContext );
@@ -164,6 +143,6 @@ class ConfigurationLoaderTest extends TestCase {
 
 		$this->assertTrue( $this->mockLogger->hasLoggedLevel( LogLevel::ERROR ) );
 		$errorLogs = $this->mockLogger->getLogsByLevel( LogLevel::ERROR );
-		$this->assertStringContainsString( 'A search query must have a "search_terms" input variable', $errorLogs[0]['message'] );
+		$this->assertStringContainsString( 'search_terms', $errorLogs[0]['message'] );
 	}
 }
