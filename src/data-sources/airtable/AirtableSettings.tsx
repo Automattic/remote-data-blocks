@@ -188,22 +188,8 @@ export const AirtableSettings = ( {
 					'Failed to fetch bases. Please check that your access token has the `schema.bases:read` Scope.'
 				);
 			} else if ( fetchingBases ) {
-				return __( 'Fetching Bases...' );
-			} else if ( bases ) {
-				if ( state.base ) {
-					const selectedBase = bases.find( base => base.id === state.base?.id );
-					return selectedBase
-						? sprintf(
-								__( 'Selected base: %s | id: %s', 'remote-data-blocks' ),
-								selectedBase.name,
-								selectedBase.id
-						  )
-						: sprintf( __( 'Invalid base selected: %s', 'remote-data-blocks' ), state.base );
-				}
-
-				return __( 'No Bases found' );
+				return __( 'Fetching bases...' );
 			}
-			return '';
 		}
 
 		return 'Select a base from which to fetch data.';
@@ -221,21 +207,21 @@ export const AirtableSettings = ( {
 			} else if ( tables ) {
 				if ( state.table ) {
 					const selectedTable = tables.find( table => table.id === state.table?.id );
-					return selectedTable
-						? sprintf(
-								__( 'Selected table: %s | Fields: %s', 'remote-data-blocks' ),
-								selectedTable.name,
-								selectedTable.fields.map( field => field.name ).join( ', ' )
-						  )
-						: sprintf( __( 'Invalid table selected: %s', 'remote-data-blocks' ), state.table );
+
+					if ( selectedTable ) {
+						return sprintf(
+							__( 'Fields: %s', 'remote-data-blocks' ),
+							selectedTable.fields.map( field => field.name ).join( ', ' )
+						);
+					}
 				}
-				if ( tables.length ) {
-					return __( 'Select a table from which to fetch data.', 'remote-data-blocks' );
+
+				if ( ! tables.length ) {
+					return __( 'No tables found', 'remote-data-blocks' );
 				}
-				return __( 'No tables found', 'remote-data-blocks' );
 			}
 
-			return '';
+			return __( 'Select a table from which to fetch data.', 'remote-data-blocks' );
 		}
 
 		return 'Select a table to attach with this data source.';
