@@ -11,11 +11,11 @@ import {
 describe( 'string utils', () => {
 	describe( 'getClassName', () => {
 		it( 'should generate a class name with prefix', () => {
-			expect( getClassName( 'testName' ) ).toBe( 'rdb-test-name' );
+			expect( getClassName( 'testName' ) ).toBe( 'rdb-testname' );
 		} );
 
 		it( 'should combine with existing class name', () => {
-			expect( getClassName( 'testName', 'existing-class' ) ).toBe( 'existing-class rdb-test-name' );
+			expect( getClassName( 'testName', 'existing-class' ) ).toBe( 'existing-class rdb-testname' );
 		} );
 	} );
 
