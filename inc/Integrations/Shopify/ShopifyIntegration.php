@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Integrations\Shopify;
 
-use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Integrations\Shopify\Queries\ShopifyGetProductQuery;
 use RemoteDataBlocks\Integrations\Shopify\Queries\ShopifySearchProductsQuery;
 use RemoteDataBlocks\Logging\LoggerManager;
@@ -36,9 +36,9 @@ class ShopifyIntegration {
 		$block_name    = $shopify_datasource->get_display_name();
 		$block_pattern = file_get_contents( __DIR__ . '/Patterns/product-teaser.html' );
 
-		ConfigurationLoader::register_block( $block_name, $shopify_get_product_query );
-		ConfigurationLoader::register_search_query( $block_name, $shopify_search_products_query );
-		ConfigurationLoader::register_block_pattern( $block_name, 'remote-data-blocks/shopify-product-teaser', $block_pattern, [ 'title' => 'Shopify Product Teaser' ] );
+		ConfigRegistry::register_block( $block_name, $shopify_get_product_query );
+		ConfigRegistry::register_search_query( $block_name, $shopify_search_products_query );
+		ConfigRegistry::register_block_pattern( $block_name, 'remote-data-blocks/shopify-product-teaser', $block_pattern, [ 'title' => 'Shopify Product Teaser' ] );
 
 		LoggerManager::instance()->info( 'Registered Shopify block', [ 'block_name' => $block_name ] );
 	}

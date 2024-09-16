@@ -55,23 +55,23 @@ class YourCustomQuery extends HttpQueryContext {
 To register your new block:
 
 1. Create a new PHP file for registering your block.
-2. Use the `ConfigurationLoader` class to register your block, queries, and patterns.
+2. Use the `ConfigRegistry` class to register your block, queries, and patterns.
 
 Example:
 
 ```php
-use RemoteDataBlocks\Editor\ConfigurationLoader;
+use RemoteDataBlocks\Editor\ConfigRegistry;
 
 function register_your_custom_block() {
     $block_name = 'Your Custom Block';
     $your_datasource = new YourCustomDatasource();
     $your_query = new YourCustomQuery( $your_datasource );
-    ConfigurationLoader::register_block( $block_name, $your_query );
-    ConfigurationLoader::register_list_query( $block_name, $your_query );
+    ConfigRegistry::register_block( $block_name, $your_query );
+    ConfigRegistry::register_list_query( $block_name, $your_query );
     $block_pattern = file_get_contents( __DIR__ . '/your-pattern.html' );
-    ConfigurationLoader::register_block_pattern( $block_name, 'your-namespace/your-pattern', $block_pattern );
+    ConfigRegistry::register_block_pattern( $block_name, 'your-namespace/your-pattern', $block_pattern );
 }
-add_action( 'register_remote_data_blocks', 'YourNamespace\\register_your_custom_block' );
+add_action( 'init', 'YourNamespace\\register_your_custom_block' );
 ```
 
 ## 4. Create Block Patterns

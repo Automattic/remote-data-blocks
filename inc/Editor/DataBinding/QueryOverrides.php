@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Editor\DataBinding;
 
-use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 
 defined( 'ABSPATH' ) || exit();
 
@@ -18,8 +18,8 @@ class QueryOverrides {
 		$query_vars = [];
 
 		// Find all of the query variable overrides defined in display queries.
-		foreach ( ConfigurationLoader::get_block_names() as $block_name ) {
-			$config = ConfigurationLoader::get_configuration( $block_name );
+		foreach ( ConfigStore::get_block_names() as $block_name ) {
+			$config = ConfigStore::get_configuration( $block_name );
 
 			if ( ! isset( $config['queries']['__DISPLAY__']->input_variables ) ) {
 				continue;

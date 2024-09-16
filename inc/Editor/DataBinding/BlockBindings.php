@@ -4,7 +4,7 @@ namespace RemoteDataBlocks\Editor\DataBinding;
 
 defined( 'ABSPATH' ) || exit();
 
-use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\Logging\LoggerManager;
 use WP_Block;
 
@@ -156,7 +156,7 @@ class BlockBindings {
 		$block_name   = $block_context['blockName'];
 		$query_input  = $block_context['queryInput'];
 		$overrides    = $block_context['queryInputOverrides'] ?? [];
-		$block_config = ConfigurationLoader::get_configuration( $block_name );
+		$block_config = ConfigStore::get_configuration( $block_name );
 
 		if ( null === $block_config ) {
 			return null;
