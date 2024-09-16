@@ -70,7 +70,7 @@ const DataSourceList = () => {
 		}
 
 		return tags.map( ( tag, index ) => (
-			<span key={ index } className="data-source-meta">
+			<span key={ tag } className="data-source-meta">
 				{ tag }
 			</span>
 		) );
