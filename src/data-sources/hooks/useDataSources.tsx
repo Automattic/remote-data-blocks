@@ -28,6 +28,11 @@ export const useDataSources = ( loadOnMount = true ) => {
 
 	const checkSlugConflict = useCallback(
 		async ( slug: string, uuid: string = '' ) => {
+			if ( slug === '' ) {
+				showSnackbar( 'error', __( 'Slug should not be empty.', 'remote-data-blocks' ) );
+				return;
+			}
+
 			setLoadingSlugConflicts( true );
 			try {
 				const conflict = await apiFetch< { exists: boolean } >( {
