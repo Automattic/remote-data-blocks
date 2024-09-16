@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\REST;
 
-use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\WpdbStorage\DatasourceCrud;
 use WP_REST_Controller;
 
@@ -96,7 +96,7 @@ class DatasourceController extends WP_REST_Controller {
 	public function get_items( $request ) {
 		// Merge the UI-managed and user-defined sources.
 		$crud_sources         = DatasourceCrud::get_data_sources();
-		$user_defined_sources = ConfigurationLoader::get_compatible_data_sources();
+		$user_defined_sources = ConfigStore::get_compatible_data_sources();
 
 		return rest_ensure_response( array_merge( $crud_sources, $user_defined_sources ) );
 	}
