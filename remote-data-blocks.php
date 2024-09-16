@@ -31,6 +31,9 @@ define( 'REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE', 'shopify' );
 // Autoloader
 require_once __DIR__ . '/vendor/autoload.php';
 
+// Access functions
+require_once __DIR__ . '/functions.php';
+
 // Other editor modifications
 Editor\AdminNotices\AdminNotices::init();
 Editor\DataBinding\BlockBindings::init();

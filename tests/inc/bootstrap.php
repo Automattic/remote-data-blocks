@@ -6,4 +6,5 @@ define( 'REMOTE_DATA_BLOCKS_ENCRYPTION_KEY', 'test_encryption_key' );
 define( 'REMOTE_DATA_BLOCKS_ENCRYPTION_SALT', 'test_encryption_salt' );
 
 require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../functions.php';
 require_once __DIR__ . '/stubs.php';

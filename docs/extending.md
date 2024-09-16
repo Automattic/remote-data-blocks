@@ -55,28 +55,24 @@ class YourCustomQuery extends HttpQueryContext {
 To register your new block:
 
 1. Create a new PHP file for registering your block.
-2. Use the `ConfigRegistry` class to register your block, queries, and patterns.
+2. Use the `register_remote_data_block` function to register your block.
 
 Example:
 
 ```php
-use RemoteDataBlocks\Editor\ConfigRegistry;
-
 function register_your_custom_block() {
-    $block_name = 'Your Custom Block';
+    $block_name      = 'Your Custom Block';
     $your_datasource = new YourCustomDatasource();
-    $your_query = new YourCustomQuery( $your_datasource );
-    ConfigRegistry::register_block( $block_name, $your_query );
-    ConfigRegistry::register_list_query( $block_name, $your_query );
-    $block_pattern = file_get_contents( __DIR__ . '/your-pattern.html' );
-    ConfigRegistry::register_block_pattern( $block_name, 'your-namespace/your-pattern', $block_pattern );
+    $your_query      = new YourCustomQuery( $your_datasource );
+
+    register_remote_data_block( $block_name, $your_query );
 }
 add_action( 'init', 'YourNamespace\\register_your_custom_block' );
 ```
 
-## 4. Create Block Patterns
+## 4. Create Block Patterns (optional)
 
-Create HTML patterns for your block to define how the data should be displayed. Use the Remote Data Blocks binding syntax to connect data to your pattern.
+Patterns allow you to represent your remote data if different ways. By default, the plugin registers a unstyled block pattern that you can use out of the box. You can create additional patterns in the WordPress Dashboard or programmatically using the `register_remote_data_block_pattern` function.
 
 Example:
 
@@ -91,4 +87,14 @@ Example:
 	<!-- /wp:paragraph -->
 </div>
 <!-- /wp:group -->
+```
+
+```php
+function register_your_block_pattern() {
+    $block_name    = 'Your Custom Block';
+    $block_pattern = file_get_contents( **DIR** . '/your-pattern.html' );
+
+    register_remote_data_block_pattern( $block_name, 'your-namespace/your-pattern', $block_pattern );
+}
+add_action( 'init', 'YourNamespace\\register_your_block_pattern' );
 ```
