@@ -1,17 +1,18 @@
 import { useDebounce } from '@wordpress/compose';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 import { ShopifyApi } from '@/data-sources/shopify/shopify-api';
+import { getConnectionMessage } from '@/data-sources/utils';
 import { useQuery } from '@/hooks/useQuery';
 
 export interface ShopifyConnection {
 	shopName: string | null;
-	connectionMessage: string;
+	connectionMessage: JSX.Element | null;
 }
 
 export const useShopifyShopName = ( store: string, token: string ): ShopifyConnection => {
-	const [ connectionMessage, setConnectionMessage ] = useState< string >( '' );
+	const [ connectionMessage, setConnectionMessage ] = useState< null | JSX.Element >( null );
 
 	const api = useMemo( () => new ShopifyApi( store, token ), [ store, token ] );
 	const queryFn = useCallback( async () => {
@@ -34,22 +35,39 @@ export const useShopifyShopName = ( store: string, token: string ): ShopifyConne
 
 	useEffect( () => {
 		if ( fetchingShopName ) {
-			setConnectionMessage( __( 'Checking connection...', 'remote-data-blocks' ) );
+			setConnectionMessage(
+				getConnectionMessage( null, __( 'Validating connection...', 'remote-data-blocks' ) )
+			);
 		} else if ( shopNameError ) {
 			setConnectionMessage(
-				__(
-					'Connection failed. Please check your Store Name and Access Token.',
-					'remote-data-blocks'
+				getConnectionMessage(
+					'error',
+					__(
+						'Connection failed. Please verify store slug and access token.',
+						'remote-data-blocks'
+					)
 				)
 			);
 		} else if ( shopName ) {
 			setConnectionMessage(
-				__( sprintf( 'Connection successful. Shop Name: %s', shopName ), 'remote-data-blocks' )
+				getConnectionMessage( 'success', __( 'Connection successful.', 'remote-data-blocks' ) )
 			);
 		} else {
-			setConnectionMessage( '' );
+			setConnectionMessage( null );
 		}
 	}, [ fetchingShopName, shopNameError, shopName ] );
+
+	if ( ! connectionMessage ) {
+		setConnectionMessage(
+			<span>
+				{ __( 'Provide access token to connect your Shopify store', 'remote-data-blocks' ) } (
+				<a href="https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens/generate-app-access-tokens-admin">
+					{ __( 'guide', 'remote-data-blocks' ) }
+				</a>
+				).
+			</span>
+		);
+	}
 
 	return { shopName, connectionMessage };
 };

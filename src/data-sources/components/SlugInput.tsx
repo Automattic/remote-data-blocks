@@ -39,9 +39,10 @@ export const SlugInput: React.FC< SlugInputProps > = ( { slug, onChange, uuid } 
 			value={ slug }
 			onChange={ onSlugChange }
 			help={ __(
-				slugConflictMessage || 'A unique identifier for this data source',
+				slugConflictMessage || 'A unique identifier for this data source.',
 				'remote-data-blocks'
 			) }
+			__next40pxDefaultSize
 		/>
 	);
 };
