@@ -233,7 +233,7 @@ class DatasourceCrud {
 
 	public static function delete_item_by_uuid( string $uuid ): WP_Error|bool {
 		$data_sources = self::get_data_sources();
-		$index = array_search( $uuid, array_column( $data_sources, 'uuid' ) );
+		$index        = array_search( $uuid, array_column( $data_sources, 'uuid' ) );
 		array_splice( $data_sources, $index, 1 );
 		$result = update_option( self::CONFIG_OPTION_NAME, $data_sources );
 		if ( true !== $result ) {
