@@ -60,7 +60,7 @@ const defaultSelectBaseOption: SelectOption = {
 
 const defaultSelectTableOption: SelectOption = {
 	disabled: true,
-	label: 'Auto-filled on successful connection.',
+	label: 'Auto-filled on valid base.',
 	value: '',
 };
 
@@ -228,20 +228,34 @@ export const AirtableSettings = ( {
 	}, [ bases, fetchingTables, state.base, state.table, tables, tablesError ] );
 
 	useEffect( () => {
+		if ( ! bases?.length ) {
+			return;
+		}
+
 		setBaseOptions( [
-			defaultSelectBaseOption,
+			{
+				...defaultSelectBaseOption,
+				label: __( 'Select a base', 'remote-data-blocks' ),
+			},
 			...( bases ?? [] ).map( ( { name, id } ) => ( { label: name, value: id } ) ),
 		] );
 	}, [ bases ] );
 
 	useEffect( () => {
+		if ( ! state?.base ) {
+			return;
+		}
+
 		if ( tables ) {
 			setTableOptions( [
-				defaultSelectTableOption,
+				{
+					...defaultSelectBaseOption,
+					label: __( 'Select a table', 'remote-data-blocks' ),
+				},
 				...tables.map( ( { name, id } ) => ( { label: name, value: id, disabled: false } ) ),
 			] );
 		}
-	}, [ tables ] );
+	}, [ state.base, tables ] );
 
 	return (
 		<Card className="add-update-data-source-card">
@@ -268,7 +282,7 @@ export const AirtableSettings = ( {
 					<div className="form-group">
 						<SelectControl
 							id="base"
-							label={ __( 'Select Base', 'remote-data-blocks' ) }
+							label={ __( 'Base', 'remote-data-blocks' ) }
 							value={ state.base?.id ?? '' }
 							onChange={ onSelectChange }
 							options={ baseOptions }
@@ -281,7 +295,7 @@ export const AirtableSettings = ( {
 					<div className="form-group">
 						<SelectControl
 							id="table"
-							label={ __( 'Select Table', 'remote-data-blocks' ) }
+							label={ __( 'Table', 'remote-data-blocks' ) }
 							value={ state.table?.id ?? '' }
 							onChange={ onSelectChange }
 							options={ tableOptions }
