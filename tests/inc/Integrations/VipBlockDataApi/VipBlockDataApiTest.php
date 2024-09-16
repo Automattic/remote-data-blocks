@@ -5,7 +5,7 @@ namespace RemoteDataBlocks\Tests\Integrations\VipBlockDataApi;
 use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
-use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Integrations\VipBlockDataApi\VipBlockDataApi;
 use RemoteDataBlocks\Tests\Mocks\MockQueryRunner;
 use RemoteDataBlocks\Tests\Mocks\MockDatasource;
@@ -141,11 +141,12 @@ class VipBlockDataApiTest extends TestCase {
 		);
 
 		$GLOBALS['__wordpress_done_actions'] = [];
+
+		ConfigRegistry::init();
 	}
 
 	protected function tearDown(): void {
 		\restore_error_handler();
-		ConfigurationLoader::unregister_all();
 	}
 
 	public function testResolveRemoteDataSimple() {
@@ -157,7 +158,7 @@ class VipBlockDataApiTest extends TestCase {
 		$mock_qr->addResult( 'location', $expected2 );
 
 		$mock_query_context = new TestQueryContext( $mock_qr );
-		ConfigurationLoader::register_block( 'Events', $mock_query_context );
+		ConfigRegistry::register_block( 'Events', $mock_query_context );
 
 		$result = VipBlockDataApi::resolve_remote_data( self::$sourced_block1, 'remote-data-blocks/events', 12, self::$parsed_block1, $mock_qr );
 		$this->assertSame( $expected1, $result['innerBlocks'][0]['attributes']['content'] );
@@ -176,7 +177,7 @@ class VipBlockDataApiTest extends TestCase {
 		$mock_qr->addResult( 'location', new \WP_Error( 'rdb-uh-oh', 'uh-oh!' ) );
 
 		$mock_query_context = new TestQueryContext( $mock_qr );
-		ConfigurationLoader::register_block( 'Events', $mock_query_context );
+		ConfigRegistry::register_block( 'Events', $mock_query_context );
 
 		$result = VipBlockDataApi::resolve_remote_data( self::$sourced_block1, 'remote-data-blocks/events', 12, self::$parsed_block1, $mock_qr );
 
