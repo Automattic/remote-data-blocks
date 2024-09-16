@@ -119,9 +119,10 @@ class ConfigurationLoaderTest extends TestCase {
 	}
 
 	public function testGetConfigurationForNonexistentBlock() {
-		$config = ConfigurationLoader::get_configuration( 'nonexistent' );
-		$this->assertNull( $config );
+		$this->assertNull( ConfigurationLoader::get_configuration( 'nonexistent' ) );
 		$this->assertTrue( $this->mockLogger->hasLoggedLevel( LogLevel::ERROR ) );
+		$errorLogs = $this->mockLogger->getLogsByLevel( LogLevel::ERROR );
+		$this->assertStringContainsString( 'not been registered', $errorLogs[0]['message'] );
 	}
 
 	public function testRegisterDuplicateBlock() {
@@ -131,7 +132,7 @@ class ConfigurationLoaderTest extends TestCase {
 
 		$this->assertTrue( $this->mockLogger->hasLoggedLevel( LogLevel::ERROR ) );
 		$errorLogs = $this->mockLogger->getLogsByLevel( LogLevel::ERROR );
-		$this->assertStringContainsString( 'has already been registered', $errorLogs[0]['message'] );
+		$this->assertStringContainsString( 'already been registered', $errorLogs[0]['message'] );
 	}
 
 	public function testRegisterSearchQueryWithoutSearchTerms() {
