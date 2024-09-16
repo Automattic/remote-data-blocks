@@ -10,12 +10,12 @@ use RemoteDataBlocks\Tests\Mocks\MockDatasource;
 use Psr\Log\LogLevel;
 
 class ConfigurationLoaderTest extends TestCase {
-	private MockLogger $mockLogger;
+	private MockLogger $mock_logger;
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->mockLogger = new MockLogger();
-		ConfigurationLoader::init( $this->mockLogger );
+		$this->mock_logger = new MockLogger();
+		ConfigurationLoader::init( $this->mock_logger );
 	}
 
 	protected function tearDown(): void {
@@ -24,78 +24,78 @@ class ConfigurationLoaderTest extends TestCase {
 	}
 
 	public function testRegisterBlock() {
-		$queryContext = new HttpQueryContext( new MockDatasource() );
-		ConfigurationLoader::register_block( 'Test Block', $queryContext );
+		$query_context = new HttpQueryContext( new MockDatasource() );
+		ConfigurationLoader::register_block( 'Test Block', $query_context );
 
-		$blockName = 'remote-data-blocks/test-block';
-		$this->assertTrue( ConfigurationLoader::is_registered_block( $blockName ) );
+		$block_name = 'remote-data-blocks/test-block';
+		$this->assertTrue( ConfigurationLoader::is_registered_block( $block_name ) );
 
-		$config = ConfigurationLoader::get_configuration( $blockName );
+		$config = ConfigurationLoader::get_configuration( $block_name );
 		$this->assertIsArray( $config );
-		$this->assertEquals( $blockName, $config['name'] );
+		$this->assertEquals( $block_name, $config['name'] );
 		$this->assertEquals( 'Test Block', $config['title'] );
 		$this->assertFalse( $config['loop'] );
 	}
 
 	public function testRegisterLoopBlock() {
-		$queryContext = new HttpQueryContext( new MockDatasource() );
-		ConfigurationLoader::register_loop_block( 'Loop Block', $queryContext );
+		$query_context = new HttpQueryContext( new MockDatasource() );
+		ConfigurationLoader::register_loop_block( 'Loop Block', $query_context );
 
-		$blockName = 'remote-data-blocks/loop-block';
-		$this->assertTrue( ConfigurationLoader::is_registered_block( $blockName ) );
+		$block_name = 'remote-data-blocks/loop-block';
+		$this->assertTrue( ConfigurationLoader::is_registered_block( $block_name ) );
 
-		$config = ConfigurationLoader::get_configuration( $blockName );
+		$config = ConfigurationLoader::get_configuration( $block_name );
 		$this->assertIsArray( $config );
 		$this->assertTrue( $config['loop'] );
 	}
 
 	public function testRegisterBlockPattern() {
-		$queryContext = new HttpQueryContext( new MockDatasource() );
-		ConfigurationLoader::register_block( 'Block with Pattern', $queryContext );
+		$query_context = new HttpQueryContext( new MockDatasource() );
+		ConfigurationLoader::register_block( 'Block with Pattern', $query_context );
 		ConfigurationLoader::register_block_pattern( 'Block with Pattern', 'Test Pattern', '<!-- wp:paragraph -->Test<!-- /wp:paragraph -->' );
 
-		$blockName = 'remote-data-blocks/block-with-pattern';
-		$config    = ConfigurationLoader::get_configuration( $blockName );
+		$block_name = 'remote-data-blocks/block-with-pattern';
+		$config     = ConfigurationLoader::get_configuration( $block_name );
 		$this->assertArrayHasKey( 'patterns', $config );
 		$this->assertArrayHasKey( 'Test Pattern', $config['patterns'] );
 	}
 
 	public function testRegisterQuery() {
-		$queryContext = new HttpQueryContext( new MockDatasource() );
-		ConfigurationLoader::register_block( 'Query Block', $queryContext );
+		$query_context = new HttpQueryContext( new MockDatasource() );
+		ConfigurationLoader::register_block( 'Query Block', $query_context );
 		
-		$additionalQuery = new HttpQueryContext( new MockDatasource() );
-		ConfigurationLoader::register_query( 'Query Block', $additionalQuery );
+		$additional_query = new HttpQueryContext( new MockDatasource() );
+		ConfigurationLoader::register_query( 'Query Block', $additional_query );
 
-		$blockName = 'remote-data-blocks/query-block';
-		$config    = ConfigurationLoader::get_configuration( $blockName );
-		$this->assertArrayHasKey( get_class( $additionalQuery ), $config['queries'] );
+		$block_name = 'remote-data-blocks/query-block';
+		$config     = ConfigurationLoader::get_configuration( $block_name );
+		$this->assertArrayHasKey( get_class( $additional_query ), $config['queries'] );
 	}
 
 	public function testRegisterListQuery() {
-		$queryContext = new HttpQueryContext( new MockDatasource() );
-		ConfigurationLoader::register_block( 'List Block', $queryContext );
+		$query_context = new HttpQueryContext( new MockDatasource() );
+		ConfigurationLoader::register_block( 'List Block', $query_context );
 		
-		$listQuery                               = new HttpQueryContext( new MockDatasource() );
-		$listQuery->output_variables['mappings'] = [ 'test' => 'test' ];
-		ConfigurationLoader::register_list_query( 'List Block', $listQuery );
+		$list_query                               = new HttpQueryContext( new MockDatasource() );
+		$list_query->output_variables['mappings'] = [ 'test' => 'test' ];
+		ConfigurationLoader::register_list_query( 'List Block', $list_query );
 
-		$blockName = 'remote-data-blocks/list-block';
-		$config    = ConfigurationLoader::get_configuration( $blockName );
+		$block_name = 'remote-data-blocks/list-block';
+		$config     = ConfigurationLoader::get_configuration( $block_name );
 		$this->assertEquals( 'list', $config['selectors'][0]['type'] );
 	}
 
 	public function testRegisterSearchQuery() {
-		$queryContext = new HttpQueryContext( new MockDatasource() );
-		ConfigurationLoader::register_block( 'Search Block', $queryContext );
+		$query_context = new HttpQueryContext( new MockDatasource() );
+		ConfigurationLoader::register_block( 'Search Block', $query_context );
 		
-		$searchQuery                                  = new HttpQueryContext( new MockDatasource() );
-		$searchQuery->input_variables['search_terms'] = [ 'type' => 'string' ];
-		$searchQuery->output_variables['mappings']    = [ 'test' => 'test' ];
-		ConfigurationLoader::register_search_query( 'Search Block', $searchQuery );
+		$search_query                                  = new HttpQueryContext( new MockDatasource() );
+		$search_query->input_variables['search_terms'] = [ 'type' => 'string' ];
+		$search_query->output_variables['mappings']    = [ 'test' => 'test' ];
+		ConfigurationLoader::register_search_query( 'Search Block', $search_query );
 
-		$blockName = 'remote-data-blocks/search-block';
-		$config    = ConfigurationLoader::get_configuration( $blockName );
+		$block_name = 'remote-data-blocks/search-block';
+		$config     = ConfigurationLoader::get_configuration( $block_name );
 		$this->assertEquals( 'search', $config['selectors'][0]['type'] );
 	}
 
@@ -103,10 +103,10 @@ class ConfigurationLoaderTest extends TestCase {
 		ConfigurationLoader::register_block( 'Block One', new HttpQueryContext( new MockDatasource() ) );
 		ConfigurationLoader::register_block( 'Block Two', new HttpQueryContext( new MockDatasource() ) );
 
-		$blockNames = ConfigurationLoader::get_block_names();
-		$this->assertCount( 2, $blockNames );
-		$this->assertContains( 'remote-data-blocks/block-one', $blockNames );
-		$this->assertContains( 'remote-data-blocks/block-two', $blockNames );
+		$block_names = ConfigurationLoader::get_block_names();
+		$this->assertCount( 2, $block_names );
+		$this->assertContains( 'remote-data-blocks/block-one', $block_names );
+		$this->assertContains( 'remote-data-blocks/block-two', $block_names );
 	}
 
 	public function testIsRegisteredBlockReturnsTrueForRegisteredBlock() {
@@ -120,30 +120,30 @@ class ConfigurationLoaderTest extends TestCase {
 
 	public function testGetConfigurationForNonexistentBlock() {
 		$this->assertNull( ConfigurationLoader::get_configuration( 'nonexistent' ) );
-		$this->assertTrue( $this->mockLogger->hasLoggedLevel( LogLevel::ERROR ) );
-		$errorLogs = $this->mockLogger->getLogsByLevel( LogLevel::ERROR );
-		$this->assertStringContainsString( 'not been registered', $errorLogs[0]['message'] );
+		$this->assertTrue( $this->mock_logger->hasLoggedLevel( LogLevel::ERROR ) );
+		$error_logs = $this->mock_logger->getLogsByLevel( LogLevel::ERROR );
+		$this->assertStringContainsString( 'not been registered', $error_logs[0]['message'] );
 	}
 
 	public function testRegisterDuplicateBlock() {
-		$queryContext = new HttpQueryContext( new MockDatasource() );
-		ConfigurationLoader::register_block( 'Duplicate Block', $queryContext );
-		ConfigurationLoader::register_block( 'Duplicate Block', $queryContext );
+		$query_context = new HttpQueryContext( new MockDatasource() );
+		ConfigurationLoader::register_block( 'Duplicate Block', $query_context );
+		ConfigurationLoader::register_block( 'Duplicate Block', $query_context );
 
-		$this->assertTrue( $this->mockLogger->hasLoggedLevel( LogLevel::ERROR ) );
-		$errorLogs = $this->mockLogger->getLogsByLevel( LogLevel::ERROR );
-		$this->assertStringContainsString( 'already been registered', $errorLogs[0]['message'] );
+		$this->assertTrue( $this->mock_logger->hasLoggedLevel( LogLevel::ERROR ) );
+		$error_logs = $this->mock_logger->getLogsByLevel( LogLevel::ERROR );
+		$this->assertStringContainsString( 'already been registered', $error_logs[0]['message'] );
 	}
 
 	public function testRegisterSearchQueryWithoutSearchTerms() {
-		$queryContext = new HttpQueryContext( new MockDatasource() );
-		ConfigurationLoader::register_block( 'Invalid Search Block', $queryContext );
+		$query_context = new HttpQueryContext( new MockDatasource() );
+		ConfigurationLoader::register_block( 'Invalid Search Block', $query_context );
 		
-		$searchQuery = new HttpQueryContext( new MockDatasource() );
-		ConfigurationLoader::register_search_query( 'Invalid Search Block', $searchQuery );
+		$search_query = new HttpQueryContext( new MockDatasource() );
+		ConfigurationLoader::register_search_query( 'Invalid Search Block', $search_query );
 
-		$this->assertTrue( $this->mockLogger->hasLoggedLevel( LogLevel::ERROR ) );
-		$errorLogs = $this->mockLogger->getLogsByLevel( LogLevel::ERROR );
-		$this->assertStringContainsString( 'search_terms', $errorLogs[0]['message'] );
+		$this->assertTrue( $this->mock_logger->hasLoggedLevel( LogLevel::ERROR ) );
+		$error_logs = $this->mock_logger->getLogsByLevel( LogLevel::ERROR );
+		$this->assertStringContainsString( 'search_terms', $error_logs[0]['message'] );
 	}
 }
