@@ -21,7 +21,7 @@ function register_block_pattern( string $name, array $options ): void {
 }
 
 function sanitize_title( string $title ): string {
-	return strtolower( $title );
+	return str_replace( ' ', '-', strtolower( $title ) );
 }
 
 function sanitize_text_field( string $text ): string {
