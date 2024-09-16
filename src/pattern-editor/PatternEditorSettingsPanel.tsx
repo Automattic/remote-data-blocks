@@ -16,10 +16,7 @@ interface SelectReturnValue {
 }
 
 const PatternEditorSettingsPanel = () => {
-	const { categoryIds, postContent, postId, postType, syncStatus } = useSelect<
-		EditorStoreSelectors,
-		SelectReturnValue
-	>( select => {
+	const { postId, postType } = useSelect< EditorStoreSelectors, SelectReturnValue >( select => {
 		const { getEditedPostAttribute } = select( editorStore );
 
 		/**
@@ -39,9 +36,6 @@ const PatternEditorSettingsPanel = () => {
 	}, [] );
 
 	const [
-		// This is the post meta for the "saved" version of this post. It's not currently updated in real-time.
-		postMeta,
-
 		// We can use this function to update the post meta if needed.
 		_updatePostMeta,
 	] = useEntityProp( 'postType', 'wp_block', 'meta', postId ) as [
@@ -53,8 +47,6 @@ const PatternEditorSettingsPanel = () => {
 	if ( postType !== 'wp_block' ) {
 		return null;
 	}
-
-	const isSynced = syncStatus !== 'unsynced';
 
 	return (
 		<PluginDocumentSettingPanel
