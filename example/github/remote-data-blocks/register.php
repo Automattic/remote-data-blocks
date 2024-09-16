@@ -35,4 +35,4 @@ function register_github_file_as_html_block() {
 	$logger = LoggerManager::instance();
 	$logger->info( sprintf( 'Registered %s block (branch: %s)', $block_name, $branch ) );
 }
-add_action( 'register_remote_data_blocks', __NAMESPACE__ . '\\register_github_file_as_html_block' );
+add_action( 'init', __NAMESPACE__ . '\\register_github_file_as_html_block' );

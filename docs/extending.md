@@ -71,7 +71,7 @@ function register_your_custom_block() {
     $block_pattern = file_get_contents( __DIR__ . '/your-pattern.html' );
     ConfigRegistry::register_block_pattern( $block_name, 'your-namespace/your-pattern', $block_pattern );
 }
-add_action( 'register_remote_data_blocks', 'YourNamespace\\register_your_custom_block' );
+add_action( 'init', 'YourNamespace\\register_your_custom_block' );
 ```
 
 ## 4. Create Block Patterns

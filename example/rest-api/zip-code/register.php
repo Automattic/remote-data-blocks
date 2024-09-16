@@ -13,4 +13,4 @@ function register_zipcode_block() {
 
 	ConfigRegistry::register_block( 'Zip Code', $zipcode_query );
 }
-add_action( 'register_remote_data_blocks', __NAMESPACE__ . '\\register_zipcode_block' );
+add_action( 'init', __NAMESPACE__ . '\\register_zipcode_block' );

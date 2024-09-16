@@ -42,4 +42,4 @@ function register_shopify_block() {
 	register_block_type( __DIR__ . '/build/blocks/shopify-cart' );
 	register_block_type( __DIR__ . '/build/blocks/shopify-cart-button' );
 }
-add_action( 'register_remote_data_blocks', __NAMESPACE__ . '\\register_shopify_block' );
+add_action( 'init', __NAMESPACE__ . '\\register_shopify_block' );

@@ -16,4 +16,4 @@ function register_aic_block() {
 	ConfigRegistry::register_block( 'Art Institute of Chicago', $get_art_query );
 	ConfigRegistry::register_search_query( 'Art Institute of Chicago', $search_art_query );
 }
-add_action( 'register_remote_data_blocks', __NAMESPACE__ . '\\register_aic_block' );
+add_action( 'init', __NAMESPACE__ . '\\register_aic_block' );

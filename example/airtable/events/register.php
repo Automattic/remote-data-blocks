@@ -26,4 +26,4 @@ function register_airtable_events_block() {
 	ConfigRegistry::register_page( $block_name, 'airtable-event' );
 }
 
-add_action( 'register_remote_data_blocks', __NAMESPACE__ . '\\register_airtable_events_block' );
+add_action( 'init', __NAMESPACE__ . '\\register_airtable_events_block' );

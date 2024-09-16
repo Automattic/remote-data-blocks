@@ -36,4 +36,4 @@ function register_westeros_houses_block() {
 	ConfigRegistry::register_page( $block_name, 'westeros-houses' );
 }
 
-add_action( 'register_remote_data_blocks', __NAMESPACE__ . '\\register_westeros_houses_block' );
+add_action( 'init', __NAMESPACE__ . '\\register_westeros_houses_block' );
