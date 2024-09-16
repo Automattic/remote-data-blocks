@@ -8,9 +8,10 @@ import {
 	Button,
 } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
+import { getConnectionMessage } from '../utils';
 import { SlugInput } from '@/data-sources/components/SlugInput';
 import { GOOGLE_SHEETS_API_SCOPES } from '@/data-sources/constants';
 import { GoogleSheetsFormState } from '@/data-sources/google-sheets/types';
@@ -59,7 +60,8 @@ const getInitialStateFromConfig = ( config?: GoogleSheetsConfig ): GoogleSheetsF
 };
 
 const defaultSelectOption: SelectOption = {
-	label: '',
+	disabled: true,
+	label: 'Select an option',
 	value: '',
 };
 
@@ -96,9 +98,17 @@ export const GoogleSheetsSettings = ( {
 	} );
 
 	const [ spreadsheetOptions, setSpreadsheetOptions ] = useState< SelectOption[] >( [
-		defaultSelectOption,
+		{
+			...defaultSelectOption,
+			label: __( 'Auto-filled on successful connection.', 'remote-data-blocks' ),
+		},
 	] );
-	const [ sheetOptions, setSheetOptions ] = useState< SelectOption[] >( [ defaultSelectOption ] );
+	const [ sheetOptions, setSheetOptions ] = useState< SelectOption[] >( [
+		{
+			...defaultSelectOption,
+			label: __( 'Auto-filled on valid spreadsheet.', 'remote-data-blocks' ),
+		},
+	] );
 
 	const { fetchingToken, token, tokenError } = useGoogleAuth(
 		state.credentials,
@@ -178,15 +188,16 @@ export const GoogleSheetsSettings = ( {
 			return errors.credentials;
 		} else if ( tokenError ) {
 			const errorMessage = tokenError.message ?? __( 'Unknown error', 'remote-data-blocks' );
-			return (
+			return getConnectionMessage(
+				'error',
 				__( 'Failed to generate token using provided credentials: ', 'remote-data-blocks' ) +
-				' ' +
-				errorMessage
+					' ' +
+					errorMessage
 			);
 		} else if ( token ) {
-			return sprintf(
-				__( 'Credentials are valid. Token generated successfully.', 'remote-data-blocks' ),
-				token
+			return getConnectionMessage(
+				'success',
+				__( 'Credentials are valid. Token generated successfully.', 'remote-data-blocks' )
 			);
 		}
 		return __(
@@ -213,24 +224,12 @@ export const GoogleSheetsSettings = ( {
 				return __( 'Failed to fetch spreadsheets.', 'remote-data-blocks' ) + ' ' + errorMessage;
 			} else if ( isLoadingSpreadsheets ) {
 				return __( 'Fetching spreadsheets...', 'remote-data-blocks' );
-			} else if ( spreadsheets ) {
-				if ( state.spreadsheet ) {
-					const selectedSpreadsheet = spreadsheets.find(
-						spreadsheet => spreadsheet.value === state.spreadsheet?.id
-					);
-					return sprintf(
-						__( 'Selected spreadsheet: %s | id: %s', 'remote-data-blocks' ),
-						selectedSpreadsheet?.label ?? '',
-						selectedSpreadsheet?.value ?? ''
-					);
-				}
-				if ( spreadsheets.length ) {
-					return '';
-				}
+			} else if ( spreadsheets?.length === 0 ) {
 				return __( 'No spreadsheets found', 'remote-data-blocks' );
 			}
-			return '';
 		}
+
+		return __( 'Select a spreadsheet from which to fetch data.', 'remote-data-blocks' );
 	}, [ token, errorSpreadsheets, isLoadingSpreadsheets, state.spreadsheet, spreadsheets ] );
 
 	const sheetHelpText = useMemo( () => {
@@ -240,37 +239,41 @@ export const GoogleSheetsSettings = ( {
 				return __( 'Failed to fetch sheets.', 'remote-data-blocks' ) + ' ' + errorMessage;
 			} else if ( isLoadingSheets ) {
 				return __( 'Fetching sheets...', 'remote-data-blocks' );
-			} else if ( sheets ) {
-				if ( state.sheet ) {
-					const selectedSheet = sheets.find( sheet => sheet.value === state.sheet?.id );
-					return sprintf(
-						__( 'Selected sheet: %s | id: %s', 'remote-data-blocks' ),
-						selectedSheet?.label ?? '',
-						selectedSheet?.value ?? ''
-					);
-				}
-				if ( sheets.length ) {
-					return '';
-				}
+			} else if ( sheets?.length === 0 ) {
 				return __( 'No sheets found', 'remote-data-blocks' );
 			}
-			return '';
 		}
+
+		return __( 'Select a sheet from which to fetch data.', 'remote-data-blocks' );
 	}, [ token, errorSheets, isLoadingSheets, state.sheet, sheets ] );
 
 	useEffect( () => {
+		if ( ! spreadsheets?.length ) {
+			return;
+		}
+
 		setSpreadsheetOptions( [
-			defaultSelectOption,
+			{
+				...defaultSelectOption,
+				label: __( 'Select a spreadsheet', 'remote-data-blocks' ),
+			},
 			...( spreadsheets ?? [] ).map( ( { label, value } ) => ( { label, value } ) ),
 		] );
 	}, [ spreadsheets ] );
 
 	useEffect( () => {
+		if ( ! state.spreadsheet ) {
+			return;
+		}
+
 		setSheetOptions( [
-			defaultSelectOption,
+			{
+				...defaultSelectOption,
+				label: __( 'Select a sheet', 'remote-data-blocks' ),
+			},
 			...( sheets ?? [] ).map( ( { label, value } ) => ( { label, value } ) ),
 		] );
-	}, [ sheets ] );
+	}, [ state.spreadsheet, sheets ] );
 
 	return (
 		<Card className="add-update-data-source-card">
@@ -300,24 +303,26 @@ export const GoogleSheetsSettings = ( {
 					<div className="form-group">
 						<SelectControl
 							id="spreadsheet"
-							label={ __( 'Select Spreadsheet', 'remote-data-blocks' ) }
+							label={ __( 'Spreadsheet', 'remote-data-blocks' ) }
 							value={ state.spreadsheet?.id ?? '' }
 							onChange={ onSelectChange }
 							options={ spreadsheetOptions }
 							help={ spreadsheetHelpText }
 							disabled={ fetchingToken || ! spreadsheets?.length }
+							__next40pxDefaultSize
 						/>
 					</div>
 
 					<div className="form-group">
 						<SelectControl
 							id="sheet"
-							label={ __( 'Select Sheet', 'remote-data-blocks' ) }
+							label={ __( 'Sheet', 'remote-data-blocks' ) }
 							value={ state.sheet?.id ?? '' }
 							onChange={ onSelectChange }
 							options={ sheetOptions }
 							help={ sheetHelpText }
 							disabled={ fetchingToken || ! sheets?.length }
+							__next40pxDefaultSize
 						/>
 					</div>
 

@@ -24,7 +24,7 @@ import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import AirtableIcon from '@/settings/icons/airtable';
 import GoogleSheetsIcon from '@/settings/icons/google-sheets';
 import ShopifyIcon from '@/settings/icons/shopify';
-import { slugToTitleCase, toTitleCase } from '@/utils/string';
+import { slugToTitleCase } from '@/utils/string';
 
 import './data-source-list.scss';
 
@@ -195,7 +195,7 @@ const DataSourceList = () => {
 					>
 						<p>
 							Are you sure you want to delete
-							<strong> &ldquo;{ toTitleCase( dataSourceToDelete.service ) }&rdquo; </strong>
+							<strong> &ldquo;{ slugToTitleCase( dataSourceToDelete.service ) }&rdquo; </strong>
 							data source with slug
 							<strong> &ldquo;{ dataSourceToDelete.slug }&rdquo;</strong>?
 						</p>

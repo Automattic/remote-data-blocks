@@ -44,7 +44,7 @@ export const SlugInput: React.FC< SlugInputProps > = ( { slug, onChange, uuid } 
 				'remote-data-blocks'
 			) }
 			required
-			__next40pxDefaultSize={ true }
+			__next40pxDefaultSize
 		/>
 	);
 };

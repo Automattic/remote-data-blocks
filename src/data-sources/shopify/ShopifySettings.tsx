@@ -104,7 +104,7 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 							placeholder="your-shop-name"
 							help={ __( 'Example: https://your-shop-name.myshopify.com', 'remote-data-blocks' ) }
 							autoComplete="off"
-							__next40pxDefaultSize={ true }
+							__next40pxDefaultSize
 						/>
 					</div>
 
@@ -125,7 +125,7 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 							onChange={ () => {} }
 							tabIndex={ -1 }
 							readOnly
-							__next40pxDefaultSize={ true }
+							__next40pxDefaultSize
 						/>
 					</div>
 

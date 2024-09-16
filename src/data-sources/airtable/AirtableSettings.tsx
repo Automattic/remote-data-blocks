@@ -274,7 +274,7 @@ export const AirtableSettings = ( {
 							options={ baseOptions }
 							help={ basesHelpText }
 							disabled={ fetchingBases || ! bases?.length }
-							__next40pxDefaultSize={ true }
+							__next40pxDefaultSize
 						/>
 					</div>
 
@@ -287,7 +287,7 @@ export const AirtableSettings = ( {
 							options={ tableOptions }
 							help={ tablesHelpText }
 							disabled={ fetchingTables || ! tables?.length }
-							__next40pxDefaultSize={ true }
+							__next40pxDefaultSize
 						/>
 					</div>
 

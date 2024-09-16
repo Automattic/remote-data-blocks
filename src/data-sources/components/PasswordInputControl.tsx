@@ -25,7 +25,7 @@ const PasswordInputControl = ( { ...props }: PasswordInputControlProps ) => {
 					onClick={ () => setVisible( ! visible ) }
 				/>
 			}
-			__next40pxDefaultSize={ true }
+			__next40pxDefaultSize
 			{ ...props }
 		/>
 	);
