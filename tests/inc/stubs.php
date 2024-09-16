@@ -78,6 +78,14 @@ function clear_mocked_options(): void {
 	$GLOBALS['__mocked_options'] = [];
 }
 
+function get_page_by_path( string $path ): string {
+	return $path ?? 'fake WP_Post';
+}
+
+function add_rewrite_rule( string $regex, string $target, string $position ): void {
+	// Do nothing
+}
+
 function wp_generate_uuid4() {
 	return sprintf(
 		'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
