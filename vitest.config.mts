@@ -11,5 +11,9 @@ export default defineConfig( {
 		environment: 'happy-dom',
 		exclude: [ '**/build/**', '**/node_modules/**', '**/vendor/**' ],
 		setupFiles: [ './tests/src/vitest.setup.ts' ],
+		coverage: {
+			reporter: 'clover',
+			reportsDirectory: './coverage/vitest',
+		},
 	},
 } );
