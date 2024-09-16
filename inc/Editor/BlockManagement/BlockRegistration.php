@@ -32,9 +32,9 @@ class BlockRegistration {
 		$remote_data_blocks_config = [];
 		$scripts_to_localize       = [];
 
-		foreach ( ConfigurationLoader::get_block_names() as $block_name ) {
+		foreach ( ConfigStore::get_block_names() as $block_name ) {
 			$block_path = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-container';
-			$config     = ConfigurationLoader::get_configuration( $block_name );
+			$config     = ConfigStore::get_configuration( $block_name );
 
 			$overrides = array_filter( $config['queries']['__DISPLAY__']->input_variables, function ( $input_var ) {
 				return isset( $input_var['overrides'] );

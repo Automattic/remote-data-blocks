@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Example\ArtInstituteOfChicago;
 
-use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 
 require_once __DIR__ . '/inc/queries/class-art-institute-datasource.php';
 require_once __DIR__ . '/inc/queries/class-art-institute-get-query.php';
@@ -13,7 +13,7 @@ function register_aic_block() {
 	$get_art_query    = new ArtInstituteOfChicagoGetArtQuery( $aic_datasource );
 	$search_art_query = new ArtInstituteOfChicagoSearchArtQuery( $aic_datasource );
 
-	ConfigurationLoader::register_block( 'Art Institute of Chicago', $get_art_query );
-	ConfigurationLoader::register_search_query( 'Art Institute of Chicago', $search_art_query );
+	ConfigRegistry::register_block( 'Art Institute of Chicago', $get_art_query );
+	ConfigRegistry::register_search_query( 'Art Institute of Chicago', $search_art_query );
 }
 add_action( 'register_remote_data_blocks', __NAMESPACE__ . '\\register_aic_block' );

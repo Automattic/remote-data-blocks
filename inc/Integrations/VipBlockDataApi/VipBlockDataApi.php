@@ -3,7 +3,7 @@
 namespace RemoteDataBlocks\Integrations\VipBlockDataApi;
 
 use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
-use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 
 defined( 'ABSPATH' ) || exit();
 
@@ -22,7 +22,7 @@ class VipBlockDataApi {
 	 * phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 	 */
 	public static function resolve_remote_data( array $sourced_block, string $block_name, int $post_id, array $parsed_block ): array {
-		if ( ! ConfigurationLoader::is_registered_block( $block_name ) ) {
+		if ( ! ConfigStore::is_registered_block( $block_name ) ) {
 			return $sourced_block;
 		}
 

@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Example\Shopify;
 
-use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Integrations\Shopify\Queries\ShopifyGetProductQuery;
 use RemoteDataBlocks\Integrations\Shopify\Queries\ShopifySearchProductsQuery;
 use RemoteDataBlocks\Integrations\Shopify\ShopifyDatasource;
@@ -29,15 +29,15 @@ function register_shopify_block() {
 	$shopify_search_products_query = new ShopifySearchProductsQuery( $shopify_datasource );
 	$shopify_get_product_query     = new ShopifyGetProductQuery( $shopify_datasource );
 
-	ConfigurationLoader::register_block( $block_name, $shopify_get_product_query );
-	ConfigurationLoader::register_search_query( $block_name, $shopify_search_products_query );
+	ConfigRegistry::register_block( $block_name, $shopify_get_product_query );
+	ConfigRegistry::register_search_query( $block_name, $shopify_search_products_query );
 
-	ConfigurationLoader::register_query( $block_name, new ShopifyCreateCartMutation( $shopify_datasource ) );
-	ConfigurationLoader::register_query( $block_name, new ShopifyAddToCartMutation( $shopify_datasource ) );
-	ConfigurationLoader::register_query( $block_name, new ShopifyRemoveFromCartMutation( $shopify_datasource ) );
+	ConfigRegistry::register_query( $block_name, new ShopifyCreateCartMutation( $shopify_datasource ) );
+	ConfigRegistry::register_query( $block_name, new ShopifyAddToCartMutation( $shopify_datasource ) );
+	ConfigRegistry::register_query( $block_name, new ShopifyRemoveFromCartMutation( $shopify_datasource ) );
 
 	$block_pattern = file_get_contents( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/inc/integrations/shopify/Patterns/product-teaser.html' );
-	ConfigurationLoader::register_block_pattern( $block_name, 'remote-data-blocks/shopify-product-teaser', $block_pattern, [ 'title' => 'Shopify Product Teaser' ] );
+	ConfigRegistry::register_block_pattern( $block_name, 'remote-data-blocks/shopify-product-teaser', $block_pattern, [ 'title' => 'Shopify Product Teaser' ] );
 
 	register_block_type( __DIR__ . '/build/blocks/shopify-cart' );
 	register_block_type( __DIR__ . '/build/blocks/shopify-cart-button' );

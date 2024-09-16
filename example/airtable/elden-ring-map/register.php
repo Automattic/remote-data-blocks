@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Example\Airtable\EldenRingMap;
 
-use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Integrations\Airtable\AirtableDatasource;
 use RemoteDataBlocks\Logging\LoggerManager;
 use function register_block_type;
@@ -31,11 +31,11 @@ function register_airtable_elden_ring_map_block() {
 	$list_locations_query  = new AirtableEldenRingListLocationsQuery( $elden_ring_datasource );
 	$list_maps_query       = new AirtableEldenRingListMapsQuery( $elden_ring_datasource );
 
-	ConfigurationLoader::register_block( $block_name, $list_locations_query );
-	ConfigurationLoader::register_list_query( $block_name, $list_maps_query );
+	ConfigRegistry::register_block( $block_name, $list_locations_query );
+	ConfigRegistry::register_list_query( $block_name, $list_maps_query );
 
 	$block_pattern = file_get_contents( __DIR__ . '/inc/patterns/map-pattern.html' );
-	ConfigurationLoader::register_block_pattern( $block_name, 'remote-data-blocks/elden-ring-map/pattern', $block_pattern );
+	ConfigRegistry::register_block_pattern( $block_name, 'remote-data-blocks/elden-ring-map/pattern', $block_pattern );
 
 	$elden_ring_map_block_path = __DIR__ . '/build/blocks/elden-ring-map';
 	wp_register_style( 'leaflet-style', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css', [], '1.9.4' );

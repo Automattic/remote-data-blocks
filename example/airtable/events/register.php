@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Example\Airtable\Events;
 
-use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Integrations\Airtable\AirtableDatasource;
 use function add_action;
 
@@ -20,10 +20,10 @@ function register_airtable_events_block() {
 	$airtable_get_event_query   = new AirtableGetEventQuery( $airtable_datasource );
 	$airtable_list_events_query = new AirtableListEventsQuery( $airtable_datasource );
 
-	ConfigurationLoader::register_block( $block_name, $airtable_get_event_query );
-	ConfigurationLoader::register_list_query( $block_name, $airtable_list_events_query );
-	ConfigurationLoader::register_loop_block( 'Airtable Event List', $airtable_list_events_query );
-	ConfigurationLoader::register_page( $block_name, 'airtable-event' );
+	ConfigRegistry::register_block( $block_name, $airtable_get_event_query );
+	ConfigRegistry::register_list_query( $block_name, $airtable_list_events_query );
+	ConfigRegistry::register_loop_block( 'Airtable Event List', $airtable_list_events_query );
+	ConfigRegistry::register_page( $block_name, 'airtable-event' );
 }
 
 add_action( 'register_remote_data_blocks', __NAMESPACE__ . '\\register_airtable_events_block' );

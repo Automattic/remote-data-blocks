@@ -4,7 +4,7 @@ namespace RemoteDataBlocks\REST;
 
 defined( 'ABSPATH' ) || exit();
 
-use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\Logging\LoggerManager;
 use WP_Error;
 use WP_REST_Request;
@@ -34,7 +34,7 @@ class RemoteDataController {
 						return strval( $value );
 					},
 					'validate_callback' => function ( $value ) {
-						return null !== ConfigurationLoader::get_configuration( $value );
+						return null !== ConfigStore::get_configuration( $value );
 					},
 				],
 				'query_key'   => [
@@ -58,7 +58,7 @@ class RemoteDataController {
 		$query_key   = $request->get_param( 'query_key' );
 		$query_input = $request->get_param( 'query_input' );
 
-		$block_config = ConfigurationLoader::get_configuration( $block_name );
+		$block_config = ConfigStore::get_configuration( $block_name );
 		$query        = $block_config['queries'][ $query_key ];
 
 		// The frontend might send more input variables than the query needs or
