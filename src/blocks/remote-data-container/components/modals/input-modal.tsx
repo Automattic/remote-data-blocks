@@ -49,6 +49,7 @@ export function InputModal( props: InputModalProps ) {
 						value={ inputState[ input.slug ] ?? '' }
 						onChange={ ( value: string ) => onChange( input.slug, value ) }
 						__nextHasNoMarginBottom
+						style={ { marginBottom: '8px' } }
 					/>
 				) ) }
 				<Button variant="primary" onClick={ wrappedOnSelect }>
