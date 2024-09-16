@@ -17,7 +17,7 @@
 	.components-menu-item__button {
 		&:hover {
 			.components-menu-items__item-icon path {
-				fill: var( --wp-admin-theme-color, #3858e9 );
+				fill: var( --wp-admin-theme-color, #68696f );
 			}
 		}
 	}
@@ -27,8 +27,13 @@
 	}
 }
 
+.data-source-list-wrapper {
+	overflow: auto;
+}
+
 table.data-source-list {
 	width: 100%;
+	min-width: 700px;
 	border-collapse: collapse;
 
 	tr {
