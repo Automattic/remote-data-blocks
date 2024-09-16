@@ -34,22 +34,22 @@ class HttpClientTest extends TestCase {
 	public function testRequest() {
 		$this->mock_handler->append( new Response( 200, [], 'Success' ) );
 		$response = $this->http_client->request( 'GET', '/test' );
-		$this->assertEquals( 200, $response->getStatusCode() );
-		$this->assertEquals( 'Success', (string) $response->getBody() );
+		$this->assertSame( 200, $response->getStatusCode() );
+		$this->assertSame( 'Success', (string) $response->getBody() );
 	}
 
 	public function testGet() {
 		$this->mock_handler->append( new Response( 200, [], 'GET Success' ) );
 		$response = $this->http_client->get( '/test' );
-		$this->assertEquals( 200, $response->getStatusCode() );
-		$this->assertEquals( 'GET Success', (string) $response->getBody() );
+		$this->assertSame( 200, $response->getStatusCode() );
+		$this->assertSame( 'GET Success', (string) $response->getBody() );
 	}
 
 	public function testPost() {
 		$this->mock_handler->append( new Response( 201, [], 'POST Success' ) );
 		$response = $this->http_client->post( '/test' );
-		$this->assertEquals( 201, $response->getStatusCode() );
-		$this->assertEquals( 'POST Success', (string) $response->getBody() );
+		$this->assertSame( 201, $response->getStatusCode() );
+		$this->assertSame( 'POST Success', (string) $response->getBody() );
 	}
 
 	public function testRetryDecider() {
@@ -74,7 +74,7 @@ class HttpClientTest extends TestCase {
 	public function testRetryDelay() {
 		$response = new Response( 429, [ 'Retry-After' => '120' ] );
 		$delay    = HttpClient::retry_delay( 1, $response );
-		$this->assertEquals( 120000, $delay );
+		$this->assertSame( 120000, $delay );
 
 		$response = new Response( 429, [ 'Retry-After' => ( new \DateTime( '+2 minutes' ) )->format( \DateTime::RFC7231 ) ] );
 		$delay    = HttpClient::retry_delay( 1, $response );
@@ -83,7 +83,7 @@ class HttpClientTest extends TestCase {
 
 		$response = new Response( 500 );
 		$delay    = HttpClient::retry_delay( 2, $response );
-		$this->assertEquals( 2000, $delay );
+		$this->assertSame( 2000, $delay );
 	}
 
 	public function testQueueRequestAndExecuteParallel() {
@@ -96,12 +96,12 @@ class HttpClientTest extends TestCase {
 		$results = $this->http_client->execute_parallel();
 
 		$this->assertCount( 2, $results );
-		$this->assertEquals( 'fulfilled', $results[0]['state'] );
-		$this->assertEquals( 200, $results[0]['value']->getStatusCode() );
-		$this->assertEquals( 'Response 1', (string) $results[0]['value']->getBody() );
-		$this->assertEquals( 'fulfilled', $results[1]['state'] );
-		$this->assertEquals( 201, $results[1]['value']->getStatusCode() );
-		$this->assertEquals( 'Response 2', (string) $results[1]['value']->getBody() );
+		$this->assertSame( 'fulfilled', $results[0]['state'] );
+		$this->assertSame( 200, $results[0]['value']->getStatusCode() );
+		$this->assertSame( 'Response 1', (string) $results[0]['value']->getBody() );
+		$this->assertSame( 'fulfilled', $results[1]['state'] );
+		$this->assertSame( 201, $results[1]['value']->getStatusCode() );
+		$this->assertSame( 'Response 2', (string) $results[1]['value']->getBody() );
 	}
 
 	public function testQueueRequestAndExecuteParallelWithFailures() {
@@ -117,16 +117,16 @@ class HttpClientTest extends TestCase {
 
 		$this->assertCount( 3, $results );
 		
-		$this->assertEquals( 'fulfilled', $results[0]['state'] );
-		$this->assertEquals( 200, $results[0]['value']->getStatusCode() );
-		$this->assertEquals( 'Success Response', (string) $results[0]['value']->getBody() );
+		$this->assertSame( 'fulfilled', $results[0]['state'] );
+		$this->assertSame( 200, $results[0]['value']->getStatusCode() );
+		$this->assertSame( 'Success Response', (string) $results[0]['value']->getBody() );
 		
-		$this->assertEquals( 'rejected', $results[1]['state'] );
+		$this->assertSame( 'rejected', $results[1]['state'] );
 		$this->assertInstanceOf( RequestException::class, $results[1]['reason'] );
-		$this->assertEquals( 'Error', $results[1]['reason']->getMessage() );
+		$this->assertSame( 'Error', $results[1]['reason']->getMessage() );
 		
-		$this->assertEquals( 'rejected', $results[2]['state'] );
+		$this->assertSame( 'rejected', $results[2]['state'] );
 		$this->assertInstanceOf( ConnectException::class, $results[2]['reason'] );
-		$this->assertEquals( 'Connection Error', $results[2]['reason']->getMessage() );
+		$this->assertSame( 'Connection Error', $results[2]['reason']->getMessage() );
 	}
 }

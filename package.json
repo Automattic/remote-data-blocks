@@ -41,7 +41,9 @@
     "stop": "./bin/stop",
     "test": "npm run test:php && npm run test:js",
     "test:php": "composer test",
-    "test:js": "vitest --watch=false"
+    "test:php:coverage": "composer test-coverage",
+    "test:js": "vitest --watch=false",
+    "test:js:coverage": "vitest --coverage --watch=false"
   },
   "devDependencies": {
     "@automattic/eslint-plugin-wpvip": "0.13.0",
@@ -50,6 +52,7 @@
     "@testing-library/react": "16.0.1",
     "@types/wordpress__block-editor": "11.5.15",
     "@types/wordpress__editor": "14.3.0",
+    "@vitest/coverage-v8": "2.1.1",
     "@wordpress/api-fetch": "7.7.0",
     "@wordpress/block-editor": "14.2.0",
     "@wordpress/blocks": "13.7.0",
@@ -72,14 +75,14 @@
     "@wordpress/url": "4.7.0",
     "eslint": "8.57.0",
     "fork-ts-checker-webpack-plugin": "9.0.2",
-    "happy-dom": "15.7.3",
+    "happy-dom": "15.7.4",
     "phplint": "2.0.5",
     "prettier": "npm:wp-prettier@2.8.5",
     "react": "18.3.1",
     "stylelint": "14.16.1",
     "ts-loader": "9.5.1",
-    "typescript": "5.5.4",
-    "vitest": "2.0.5"
+    "typescript": "5.6.2",
+    "vitest": "2.1.1"
   },
   "stylelint": {
     "extends": "./node_modules/@wordpress/scripts/config/.stylelintrc.json"

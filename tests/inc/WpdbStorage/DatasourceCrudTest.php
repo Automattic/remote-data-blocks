@@ -38,7 +38,7 @@ class DatasourceCrudTest extends TestCase {
 
 		$result = DatasourceCrud::validate_airtable_source( $valid_source );
 		$this->assertIsObject( $result );
-		$this->assertEquals( $valid_source->uuid, $result->uuid );
+		$this->assertSame( $valid_source->uuid, $result->uuid );
 	}
 
 	public function test_validate_airtable_source_with_invalid_input() {
@@ -62,7 +62,7 @@ class DatasourceCrudTest extends TestCase {
 
 		$result = DatasourceCrud::validate_shopify_source( $valid_source );
 		$this->assertIsObject( $result );
-		$this->assertEquals( $valid_source->uuid, $result->uuid );
+		$this->assertSame( $valid_source->uuid, $result->uuid );
 	}
 
 	public function test_validate_shopify_source_with_invalid_input() {
@@ -107,7 +107,7 @@ class DatasourceCrudTest extends TestCase {
 
 		$result = DatasourceCrud::validate_google_sheets_source( $valid_source );
 		$this->assertIsObject( $result );
-		$this->assertEquals( $valid_source->uuid, $result->uuid );
+		$this->assertSame( $valid_source->uuid, $result->uuid );
 	}
 
 	public function test_validate_google_sheets_source_with_invalid_input() {
@@ -140,7 +140,7 @@ class DatasourceCrudTest extends TestCase {
 		$result = DatasourceCrud::validate_source( $valid_source );
 		$this->assertIsObject( $result );
 		$this->assertObjectHasProperty( 'uuid', $result );
-		$this->assertEquals( $valid_source->uuid, $result->uuid );
+		$this->assertSame( $valid_source->uuid, $result->uuid );
 	}
 
 	public function test_validate_source_with_invalid_input() {
@@ -152,7 +152,7 @@ class DatasourceCrudTest extends TestCase {
 
 		$result = DatasourceCrud::validate_source( $invalid_source );
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertEquals( 'invalid_uuid', $result->get_error_code() );
+		$this->assertSame( 'invalid_uuid', $result->get_error_code() );
 	}
 
 	public function test_register_new_data_source_with_valid_input() {
@@ -216,11 +216,11 @@ class DatasourceCrudTest extends TestCase {
 
 		$airtable_sources = DatasourceCrud::get_data_sources( 'airtable' );
 		$this->assertCount( 1, $airtable_sources );
-		$this->assertEquals( 'source-1', $airtable_sources[0]->slug );
+		$this->assertSame( 'source-1', $airtable_sources[0]->slug );
 
 		$shopify_sources = DatasourceCrud::get_data_sources( 'shopify' );
 		$this->assertCount( 1, $shopify_sources );
-		$this->assertEquals( 'source-2', $shopify_sources[0]->slug );
+		$this->assertSame( 'source-2', $shopify_sources[0]->slug );
 	}
 
 	public function test_get_item_by_uuid_with_valid_uuid() {
@@ -239,7 +239,7 @@ class DatasourceCrudTest extends TestCase {
 		] );
 
 		$retrieved_source = DatasourceCrud::get_item_by_uuid( DatasourceCrud::get_data_sources(), $source->uuid );
-		$this->assertEquals( $source, $retrieved_source );
+		$this->assertSame( $source, $retrieved_source );
 	}
 
 	public function test_get_item_by_uuid_with_invalid_uuid() {
@@ -268,8 +268,8 @@ class DatasourceCrudTest extends TestCase {
 		] );
 
 		$this->assertIsObject( $updated_source );
-		$this->assertEquals( 'updated_token', $updated_source->token );
-		$this->assertEquals( 'updated-slug', $updated_source->slug );
+		$this->assertSame( 'updated_token', $updated_source->token );
+		$this->assertSame( 'updated-slug', $updated_source->slug );
 	}
 
 	public function test_update_item_by_uuid_with_invalid_uuid() {

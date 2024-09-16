@@ -5,7 +5,7 @@ namespace RemoteDataBlocks\Tests\Config;
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Psr7\Response;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
-use RemoteDataBlocks\Tests\TestDatasource;
+use RemoteDataBlocks\Tests\Mocks\MockDatasource;
 
 class QueryContextTest extends TestCase {
 
@@ -13,13 +13,13 @@ class QueryContextTest extends TestCase {
 	private $query_context;
 
 	protected function setUp(): void {
-		$this->datasource    = new TestDatasource();
+		$this->datasource    = new MockDatasource();
 		$this->query_context = new HttpQueryContext( $this->datasource );
 	}
 
 	public function testGetEndpoint() {
 		$result = $this->query_context->get_endpoint( [] );
-		$this->assertEquals( 'https://example.com/api', $result );
+		$this->assertSame( 'https://example.com/api', $result );
 	}
 
 	public function testGetImageUrl() {
@@ -35,20 +35,20 @@ class QueryContextTest extends TestCase {
 
 		$this->assertArrayHasKey( 'last_updated', $metadata );
 		$this->assertArrayHasKey( 'total_count', $metadata );
-		$this->assertEquals( 'Last updated', $metadata['last_updated']['name'] );
-		$this->assertEquals( 'string', $metadata['last_updated']['type'] );
-		$this->assertEquals( 'Total count', $metadata['total_count']['name'] );
-		$this->assertEquals( 'number', $metadata['total_count']['type'] );
-		$this->assertEquals( 2, $metadata['total_count']['value'] );
+		$this->assertSame( 'Last updated', $metadata['last_updated']['name'] );
+		$this->assertSame( 'string', $metadata['last_updated']['type'] );
+		$this->assertSame( 'Total count', $metadata['total_count']['name'] );
+		$this->assertSame( 'number', $metadata['total_count']['type'] );
+		$this->assertSame( 2, $metadata['total_count']['value'] );
 	}
 
 	public function testGetRequestMethod() {
-		$this->assertEquals( 'GET', $this->query_context->get_request_method() );
+		$this->assertSame( 'GET', $this->query_context->get_request_method() );
 	}
 
 	public function testGetRequestHeaders() {
 		$result = $this->query_context->get_request_headers( [] );
-		$this->assertEquals( [ 'Content-Type' => 'application/json' ], $result );
+		$this->assertSame( [ 'Content-Type' => 'application/json' ], $result );
 	}
 
 	public function testGetRequestBody() {
@@ -56,7 +56,7 @@ class QueryContextTest extends TestCase {
 	}
 
 	public function testGetQueryName() {
-		$this->assertEquals( 'Query', $this->query_context->get_query_name() );
+		$this->assertSame( 'Query', $this->query_context->get_query_name() );
 	}
 
 	public function testIsResponseDataCollection() {
@@ -68,7 +68,7 @@ class QueryContextTest extends TestCase {
 
 	public function testDefaultProcessResponse() {
 		$raw_data = '{"key": "value"}';
-		$this->assertEquals( $raw_data, $this->query_context->process_response( $raw_data, [] ) );
+		$this->assertSame( $raw_data, $this->query_context->process_response( $raw_data, [] ) );
 	}
 
 	public function testCustomProcessResponse() {
@@ -98,6 +98,6 @@ class QueryContextTest extends TestCase {
 		$html_data     = '<html><head><title>Test Page</title></head><body><p>Paragraph 1</p><p>Paragraph 2</p></body></html>';
 		$expected_json = '{"title":"Test Page","content":["Paragraph 1","Paragraph 2"]}';
 		
-		$this->assertEquals( $expected_json, $custom_query_context->process_response( $html_data, [] ) );
+		$this->assertSame( $expected_json, $custom_query_context->process_response( $html_data, [] ) );
 	}
 }
