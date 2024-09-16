@@ -112,5 +112,4 @@ class ConfigStore {
 
 		return array_values( $compatible_data_sources );
 	}
-
 }
