@@ -1,7 +1,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch } from '@wordpress/data';
 import { useEffect, useState, useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore, NoticeStoreActions, WPNotice } from '@wordpress/notices';
 
 import { REST_BASE_DATA_SOURCES } from '@/data-sources/constants';
@@ -65,7 +65,7 @@ export const useDataSources = ( loadOnMount = true ) => {
 
 		showSnackbar(
 			'success',
-			__( `"${ source.slug }" has been successfully updated.`, 'remote-data-blocks' )
+			__( sprintf( '"%s" has been successfully updated.', 'remote-data-blocks' ), source.slug )
 		);
 		return result;
 	}
@@ -86,7 +86,7 @@ export const useDataSources = ( loadOnMount = true ) => {
 
 		showSnackbar(
 			'success',
-			__( `"${ source.slug }" has been successfully added.`, 'remote-data-blocks' )
+			__( sprintf( '"%s" has been successfully added.', 'remote-data-blocks' ), source.slug )
 		);
 		return result;
 	}
@@ -104,7 +104,7 @@ export const useDataSources = ( loadOnMount = true ) => {
 
 		showSnackbar(
 			'success',
-			__( `"${ source.slug }" has been successfully deleted.`, 'remote-data-blocks' )
+			__( sprintf( '"%s" has been successfully deleted.', 'remote-data-blocks' ), source.slug )
 		);
 	}
 

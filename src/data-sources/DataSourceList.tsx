@@ -14,7 +14,7 @@ import {
 	Dropdown,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown, edit, info, trash } from '@wordpress/icons';
 
 import { SUPPORTED_SERVICES } from './constants';
@@ -102,9 +102,17 @@ const DataSourceList = () => {
 				renderContent={ () => (
 					<MenuGroup>
 						{ [
-							{ icon: AirtableIcon, label: 'Airtable', value: 'airtable' },
-							{ icon: GoogleSheetsIcon, label: 'Google Sheets', value: 'google-sheets' },
-							{ icon: ShopifyIcon, label: 'Shopify', value: 'shopify' },
+							{
+								icon: AirtableIcon,
+								label: __( 'Airtable', 'remote-data-blocks' ),
+								value: 'airtable',
+							},
+							{
+								icon: GoogleSheetsIcon,
+								label: __( 'Google Sheets', 'remote-data-blocks' ),
+								value: 'google-sheets',
+							},
+							{ icon: ShopifyIcon, label: __( 'Shopify', 'remote-data-blocks' ), value: 'shopify' },
 						].map( ( { icon, label, value } ) => (
 							<MenuItem
 								key={ value }
@@ -165,14 +173,16 @@ const DataSourceList = () => {
 									</td>
 									<td> { renderDataSourceMeta( source ) } </td>
 									<td className="data-source-actions">
-										<ButtonGroup className="data-source-actions">
-											<Button variant="secondary" onClick={ () => onEditDataSource( uuid ) }>
-												<Icon icon={ edit } />
-											</Button>
-											<Button variant="secondary" onClick={ () => onDeleteDataSource( source ) }>
-												<Icon icon={ trash } />
-											</Button>
-										</ButtonGroup>
+										{ uuid && (
+											<ButtonGroup className="data-source-actions">
+												<Button variant="secondary" onClick={ () => onEditDataSource( uuid ) }>
+													<Icon icon={ edit } />
+												</Button>
+												<Button variant="secondary" onClick={ () => onDeleteDataSource( source ) }>
+													<Icon icon={ trash } />
+												</Button>
+											</ButtonGroup>
+										) }
 									</td>
 								</tr>
 							);
@@ -183,7 +193,7 @@ const DataSourceList = () => {
 				{ dataSourceToDelete && (
 					<Modal
 						className="confirm-delete-data-source-modal"
-						title="Delete Data Source"
+						title={ __( 'Delete Data Source', 'remote-data-blocks' ) }
 						size="medium"
 						onRequestClose={ () => {
 							onCancelDeleteDialog();
@@ -194,24 +204,26 @@ const DataSourceList = () => {
 						shouldCloseOnClickOutside={ true }
 					>
 						<p>
-							Are you sure you want to delete
-							<strong> &ldquo;{ slugToTitleCase( dataSourceToDelete.service ) }&rdquo; </strong>
-							data source with slug
-							<strong> &ldquo;{ dataSourceToDelete.slug }&rdquo;</strong>?
+							{ sprintf(
+								__(
+									'Are you sure you want to delete "%s" data source with slug "%s"?',
+									'remote-data-blocks'
+								),
+								slugToTitleCase( dataSourceToDelete.service ),
+								dataSourceToDelete.slug
+							) }
 						</p>
 
 						<div className="action-buttons">
 							<Button variant="link" onClick={ onCancelDeleteDialog }>
-								{ ' ' }
-								Cancel{ ' ' }
+								{ __( 'Cancel', 'remote-data-blocks' ) }
 							</Button>
 							<Button
 								variant="primary"
 								isDestructive
 								onClick={ () => void onConfirmDeleteDataSource( dataSourceToDelete ) }
 							>
-								{ ' ' }
-								Confirm{ ' ' }
+								{ __( 'Confirm', 'remote-data-blocks' ) }
 							</Button>
 						</div>
 					</Modal>

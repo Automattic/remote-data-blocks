@@ -61,7 +61,7 @@ const getInitialStateFromConfig = ( config?: GoogleSheetsConfig ): GoogleSheetsF
 
 const defaultSelectOption: SelectOption = {
 	disabled: true,
-	label: 'Select an option',
+	label: __( 'Select an option', 'remote-data-blocks' ),
 	value: '',
 };
 

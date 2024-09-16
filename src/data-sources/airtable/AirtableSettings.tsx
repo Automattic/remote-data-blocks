@@ -54,13 +54,13 @@ const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState
 
 const defaultSelectBaseOption: SelectOption = {
 	disabled: true,
-	label: 'Auto-filled on successful connection.',
+	label: __( 'Auto-filled on successful connection.', 'remote-data-blocks' ),
 	value: '',
 };
 
 const defaultSelectTableOption: SelectOption = {
 	disabled: true,
-	label: 'Auto-filled on valid base.',
+	label: __( 'Auto-filled on valid base.', 'remote-data-blocks' ),
 	value: '',
 };
 
@@ -189,6 +189,8 @@ export const AirtableSettings = ( {
 				);
 			} else if ( fetchingBases ) {
 				return __( 'Fetching bases...' );
+			} else if ( bases?.length === 0 ) {
+				return __( 'No bases found.' );
 			}
 		}
 

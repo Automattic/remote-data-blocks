@@ -35,7 +35,6 @@ export const SlugInput: React.FC< SlugInputProps > = ( { slug, onChange, uuid } 
 
 	return (
 		<TextControl
-			type="text"
 			label={ __( 'Slug', 'remote-data-blocks' ) }
 			value={ slug }
 			onChange={ onSlugChange }
@@ -43,7 +42,6 @@ export const SlugInput: React.FC< SlugInputProps > = ( { slug, onChange, uuid } 
 				slugConflictMessage || 'A unique identifier for this data source.',
 				'remote-data-blocks'
 			) }
-			required
 			__next40pxDefaultSize
 		/>
 	);
