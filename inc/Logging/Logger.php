@@ -137,10 +137,6 @@ class Logger extends AbstractLogger {
 		do_action( $action, $qm_log );
 	}
 
-	public function some_fake_function(): void {
-		$this->log( LogLevel::ERROR, 'This is a test error message' );
-	}
-	
 	/**
 	 * Determine if a message should be logged based on the log level.
 	 */
