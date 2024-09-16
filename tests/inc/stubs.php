@@ -79,7 +79,7 @@ function clear_mocked_options(): void {
 }
 
 function get_page_by_path( string $path ): string {
-	return 'fake WP_Post';
+	return $path ?? 'fake WP_Post';
 }
 
 function add_rewrite_rule( string $regex, string $target, string $position ): void {
