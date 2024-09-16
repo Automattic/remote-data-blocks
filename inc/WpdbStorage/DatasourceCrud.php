@@ -198,8 +198,6 @@ class DatasourceCrud {
 	public static function get_data_sources( string $service = '' ) {
 		$data_sources = self::get_config();
 
-		$data_sources = apply_filters( 'remote_data_blocks_data_sources', $data_sources );
-
 		if ( $service ) {
 			return array_values( array_filter($data_sources, function ( $config ) use ( $service ) {
 				return $config->service === $service;
@@ -207,30 +205,6 @@ class DatasourceCrud {
 		}
 
 		return $data_sources;
-	}
-
-	public static function get_data_source_by_slug( string $slug ) {
-		$data_sources = self::get_data_sources();
-		
-		$filtered = array_filter( $data_sources, function ( $source ) use ( $slug ) {
-			if ( is_array( $source ) && array_key_exists( 'slug', $source ) ) {
-				return $source['slug'] === $slug;
-			} elseif ( is_object( $source ) && property_exists( $source, 'slug' ) ) {
-				return $source->slug === $slug;
-			}
-
-			return false;
-		} );
-	
-		$data_source = reset( $filtered );
-
-		if ( ! $data_source ) {
-			$logger = LoggerManager::instance();
-			$logger->warning( sprintf( 'Data source (slug=%s) was not found.', $slug ) );
-			return null;
-		}
-
-		return $data_source;
 	}
 
 	public static function get_item_by_uuid( $data_sources, string $uuid ) {
