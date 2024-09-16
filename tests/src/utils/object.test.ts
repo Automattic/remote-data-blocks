@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { constructObjectWithValues, isNonEmptyObj } from '../../../src/utils/object';
+
+import { constructObjectWithValues, isNonEmptyObj } from '@/utils/object';
 
 describe( 'object utils', () => {
 	describe( 'isNonEmptyObj', () => {

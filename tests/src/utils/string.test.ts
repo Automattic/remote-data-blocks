@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import {
 	combineClassNames,
 	getClassName,
@@ -6,7 +7,7 @@ import {
 	slugToTitleCase,
 	toKebabCase,
 	toTitleCase,
-} from '../../../src/utils/string';
+} from '@/utils/string';
 
 describe( 'string utils', () => {
 	describe( 'getClassName', () => {

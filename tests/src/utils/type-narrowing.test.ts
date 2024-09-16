@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { isObjectWithStringKeys } from '../../../src/utils/type-narrowing';
+
+import { isObjectWithStringKeys } from '@/utils/type-narrowing';
 
 describe( 'type-narrowing utils', () => {
 	describe( 'isObjectWithStringKeys', () => {
