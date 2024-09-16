@@ -1,4 +1,5 @@
 .data-source-list-card {
+
 	.add-data-source-btn {
 		border-radius: 4px;
 		padding-right: 8px;
@@ -10,14 +11,17 @@
 }
 
 .settings_page_remote-data-blocks-settings {
+
 	.add-data-source-dropdown-content {
 		top: -7px !important;
 	}
 
 	.components-menu-item__button {
+
 		&:hover {
+
 			.components-menu-items__item-icon path {
-				fill: var( --wp-admin-theme-color, #68696f );
+				fill: var(--wp-admin-theme-color, #68696f);
 			}
 		}
 	}
@@ -41,17 +45,6 @@ table.data-source-list {
 		transition: 0.1s;
 	}
 
-	th,
-	td {
-		&:first-child {
-			padding-left: 44px;
-		}
-
-		&.data-source-actions {
-			width: 150px;
-		}
-	}
-
 	th {
 		text-transform: uppercase;
 		font-size: 12px;
@@ -61,13 +54,26 @@ table.data-source-list {
 	}
 
 	tbody tr {
+
 		&:hover {
-			background-color: rgba( 56, 88, 233, 0.04 );
+			background-color: rgba(56, 88, 233, 0.04);
 		}
 	}
 
 	td {
 		padding: 10px 0;
+	}
+
+	th,
+	td {
+
+		&:first-child {
+			padding-left: 44px;
+		}
+
+		&.data-source-actions {
+			width: 150px;
+		}
 	}
 }
 
@@ -84,6 +90,7 @@ span.data-source-slug {
 }
 
 .data-source-actions {
+
 	button.components-button {
 		padding: 6px;
 		height: initial;
@@ -98,6 +105,7 @@ span.data-source-slug {
 }
 
 .confirm-delete-data-source-modal {
+
 	.action-buttons {
 		display: flex;
 		padding-top: 50px;
