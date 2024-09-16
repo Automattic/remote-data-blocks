@@ -5,7 +5,7 @@ namespace RemoteDataBlocks\Tests\Config;
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Psr7\Response;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
-use RemoteDataBlocks\Tests\TestDatasource;
+use RemoteDataBlocks\Tests\Mocks\MockDatasource;
 
 class QueryContextTest extends TestCase {
 
@@ -13,7 +13,7 @@ class QueryContextTest extends TestCase {
 	private $query_context;
 
 	protected function setUp(): void {
-		$this->datasource    = new TestDatasource();
+		$this->datasource    = new MockDatasource();
 		$this->query_context = new HttpQueryContext( $this->datasource );
 	}
 
