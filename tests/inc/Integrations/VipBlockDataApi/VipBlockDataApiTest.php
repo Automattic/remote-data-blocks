@@ -7,12 +7,12 @@ use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigurationLoader;
 use RemoteDataBlocks\Integrations\VipBlockDataApi\VipBlockDataApi;
-use RemoteDataBlocks\Tests\MockQueryRunner;
-use RemoteDataBlocks\Tests\TestDatasource;
+use RemoteDataBlocks\Tests\Mocks\MockQueryRunner;
+use RemoteDataBlocks\Tests\Mocks\MockDatasource;
 
 class TestQueryContext extends HttpQueryContext {
 	public function __construct( private QueryRunnerInterface $mock_qr ) {
-		parent::__construct( new TestDatasource() );
+		parent::__construct( new MockDatasource() );
 	}
 
 	public function get_query_runner(): QueryRunnerInterface {

@@ -5,8 +5,8 @@ namespace RemoteDataBlocks\Editor\BlockManagement;
 defined( 'ABSPATH' ) || exit();
 
 use RemoteDataBlocks\Config\QueryContext\QueryContextInterface;
-use RemoteDataBlocks\Logging\Logger;
 use RemoteDataBlocks\Logging\LoggerManager;
+use Psr\Log\LoggerInterface;
 use Error;
 
 use function add_action;
@@ -17,10 +17,10 @@ use function wp_insert_post;
 
 class ConfigurationLoader {
 	private static array $configurations = [];
-	private static Logger $logger;
+	private static LoggerInterface $logger;
 
-	public static function init() {
-		self::$logger = LoggerManager::instance();
+	public static function init( LoggerInterface $logger = null ) {
+		self::$logger = $logger ?? LoggerManager::instance();
 
 		add_action( 'init', [ __CLASS__, 'register_remote_data_blocks' ], 10, 0 );
 	}

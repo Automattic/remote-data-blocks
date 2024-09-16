@@ -10,7 +10,7 @@ use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 use RemoteDataBlocks\HttpClient\HttpClient;
-use RemoteDataBlocks\Tests\TestDatasource;
+use RemoteDataBlocks\Tests\Mocks\MockDatasource;
 use WP_Error;
 
 class QueryRunnerTest extends TestCase {
@@ -24,7 +24,7 @@ class QueryRunnerTest extends TestCase {
 
 		$this->http_client = $this->createMock( HttpClient::class );
 
-		$this->http_datasource = new class() extends TestDatasource {
+		$this->http_datasource = new class() extends MockDatasource {
 			private $endpoint = 'https://example.com/api';
 			private $headers  = [ 'Content-Type' => 'application/json' ];
 

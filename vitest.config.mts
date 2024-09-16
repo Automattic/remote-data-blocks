@@ -10,7 +10,7 @@ export default defineConfig( {
 	test: {
 		environment: 'happy-dom',
 		exclude: [ '**/build/**', '**/node_modules/**', '**/vendor/**' ],
-		setupFiles: [ './tests/vitest.setup.ts' ],
+		setupFiles: [ './tests/src/vitest.setup.ts' ],
 		coverage: {
 			reporter: 'clover',
 			reportsDirectory: './coverage/vitest',

@@ -1,5 +1,5 @@
 <?php
-namespace RemoteDataBlocks\Tests;
+namespace RemoteDataBlocks\Tests\Mocks;
 
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 

@@ -21,7 +21,7 @@ function register_block_pattern( string $name, array $options ): void {
 }
 
 function sanitize_title( string $title ): string {
-	return strtolower( $title );
+	return str_replace( ' ', '-', strtolower( $title ) );
 }
 
 function sanitize_text_field( string $text ): string {
@@ -76,6 +76,14 @@ function set_mocked_option( string $option, mixed $value ): void {
 
 function clear_mocked_options(): void {
 	$GLOBALS['__mocked_options'] = [];
+}
+
+function get_page_by_path( string $path ): string {
+	return $path ?? 'fake WP_Post';
+}
+
+function add_rewrite_rule( string $regex, string $target, string $position ): void {
+	// Do nothing
 }
 
 function wp_generate_uuid4() {
