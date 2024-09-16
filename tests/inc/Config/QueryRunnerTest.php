@@ -142,7 +142,7 @@ class QueryRunnerTest extends TestCase {
 		$result       = $query_runner->execute( $input_variables );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertEquals( 'Invalid endpoint URL scheme', $result->get_error_code() );
+		$this->assertSame( 'Invalid endpoint URL scheme', $result->get_error_code() );
 	}
 
 	public function testExecuteInvalidHost() {
@@ -154,7 +154,7 @@ class QueryRunnerTest extends TestCase {
 		$result       = $query_runner->execute( $input_variables );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertEquals( 'Invalid endpoint URL parse', $result->get_error_code() );
+		$this->assertSame( 'Invalid endpoint URL parse', $result->get_error_code() );
 	}
 
 	public function testExecuteHttpClientException() {
@@ -166,7 +166,7 @@ class QueryRunnerTest extends TestCase {
 		$result       = $query_runner->execute( $input_variables );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertEquals( 'remote-data-blocks-unexpected-exception', $result->get_error_code() );
+		$this->assertSame( 'remote-data-blocks-unexpected-exception', $result->get_error_code() );
 	}
 
 	public function testExecuteBadStatusCode() {
@@ -179,7 +179,7 @@ class QueryRunnerTest extends TestCase {
 		$result       = $query_runner->execute( $input_variables );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertEquals( 'remote-data-blocks-bad-status-code', $result->get_error_code() );
+		$this->assertSame( 'remote-data-blocks-bad-status-code', $result->get_error_code() );
 	}
 
 	public function testExecuteSuccessfulResponse() {
@@ -224,7 +224,7 @@ class QueryRunnerTest extends TestCase {
 
 		$this->assertIsArray( $result['results'] );
 		$this->assertCount( 1, $result['results'] );
-		$this->assertEquals( $expected_result, $result['results'][0] );
+		$this->assertSame( $expected_result, $result['results'][0] );
 	}
 
 	public function testExecuteSuccessfulResponseWithJsonStringResponseData() {
@@ -266,7 +266,7 @@ class QueryRunnerTest extends TestCase {
 
 		$this->assertIsArray( $result['results'] );
 		$this->assertCount( 1, $result['results'] );
-		$this->assertEquals( $expected_result, $result['results'][0] );
+		$this->assertSame( $expected_result, $result['results'][0] );
 	}
 
 	public function testExecuteSuccessfulResponseWithArrayResponseData() {
@@ -308,7 +308,7 @@ class QueryRunnerTest extends TestCase {
 
 		$this->assertIsArray( $result['results'] );
 		$this->assertCount( 1, $result['results'] );
-		$this->assertEquals( $expected_result, $result['results'][0] );
+		$this->assertSame( $expected_result, $result['results'][0] );
 	}
 
 	public function testExecuteSuccessfulResponseWithObjectResponseData() {
@@ -355,6 +355,6 @@ class QueryRunnerTest extends TestCase {
 
 		$this->assertIsArray( $result['results'] );
 		$this->assertCount( 1, $result['results'] );
-		$this->assertEquals( $expected_result, $result['results'][0] );
+		$this->assertSame( $expected_result, $result['results'][0] );
 	}
 }

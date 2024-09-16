@@ -32,8 +32,8 @@ class ConfigurationLoaderTest extends TestCase {
 
 		$config = ConfigurationLoader::get_configuration( $block_name );
 		$this->assertIsArray( $config );
-		$this->assertEquals( $block_name, $config['name'] );
-		$this->assertEquals( 'Test Block', $config['title'] );
+		$this->assertSame( $block_name, $config['name'] );
+		$this->assertSame( 'Test Block', $config['title'] );
 		$this->assertFalse( $config['loop'] );
 	}
 
@@ -82,7 +82,7 @@ class ConfigurationLoaderTest extends TestCase {
 
 		$block_name = 'remote-data-blocks/list-block';
 		$config     = ConfigurationLoader::get_configuration( $block_name );
-		$this->assertEquals( 'list', $config['selectors'][0]['type'] );
+		$this->assertSame( 'list', $config['selectors'][0]['type'] );
 	}
 
 	public function testRegisterSearchQuery() {
@@ -96,7 +96,7 @@ class ConfigurationLoaderTest extends TestCase {
 
 		$block_name = 'remote-data-blocks/search-block';
 		$config     = ConfigurationLoader::get_configuration( $block_name );
-		$this->assertEquals( 'search', $config['selectors'][0]['type'] );
+		$this->assertSame( 'search', $config['selectors'][0]['type'] );
 	}
 
 	public function testGetBlockNames() {
