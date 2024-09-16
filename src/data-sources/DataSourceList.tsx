@@ -123,7 +123,7 @@ const DataSourceList = () => {
 						{ getValidDataSources().map( source => {
 							const { uuid, slug, service } = source;
 							return (
-								<tr key={ uuid } className="table-row">
+								<tr key={ slug } className="table-row">
 									<td>
 										<Text>{ slug }</Text>
 									</td>

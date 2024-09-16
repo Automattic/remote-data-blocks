@@ -2,13 +2,13 @@
 
 namespace RemoteDataBlocks\Integrations\Shopify;
 
-use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+use RemoteDataBlocks\Config\Datasource\CompatibleHttpDatasource;
 
 use function plugins_url;
 
 defined( 'ABSPATH' ) || exit();
 
-class ShopifyDatasource extends HttpDatasource {
+class ShopifyDatasource extends CompatibleHttpDatasource {
 	public function __construct( private string $access_token, private string $store_name ) {}
 
 	public function get_store_name(): string {
@@ -32,5 +32,20 @@ class ShopifyDatasource extends HttpDatasource {
 
 	public function get_image_url(): string {
 		return plugins_url( '../../assets/shopify_logo_black.png', __FILE__ );
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function get_object_representations(): array {
+		$slug = $this->get_display_name();
+
+		return [
+			$slug => (object) [
+				'service' => 'shopify',
+				'slug'    => $slug,
+				'store'   => $this->get_store_name(),
+			],
+		];
 	}
 }
