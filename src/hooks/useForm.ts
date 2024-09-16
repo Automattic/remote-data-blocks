@@ -8,7 +8,7 @@ export type ValidationRules< T > = {
 	[ P in keyof T ]?: ValidationRuleFn< T >;
 };
 
-const executeValidationRules = < T, >( rule: ValidationRuleFn< T >, value: T ): string | null => {
+const executeValidationRules = < T >( rule: ValidationRuleFn< T >, value: T ): string | null => {
 	const error = rule( value );
 	if ( error ) {
 		return error;
@@ -21,7 +21,7 @@ interface ExecuteAllValidationRules {
 	hasError: boolean;
 }
 
-const executeAllValidationRules = < T, >(
+const executeAllValidationRules = < T >(
 	validationRules: ValidationRules< T >,
 	values: T
 ): ExecuteAllValidationRules => {
@@ -69,7 +69,7 @@ type FormAction< T > =
 	| { type: 'setField'; payload: { id: string; value: unknown } }
 	| { type: 'setState'; payload: { value: T } };
 
-const reducer = < T, >( state: T, action: FormAction< T > ): T => {
+const reducer = < T >( state: T, action: FormAction< T > ): T => {
 	switch ( action.type ) {
 		case 'setField':
 			return { ...state, [ action.payload.id ]: action.payload.value };
