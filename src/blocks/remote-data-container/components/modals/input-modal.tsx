@@ -48,6 +48,7 @@ export function InputModal( props: InputModalProps ) {
 						required={ input.required }
 						value={ inputState[ input.slug ] ?? '' }
 						onChange={ ( value: string ) => onChange( input.slug, value ) }
+						__nextHasNoMarginBottom
 					/>
 				) ) }
 				<Button variant="primary" onClick={ wrappedOnSelect }>
