@@ -14,7 +14,7 @@ use function register_remote_data_list_query;
 use function register_remote_data_search_query;
 use function register_remote_data_loop_block;
 
-class ConfigRegistryTest extends TestCase {
+class FunctionsTest extends TestCase {
 	private MockLogger $mock_logger;
 
 	protected function setUp(): void {
