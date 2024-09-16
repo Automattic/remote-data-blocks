@@ -1,28 +1,28 @@
 import {
 	Button,
 	ButtonGroup,
-	__experimentalHeading as Heading,
 	SelectControl,
-	Panel,
-	PanelBody,
-	PanelRow,
+	Card,
+	CardHeader,
+	CardBody,
 } from '@wordpress/components';
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
-import { SlugInput } from '@/data-sources/SlugInput';
 import {
 	useAirtableApiBases,
 	useAirtableApiTables,
 	useAirtableApiUserId,
 } from '@/data-sources/airtable/airtable-api-hooks';
 import { AirtableFormState } from '@/data-sources/airtable/types';
+import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
+import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { AirtableConfig } from '@/data-sources/types';
+import { getConnectionMessage } from '@/data-sources/utils';
 import { useForm } from '@/hooks/useForm';
-import PasswordInputControl from '@/settings/PasswordInputControl';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import { StringIdName } from '@/types/common';
 import { SelectOption } from '@/types/input';
@@ -53,12 +53,14 @@ const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState
 };
 
 const defaultSelectBaseOption: SelectOption = {
-	label: '',
+	disabled: true,
+	label: __( 'Auto-filled on successful connection.', 'remote-data-blocks' ),
 	value: '',
 };
 
 const defaultSelectTableOption: SelectOption = {
-	label: '',
+	disabled: true,
+	label: __( 'Auto-filled on valid base.', 'remote-data-blocks' ),
 	value: '',
 };
 
@@ -144,13 +146,27 @@ export const AirtableSettings = ( {
 
 	const connectionMessage = useMemo( () => {
 		if ( fetchingUserId ) {
-			return __( 'Checking connection...', 'remote-data-blocks' );
+			return __( 'Validating connection...', 'remote-data-blocks' );
 		} else if ( userIdError ) {
-			return __( 'Connection failed. Please check your API key.', 'remote-data-blocks' );
+			return getConnectionMessage(
+				'error',
+				__( 'Connection failed. Please verify your access token.', 'remote-data-blocks' )
+			);
 		} else if ( userId ) {
-			return sprintf( __( 'Connection successful. User ID: %s', 'remote-data-blocks' ), userId );
+			return getConnectionMessage(
+				'success',
+				__( 'Connection successful.', 'remote-data-blocks' )
+			);
 		}
-		return '';
+		return (
+			<span>
+				{ __( 'Provide access token to connect your Airtable', 'remote-data-blocks' ) } (
+				<a href="https://support.airtable.com/docs/creating-personal-access-tokens" target="_label">
+					{ __( 'guide', 'remote-data-blocks' ) }
+				</a>
+				).
+			</span>
+		);
 	}, [ fetchingUserId, userId, userIdError ] );
 
 	const shouldAllowSubmit = useMemo( () => {
@@ -172,25 +188,13 @@ export const AirtableSettings = ( {
 					'Failed to fetch bases. Please check that your access token has the `schema.bases:read` Scope.'
 				);
 			} else if ( fetchingBases ) {
-				return __( 'Fetching Bases...' );
-			} else if ( bases ) {
-				if ( state.base ) {
-					const selectedBase = bases.find( base => base.id === state.base?.id );
-					return selectedBase
-						? sprintf(
-								__( 'Selected base: %s | id: %s', 'remote-data-blocks' ),
-								selectedBase.name,
-								selectedBase.id
-						  )
-						: sprintf( __( 'Invalid base selected: %s', 'remote-data-blocks' ), state.base );
-				}
-				if ( bases.length ) {
-					return '';
-				}
-				return __( 'No Bases found' );
+				return __( 'Fetching bases...' );
+			} else if ( bases?.length === 0 ) {
+				return __( 'No bases found.' );
 			}
-			return '';
 		}
+
+		return 'Select a base from which to fetch data.';
 	}, [ bases, basesError, fetchingBases, state.base, userId ] );
 
 	const tablesHelpText = useMemo( () => {
@@ -205,90 +209,120 @@ export const AirtableSettings = ( {
 			} else if ( tables ) {
 				if ( state.table ) {
 					const selectedTable = tables.find( table => table.id === state.table?.id );
-					return selectedTable
-						? sprintf(
-								__( 'Selected table: %s | Fields: %s', 'remote-data-blocks' ),
-								selectedTable.name,
-								selectedTable.fields.map( field => field.name ).join( ', ' )
-						  )
-						: sprintf( __( 'Invalid table selected: %s', 'remote-data-blocks' ), state.table );
+
+					if ( selectedTable ) {
+						return sprintf(
+							__( 'Fields: %s', 'remote-data-blocks' ),
+							selectedTable.fields.map( field => field.name ).join( ', ' )
+						);
+					}
 				}
-				if ( tables.length ) {
-					return __( 'Select a table from which to fetch data.', 'remote-data-blocks' );
+
+				if ( ! tables.length ) {
+					return __( 'No tables found', 'remote-data-blocks' );
 				}
-				return __( 'No tables found', 'remote-data-blocks' );
 			}
 
-			return '';
+			return __( 'Select a table from which to fetch data.', 'remote-data-blocks' );
 		}
+
+		return 'Select a table to attach with this data source.';
 	}, [ bases, fetchingTables, state.base, state.table, tables, tablesError ] );
 
 	useEffect( () => {
+		if ( ! bases?.length ) {
+			return;
+		}
+
 		setBaseOptions( [
-			defaultSelectBaseOption,
+			{
+				...defaultSelectBaseOption,
+				label: __( 'Select a base', 'remote-data-blocks' ),
+			},
 			...( bases ?? [] ).map( ( { name, id } ) => ( { label: name, value: id } ) ),
 		] );
 	}, [ bases ] );
 
 	useEffect( () => {
+		if ( ! state?.base ) {
+			return;
+		}
+
 		if ( tables ) {
 			setTableOptions( [
-				defaultSelectTableOption,
+				{
+					...defaultSelectBaseOption,
+					label: __( 'Select a table', 'remote-data-blocks' ),
+				},
 				...tables.map( ( { name, id } ) => ( { label: name, value: id, disabled: false } ) ),
 			] );
 		}
-	}, [ tables ] );
+	}, [ state.base, tables ] );
 
 	return (
-		<Panel>
-			<PanelBody>
-				<Heading>
-					{ mode === 'add'
-						? __( 'Add a new Airtable Data Source' )
-						: __( 'Edit Airtable Data Source' ) }
-				</Heading>
-				<PanelRow>
-					<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
-				</PanelRow>
-				<PanelRow>
-					<PasswordInputControl
-						label={ __( 'Airtable Access Token', 'remote-data-blocks' ) }
-						onChange={ onTokenInputChange }
-						value={ state.token }
-						help={ connectionMessage }
-					/>
-				</PanelRow>
-				<PanelRow>
-					<SelectControl
-						id="base"
-						label={ __( 'Select Base', 'remote-data-blocks' ) }
-						value={ state.base?.id ?? '' }
-						onChange={ onSelectChange }
-						options={ baseOptions }
-						help={ basesHelpText }
-						disabled={ fetchingBases || ! bases?.length }
-					/>
-				</PanelRow>
-				<PanelRow>
-					<SelectControl
-						id="table"
-						label={ __( 'Select Table', 'remote-data-blocks' ) }
-						value={ state.table?.id ?? '' }
-						onChange={ onSelectChange }
-						options={ tableOptions }
-						help={ tablesHelpText }
-						disabled={ fetchingTables || ! tables?.length }
-					/>
-				</PanelRow>
-			</PanelBody>
-			<ButtonGroup className="settings-form-cta-button-group">
-				<Button variant="primary" onClick={ onSaveClick } disabled={ shouldAllowSubmit }>
-					{ __( 'Save', 'remote-data-blocks' ) }
-				</Button>
-				<Button variant="secondary" onClick={ goToMainScreen }>
-					{ __( 'Cancel', 'remote-data-blocks' ) }
-				</Button>
-			</ButtonGroup>
-		</Panel>
+		<Card className="add-update-data-source-card">
+			<CardHeader>
+				<h2>
+					{ mode === 'add' ? __( 'Add Airtable Data Source' ) : __( 'Edit Airtable Data Source' ) }
+				</h2>
+			</CardHeader>
+			<CardBody>
+				<form>
+					<div className="form-group">
+						<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
+					</div>
+
+					<div className="form-group">
+						<PasswordInputControl
+							label={ __( 'Access Token', 'remote-data-blocks' ) }
+							onChange={ onTokenInputChange }
+							value={ state.token }
+							help={ connectionMessage }
+						/>
+					</div>
+
+					<div className="form-group">
+						<SelectControl
+							id="base"
+							label={ __( 'Base', 'remote-data-blocks' ) }
+							value={ state.base?.id ?? '' }
+							onChange={ onSelectChange }
+							options={ baseOptions }
+							help={ basesHelpText }
+							disabled={ fetchingBases || ! bases?.length }
+							__next40pxDefaultSize
+						/>
+					</div>
+
+					<div className="form-group">
+						<SelectControl
+							id="table"
+							label={ __( 'Table', 'remote-data-blocks' ) }
+							value={ state.table?.id ?? '' }
+							onChange={ onSelectChange }
+							options={ tableOptions }
+							help={ tablesHelpText }
+							disabled={ fetchingTables || ! tables?.length }
+							__next40pxDefaultSize
+						/>
+					</div>
+
+					<div className="form-group">
+						<ButtonGroup className="form-actions">
+							<Button
+								variant="primary"
+								onClick={ () => void onSaveClick() }
+								disabled={ shouldAllowSubmit }
+							>
+								{ __( 'Save', 'remote-data-blocks' ) }
+							</Button>
+							<Button variant="secondary" onClick={ goToMainScreen }>
+								{ __( 'Cancel', 'remote-data-blocks' ) }
+							</Button>
+						</ButtonGroup>
+					</div>
+				</form>
+			</CardBody>
+		</Card>
 	);
 };

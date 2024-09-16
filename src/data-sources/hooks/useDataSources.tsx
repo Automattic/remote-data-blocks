@@ -1,8 +1,8 @@
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch } from '@wordpress/data';
 import { useEffect, useState, useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { store as noticesStore, NoticeStoreActions } from '@wordpress/notices';
+import { __, sprintf } from '@wordpress/i18n';
+import { store as noticesStore, NoticeStoreActions, WPNotice } from '@wordpress/notices';
 
 import { REST_BASE_DATA_SOURCES } from '@/data-sources/constants';
 import { DataSourceConfig } from '@/data-sources/types';
@@ -21,13 +21,18 @@ export const useDataSources = ( loadOnMount = true ) => {
 			const sources = ( await apiFetch( { path: REST_BASE_DATA_SOURCES } ) ) || [];
 			setDataSources( sources as DataSourceConfig[] );
 		} catch ( error ) {
-			createErrorNotice( __( 'Failed to load Data Sources.', 'remote-data-blocks' ) );
+			showSnackbar( 'error', __( 'Failed to load Data Sources.', 'remote-data-blocks' ) );
 		}
 		setLoadingDataSources( false );
 	}
 
 	const checkSlugConflict = useCallback(
 		async ( slug: string, uuid: string = '' ) => {
+			if ( slug === '' ) {
+				showSnackbar( 'error', __( 'Slug should not be empty.', 'remote-data-blocks' ) );
+				return;
+			}
+
 			setLoadingSlugConflicts( true );
 			try {
 				const conflict = await apiFetch< { exists: boolean } >( {
@@ -54,11 +59,14 @@ export const useDataSources = ( loadOnMount = true ) => {
 				data: source,
 			} );
 		} catch ( error ) {
-			createErrorNotice( __( 'Failed to update Data Source.', 'remote-data-blocks' ) );
+			showSnackbar( 'error', __( 'Failed to update data source.', 'remote-data-blocks' ) );
 			throw error;
 		}
 
-		createSuccessNotice( __( 'Updated Data Source.', 'remote-data-blocks' ) );
+		showSnackbar(
+			'success',
+			__( sprintf( '"%s" has been successfully updated.', 'remote-data-blocks' ), source.slug )
+		);
 		return result;
 	}
 
@@ -72,26 +80,47 @@ export const useDataSources = ( loadOnMount = true ) => {
 				data: source,
 			} );
 		} catch ( error ) {
-			createErrorNotice( __( 'Failed to add Data Source.', 'remote-data-blocks' ) );
+			showSnackbar( 'error', __( 'Failed to add data source.', 'remote-data-blocks' ) );
 			throw error;
 		}
 
-		createSuccessNotice( __( 'Added Data Source.', 'remote-data-blocks' ) );
+		showSnackbar(
+			'success',
+			__( sprintf( '"%s" has been successfully added.', 'remote-data-blocks' ), source.slug )
+		);
 		return result;
 	}
 
-	async function deleteDataSource( uuid: string ) {
+	async function deleteDataSource( source: DataSourceConfig ) {
 		try {
 			await apiFetch( {
-				path: `${ REST_BASE_DATA_SOURCES }/${ uuid }`,
+				path: `${ REST_BASE_DATA_SOURCES }/${ source.uuid }`,
 				method: 'DELETE',
 			} );
 		} catch ( error ) {
-			createErrorNotice( __( 'Failed to delete Data Source.', 'remote-data-blocks' ) );
+			showSnackbar( 'error', __( 'Failed to delete data source.', 'remote-data-blocks' ) );
 			throw error;
 		}
 
-		createSuccessNotice( __( `Deleted Data Source: ${ uuid }`, 'remote-data-blocks' ) );
+		showSnackbar(
+			'success',
+			__( sprintf( '"%s" has been successfully deleted.', 'remote-data-blocks' ), source.slug )
+		);
+	}
+
+	function showSnackbar( type: 'success' | 'error', message: string ): void {
+		const SNACKBAR_OPTIONS: Partial< WPNotice > = {
+			isDismissible: true,
+		};
+
+		switch ( type ) {
+			case 'success':
+				createSuccessNotice( message, { ...SNACKBAR_OPTIONS, icon: '✅' } );
+				break;
+			case 'error':
+				createErrorNotice( message, { ...SNACKBAR_OPTIONS, icon: '❌' } );
+				break;
+		}
 	}
 
 	useEffect( () => {
