@@ -5,18 +5,14 @@ namespace RemoteDataBlocks\Example\Airtable\Events;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
 class AirtableListEventsQuery extends HttpQueryContext {
-	public array $input_variables = [
-		'search' => [
-			'type' => 'string',
-		],
-	];
+	public array $input_variables = [];
 
 	public array $output_variables = [
 		'root_path'     => '$.records[*]',
 		'is_collection' => true,
 		'mappings'      => [
-			'event_id' => [
-				'name' => 'Event ID',
+			'record_id'       => [
+				'name' => 'Record ID',
 				'path' => '$.id',
 				'type' => 'id',
 			],

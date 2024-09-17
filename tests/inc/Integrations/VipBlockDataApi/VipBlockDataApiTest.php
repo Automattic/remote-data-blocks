@@ -28,7 +28,7 @@ class VipBlockDataApiTest extends TestCase {
 			'remoteData' => [
 				'blockName'  => 'remote-data-blocks/events',
 				'queryInput' => [
-					'event_id' => 'rec9H65WdbaeuxxaU',
+					'record_id' => 'rec9H65WdbaeuxxaU',
 				],
 			],
 		],
@@ -76,7 +76,7 @@ class VipBlockDataApiTest extends TestCase {
 			'remoteData' => [
 				'blockName'  => 'remote-data-blocks/events',
 				'queryInput' => [
-					'event_id' => 'rec9H65WdbaeuxxaU',
+					'record_id' => 'rec9H65WdbaeuxxaU',
 				],
 			],
 		],
