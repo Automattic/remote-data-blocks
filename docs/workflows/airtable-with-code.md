@@ -121,7 +121,7 @@ Open a post for editing and select the block in the Block Inserter using the blo
 
 https://github.com/user-attachments/assets/e37e5348-9bee-47bf-bebb-f7977e53f139
 
-The default experience is basic. Since the query requires a record ID as input, the block provides a form to enter it manually. After the record is loaded, we can select a pattern to display the data; the plugin provides a simple, default pattern to use out-of-the-box. 
+The default experience is basic. Since the query requires a record ID as input, the block provides a form to enter it manually. After the record is loaded, we can select a pattern to display the data; the plugin provides a simple, default pattern to use out-of-the-box.
 
 Next, let's work to make this default experience better.
 
