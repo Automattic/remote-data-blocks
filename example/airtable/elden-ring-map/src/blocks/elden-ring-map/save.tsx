@@ -1,7 +1,6 @@
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
-export default function save( a, b, c ) {
-	console.log( { savedContext: 1, a, b, c } );
+export function Save() {
 	return (
 		<p { ...useBlockProps.save() }>
 			<InnerBlocks.Content />

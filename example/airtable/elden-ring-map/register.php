@@ -9,6 +9,7 @@ use function register_block_type;
 use function wp_register_script;
 use function wp_register_style;
 
+require_once __DIR__ . '/inc/interactivity-store/interactivity-store.php';
 require_once __DIR__ . '/inc/queries/class-airtable-elden-ring-list-locations-query.php';
 require_once __DIR__ . '/inc/queries/class-airtable-elden-ring-list-maps-query.php';
 

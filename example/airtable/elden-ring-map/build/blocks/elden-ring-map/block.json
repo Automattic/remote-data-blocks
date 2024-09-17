@@ -23,6 +23,7 @@
   "editorStyle": [
     "leaflet-style"
   ],
+  "render": "file:./render.js",
   "viewScript": [
     "file:./view.js"
   ]
