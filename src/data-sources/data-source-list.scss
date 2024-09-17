@@ -62,6 +62,10 @@ table.data-source-list {
 
 	td {
 		padding: 10px 0;
+
+		&.data-source-actions {
+			height: 36px;
+		}
 	}
 
 	th,
