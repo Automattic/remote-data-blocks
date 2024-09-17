@@ -11,22 +11,22 @@ class AirtableListEventsQuery extends HttpQueryContext {
 		'root_path'     => '$.records[*]',
 		'is_collection' => true,
 		'mappings'      => [
-			'record_id'       => [
+			'record_id' => [
 				'name' => 'Record ID',
 				'path' => '$.id',
 				'type' => 'id',
 			],
-			'title'    => [
+			'title'     => [
 				'name' => 'Title',
 				'path' => '$.fields.Activity',
 				'type' => 'string',
 			],
-			'location' => [
+			'location'  => [
 				'name' => 'Location',
 				'path' => '$.fields.Location',
 				'type' => 'string',
 			],
-			'type'     => [
+			'type'      => [
 				'name' => 'Type',
 				'path' => '$.fields.Type',
 				'type' => 'string',
