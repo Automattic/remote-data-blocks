@@ -99,7 +99,7 @@ use RemoteDataBlocks\Integrations\Airtable\AirtableDatasource;
 require_once __DIR__ . '/class-airtable-get-event-query.php';
 
 function register_conference_event_block() {
-	$block_name.  = 'Conference Event';
+	$block_name   = 'Conference Event';
 	$access_token = AIRTABLE_EVENTS_ACCESS_TOKEN;
 	$base_id      = 'base-id';
 	$table_id     = 'table-id';
