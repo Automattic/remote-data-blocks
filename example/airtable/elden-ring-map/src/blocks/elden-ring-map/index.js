@@ -21,20 +21,8 @@ import metadata from './block.json';
 import { Edit } from './edit';
 import { Save } from './save';
 
-const { category, name, title, usesContext } = metadata;
-
-registerBlockType( name, {
-	attributes: {
-		className: {
-			type: 'string',
-		},
-		'remote-data-blocks/remoteData': {
-			type: 'object',
-		},
-	},
-	category,
+registerBlockType( metadata.name, {
+	...metadata,
 	edit: Edit,
 	save: Save,
-	title,
-	usesContext,
 } );
