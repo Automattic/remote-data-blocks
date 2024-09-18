@@ -8,7 +8,7 @@ require_once __DIR__ . '/inc/queries/class-airtable-get-event-query.php';
 require_once __DIR__ . '/inc/queries/class-airtable-list-events-query.php';
 
 function register_airtable_events_block() {
-	$block_name   = 'Airtable Event';
+	$block_name   = 'Conference Event';
 	$access_token = \RemoteDataBlocks\Example\get_access_token( 'airtable_events' );
 	$base         = 'appVQ2PAl95wQSo9S';
 	$table        = 'tblyGtuxblLtmoqMI';

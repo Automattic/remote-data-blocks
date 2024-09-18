@@ -6,8 +6,8 @@ use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
 class AirtableGetEventQuery extends HttpQueryContext {
 	public array $input_variables = [
-		'event_id' => [
-			'name'      => 'Event ID',
+		'record_id' => [
+			'name'      => 'Record ID',
 			'overrides' => [
 				[
 					'target' => 'utm_content',
@@ -22,7 +22,7 @@ class AirtableGetEventQuery extends HttpQueryContext {
 		'is_collection' => false,
 		'mappings'      => [
 			'id'       => [
-				'name' => 'Event ID',
+				'name' => 'Record ID',
 				'path' => '$.id',
 				'type' => 'id',
 			],
@@ -36,11 +36,6 @@ class AirtableGetEventQuery extends HttpQueryContext {
 				'path' => '$.fields.Location',
 				'type' => 'string',
 			],
-			'notes'    => [
-				'name' => 'Notes',
-				'path' => '$.fields.Notes',
-				'type' => 'string',
-			],
 			'type'     => [
 				'name' => 'Type',
 				'path' => '$.fields.Type',
@@ -52,7 +47,11 @@ class AirtableGetEventQuery extends HttpQueryContext {
 	/**
 	 * Airtable API endpoint for fetching a single event.
 	 */
-	public function get_endpoint( $input_variables ): string {
-		return $this->get_datasource()->get_endpoint() . '/' . $input_variables['event_id'];
+	public function get_endpoint( array $input_variables ): string {
+		return $this->get_datasource()->get_endpoint() . '/' . $input_variables['record_id'];
+	}
+
+	public function get_query_name(): string {
+		return 'Get event';
 	}
 }
