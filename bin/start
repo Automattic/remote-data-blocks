@@ -15,7 +15,7 @@ cleanup() {
 setup_object_cache() {
     echo "Setting up object cache..."
     docker compose -f "$root_dir/docker-compose.overrides.yml" up -d
-    npx wp-env run cli -- wp redis enable
+    # npx wp-env run cli -- wp redis enable
 }
 
 composer install
