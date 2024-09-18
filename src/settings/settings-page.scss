@@ -1,0 +1,41 @@
+.rdb-settings-page {
+
+	.components-card-header {
+		padding: 10px 20px;
+	}
+
+	.components-card-body {
+		padding: 0;
+	}
+
+	.card-loader {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		min-height: 250px;
+	}
+
+	.components-placeholder {
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+		box-shadow: none;
+		min-height: 250px;
+		border-radius: 8px;
+	}
+
+	.components-placeholder__label {
+		flex-direction: column;
+
+		svg {
+			width: 40px;
+			height: 40px;
+			margin-bottom: 12px;
+		}
+	}
+
+	.components-placeholder__instructions {
+		color: #757575;
+	}
+}

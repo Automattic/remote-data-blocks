@@ -2,8 +2,8 @@
 
 namespace RemoteDataBlocks\Example\GitHub;
 
-use RemoteDataBlocks\Config\HttpDatasource;
-use RemoteDataBlocks\Config\HttpQueryContext;
+use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
 class GitHubListFilesQuery extends HttpQueryContext {   
 	public array $input_variables = [

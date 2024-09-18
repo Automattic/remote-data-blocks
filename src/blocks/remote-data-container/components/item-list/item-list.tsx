@@ -36,7 +36,9 @@ export function ItemList( props: ItemListProps ) {
 		<ul>
 			{ props.results.map( ( result, index ) => {
 				const blocks =
-					pattern?.blocks.map( block => cloneBlockWithAttributes( block, result ) ) ?? [];
+					pattern?.blocks.map( block =>
+						cloneBlockWithAttributes( block, result, props.blockName )
+					) ?? [];
 
 				return (
 					<ItemPreview

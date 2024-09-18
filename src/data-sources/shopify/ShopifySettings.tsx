@@ -1,21 +1,19 @@
 import {
 	Button,
 	ButtonGroup,
-	__experimentalHeading as Heading,
 	TextControl,
-	Panel,
-	PanelBody,
-	PanelRow,
+	Card,
+	CardHeader,
+	CardBody,
 } from '@wordpress/components';
-import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { __ } from '@wordpress/i18n';
 
-import { SlugInput } from '@/data-sources/SlugInput';
+import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
+import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { useShopifyShopName } from '@/data-sources/shopify/shopify-api-hooks';
 import { ShopifyConfig } from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
-import PasswordInputControl from '@/settings/PasswordInputControl';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
 export interface ShopifySettingsProps {
@@ -51,10 +49,10 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 		initialValues: getInitialStateFromConfig( config ),
 	} );
 
-	const { connectionMessage } = useShopifyShopName( state.store, state.token );
+	const { shopName, connectionMessage } = useShopifyShopName( state.store, state.token );
 
 	const onSaveClick = async () => {
-		const airtableConfig: ShopifyConfig = {
+		const shopifyConfig: ShopifyConfig = {
 			uuid: uuidFromProps ?? '',
 			service: 'shopify',
 			store: state.store,
@@ -63,14 +61,14 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 		};
 
 		if ( mode === 'add' ) {
-			await addDataSource( airtableConfig );
+			await addDataSource( shopifyConfig );
 		} else {
-			await updateDataSource( airtableConfig );
+			await updateDataSource( shopifyConfig );
 		}
 		goToMainScreen();
 	};
 
-	const onTokenInputChange: InputChangeCallback = ( token: string | undefined ) => {
+	const onTokenInputChange = ( token: string | undefined ) => {
 		handleOnChange( 'token', token ?? '' );
 	};
 
@@ -83,50 +81,66 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 	};
 
 	return (
-		<Panel>
-			<PanelBody>
-				<Heading>
-					{ mode === 'add'
-						? __( 'Add a new Shopify Data Source' )
-						: __( 'Edit Shopify Data Source' ) }
-				</Heading>
-				<PanelRow>
-					<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
-				</PanelRow>
-				<PanelRow>
-					<TextControl
-						label={ __( 'Shopify Store Name', 'remote-data-blocks' ) }
-						onChange={ store => {
-							handleOnChange( 'store', store ?? '' );
-						} }
-						size={ 20 }
-						value={ state.store }
-						autoComplete="off"
-					/>
-				</PanelRow>
-				<PanelRow>
-					<PasswordInputControl
-						label={ __( 'Shopify Access Token', 'remote-data-blocks' ) }
-						onChange={ onTokenInputChange }
-						// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-						size={ 999 as any }
-						value={ state.token }
-					/>
-				</PanelRow>
-				<PanelRow>{ connectionMessage }</PanelRow>
-			</PanelBody>
-			<ButtonGroup className="settings-form-cta-button-group">
-				<Button
-					variant="primary"
-					// eslint-disable-next-line @typescript-eslint/no-misused-promises
-					onClick={ onSaveClick }
-				>
-					{ __( 'Save', 'remote-data-blocks' ) }
-				</Button>
-				<Button variant="secondary" onClick={ goToMainScreen }>
-					{ __( 'Cancel', 'remote-data-blocks' ) }
-				</Button>
-			</ButtonGroup>
-		</Panel>
+		<Card className="add-update-data-source-card">
+			<CardHeader>
+				<h2>
+					{ mode === 'add' ? __( 'Add Shopify Data Source' ) : __( 'Edit Shopify Data Source' ) }
+				</h2>
+			</CardHeader>
+			<CardBody>
+				<form>
+					<div className="form-group">
+						<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
+					</div>
+
+					<div className="form-group">
+						<TextControl
+							type="url"
+							label={ __( 'Store Slug', 'remote-data-blocks' ) }
+							onChange={ store => {
+								handleOnChange( 'store', store ?? '' );
+							} }
+							value={ state.store }
+							placeholder="your-shop-name"
+							help={ __( 'Example: https://your-shop-name.myshopify.com', 'remote-data-blocks' ) }
+							autoComplete="off"
+							__next40pxDefaultSize
+						/>
+					</div>
+
+					<div className="form-group">
+						<PasswordInputControl
+							label={ __( 'Access Token', 'remote-data-blocks' ) }
+							onChange={ onTokenInputChange }
+							value={ state.token }
+							help={ connectionMessage }
+						/>
+					</div>
+
+					<div className="form-group">
+						<TextControl
+							label={ __( 'Store Name', 'remote-data-blocks' ) }
+							placeholder={ __( 'Auto-filled on successful connection.', 'remote-data-blocks' ) }
+							value={ shopName ?? '' }
+							onChange={ () => {} }
+							tabIndex={ -1 }
+							readOnly
+							__next40pxDefaultSize
+						/>
+					</div>
+
+					<div className="form-group">
+						<ButtonGroup className="form-actions">
+							<Button variant="primary" onClick={ () => void onSaveClick() }>
+								{ __( 'Save', 'remote-data-blocks' ) }
+							</Button>
+							<Button variant="secondary" onClick={ goToMainScreen }>
+								{ __( 'Cancel', 'remote-data-blocks' ) }
+							</Button>
+						</ButtonGroup>
+					</div>
+				</form>
+			</CardBody>
+		</Card>
 	);
 };

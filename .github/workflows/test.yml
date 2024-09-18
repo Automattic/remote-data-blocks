@@ -28,10 +28,23 @@ jobs:
           php-version: ${{ matrix.php-version }}
 
       - name: Install dependencies
-        run: composer install
+        run: composer install --prefer-dist
 
       - name: Run tests
+        if: ${{ matrix.php-version != '8.3' }}
         run: composer test
+
+      - name: Run tests and generate coverage
+        if: ${{ matrix.php-version == '8.3' }}
+        run: composer test-coverage
+
+      - name: Upload coverage to Codecov
+        if: ${{ matrix.php-version == '8.3' }}
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/phpunit/clover.xml
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   vitest:
     runs-on: ubuntu-latest
@@ -47,4 +60,11 @@ jobs:
           node-version-file: .nvmrc
 
       - name: Run tests
-        run: npm run test:js
+        run: npm run test:js:coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/vitest/clover.xml
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

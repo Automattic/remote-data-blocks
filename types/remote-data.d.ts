@@ -37,9 +37,9 @@ interface MetaFieldSelection extends FieldSelection {
 }
 
 interface RemoteDataBlockBindingArgs {
+	block: string;
 	field: string;
 	label?: string;
-	name: string;
 }
 
 interface RemoteDataBlockBinding {

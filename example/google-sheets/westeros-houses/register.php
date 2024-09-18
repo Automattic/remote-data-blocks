@@ -2,9 +2,7 @@
 
 namespace RemoteDataBlocks\Example\GoogleSheets\WesterosHouses;
 
-use RemoteDataBlocks\Editor\ConfigurationLoader;
 use RemoteDataBlocks\Logging\LoggerManager;
-use function add_action;
 
 require_once __DIR__ . '/inc/queries/class-westeros-houses-datasource.php';
 require_once __DIR__ . '/inc/queries/class-list-westeros-houses-query.php';
@@ -30,10 +28,10 @@ function register_westeros_houses_block() {
 	$list_westeros_houses_query = new ListWesterosHousesQuery( $westeros_houses_datasource );
 	$get_westeros_houses_query  = new GetWesterosHousesQuery( $westeros_houses_datasource );
 
-	ConfigurationLoader::register_block( $block_name, $get_westeros_houses_query );
-	ConfigurationLoader::register_list_query( $block_name, $list_westeros_houses_query );
-	ConfigurationLoader::register_loop_block( 'Westeros Houses List', $list_westeros_houses_query );
-	ConfigurationLoader::register_page( $block_name, 'westeros-houses' );
+	register_remote_data_block( $block_name, $get_westeros_houses_query );
+	register_remote_data_list_query( $block_name, $list_westeros_houses_query );
+	register_remote_data_loop_block( 'Westeros Houses List', $list_westeros_houses_query );
+	register_remote_data_page( $block_name, 'westeros-houses' );
 }
 
-add_action( 'register_remote_data_blocks', __NAMESPACE__ . '\\register_westeros_houses_block' );
+add_action( 'init', __NAMESPACE__ . '\\register_westeros_houses_block' );

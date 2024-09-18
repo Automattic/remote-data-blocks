@@ -2,9 +2,7 @@
 
 namespace RemoteDataBlocks\Example\GitHub;
 
-use RemoteDataBlocks\Editor\ConfigurationLoader;
 use RemoteDataBlocks\Logging\LoggerManager;
-use function add_action;
 
 require_once __DIR__ . '/inc/queries/class-github-datasource.php';
 require_once __DIR__ . '/inc/queries/class-github-get-file-as-html-query.php';
@@ -21,18 +19,18 @@ function register_github_file_as_html_block() {
 	$github_get_file_as_html_query = new GitHubGetFileAsHtmlQuery( $github_datasource );
 	$github_get_list_files_query   = new GitHubListFilesQuery( $github_datasource, '.md' );
 
-	ConfigurationLoader::register_block( $block_name, $github_get_file_as_html_query );
-	ConfigurationLoader::register_list_query( $block_name, $github_get_list_files_query );
+	register_remote_data_block( $block_name, $github_get_file_as_html_query );
+	register_remote_data_list_query( $block_name, $github_get_list_files_query );
 
 	$block_pattern1 = file_get_contents( __DIR__ . '/inc/patterns/file-picker.html' );
 	$block_pattern2 = file_get_contents( __DIR__ . '/inc/patterns/file-render.html' );
-	ConfigurationLoader::register_block_pattern( $block_name, 'remote-data-blocks/github-file-picker', $block_pattern1, [
+	register_remote_data_block_pattern( $block_name, 'remote-data-blocks/github-file-picker', $block_pattern1, [
 		'title'    => 'GitHub File Picker',
 		'inserter' => false,
 	] );
-	ConfigurationLoader::register_block_pattern( $block_name, 'remote-data-blocks/github-file-render', $block_pattern2, [ 'title' => 'GitHub File Render' ] );
+	register_remote_data_block_pattern( $block_name, 'remote-data-blocks/github-file-render', $block_pattern2, [ 'title' => 'GitHub File Render' ] );
 
 	$logger = LoggerManager::instance();
 	$logger->info( sprintf( 'Registered %s block (branch: %s)', $block_name, $branch ) );
 }
-add_action( 'register_remote_data_blocks', __NAMESPACE__ . '\\register_github_file_as_html_block' );
+add_action( 'init', __NAMESPACE__ . '\\register_github_file_as_html_block' );

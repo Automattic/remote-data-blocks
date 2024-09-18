@@ -2,12 +2,10 @@ import { InspectorControls } from '@wordpress/block-editor';
 import { BlockEditProps } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useContext, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { BlockBindingControls } from '@/blocks/remote-data-container/components/block-binding-controls';
-import { REMOTE_DATA_CONTEXT_KEY } from '@/blocks/remote-data-container/config/constants';
-import { LoopIndexContext } from '@/blocks/remote-data-container/context/loop-index-context';
+import { useRemoteDataContext } from '@/blocks/remote-data-container/hooks/use-remote-data-context';
 import {
 	BLOCK_BINDING_SOURCE,
 	PATTERN_OVERRIDES_BINDING_SOURCE,
@@ -40,9 +38,9 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 		} );
 	}
 
-	function updateBinding( target: string, args: Omit< RemoteDataBlockBindingArgs, 'name' > ) {
+	function updateBinding( target: string, args: Omit< RemoteDataBlockBindingArgs, 'block' > ) {
 		setAttributes( {
-			className: getBoundBlockClassName( attributes ),
+			className: getBoundBlockClassName( attributes, remoteDataName ),
 			metadata: {
 				...attributes.metadata,
 				bindings: {
@@ -51,7 +49,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 						source: BLOCK_BINDING_SOURCE,
 						args: {
 							...args,
-							name: remoteDataName, // Remote Data Block name
+							block: remoteDataName, // Remote Data Block name
 						},
 					},
 				},
@@ -81,7 +79,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 	return ( props: BlockEditProps< RemoteDataInnerBlockAttributes > ) => {
 		const { attributes, context, name, setAttributes } = props;
-		const remoteData = context[ REMOTE_DATA_CONTEXT_KEY ] as RemoteData | undefined;
+		const { remoteData, index } = useRemoteDataContext( context );
 		const availableBindings = getBlockAvailableBindings( remoteData?.blockName ?? '' );
 		const hasAvailableBindings = Boolean( Object.keys( availableBindings ).length );
 
@@ -106,25 +104,22 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 		// a synced block without overrides enabled is useless and can cause issues.
 
 		const patternOverrides = context[ PATTERN_OVERRIDES_CONTEXT_KEY ] as string[] | undefined;
-		const { index } = useContext( LoopIndexContext );
 		const isInSyncedPattern = Boolean( patternOverrides );
 		const hasEnabledOverrides = Object.values( attributes.metadata?.bindings ?? {} ).some(
 			binding => binding.source === PATTERN_OVERRIDES_BINDING_SOURCE
 		);
 
-		// If the block is not writable, render it as usual.
-		if ( isInSyncedPattern && ! hasEnabledOverrides ) {
-			return <BlockEdit { ...props } />;
-		}
-
 		// If the block has a binding and the attributes do not match their expected
 		// values, update and merge the attributes.
-		const mergedAttributes = useMemo< RemoteDataInnerBlockAttributes >( () => {
-			return {
-				...attributes,
-				...getMismatchedAttributes( attributes, remoteData.results, index ),
-			};
-		}, [ attributes, remoteData.results, index ] );
+		const mergedAttributes = {
+			...attributes,
+			...getMismatchedAttributes( attributes, remoteData.results, remoteData.blockName, index ),
+		};
+
+		// If the block is not writable, render it as usual.
+		if ( isInSyncedPattern && ! hasEnabledOverrides ) {
+			return <BlockEdit { ...props } attributes={ mergedAttributes } />;
+		}
 
 		return (
 			<BoundBlockEdit
