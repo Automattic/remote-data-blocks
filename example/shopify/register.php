@@ -39,6 +39,7 @@ function register_shopify_block() {
 	$block_pattern = file_get_contents( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/inc/integrations/shopify/Patterns/product-teaser.html' );
 	register_remote_data_block_pattern( $block_name, 'remote-data-blocks/shopify-product-teaser', $block_pattern, [ 'title' => 'Shopify Product Teaser' ] );
 
+	register_block_type( __DIR__ . '/build/blocks/shopify-product-type' );
 	register_block_type( __DIR__ . '/build/blocks/shopify-cart' );
 	register_block_type( __DIR__ . '/build/blocks/shopify-cart-button' );
 }

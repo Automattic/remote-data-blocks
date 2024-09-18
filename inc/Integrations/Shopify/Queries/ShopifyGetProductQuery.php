@@ -20,6 +20,11 @@ class ShopifyGetProductQuery extends GraphqlQueryContext {
 				'path' => '$.data.product.descriptionHtml',
 				'type' => 'string',
 			],
+			'type'           => [
+				'name' => 'Product Type',
+				'path' => '$.data.product.productType',
+				'type' => 'string',
+			],
 			'title'          => [
 				'name' => 'Title',
 				'path' => '$.data.product.title',
@@ -54,6 +59,7 @@ class ShopifyGetProductQuery extends GraphqlQueryContext {
 				id
 				descriptionHtml
 				title
+				productType
 				featuredImage {
 					url
 					altText
