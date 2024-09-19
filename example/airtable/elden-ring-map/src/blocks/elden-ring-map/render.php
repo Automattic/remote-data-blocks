@@ -11,5 +11,4 @@ $public_store_name   = InteractivityStore::get_store_name();
 	<?php echo get_block_wrapper_attributes(); ?>
 	<?php echo wp_interactivity_data_wp_context( $interactive_context ); ?>
 >
-	<div data-wp-run="callbacks.runMap"></div>
 </div>

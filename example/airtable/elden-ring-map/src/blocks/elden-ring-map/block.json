@@ -11,12 +11,12 @@
   "example": {},
   "supports": {
     "html": false,
-    "inserter": false,
-    "interactivity": true
+    "inserter": false
   },
   "textdomain": "remote-data-blocks",
   "editorScript": [ "file:./index.js", "leaflet-script" ],
   "editorStyle": [ "leaflet-style" ],
   "render": "file:./render.php",
-  "viewScriptModule": [ "file:./view.js", "leaflet-script" ]
+  "viewScript": [ "file:./view.js", "leaflet-script" ],
+  "viewStyle": [ "leaflet-style" ]
 }

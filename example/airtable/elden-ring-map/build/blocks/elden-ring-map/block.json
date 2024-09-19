@@ -13,8 +13,7 @@
   "example": {},
   "supports": {
     "html": false,
-    "inserter": false,
-    "interactivity": true
+    "inserter": false
   },
   "textdomain": "remote-data-blocks",
   "editorScript": [
@@ -25,8 +24,11 @@
     "leaflet-style"
   ],
   "render": "file:./render.php",
-  "viewScriptModule": [
+  "viewScript": [
     "file:./view.js",
     "leaflet-script"
+  ],
+  "viewStyle": [
+    "leaflet-style"
   ]
 }

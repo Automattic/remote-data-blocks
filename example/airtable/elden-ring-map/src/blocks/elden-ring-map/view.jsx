@@ -1,37 +1,26 @@
-import {
-	getContext,
-	getElement,
-	useEffect,
-	useInit,
-	useState,
-	store,
-} from '@wordpress/interactivity';
+import domReady from '@wordpress/dom-ready';
+import { createRoot } from '@wordpress/element';
 
-store( 'remote-data-blocks/elden-ring-map', {
-	callbacks: {
-		runMap: () => {
-			// eslint-disable-next-line react-hooks/rules-of-hooks
-			const [ ref, setRef ] = useState( null );
+import { Map } from './map';
 
-			// eslint-disable-next-line react-hooks/rules-of-hooks
-			useInit( () => {
-				const { ref: _ref } = getElement();
-				setRef( _ref );
-			} );
+domReady( () => {
+	const elements = [
+		...document.getElementsByClassName( 'wp-block-remote-data-blocks-elden-ring-map' ),
+	];
 
-			const context = getContext();
+	elements.forEach( element => {
+		const context = element.dataset.wpContext;
+		let coordinates = [];
+		try {
+			const parsed = JSON.parse( context );
+			coordinates = parsed.coordinates ?? [];
+		} catch ( error ) {}
 
-			// eslint-disable-next-line react-hooks/rules-of-hooks
-			useEffect( () => {
-				if ( ! ref ) {
-					return;
-				}
-				// const coordinates = context?.coordinates
-				// 	? [ ...context.coordinates ].map( proxyObj => ( { ...proxyObj } ) )
-				// 	: [];
-				ref.innerText = JSON.stringify( context?.coordinates, null, 2 );
-				// TODO: Pass to map instead!
-			}, [ context, ref ] );
-		},
-	},
+		if ( ! coordinates.length ) {
+			return;
+		}
+
+		const root = createRoot( element );
+		root.render( <Map coordinates={ coordinates } /> );
+	} );
 } );
