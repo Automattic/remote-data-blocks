@@ -4,7 +4,6 @@ namespace RemoteDataBlocks\Tests\Config;
 
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\ResponseInterface;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
@@ -65,7 +64,7 @@ class QueryRunnerTest extends TestCase {
 				return null;
 			}
 
-			public function get_metadata( ResponseInterface $response, array $query_results ): array {
+			public function get_metadata( array $response_metadata, array $query_results ): array {
 				return [];
 			}
 
