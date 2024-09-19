@@ -76,4 +76,11 @@ export interface RestApiConfig extends BaseDataSourceConfig {
 	auth: ApiAuth;
 }
 
+export type ApiAuthFormState = {
+	authType: ( typeof AUTH_TYPES )[ number ];
+	authValue: string;
+	authKey: string;
+	authAddTo: ( typeof API_KEY_ADD_TO )[ number ];
+};
+
 export type DataSourceConfig = AirtableConfig | ShopifyConfig | GoogleSheetsConfig | RestApiConfig;
