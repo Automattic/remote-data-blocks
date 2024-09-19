@@ -3,7 +3,6 @@
 namespace RemoteDataBlocks\Tests\Config;
 
 use PHPUnit\Framework\TestCase;
-use GuzzleHttp\Psr7\Response;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Tests\Mocks\MockDatasource;
 
@@ -28,10 +27,10 @@ class QueryContextTest extends TestCase {
 	}
 
 	public function testGetMetadata() {
-		$mock_response = new Response( 200, [ 'Age' => '60' ] );
-		$results       = [ [ 'id' => 1 ], [ 'id' => 2 ] ];
+		$mock_response_metadata = [ 'age' => '60' ];
+		$mock_results           = [ [ 'id' => 1 ], [ 'id' => 2 ] ];
 
-		$metadata = $this->query_context->get_metadata( $mock_response, $results );
+		$metadata = $this->query_context->get_metadata( $mock_response_metadata, $mock_results );
 
 		$this->assertArrayHasKey( 'last_updated', $metadata );
 		$this->assertArrayHasKey( 'total_count', $metadata );
