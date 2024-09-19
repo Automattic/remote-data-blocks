@@ -18,6 +18,13 @@
   },
   "steps": [
     {
+      "step": "setSiteOptions",
+      "options": {
+        "blogname": "Remote Data Blocks",
+        "blogdescription": "A WordPress playground to explore the Remote Data Blocks plugin"
+      }
+    },
+    {
       "step": "installPlugin",
       "options": {
         "activate": true
