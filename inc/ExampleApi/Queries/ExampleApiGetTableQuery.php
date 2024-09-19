@@ -35,12 +35,6 @@ class ExampleApiGetTableQuery extends HttpQueryContext {
 		],
 	];
 
-	public function __construct() {}
-
-	public function get_image_url(): null {
-		return null;
-	}
-
 	public function get_query_name(): string {
 		return 'List events';
 	}
