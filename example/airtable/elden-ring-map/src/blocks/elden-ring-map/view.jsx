@@ -7,7 +7,7 @@ import {
 	store,
 } from '@wordpress/interactivity';
 
-store( 'remote-data-blocks/airtable-elden-ring-map', {
+store( 'remote-data-blocks/elden-ring-map', {
 	callbacks: {
 		runMap: () => {
 			// eslint-disable-next-line react-hooks/rules-of-hooks
@@ -26,10 +26,11 @@ store( 'remote-data-blocks/airtable-elden-ring-map', {
 				if ( ! ref ) {
 					return;
 				}
-				const coordinates = context?.coordinates
-					? [ ...context.coordinates ].map( proxyObj => ( { ...proxyObj } ) )
-					: [];
-				ref.innerText = JSON.stringify( coordinates, null, 2 );
+				// const coordinates = context?.coordinates
+				// 	? [ ...context.coordinates ].map( proxyObj => ( { ...proxyObj } ) )
+				// 	: [];
+				ref.innerText = JSON.stringify( context?.coordinates, null, 2 );
+				// TODO: Pass to map instead!
 			}, [ context, ref ] );
 		},
 	},
