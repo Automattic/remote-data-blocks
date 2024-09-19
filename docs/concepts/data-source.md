@@ -48,9 +48,9 @@ class WebDavDatasource implements DatasourceInterface {
 		return 'WebDAV Files';
 	}
 
-    public function get_image_url(): null {
-        return null;
-    }
+	public function get_image_url(): null {
+		return null;
+	}
 
 	public function get_webdav_root(): string {
 		return 'webdavs://webdav.example.com/';
