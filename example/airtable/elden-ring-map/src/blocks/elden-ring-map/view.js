@@ -5,6 +5,7 @@ import { Map } from './map';
 
 domReady( () => {
 	const elements = [
+		// eslint-disable-next-line no-undef -- why does eslint think `document` is undefined here?
 		...document.getElementsByClassName( 'wp-block-remote-data-blocks-elden-ring-map' ),
 	];
 
