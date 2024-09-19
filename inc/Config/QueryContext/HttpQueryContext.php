@@ -9,7 +9,6 @@
 
 namespace RemoteDataBlocks\Config\QueryContext;
 
-use Psr\Http\Message\ResponseInterface;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
@@ -94,16 +93,16 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * query. This method is called after the query is run or is returned from
 	 * cache. These variables will be available as bindings for field shortcodes.
 	 *
-	 * @param ResponseInterface $response The response object from the query.
-	 * @param array             $results  The results of the query.
+	 * @param array $response_metadata The response metadata returned by the query runner.
+	 * @param array $query_results     The results of the query.
 	 * @return array $var_name {
 	 *   @type string $name  Display name of the variable.
 	 *   @type string $type  The variable type (string, number, boolean)
 	 *   @type string $value Value of the variable.
 	 * }
 	 */
-	public function get_metadata( ResponseInterface $response, array $query_results ): array {
-		$age  = intval( $response->getHeader( 'age' )[0] ?? 0 );
+	public function get_metadata( array $response_metadata, array $query_results ): array {
+		$age  = intval( $response_metadata['age'] ?? 0 );
 		$time = time() - $age;
 
 		return [
@@ -168,7 +167,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	/**
 	 * Override this method to process the raw response data from the query before
 	 * it is passed to the query runner and the output variables are extracted. The
-	 * result can be  a JSON string, a PHP associative array, a PHP object, or null.
+	 * result can be a JSON string, a PHP associative array, a PHP object, or null.
 	 *
 	 * @param string $raw_response_data The raw response data.
 	 * @param array  $input_variables   The input variables for this query.
