@@ -43,6 +43,9 @@ Editor\BlockManagement\BlockRegistration::init();
 Editor\BlockManagement\ConfigRegistry::init();
 Editor\PatternEditor\PatternEditor::init();
 
+// Example API
+ExampleApi\ExampleApi::init();
+
 // Load Settings Page
 PluginSettings\PluginSettings::init();
 

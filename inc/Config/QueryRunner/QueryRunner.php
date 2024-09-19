@@ -30,7 +30,7 @@ class QueryRunner implements QueryRunnerInterface {
 	) {
 	}
 
-	public function execute( array $input_variables ): array|WP_Error {
+	protected function get_raw_response_data( array $input_variables ): array|WP_Error {
 		$headers = $this->query_context->get_request_headers( $input_variables );
 		$method  = $this->query_context->get_request_method();
 
@@ -100,18 +100,41 @@ class QueryRunner implements QueryRunnerInterface {
 		}
 
 		// The body is a stream... if we need to read it in chunks, etc. we can do so here.
-		$raw_response_data = $response->getBody()->getContents();
+		$raw_response_string = $response->getBody()->getContents();
 
-		if ( isset( $raw_response_data['errors'][0]['message'] ) ) {
-			$logger = LoggerManager::instance();
-			$logger->warning( sprintf( 'Query error: %s', esc_html( $raw_response_data['errors'][0]['message'] ) ) );
+		return [
+			'metadata'      => [
+				'age'         => intval( $response->getHeaderLine( 'Age' ) ?? 0 ),
+				'status_code' => $response_code,
+			],
+			'response_data' => $raw_response_string,
+		];
+	}
+
+	public function execute( array $input_variables ): array|WP_Error {
+		$raw_response_data = $this->get_raw_response_data( $input_variables );
+
+		if ( is_wp_error( $raw_response_data ) ) {
+			return $raw_response_data;
 		}
 
-		// Optionally process the raw response data using query context custom logic.
-		$response_data = $this->query_context->process_response( $raw_response_data, $input_variables );
+		// Loose validation of the raw response data.
+		if ( ! isset( $raw_response_data['metadata'], $raw_response_data['response_data'] ) || ! is_array( $raw_response_data['metadata'] ) ) {
+			return new WP_Error( 'Invalid raw response data' );
+		}
+
+		$metadata      = $raw_response_data['metadata'];
+		$response_data = $raw_response_data['response_data'];
+
+		// If the response data is a string, allow queries to implement their own
+		// deserialization logic. Otherwise, JsonPath is prepared to work with a
+		// string, array, object, or null.
+		if ( is_string( $response_data ) ) {
+			$response_data = $this->query_context->process_response( $response_data, $input_variables );
+		}
 
 		// Determine if the response data is expected to be a collection.
-		$is_collection = $this->query_context->is_response_data_collection();
+		$is_collection = $this->query_context->is_response_data_collection( $response_data );
 
 		// This method always returns an array, even if it's a single item. This
 		// ensures a consistent response shape. The requestor is expected to inspect
@@ -120,7 +143,7 @@ class QueryRunner implements QueryRunnerInterface {
 
 		return [
 			'is_collection' => $is_collection,
-			'metadata'      => $this->query_context->get_metadata( $response, $results ),
+			'metadata'      => $this->query_context->get_metadata( $metadata, $results ),
 			'results'       => $results,
 		];
 	}
