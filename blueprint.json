@@ -24,7 +24,7 @@
       },
       "pluginZipFile": {
         "resource": "url",
-        "url": "https://github.com/Automattic/remote-data-blocks/releases/latest/download/remote-data-blocks.zip"
+        "url": "https://github.com/Automattic/remote-data-blocks/releases/download/811ebf0/remote-data-blocks.zip"
       }
     }
   ]
