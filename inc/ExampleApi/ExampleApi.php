@@ -2,6 +2,7 @@
 
 namespace RemoteDataBlocks\ExampleApi;
 
+use RemoteDataBlocks\ExampleApi\Queries\ExampleApiDataSource;
 use RemoteDataBlocks\ExampleApi\Queries\ExampleApiGetRecordQuery;
 use RemoteDataBlocks\ExampleApi\Queries\ExampleApiGetTableQuery;
 use function register_remote_data_block;
@@ -29,8 +30,9 @@ class ExampleApi {
 			return;
 		}
 
-		$get_record_query = new ExampleApiGetRecordQuery();
-		$get_table_query  = new ExampleApiGetTableQuery();
+		$datasource       = new ExampleApiDataSource();
+		$get_record_query = new ExampleApiGetRecordQuery( $datasource );
+		$get_table_query  = new ExampleApiGetTableQuery( $datasource );
 
 		register_remote_data_block( self::$block_name, $get_record_query );
 		register_remote_data_list_query( self::$block_name, $get_table_query );
