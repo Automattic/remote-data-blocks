@@ -1,4 +1,9 @@
-import { SUPPORTED_SERVICES } from '@/data-sources/constants';
+import {
+	SUPPORTED_SERVICES,
+	AUTH_TYPES,
+	API_KEY_ADD_TO,
+	HTTP_METHODS,
+} from '@/data-sources/constants';
 import { NumberIdName, StringIdName } from '@/types/common';
 import { GoogleServiceAccountKey } from '@/types/google';
 
@@ -43,4 +48,32 @@ export interface GoogleSheetsConfig extends BaseDataSourceConfig {
 	sheet: NumberIdName;
 }
 
-export type DataSourceConfig = AirtableConfig | ShopifyConfig | GoogleSheetsConfig;
+export interface BaseRestApiAuth {
+	type: ( typeof AUTH_TYPES )[ number ];
+	value: string;
+}
+
+export interface RestApiBearerAuth extends BaseRestApiAuth {
+	type: 'bearer';
+}
+
+export interface RestApiBasicAuth extends BaseRestApiAuth {
+	type: 'basic';
+}
+
+export type ApiAuth = RestApiBearerAuth | RestApiBasicAuth | RestApiApiKeyAuth;
+
+export interface RestApiApiKeyAuth extends BaseRestApiAuth {
+	type: 'api-key';
+	key: string;
+	addTo: ( typeof API_KEY_ADD_TO )[ number ];
+}
+
+export interface RestApiConfig extends BaseDataSourceConfig {
+	service: 'rest-api';
+	url: string;
+	method: ( typeof HTTP_METHODS )[ number ];
+	auth: ApiAuth;
+}
+
+export type DataSourceConfig = AirtableConfig | ShopifyConfig | GoogleSheetsConfig | RestApiConfig;

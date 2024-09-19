@@ -7,7 +7,7 @@ use WP_Error;
 
 class DatasourceCrud {
 	const CONFIG_OPTION_NAME = 'remote_data_blocks_config';
-	const DATA_SOURCE_TYPES  = [ 'airtable', 'shopify', 'google-sheets' ];
+	const DATA_SOURCE_TYPES  = [ 'airtable', 'shopify', 'google-sheets', 'rest-api' ];
 
 	/**
 	 * Validate the slug to verify
@@ -129,6 +129,45 @@ class DatasourceCrud {
 		];
 	}
 
+	public static function validate_rest_api_source( $source ) {
+		if ( empty( $source->url ) ) {
+			return new WP_Error( 'missing_url', __( 'Missing URL.', 'remote-data-blocks' ) );
+		}
+		
+		if ( empty( $source->method ) || ! in_array( $source->method, [ 'GET', 'POST' ], true ) ) {
+			return new WP_Error( 'invalid_method', __( 'Invalid HTTP method. Must be either GET or POST.', 'remote-data-blocks' ) );
+		}
+
+		if ( empty( $source->auth ) ) {
+			return new WP_Error( 'missing_auth', __( 'Missing authentication.', 'remote-data-blocks' ) );
+		}
+
+		if ( ! in_array( $source->auth['type'], [ 'bearer', 'basic', 'api-key' ], true ) ) {
+			return new WP_Error( 'invalid_auth_type', __( 'Invalid authentication type. Must be either bearer, basic, or api-key.', 'remote-data-blocks' ) );
+		}
+
+		if ( empty( $source->auth['value'] ) ) {
+			return new WP_Error( 'missing_auth_value', __( 'Missing authentication value.', 'remote-data-blocks' ) );
+		}
+
+		if ( 'api-key' === $source->auth['type'] && empty( $source->auth['key'] ) ) {
+			return new WP_Error( 'missing_api_key', __( 'Missing API key.', 'remote-data-blocks' ) );
+		}
+
+		if ( 'api-key' === $source->auth['type'] && empty( $source->auth['add_to'] ) ) {
+			return new WP_Error( 'missing_api_key_add_to', __( 'Missing API key add to.', 'remote-data-blocks' ) );
+		}
+
+		return (object) [
+			'uuid'    => $source->uuid,
+			'service' => 'rest-api',
+			'url'     => sanitize_text_field( $source->url ),
+			'method'  => sanitize_text_field( $source->method ),
+			'auth'    => $source->auth,
+			'slug'    => sanitize_text_field( $source->slug ),
+		];
+	}
+
 	public static function validate_source( $source ) {
 		if ( ! is_object( $source ) ) {
 			return new WP_Error( 'invalid_data_source', __( 'Invalid data source.', 'remote-data-blocks' ) );
@@ -160,6 +199,8 @@ class DatasourceCrud {
 				return self::validate_shopify_source( $source );
 			case 'google-sheets':
 				return self::validate_google_sheets_source( $source );
+			case 'rest-api':
+				return self::validate_rest_api_source( $source );
 			default:
 				return new WP_Error( 'unsupported_data_source', __( 'Unsupported data source.', 'remote-data-blocks' ) );
 		}

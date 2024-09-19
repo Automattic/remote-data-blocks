@@ -23,6 +23,7 @@ import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import AirtableIcon from '@/settings/icons/airtable';
 import GoogleSheetsIcon from '@/settings/icons/google-sheets';
+import RestApiIcon from '@/settings/icons/rest-api';
 import ShopifyIcon from '@/settings/icons/shopify';
 import { slugToTitleCase } from '@/utils/string';
 
@@ -113,6 +114,11 @@ const DataSourceList = () => {
 								value: 'google-sheets',
 							},
 							{ icon: ShopifyIcon, label: __( 'Shopify', 'remote-data-blocks' ), value: 'shopify' },
+							{
+								icon: RestApiIcon,
+								label: __( 'Rest API', 'remote-data-blocks' ),
+								value: 'rest-api',
+							},
 						].map( ( { icon, label, value } ) => (
 							<MenuItem
 								key={ value }
