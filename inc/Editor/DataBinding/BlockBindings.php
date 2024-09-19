@@ -79,9 +79,6 @@ class BlockBindings {
 			[ self::$context_name ]
 		);
 
-		$logger = LoggerManager::instance();
-		$logger->info( 'Injecting context for synced patterns' );
-
 		// Wrap the existing block render callback.
 		$block_type_args['render_callback'] = static function ( array $attributes, string $content, WP_Block $synced_pattern_block ) use ( $block_type_args ): string {
 
