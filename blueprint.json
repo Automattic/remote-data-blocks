@@ -1,0 +1,31 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "meta": {
+    "title": "Remote Data Blocks latest",
+    "description": "Installs the latest release of remote-data-blocks plugin to WordPress Playground",
+    "author": "WordPress VIP",
+    "categories": [ "Content" ]
+  },
+  "features": {
+    "networking": true
+  },
+  "landingPage": "/wp-admin/",
+  "login": true,
+  "phpExtensionBundles": [ "kitchen-sink" ],
+  "preferredVersions": {
+    "php": "8.2",
+    "wp": "latest"
+  },
+  "steps": [
+    {
+      "step": "installPlugin",
+      "options": {
+        "activate": true
+      },
+      "pluginZipFile": {
+        "resource": "url",
+        "url": "https://github.com/Automattic/remote-data-blocks/releases/latest/download/remote-data-blocks.zip"
+      }
+    }
+  ]
+}
