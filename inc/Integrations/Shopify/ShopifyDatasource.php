@@ -31,7 +31,7 @@ class ShopifyDatasource extends HttpDatasource implements ArraySerializableInter
 	public function get_display_name(): string {
 		return 'Shopify (' . $this->config['store_name'] . ')';
 	}
-	
+
 	public function get_endpoint(): string {
 		return 'https://' . $this->config['store_name'] . '.myshopify.com/api/2024-04/graphql.json';
 	}
