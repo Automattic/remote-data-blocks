@@ -17,7 +17,7 @@ import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown, edit, info, trash } from '@wordpress/icons';
 
-import { SUPPORTED_SERVICES } from './constants';
+import { SUPPORTED_SERVICES, SUPPORTED_SERVICES_LABELS } from './constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
@@ -26,7 +26,6 @@ import GoogleSheetsIcon from '@/settings/icons/google-sheets';
 import GraphQLIcon from '@/settings/icons/graphql';
 import RestApiIcon from '@/settings/icons/rest-api';
 import ShopifyIcon from '@/settings/icons/shopify';
-import { slugToTitleCase } from '@/utils/string';
 
 import './data-source-list.scss';
 
@@ -181,7 +180,7 @@ const DataSourceList = () => {
 										<Text className="data-source-slug">{ slug }</Text>
 									</td>
 									<td>
-										<Text>{ slugToTitleCase( service ) }</Text>
+										<Text>{ SUPPORTED_SERVICES_LABELS.get( service ) }</Text>
 									</td>
 									<td> { renderDataSourceMeta( source ) } </td>
 									<td className="data-source-actions">
@@ -221,7 +220,7 @@ const DataSourceList = () => {
 									'Are you sure you want to delete "%s" data source with slug "%s"?',
 									'remote-data-blocks'
 								),
-								slugToTitleCase( dataSourceToDelete.service ),
+								SUPPORTED_SERVICES_LABELS.get( dataSourceToDelete.service ),
 								dataSourceToDelete.slug
 							) }
 						</p>

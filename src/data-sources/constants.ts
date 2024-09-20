@@ -7,6 +7,15 @@ export const SUPPORTED_SERVICES = [
 	'rest-api',
 	'graphql',
 ] as const;
+export const SUPPORTED_SERVICES_LABELS = new Map< ( typeof SUPPORTED_SERVICES )[ number ], string >(
+	[
+		[ 'airtable', 'Airtable' ],
+		[ 'shopify', 'Shopify' ],
+		[ 'google-sheets', 'Google Sheets' ],
+		[ 'rest-api', 'REST API' ],
+		[ 'graphql', 'GraphQL' ],
+	]
+);
 export const OPTIONS_PAGE_SLUG = 'remote-data-blocks-settings';
 export const REST_BASE = '/remote-data-blocks/v1';
 export const REST_BASE_DATA_SOURCES = `${ REST_BASE }/data-sources`;
