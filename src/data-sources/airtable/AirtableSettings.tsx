@@ -1,11 +1,4 @@
-import {
-	Button,
-	ButtonGroup,
-	SelectControl,
-	Card,
-	CardHeader,
-	CardBody,
-} from '@wordpress/components';
+import { SelectControl, Card, CardHeader, CardBody } from '@wordpress/components';
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -17,6 +10,7 @@ import {
 	useAirtableApiUserId,
 } from '@/data-sources/airtable/airtable-api-hooks';
 import { AirtableFormState } from '@/data-sources/airtable/types';
+import { FormActionsInput } from '@/data-sources/components/FormActionsInput';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
@@ -83,11 +77,7 @@ export const AirtableSettings = ( {
 		state.base?.id ?? ''
 	);
 
-	const handleSaveError = ( error: unknown ) => {
-		console.error( error );
-	};
-
-	const onSaveClick = () => {
+	const onSaveClick = async () => {
 		if ( ! state.base || ! state.table ) {
 			// TODO: Error handling
 			return;
@@ -103,9 +93,11 @@ export const AirtableSettings = ( {
 		};
 
 		if ( mode === 'add' ) {
-			void addDataSource( airtableConfig ).then( goToMainScreen ).catch( handleSaveError );
+			await addDataSource( airtableConfig );
+		} else {
+			await updateDataSource( airtableConfig );
 		}
-		void updateDataSource( airtableConfig ).then( goToMainScreen ).catch( handleSaveError );
+		goToMainScreen();
 	};
 
 	const onTokenInputChange: InputChangeCallback = ( token: string | undefined ) => {
@@ -165,13 +157,13 @@ export const AirtableSettings = ( {
 
 	const shouldAllowSubmit = useMemo( () => {
 		return (
-			bases === null ||
-			tables === null ||
-			! state.base ||
-			! state.table ||
-			! state.slug ||
-			loadingSlugConflicts ||
-			slugConflicts
+			bases !== null &&
+			tables !== null &&
+			state.base &&
+			state.table &&
+			state.slug &&
+			! loadingSlugConflicts &&
+			! slugConflicts
 		);
 	}, [ bases, tables, state.base, state.table, state.slug, loadingSlugConflicts, slugConflicts ] );
 
@@ -301,20 +293,11 @@ export const AirtableSettings = ( {
 						/>
 					</div>
 
-					<div className="form-group">
-						<ButtonGroup className="form-actions">
-							<Button
-								variant="primary"
-								onClick={ () => void onSaveClick() }
-								disabled={ shouldAllowSubmit }
-							>
-								{ __( 'Save', 'remote-data-blocks' ) }
-							</Button>
-							<Button variant="secondary" onClick={ goToMainScreen }>
-								{ __( 'Cancel', 'remote-data-blocks' ) }
-							</Button>
-						</ButtonGroup>
-					</div>
+					<FormActionsInput
+						onSave={ onSaveClick }
+						onCancel={ goToMainScreen }
+						saveDisabled={ ! shouldAllowSubmit }
+					/>
 				</form>
 			</CardBody>
 		</Card>

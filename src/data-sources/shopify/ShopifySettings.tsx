@@ -1,13 +1,8 @@
-import {
-	Button,
-	ButtonGroup,
-	TextControl,
-	Card,
-	CardHeader,
-	CardBody,
-} from '@wordpress/components';
+import { TextControl, Card, CardHeader, CardBody } from '@wordpress/components';
+import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
+import { FormActionsInput } from '@/data-sources/components/FormActionsInput';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
@@ -48,6 +43,13 @@ export const ShopifySettings = ( {
 	} );
 
 	const { shopName, connectionMessage } = useShopifyShopName( state.store, state.token );
+
+	const shouldAllowSubmit = useMemo( () => {
+		if ( state.slug && state.store && state.token ) {
+			return true;
+		}
+		return false;
+	}, [ state.slug, state.store, state.token ] );
 
 	const onSaveClick = async () => {
 		const shopifyConfig: ShopifyConfig = {
@@ -127,16 +129,11 @@ export const ShopifySettings = ( {
 						/>
 					</div>
 
-					<div className="form-group">
-						<ButtonGroup className="form-actions">
-							<Button variant="primary" onClick={ () => void onSaveClick() }>
-								{ __( 'Save', 'remote-data-blocks' ) }
-							</Button>
-							<Button variant="secondary" onClick={ goToMainScreen }>
-								{ __( 'Cancel', 'remote-data-blocks' ) }
-							</Button>
-						</ButtonGroup>
-					</div>
+					<FormActionsInput
+						onSave={ onSaveClick }
+						onCancel={ goToMainScreen }
+						saveDisabled={ ! shouldAllowSubmit }
+					/>
 				</form>
 			</CardBody>
 		</Card>

@@ -1,9 +1,10 @@
-import { Button, ButtonGroup, Card, CardHeader, CardBody } from '@wordpress/components';
+import { Card, CardHeader, CardBody } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { ApiAuthSettingsInput } from '@/data-sources/components/ApiAuthSettingsInput';
 import { ApiUrlMethodSettingsInput } from '@/data-sources/components/ApiUrlMethodSettingsInput';
+import { FormActionsInput } from '@/data-sources/components/FormActionsInput';
 import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { RestApiFormState } from '@/data-sources/rest-api/types';
@@ -160,20 +161,11 @@ export const RestApiSettings = ( {
 
 					<ApiAuthSettingsInput auth={ getAuthState() } onChange={ handleOnChange } />
 
-					<div className="form-group">
-						<ButtonGroup className="form-actions">
-							<Button
-								variant="primary"
-								onClick={ () => void onSaveClick() }
-								disabled={ ! shouldAllowSubmit }
-							>
-								{ __( 'Save', 'remote-data-blocks' ) }
-							</Button>
-							<Button variant="secondary" onClick={ goToMainScreen }>
-								{ __( 'Cancel', 'remote-data-blocks' ) }
-							</Button>
-						</ButtonGroup>
-					</div>
+					<FormActionsInput
+						onSave={ onSaveClick }
+						onCancel={ goToMainScreen }
+						saveDisabled={ ! shouldAllowSubmit }
+					/>
 				</form>
 			</CardBody>
 		</Card>
