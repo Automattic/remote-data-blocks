@@ -22,8 +22,8 @@ class FunctionsTest extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->mock_logger = new MockLogger();
-		$this->mock_datasource = MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator());
+		$this->mock_logger     = new MockLogger();
+		$this->mock_datasource = MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator() );
 		ConfigRegistry::init( $this->mock_logger );
 	}
 

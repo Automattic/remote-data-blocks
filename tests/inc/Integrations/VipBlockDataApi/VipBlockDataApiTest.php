@@ -15,7 +15,7 @@ use function register_remote_data_block;
 
 class TestQueryContext extends HttpQueryContext {
 	public function __construct( private QueryRunnerInterface $mock_qr ) {
-		parent::__construct( MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator()));
+		parent::__construct( MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator() ) );
 	}
 
 	public function get_query_runner(): QueryRunnerInterface {

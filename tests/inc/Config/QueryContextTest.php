@@ -13,7 +13,7 @@ class QueryContextTest extends TestCase {
 	private $query_context;
 
 	protected function setUp(): void {
-		$this->datasource = MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator() );
+		$this->datasource    = MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator() );
 		$this->query_context = new HttpQueryContext( $this->datasource );
 	}
 

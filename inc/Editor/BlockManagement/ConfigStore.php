@@ -85,8 +85,8 @@ class ConfigStore {
 	 *
 	 * @return HttpDatasource[]
 	 */
-	public static function get_compatible_data_sources(): array {
-		$compatible_data_sources = [];
+	public static function get_coded_data_sources(): array {
+		$coded_data_sources = [];
 
 		foreach ( self::$configurations as $config ) {
 			foreach ( $config['queries'] as $query ) {
@@ -96,20 +96,13 @@ class ConfigStore {
 
 				$data_source = $query->get_datasource();
 
-				if ( ! $data_source instanceof CodedHttpDatasource ) {
-					continue;
-				}
-
-				// Get the object representation of the data source, which is compatible
-				// with the settings screen. Queries can be reused, so filter for unique
-				// data sources using the slug.
-				$compatible_data_sources = array_merge(
-					$compatible_data_sources,
+				$coded_data_sources = array_merge(
+					$coded_data_sources,
 					$data_source->to_array()
 				);
 			}
 		}
 
-		return array_values( $compatible_data_sources );
+		return array_values( $coded_data_sources );
 	}
 }

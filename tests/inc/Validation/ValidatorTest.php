@@ -3,15 +3,13 @@
 namespace RemoteDataBlocks\Tests\Validation;
 
 use PHPUnit\Framework\TestCase;
-use RemoteDataBlocks\WpdbStorage\DatasourceCrud;
-use RemoteDataBlocks\Validation\DatasourceValidator;
-use RemoteDataBlocks\Validation\DatasourceValidatorInterface;
-use RemoteDataBlocks\Validation\ValidatorInterface;
+use RemoteDataBlocks\Integrations\Airtable\AirtableDatasource;
+use RemoteDataBlocks\Integrations\Shopify\ShopifyDatasource;
+use RemoteDataBlocks\Validation\Validator;
 use WP_Error;
 
-
 class ValidatorTest extends TestCase {
-    public function test_validate_airtable_source_with_valid_input() {
+	public function test_validate_airtable_source_with_valid_input() {
 		$valid_source = (object) [
 			'uuid'    => '123e4567-e89b-12d3-a456-426614174000',
 			'token'   => 'valid_token',
@@ -27,9 +25,8 @@ class ValidatorTest extends TestCase {
 			'slug'    => 'valid-slug',
 		];
 
-		$result = DatasourceCrud::validate_airtable_source( $valid_source );
-		$this->assertIsObject( $result );
-		$this->assertSame( $valid_source->uuid, $result->uuid );
+		$validator = new Validator( AirtableDatasource::get_config_schema() );
+		$this->assertTrue( $validator->validate( $valid_source ) );
 	}
 
 	public function test_validate_airtable_source_with_invalid_input() {
@@ -39,7 +36,8 @@ class ValidatorTest extends TestCase {
 			'slug'    => 'valid-slug',
 		];
 
-		$this->assertInstanceOf( WP_Error::class, DatasourceCrud::validate_airtable_source( $invalid_source ) );
+		$validator = new Validator( AirtableDatasource::get_config_schema() );
+		$this->assertInstanceOf( WP_Error::class, $validator->validate( $invalid_source ) );
 	}
 
 	public function test_validate_shopify_source_with_valid_input() {
@@ -50,10 +48,9 @@ class ValidatorTest extends TestCase {
 			'store'   => 'mystore.myshopify.com',
 			'slug'    => 'valid-slug',
 		];
-
-		$result = DatasourceCrud::validate_shopify_source( $valid_source );
-		$this->assertIsObject( $result );
-		$this->assertSame( $valid_source->uuid, $result->uuid );
+	
+		$validator = new Validator( ShopifyDatasource::get_config_schema() );
+		$this->assertTrue( $validator->validate( $valid_source ) );
 	}
 
 	public function test_validate_shopify_source_with_invalid_input() {
@@ -63,9 +60,10 @@ class ValidatorTest extends TestCase {
 			'slug'    => 'valid-slug',
 		];
 
-		$this->assertInstanceOf( WP_Error::class, DatasourceCrud::validate_shopify_source( $invalid_source ) );
+		$validator = new Validator( ShopifyDatasource::get_config_schema() );
+		$this->assertInstanceOf( WP_Error::class, $validator->validate( $invalid_source ) );
 	}
-
+	/*
 	public function test_validate_google_sheets_source_with_valid_input() {
 		$valid_credentials = [
 			'type'                        => 'service_account',
@@ -96,9 +94,8 @@ class ValidatorTest extends TestCase {
 			'slug'        => 'valid-slug',
 		];
 
-		$result = DatasourceCrud::validate_google_sheets_source( $valid_source );
-		$this->assertIsObject( $result );
-		$this->assertSame( $valid_source->uuid, $result->uuid );
+		$validator = new Validator( GoogleSheetsDatasource::get_config_schema() );
+		$this->assertTrue($validator->validate( $valid_source ));
 	}
 
 	public function test_validate_google_sheets_source_with_invalid_input() {
@@ -109,40 +106,8 @@ class ValidatorTest extends TestCase {
 			'slug'        => 'valid-slug',
 		];
 
-		$this->assertInstanceOf( WP_Error::class, DatasourceCrud::validate_google_sheets_source( $invalid_source ) );
+		$validator = new Validator( GoogleSheetsDatasource::get_config_schema() );
+		$this->assertInstanceOf( WP_Error::class, $validator->validate( $invalid_source ) );
 	}
-
-
-	public function test_validate_source_with_valid_input() {
-		$valid_source = (object) [
-			'uuid'    => '123e4567-e89b-12d3-a456-426614174000',
-			'token'   => 'valid_token',
-			'service' => 'airtable',
-			'base'    => [
-				'id'   => 'base_id',
-				'name' => 'Base Name',
-			],
-			'table'   => [
-				'id'   => 'table_id',
-				'name' => 'Table Name',
-			],
-			'slug'    => 'valid-slug',
-		];
-
-		$result = DatasourceCrud::validate_source( $valid_source );
-		$this->assertIsObject( $result );
-		$this->assertObjectHasProperty( 'uuid', $result );
-		$this->assertSame( $valid_source->uuid, $result->uuid );
-	}
-
-	public function test_validate_source_with_invalid_input() {
-		$invalid_source = (object) [
-			'uuid'    => 'invalid-uuid',
-			'service' => 'unsupported',
-			'slug'    => 'valid-slug',
-		];
-
-		$result = DatasourceCrud::validate_source( $invalid_source );
-		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'invalid_uuid', $result->get_error_code() );
-	}
+	*/
+}

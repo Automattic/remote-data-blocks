@@ -31,11 +31,9 @@ class Validator implements ValidatorInterface {
 				return new WP_Error( 'missing_field', sprintf( __( '%s is required.', 'remote-data-blocks' ), $field ) );
 			}
 
-			if ( isset( $rules['type'] ) ) {
-				$type_check = $this->checkType( $value, $rules['type'] );
-				if ( is_wp_error( $type_check ) ) {
-					return $type_check;
-				}
+			if ( isset( $rules['type'] ) && ! $this->checkType( $value, $rules['type'] ) ) {
+				$msg = sprintf( __( '%1$s has an invalid type. Expected %2$s, got %3$s.', 'remote-data-blocks' ), $field, $rules['type'], gettype( $value ) );
+				return new WP_Error( 'invalid_type', $msg );
 			}
 
 			if ( isset( $rules['pattern'] ) && ! preg_match( $rules['pattern'], $value ) ) {
@@ -57,16 +55,7 @@ class Validator implements ValidatorInterface {
 		return true;
 	}
 
-	private function checkType( $value, string $expected_type ): bool|WP_Error {
-		$actual_type = gettype( $value );
-
-		if ( $actual_type === $expected_type ) {
-			return true;
-		}
-
-		return new WP_Error(
-			'invalid_type',
-			sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), $expected_type, $actual_type )
-		);
+	private function checkType( $value, string $expected_type ): bool {
+		return gettype( $value ) === $expected_type;
 	}
 }
