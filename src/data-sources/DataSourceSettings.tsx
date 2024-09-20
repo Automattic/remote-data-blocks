@@ -2,9 +2,8 @@ import { __ } from '@wordpress/i18n';
 
 import { AirtableSettings } from '@/data-sources/airtable/AirtableSettings';
 import { GoogleSheetsSettings } from '@/data-sources/google-sheets/GoogleSheetsSettings';
-import { GraphQLSettings } from '@/data-sources/graphql/GraphQLSettings';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
-import { RestApiSettings } from '@/data-sources/rest-api/RestApiSettings';
+import { HttpSettings } from '@/data-sources/http/HttpSettings';
 import { ShopifySettings } from '@/data-sources/shopify/ShopifySettings';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
@@ -33,11 +32,8 @@ const DataSourceEditSettings = ( { uuid }: DataSourceEditSettings ) => {
 	if ( 'google-sheets' === dataSource.service ) {
 		return <GoogleSheetsSettings mode="edit" uuid={ uuid } config={ dataSource } />;
 	}
-	if ( 'rest-api' === dataSource.service ) {
-		return <RestApiSettings mode="edit" uuid={ uuid } config={ dataSource } />;
-	}
-	if ( 'graphql' === dataSource.service ) {
-		return <GraphQLSettings mode="edit" uuid={ uuid } config={ dataSource } />;
+	if ( 'http' === dataSource.service ) {
+		return <HttpSettings mode="edit" uuid={ uuid } config={ dataSource } />;
 	}
 
 	return <>{ __( 'Service not (yet) supported.', 'remote-data-blocks' ) }</>;
@@ -57,11 +53,8 @@ const DataSourceSettings = () => {
 		if ( 'google-sheets' === service ) {
 			return <GoogleSheetsSettings mode="add" />;
 		}
-		if ( 'rest-api' === service ) {
-			return <RestApiSettings mode="add" />;
-		}
-		if ( 'graphql' === service ) {
-			return <GraphQLSettings mode="add" />;
+		if ( 'http' === service ) {
+			return <HttpSettings mode="add" />;
 		}
 		return <>{ __( 'Service not (yet) supported.', 'remote-data-blocks' ) }</>;
 	}

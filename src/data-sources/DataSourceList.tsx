@@ -23,8 +23,7 @@ import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import AirtableIcon from '@/settings/icons/airtable';
 import GoogleSheetsIcon from '@/settings/icons/google-sheets';
-import GraphQLIcon from '@/settings/icons/graphql';
-import RestApiIcon from '@/settings/icons/rest-api';
+import HttpIcon from '@/settings/icons/http';
 import ShopifyIcon from '@/settings/icons/shopify';
 
 import './data-source-list.scss';
@@ -115,14 +114,9 @@ const DataSourceList = () => {
 							},
 							{ icon: ShopifyIcon, label: __( 'Shopify', 'remote-data-blocks' ), value: 'shopify' },
 							{
-								icon: RestApiIcon,
-								label: __( 'Rest API', 'remote-data-blocks' ),
-								value: 'rest-api',
-							},
-							{
-								icon: GraphQLIcon,
-								label: __( 'GraphQL', 'remote-data-blocks' ),
-								value: 'graphql',
+								icon: HttpIcon,
+								label: __( 'HTTP', 'remote-data-blocks' ),
+								value: 'http',
 							},
 						].map( ( { icon, label, value } ) => (
 							<MenuItem

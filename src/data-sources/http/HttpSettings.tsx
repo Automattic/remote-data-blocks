@@ -1,25 +1,23 @@
-import { Card, CardHeader, CardBody } from '@wordpress/components';
+import { Card, CardHeader, CardBody, TextControl } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { ApiAuthSettingsInput } from '@/data-sources/components/ApiAuthSettingsInput';
-import { ApiUrlMethodSettingsInput } from '@/data-sources/components/ApiUrlMethodSettingsInput';
 import { FormActionsInput } from '@/data-sources/components/FormActionsInput';
+import { HttpAuthSettingsInput } from '@/data-sources/components/HttpAuthSettingsInput';
 import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
-import { RestApiFormState } from '@/data-sources/rest-api/types';
+import { HttpFormState } from '@/data-sources/http/types';
 import {
-	RestApiConfig,
-	ApiAuth,
-	ApiAuthFormState,
+	HttpConfig,
+	HttpAuth,
+	HttpAuthFormState,
 	SettingsComponentProps,
 } from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
-export const initialState: RestApiFormState = {
+const initialState: HttpFormState = {
 	slug: '',
-	method: 'GET',
 	url: '',
 	authType: 'bearer',
 	authValue: '',
@@ -27,14 +25,13 @@ export const initialState: RestApiFormState = {
 	authAddTo: 'header',
 };
 
-const getInitialStateFromConfig = ( config?: RestApiConfig ): RestApiFormState => {
+const getInitialStateFromConfig = ( config?: HttpConfig ): HttpFormState => {
 	if ( ! config ) {
 		return initialState;
 	}
 
-	const initialStateFromConfig: RestApiFormState = {
+	const initialStateFromConfig: HttpFormState = {
 		slug: config.slug,
-		method: config.method,
 		url: config.url,
 		authType: config.auth.type,
 		authValue: config.auth.value,
@@ -50,20 +47,20 @@ const getInitialStateFromConfig = ( config?: RestApiConfig ): RestApiFormState =
 	return initialStateFromConfig;
 };
 
-export const RestApiSettings = ( {
+export const HttpSettings = ( {
 	mode,
 	uuid: uuidFromProps,
 	config,
-}: SettingsComponentProps< RestApiConfig > ) => {
+}: SettingsComponentProps< HttpConfig > ) => {
 	const { goToMainScreen } = useSettingsContext();
 
-	const { state, handleOnChange } = useForm< RestApiFormState >( {
+	const { state, handleOnChange } = useForm< HttpFormState >( {
 		initialValues: getInitialStateFromConfig( config ),
 	} );
 
 	const { addDataSource, updateDataSource } = useDataSources( false );
 
-	const getAuthState = (): ApiAuthFormState => {
+	const getAuthState = (): HttpAuthFormState => {
 		return {
 			authType: state.authType,
 			authValue: state.authValue,
@@ -81,7 +78,7 @@ export const RestApiSettings = ( {
 	};
 
 	const shouldAllowSubmit = useMemo( () => {
-		if ( ! state.slug || ! state.url || ! state.method || ! state.authType || ! state.authValue ) {
+		if ( ! state.slug || ! state.url || ! state.authType || ! state.authValue ) {
 			return false;
 		}
 
@@ -92,22 +89,14 @@ export const RestApiSettings = ( {
 		}
 
 		return true;
-	}, [
-		state.slug,
-		state.url,
-		state.method,
-		state.authType,
-		state.authValue,
-		state.authKey,
-		state.authAddTo,
-	] );
+	}, [ state.slug, state.url, state.authType, state.authValue, state.authKey, state.authAddTo ] );
 
 	const onSaveClick = async () => {
 		if ( ! shouldAllowSubmit ) {
 			return;
 		}
 
-		let auth: ApiAuth;
+		let auth: HttpAuth;
 
 		if ( state.authType === 'api-key' ) {
 			auth = {
@@ -123,19 +112,18 @@ export const RestApiSettings = ( {
 			};
 		}
 
-		const restApiConfig: RestApiConfig = {
+		const httpConfig: HttpConfig = {
 			uuid: uuidFromProps ?? '',
-			service: 'rest-api',
+			service: 'http',
 			slug: state.slug,
-			method: state.method,
 			url: state.url,
 			auth,
 		};
 
 		if ( mode === 'add' ) {
-			await addDataSource( restApiConfig );
+			await addDataSource( httpConfig );
 		} else {
-			await updateDataSource( restApiConfig );
+			await updateDataSource( httpConfig );
 		}
 		goToMainScreen();
 	};
@@ -143,9 +131,7 @@ export const RestApiSettings = ( {
 	return (
 		<Card className="add-update-data-source-card">
 			<CardHeader>
-				<h2>
-					{ mode === 'add' ? __( 'Add REST API Data Source' ) : __( 'Edit REST API Data Source' ) }
-				</h2>
+				<h2>{ mode === 'add' ? __( 'Add HTTP Data Source' ) : __( 'Edit HTTP Data Source' ) }</h2>
 			</CardHeader>
 			<CardBody>
 				<form>
@@ -153,13 +139,20 @@ export const RestApiSettings = ( {
 						<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
 					</div>
 
-					<ApiUrlMethodSettingsInput
-						url={ state.url }
-						method={ state.method }
-						onChange={ handleOnChange }
-					/>
+					<div className="form-group">
+						<TextControl
+							type="url"
+							id="url"
+							label={ __( 'URL', 'remote-data-blocks' ) }
+							value={ state.url }
+							onChange={ value => handleOnChange( 'url', value ) }
+							autoComplete="off"
+							__next40pxDefaultSize
+							help={ __( 'The URL for the HTTP endpoint.', 'remote-data-blocks' ) }
+						/>
+					</div>
 
-					<ApiAuthSettingsInput auth={ getAuthState() } onChange={ handleOnChange } />
+					<HttpAuthSettingsInput auth={ getAuthState() } onChange={ handleOnChange } />
 
 					<FormActionsInput
 						onSave={ onSaveClick }

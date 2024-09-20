@@ -4,8 +4,7 @@ export const SUPPORTED_SERVICES = [
 	'airtable',
 	'shopify',
 	'google-sheets',
-	'rest-api',
-	'graphql',
+	'http',
 	'example-api',
 ] as const;
 export const SUPPORTED_SERVICES_LABELS = new Map< ( typeof SUPPORTED_SERVICES )[ number ], string >(
@@ -13,8 +12,7 @@ export const SUPPORTED_SERVICES_LABELS = new Map< ( typeof SUPPORTED_SERVICES )[
 		[ 'airtable', 'Airtable' ],
 		[ 'shopify', 'Shopify' ],
 		[ 'google-sheets', 'Google Sheets' ],
-		[ 'rest-api', 'REST API' ],
-		[ 'graphql', 'GraphQL' ],
+		[ 'http', 'HTTP' ],
 		[ 'example-api', 'Example API' ],
 	]
 );
@@ -35,25 +33,18 @@ export const GOOGLE_SHEETS_API_SCOPES = [
  */
 export const AUTH_TYPES = [ 'bearer', 'basic', 'api-key' ] as const;
 export const API_KEY_ADD_TO = [ 'queryparams', 'header' ] as const;
-export const HTTP_METHODS = [ 'GET', 'POST' ] as const;
 
 /**
  * REST API Source SelectOptions
  */
-export const REST_API_SOURCE_AUTH_TYPE_SELECT_OPTIONS: SelectOption<
+export const HTTP_SOURCE_AUTH_TYPE_SELECT_OPTIONS: SelectOption<
 	( typeof AUTH_TYPES )[ number ]
 >[] = [
 	{ label: 'Bearer', value: 'bearer' },
 	{ label: 'Basic', value: 'basic' },
 	{ label: 'API Key', value: 'api-key' },
 ];
-export const REST_API_SOURCE_METHOD_SELECT_OPTIONS: SelectOption<
-	( typeof HTTP_METHODS )[ number ]
->[] = [
-	{ label: 'GET', value: 'GET' },
-	{ label: 'POST', value: 'POST' },
-];
-export const REST_API_SOURCE_ADD_TO_SELECT_OPTIONS: SelectOption<
+export const HTTP_SOURCE_ADD_TO_SELECT_OPTIONS: SelectOption<
 	( typeof API_KEY_ADD_TO )[ number ]
 >[] = [
 	{ label: 'Header', value: 'header' },

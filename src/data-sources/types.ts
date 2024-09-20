@@ -1,9 +1,4 @@
-import {
-	SUPPORTED_SERVICES,
-	AUTH_TYPES,
-	API_KEY_ADD_TO,
-	HTTP_METHODS,
-} from '@/data-sources/constants';
+import { SUPPORTED_SERVICES, AUTH_TYPES, API_KEY_ADD_TO } from '@/data-sources/constants';
 import { NumberIdName, StringIdName } from '@/types/common';
 import { GoogleServiceAccountKey } from '@/types/google';
 
@@ -48,52 +43,41 @@ export interface GoogleSheetsConfig extends BaseDataSourceConfig {
 	sheet: NumberIdName;
 }
 
-export interface BaseRestApiAuth {
+export interface BaseHttpAuth {
 	type: ( typeof AUTH_TYPES )[ number ];
 	value: string;
 }
 
-export interface RestApiBearerAuth extends BaseRestApiAuth {
+export interface HttpBearerAuth extends BaseHttpAuth {
 	type: 'bearer';
 }
 
-export interface RestApiBasicAuth extends BaseRestApiAuth {
+export interface HttpBasicAuth extends BaseHttpAuth {
 	type: 'basic';
 }
 
-export type ApiAuth = RestApiBearerAuth | RestApiBasicAuth | RestApiApiKeyAuth;
+export type HttpAuth = HttpBearerAuth | HttpBasicAuth | HttpApiKeyAuth;
 
-export interface RestApiApiKeyAuth extends BaseRestApiAuth {
+export interface HttpApiKeyAuth extends BaseHttpAuth {
 	type: 'api-key';
 	key: string;
 	addTo: ( typeof API_KEY_ADD_TO )[ number ];
 }
 
-export interface RestApiConfig extends BaseDataSourceConfig {
-	service: 'rest-api';
-	url: string;
-	method: ( typeof HTTP_METHODS )[ number ];
-	auth: ApiAuth;
-}
-
-export type ApiAuthFormState = {
+export type HttpAuthFormState = {
 	authType: ( typeof AUTH_TYPES )[ number ];
 	authValue: string;
 	authKey: string;
 	authAddTo: ( typeof API_KEY_ADD_TO )[ number ];
 };
 
-export interface GraphQLConfig extends Omit< RestApiConfig, 'service' > {
-	service: 'graphql';
-	query: string;
+export interface HttpConfig extends BaseDataSourceConfig {
+	service: 'http';
+	url: string;
+	auth: HttpAuth;
 }
 
-export type DataSourceConfig =
-	| AirtableConfig
-	| ShopifyConfig
-	| GoogleSheetsConfig
-	| RestApiConfig
-	| GraphQLConfig;
+export type DataSourceConfig = AirtableConfig | ShopifyConfig | GoogleSheetsConfig | HttpConfig;
 
 export type SettingsComponentProps< T extends BaseDataSourceConfig > = {
 	mode: 'add' | 'edit';

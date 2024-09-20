@@ -7,7 +7,7 @@ use WP_Error;
 
 class DatasourceCrud {
 	const CONFIG_OPTION_NAME = 'remote_data_blocks_config';
-	const DATA_SOURCE_TYPES  = [ 'airtable', 'shopify', 'google-sheets', 'rest-api', 'graphql' ];
+	const DATA_SOURCE_TYPES  = [ 'airtable', 'shopify', 'google-sheets', 'http' ];
 
 	/**
 	 * Validate the slug to verify
@@ -129,13 +129,9 @@ class DatasourceCrud {
 		];
 	}
 
-	public static function validate_rest_api_source( $source ) {
+	public static function validate_http_source( $source ) {
 		if ( empty( $source->url ) ) {
 			return new WP_Error( 'missing_url', __( 'Missing URL.', 'remote-data-blocks' ) );
-		}
-		
-		if ( empty( $source->method ) || ! in_array( $source->method, [ 'GET', 'POST' ], true ) ) {
-			return new WP_Error( 'invalid_method', __( 'Invalid HTTP method. Must be either GET or POST.', 'remote-data-blocks' ) );
 		}
 
 		if ( empty( $source->auth ) ) {
@@ -160,32 +156,11 @@ class DatasourceCrud {
 
 		return (object) [
 			'uuid'    => $source->uuid,
-			'service' => 'rest-api',
+			'service' => 'http',
 			'url'     => sanitize_text_field( $source->url ),
-			'method'  => sanitize_text_field( $source->method ),
 			'auth'    => $source->auth,
 			'slug'    => sanitize_text_field( $source->slug ),
 		];
-	}
-
-	public static function validate_graphql_source( $source ) {
-		$rest_api_source = self::validate_rest_api_source( $source );
-
-		if ( is_wp_error( $rest_api_source ) ) {
-			return $rest_api_source;
-		}
-
-		if ( empty( $source->query ) ) {
-			return new WP_Error( 'missing_query', __( 'Missing query.', 'remote-data-blocks' ) );
-		}
-
-		return (object) array_merge(
-			(array) $rest_api_source,
-			[
-				'service' => 'graphql',
-				'query'   => sanitize_textarea_field( $source->query ),
-			]
-		);
 	}
 
 	public static function validate_source( $source ) {
@@ -219,10 +194,8 @@ class DatasourceCrud {
 				return self::validate_shopify_source( $source );
 			case 'google-sheets':
 				return self::validate_google_sheets_source( $source );
-			case 'rest-api':
-				return self::validate_rest_api_source( $source );
-			case 'graphql':
-				return self::validate_graphql_source( $source );
+			case 'http':
+				return self::validate_http_source( $source );
 			default:
 				return new WP_Error( 'unsupported_data_source', __( 'Unsupported data source.', 'remote-data-blocks' ) );
 		}

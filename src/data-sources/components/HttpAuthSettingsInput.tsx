@@ -4,17 +4,17 @@ import { ChangeEvent } from 'react';
 
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import {
-	REST_API_SOURCE_AUTH_TYPE_SELECT_OPTIONS,
-	REST_API_SOURCE_ADD_TO_SELECT_OPTIONS,
+	HTTP_SOURCE_AUTH_TYPE_SELECT_OPTIONS,
+	HTTP_SOURCE_ADD_TO_SELECT_OPTIONS,
 } from '@/data-sources/constants';
-import { ApiAuthFormState } from '@/data-sources/types';
+import { HttpAuthFormState } from '@/data-sources/types';
 
-interface ApiAuthSettingsInputProps {
-	auth: ApiAuthFormState;
+interface HttpAuthSettingsInputProps {
+	auth: HttpAuthFormState;
 	onChange: ( id: string, value: unknown ) => void;
 }
 
-export const ApiAuthSettingsInput: React.FC< ApiAuthSettingsInputProps > = ( {
+export const HttpAuthSettingsInput: React.FC< HttpAuthSettingsInputProps > = ( {
 	auth,
 	onChange,
 } ) => {
@@ -36,7 +36,7 @@ export const ApiAuthSettingsInput: React.FC< ApiAuthSettingsInputProps > = ( {
 					label={ __( 'Authentication Type', 'remote-data-blocks' ) }
 					value={ auth.authType }
 					onChange={ onSelectChange }
-					options={ REST_API_SOURCE_AUTH_TYPE_SELECT_OPTIONS }
+					options={ HTTP_SOURCE_AUTH_TYPE_SELECT_OPTIONS }
 				/>
 			</div>
 
@@ -47,7 +47,10 @@ export const ApiAuthSettingsInput: React.FC< ApiAuthSettingsInputProps > = ( {
 					value={ auth.authValue }
 					onChange={ value => onChange( 'authValue', value ) }
 					__next40pxDefaultSize
-					help={ __( 'The authentication value to use for the REST API.', 'remote-data-blocks' ) }
+					help={ __(
+						'The authentication value to use for the HTTP endpoint. When using Basic Auth, this is "username:password" string.',
+						'remote-data-blocks'
+					) }
 				/>
 			</div>
 			{ auth.authType === 'api-key' && (
@@ -67,7 +70,7 @@ export const ApiAuthSettingsInput: React.FC< ApiAuthSettingsInputProps > = ( {
 							label={ __( 'Add API Key to', 'remote-data-blocks' ) }
 							value={ auth.authAddTo }
 							onChange={ onSelectChange }
-							options={ REST_API_SOURCE_ADD_TO_SELECT_OPTIONS }
+							options={ HTTP_SOURCE_ADD_TO_SELECT_OPTIONS }
 							help={ __(
 								'Where to add the API key to. Authentication Key Name would be the header name or query param name and Authentication Value would be the value of the header or query param.',
 								'remote-data-blocks'
