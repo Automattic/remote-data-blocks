@@ -43,7 +43,7 @@ class DatasourceCrud {
 
 		if ( $service ) {
 			return array_values( array_filter($data_sources, function ( $config ) use ( $service ) {
-				return $config->service === $service;
+				return $config['service'] === $service;
 			} ) );
 		}
 

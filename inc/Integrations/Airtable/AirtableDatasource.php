@@ -31,7 +31,7 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 				],
 			],
 		],
-		'tables'        => [
+		'tables'       => [
 			'path'     => '$.tables',
 			'required' => true,
 			'type'     => 'array',

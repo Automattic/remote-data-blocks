@@ -20,11 +20,11 @@ class DatasourceCrudTest extends TestCase {
 				'id'   => 'base_id',
 				'name' => 'Base Name',
 			],
-			'tables'   => [
+			'tables'       => [
 				'id'   => 'table_id',
 				'name' => 'Table Name',
 			],
-			'slug'    => 'valid-slug',
+			'slug'         => 'valid-slug',
 		];
 
 		$result = DatasourceCrud::register_new_data_source( $valid_source );
@@ -39,9 +39,9 @@ class DatasourceCrudTest extends TestCase {
 			'slug'    => 'valid-slug',
 		];
 
-		set_error_handler(static function (int $errno, string $errstr): never {
-            throw new Exception($errstr, $errno);
-        }, E_USER_WARNING);
+		set_error_handler(static function ( int $errno, string $errstr ): never {
+			throw new Exception( $errstr, $errno );
+		}, E_USER_WARNING);
 
 		$result = DatasourceCrud::register_new_data_source( $invalid_source );
 		restore_error_handler();
@@ -58,23 +58,23 @@ class DatasourceCrudTest extends TestCase {
 				'id'   => 'base_id1',
 				'name' => 'Base Name 1',
 			],
-			'tables'   => [
+			'tables'       => [
 				'id'   => 'table_id1',
 				'name' => 'Table Name 1',
 			],
-			'slug'    => 'source-1',
+			'slug'         => 'source-1',
 		] );
 
 		$source2 = DatasourceCrud::register_new_data_source( [
-			'access_token'   => 'token2',
-			'service' => 'shopify',
-			'store'   => 'mystore.myshopify.com',
-			'slug'    => 'source-2',
+			'access_token' => 'token2',
+			'service'      => 'shopify',
+			'store_name'   => 'mystore',
+			'slug'         => 'source-2',
 		] );
 
 		set_mocked_option( DatasourceCrud::CONFIG_OPTION_NAME, [
-			$source1,
-			$source2,
+			$source1->to_array(),
+			$source2->to_array(),
 		] );
 
 		$all_sources = DatasourceCrud::get_data_sources();
@@ -82,11 +82,11 @@ class DatasourceCrudTest extends TestCase {
 
 		$airtable_sources = DatasourceCrud::get_data_sources( 'airtable' );
 		$this->assertCount( 1, $airtable_sources );
-		$this->assertSame( 'source-1', $airtable_sources[0]->slug );
+		$this->assertSame( 'source-1', $airtable_sources[0]['slug'] );
 
 		$shopify_sources = DatasourceCrud::get_data_sources( 'shopify' );
 		$this->assertCount( 1, $shopify_sources );
-		$this->assertSame( 'source-2', $shopify_sources[0]->slug );
+		$this->assertSame( 'source-2', $shopify_sources[0]['slug'] );
 	}
 
 	public function test_get_item_by_uuid_with_valid_uuid() {
@@ -97,11 +97,11 @@ class DatasourceCrudTest extends TestCase {
 				'id'   => 'base_id1',
 				'name' => 'Base Name 1',
 			],
-			'tables'   => [
+			'tables'       => [
 				'id'   => 'table_id1',
 				'name' => 'Table Name 1',
 			],
-			'slug'    => 'source-1',
+			'slug'         => 'source-1',
 		] );
 
 		$retrieved_source = DatasourceCrud::get_item_by_uuid( DatasourceCrud::get_data_sources(), $source->to_array()['uuid'] );
@@ -121,16 +121,16 @@ class DatasourceCrudTest extends TestCase {
 				'id'   => 'base_id1',
 				'name' => 'Base Name 1',
 			],
-			'tables'   => [
+			'tables'       => [
 				'id'   => 'table_id1',
 				'name' => 'Table Name 1',
 			],
-			'slug'    => 'source-1',
+			'slug'         => 'source-1',
 		] );
 
 		$updated_source = DatasourceCrud::update_item_by_uuid( $source->to_array()['uuid'], [
 			'borked_token' => 'updated_token',
-			'slug'  => 'updated-slug',
+			'slug'         => 'updated-slug',
 		] );
 
 		$this->assertIsObject( $updated_source );
@@ -151,17 +151,17 @@ class DatasourceCrudTest extends TestCase {
 				'id'   => 'base_id1',
 				'name' => 'Base Name 1',
 			],
-			'tables'   => [
+			'tables'       => [
 				'id'   => 'table_id1',
 				'name' => 'Table Name 1',
 			],
-			'slug'    => 'source-1',
+			'slug'         => 'source-1',
 		] );
 
 		$result = DatasourceCrud::delete_item_by_uuid( $source->to_array()['uuid'] );
 		$this->assertTrue( $result );
 
-		$deleted_source = DatasourceCrud::get_item_by_uuid( DatasourceCrud::get_data_sources(), $source['uuid'] );
+		$deleted_source = DatasourceCrud::get_item_by_uuid( DatasourceCrud::get_data_sources(), $source->to_array()['uuid'] );
 		$this->assertFalse( $deleted_source );
 	}
 }
