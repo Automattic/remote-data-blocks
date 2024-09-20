@@ -2,10 +2,17 @@
 
 namespace RemoteDataBlocks\Integrations\Airtable;
 
-use RemoteDataBlocks\Config\Datasource\CompatibleHttpDatasource;
-use function sanitize_title;
+use RemoteDataBlocks\Config\Datasource\DatasourceInterface;
+use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+use RemoteDataBlocks\Config\Datasource\HttpDatasourceInterface;
 
-class AirtableDatasource extends CompatibleHttpDatasource {
+class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterface {
+	private const SERVICE_SCHEMA = [
+		'api_key' => ['path' => '$.api_key', 'required' => true, 'type' => 'string'],
+		'base_id' => ['path' => '$.base_id', 'required' => true, 'type' => 'string'],
+		'table_id' => ['path' => '$.table_id', 'required' => true, 'type' => 'string'],
+	];
+
 	private $tables;
 
 	public function __construct( private string $access_token, private string $base, mixed $tables ) {
@@ -48,16 +55,20 @@ class AirtableDatasource extends CompatibleHttpDatasource {
 		];
 	}
 
+	public static function get_config_schema(): array {
+		return array_merge( DatasourceInterface::BASE_SCHEMA, self::SERVICE_SCHEMA );
+	}
+
 	/**
 	 * @inheritDoc
 	 */
-	public function get_object_representations(): array {
+	public function to_array(): array {
 		$objects = [];
 
 		foreach ( $this->tables as $table ) {
 			$slug = sprintf( 'Airtable: %s %s', $this->get_base(), $table );
 
-			$objects[ $slug ] = (object) [
+			$objects[ $slug ] =  [
 				'base'    => [
 					'name' => $this->get_base(),
 				],

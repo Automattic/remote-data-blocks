@@ -3,11 +3,13 @@
 namespace RemoteDataBlocks\WpdbStorage;
 
 use RemoteDataBlocks\Integrations\Google\Auth\GoogleServiceAccountKey;
+use RemoteDataBlocks\Validation\DatasourceValidator;
+use RemoteDataBlocks\Validation\DatasourceValidatorInterface;
+use RemoteDataBlocks\Validation\ValidatorInterface;
 use WP_Error;
 
 class DatasourceCrud {
 	const CONFIG_OPTION_NAME = 'remote_data_blocks_config';
-	const DATA_SOURCE_TYPES  = [ 'airtable', 'shopify', 'google-sheets' ];
 
 	/**
 	 * Validate the slug to verify
@@ -129,52 +131,14 @@ class DatasourceCrud {
 		];
 	}
 
-	public static function validate_source( $source ) {
-		if ( ! is_object( $source ) ) {
-			return new WP_Error( 'invalid_data_source', __( 'Invalid data source.', 'remote-data-blocks' ) );
-		}
-
-		if ( empty( $source->uuid ) ) {
-			return new WP_Error( 'missing_uuid', __( 'Missing UUID.', 'remote-data-blocks' ) );
-		}
-
-
-		if ( ! wp_is_uuid( $source->uuid ) ) {
-			return new WP_Error( 'invalid_uuid', __( 'Invalid UUID.', 'remote-data-blocks' ) );
-		}
-
-		$slug_validation = self::validate_slug( $source->slug, $source->uuid );
-
-		if ( is_wp_error( $slug_validation ) ) {
-			return $slug_validation;
-		}
-
-		if ( ! in_array( $source->service, self::DATA_SOURCE_TYPES ) ) {
-			return new WP_Error( 'unsupported_data_source_type', __( 'Unsupported data source type.', 'remote-data-blocks' ) );
-		}
-
-		switch ( $source->service ) {
-			case 'airtable':
-				return self::validate_airtable_source( $source );
-			case 'shopify':
-				return self::validate_shopify_source( $source );
-			case 'google-sheets':
-				return self::validate_google_sheets_source( $source );
-			default:
-				return new WP_Error( 'unsupported_data_source', __( 'Unsupported data source.', 'remote-data-blocks' ) );
-		}
-	}
-
-	public static function register_new_data_source( $settings ) {
+	public static function register_new_data_source( array $settings, ValidatorInterface $validator ) {
 		$data_sources = self::get_data_sources();
+
 		do {
 			$uuid = wp_generate_uuid4();
 		} while ( ! empty( self::get_item_by_uuid( self::get_data_sources(), $uuid ) ) );
 
-		$item = self::validate_source( (object) [
-			...( $settings ?? [] ),
-			...compact( 'uuid' ),
-		] );
+		$item = $validator->validate( array_merge( $settings, [ 'uuid' => $uuid ] ) );
 
 		if ( is_wp_error( $item ) ) {
 			return $item;
@@ -214,13 +178,14 @@ class DatasourceCrud {
 		return reset( $item );
 	}
 
-	public static function update_item_by_uuid( string $uuid, $new_item ) {
+	public static function update_item_by_uuid( string $uuid, $new_item, ValidatorInterface $validator = null ) {
 		$data_sources = self::get_data_sources();
 		$item         = self::get_item_by_uuid( $data_sources, $uuid );
 		if ( empty( $item ) ) {
 			return new WP_Error( 'data_source_not_found', __( 'Data source not found.', 'remote-data-blocks' ), [ 'status' => 404 ] );
 		}
-		$new_item     = self::validate_source( (object) array_merge( (array) $item, $new_item ) );
+		$validator = $validator ?? DatasourceValidator::from_service( $item->service );
+		$new_item     = $validator->validate( (object) array_merge( (array) $item, $new_item ) );
 		$data_sources = array_map( function ( $source ) use ( $new_item ) {
 			return $source->uuid === $new_item->uuid ? $new_item : $source;
 		}, $data_sources );

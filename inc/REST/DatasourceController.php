@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\REST;
 
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
+use RemoteDataBlocks\Validation\DatasourceValidator;
 use RemoteDataBlocks\WpdbStorage\DatasourceCrud;
 use WP_REST_Controller;
 
@@ -51,6 +52,13 @@ class DatasourceController extends WP_REST_Controller {
 				'methods'             => 'POST',
 				'callback'            => [ $this, 'create_item' ],
 				'permission_callback' => [ $this, 'create_item_permissions_check' ],
+				'args'                => [
+					'service' => [
+						'type'     => 'string',
+						'required' => true,
+						'enum'     => REMOTE_DATA_BLOCKS__SERVICES,
+					],
+				],
 			]
 		);
 
@@ -89,7 +97,9 @@ class DatasourceController extends WP_REST_Controller {
 	}
 
 	public function create_item( $request ) {
-		$item = DatasourceCrud::register_new_data_source( $request->get_json_params() );
+		$validator = DatasourceValidator::from_service( $request->get_json_params()['service'] );
+		$item      = DatasourceCrud::register_new_data_source( $request->get_json_params(), $validator );
+
 		return rest_ensure_response( $item );
 	}
 

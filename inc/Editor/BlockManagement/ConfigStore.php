@@ -6,7 +6,7 @@ defined( 'ABSPATH' ) || exit();
 
 use RemoteDataBlocks\Logging\LoggerManager;
 use Psr\Log\LoggerInterface;
-use RemoteDataBlocks\Config\Datasource\CompatibleHttpDatasource;
+use RemoteDataBlocks\Config\Datasource\CodedHttpDatasource;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
 use function sanitize_title;
@@ -96,7 +96,7 @@ class ConfigStore {
 
 				$data_source = $query->get_datasource();
 
-				if ( ! $data_source instanceof CompatibleHttpDatasource ) {
+				if ( ! $data_source instanceof CodedHttpDatasource ) {
 					continue;
 				}
 
@@ -105,7 +105,7 @@ class ConfigStore {
 				// data sources using the slug.
 				$compatible_data_sources = array_merge(
 					$compatible_data_sources,
-					$data_source->get_object_representations()
+					$data_source->to_array()
 				);
 			}
 		}

@@ -2,13 +2,14 @@
 
 namespace RemoteDataBlocks\Integrations\Shopify;
 
-use RemoteDataBlocks\Config\Datasource\CompatibleHttpDatasource;
+use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+use RemoteDataBlocks\Config\ConfigSerializableInterface;
 
 use function plugins_url;
 
 defined( 'ABSPATH' ) || exit();
 
-class ShopifyDatasource extends CompatibleHttpDatasource {
+class ShopifyDatasource extends HttpDatasource implements ConfigSerializableInterface {
 	public function __construct( private string $access_token, private string $store_name ) {}
 
 	public function get_store_name(): string {
@@ -37,7 +38,7 @@ class ShopifyDatasource extends CompatibleHttpDatasource {
 	/**
 	 * @inheritDoc
 	 */
-	public function get_object_representations(): array {
+	public function to_array(): array {
 		$slug = $this->get_display_name();
 
 		return [

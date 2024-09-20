@@ -26,7 +26,15 @@ define( 'REMOTE_DATA_BLOCKS__REST_NAMESPACE', 'remote-data-blocks/v1' );
 // Datasource services
 define( 'REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE', 'airtable' );
 define( 'REMOTE_DATA_BLOCKS_GITHUB_SERVICE', 'github' );
+define( 'REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE', 'google-sheets' );
 define( 'REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE', 'shopify' );
+
+define( 'REMOTE_DATA_BLOCKS__SERVICES', [
+	REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
+	REMOTE_DATA_BLOCKS_GITHUB_SERVICE,
+	REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE,
+	REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
+] );
 
 // Autoloader
 require_once __DIR__ . '/vendor/autoload.php';
