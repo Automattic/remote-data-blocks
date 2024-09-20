@@ -2,9 +2,13 @@
 
 namespace RemoteDataBlocks\Tests\Validation;
 
-use RemoteDataBlocks\WpdbStorage\DatasourceCrud;
-use WP_Error;
 use PHPUnit\Framework\TestCase;
+use RemoteDataBlocks\WpdbStorage\DatasourceCrud;
+use RemoteDataBlocks\Validation\DatasourceValidator;
+use RemoteDataBlocks\Validation\DatasourceValidatorInterface;
+use RemoteDataBlocks\Validation\ValidatorInterface;
+use WP_Error;
+
 
 class ValidatorTest extends TestCase {
     public function test_validate_airtable_source_with_valid_input() {
@@ -51,10 +55,6 @@ class ValidatorTest extends TestCase {
 		$this->assertIsObject( $result );
 		$this->assertSame( $valid_source->uuid, $result->uuid );
 	}
-
-
-
-
 
 	public function test_validate_shopify_source_with_invalid_input() {
 		$invalid_source = (object) [

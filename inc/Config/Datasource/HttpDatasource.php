@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Config\Datasource;
 
-use RemoteDataBlocks\Config\ConfigSerializableInterface;
+use RemoteDataBlocks\Config\ArraySerializableInterface;
 use RemoteDataBlocks\Validation\DatasourceValidator;
 use RemoteDataBlocks\Validation\ValidatorInterface;
 use WP_Error;
@@ -15,7 +15,7 @@ use WP_Error;
  * @package remote-data-blocks
  * @since 0.1.0
  */
-abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInterface, ConfigSerializableInterface {
+abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInterface, ArraySerializableInterface {
 	protected $config;
 
 	private function __construct( array $config ) {

@@ -2,138 +2,15 @@
 
 namespace RemoteDataBlocks\WpdbStorage;
 
-use RemoteDataBlocks\Config\ConfigSerializableInterface;
+use RemoteDataBlocks\Config\ArraySerializableInterface;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 use RemoteDataBlocks\Integrations\Google\Auth\GoogleServiceAccountKey;
-use RemoteDataBlocks\Validation\DatasourceValidator;
-use RemoteDataBlocks\Validation\DatasourceValidatorInterface;
-use RemoteDataBlocks\Validation\ValidatorInterface;
 use WP_Error;
 
 class DatasourceCrud {
 	const CONFIG_OPTION_NAME = 'remote_data_blocks_config';
 
-	/**
-	 * Validate the slug to verify
-	 * - is not empty
-	 * - only contains lowercase alphanumeric characters and hyphens
-	 * - is not already taken
-	 *
-	 * @param string $slug The slug to validate.
-	 * @param string [$uuid] The UUID of the data source to exclude from the check.
-	 * @return WP_Error|true Returns true if the slug is valid, or a WP_Error object if not.
-	 */
-	public static function validate_slug( string $slug, string $uuid = '' ): WP_Error|bool {
-		if ( empty( $slug ) ) {
-			return new WP_Error( 'missing_slug', __( 'Missing slug.', 'remote-data-blocks' ) );
-		}
-
-		if ( ! preg_match( '/^[a-z0-9-]+$/', $slug ) ) {
-			return new WP_Error( 'invalid_slug', __( 'Invalid slug.', 'remote-data-blocks' ) );
-		}
-
-		$data_sources = self::get_data_sources();
-		$data_sources = array_filter( $data_sources, function ( $source ) use ( $uuid ) {
-			return $source->uuid !== $uuid;
-		} );
-
-		$slug_exists = array_filter( $data_sources, function ( $source ) use ( $slug ) {
-			return $source->slug === $slug;
-		} );
-
-		if ( ! empty( $slug_exists ) ) {
-			return new WP_Error( 'slug_already_taken', __( 'Slug already taken.', 'remote-data-blocks' ) );
-		}
-
-		return true;
-	}
-
-	public static function validate_airtable_source( $source ) {
-		if ( empty( $source->token ) ) {
-			return new WP_Error( 'missing_token', __( 'Missing token.', 'remote-data-blocks' ) );
-		}
-
-		// Validate base is not empty and is an object with id and name fields with string values
-		if ( empty( $source->base ) ) {
-			return new WP_Error( 'missing_base', __( 'Missing base.', 'remote-data-blocks' ) );
-		}
-
-		if ( empty( $source->base['id'] ) || empty( $source->base['name'] ) ) {
-			return new WP_Error( 'invalid_base', __( 'Invalid base. Must have id and name fields.', 'remote-data-blocks' ) );
-		}
-
-		// Validate table is not empty and is an object with id and name fields with string values
-		if ( empty( $source->table ) ) {
-			return new WP_Error( 'missing_table', __( 'Missing table.', 'remote-data-blocks' ) );
-		}
-
-		if ( empty( $source->table['id'] ) || empty( $source->table['name'] ) ) {
-			return new WP_Error( 'invalid_table', __( 'Invalid table. Must have id and name fields.', 'remote-data-blocks' ) );
-		}
-
-		return (object) [
-			'uuid'    => $source->uuid,
-			'token'   => sanitize_text_field( $source->token ),
-			'service' => 'airtable',
-			'base'    => $source->base,
-			'table'   => $source->table,
-			'slug'    => sanitize_text_field( $source->slug ),
-		];
-	}
-
-	public static function validate_shopify_source( $source ) {
-		if ( empty( $source->token ) ) {
-			return new WP_Error( 'missing_token', __( 'Missing token.', 'remote-data-blocks' ) );
-		}
-
-		return (object) [
-			'uuid'    => $source->uuid,
-			'token'   => sanitize_text_field( $source->token ),
-			'service' => 'shopify',
-			'store'   => sanitize_text_field( $source->store ),
-			'slug'    => sanitize_text_field( $source->slug ),
-		];
-	}
-
-	public static function validate_google_sheets_source( $source ) {
-		$service_account_key = GoogleServiceAccountKey::from_array( $source->credentials );
-		if ( is_wp_error( $service_account_key ) ) {
-			return $service_account_key;
-		}
-
-		// Validate spreadsheet is not empty and is an object with id and name fields with string values
-		if ( empty( $source->spreadsheet ) ) {
-			return new WP_Error( 'missing_spreadsheet', __( 'Missing spreadsheet.', 'remote-data-blocks' ) );
-		}
-
-		if ( empty( $source->spreadsheet['id'] ) || empty( $source->spreadsheet['name'] ) ) {
-			return new WP_Error( 'invalid_spreadsheet', __( 'Invalid spreadsheet. Must have id and name fields.', 'remote-data-blocks' ) );
-		}
-
-		// Validate sheet is not empty and is an object with id integer and name string fields
-		if ( empty( $source->sheet ) ) {
-			return new WP_Error( 'missing_sheet', __( 'Missing sheet.', 'remote-data-blocks' ) );
-		}
-
-		if ( ! isset( $source->sheet['id'] ) || ! is_int( $source->sheet['id'] ) ) {
-			return new WP_Error( 'invalid_sheet', __( 'Invalid sheet. Must have id field with integer value.', 'remote-data-blocks' ) );
-		}
-
-		if ( empty( $source->sheet['name'] ) ) {
-			return new WP_Error( 'missing_sheet_name', __( 'Missing sheet name.', 'remote-data-blocks' ) );
-		}
-
-		return (object) [
-			'uuid'        => $source->uuid,
-			'service'     => 'google-sheets',
-			'credentials' => $service_account_key,
-			'spreadsheet' => $source->spreadsheet,
-			'sheet'       => $source->sheet,
-			'slug'        => sanitize_text_field( $source->slug ),
-		];
-	}
-
-	public static function register_new_data_source( array $settings, ConfigSerializableInterface $datasource = null ) {
+	public static function register_new_data_source( array $settings, ArraySerializableInterface $datasource = null ) {
 		$data_sources = self::get_data_sources();
 
 		do {
@@ -180,7 +57,7 @@ class DatasourceCrud {
 		return reset( $item );
 	}
 
-	public static function update_item_by_uuid( string $uuid, $new_item, ConfigSerializableInterface $datasource = null ) {
+	public static function update_item_by_uuid( string $uuid, $new_item, ArraySerializableInterface $datasource = null ) {
 		$data_sources = self::get_data_sources();
 		$item         = self::get_item_by_uuid( $data_sources, $uuid );
 		if ( empty( $item ) ) {

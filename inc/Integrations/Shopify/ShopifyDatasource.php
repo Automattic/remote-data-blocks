@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Integrations\Shopify;
 
-use RemoteDataBlocks\Config\ConfigSerializableInterface;
+use RemoteDataBlocks\Config\ArraySerializableInterface;
 use RemoteDataBlocks\Config\Datasource\DatasourceInterface;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 
@@ -10,7 +10,7 @@ use function plugins_url;
 
 defined( 'ABSPATH' ) || exit();
 
-class ShopifyDatasource extends HttpDatasource implements ConfigSerializableInterface {
+class ShopifyDatasource extends HttpDatasource implements ArraySerializableInterface {
 	private const SERVICE_SCHEMA = [
 		'access_token' => [
 			'path'     => '$.access_token',

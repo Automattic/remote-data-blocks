@@ -11,15 +11,6 @@ class DatasourceCrudTest extends TestCase {
 		clear_mocked_options();
 	}
 
-	public function test_validate_slug_with_valid_input() {
-		$this->assertTrue( DatasourceCrud::validate_slug( 'valid-slug' ) );
-	}
-
-	public function test_validate_slug_with_invalid_input() {
-		$this->assertInstanceOf( WP_Error::class, DatasourceCrud::validate_slug( '' ) );
-		$this->assertInstanceOf( WP_Error::class, DatasourceCrud::validate_slug( 'INVALID_SLUG' ) );
-	}
-
 	public function test_register_new_data_source_with_valid_input() {
 		$valid_source = [
 			'token'   => 'valid_token',
