@@ -171,14 +171,13 @@ export const GraphQLSettings = ( { mode, uuid: uuidFromProps, config }: GraphQLS
 						onChange={ handleOnChange }
 					/>
 
-					<div className="form-group">
+					<div className="form-group code-input">
 						<TextareaControl
 							label={ __( 'Query', 'remote-data-blocks' ) }
 							value={ state.query }
 							onChange={ onQueryChange }
 							help={ __( 'The GraphQL query to execute.', 'remote-data-blocks' ) }
 							rows={ 14 }
-							style={ { fontFamily: 'monospace' } }
 						/>
 					</div>
 

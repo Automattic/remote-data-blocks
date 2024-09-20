@@ -290,7 +290,7 @@ export const GoogleSheetsSettings = ( {
 						<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
 					</div>
 
-					<div className="form-group">
+					<div className="form-group code-input">
 						<TextareaControl
 							label={ __( 'Credentials', 'remote-data-blocks' ) }
 							value={ state.credentials }
