@@ -18,7 +18,7 @@ class ValidatorTest extends TestCase {
 				'id'   => 'base_id',
 				'name' => 'Base Name',
 			],
-			'table'        => [
+			'tables'        => [
 				'id'   => 'table_id',
 				'name' => 'Table Name',
 			],

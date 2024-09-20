@@ -38,7 +38,7 @@ class DatasourceCrud {
 		return (array) get_option( self::CONFIG_OPTION_NAME, [] );
 	}
 
-	public static function get_data_sources( string $service = '' ) {
+	public static function get_data_sources( string $service = '' ): array {
 		$data_sources = self::get_config();
 
 		if ( $service ) {
@@ -50,9 +50,9 @@ class DatasourceCrud {
 		return $data_sources;
 	}
 
-	public static function get_item_by_uuid( $data_sources, string $uuid ) {
+	public static function get_item_by_uuid( $data_sources, string $uuid ): array|false {
 		$item = array_filter( $data_sources, function ( $source ) use ( $uuid ) {
-			return $source->uuid === $uuid;
+			return $source['uuid'] === $uuid;
 		} );
 		return reset( $item );
 	}

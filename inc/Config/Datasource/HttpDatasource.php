@@ -7,6 +7,8 @@ use RemoteDataBlocks\Validation\DatasourceValidator;
 use RemoteDataBlocks\Validation\ValidatorInterface;
 use WP_Error;
 
+use const RemoteDataBlocks\REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP;
+
 /**
  * HttpDatasource class
  *
@@ -60,7 +62,7 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 	/**
 	 * @inheritDoc
 	 */
-	public static function from_array( array $config, ?ValidatorInterface $validator = null ): static|WP_Error {
+	public static function from_array( array $config, ?ValidatorInterface $validator = null ): DatasourceInterface|WP_Error {
 		if ( ! is_string( $config['service'] ) ) {
 			return new WP_Error( 'invalid_config', 'Invalid config', [ 'status' => 400 ] );
 		}
@@ -77,7 +79,13 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 			return $validated;
 		}
 
-		return new static( $config );
+		$datasource_class = REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP[ $config['service']] ;
+
+		if ( ! class_exists( $datasource_class ) ) {
+			return new WP_Error( 'invalid_datasource', 'Invalid datasource', [ 'status' => 400 ] );
+		}
+
+		return new $datasource_class( $config );
 	}
 
 	/**
@@ -86,4 +94,5 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 	public function to_array(): array {
 		return $this->config;
 	}
+
 }

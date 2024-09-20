@@ -31,8 +31,8 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 				],
 			],
 		],
-		'table'        => [
-			'path'     => '$.table',
+		'tables'        => [
+			'path'     => '$.tables',
 			'required' => true,
 			'type'     => 'array',
 			'items'    => [
@@ -51,14 +51,9 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 		],
 	];
 
+	private $access_token;
+	private $base;
 	private $tables;
-
-	public function __construct( private string $access_token, private string $base, mixed $tables ) {
-		if ( ! is_array( $tables ) ) {
-			$tables = [ '' => $tables ];
-		}
-		$this->tables = $tables;
-	}
 
 	public function get_access_token(): string {
 		return $this->access_token;
@@ -95,29 +90,5 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 
 	public static function get_config_schema(): array {
 		return array_merge( DatasourceInterface::BASE_SCHEMA, self::SERVICE_SCHEMA );
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function to_array(): array {
-		$objects = [];
-
-		foreach ( $this->tables as $table ) {
-			$slug = sprintf( 'Airtable: %s %s', $this->get_base(), $table );
-
-			$objects[ $slug ] = [
-				'base'    => [
-					'name' => $this->get_base(),
-				],
-				'service' => 'airtable',
-				'slug'    => $slug,
-				'table'   => [
-					'name' => $table,
-				],
-			];
-		}
-
-		return $objects;
 	}
 }
