@@ -16,7 +16,19 @@ use WP_Error;
  * @since 0.1.0
  */
 abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInterface, ConfigSerializableInterface {
-	protected $config_schema = [];
+	protected $config;
+
+	private function __construct( array $config ) {
+		$config_schema = static::get_config_schema();
+
+		foreach ( $config as $key => $value ) {
+			if ( array_key_exists( 'sanitize', $config_schema[$key] ) ) {
+				$config[ $key ] = call_user_func( $config_schema[$key]['sanitize'], $value );
+			}
+		}
+
+		$this->config = $config;
+	}
 
 	/**
 	 * @inheritDoc
@@ -65,11 +77,13 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 			return $validated;
 		}
 
-		return new static( $config) );
+		return new static( $config );
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	abstract public function to_array(): array;
+	public function to_array(): array {
+		return $this->config;
+	}
 }

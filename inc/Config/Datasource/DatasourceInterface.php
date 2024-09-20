@@ -59,7 +59,7 @@ interface DatasourceInterface {
 	 *
 	 * @return array The schema for the datasource's configuration.
 	 */
-	public function get_config_schema(): array;
+	public static function get_config_schema(): array;
 
 	/**
 	 * An optional image URL that can represent the datasource in the block editor

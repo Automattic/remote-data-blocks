@@ -2,32 +2,36 @@
 
 namespace RemoteDataBlocks\Integrations\Shopify;
 
-use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 use RemoteDataBlocks\Config\ConfigSerializableInterface;
+use RemoteDataBlocks\Config\Datasource\DatasourceInterface;
+use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 
 use function plugins_url;
 
 defined( 'ABSPATH' ) || exit();
 
 class ShopifyDatasource extends HttpDatasource implements ConfigSerializableInterface {
-	public function __construct( private string $access_token, private string $store_name ) {}
+	private const SERVICE_SCHEMA = [
+		'access_token' => ['path' => '$.access_token', 'required' => true, 'type' => 'string'],
+		'store_name' => ['path' => '$.store_name', 'required' => true, 'type' => 'string'],
+	];
 
 	public function get_store_name(): string {
-		return $this->store_name;
+		return $this->config['store_name'];
 	}
 
 	public function get_display_name(): string {
-		return 'Shopify (' . $this->store_name . ')';
+		return 'Shopify (' . $this->config['store_name'] . ')';
 	}
 	
 	public function get_endpoint(): string {
-		return 'https://' . $this->store_name . '.myshopify.com/api/2024-04/graphql.json';
+		return 'https://' . $this->config['store_name'] . '.myshopify.com/api/2024-04/graphql.json';
 	}
 
 	public function get_request_headers(): array {
 		return [
 			'Content-Type'                      => 'application/json',
-			'X-Shopify-Storefront-Access-Token' => $this->access_token,
+			'X-Shopify-Storefront-Access-Token' => $this->config['access_token'],
 		];
 	}
 
@@ -35,18 +39,7 @@ class ShopifyDatasource extends HttpDatasource implements ConfigSerializableInte
 		return plugins_url( '../../assets/shopify_logo_black.png', __FILE__ );
 	}
 
-	/**
-	 * @inheritDoc
-	 */
-	public function to_array(): array {
-		$slug = $this->get_display_name();
-
-		return [
-			$slug => (object) [
-				'service' => 'shopify',
-				'slug'    => $slug,
-				'store'   => $this->get_store_name(),
-			],
-		];
+	public static function get_config_schema(): array {
+		return array_merge( DatasourceInterface::BASE_SCHEMA, self::SERVICE_SCHEMA );
 	}
 }

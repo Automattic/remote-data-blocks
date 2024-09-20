@@ -2,6 +2,8 @@
 
 namespace RemoteDataBlocks\WpdbStorage;
 
+use RemoteDataBlocks\Config\ConfigSerializableInterface;
+use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 use RemoteDataBlocks\Integrations\Google\Auth\GoogleServiceAccountKey;
 use RemoteDataBlocks\Validation\DatasourceValidator;
 use RemoteDataBlocks\Validation\DatasourceValidatorInterface;
@@ -131,20 +133,20 @@ class DatasourceCrud {
 		];
 	}
 
-	public static function register_new_data_source( array $settings, ValidatorInterface $validator ) {
+	public static function register_new_data_source( array $settings, ConfigSerializableInterface $datasource = null ) {
 		$data_sources = self::get_data_sources();
 
 		do {
 			$uuid = wp_generate_uuid4();
 		} while ( ! empty( self::get_item_by_uuid( self::get_data_sources(), $uuid ) ) );
 
-		$item = $validator->validate( array_merge( $settings, [ 'uuid' => $uuid ] ) );
+		$new_datasource = $datasource ?? HttpDatasource::from_array( array_merge( $settings, [ 'uuid' => $uuid ] ) );
 
-		if ( is_wp_error( $item ) ) {
-			return $item;
+		if ( is_wp_error( $new_datasource ) ) {
+			return $new_datasource;
 		}
 
-		$data_sources[] = $item;
+		$data_sources[] = $new_datasource->to_array();
 
 		$result = update_option( self::CONFIG_OPTION_NAME, $data_sources );
 
@@ -152,7 +154,7 @@ class DatasourceCrud {
 			return new WP_Error( 'failed_to_register_data_source', __( 'Failed to register data source.', 'remote-data-blocks' ) );
 		}
 
-		return $item;
+		return $new_datasource;
 	}
 
 	public static function get_config() {
@@ -178,16 +180,18 @@ class DatasourceCrud {
 		return reset( $item );
 	}
 
-	public static function update_item_by_uuid( string $uuid, $new_item, ValidatorInterface $validator = null ) {
+	public static function update_item_by_uuid( string $uuid, $new_item, ConfigSerializableInterface $datasource = null ) {
 		$data_sources = self::get_data_sources();
 		$item         = self::get_item_by_uuid( $data_sources, $uuid );
 		if ( empty( $item ) ) {
 			return new WP_Error( 'data_source_not_found', __( 'Data source not found.', 'remote-data-blocks' ), [ 'status' => 404 ] );
 		}
-		$validator = $validator ?? DatasourceValidator::from_service( $item->service );
-		$new_item     = $validator->validate( (object) array_merge( (array) $item, $new_item ) );
-		$data_sources = array_map( function ( $source ) use ( $new_item ) {
-			return $source->uuid === $new_item->uuid ? $new_item : $source;
+
+		$datasource = $datasource ?? HttpDatasource::from_array( array_merge( (array) $item, $new_item ) );
+		$updated = $datasource->to_array();
+
+		$data_sources = array_map( function ( $source ) use ( $updated ) {
+			return $source->uuid === $updated['uuid'] ? $updated : $source;
 		}, $data_sources );
 		$result       = update_option( self::CONFIG_OPTION_NAME, $data_sources );
 		if ( true !== $result ) {
