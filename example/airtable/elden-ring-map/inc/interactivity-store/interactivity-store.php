@@ -23,24 +23,15 @@ class InteractivityStore {
 			];
 		}, $response['results'] );
 
-		// $fallback_coordinates = $block->context['remote-data-blocks/remoteData']['results'];
+		/**
+		 * We have the coordinate data that was saved in the Editor in:
+		 * $block->context['remote-data-blocks/remoteData']['results']
+		 * 
+		 * We can potentially use it as a fallback if the query fails.
+		 */
 
 		return [
 			'coordinates' => $coordinates,
 		];
-	}
-
-	public static function get_map_interactive_state(): array {
-		// $block_name = ConfigurationLoader::get_block_name( 'Elden Ring Map' );
-		// $rest_url   = RemoteData::get_url() . '?_envelope=true';
-
-		return [
-			'blockName' => 'Elden Ring Map',
-			'restUrl'   => '',
-		];
-	}
-
-	public static function get_store_name(): string {
-		return 'remote-data-blocks/elden-ring-map';
 	}
 }
