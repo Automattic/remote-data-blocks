@@ -1,18 +1,10 @@
-import {
-	Button,
-	ButtonGroup,
-	SelectControl,
-	TextControl,
-	Card,
-	CardHeader,
-	CardBody,
-} from '@wordpress/components';
+import { Button, ButtonGroup, Card, CardHeader, CardBody } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { ApiAuthSettingsInput } from '@/data-sources/components/ApiAuthSettingsInput';
+import { ApiUrlMethodSettingsInput } from '@/data-sources/components/ApiUrlMethodSettingsInput';
 import { SlugInput } from '@/data-sources/components/SlugInput';
-import { REST_API_SOURCE_METHOD_SELECT_OPTIONS } from '@/data-sources/constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { RestApiFormState } from '@/data-sources/rest-api/types';
 import { RestApiConfig, ApiAuth, ApiAuthFormState } from '@/data-sources/types';
@@ -157,28 +149,11 @@ export const RestApiSettings = ( { mode, uuid: uuidFromProps, config }: RestApiS
 						<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
 					</div>
 
-					<div className="form-group">
-						<TextControl
-							type="url"
-							id="url"
-							label={ __( 'URL', 'remote-data-blocks' ) }
-							value={ state.url }
-							onChange={ value => handleOnChange( 'url', value ) }
-							autoComplete="off"
-							__next40pxDefaultSize
-							help={ __( 'The URL for the REST API endpoint.', 'remote-data-blocks' ) }
-						/>
-					</div>
-
-					<div className="form-group">
-						<SelectControl
-							id="method"
-							label={ __( 'Method', 'remote-data-blocks' ) }
-							value={ state.method }
-							onChange={ value => handleOnChange( 'method', value ) }
-							options={ REST_API_SOURCE_METHOD_SELECT_OPTIONS }
-						/>
-					</div>
+					<ApiUrlMethodSettingsInput
+						url={ state.url }
+						method={ state.method }
+						onChange={ handleOnChange }
+					/>
 
 					<ApiAuthSettingsInput auth={ getAuthState() } onChange={ handleOnChange } />
 
