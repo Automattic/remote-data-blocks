@@ -3,14 +3,15 @@
 namespace RemoteDataBlocks\Config\Datasource;
 
 /**
- * HttpDatasource class
+ * CodedHttpDatasource class
  *
- * Implements the HttpDatasourceInterface to define a generic HTTP datasource.
+ * Extends HttpDatasource to define a HTTP datasource that can be displayed in
+ * the plugin settings.
  *
  * @package remote-data-blocks
  * @since 0.1.0
  */
-abstract class CompatibleHttpDatasource extends HttpDatasource {
+abstract class CodedHttpDatasource extends HttpDatasource {
 	/**
 	 * Provide object representations of the data source for display in plugin
 	 * settings. This allows the data sources defined in code to be viewed without
