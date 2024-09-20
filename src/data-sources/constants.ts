@@ -6,6 +6,7 @@ export const SUPPORTED_SERVICES = [
 	'google-sheets',
 	'rest-api',
 	'graphql',
+	'example-api',
 ] as const;
 export const SUPPORTED_SERVICES_LABELS = new Map< ( typeof SUPPORTED_SERVICES )[ number ], string >(
 	[
@@ -14,6 +15,7 @@ export const SUPPORTED_SERVICES_LABELS = new Map< ( typeof SUPPORTED_SERVICES )[
 		[ 'google-sheets', 'Google Sheets' ],
 		[ 'rest-api', 'REST API' ],
 		[ 'graphql', 'GraphQL' ],
+		[ 'example-api', 'Example API' ],
 	]
 );
 export const OPTIONS_PAGE_SLUG = 'remote-data-blocks-settings';
