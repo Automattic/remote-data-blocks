@@ -79,7 +79,7 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 			return $validated;
 		}
 
-		$datasource_class = REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP[ $config['service']] ;
+		$datasource_class = REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP[ $config['service'] ];
 
 		if ( ! class_exists( $datasource_class ) ) {
 			return new WP_Error( 'invalid_datasource', 'Invalid datasource', [ 'status' => 400 ] );
@@ -94,5 +94,4 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 	public function to_array(): array {
 		return $this->config;
 	}
-
 }
