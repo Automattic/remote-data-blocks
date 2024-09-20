@@ -4,6 +4,7 @@ namespace RemoteDataBlocks\Tests\Validation;
 
 use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\Integrations\Airtable\AirtableDatasource;
+use RemoteDataBlocks\Integrations\Google\Sheets\GoogleSheetsDatasource;
 use RemoteDataBlocks\Integrations\Shopify\ShopifyDatasource;
 use RemoteDataBlocks\Validation\Validator;
 use WP_Error;
@@ -63,7 +64,7 @@ class ValidatorTest extends TestCase {
 		$validator = new Validator( ShopifyDatasource::get_config_schema() );
 		$this->assertInstanceOf( WP_Error::class, $validator->validate( $invalid_source ) );
 	}
-	/*
+	
 	public function test_validate_google_sheets_source_with_valid_input() {
 		$valid_credentials = [
 			'type'                        => 'service_account',
@@ -107,7 +108,9 @@ class ValidatorTest extends TestCase {
 		];
 
 		$validator = new Validator( GoogleSheetsDatasource::get_config_schema() );
-		$this->assertInstanceOf( WP_Error::class, $validator->validate( $invalid_source ) );
+		$result = $validator->validate( $invalid_source );
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertSame( 'missing_field', $result->get_error_code() );
 	}
-	*/
 }
