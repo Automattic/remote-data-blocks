@@ -8,20 +8,46 @@ use RemoteDataBlocks\Config\Datasource\HttpDatasourceInterface;
 
 class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterface {
 	private const SERVICE_SCHEMA = [
-		'api_key'  => [
-			'path'     => '$.api_key',
+		'access_token' => [
+			'path'     => '$.access_token',
 			'required' => true,
 			'type'     => 'string',
 		],
-		'base_id'  => [
-			'path'     => '$.base_id',
+		'base'         => [
+			'path'     => '$.base',
 			'required' => true,
-			'type'     => 'string',
+			'type'     => 'array',
+			'items'    => [
+				'type'       => 'object',
+				'properties' => [
+					'id'   => [
+						'type'     => 'string',
+						'required' => true,
+					],
+					'name' => [
+						'type'     => 'string',
+						'required' => true,
+					],
+				],
+			],
 		],
-		'table_id' => [
-			'path'     => '$.table_id',
+		'table'        => [
+			'path'     => '$.table',
 			'required' => true,
-			'type'     => 'string',
+			'type'     => 'array',
+			'items'    => [
+				'type'       => 'object',
+				'properties' => [
+					'id'   => [
+						'type'     => 'string',
+						'required' => true,
+					],
+					'name' => [
+						'type'     => 'string',
+						'required' => true,
+					],
+				],
+			],
 		],
 	];
 

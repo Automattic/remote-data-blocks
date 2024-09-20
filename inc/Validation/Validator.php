@@ -22,7 +22,7 @@ class Validator implements ValidatorInterface {
 	 * @inheritDoc
 	 */
 	public function validate( string|array|object|null $data ): bool|WP_Error {
-		$json_data = new JsonObject( $data );
+		$json_data = new JsonObject( $data, true );
 
 		foreach ( $this->schema as $field => $rules ) {
 			$value = $json_data->get( $rules['path'] );

@@ -10,19 +10,19 @@ use WP_Error;
 
 class ValidatorTest extends TestCase {
 	public function test_validate_airtable_source_with_valid_input() {
-		$valid_source = (object) [
-			'uuid'    => '123e4567-e89b-12d3-a456-426614174000',
-			'token'   => 'valid_token',
-			'service' => 'airtable',
-			'base'    => [
+		$valid_source = [
+			'uuid'         => '123e4567-e89b-12d3-a456-426614174000',
+			'access_token' => 'valid_token',
+			'service'      => 'airtable',
+			'base'         => [
 				'id'   => 'base_id',
 				'name' => 'Base Name',
 			],
-			'table'   => [
+			'table'        => [
 				'id'   => 'table_id',
 				'name' => 'Table Name',
 			],
-			'slug'    => 'valid-slug',
+			'slug'         => 'valid-slug',
 		];
 
 		$validator = new Validator( AirtableDatasource::get_config_schema() );
@@ -30,7 +30,7 @@ class ValidatorTest extends TestCase {
 	}
 
 	public function test_validate_airtable_source_with_invalid_input() {
-		$invalid_source = (object) [
+		$invalid_source = [
 			'uuid'    => '123e4567-e89b-12d3-a456-426614174000',
 			'service' => 'airtable',
 			'slug'    => 'valid-slug',
@@ -41,12 +41,12 @@ class ValidatorTest extends TestCase {
 	}
 
 	public function test_validate_shopify_source_with_valid_input() {
-		$valid_source = (object) [
-			'uuid'    => '123e4567-e89b-12d3-a456-426614174000',
-			'token'   => 'valid_token',
-			'service' => 'shopify',
-			'store'   => 'mystore.myshopify.com',
-			'slug'    => 'valid-slug',
+		$valid_source = [
+			'uuid'         => '123e4567-e89b-12d3-a456-426614174000',
+			'access_token' => 'valid_token',
+			'service'      => 'shopify',
+			'store_name'   => 'mystore.myshopify.com',
+			'slug'         => 'valid-slug',
 		];
 	
 		$validator = new Validator( ShopifyDatasource::get_config_schema() );
@@ -54,7 +54,7 @@ class ValidatorTest extends TestCase {
 	}
 
 	public function test_validate_shopify_source_with_invalid_input() {
-		$invalid_source = (object) [
+		$invalid_source = [
 			'uuid'    => '123e4567-e89b-12d3-a456-426614174000',
 			'service' => 'shopify',
 			'slug'    => 'valid-slug',
