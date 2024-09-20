@@ -12,8 +12,16 @@ defined( 'ABSPATH' ) || exit();
 
 class ShopifyDatasource extends HttpDatasource implements ConfigSerializableInterface {
 	private const SERVICE_SCHEMA = [
-		'access_token' => ['path' => '$.access_token', 'required' => true, 'type' => 'string'],
-		'store_name' => ['path' => '$.store_name', 'required' => true, 'type' => 'string'],
+		'access_token' => [
+			'path'     => '$.access_token',
+			'required' => true,
+			'type'     => 'string',
+		],
+		'store_name'   => [
+			'path'     => '$.store_name',
+			'required' => true,
+			'type'     => 'string',
+		],
 	];
 
 	public function get_store_name(): string {

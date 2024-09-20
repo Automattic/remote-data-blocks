@@ -48,7 +48,7 @@ class DatasourceValidator extends Validator {
 	 * @throws WP_Error if the service is unsupported.
 	 */
 	public static function from_service( string $service ): DatasourceValidator|WP_Error {
-		$datasource_class = $service . 'Datasource';
+		$datasource_class = 'RemoteDataBlocks\\Integrations\\' . $service . '\\' . $service . 'Datasource';
 
 		if ( ! in_array( $service, REMOTE_DATA_BLOCKS__SERVICES ) || ! class_exists( $datasource_class ) ) {
 			return new WP_Error( 'unsupported_data_source', __( 'Unsupported data source.', 'remote-data-blocks' ) );

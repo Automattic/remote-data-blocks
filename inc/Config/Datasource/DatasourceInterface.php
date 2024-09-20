@@ -40,8 +40,6 @@ interface DatasourceInterface {
 		],
 	];
 
-	public function __construct( array $config_schema );
-
 	/**
 	 * Get a human-readable name for this datasource.
 	 *

@@ -22,8 +22,8 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 		$config_schema = static::get_config_schema();
 
 		foreach ( $config as $key => $value ) {
-			if ( array_key_exists( 'sanitize', $config_schema[$key] ) ) {
-				$config[ $key ] = call_user_func( $config_schema[$key]['sanitize'], $value );
+			if ( array_key_exists( 'sanitize', $config_schema[ $key ] ) ) {
+				$config[ $key ] = call_user_func( $config_schema[ $key ]['sanitize'], $value );
 			}
 		}
 
@@ -55,7 +55,7 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 	/**
 	 * @inheritDoc
 	 */
-	abstract static public function get_config_schema(): array;
+	abstract public static function get_config_schema(): array;
 
 	/**
 	 * @inheritDoc

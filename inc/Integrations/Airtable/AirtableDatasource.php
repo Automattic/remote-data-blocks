@@ -8,9 +8,21 @@ use RemoteDataBlocks\Config\Datasource\HttpDatasourceInterface;
 
 class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterface {
 	private const SERVICE_SCHEMA = [
-		'api_key' => ['path' => '$.api_key', 'required' => true, 'type' => 'string'],
-		'base_id' => ['path' => '$.base_id', 'required' => true, 'type' => 'string'],
-		'table_id' => ['path' => '$.table_id', 'required' => true, 'type' => 'string'],
+		'api_key'  => [
+			'path'     => '$.api_key',
+			'required' => true,
+			'type'     => 'string',
+		],
+		'base_id'  => [
+			'path'     => '$.base_id',
+			'required' => true,
+			'type'     => 'string',
+		],
+		'table_id' => [
+			'path'     => '$.table_id',
+			'required' => true,
+			'type'     => 'string',
+		],
 	];
 
 	private $tables;
@@ -68,7 +80,7 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 		foreach ( $this->tables as $table ) {
 			$slug = sprintf( 'Airtable: %s %s', $this->get_base(), $table );
 
-			$objects[ $slug ] =  [
+			$objects[ $slug ] = [
 				'base'    => [
 					'name' => $this->get_base(),
 				],
