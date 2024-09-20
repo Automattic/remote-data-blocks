@@ -94,3 +94,9 @@ export type DataSourceConfig =
 	| GoogleSheetsConfig
 	| RestApiConfig
 	| GraphQLConfig;
+
+export type SettingsComponentProps< T extends BaseDataSourceConfig > = {
+	mode: 'add' | 'edit';
+	uuid?: string;
+	config?: T;
+};

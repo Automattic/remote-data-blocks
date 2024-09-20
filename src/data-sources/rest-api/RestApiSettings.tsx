@@ -7,15 +7,14 @@ import { ApiUrlMethodSettingsInput } from '@/data-sources/components/ApiUrlMetho
 import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { RestApiFormState } from '@/data-sources/rest-api/types';
-import { RestApiConfig, ApiAuth, ApiAuthFormState } from '@/data-sources/types';
+import {
+	RestApiConfig,
+	ApiAuth,
+	ApiAuthFormState,
+	SettingsComponentProps,
+} from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
-
-interface RestApiSettingsProps {
-	mode: 'add' | 'edit';
-	uuid?: string;
-	config?: RestApiConfig;
-}
 
 export const initialState: RestApiFormState = {
 	slug: '',
@@ -50,7 +49,11 @@ const getInitialStateFromConfig = ( config?: RestApiConfig ): RestApiFormState =
 	return initialStateFromConfig;
 };
 
-export const RestApiSettings = ( { mode, uuid: uuidFromProps, config }: RestApiSettingsProps ) => {
+export const RestApiSettings = ( {
+	mode,
+	uuid: uuidFromProps,
+	config,
+}: SettingsComponentProps< RestApiConfig > ) => {
 	const { goToMainScreen } = useSettingsContext();
 
 	const { state, handleOnChange } = useForm< RestApiFormState >( {

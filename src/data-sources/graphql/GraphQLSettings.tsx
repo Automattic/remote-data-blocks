@@ -15,15 +15,14 @@ import { SlugInput } from '@/data-sources/components/SlugInput';
 import { GraphQLFormState } from '@/data-sources/graphql/type';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { initialState as initialRestState } from '@/data-sources/rest-api/RestApiSettings';
-import { GraphQLConfig, ApiAuth, ApiAuthFormState } from '@/data-sources/types';
+import {
+	GraphQLConfig,
+	ApiAuth,
+	ApiAuthFormState,
+	SettingsComponentProps,
+} from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
-
-interface GraphQLSettingsProps {
-	mode: 'add' | 'edit';
-	uuid?: string;
-	config?: GraphQLConfig;
-}
 
 const initialState: GraphQLFormState = {
 	...initialRestState,
@@ -55,7 +54,11 @@ const getInitialStateFromConfig = ( config?: GraphQLConfig ): GraphQLFormState =
 	return initialStateFromConfig;
 };
 
-export const GraphQLSettings = ( { mode, uuid: uuidFromProps, config }: GraphQLSettingsProps ) => {
+export const GraphQLSettings = ( {
+	mode,
+	uuid: uuidFromProps,
+	config,
+}: SettingsComponentProps< GraphQLConfig > ) => {
 	const { goToMainScreen } = useSettingsContext();
 
 	const { state, handleOnChange } = useForm< GraphQLFormState >( {

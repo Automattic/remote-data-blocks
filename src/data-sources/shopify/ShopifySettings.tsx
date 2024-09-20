@@ -12,15 +12,9 @@ import PasswordInputControl from '@/data-sources/components/PasswordInputControl
 import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { useShopifyShopName } from '@/data-sources/shopify/shopify-api-hooks';
-import { ShopifyConfig } from '@/data-sources/types';
+import { ShopifyConfig, SettingsComponentProps } from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
-
-export interface ShopifySettingsProps {
-	mode: 'add' | 'edit';
-	uuid?: string;
-	config?: ShopifyConfig;
-}
 
 export type ShopifyFormState = Omit< ShopifyConfig, 'service' | 'uuid' >;
 
@@ -41,7 +35,11 @@ const getInitialStateFromConfig = ( config?: ShopifyConfig ): ShopifyFormState =
 	};
 };
 
-export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifySettingsProps ) => {
+export const ShopifySettings = ( {
+	mode,
+	uuid: uuidFromProps,
+	config,
+}: SettingsComponentProps< ShopifyConfig > ) => {
 	const { goToMainScreen } = useSettingsContext();
 	const { updateDataSource, addDataSource } = useDataSources( false );
 

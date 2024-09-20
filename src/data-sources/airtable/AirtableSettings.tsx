@@ -20,18 +20,12 @@ import { AirtableFormState } from '@/data-sources/airtable/types';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
-import { AirtableConfig } from '@/data-sources/types';
+import { AirtableConfig, SettingsComponentProps } from '@/data-sources/types';
 import { getConnectionMessage } from '@/data-sources/utils';
 import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import { StringIdName } from '@/types/common';
 import { SelectOption } from '@/types/input';
-
-export interface AirtableSettingsProps {
-	mode: 'add' | 'edit';
-	uuid?: string;
-	config?: AirtableConfig;
-}
 
 const initialState: AirtableFormState = {
 	token: '',
@@ -68,7 +62,7 @@ export const AirtableSettings = ( {
 	mode,
 	uuid: uuidFromProps,
 	config,
-}: AirtableSettingsProps ) => {
+}: SettingsComponentProps< AirtableConfig > ) => {
 	const { goToMainScreen } = useSettingsContext();
 	const { updateDataSource, addDataSource, slugConflicts, loadingSlugConflicts } =
 		useDataSources( false );

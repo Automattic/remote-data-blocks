@@ -21,18 +21,12 @@ import {
 	useGoogleSheetsOptions,
 } from '@/data-sources/hooks/useGoogleApi';
 import { useGoogleAuth } from '@/data-sources/hooks/useGoogleAuth';
-import { GoogleSheetsConfig } from '@/data-sources/types';
+import { GoogleSheetsConfig, SettingsComponentProps } from '@/data-sources/types';
 import { useForm, ValidationRules } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import { StringIdName } from '@/types/common';
 import { GoogleServiceAccountKey } from '@/types/google';
 import { SelectOption } from '@/types/input';
-
-export interface GoogleSheetsSettingsProps {
-	mode: 'add' | 'edit';
-	uuid?: string;
-	config?: GoogleSheetsConfig;
-}
 
 const initialState: GoogleSheetsFormState = {
 	slug: '',
@@ -87,7 +81,7 @@ export const GoogleSheetsSettings = ( {
 	mode,
 	uuid: uuidFromProps,
 	config,
-}: GoogleSheetsSettingsProps ) => {
+}: SettingsComponentProps< GoogleSheetsConfig > ) => {
 	const { goToMainScreen } = useSettingsContext();
 	const { updateDataSource, addDataSource, slugConflicts, loadingSlugConflicts } =
 		useDataSources( false );
