@@ -60,15 +60,15 @@ class DatasourceCrud {
 	public static function update_item_by_uuid( string $uuid, $new_item, ArraySerializableInterface $datasource = null ) {
 		$data_sources = self::get_data_sources();
 		$item         = self::get_item_by_uuid( $data_sources, $uuid );
-		if ( empty( $item ) ) {
+		if ( ! $item ) {
 			return new WP_Error( 'data_source_not_found', __( 'Data source not found.', 'remote-data-blocks' ), [ 'status' => 404 ] );
 		}
 
-		$datasource = $datasource ?? HttpDatasource::from_array( array_merge( (array) $item, $new_item ) );
+		$datasource = $datasource ?? HttpDatasource::from_array( array_merge( $item, $new_item ) );
 		$updated    = $datasource->to_array();
 
 		$data_sources = array_map( function ( $source ) use ( $updated ) {
-			return $source->uuid === $updated['uuid'] ? $updated : $source;
+			return $source['uuid'] === $updated['uuid'] ? $updated : $source;
 		}, $data_sources );
 		$result       = update_option( self::CONFIG_OPTION_NAME, $data_sources );
 		if ( true !== $result ) {

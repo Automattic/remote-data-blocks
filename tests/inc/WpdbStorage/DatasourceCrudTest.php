@@ -129,13 +129,13 @@ class DatasourceCrudTest extends TestCase {
 		] );
 
 		$updated_source = DatasourceCrud::update_item_by_uuid( $source->to_array()['uuid'], [
-			'borked_token' => 'updated_token',
+			'access_token' => 'updated_token',
 			'slug'         => 'updated-slug',
 		] );
 
-		$this->assertIsObject( $updated_source );
-		$this->assertSame( 'updated_token', $updated_source->token );
-		$this->assertSame( 'updated-slug', $updated_source->slug );
+		$this->assertIsArray( $updated_source );
+		$this->assertSame( 'updated_token', $updated_source['access_token'] );
+		$this->assertSame( 'updated-slug', $updated_source['slug'] );
 	}
 
 	public function test_update_item_by_uuid_with_invalid_uuid() {

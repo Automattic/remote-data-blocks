@@ -24,7 +24,7 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 		$config_schema = static::get_config_schema();
 
 		foreach ( $config as $key => $value ) {
-			if ( array_key_exists( 'sanitize', $config_schema[ $key ] ) ) {
+			if ( isset( $config_schema[ $key ] ) && array_key_exists( 'sanitize', $config_schema[ $key ] ) ) {
 				$config[ $key ] = call_user_func( $config_schema[ $key ]['sanitize'], $value );
 			}
 		}
@@ -79,7 +79,7 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 			return $validated;
 		}
 
-		$datasource_class = REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP[ $config['service'] ];
+		$datasource_class = REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP[ $config['service']] ;
 
 		if ( ! class_exists( $datasource_class ) ) {
 			return new WP_Error( 'invalid_datasource', 'Invalid datasource', [ 'status' => 400 ] );
@@ -94,4 +94,5 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 	public function to_array(): array {
 		return $this->config;
 	}
+
 }
