@@ -83,4 +83,14 @@ export type ApiAuthFormState = {
 	authAddTo: ( typeof API_KEY_ADD_TO )[ number ];
 };
 
-export type DataSourceConfig = AirtableConfig | ShopifyConfig | GoogleSheetsConfig | RestApiConfig;
+export interface GraphQLConfig extends Omit< RestApiConfig, 'service' > {
+	service: 'graphql';
+	query: string;
+}
+
+export type DataSourceConfig =
+	| AirtableConfig
+	| ShopifyConfig
+	| GoogleSheetsConfig
+	| RestApiConfig
+	| GraphQLConfig;

@@ -2,6 +2,7 @@ import { __ } from '@wordpress/i18n';
 
 import { AirtableSettings } from '@/data-sources/airtable/AirtableSettings';
 import { GoogleSheetsSettings } from '@/data-sources/google-sheets/GoogleSheetsSettings';
+import { GraphQLSettings } from '@/data-sources/graphql/GraphQLSettings';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { RestApiSettings } from '@/data-sources/rest-api/RestApiSettings';
 import { ShopifySettings } from '@/data-sources/shopify/ShopifySettings';
@@ -35,6 +36,9 @@ const DataSourceEditSettings = ( { uuid }: DataSourceEditSettings ) => {
 	if ( 'rest-api' === dataSource.service ) {
 		return <RestApiSettings mode="edit" uuid={ uuid } config={ dataSource } />;
 	}
+	if ( 'graphql' === dataSource.service ) {
+		return <GraphQLSettings mode="edit" uuid={ uuid } config={ dataSource } />;
+	}
 
 	return <>{ __( 'Service not (yet) supported.', 'remote-data-blocks' ) }</>;
 };
@@ -55,6 +59,9 @@ const DataSourceSettings = () => {
 		}
 		if ( 'rest-api' === service ) {
 			return <RestApiSettings mode="add" />;
+		}
+		if ( 'graphql' === service ) {
+			return <GraphQLSettings mode="add" />;
 		}
 		return <>{ __( 'Service not (yet) supported.', 'remote-data-blocks' ) }</>;
 	}

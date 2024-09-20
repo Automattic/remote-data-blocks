@@ -7,7 +7,7 @@ use WP_Error;
 
 class DatasourceCrud {
 	const CONFIG_OPTION_NAME = 'remote_data_blocks_config';
-	const DATA_SOURCE_TYPES  = [ 'airtable', 'shopify', 'google-sheets', 'rest-api' ];
+	const DATA_SOURCE_TYPES  = [ 'airtable', 'shopify', 'google-sheets', 'rest-api', 'graphql' ];
 
 	/**
 	 * Validate the slug to verify
@@ -168,6 +168,26 @@ class DatasourceCrud {
 		];
 	}
 
+	public static function validate_graphql_source( $source ) {
+		$rest_api_source = self::validate_rest_api_source( $source );
+
+		if ( is_wp_error( $rest_api_source ) ) {
+			return $rest_api_source;
+		}
+
+		if ( empty( $source->query ) ) {
+			return new WP_Error( 'missing_query', __( 'Missing query.', 'remote-data-blocks' ) );
+		}
+
+		return (object) array_merge(
+			(array) $rest_api_source,
+			[
+				'service' => 'graphql',
+				'query'   => sanitize_textarea_field( $source->query ),
+			]
+		);
+	}
+
 	public static function validate_source( $source ) {
 		if ( ! is_object( $source ) ) {
 			return new WP_Error( 'invalid_data_source', __( 'Invalid data source.', 'remote-data-blocks' ) );
@@ -201,6 +221,8 @@ class DatasourceCrud {
 				return self::validate_google_sheets_source( $source );
 			case 'rest-api':
 				return self::validate_rest_api_source( $source );
+			case 'graphql':
+				return self::validate_graphql_source( $source );
 			default:
 				return new WP_Error( 'unsupported_data_source', __( 'Unsupported data source.', 'remote-data-blocks' ) );
 		}

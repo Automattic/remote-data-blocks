@@ -1,41 +1,46 @@
-import { Button, ButtonGroup, Card, CardHeader, CardBody } from '@wordpress/components';
+import {
+	Button,
+	ButtonGroup,
+	Card,
+	CardHeader,
+	CardBody,
+	TextareaControl,
+} from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { ApiAuthSettingsInput } from '@/data-sources/components/ApiAuthSettingsInput';
 import { ApiUrlMethodSettingsInput } from '@/data-sources/components/ApiUrlMethodSettingsInput';
 import { SlugInput } from '@/data-sources/components/SlugInput';
+import { GraphQLFormState } from '@/data-sources/graphql/type';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
-import { RestApiFormState } from '@/data-sources/rest-api/types';
-import { RestApiConfig, ApiAuth, ApiAuthFormState } from '@/data-sources/types';
+import { initialState as initialRestState } from '@/data-sources/rest-api/RestApiSettings';
+import { GraphQLConfig, ApiAuth, ApiAuthFormState } from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
-interface RestApiSettingsProps {
+interface GraphQLSettingsProps {
 	mode: 'add' | 'edit';
 	uuid?: string;
-	config?: RestApiConfig;
+	config?: GraphQLConfig;
 }
 
-export const initialState: RestApiFormState = {
-	slug: '',
-	method: 'GET',
-	url: '',
-	authType: 'bearer',
-	authValue: '',
-	authKey: '',
-	authAddTo: 'header',
+const initialState: GraphQLFormState = {
+	...initialRestState,
+	method: 'POST',
+	query: '',
 };
 
-const getInitialStateFromConfig = ( config?: RestApiConfig ): RestApiFormState => {
+const getInitialStateFromConfig = ( config?: GraphQLConfig ): GraphQLFormState => {
 	if ( ! config ) {
 		return initialState;
 	}
 
-	const initialStateFromConfig: RestApiFormState = {
+	const initialStateFromConfig: GraphQLFormState = {
 		slug: config.slug,
 		method: config.method,
 		url: config.url,
+		query: config.query,
 		authType: config.auth.type,
 		authValue: config.auth.value,
 		authKey: '',
@@ -50,10 +55,10 @@ const getInitialStateFromConfig = ( config?: RestApiConfig ): RestApiFormState =
 	return initialStateFromConfig;
 };
 
-export const RestApiSettings = ( { mode, uuid: uuidFromProps, config }: RestApiSettingsProps ) => {
+export const GraphQLSettings = ( { mode, uuid: uuidFromProps, config }: GraphQLSettingsProps ) => {
 	const { goToMainScreen } = useSettingsContext();
 
-	const { state, handleOnChange } = useForm< RestApiFormState >( {
+	const { state, handleOnChange } = useForm< GraphQLFormState >( {
 		initialValues: getInitialStateFromConfig( config ),
 	} );
 
@@ -77,7 +82,13 @@ export const RestApiSettings = ( { mode, uuid: uuidFromProps, config }: RestApiS
 	};
 
 	const shouldAllowSubmit = useMemo( () => {
-		if ( ! state.slug || ! state.url || ! state.method || ! state.authType || ! state.authValue ) {
+		if (
+			! state.slug ||
+			! state.query ||
+			! state.method ||
+			! state.authType ||
+			! state.authValue
+		) {
 			return false;
 		}
 
@@ -90,7 +101,7 @@ export const RestApiSettings = ( { mode, uuid: uuidFromProps, config }: RestApiS
 		return true;
 	}, [
 		state.slug,
-		state.url,
+		state.query,
 		state.method,
 		state.authType,
 		state.authValue,
@@ -119,28 +130,33 @@ export const RestApiSettings = ( { mode, uuid: uuidFromProps, config }: RestApiS
 			};
 		}
 
-		const restApiConfig: RestApiConfig = {
+		const graphqlConfig: GraphQLConfig = {
 			uuid: uuidFromProps ?? '',
-			service: 'rest-api',
+			service: 'graphql',
 			slug: state.slug,
 			method: state.method,
 			url: state.url,
+			query: state.query,
 			auth,
 		};
 
 		if ( mode === 'add' ) {
-			await addDataSource( restApiConfig );
+			await addDataSource( graphqlConfig );
 		} else {
-			await updateDataSource( restApiConfig );
+			await updateDataSource( graphqlConfig );
 		}
 		goToMainScreen();
+	};
+
+	const onQueryChange = ( nextValue: string ) => {
+		handleOnChange( 'query', nextValue );
 	};
 
 	return (
 		<Card className="add-update-data-source-card">
 			<CardHeader>
 				<h2>
-					{ mode === 'add' ? __( 'Add REST API Data Source' ) : __( 'Edit REST API Data Source' ) }
+					{ mode === 'add' ? __( 'Add GraphQL Data Source' ) : __( 'Edit GraphQL Data Source' ) }
 				</h2>
 			</CardHeader>
 			<CardBody>
@@ -154,6 +170,17 @@ export const RestApiSettings = ( { mode, uuid: uuidFromProps, config }: RestApiS
 						method={ state.method }
 						onChange={ handleOnChange }
 					/>
+
+					<div className="form-group">
+						<TextareaControl
+							label={ __( 'Query', 'remote-data-blocks' ) }
+							value={ state.query }
+							onChange={ onQueryChange }
+							help={ __( 'The GraphQL query to execute.', 'remote-data-blocks' ) }
+							rows={ 14 }
+							style={ { fontFamily: 'monospace' } }
+						/>
+					</div>
 
 					<ApiAuthSettingsInput auth={ getAuthState() } onChange={ handleOnChange } />
 
