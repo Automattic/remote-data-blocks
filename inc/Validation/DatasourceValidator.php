@@ -15,10 +15,6 @@ use const RemoteDataBlocks\REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP;
 class DatasourceValidator extends Validator {
 	/**
 	 * Create a new DatasourceValidator from a service.
-	 * 
-	 * @param string $service
-	 * @return DatasourceValidator
-	 * @throws WP_Error if the service is unsupported.
 	 */
 	public static function from_service( string $service ): DatasourceValidator|WP_Error {
 		$datasource_class = REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP[ $service ];

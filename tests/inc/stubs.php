@@ -108,6 +108,10 @@ function wp_generate_uuid4() {
 	);
 }
 
+function is_email( $email ) {
+	return filter_var( $email, FILTER_VALIDATE_EMAIL ) !== false;
+}
+
 function wp_is_uuid( $uuid, $version = null ) {
 	if ( ! is_string( $uuid ) ) {
 		return false;

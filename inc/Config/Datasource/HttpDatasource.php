@@ -26,6 +26,8 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 		foreach ( $config as $key => $value ) {
 			if ( isset( $config_schema[ $key ] ) && array_key_exists( 'sanitize', $config_schema[ $key ] ) ) {
 				$config[ $key ] = call_user_func( $config_schema[ $key ]['sanitize'], $value );
+			} else {
+				$config[ $key ] = sanitize_text_field( $value );
 			}
 		}
 

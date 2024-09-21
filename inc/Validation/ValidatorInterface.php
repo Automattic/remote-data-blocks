@@ -20,9 +20,9 @@ interface ValidatorInterface {
 	/**
 	 * Validate data against a schema.
 	 *
-	 * @param string|array|object|null $data
+	 * @param array $data
 	 *
 	 * @return true|\WP_Error WP_Error for invalid data, true otherwise
 	 */
-	public function validate( string|array|object|null $data ): bool|WP_Error;
+	public function validate( array $data ): bool|WP_Error;
 }

@@ -9,84 +9,46 @@ use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
 
 class GoogleSheetsDatasource extends HttpDatasource implements ArraySerializableInterface {
 	private const SERVICE_SCHEMA = [
-		'credentials' => [
-			'path'       => '$.credentials',
-			'required'   => true,
-			'type'       => 'array',
-			'properties' => [
-				'type'                        => [
-					'type'     => 'string',
-					'required' => true,
-				],
-				'project_id'                  => [
-					'type'     => 'string',
-					'required' => true,
-				],
-				'private_key_id'              => [
-					'type'     => 'string',
-					'required' => true,
-				],
-				'private_key'                 => [
-					'type'     => 'string',
-					'required' => true,
-				],
-				'client_email'                => [
-					'type'     => 'string',
-					'required' => true,
-				],
-				'client_id'                   => [
-					'type'     => 'string',
-					'required' => true,
-				],
-				'auth_uri'                    => [
-					'type'     => 'string',
-					'required' => true,
-				],
-				'token_uri'                   => [
-					'type'     => 'string',
-					'required' => true,
-				],
-				'auth_provider_x509_cert_url' => [
-					'type'     => 'string',
-					'required' => true,
-				],
-				'client_x509_cert_url'        => [
-					'type'     => 'string',
-					'required' => true,
-				],
-				'universe_domain'             => [
-					'type'     => 'string',
-					'required' => true,
+		'type'       => 'object',
+		'properties' => [       
+			'credentials' => [
+				'type'       => 'object',
+				'properties' => [
+					'type'                        => [ 'type' => 'string' ],
+					'project_id'                  => [ 'type' => 'string' ],
+					'private_key_id'              => [ 'type' => 'string' ],
+					'private_key'                 => [ 'type' => 'string' ],
+					'client_email'                => [
+						'type'     => 'string',
+						'callback' => 'is_email',
+						'sanitize' => 'sanitize_email',
+					],
+					'client_id'                   => [ 'type' => 'string' ],
+					'auth_uri'                    => [ 'type' => 'string' ],
+					'token_uri'                   => [ 'type' => 'string' ],
+					'auth_provider_x509_cert_url' => [
+						'type'     => 'string',
+						'sanitize' => 'sanitize_url',
+					],
+					'client_x509_cert_url'        => [
+						'type'     => 'string',
+						'sanitize' => 'sanitize_url',
+					],
+					'universe_domain'             => [ 'type' => 'string' ],
 				],
 			],
-		],
-		'spreadsheet' => [
-			'path'       => '$.spreadsheet',
-			'required'   => true,
-			'type'       => 'array',
-			'properties' => [
-				'id'   => [
-					'type'     => 'string',
-					'required' => true,
-				],
-				'name' => [
-					'type'     => 'string',
-					'required' => true,
+			'spreadsheet' => [
+				'type'       => 'object',
+				'properties' => [
+					'id'   => [ 'type' => 'string' ],
+					'name' => [ 'type' => 'string' ],
 				],
 			],
-		],
-		'sheet'       => [
-			'path'       => '$.sheet',
-			'required'   => true,
-			'type'       => 'array',
-			'properties' => [
-				'id'   => [
-					'type'     => 'integer',
-					'required' => true,
-				],
-				'name' => [
-					'type'     => 'string',
-					'required' => true,
+			'sheet'       => [
+				'type'       => 'object',
+				'properties' => [
+					'id'   => [ 'type' => 'integer' ],
+					'name' => [ 'type' => 'string' ],
 				],
 			],
 		],

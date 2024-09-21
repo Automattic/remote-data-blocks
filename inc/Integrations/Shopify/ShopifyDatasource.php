@@ -12,15 +12,10 @@ defined( 'ABSPATH' ) || exit();
 
 class ShopifyDatasource extends HttpDatasource implements ArraySerializableInterface {
 	private const SERVICE_SCHEMA = [
-		'access_token' => [
-			'path'     => '$.access_token',
-			'required' => true,
-			'type'     => 'string',
-		],
-		'store_name'   => [
-			'path'     => '$.store_name',
-			'required' => true,
-			'type'     => 'string',
+		'type'       => 'object',
+		'properties' => [
+			'access_token' => [ 'type' => 'string' ],
+			'store_name'   => [ 'type' => 'string' ],
 		],
 	];
 

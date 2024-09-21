@@ -19,24 +19,21 @@ namespace RemoteDataBlocks\Config\Datasource;
  */
 interface DatasourceInterface {
 	public const BASE_SCHEMA = [
-		'uuid'    => [
-			'path'     => '$.uuid',
-			'required' => true,
-			'type'     => 'string',
-			'callback' => 'wp_is_uuid',
-		],
-		'service' => [
-			'path'     => '$.service',
-			'required' => true,
-			'type'     => 'string',
-			'enum'     => REMOTE_DATA_BLOCKS__SERVICES,
-		],
-		'slug'    => [
-			'path'     => '$.slug',
-			'required' => true,
-			'type'     => 'string',
-			'pattern'  => '/^[a-z0-9-]+$/',
-			'sanitize' => 'sanitize_text_field',
+		'type'       => 'object',
+		'properties' => [
+			'uuid'    => [
+				'type'     => 'string',
+				'callback' => 'wp_is_uuid',
+			],
+			'service' => [
+				'type' => 'string',
+				'enum' => REMOTE_DATA_BLOCKS__SERVICES,
+			],
+			'slug'    => [
+				'type'     => 'string',
+				'pattern'  => '/^[a-z0-9-]+$/',
+				'sanitize' => 'sanitize_text_field',
+			],
 		],
 	];
 
