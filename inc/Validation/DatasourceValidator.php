@@ -2,6 +2,7 @@
 
 namespace RemoteDataBlocks\Validation;
 
+use RemoteDataBlocks\Config\Datasource\DatasourceInterface;
 use WP_Error;
 
 use const RemoteDataBlocks\REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP;
@@ -12,36 +13,6 @@ use const RemoteDataBlocks\REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP;
  * Merges the datasource base schema with the specific service schema.
  */
 class DatasourceValidator extends Validator {
-	private const BASE_SCHEMA = [
-		'uuid'    => [
-			'path'     => '$.uuid',
-			'required' => true,
-			'type'     => 'string',
-			'callback' => 'wp_is_uuid',
-		],
-		'service' => [
-			'path'     => '$.service',
-			'required' => true,
-			'type'     => 'string',
-			'enum'     => REMOTE_DATA_BLOCKS__SERVICES,
-		],
-		'slug'    => [
-			'path'     => '$.slug',
-			'required' => true,
-			'type'     => 'string',
-			'pattern'  => '/^[a-z0-9-]+$/',
-			'sanitize' => 'sanitize_text_field',
-		],
-	];
-
-	/**
-	 * @inheritDoc
-	 */
-	public function __construct( array $service_schema ) {
-		$schema = array_merge( self::BASE_SCHEMA, $service_schema );
-		parent::__construct( $schema );
-	}
-
 	/**
 	 * Create a new DatasourceValidator from a service.
 	 * 
@@ -56,6 +27,6 @@ class DatasourceValidator extends Validator {
 			return new WP_Error( 'unsupported_data_source', __( 'Unsupported data source.', 'remote-data-blocks' ) );
 		}
 
-		return new DatasourceValidator( $datasource_class::get_config_schema() );
+		return new DatasourceValidator( array_merge( DatasourceInterface::BASE_SCHEMA, $datasource_class::get_config_schema() ) );
 	}
 }

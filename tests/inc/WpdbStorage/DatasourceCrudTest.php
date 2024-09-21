@@ -39,9 +39,12 @@ class DatasourceCrudTest extends TestCase {
 			'slug'    => 'valid-slug',
 		];
 
+		// phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
+		// phpcs:disable WordPress.Security.EscapeOutput.ExceptionNotEscaped
 		set_error_handler(static function ( int $errno, string $errstr ): never {
-			throw new Exception( $errstr, $errno );
+			throw new \Exception( $errstr, $errno );
 		}, E_USER_WARNING);
+		// phpcs:enable
 
 		$result = DatasourceCrud::register_new_data_source( $invalid_source );
 		restore_error_handler();
