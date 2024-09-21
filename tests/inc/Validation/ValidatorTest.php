@@ -80,7 +80,7 @@ class ValidatorTest extends TestCase {
 			'universe_domain'             => 'googleapis.com',
 		];
 
-		$valid_source = (object) [
+		$valid_source = [
 			'uuid'        => '123e4567-e89b-12d3-a456-426614174000',
 			'service'     => 'google-sheets',
 			'credentials' => $valid_credentials,
@@ -96,7 +96,7 @@ class ValidatorTest extends TestCase {
 		];
 
 		$validator = new Validator( GoogleSheetsDatasource::get_config_schema() );
-		$this->assertTrue($validator->validate( $valid_source ));
+		$this->assertTrue( $validator->validate( $valid_source ) );
 	}
 
 	public function test_validate_google_sheets_source_with_invalid_input() {
@@ -108,7 +108,7 @@ class ValidatorTest extends TestCase {
 		];
 
 		$validator = new Validator( GoogleSheetsDatasource::get_config_schema() );
-		$result = $validator->validate( $invalid_source );
+		$result    = $validator->validate( $invalid_source );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
 		$this->assertSame( 'missing_field', $result->get_error_code() );
