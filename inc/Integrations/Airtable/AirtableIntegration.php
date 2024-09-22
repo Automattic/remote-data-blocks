@@ -14,13 +14,6 @@ class AirtableIntegration {
 		$data_sources = DatasourceCrud::get_data_sources( REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE );
 
 		foreach ( $data_sources as $config ) {
-			// Transform data to our experimental format, which is all array based
-			$config = array_map(
-				function ( $value ) {
-					return is_object( $value ) ? (array) $value : $value;
-				},
-				(array) $config
-			);
 			self::register_blocks_for_airtable_data_source( $config );
 		}
 	}
@@ -35,7 +28,7 @@ class AirtableIntegration {
 			$logger->error( 'Airtable block is missing base ID' );
 		}
 
-		$airtable_datasource = new AirtableDatasource( $config['token'], $base_id, $table_id );
+		$airtable_datasource = AirtableDatasource::from_array( $config );
 		// TODO: Block registration & all the rest...  This will only work if there is some mapping configured
 	}
 }

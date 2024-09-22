@@ -14,7 +14,12 @@ function register_airtable_events_block() {
 	$table        = 'tblyGtuxblLtmoqMI';
 
 
-	$airtable_datasource        = new AirtableDatasource( $access_token, $base, $table );
+	$airtable_datasource = AirtableDatasource::from_array( [
+		'access_token' => $access_token,
+		'base'         => $base,
+		'tables'       => [ 'events' => $table ],
+	] );
+
 	$airtable_get_event_query   = new AirtableGetEventQuery( $airtable_datasource );
 	$airtable_list_events_query = new AirtableListEventsQuery( $airtable_datasource );
 

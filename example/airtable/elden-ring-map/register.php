@@ -23,9 +23,14 @@ function register_airtable_elden_ring_map_block() {
 		return;
 	}
 
-	$elden_ring_datasource = new AirtableDatasource( $access_token, $base, $tables );
-	$list_locations_query  = new AirtableEldenRingListLocationsQuery( $elden_ring_datasource );
-	$list_maps_query       = new AirtableEldenRingListMapsQuery( $elden_ring_datasource );
+	$elden_ring_datasource = AirtableDatasource::from_array( [
+		'access_token' => $access_token,
+		'base'         => $base,
+		'tables'       => $tables,
+	] );
+	var_dump( $elden_ring_datasource );
+	$list_locations_query = new AirtableEldenRingListLocationsQuery( $elden_ring_datasource );
+	$list_maps_query      = new AirtableEldenRingListMapsQuery( $elden_ring_datasource );
 
 	register_remote_data_block( $block_name, $list_locations_query );
 	register_remote_data_list_query( $block_name, $list_maps_query );
