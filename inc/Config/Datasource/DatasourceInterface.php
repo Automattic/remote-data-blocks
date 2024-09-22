@@ -32,7 +32,7 @@ interface DatasourceInterface {
 			'slug'    => [
 				'type'     => 'string',
 				'pattern'  => '/^[a-z0-9-]+$/',
-				'sanitize' => 'sanitize_text_field',
+				'sanitize' => 'sanitize_title',
 			],
 		],
 	];

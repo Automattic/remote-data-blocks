@@ -54,31 +54,20 @@ class GoogleSheetsDatasource extends HttpDatasource implements ArraySerializable
 		],
 	];
 
-	private $credentials;
-	private $spreadsheet;
-	private $sheet;
-
-	public function __construct( array $config ) {
-		parent::__construct( $config );
-		$this->credentials = $config['credentials'];
-		$this->spreadsheet = $config['spreadsheet'];
-		$this->sheet       = $config['sheet'];
-	}
-
 	public function get_display_name(): string {
-		return sprintf( 'Google Sheets: %s - %s', $this->spreadsheet['name'], $this->sheet['name'] );
+		return sprintf( 'Google Sheets: %s - %s', $this->config['spreadsheet']['name'], $this->config['sheet']['name'] );
 	}
 
 	public function get_endpoint(): string {
 		return sprintf('https://sheets.googleapis.com/v4/spreadsheets/%s/values/%s', 
-			$this->spreadsheet['id'], 
-			urlencode( $this->sheet['name'] )
+			$this->config['spreadsheet']['id'], 
+			urlencode( $this->config['sheet']['name'] )
 		);
 	}
 
 	public function get_request_headers(): array {
 		$access_token = GoogleAuth::generate_token_from_service_account_key(
-			$this->credentials,
+			$this->config['credentials'],
 			GoogleAuth::GOOGLE_SHEETS_SCOPES
 		);
 

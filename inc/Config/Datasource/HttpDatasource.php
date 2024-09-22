@@ -3,6 +3,8 @@
 namespace RemoteDataBlocks\Config\Datasource;
 
 use RemoteDataBlocks\Config\ArraySerializableInterface;
+use RemoteDataBlocks\Sanitization\Sanitizer;
+use RemoteDataBlocks\Sanitization\SanitizerInterface;
 use RemoteDataBlocks\Validation\DatasourceValidator;
 use RemoteDataBlocks\Validation\ValidatorInterface;
 use WP_Error;
@@ -18,21 +20,7 @@ use const RemoteDataBlocks\REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP;
  * @since 0.1.0
  */
 abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInterface, ArraySerializableInterface {
-	protected $config;
-
-	private function __construct( array $config ) {
-		$config_schema = static::get_config_schema();
-
-		foreach ( $config as $key => $value ) {
-			if ( isset( $config_schema[ $key ] ) && array_key_exists( 'sanitize', $config_schema[ $key ] ) ) {
-				$config[ $key ] = call_user_func( $config_schema[ $key ]['sanitize'], $value );
-			} else {
-				$config[ $key ] = sanitize_text_field( $value );
-			}
-		}
-
-		$this->config = $config;
-	}
+	final private function __construct( protected array $config ) {}
 
 	/**
 	 * @inheritDoc
@@ -64,9 +52,9 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 	/**
 	 * @inheritDoc
 	 */
-	public static function from_array( array $config, ?ValidatorInterface $validator = null ): DatasourceInterface|WP_Error {
+	public static function from_array( array $config, ?ValidatorInterface $validator = null, ?SanitizerInterface $sanitizer = null ): DatasourceInterface|WP_Error {
 		if ( ! is_string( $config['service'] ) ) {
-			return new WP_Error( 'invalid_config', 'Invalid config', [ 'status' => 400 ] );
+			return new WP_Error( 'invalid_config', 'Invalid config' );
 		}
 
 		$validator = $validator ?? DatasourceValidator::from_service( $config['service'] );
@@ -84,10 +72,13 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 		$datasource_class = REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP[ $config['service'] ];
 
 		if ( ! class_exists( $datasource_class ) ) {
-			return new WP_Error( 'invalid_datasource', 'Invalid datasource', [ 'status' => 400 ] );
+			return new WP_Error( 'invalid_datasource', 'Invalid datasource' );
 		}
 
-		return new $datasource_class( $config );
+		$sanitizer = $sanitizer ?? new Sanitizer( $datasource_class::get_config_schema() );
+		$sanitized = $sanitizer->sanitize( $config );
+
+		return new $datasource_class( $sanitized );
 	}
 
 	/**
