@@ -19,7 +19,7 @@ class Sanitizer implements SanitizerInterface {
 	 * @inheritDoc
 	 */
 	public function sanitize( array $data ): array {
-		if ( ! isset( $this->schema['type'] ) || $this->schema['type'] !== 'object' || ! isset( $this->schema['properties'] ) ) {
+		if ( ! isset( $this->schema['type'] ) || 'object' !== $this->schema['type'] || ! isset( $this->schema['properties'] ) ) {
 			return [];
 		}
 
