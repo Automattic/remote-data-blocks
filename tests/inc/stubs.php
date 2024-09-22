@@ -25,6 +25,7 @@ function sanitize_title( string $title ): string {
 }
 
 function sanitize_text_field( string $text ): string {
+	// phpcs:ignore WordPressVIPMinimum.Functions.StripTags.StripTagsOneParameter
 	$text = strip_tags( $text );
 	$text = trim( $text );
 	$text = stripslashes( $text );

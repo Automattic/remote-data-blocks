@@ -197,7 +197,6 @@ class ValidatorTest extends TestCase {
 		$this->assertSame( 'missing_field', $result->get_error_code() );
 	}
 
-
 	public function test_validate_nested_array_with_valid_input() {
 		$valid_nested_source = [
 			'uuid'     => '123e4567-e89b-12d3-a456-426614174000',
