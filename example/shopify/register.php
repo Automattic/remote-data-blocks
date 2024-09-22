@@ -2,6 +2,7 @@
 
 namespace RemoteDataBlocks\Example\Shopify;
 
+use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Integrations\Shopify\Queries\ShopifyGetProductQuery;
 use RemoteDataBlocks\Integrations\Shopify\Queries\ShopifySearchProductsQuery;
@@ -24,7 +25,12 @@ function register_shopify_block() {
 		return;
 	}
 
-	$shopify_datasource            = new ShopifyDatasource( $access_token, $store_name );
+	$shopify_datasource = HttpDatasource::from_array( [
+		'service'      => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
+		'access_token' => $access_token,
+		'store_name'   => $store_name,
+	] );
+
 	$shopify_search_products_query = new ShopifySearchProductsQuery( $shopify_datasource );
 	$shopify_get_product_query     = new ShopifyGetProductQuery( $shopify_datasource );
 

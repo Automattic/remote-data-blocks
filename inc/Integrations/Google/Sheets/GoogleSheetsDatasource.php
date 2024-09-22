@@ -84,6 +84,8 @@ class GoogleSheetsDatasource extends HttpDatasource implements ArraySerializable
 	}
 
 	public static function get_config_schema(): array {
-		return array_merge( DatasourceInterface::BASE_SCHEMA, self::SERVICE_SCHEMA );
+		$schema               = DatasourceInterface::BASE_SCHEMA;
+		$schema['properties'] = array_merge( DatasourceInterface::BASE_SCHEMA['properties'], self::SERVICE_SCHEMA['properties'] );
+		return $schema;
 	}
 }

@@ -2,6 +2,7 @@
 
 namespace RemoteDataBlocks\ExampleApi;
 
+use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 use RemoteDataBlocks\ExampleApi\Queries\ExampleApiDataSource;
 use RemoteDataBlocks\ExampleApi\Queries\ExampleApiGetRecordQuery;
 use RemoteDataBlocks\ExampleApi\Queries\ExampleApiGetTableQuery;
@@ -30,7 +31,7 @@ class ExampleApi {
 			return;
 		}
 
-		$datasource       = new ExampleApiDataSource();
+		$datasource       = ExampleApiDatasource::from_array( [] );
 		$get_record_query = new ExampleApiGetRecordQuery( $datasource );
 		$get_table_query  = new ExampleApiGetTableQuery( $datasource );
 

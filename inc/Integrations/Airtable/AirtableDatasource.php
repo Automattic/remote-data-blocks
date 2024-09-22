@@ -19,7 +19,7 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 				],
 			],
 			'tables'       => [
-				'type'  => 'object',
+				'type'       => 'object',
 				'properties' => [
 					'id'   => [ 'type' => 'string' ],
 					'name' => [ 'type' => 'string' ],
@@ -62,6 +62,8 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 	}
 
 	public static function get_config_schema(): array {
-		return array_merge( DatasourceInterface::BASE_SCHEMA, self::SERVICE_SCHEMA );
+		$schema               = DatasourceInterface::BASE_SCHEMA;
+		$schema['properties'] = array_merge( DatasourceInterface::BASE_SCHEMA['properties'], self::SERVICE_SCHEMA['properties'] );
+		return $schema;
 	}
 }

@@ -2,12 +2,14 @@
 
 namespace RemoteDataBlocks\Example\ArtInstituteOfChicago;
 
+use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+
 require_once __DIR__ . '/inc/queries/class-art-institute-datasource.php';
 require_once __DIR__ . '/inc/queries/class-art-institute-get-query.php';
 require_once __DIR__ . '/inc/queries/class-art-institute-search-query.php';
 
 function register_aic_block() {
-	$aic_datasource   = new ArtInstituteOfChicagoDatasource();
+	$aic_datasource   = ArtInstituteOfChicagoDatasource::from_array( [] );
 	$get_art_query    = new ArtInstituteOfChicagoGetArtQuery( $aic_datasource );
 	$search_art_query = new ArtInstituteOfChicagoSearchArtQuery( $aic_datasource );
 

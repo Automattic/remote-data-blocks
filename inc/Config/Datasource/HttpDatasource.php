@@ -53,18 +53,7 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 	 * @inheritDoc
 	 */
 	final public static function from_array( array $config, ?ValidatorInterface $validator = null, ?SanitizerInterface $sanitizer = null ): DatasourceInterface|WP_Error {
-		if ( ! is_string( $config['service'] ) || ! isset( REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP[ $config['service'] ] ) ) {
-			return new WP_Error( 'unsupported_datasource', 'Unsupported data source' );
-		}
-
-		$datasource_class = REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP[ $config['service'] ];
-
-		if ( ! class_exists( $datasource_class ) ) {
-			return new WP_Error( 'invalid_datasource', 'Invalid datasource' );
-		}
-
-		$schema               = DatasourceInterface::BASE_SCHEMA;
-		$schema['properties'] = array_merge( DatasourceInterface::BASE_SCHEMA['properties'], $datasource_class::get_config_schema()['properties'] );
+		$schema = static::get_config_schema();
 
 		$validator = $validator ?? new Validator( $schema );
 		$validated = $validator->validate( $config );
@@ -76,7 +65,7 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 		$sanitizer = $sanitizer ?? new Sanitizer( $schema );
 		$sanitized = $sanitizer->sanitize( $config );
 
-		return new $datasource_class( $sanitized );
+		return new static( $sanitized );
 	}
 
 	/**

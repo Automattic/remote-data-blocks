@@ -18,4 +18,8 @@ class ArtInstituteOfChicagoDatasource extends HttpDatasource {
 			'Content-Type' => 'application/json',
 		];
 	}
+
+	public static function get_config_schema(): array {
+		return [];
+	}
 }

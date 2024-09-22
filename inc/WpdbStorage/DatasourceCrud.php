@@ -4,7 +4,10 @@ namespace RemoteDataBlocks\WpdbStorage;
 
 use RemoteDataBlocks\Config\ArraySerializableInterface;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+use RemoteDataBlocks\Config\Datasource\HttpDatasourceInterface;
 use WP_Error;
+
+use const RemoteDataBlocks\REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP;
 
 class DatasourceCrud {
 	const CONFIG_OPTION_NAME = 'remote_data_blocks_config';
@@ -16,7 +19,7 @@ class DatasourceCrud {
 			$uuid = wp_generate_uuid4();
 		} while ( ! empty( self::get_item_by_uuid( self::get_data_sources(), $uuid ) ) );
 
-		$new_datasource = $datasource ?? HttpDatasource::from_array( array_merge( $settings, [ 'uuid' => $uuid ] ) );
+		$new_datasource = $datasource ?? self::get_datasource( array_merge( $settings, [ 'uuid' => $uuid ] ) );
 
 		if ( is_wp_error( $new_datasource ) ) {
 			return $new_datasource;
@@ -63,7 +66,7 @@ class DatasourceCrud {
 			return new WP_Error( 'data_source_not_found', __( 'Data source not found.', 'remote-data-blocks' ), [ 'status' => 404 ] );
 		}
 
-		$datasource = $datasource ?? HttpDatasource::from_array( array_merge( $item, $new_item ) );
+		$datasource = $datasource ?? self::get_datasource( array_merge( $item, $new_item ) );
 
 		if ( is_wp_error( $datasource ) ) {
 			return $datasource;
@@ -90,5 +93,13 @@ class DatasourceCrud {
 			return new WP_Error( 'failed_to_delete_data_source', __( 'Failed to delete data source.', 'remote-data-blocks' ) );
 		}
 		return true;
+	}
+
+	private static function get_datasource( array $config ): HttpDatasourceInterface|WP_Error {
+		if ( isset( REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP[ $config['service'] ] ) ) {
+			return REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP[ $config['service'] ]::from_array( $config );
+		}
+
+		return new WP_Error( 'unsupported_datasource', __( 'Datasource class not found.', 'remote-data-blocks' ) );
 	}
 }
