@@ -20,7 +20,7 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 			],
 			'tables'       => [
 				'type'  => 'object',
-				'items' => [
+				'properties' => [
 					'id'   => [ 'type' => 'string' ],
 					'name' => [ 'type' => 'string' ],
 				],

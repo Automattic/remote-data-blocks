@@ -64,7 +64,12 @@ class DatasourceCrud {
 		}
 
 		$datasource = $datasource ?? HttpDatasource::from_array( array_merge( $item, $new_item ) );
-		$updated    = $datasource->to_array();
+
+		if ( is_wp_error( $datasource ) ) {
+			return $datasource;
+		}
+
+		$updated = $datasource->to_array();
 
 		$data_sources = array_map( function ( $source ) use ( $updated ) {
 			return $source['uuid'] === $updated['uuid'] ? $updated : $source;

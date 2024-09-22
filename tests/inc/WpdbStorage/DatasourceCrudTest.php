@@ -29,7 +29,6 @@ class DatasourceCrudTest extends TestCase {
 
 		$result = DatasourceCrud::register_new_data_source( $valid_source );
 
-		var_dump( $result );
 		$this->assertInstanceOf( HttpDatasource::class, $result );
 		$this->assertTrue( wp_is_uuid( $result->to_array()['uuid'] ) );
 	}
