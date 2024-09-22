@@ -26,20 +26,24 @@ class Validator implements ValidatorInterface {
 
 	private function validate_schema( array $schema, $data ): bool|WP_Error {
 		if ( isset( $schema['type'] ) && ! $this->check_type( $data, $schema['type'] ) ) {
+			// translators: %1$s is the expected PHP data type, %2$s is the actual PHP data type.
 			return new WP_Error( 'invalid_type', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), $schema['type'], gettype( $data ) ) );
 		}
 
 		if ( isset( $schema['pattern'] ) && is_string( $data ) && ! preg_match( $schema['pattern'], $data ) ) {
+			// translators: %1$s is the expected regex pattern, %2$s is the actual value.
 			return new WP_Error( 'invalid_format', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), $schema['pattern'], $data ) );
 		}
 
 		if ( isset( $schema['enum'] ) && ! in_array( $data, $schema['enum'] ) ) {
+			// translators: %1$s is the expected value, %2$s is the actual value.
 			return new WP_Error( 'invalid_value', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), implode( ', ', $schema['enum'] ), $data ) );
 		}
 
 		if ( isset( $schema['properties'] ) && is_array( $schema['properties'] ) ) {
 			foreach ( $schema['properties'] as $field => $field_schema ) {
 				if ( ! isset( $data[ $field ] ) ) {
+					// translators: %1$s is the missing field name.
 					return new WP_Error( 'missing_field', sprintf( __( 'Missing field %1$s.', 'remote-data-blocks' ), $field ) );
 				}
 				
@@ -52,7 +56,8 @@ class Validator implements ValidatorInterface {
 
 		if ( isset( $schema['items'] ) ) {
 			if ( ! is_array( $data ) ) {
-				return new WP_Error( 'invalid_array', __( 'Expected array', 'remote-data-blocks' ) );
+				// translators: %1$s is the expected PHP data type, %2$s is the actual PHP data type.
+				return new WP_Error( 'invalid_array', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), 'array', gettype( $data ) ) );
 			}
 
 			foreach ( $data as $item ) {
@@ -74,8 +79,6 @@ class Validator implements ValidatorInterface {
 				return is_object( $value ) || ( is_array( $value ) && ! array_is_list( $value ) );
 			case 'string':
 				return is_string( $value );
-			case 'number':
-				return is_numeric( $value );
 			case 'integer':
 				return is_int( $value );
 			case 'boolean':
