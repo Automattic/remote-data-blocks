@@ -27,7 +27,7 @@ class Validator implements ValidatorInterface {
 	private function validate_schema( array $schema, $data ): bool|WP_Error {
 		if ( isset( $schema['type'] ) && ! $this->check_type( $data, $schema['type'] ) ) {
 			// translators: %1$s is the expected PHP data type, %2$s is the actual PHP data type.
-			return new WP_Error( 'invalid_type', sprintf( __('Expected %1$s, got %2$s.', 'remote-data-blocks' ), $schema['type'], gettype( $data ) ) );
+			return new WP_Error( 'invalid_type', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), $schema['type'], gettype( $data ) ) );
 		}
 
 		if ( isset( $schema['pattern'] ) && is_string( $data ) && ! preg_match( $schema['pattern'], $data ) ) {
