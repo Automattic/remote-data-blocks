@@ -8,7 +8,10 @@ use RemoteDataBlocks\Sanitization\Sanitizer;
 class SanitizerTest extends TestCase {
 	public function test_sanitize_string() {
 		$schema = [
-			'name' => [ 'type' => 'string' ],
+			'type'       => 'object',
+			'properties' => [
+				'name' => [ 'type' => 'string' ],
+			],
 		];
 		$data   = [ 'name' => ' John Doe ' ];
 		
@@ -20,7 +23,10 @@ class SanitizerTest extends TestCase {
 
 	public function test_sanitize_integer() {
 		$schema = [
-			'age' => [ 'type' => 'integer' ],
+			'type'       => 'object',
+			'properties' => [
+				'age' => [ 'type' => 'integer' ],
+			],
 		];
 		$data   = [ 'age' => '25' ];
 		
@@ -32,7 +38,10 @@ class SanitizerTest extends TestCase {
 
 	public function test_sanitize_boolean() {
 		$schema = [
-			'is_active' => [ 'type' => 'boolean' ],
+			'type'       => 'object',
+			'properties' => [
+				'is_active' => [ 'type' => 'boolean' ],
+			],
 		];
 		$data   = [ 'is_active' => 1 ];
 		
@@ -44,7 +53,10 @@ class SanitizerTest extends TestCase {
 
 	public function test_sanitize_array() {
 		$schema = [
-			'tags' => [ 'type' => 'array' ],
+			'type'       => 'object',
+			'properties' => [
+				'tags' => [ 'type' => 'array' ],
+			],
 		];
 		$data   = [ 'tags' => [ 'php', ' javascript ', 'python ' ] ];
 		
@@ -55,12 +67,15 @@ class SanitizerTest extends TestCase {
 	}
 
 	public function test_sanitize_nested_array() {
-		$schema = [
-			'users' => [
-				'type'  => 'array',
-				'items' => [
-					'name' => [ 'type' => 'string' ],
-					'age'  => [ 'type' => 'integer' ],
+		$schema = [ 
+			'type'       => 'object',
+			'properties' => [
+				'users' => [
+					'type'  => 'array',
+					'items' => [
+						'name' => [ 'type' => 'string' ],
+						'age'  => [ 'type' => 'integer' ],
+					],
 				],
 			],
 		];
@@ -97,11 +112,14 @@ class SanitizerTest extends TestCase {
 
 	public function test_sanitize_object() {
 		$schema = [
-			'user' => [
-				'type'       => 'object',
-				'properties' => [
-					'name' => [ 'type' => 'string' ],
-					'age'  => [ 'type' => 'integer' ],
+			'type'       => 'object',
+			'properties' => [
+				'user' => [
+					'type'       => 'object',
+					'properties' => [
+						'name' => [ 'type' => 'string' ],
+						'age'  => [ 'type' => 'integer' ],
+					],
 				],
 			],
 		];
@@ -126,11 +144,14 @@ class SanitizerTest extends TestCase {
 
 	public function test_sanitize_with_custom_sanitizer() {
 		$schema = [
-			'email' => [
-				'type'     => 'string',
-				'sanitize' => function ( $value ) {
-					return strtolower( trim( $value ) );
-				},
+			'type'       => 'object',
+			'properties' => [
+				'email' => [
+					'type'     => 'string',
+					'sanitize' => function ( $value ) {
+						return strtolower( trim( $value ) );
+					},
+				],
 			],
 		];
 		$data   = [ 'email' => ' User@Example.com ' ];
@@ -143,7 +164,10 @@ class SanitizerTest extends TestCase {
 
 	public function test_sanitize_ignores_undefined_fields() {
 		$schema = [
-			'name' => [ 'type' => 'string' ],
+			'type'       => 'object',
+			'properties' => [
+				'name' => [ 'type' => 'string' ],
+			],
 		];
 		$data   = [
 			'name' => 'John Doe',
@@ -159,16 +183,19 @@ class SanitizerTest extends TestCase {
 
 	public function test_sanitize_complex_nested_structure() {
 		$schema = [
-			'company' => [
-				'type'       => 'object',
-				'properties' => [
-					'name'      => [ 'type' => 'string' ],
-					'employees' => [
-						'type'  => 'array',
-						'items' => [
-							'name'     => [ 'type' => 'string' ],
-							'position' => [ 'type' => 'string' ],
-							'skills'   => [ 'type' => 'array' ],
+			'type'       => 'object',
+			'properties' => [
+				'company' => [
+					'type'       => 'object',
+					'properties' => [
+						'name'      => [ 'type' => 'string' ],
+						'employees' => [
+							'type'  => 'array',
+							'items' => [
+								'name'     => [ 'type' => 'string' ],
+								'position' => [ 'type' => 'string' ],
+								'skills'   => [ 'type' => 'array' ],
+							],
 						],
 					],
 				],

@@ -24,8 +24,14 @@ class GoogleSheetsDatasource extends HttpDatasource implements ArraySerializable
 						'sanitize' => 'sanitize_email',
 					],
 					'client_id'                   => [ 'type' => 'string' ],
-					'auth_uri'                    => [ 'type' => 'string' ],
-					'token_uri'                   => [ 'type' => 'string' ],
+					'auth_uri'                    => [
+						'type'     => 'string',
+						'sanitize' => 'sanitize_url',
+					],
+					'token_uri'                   => [
+						'type'     => 'string',
+						'sanitize' => 'sanitize_url',
+					],
 					'auth_provider_x509_cert_url' => [
 						'type'     => 'string',
 						'sanitize' => 'sanitize_url',

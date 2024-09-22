@@ -28,25 +28,21 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 		],
 	];
 
-	private $access_token;
-	private $base;
-	private $tables;
-
 	public function get_access_token(): string {
-		return $this->access_token;
+		return $this->config['access_token'];
 	}
 
 	public function get_base(): string {
-		return $this->base;
+		return $this->config['base']['id'];
 	}
 
 	public function get_display_name(): string {
-		$suffix = count( $this->tables ) > 1 ? ' (' . implode( ', ', array_keys( $this->tables ) ) . ')' : '';
+		$suffix = count( $this->config['tables'] ) > 1 ? ' (' . implode( ', ', array_keys( $this->config['tables'] ) ) . ')' : '';
 		return trim( sprintf( 'Airtable: %s %s', $this->get_base(), $suffix ) );
 	}
 
 	public function get_table( string $variation = '' ): string {
-		return $this->tables[ $variation ] ?? '';
+		return $this->config['tables'][ $variation ] ?? '';
 	}
 
 	public function get_endpoint( string $variation = '' ): string {

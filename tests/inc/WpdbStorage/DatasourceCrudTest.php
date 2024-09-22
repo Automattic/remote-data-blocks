@@ -29,6 +29,7 @@ class DatasourceCrudTest extends TestCase {
 
 		$result = DatasourceCrud::register_new_data_source( $valid_source );
 
+		var_dump( $result );
 		$this->assertInstanceOf( HttpDatasource::class, $result );
 		$this->assertTrue( wp_is_uuid( $result->to_array()['uuid'] ) );
 	}
@@ -50,7 +51,7 @@ class DatasourceCrudTest extends TestCase {
 		restore_error_handler();
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'unsupported_data_source', $result->get_error_code() );
+		$this->assertSame( 'unsupported_datasource', $result->get_error_code() );
 	}
 
 	public function test_get_data_sources() {

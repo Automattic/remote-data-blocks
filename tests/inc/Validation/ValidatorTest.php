@@ -103,7 +103,9 @@ class ValidatorTest extends TestCase {
 		$invalid_source = [
 			'uuid'        => '123e4567-e89b-12d3-a456-426614174000',
 			'service'     => 'google-sheets',
-			'credentials' => [],
+			'credentials' => [
+				'type' => 'service_account',
+			],
 			'slug'        => 'valid-slug',
 		];
 
