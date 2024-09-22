@@ -210,6 +210,7 @@ class ValidatorTest extends TestCase {
 					'simple_array' => [ 'item1', 'item2', 'item3' ],
 				],
 				'boolean_field' => true,
+				'enum_field'    => 'option2',
 			],
 			'slug'     => 'valid-nested-slug',
 		];
@@ -239,6 +240,10 @@ class ValidatorTest extends TestCase {
 							],
 						],
 						'boolean_field' => [ 'type' => 'boolean' ],
+						'enum_field'    => [
+							'type' => 'string',
+							'enum' => [ 'option1', 'option2', 'option3' ],
+						],
 					],
 				],
 				'slug'     => [ 'type' => 'string' ],

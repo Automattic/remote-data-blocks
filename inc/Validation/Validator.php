@@ -79,8 +79,6 @@ class Validator implements ValidatorInterface {
 				return is_object( $value ) || ( is_array( $value ) && ! array_is_list( $value ) );
 			case 'string':
 				return is_string( $value );
-			case 'number':
-				return is_numeric( $value );
 			case 'integer':
 				return is_int( $value );
 			case 'boolean':
