@@ -97,9 +97,7 @@ class DatasourceController extends WP_REST_Controller {
 	}
 
 	public function create_item( $request ) {
-		$validator = DatasourceValidator::from_service( $request->get_json_params()['service'] );
-		$item      = DatasourceCrud::register_new_data_source( $request->get_json_params(), $validator );
-
+		$item = DatasourceCrud::register_new_data_source( $request->get_json_params() );
 		return rest_ensure_response( $item );
 	}
 

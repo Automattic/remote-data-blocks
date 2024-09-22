@@ -25,7 +25,22 @@ function sanitize_title( string $title ): string {
 }
 
 function sanitize_text_field( string $text ): string {
-	return $text;
+	$text = strip_tags( $text );
+	$text = trim( $text );
+	$text = stripslashes( $text );
+	return htmlspecialchars( $text, ENT_QUOTES, 'UTF-8' );
+}
+
+function sanitize_email( string $email ): string {
+	$email = trim( $email );
+	$email = strtolower( $email );
+	return filter_var( $email, FILTER_SANITIZE_EMAIL );
+}
+
+function sanitize_url( string $url ): string {
+	$url = trim( $url );
+	$url = filter_var( $url, FILTER_SANITIZE_URL );
+	return preg_replace( '/[^-a-zA-Z0-9:_.\/@?&=#%]/', '', $url );
 }
 
 function __( string $text ): string {

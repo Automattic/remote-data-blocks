@@ -2,8 +2,6 @@
 
 namespace RemoteDataBlocks\Sanitization;
 
-use WP_Error;
-
 /**
  * Sanitizer class.
  */
@@ -25,7 +23,7 @@ class Sanitizer implements SanitizerInterface {
 	}
 
 	/**
-	 * Sanitize the config according to the schema.
+	 * Sanitize the config, recursively if necessary, according to the schema.
 	 *
 	 * @param array $config The config to sanitize.
 	 * @param array $schema The schema to use for sanitization.

@@ -5,7 +5,7 @@ namespace RemoteDataBlocks\Config\Datasource;
 use RemoteDataBlocks\Config\ArraySerializableInterface;
 use RemoteDataBlocks\Sanitization\Sanitizer;
 use RemoteDataBlocks\Sanitization\SanitizerInterface;
-use RemoteDataBlocks\Validation\DatasourceValidator;
+use RemoteDataBlocks\Validation\Validator;
 use RemoteDataBlocks\Validation\ValidatorInterface;
 use WP_Error;
 
@@ -52,21 +52,9 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 	/**
 	 * @inheritDoc
 	 */
-	public static function from_array( array $config, ?ValidatorInterface $validator = null, ?SanitizerInterface $sanitizer = null ): DatasourceInterface|WP_Error {
-		if ( ! is_string( $config['service'] ) ) {
+	final public static function from_array( array $config, ?ValidatorInterface $validator = null, ?SanitizerInterface $sanitizer = null ): DatasourceInterface|WP_Error {
+		if ( ! is_string( $config['service'] ) || ! isset( REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP[ $config['service'] ] ) ) {
 			return new WP_Error( 'invalid_config', 'Invalid config' );
-		}
-
-		$validator = $validator ?? DatasourceValidator::from_service( $config['service'] );
-
-		if ( is_wp_error( $validator ) ) {
-			return $validator;
-		}
-
-		$validated = $validator->validate( $config );
-
-		if ( is_wp_error( $validated ) ) {
-			return $validated;
 		}
 
 		$datasource_class = REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP[ $config['service'] ];
@@ -75,7 +63,16 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 			return new WP_Error( 'invalid_datasource', 'Invalid datasource' );
 		}
 
-		$sanitizer = $sanitizer ?? new Sanitizer( $datasource_class::get_config_schema() );
+		$schema = array_merge( DatasourceInterface::BASE_SCHEMA, $datasource_class::get_config_schema() );
+
+		$validator = $validator ?? new Validator( $schema );
+		$validated = $validator->validate( $config );
+
+		if ( is_wp_error( $validated ) ) {
+			return $validated;
+		}
+
+		$sanitizer = $sanitizer ?? new Sanitizer( $schema );
 		$sanitized = $sanitizer->sanitize( $config );
 
 		return new $datasource_class( $sanitized );

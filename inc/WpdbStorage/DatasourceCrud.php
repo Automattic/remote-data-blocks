@@ -4,7 +4,6 @@ namespace RemoteDataBlocks\WpdbStorage;
 
 use RemoteDataBlocks\Config\ArraySerializableInterface;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
-use RemoteDataBlocks\Integrations\Google\Auth\GoogleServiceAccountKey;
 use WP_Error;
 
 class DatasourceCrud {
