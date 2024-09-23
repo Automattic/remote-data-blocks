@@ -2,16 +2,31 @@
 
 namespace RemoteDataBlocks\Integrations\Google\Sheets;
 
+<<<<<<< HEAD
 use RemoteDataBlocks\Config\ArraySerializableInterface;
+=======
+>>>>>>> trunk
 use RemoteDataBlocks\Config\Datasource\DatasourceInterface;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
 
+<<<<<<< HEAD
 class GoogleSheetsDatasource extends HttpDatasource implements ArraySerializableInterface {
 	private const SERVICE_SCHEMA = [
 		'type'       => 'object',
 		'properties' => [       
 			'credentials' => [
+=======
+class GoogleSheetsDatasource extends HttpDatasource {
+	private array $credentials;
+	private string $endpoint;
+	private string $display_name;
+
+	private const SERVICE_SCHEMA = [
+		'type'       => 'object',
+		'properties' => [       
+			'credentials'    => [
+>>>>>>> trunk
 				'type'       => 'object',
 				'properties' => [
 					'type'                        => [ 'type' => 'string' ],
@@ -43,37 +58,31 @@ class GoogleSheetsDatasource extends HttpDatasource implements ArraySerializable
 					'universe_domain'             => [ 'type' => 'string' ],
 				],
 			],
-			'spreadsheet' => [
-				'type'       => 'object',
-				'properties' => [
-					'id'   => [ 'type' => 'string' ],
-					'name' => [ 'type' => 'string' ],
-				],
-			],
-			'sheet'       => [
-				'type'       => 'object',
-				'properties' => [
-					'id'   => [ 'type' => 'integer' ],
-					'name' => [ 'type' => 'string' ],
-				],
-			],
+			'spreadsheet_id' => [ 'type' => 'string' ],
 		],
 	];
 
+	public function __construct( string $credentials, string $endpoint, string $display_name ) {
+		/**
+		 * Decodes Base64 encoded JSON string into an array
+		 * and assigns it to the $credentials property.
+		 */
+		$this->credentials  = json_decode( base64_decode( $credentials ), true );
+		$this->endpoint     = $endpoint;
+		$this->display_name = $display_name;
+	}
+
 	public function get_display_name(): string {
-		return sprintf( 'Google Sheets: %s - %s', $this->config['spreadsheet']['name'], $this->config['sheet']['name'] );
+		return sprintf( 'Google Sheets: %s', $this->display_name );
 	}
 
 	public function get_endpoint(): string {
-		return sprintf('https://sheets.googleapis.com/v4/spreadsheets/%s/values/%s', 
-			$this->config['spreadsheet']['id'], 
-			urlencode( $this->config['sheet']['name'] )
-		);
+		return $this->endpoint;
 	}
 
 	public function get_request_headers(): array {
 		$access_token = GoogleAuth::generate_token_from_service_account_key(
-			$this->config['credentials'],
+			$this->credentials,
 			GoogleAuth::GOOGLE_SHEETS_SCOPES
 		);
 
@@ -81,11 +90,5 @@ class GoogleSheetsDatasource extends HttpDatasource implements ArraySerializable
 			'Authorization' => sprintf( 'Bearer %s', $access_token ),
 			'Content-Type'  => 'application/json',
 		];
-	}
-
-	public static function get_config_schema(): array {
-		$schema               = DatasourceInterface::BASE_SCHEMA;
-		$schema['properties'] = array_merge( DatasourceInterface::BASE_SCHEMA['properties'], self::SERVICE_SCHEMA['properties'] );
-		return $schema;
 	}
 }
