@@ -29,6 +29,10 @@ class GitHubDatasource extends HttpDatasource {
 		return sprintf( 'GitHub: %s/%s (%s)', $this->config['repo_owner'], $this->config['repo_name'], $this->config['ref'] );
 	}
 
+	public function get_hash(): string {
+		return hash( 'sha256', sprintf( '%s/%s/%s', $this->config['repo_owner'], $this->config['repo_name'], $this->config['ref'] ) );
+	}
+
 	public function get_endpoint(): string {
 		return sprintf(
 			'https://api.github.com/repos/%s/%s/git/trees/%s?recursive=1',
@@ -64,6 +68,7 @@ class GitHubDatasource extends HttpDatasource {
 			'repo_owner'             => $repo_owner,
 			'repo_name'              => $repo_name,
 			'ref'                    => $ref,
+			'slug'                   => sanitize_title( sprintf( '%s/%s/%s', $repo_owner, $repo_name, $ref ) ),
 		]);
 	}
 }

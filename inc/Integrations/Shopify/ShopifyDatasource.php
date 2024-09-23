@@ -59,12 +59,13 @@ class ShopifyDatasource extends HttpDatasource implements ArraySerializableInter
 			'uuid'                   => wp_generate_uuid4(),
 			'access_token'           => $access_token,
 			'store_name'             => $store_name,
+			'slug'                   => $store_name,
 		]);
 	}
 
 	public function to_ui_display(): array {
 		return [
-			'slug'    => $this->get_display_name(),
+			'slug'    => $this->get_slug(),
 			'service' => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
 			'store'   => $this->config['store_name'],
 		];

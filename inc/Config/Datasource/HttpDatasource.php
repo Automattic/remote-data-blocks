@@ -96,7 +96,7 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 		// TODO: Implement remove from children and implement here in standardized way
 		return [
 			'display_name' => $this->get_display_name(),
-			'slug'         => $this->get_display_name(),
+			'slug'         => $this->get_slug(),
 			'service'      => static::SERVICE_NAME,
 		];
 	}
