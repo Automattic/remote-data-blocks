@@ -18,7 +18,11 @@ interface ItemListProps {
 
 export function ItemList( props: ItemListProps ) {
 	const { getPatternsByBlockTypes } = usePatterns( props.blockName, '' );
-	const [ pattern ] = getPatternsByBlockTypes( props.blockName );
+
+	// Find the pattern that the plugin has registered that is guaranteed to work.
+	const pattern = getPatternsByBlockTypes( props.blockName ).find(
+		( { name } ) => `${ props.blockName }/pattern` === name
+	);
 
 	if ( props.loading || ! pattern ) {
 		return <Spinner />;

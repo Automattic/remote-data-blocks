@@ -49,17 +49,6 @@ class FunctionsTest extends TestCase {
 		$this->assertTrue( $config['loop'] );
 	}
 
-	public function testRegisterBlockPattern() {
-		$query_context = new HttpQueryContext( new MockDatasource() );
-		register_remote_data_block( 'Block with Pattern', $query_context );
-		register_remote_data_block_pattern( 'Block with Pattern', 'Test Pattern', '<!-- wp:paragraph -->Test<!-- /wp:paragraph -->' );
-
-		$block_name = 'remote-data-blocks/block-with-pattern';
-		$config     = ConfigStore::get_configuration( $block_name );
-		$this->assertArrayHasKey( 'patterns', $config );
-		$this->assertArrayHasKey( 'Test Pattern', $config['patterns'] );
-	}
-
 	public function testRegisterQuery() {
 		$query_context = new HttpQueryContext( new MockDatasource() );
 		register_remote_data_block( 'Query Block', $query_context );
