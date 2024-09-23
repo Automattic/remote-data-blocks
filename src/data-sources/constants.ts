@@ -7,15 +7,14 @@ export const SUPPORTED_SERVICES = [
 	'http',
 	'example-api',
 ] as const;
-export const SUPPORTED_SERVICES_LABELS = new Map< ( typeof SUPPORTED_SERVICES )[ number ], string >(
-	[
-		[ 'airtable', 'Airtable' ],
-		[ 'shopify', 'Shopify' ],
-		[ 'google-sheets', 'Google Sheets' ],
-		[ 'http', 'HTTP' ],
-		[ 'example-api', 'Example API' ],
-	]
-);
+export const SUPPORTED_SERVICES_LABELS: Record< ( typeof SUPPORTED_SERVICES )[ number ], string > =
+	{
+		airtable: 'Airtable',
+		shopify: 'Shopify',
+		'google-sheets': 'Google Sheets',
+		http: 'HTTP',
+		'example-api': 'Example API',
+	} as const;
 export const OPTIONS_PAGE_SLUG = 'remote-data-blocks-settings';
 export const REST_BASE = '/remote-data-blocks/v1';
 export const REST_BASE_DATA_SOURCES = `${ REST_BASE }/data-sources`;

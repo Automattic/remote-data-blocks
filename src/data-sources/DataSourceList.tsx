@@ -104,18 +104,22 @@ const DataSourceList = () => {
 						{ [
 							{
 								icon: AirtableIcon,
-								label: __( 'Airtable', 'remote-data-blocks' ),
+								label: __( SUPPORTED_SERVICES_LABELS.airtable, 'remote-data-blocks' ),
 								value: 'airtable',
 							},
 							{
 								icon: GoogleSheetsIcon,
-								label: __( 'Google Sheets', 'remote-data-blocks' ),
+								label: __( SUPPORTED_SERVICES_LABELS[ 'google-sheets' ], 'remote-data-blocks' ),
 								value: 'google-sheets',
 							},
-							{ icon: ShopifyIcon, label: __( 'Shopify', 'remote-data-blocks' ), value: 'shopify' },
+							{
+								icon: ShopifyIcon,
+								label: __( SUPPORTED_SERVICES_LABELS.shopify, 'remote-data-blocks' ),
+								value: 'shopify',
+							},
 							{
 								icon: HttpIcon,
-								label: __( 'HTTP', 'remote-data-blocks' ),
+								label: __( SUPPORTED_SERVICES_LABELS.http, 'remote-data-blocks' ),
 								value: 'http',
 							},
 						].map( ( { icon, label, value } ) => (
@@ -132,6 +136,11 @@ const DataSourceList = () => {
 				) }
 			/>
 		);
+	};
+
+	const getServiceLabel = ( service: ( typeof SUPPORTED_SERVICES )[ number ] ) => {
+		// eslint-disable-next-line security/detect-object-injection
+		return SUPPORTED_SERVICES_LABELS[ service ];
 	};
 
 	const CardBodyContent = (): JSX.Element => {
@@ -174,7 +183,7 @@ const DataSourceList = () => {
 										<Text className="data-source-slug">{ slug }</Text>
 									</td>
 									<td>
-										<Text>{ SUPPORTED_SERVICES_LABELS.get( service ) }</Text>
+										<Text>{ getServiceLabel( service ) }</Text>
 									</td>
 									<td> { renderDataSourceMeta( source ) } </td>
 									<td className="data-source-actions">
@@ -214,7 +223,7 @@ const DataSourceList = () => {
 									'Are you sure you want to delete "%s" data source with slug "%s"?',
 									'remote-data-blocks'
 								),
-								SUPPORTED_SERVICES_LABELS.get( dataSourceToDelete.service ),
+								getServiceLabel( dataSourceToDelete.service ),
 								dataSourceToDelete.slug
 							) }
 						</p>
