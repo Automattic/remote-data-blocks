@@ -25,7 +25,7 @@ class Validator implements ValidatorInterface {
 	}
 
 	private function validate_schema( array $schema, $data ): bool|WP_Error {
-		if ( isset( $schema['required'] ) && $schema['required'] === false && ! isset( $data ) ) {
+		if ( isset( $schema['required'] ) && false === $schema['required'] && ! isset( $data ) ) {
 			return true;
 		}
 
@@ -51,7 +51,7 @@ class Validator implements ValidatorInterface {
 
 		if ( isset( $schema['properties'] ) && is_array( $schema['properties'] ) ) {
 			foreach ( $schema['properties'] as $field => $field_schema ) {
-				if ( isset( $field_schema['required'] ) && $field_schema['required'] === false && ! isset( $data[ $field ] ) ) {
+				if ( isset( $field_schema['required'] ) && false === $field_schema['required'] && ! isset( $data[ $field ] ) ) {
 					continue;
 				}
 
