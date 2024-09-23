@@ -32,8 +32,8 @@ export interface AirtableConfig extends BaseDataSourceConfig {
 
 export interface ShopifyConfig extends BaseDataSourceConfig {
 	service: 'shopify';
-	store: string;
-	token: string;
+	access_token: string;
+	store_name: string;
 }
 
 export interface GoogleSheetsConfig extends BaseDataSourceConfig {

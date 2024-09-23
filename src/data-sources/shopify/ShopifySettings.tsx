@@ -1,10 +1,10 @@
 import {
 	Button,
 	ButtonGroup,
-	TextControl,
 	Card,
-	CardHeader,
 	CardBody,
+	CardHeader,
+	TextControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -25,8 +25,8 @@ export interface ShopifySettingsProps {
 export type ShopifyFormState = Omit< ShopifyConfig, 'service' | 'uuid' >;
 
 const initialState: ShopifyFormState = {
-	store: '',
-	token: '',
+	store_name: '',
+	access_token: '',
 	slug: '',
 };
 
@@ -35,8 +35,8 @@ const getInitialStateFromConfig = ( config?: ShopifyConfig ): ShopifyFormState =
 		return initialState;
 	}
 	return {
-		store: config.store,
-		token: config.token,
+		store_name: config.store_name,
+		access_token: config.access_token,
 		slug: config.slug,
 	};
 };
@@ -49,14 +49,17 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 		initialValues: getInitialStateFromConfig( config ),
 	} );
 
-	const { shopName, connectionMessage } = useShopifyShopName( state.store, state.token );
+	const { shopName, connectionMessage } = useShopifyShopName(
+		state.store_name,
+		state.access_token
+	);
 
 	const onSaveClick = async () => {
 		const shopifyConfig: ShopifyConfig = {
 			uuid: uuidFromProps ?? '',
 			service: 'shopify',
-			store: state.store,
-			token: state.token,
+			store_name: state.store_name,
+			access_token: state.access_token,
 			slug: state.slug,
 		};
 
@@ -69,7 +72,7 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 	};
 
 	const onTokenInputChange = ( token: string | undefined ) => {
-		handleOnChange( 'token', token ?? '' );
+		handleOnChange( 'access_token', token ?? '' );
 	};
 
 	/**
@@ -97,10 +100,10 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 						<TextControl
 							type="url"
 							label={ __( 'Store Slug', 'remote-data-blocks' ) }
-							onChange={ store => {
-								handleOnChange( 'store', store ?? '' );
+							onChange={ store_name => {
+								handleOnChange( 'store_name', store_name ?? '' );
 							} }
-							value={ state.store }
+							value={ state.store_name }
 							placeholder="your-shop-name"
 							help={ __( 'Example: https://your-shop-name.myshopify.com', 'remote-data-blocks' ) }
 							autoComplete="off"
@@ -112,7 +115,7 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 						<PasswordInputControl
 							label={ __( 'Access Token', 'remote-data-blocks' ) }
 							onChange={ onTokenInputChange }
-							value={ state.token }
+							value={ state.access_token }
 							help={ connectionMessage }
 						/>
 					</div>

@@ -57,7 +57,7 @@ const DataSourceList = () => {
 				tags.push( source.base.name, source.table.name );
 				break;
 			case 'shopify':
-				tags.push( source.store );
+				tags.push( source.store_name );
 				break;
 			case 'google-sheets':
 				tags.push( source.spreadsheet.name, source.sheet.name );

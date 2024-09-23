@@ -65,9 +65,9 @@ class ShopifyDatasource extends HttpDatasource implements ArraySerializableInter
 
 	public function to_ui_display(): array {
 		return [
-			'slug'    => $this->get_slug(),
-			'service' => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
-			'store'   => $this->config['store_name'],
+			'slug'       => $this->get_slug(),
+			'service'    => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
+			'store_name' => $this->config['store_name'],
 		];
 	}
 }
