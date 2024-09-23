@@ -37,8 +37,42 @@ export const HttpAuthSettingsInput: React.FC< HttpAuthSettingsInputProps > = ( {
 					value={ auth.authType }
 					onChange={ onSelectChange }
 					options={ HTTP_SOURCE_AUTH_TYPE_SELECT_OPTIONS }
+					__next40pxDefaultSize
 				/>
 			</div>
+
+			{ auth.authType === 'api-key' && (
+				<>
+					<div className="form-group">
+						<SelectControl
+							id="authAddTo"
+							label={ __( 'Add API Key to', 'remote-data-blocks' ) }
+							value={ auth.authAddTo }
+							onChange={ onSelectChange }
+							options={ HTTP_SOURCE_ADD_TO_SELECT_OPTIONS }
+							__next40pxDefaultSize
+							help={ __(
+								'Add the API key to the header or query parameter. The "Authentication Key Name" field should contain the header name or query param name, and the "Authentication Value" field should contain the value of the header or query parameter.',
+								'remote-data-blocks'
+							) }
+						/>
+					</div>
+
+					<div className="form-group">
+						<TextControl
+							id="authKey"
+							label={ __( 'Authentication Key Name', 'remote-data-blocks' ) }
+							value={ auth.authKey }
+							onChange={ value => onChange( 'authKey', value ) }
+							help={ __(
+								'The name of the header or query parameter to add the API key to.',
+								'remote-data-blocks'
+							) }
+							__next40pxDefaultSize
+						/>
+					</div>
+				</>
+			) }
 
 			<div className="form-group">
 				<PasswordInputControl
@@ -53,32 +87,6 @@ export const HttpAuthSettingsInput: React.FC< HttpAuthSettingsInputProps > = ( {
 					) }
 				/>
 			</div>
-			{ auth.authType === 'api-key' && (
-				<>
-					<div className="form-group">
-						<TextControl
-							id="authKey"
-							label={ __( 'Authentication Key Name', 'remote-data-blocks' ) }
-							value={ auth.authKey }
-							onChange={ value => onChange( 'authKey', value ) }
-							__next40pxDefaultSize
-						/>
-					</div>
-					<div className="form-group">
-						<SelectControl
-							id="authAddTo"
-							label={ __( 'Add API Key to', 'remote-data-blocks' ) }
-							value={ auth.authAddTo }
-							onChange={ onSelectChange }
-							options={ HTTP_SOURCE_ADD_TO_SELECT_OPTIONS }
-							help={ __(
-								'Where to add the API key to. Authentication Key Name would be the header name or query param name and Authentication Value would be the value of the header or query param.',
-								'remote-data-blocks'
-							) }
-						/>
-					</div>
-				</>
-			) }
 		</>
 	);
 };

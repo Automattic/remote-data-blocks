@@ -7,7 +7,11 @@ interface DataSourceFormActionsProps {
 	IsSaveDisabled: boolean;
 }
 
-export const DataSourceFormActions = ( { onSave, onCancel, IsSaveDisabled }: DataSourceFormActionsProps ) => {
+export const DataSourceFormActions = ( {
+	onSave,
+	onCancel,
+	IsSaveDisabled,
+}: DataSourceFormActionsProps ) => {
 	return (
 		<div className="form-group">
 			<ButtonGroup className="form-actions">
