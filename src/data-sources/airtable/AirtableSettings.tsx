@@ -296,7 +296,7 @@ export const AirtableSettings = ( {
 					<DataSourceFormActions
 						onSave={ onSaveClick }
 						onCancel={ goToMainScreen }
-						saveDisabled={ ! shouldAllowSubmit }
+						IsSaveDisabled={ ! shouldAllowSubmit }
 					/>
 				</form>
 			</CardBody>
