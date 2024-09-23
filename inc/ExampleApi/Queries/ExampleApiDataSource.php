@@ -30,8 +30,4 @@ class ExampleApiDataSource extends HttpDatasource {
 	public function get_request_headers(): array {
 		return [];
 	}
-
-	public static function get_config_schema(): array {
-		return [];
-	}
 }

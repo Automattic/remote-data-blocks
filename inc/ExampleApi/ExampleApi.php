@@ -31,7 +31,11 @@ class ExampleApi {
 			return;
 		}
 
-		$datasource       = ExampleApiDatasource::from_array( [] );
+		$datasource = ExampleApiDatasource::from_array( [
+			'service'                => 'example_api',
+			'service_schema_version' => 1,
+		] );
+		
 		$get_record_query = new ExampleApiGetRecordQuery( $datasource );
 		$get_table_query  = new ExampleApiGetTableQuery( $datasource );
 

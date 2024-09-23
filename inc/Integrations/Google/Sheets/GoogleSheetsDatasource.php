@@ -5,8 +5,11 @@ namespace RemoteDataBlocks\Integrations\Google\Sheets;
 use RemoteDataBlocks\Config\ArraySerializableInterface;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
+use WP_Error;
 
 class GoogleSheetsDatasource extends HttpDatasource implements ArraySerializableInterface {
+	protected const SERVICE_SCHEMA_VERSION = 1;
+
 	protected const SERVICE_SCHEMA = [
 		'type'       => 'object',
 		'properties' => [       
@@ -65,5 +68,15 @@ class GoogleSheetsDatasource extends HttpDatasource implements ArraySerializable
 			'Authorization' => sprintf( 'Bearer %s', $access_token ),
 			'Content-Type'  => 'application/json',
 		];
+	}
+
+	public static function create( array $credentials, string $spreadsheet_id, string $display_name ): self|WP_Error {
+		return parent::from_array([
+			'service'                => REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE,
+			'service_schema_version' => self::SERVICE_SCHEMA_VERSION,
+			'credentials'            => $credentials,
+			'display_name'           => $display_name,
+			'spreadsheet_id'         => $spreadsheet_id,
+		]);
 	}
 }

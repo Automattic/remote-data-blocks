@@ -24,12 +24,7 @@ function register_westeros_houses_block() {
 		return;
 	}
 
-	$westeros_houses_datasource = GoogleSheetsDatasource::from_array( [
-		'credentials'    => $credentials,
-		'display_name'   => 'Westeros Houses',
-		'spreadsheet_id' => '1EHdQg53Doz0B-ImrGz_hTleYeSvkVIk_NSJCOM1FQk0',
-	] );
-
+	$westeros_houses_datasource = GoogleSheetsDatasource::create( $credentials, '1EHdQg53Doz0B-ImrGz_hTleYeSvkVIk_NSJCOM1FQk0', 'Westeros Houses', );
 	$list_westeros_houses_query = new ListWesterosHousesQuery( $westeros_houses_datasource );
 	$get_westeros_houses_query  = new GetWesterosHousesQuery( $westeros_houses_datasource );
 

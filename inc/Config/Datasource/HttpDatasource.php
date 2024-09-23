@@ -50,8 +50,12 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 	 * @inheritDoc
 	 */
 	final public static function get_config_schema(): array {
-		$schema               = DatasourceInterface::BASE_SCHEMA;
-		$schema['properties'] = array_merge( DatasourceInterface::BASE_SCHEMA['properties'], static::SERVICE_SCHEMA['properties'] );
+		$schema = DatasourceInterface::BASE_SCHEMA;
+
+		if ( isset( static::SERVICE_SCHEMA['properties'] ) ) {
+			$schema['properties'] = array_merge( DatasourceInterface::BASE_SCHEMA['properties'], static::SERVICE_SCHEMA['properties'] );
+		}
+
 		return $schema;
 	}
 
