@@ -2,7 +2,6 @@
 
 namespace RemoteDataBlocks\Example\GitHub;
 
-use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 use RemoteDataBlocks\Logging\LoggerManager;
 
 require_once __DIR__ . '/inc/queries/class-github-datasource.php';
@@ -16,13 +15,7 @@ function register_github_file_as_html_block() {
 
 	$block_name = sprintf( 'GitHub File As HTML (%s/%s)', $repo_owner, $repo_name );
 
-	$github_datasource = GitHubDatasource::from_array( [
-		'service'    => REMOTE_DATA_BLOCKS_GITHUB_SERVICE,
-		'repo_owner' => $repo_owner,
-		'repo_name'  => $repo_name,
-		'ref'        => $branch,
-	] );
-
+	$github_datasource             = GitHubDatasource::create( $repo_owner, $repo_name, $branch );
 	$github_get_file_as_html_query = new GitHubGetFileAsHtmlQuery( $github_datasource );
 	$github_get_list_files_query   = new GitHubListFilesQuery( $github_datasource, '.md' );
 

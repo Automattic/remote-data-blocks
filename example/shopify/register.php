@@ -24,12 +24,7 @@ function register_shopify_block() {
 		return;
 	}
 
-	$shopify_datasource = ShopifyDatasource::from_array( [
-		'service'      => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
-		'access_token' => $access_token,
-		'store_name'   => $store_name,
-	] );
-
+	$shopify_datasource            = ShopifyDatasource::create( $access_token, $store_name );
 	$shopify_search_products_query = new ShopifySearchProductsQuery( $shopify_datasource );
 	$shopify_get_product_query     = new ShopifyGetProductQuery( $shopify_datasource );
 

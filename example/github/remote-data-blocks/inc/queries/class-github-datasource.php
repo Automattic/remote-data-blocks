@@ -5,18 +5,22 @@ namespace RemoteDataBlocks\Example\GitHub;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 
 class GitHubDatasource extends HttpDatasource {
-	const SERVICE_SCHEMA = [
+	protected const SERVICE_SCHEMA_VERSION = 1;
+	
+	protected const SERVICE_SCHEMA = [
 		'type'       => 'object',
 		'properties' => [
-			'repo_owner' => [
-				'type' => 'string',
+			'service'                => [
+				'type'  => 'string',
+				'const' => REMOTE_DATA_BLOCKS_GITHUB_SERVICE,
 			],
-			'repo_name'  => [
-				'type' => 'string',
+			'service_schema_version' => [
+				'type'  => 'integer',
+				'const' => self::SERVICE_SCHEMA_VERSION,
 			],
-			'ref'        => [
-				'type' => 'string',
-			],
+			'repo_owner'             => [ 'type' => 'string' ],
+			'repo_name'              => [ 'type' => 'string' ],
+			'ref'                    => [ 'type' => 'string' ],
 		],
 	];
 
@@ -37,5 +41,15 @@ class GitHubDatasource extends HttpDatasource {
 		return [
 			'Accept' => 'application/vnd.github+json',
 		];
+	}
+
+	public static function create( string $repo_owner, string $repo_name, string $ref ): self {
+		return parent::from_array([
+			'service'                => REMOTE_DATA_BLOCKS_GITHUB_SERVICE,
+			'service_schema_version' => self::SERVICE_SCHEMA_VERSION,
+			'repo_owner'             => $repo_owner,
+			'repo_name'              => $repo_name,
+			'ref'                    => $ref,
+		]);
 	}
 }

@@ -40,6 +40,11 @@ class Validator implements ValidatorInterface {
 			return new WP_Error( 'invalid_value', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), implode( ', ', $schema['enum'] ), $data ) );
 		}
 
+		if ( isset( $schema['const'] ) && $data !== $schema['const'] ) {
+			// translators: %1$s is the expected value, %2$s is the actual value.
+			return new WP_Error( 'invalid_value', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), $schema['const'], $data ) );
+		}
+
 		if ( isset( $schema['properties'] ) && is_array( $schema['properties'] ) ) {
 			foreach ( $schema['properties'] as $field => $field_schema ) {
 				if ( ! isset( $data[ $field ] ) ) {

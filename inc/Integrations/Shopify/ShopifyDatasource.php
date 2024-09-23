@@ -10,11 +10,21 @@ use function plugins_url;
 defined( 'ABSPATH' ) || exit();
 
 class ShopifyDatasource extends HttpDatasource implements ArraySerializableInterface {
+	protected const SERVICE_SCHEMA_VERSION = 1;
+
 	protected const SERVICE_SCHEMA = [
 		'type'       => 'object',
 		'properties' => [
-			'access_token' => [ 'type' => 'string' ],
-			'store_name'   => [ 'type' => 'string' ],
+			'service'                => [
+				'type'  => 'string',
+				'const' => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
+			],
+			'service_schema_version' => [
+				'type'  => 'integer',
+				'const' => self::SERVICE_SCHEMA_VERSION,
+			],
+			'access_token'           => [ 'type' => 'string' ],
+			'store_name'             => [ 'type' => 'string' ],
 		],
 	];
 
@@ -39,5 +49,14 @@ class ShopifyDatasource extends HttpDatasource implements ArraySerializableInter
 
 	public function get_image_url(): string {
 		return plugins_url( '../../assets/shopify_logo_black.png', __FILE__ );
+	}
+
+	public static function create( string $access_token, string $store_name ): self {
+		return parent::from_array([
+			'service'                => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
+			'service_schema_version' => self::SERVICE_SCHEMA_VERSION,
+			'access_token'           => $access_token,
+			'store_name'             => $store_name,
+		]);
 	}
 }

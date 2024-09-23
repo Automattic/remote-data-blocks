@@ -21,20 +21,8 @@ interface DatasourceInterface {
 	public const BASE_SCHEMA = [
 		'type'       => 'object',
 		'properties' => [
-			'version' => ['type' => 'integer'],
-			'uuid'    => [
-				'type'     => 'string',
-				'callback' => 'wp_is_uuid',
-			],
-			'service' => [
-				'type' => 'string',
-				'enum' => REMOTE_DATA_BLOCKS__SERVICES,
-			],
-			'slug'    => [
-				'type'     => 'string',
-				'pattern'  => '/^[a-z0-9-]+$/',
-				'sanitize' => 'sanitize_title',
-			],
+			'service'                => [ 'type' => 'string' ],
+			'service_schema_version' => [ 'type' => 'integer' ],
 		],
 	];
 
