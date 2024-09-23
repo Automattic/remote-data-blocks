@@ -2,10 +2,9 @@
 
 namespace RemoteDataBlocks\Integrations\Airtable;
 
-use RemoteDataBlocks\Config\Datasource\CompatibleHttpDatasource;
-use function sanitize_title;
+use RemoteDataBlocks\Config\Datasource\CodedHttpDatasource;
 
-class AirtableDatasource extends CompatibleHttpDatasource {
+class AirtableDatasource extends CodedHttpDatasource {
 	private $tables;
 
 	public function __construct( private string $access_token, private string $base, mixed $tables ) {
