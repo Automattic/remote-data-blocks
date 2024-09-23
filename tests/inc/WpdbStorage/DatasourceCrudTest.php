@@ -89,21 +89,21 @@ class DatasourceCrudTest extends TestCase {
 
 	public function test_get_item_by_uuid_with_valid_uuid() {
 		$source = DatasourceCrud::register_new_data_source( [
-			'access_token' => 'token1',
-			'service'      => 'airtable',
-			'base'         => [
-				'id'   => 'base_id1',
-				'name' => 'Base Name 1',
-			],
-			'tables'       => [
-				'id'   => 'table_id1',
-				'name' => 'Table Name 1',
-			],
-			'slug'         => 'source-1',
+			'service'                => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
+			'service_schema_version' => 1,
+			'uuid'                   => wp_generate_uuid4(),
+			'access_token'           => 'token1',
+			'base'                   => 'base_id1',
+			'display_name'           => 'Crud Test',
 		] );
 
 		$retrieved_source = DatasourceCrud::get_item_by_uuid( DatasourceCrud::get_data_sources(), $source->to_array()['uuid'] );
-		$this->assertSame( $source->to_array(), $retrieved_source );
+		$this->assertSame( 'token1', $retrieved_source['access_token'] );
+		$this->assertSame( 'base_id1', $retrieved_source['base'] );
+		$this->assertSame( 'Crud Test', $retrieved_source['display_name'] );
+		$this->assertArrayHasKey( '_metadata', $retrieved_source );
+		$this->assertArrayHasKey( 'created_at', $retrieved_source['_metadata'] );
+		$this->assertArrayHasKey( 'updated_at', $retrieved_source['_metadata'] );
 	}
 
 	public function test_get_item_by_uuid_with_invalid_uuid() {
@@ -113,17 +113,12 @@ class DatasourceCrudTest extends TestCase {
 
 	public function test_update_item_by_uuid_with_valid_uuid() {
 		$source = DatasourceCrud::register_new_data_source( [
-			'access_token' => 'token1',
-			'service'      => 'airtable',
-			'base'         => [
-				'id'   => 'base_id1',
-				'name' => 'Base Name 1',
-			],
-			'tables'       => [
-				'id'   => 'table_id1',
-				'name' => 'Table Name 1',
-			],
-			'slug'         => 'source-1',
+			'service'                => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
+			'service_schema_version' => 1,
+			'uuid'                   => wp_generate_uuid4(),
+			'access_token'           => 'token1',
+			'base'                   => 'base_id1',
+			'display_name'           => 'Crud Test',
 		] );
 
 		$updated_source = DatasourceCrud::update_item_by_uuid( $source->to_array()['uuid'], [
@@ -143,17 +138,12 @@ class DatasourceCrudTest extends TestCase {
 
 	public function test_delete_item_by_uuid() {
 		$source = DatasourceCrud::register_new_data_source( [
-			'access_token' => 'token1',
-			'service'      => 'airtable',
-			'base'         => [
-				'id'   => 'base_id1',
-				'name' => 'Base Name 1',
-			],
-			'tables'       => [
-				'id'   => 'table_id1',
-				'name' => 'Table Name 1',
-			],
-			'slug'         => 'source-1',
+			'service'                => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
+			'service_schema_version' => 1,
+			'uuid'                   => wp_generate_uuid4(),
+			'access_token'           => 'token1',
+			'base'                   => 'base_id1',
+			'display_name'           => 'Crud Test',
 		] );
 
 		$result = DatasourceCrud::delete_item_by_uuid( $source->to_array()['uuid'] );
