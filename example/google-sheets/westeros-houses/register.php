@@ -10,7 +10,7 @@ require_once __DIR__ . '/inc/queries/class-get-westeros-houses-query.php';
 
 function register_westeros_houses_block() {
 	$block_name   = 'Westeros House';
-	$endpoint = 'https://sheets.googleapis.com/v4/spreadsheets/1EHdQg53Doz0B-ImrGz_hTleYeSvkVIk_NSJCOM1FQk0/values/Houses';
+	$endpoint     = 'https://sheets.googleapis.com/v4/spreadsheets/1EHdQg53Doz0B-ImrGz_hTleYeSvkVIk_NSJCOM1FQk0/values/Houses';
 	$access_token = \RemoteDataBlocks\Example\get_access_token( 'google_sheets_westeros_houses' );
 
 	if ( empty( $access_token ) ) {
