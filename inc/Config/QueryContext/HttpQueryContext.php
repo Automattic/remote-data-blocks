@@ -23,10 +23,28 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	const VERSION = '0.1.0';
 
 	/**
-	 * A definition of input fields accepted by this query. These values of these
-	 * input fields will be passed to the `get_request_body` method.
+	 * Constructor.
 	 *
-	 * @var array {
+	 * @param HttpDatasource $datasource The datasource that this query will use.
+	 * @param array          $input_variables The input variables for this query.
+	 * @param array          $output_variables The output variables for this query.
+	 */
+	public function __construct(
+		private HttpDatasource $datasource,
+		public array $input_variables = [],
+		public array $output_variables = []
+	) {
+		// Provide input and output variables as public properties.
+		$this->input_variables  = $this->define_input_variables();
+		$this->output_variables = $this->define_output_variables();
+	}
+
+	/**
+	 * Override this method to define the input fields accepted by this query. The
+	 * return value of this function will be passed to several methods in this
+	 * class (e.g., `get_endpoint`, `get_request_body`).
+	 *
+	 * @return array {
 	 *   @type array $var_name {
 	 *     @type string $default_value Optional default value of the variable.
 	 *     @type string $name          Display name of the variable.
@@ -40,12 +58,14 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 *   }
 	 * }
 	 */
-	public array $input_variables = [];
+	public function define_input_variables(): array {
+		return $this->input_variables;
+	}
 
 	/**
-	 * A definition of output fields produced by this query.
+	 * Override this method to define output fields produced by this query.
 	 *
-	 * @var array {
+	 * @return array {
 	 *   @type array $var_name {
 	 *     @type string $default_value Optional default value of the variable.
 	 *     @type string $name          Display name of the variable.
@@ -54,14 +74,8 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 *   }
 	 * }
 	 */
-	public array $output_variables = [];
-
-	/**
-	 * Constructor.
-	 *
-	 * @param HttpDatasource $datasource The datasource that this query will use.
-	 */
-	public function __construct( private HttpDatasource $datasource ) {
+	public function define_output_variables(): array {
+		return $this->output_variables;
 	}
 
 	/**

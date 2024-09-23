@@ -12,6 +12,8 @@ namespace RemoteDataBlocks\Config\QueryContext;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 
 interface QueryContextInterface {
+	public function define_input_variables(): array;
+	public function define_output_variables(): array;
 	public function get_image_url(): string|null;
 	public function get_metadata( array $response_metadata, array $query_results ): array;
 	public function get_query_name(): string;
