@@ -45,10 +45,7 @@ export const ShopifySettings = ( {
 	const { shopName, connectionMessage } = useShopifyShopName( state.store, state.token );
 
 	const shouldAllowSubmit = useMemo( () => {
-		if ( state.slug && state.store && state.token ) {
-			return true;
-		}
-		return false;
+		return state.slug && state.store && state.token;
 	}, [ state.slug, state.store, state.token ] );
 
 	const onSaveClick = async () => {
