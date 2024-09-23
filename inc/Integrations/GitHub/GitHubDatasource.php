@@ -59,6 +59,7 @@ class GitHubDatasource extends HttpDatasource {
 		return parent::from_array([
 			'service'                => REMOTE_DATA_BLOCKS_GITHUB_SERVICE,
 			'service_schema_version' => self::SERVICE_SCHEMA_VERSION,
+			'uuid'                   => wp_generate_uuid4(),
 			'repo_owner'             => $repo_owner,
 			'repo_name'              => $repo_name,
 			'ref'                    => $ref,

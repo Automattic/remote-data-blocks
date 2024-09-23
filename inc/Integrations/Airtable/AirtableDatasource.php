@@ -48,6 +48,7 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 		return parent::from_array([
 			'service'                => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'service_schema_version' => self::SERVICE_SCHEMA_VERSION,
+			'uuid'                   => wp_generate_uuid4(),
 			'access_token'           => $access_token,
 			'base'                   => $base,
 			'display_name'           => $display_name,

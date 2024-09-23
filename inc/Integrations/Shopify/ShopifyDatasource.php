@@ -55,6 +55,7 @@ class ShopifyDatasource extends HttpDatasource implements ArraySerializableInter
 		return parent::from_array([
 			'service'                => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
 			'service_schema_version' => self::SERVICE_SCHEMA_VERSION,
+			'uuid'                   => wp_generate_uuid4(),
 			'access_token'           => $access_token,
 			'store_name'             => $store_name,
 		]);

@@ -74,6 +74,7 @@ class GoogleSheetsDatasource extends HttpDatasource implements ArraySerializable
 		return parent::from_array([
 			'service'                => REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE,
 			'service_schema_version' => self::SERVICE_SCHEMA_VERSION,
+			'uuid'                   => wp_generate_uuid4(),
 			'credentials'            => $credentials,
 			'display_name'           => $display_name,
 			'spreadsheet_id'         => $spreadsheet_id,

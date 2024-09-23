@@ -25,6 +25,10 @@ class Validator implements ValidatorInterface {
 	}
 
 	private function validate_schema( array $schema, $data ): bool|WP_Error {
+		if ( isset( $schema['required'] ) && $schema['required'] === false && ! isset( $data ) ) {
+			return true;
+		}
+
 		if ( isset( $schema['type'] ) && ! $this->check_type( $data, $schema['type'] ) ) {
 			// translators: %1$s is the expected PHP data type, %2$s is the actual PHP data type.
 			return new WP_Error( 'invalid_type', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), $schema['type'], gettype( $data ) ) );
@@ -47,6 +51,10 @@ class Validator implements ValidatorInterface {
 
 		if ( isset( $schema['properties'] ) && is_array( $schema['properties'] ) ) {
 			foreach ( $schema['properties'] as $field => $field_schema ) {
+				if ( isset( $field_schema['required'] ) && $field_schema['required'] === false && ! isset( $data[ $field ] ) ) {
+					continue;
+				}
+
 				if ( ! isset( $data[ $field ] ) ) {
 					// translators: %1$s is the missing field name.
 					return new WP_Error( 'missing_field', sprintf( __( 'Missing field %1$s.', 'remote-data-blocks' ), $field ) );

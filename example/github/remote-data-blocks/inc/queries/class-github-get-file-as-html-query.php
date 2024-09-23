@@ -6,19 +6,19 @@ use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Integrations\GitHub\GitHubDatasource;
 class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 	public array $input_variables = [
-		'file_path'  => [
+		'file_path' => [
 			'name' => 'File Path',
 			'type' => 'string',
 		],
-		'sha'        => [
+		'sha'       => [
 			'name' => 'SHA',
 			'type' => 'string',
 		],
-		'size'       => [
+		'size'      => [
 			'name' => 'Size',
 			'type' => 'number',
 		],
-		'url'        => [
+		'url'       => [
 			'name' => 'URL',
 			'type' => 'string',
 		],

@@ -10,6 +10,7 @@ function register_aic_block() {
 	$aic_datasource = ArtInstituteOfChicagoDatasource::from_array( [
 		'service'                => 'art-institute-of-chicago',
 		'service_schema_version' => 1,
+		'uuid'                   => wp_generate_uuid4(),
 	] );
 
 	$get_art_query    = new ArtInstituteOfChicagoGetArtQuery( $aic_datasource );

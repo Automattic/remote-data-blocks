@@ -3,7 +3,6 @@
 namespace RemoteDataBlocks\WpdbStorage;
 
 use RemoteDataBlocks\Config\ArraySerializableInterface;
-use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 use RemoteDataBlocks\Config\Datasource\HttpDatasourceInterface;
 use WP_Error;
 
@@ -25,9 +24,7 @@ class DatasourceCrud {
 			return $new_datasource;
 		}
 
-		$data_sources[] = $new_datasource->to_array();
-
-		$result = update_option( self::CONFIG_OPTION_NAME, $data_sources );
+		$result = self::save_datasource( $new_datasource->to_array(), $data_sources );
 
 		if ( true !== $result ) {
 			return new WP_Error( 'failed_to_register_data_source', __( 'Failed to register data source.', 'remote-data-blocks' ) );
@@ -36,8 +33,8 @@ class DatasourceCrud {
 		return $new_datasource;
 	}
 
-	public static function get_config() {
-		return (array) get_option( self::CONFIG_OPTION_NAME, [] );
+	public static function get_config(): array {
+		return get_option( self::CONFIG_OPTION_NAME, [] );
 	}
 
 	public static function get_data_sources( string $service = '' ): array {
@@ -52,11 +49,8 @@ class DatasourceCrud {
 		return $data_sources;
 	}
 
-	public static function get_item_by_uuid( $data_sources, string $uuid ): array|false {
-		$item = array_filter( $data_sources, function ( $source ) use ( $uuid ) {
-			return $source['uuid'] === $uuid;
-		} );
-		return reset( $item );
+	public static function get_item_by_uuid( array $data_sources, string $uuid ): array|false {
+		return $data_sources[ $uuid ] ?? false;
 	}
 
 	public static function update_item_by_uuid( string $uuid, $new_item, ArraySerializableInterface $datasource = null ) {
@@ -73,26 +67,40 @@ class DatasourceCrud {
 		}
 
 		$updated = $datasource->to_array();
-
-		$data_sources = array_map( function ( $source ) use ( $updated ) {
-			return $source['uuid'] === $updated['uuid'] ? $updated : $source;
-		}, $data_sources );
-		$result       = update_option( self::CONFIG_OPTION_NAME, $data_sources );
+		$result  = self::save_datasource( $updated, $data_sources );
+		
 		if ( true !== $result ) {
 			return new WP_Error( 'failed_to_update_data_source', __( 'Failed to update data source.', 'remote-data-blocks' ) );
 		}
+		
 		return $new_item;
 	}
 
 	public static function delete_item_by_uuid( string $uuid ): WP_Error|bool {
 		$data_sources = self::get_data_sources();
-		$index        = array_search( $uuid, array_column( $data_sources, 'uuid' ) );
-		array_splice( $data_sources, $index, 1 );
+		unset( $data_sources[ $uuid ] );
 		$result = update_option( self::CONFIG_OPTION_NAME, $data_sources );
 		if ( true !== $result ) {
 			return new WP_Error( 'failed_to_delete_data_source', __( 'Failed to delete data source.', 'remote-data-blocks' ) );
 		}
 		return true;
+	}
+
+	private static function save_datasource( array $datasource, array $datasources ): bool {
+		if ( ! isset( $datasource['_metadata'] ) ) {
+			$datasource['_metadata'] = [];
+		}
+
+		$now = gmdate( 'Y-m-d H:i:s' );
+		
+		if ( ! isset( $datasource['_metadata']['created_at'] ) ) {
+			$datasource['_metadata']['created_at'] = $now;
+		}
+
+		$datasource['_metadata']['updated_at'] = $now;
+		$datasources[ $datasource['uuid'] ]    = $datasource;
+
+		return update_option( self::CONFIG_OPTION_NAME, $datasources );
 	}
 
 	private static function resolve_datasource( array $config ): HttpDatasourceInterface|WP_Error {

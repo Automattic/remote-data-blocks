@@ -14,12 +14,13 @@ class DatasourceCrudTest extends TestCase {
 
 	public function test_register_new_data_source_with_valid_input() {
 		$valid_source = [
-			'service'      => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
+			'service'                => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'service_schema_version' => 1,
-			'access_token' => 'valid_token',
-			'base'         => 'base_id',
-			'display_name' => 'Crud Test',
-			'slug'         => 'valid-slug',
+			'uuid'                   => wp_generate_uuid4(),
+			'access_token'           => 'valid_token',
+			'base'                   => 'base_id',
+			'display_name'           => 'Crud Test',
+			'slug'                   => 'valid-slug',
 		];
 
 		$result = DatasourceCrud::register_new_data_source( $valid_source );
@@ -30,8 +31,9 @@ class DatasourceCrudTest extends TestCase {
 
 	public function test_register_new_data_source_with_invalid_input() {
 		$invalid_source = [
-			'service' => 'unsupported',
-			'slug'    => 'valid-slug',
+			'service'                => 'unsupported',
+			'service_schema_version' => 1,
+			'uuid'                   => wp_generate_uuid4(),
 		];
 
 		// phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
@@ -50,24 +52,22 @@ class DatasourceCrudTest extends TestCase {
 
 	public function test_get_data_sources() {
 		$source1 = DatasourceCrud::register_new_data_source( [
-			'access_token' => 'token1',
-			'service'      => 'airtable',
-			'base'         => [
-				'id'   => 'base_id1',
-				'name' => 'Base Name 1',
-			],
-			'tables'       => [
-				'id'   => 'table_id1',
-				'name' => 'Table Name 1',
-			],
-			'slug'         => 'source-1',
+			'service'                => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
+			'service_schema_version' => 1,
+			'uuid'                   => wp_generate_uuid4(),
+			'access_token'           => 'token1',
+			'base'                   => 'base_id1',
+			'display_name'           => 'Base Name 1',
+			'slug'                   => 'source-1',
 		] );
 
 		$source2 = DatasourceCrud::register_new_data_source( [
-			'access_token' => 'token2',
-			'service'      => 'shopify',
-			'store_name'   => 'mystore',
-			'slug'         => 'source-2',
+			'service'                => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
+			'service_schema_version' => 1,
+			'uuid'                   => wp_generate_uuid4(),
+			'access_token'           => 'token2',
+			'store_name'             => 'mystore',
+			'slug'                   => 'source-2',
 		] );
 
 		set_mocked_option( DatasourceCrud::CONFIG_OPTION_NAME, [
