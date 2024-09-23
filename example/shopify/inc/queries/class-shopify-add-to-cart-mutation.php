@@ -5,44 +5,48 @@ namespace RemoteDataBlocks\Example\Shopify;
 use RemoteDataBlocks\Config\QueryContext\GraphqlQueryContext;
 
 class ShopifyAddToCartMutation extends GraphqlQueryContext {
-	public array $input_variables = [
-		'cart_id'    => [
-			'type' => 'id',
-		],
-		'variant_id' => [
-			'type' => 'id',
-		],
-		'quantity'   => [
-			'type' => 'number',
-		],
-	];
+	public function define_input_variables(): array {
+		return [
+			'cart_id'    => [
+				'type' => 'id',
+			],
+			'variant_id' => [
+				'type' => 'id',
+			],
+			'quantity'   => [
+				'type' => 'number',
+			],
+		];
+	}
 
-	public array $output_variables = [
-		'root_path'     => '$.data.cartLinesAdd.cart.lines.edges[*]',
-		'is_collection' => true,
-		'mappings'      => [
-			'id'            => [
-				'name' => 'Line ID',
-				'path' => '$.node.id',
-				'type' => 'id',
+	public function define_output_variables(): array {
+		return [
+			'root_path'     => '$.data.cartLinesAdd.cart.lines.edges[*]',
+			'is_collection' => true,
+			'mappings'      => [
+				'id'            => [
+					'name' => 'Line ID',
+					'path' => '$.node.id',
+					'type' => 'id',
+				],
+				'quantity'      => [
+					'name' => 'Quantity',
+					'path' => '$.node.quantity',
+					'type' => 'string',
+				],
+				'variant_id'    => [
+					'name' => 'Variant ID',
+					'path' => '$.node.merchandise.id',
+					'type' => 'id',
+				],
+				'variant_title' => [
+					'name' => 'Title',
+					'path' => '$.node.merchandise.title',
+					'type' => 'string',
+				],
 			],
-			'quantity'      => [
-				'name' => 'Quantity',
-				'path' => '$.node.quantity',
-				'type' => 'string',
-			],
-			'variant_id'    => [
-				'name' => 'Variant ID',
-				'path' => '$.node.merchandise.id',
-				'type' => 'id',
-			],
-			'variant_title' => [
-				'name' => 'Title',
-				'path' => '$.node.merchandise.title',
-				'type' => 'string',
-			],
-		],
-	];
+		];
+	}
 
 	public function get_query(): string {
 		return '

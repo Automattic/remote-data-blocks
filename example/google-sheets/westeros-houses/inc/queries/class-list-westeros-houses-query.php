@@ -13,44 +13,44 @@ class ListWesterosHousesQuery extends HttpQueryContext {
 		'Sigil',
 	];
 
-	public array $input_variables = [];
-
-	public array $output_variables = [
-		'root_path'     => '$.values[*]',
-		'is_collection' => true,
-		'mappings'      => [
-			'row_id'    => [
-				'name' => 'Row ID',
-				'path' => '$.RowId',
-				'type' => 'id',
+	public function define_output_variables(): array {
+		return [
+			'root_path'     => '$.values[*]',
+			'is_collection' => true,
+			'mappings'      => [
+				'row_id'    => [
+					'name' => 'Row ID',
+					'path' => '$.RowId',
+					'type' => 'id',
+				],
+				'house'     => [
+					'name' => 'House',
+					'path' => '$.House',
+					'type' => 'string',
+				],
+				'seat'      => [
+					'name' => 'Seat',
+					'path' => '$.Seat',
+					'type' => 'string',
+				],
+				'region'    => [
+					'name' => 'Region',
+					'path' => '$.Region',
+					'type' => 'string',
+				],
+				'words'     => [
+					'name' => 'Words',
+					'path' => '$.Words',
+					'type' => 'string',
+				],
+				'image_url' => [
+					'name' => 'Sigil',
+					'path' => '$.Sigil',
+					'type' => 'image_url',
+				],
 			],
-			'house'     => [
-				'name' => 'House',
-				'path' => '$.House',
-				'type' => 'string',
-			],
-			'seat'      => [
-				'name' => 'Seat',
-				'path' => '$.Seat',
-				'type' => 'string',
-			],
-			'region'    => [
-				'name' => 'Region',
-				'path' => '$.Region',
-				'type' => 'string',
-			],
-			'words'     => [
-				'name' => 'Words',
-				'path' => '$.Words',
-				'type' => 'string',
-			],
-			'image_url' => [
-				'name' => 'Sigil',
-				'path' => '$.Sigil',
-				'type' => 'image_url',
-			],
-		],
-	];
+		];
+	}
 
 	public function get_endpoint( array $input_variables ): string {
 		return $this->get_datasource()->get_endpoint() . '/values/Houses';

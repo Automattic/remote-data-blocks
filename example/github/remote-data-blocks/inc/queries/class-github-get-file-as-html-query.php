@@ -5,55 +5,59 @@ namespace RemoteDataBlocks\Example\GitHub;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Integrations\GitHub\GitHubDatasource;
 class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
-	public array $input_variables = [
-		'file_path' => [
-			'name' => 'File Path',
-			'type' => 'string',
-		],
-		'sha'       => [
-			'name' => 'SHA',
-			'type' => 'string',
-		],
-		'size'      => [
-			'name' => 'Size',
-			'type' => 'number',
-		],
-		'url'       => [
-			'name' => 'URL',
-			'type' => 'string',
-		],
-	];
-
-	public array $output_variables = [
-		'is_collection' => false,
-		'mappings'      => [
-			'file_content' => [
-				'name' => 'File Content',
-				'path' => '$.content',
-				'type' => 'html',
-			],
-			'file_path'    => [
+	public function define_input_variables(): array {
+		return [
+			'file_path' => [
 				'name' => 'File Path',
-				'path' => '$.path',
 				'type' => 'string',
 			],
-			'sha'          => [
+			'sha'       => [
 				'name' => 'SHA',
-				'path' => '$.sha',
 				'type' => 'string',
 			],
-			'size'         => [
+			'size'      => [
 				'name' => 'Size',
-				'path' => '$.size',
 				'type' => 'number',
 			],
-			'url'          => [
+			'url'       => [
 				'name' => 'URL',
-				'path' => '$.url',
 				'type' => 'string',
 			],
-		],
-	];
+		];
+	}
+
+	public function define_output_variables(): array {
+		return [
+			'is_collection' => false,
+			'mappings'      => [
+				'file_content' => [
+					'name' => 'File Content',
+					'path' => '$.content',
+					'type' => 'html',
+				],
+				'file_path'    => [
+					'name' => 'File Path',
+					'path' => '$.path',
+					'type' => 'string',
+				],
+				'sha'          => [
+					'name' => 'SHA',
+					'path' => '$.sha',
+					'type' => 'string',
+				],
+				'size'         => [
+					'name' => 'Size',
+					'path' => '$.size',
+					'type' => 'number',
+				],
+				'url'          => [
+					'name' => 'URL',
+					'path' => '$.url',
+					'type' => 'string',
+				],
+			],
+		];
+	}
 
 	public function get_endpoint( array $input_variables ): string {
 		/** @var GitHubDatasource $datasource */
