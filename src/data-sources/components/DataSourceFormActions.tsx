@@ -1,13 +1,13 @@
 import { Button, ButtonGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-interface FormActionsInputProps {
+interface DataSourceFormActionsProps {
 	onSave: () => Promise< void >;
 	onCancel: () => void;
 	saveDisabled: boolean;
 }
 
-export const FormActionsInput = ( { onSave, onCancel, saveDisabled }: FormActionsInputProps ) => {
+export const DataSourceFormActions = ( { onSave, onCancel, saveDisabled }: DataSourceFormActionsProps ) => {
 	return (
 		<div className="form-group">
 			<ButtonGroup className="form-actions">

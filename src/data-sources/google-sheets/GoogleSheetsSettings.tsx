@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
 import { getConnectionMessage } from '../utils';
-import { FormActionsInput } from '@/data-sources/components/FormActionsInput';
+import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import { SlugInput } from '@/data-sources/components/SlugInput';
 import { GOOGLE_SHEETS_API_SCOPES } from '@/data-sources/constants';
 import { GoogleSheetsFormState } from '@/data-sources/google-sheets/types';
@@ -311,7 +311,7 @@ export const GoogleSheetsSettings = ( {
 						/>
 					</div>
 
-					<FormActionsInput
+					<DataSourceFormActions
 						onSave={ onSaveClick }
 						onCancel={ goToMainScreen }
 						saveDisabled={ ! shouldAllowSubmit }

@@ -2,7 +2,7 @@ import { TextControl, Card, CardHeader, CardBody } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { FormActionsInput } from '@/data-sources/components/FormActionsInput';
+import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
@@ -129,7 +129,7 @@ export const ShopifySettings = ( {
 						/>
 					</div>
 
-					<FormActionsInput
+					<DataSourceFormActions
 						onSave={ onSaveClick }
 						onCancel={ goToMainScreen }
 						saveDisabled={ ! shouldAllowSubmit }

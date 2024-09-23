@@ -10,7 +10,7 @@ import {
 	useAirtableApiUserId,
 } from '@/data-sources/airtable/airtable-api-hooks';
 import { AirtableFormState } from '@/data-sources/airtable/types';
-import { FormActionsInput } from '@/data-sources/components/FormActionsInput';
+import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
@@ -293,7 +293,7 @@ export const AirtableSettings = ( {
 						/>
 					</div>
 
-					<FormActionsInput
+					<DataSourceFormActions
 						onSave={ onSaveClick }
 						onCancel={ goToMainScreen }
 						saveDisabled={ ! shouldAllowSubmit }
