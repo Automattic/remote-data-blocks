@@ -2,9 +2,9 @@
 
 namespace RemoteDataBlocks\Example\GitHub;
 
+use RemoteDataBlocks\Integrations\GitHub\GitHubDatasource;
 use RemoteDataBlocks\Logging\LoggerManager;
 
-require_once __DIR__ . '/inc/queries/class-github-datasource.php';
 require_once __DIR__ . '/inc/queries/class-github-get-file-as-html-query.php';
 require_once __DIR__ . '/inc/queries/class-github-list-files-query.php';
 

@@ -17,7 +17,7 @@ function register_airtable_events_block() {
 
 	register_remote_data_block( $block_name, $airtable_get_event_query );
 	register_remote_data_list_query( $block_name, $airtable_list_events_query );
-	register_remote_data_loop_block( 'Airtable Event List', $airtable_list_events_query );
+	register_remote_data_loop_block( 'Conference Event List', $airtable_list_events_query );
 	register_remote_data_page( $block_name, 'airtable-event' );
 }
 

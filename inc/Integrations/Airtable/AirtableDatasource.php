@@ -30,11 +30,11 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 	}
 
 	public function get_display_name(): string {
-		return sprintf( 'Airtable: %s', $this->config['base'] );
+		return sprintf( 'Airtable: %s', $this->config['display_name'] );
 	}
 
 	public function get_endpoint( string $variation = '' ): string {
-		return 'https://api.airtable.com/v0/' . $this->config['display_name'];
+		return 'https://api.airtable.com/v0/' . $this->config['base'];
 	}
 
 	public function get_request_headers(): array {

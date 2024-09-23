@@ -12,10 +12,6 @@ use function register_remote_data_search_query;
 
 class ShopifyIntegration {
 	public static function init(): void {
-		self::register_dynamic_data_source_blocks();
-	}
-
-	private static function register_dynamic_data_source_blocks(): void {
 		$data_sources = DatasourceCrud::get_data_sources( REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE );
 
 		foreach ( $data_sources as $config ) {

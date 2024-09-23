@@ -14,16 +14,11 @@ class DatasourceCrudTest extends TestCase {
 
 	public function test_register_new_data_source_with_valid_input() {
 		$valid_source = [
+			'service'      => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
+			'service_schema_version' => 1,
 			'access_token' => 'valid_token',
-			'service'      => 'airtable',
-			'base'         => [
-				'id'   => 'base_id',
-				'name' => 'Base Name',
-			],
-			'tables'       => [
-				'id'   => 'table_id',
-				'name' => 'Table Name',
-			],
+			'base'         => 'base_id',
+			'display_name' => 'Crud Test',
 			'slug'         => 'valid-slug',
 		];
 

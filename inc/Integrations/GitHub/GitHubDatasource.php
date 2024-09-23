@@ -1,6 +1,6 @@
 <?php
 
-namespace RemoteDataBlocks\Example\GitHub;
+namespace RemoteDataBlocks\Integrations\GitHub;
 
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 
@@ -25,7 +25,7 @@ class GitHubDatasource extends HttpDatasource {
 	];
 
 	public function get_display_name(): string {
-		return 'GitHub';
+		return sprintf( 'GitHub: %s/%s (%s)', $this->config['repo_owner'], $this->config['repo_name'], $this->config['ref'] );
 	}
 
 	public function get_endpoint(): string {
@@ -43,6 +43,18 @@ class GitHubDatasource extends HttpDatasource {
 		];
 	}
 
+	public function get_repo_owner(): string {
+		return $this->config['repo_owner'];
+	}
+
+	public function get_repo_name(): string {
+		return $this->config['repo_name'];
+	}
+	
+	public function get_ref(): string {
+		return $this->config['ref'];
+	}
+	
 	public static function create( string $repo_owner, string $repo_name, string $ref ): self {
 		return parent::from_array([
 			'service'                => REMOTE_DATA_BLOCKS_GITHUB_SERVICE,

@@ -7,10 +7,6 @@ use RemoteDataBlocks\WpdbStorage\DatasourceCrud;
 
 class AirtableIntegration {
 	public static function init(): void {
-		self::register_dynamic_data_source_blocks();
-	}
-
-	private static function register_dynamic_data_source_blocks(): void {
 		$data_sources = DatasourceCrud::get_data_sources( REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE );
 
 		foreach ( $data_sources as $config ) {
@@ -19,14 +15,7 @@ class AirtableIntegration {
 	}
 
 	private static function register_blocks_for_airtable_data_source( array $config ): void {
-		$logger = LoggerManager::instance();
-		$logger->info( 'Registering Airtable block for: ' . wp_json_encode( $config ) ); // TODO: Remove this or make it debug level, etc.
-
-		$base_id  = $config['base']['id'] ?? '';
-		$table_id = $config['table']['id'] ?? '';
-		if ( empty( $base_id ) ) {
-			$logger->error( 'Airtable block is missing base ID' );
-		}
+		LoggerManager::instance()->info( 'Registering Airtable block for: ' . wp_json_encode( $config ) ); // TODO: Remove this or make it debug level, etc.
 
 		$airtable_datasource = AirtableDatasource::from_array( $config );
 		// TODO: Block registration & all the rest...  This will only work if there is some mapping configured
