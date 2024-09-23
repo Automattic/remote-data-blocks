@@ -6,13 +6,8 @@ import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormA
 import { HttpAuthSettingsInput } from '@/data-sources/components/HttpAuthSettingsInput';
 import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
-import { HttpFormState } from '@/data-sources/http/types';
-import {
-	HttpConfig,
-	HttpAuth,
-	HttpAuthFormState,
-	SettingsComponentProps,
-} from '@/data-sources/types';
+import { HttpFormState, HttpAuth, HttpAuthFormState } from '@/data-sources/http/types';
+import { HttpConfig, SettingsComponentProps } from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 

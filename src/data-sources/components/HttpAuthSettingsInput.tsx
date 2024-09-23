@@ -7,7 +7,7 @@ import {
 	HTTP_SOURCE_AUTH_TYPE_SELECT_OPTIONS,
 	HTTP_SOURCE_ADD_TO_SELECT_OPTIONS,
 } from '@/data-sources/constants';
-import { HttpAuthFormState } from '@/data-sources/types';
+import { HttpAuthFormState } from '@/data-sources/http/types';
 
 interface HttpAuthSettingsInputProps {
 	auth: HttpAuthFormState;

@@ -1,4 +1,5 @@
-import { SUPPORTED_SERVICES, AUTH_TYPES, API_KEY_ADD_TO } from '@/data-sources/constants';
+import { SUPPORTED_SERVICES } from '@/data-sources/constants';
+import { HttpAuth } from '@/data-sources/http/types';
 import { NumberIdName, StringIdName } from '@/types/common';
 import { GoogleServiceAccountKey } from '@/types/google';
 
@@ -42,34 +43,6 @@ export interface GoogleSheetsConfig extends BaseDataSourceConfig {
 	spreadsheet: StringIdName;
 	sheet: NumberIdName;
 }
-
-export interface BaseHttpAuth {
-	type: ( typeof AUTH_TYPES )[ number ];
-	value: string;
-}
-
-export interface HttpBearerAuth extends BaseHttpAuth {
-	type: 'bearer';
-}
-
-export interface HttpBasicAuth extends BaseHttpAuth {
-	type: 'basic';
-}
-
-export type HttpAuth = HttpBearerAuth | HttpBasicAuth | HttpApiKeyAuth;
-
-export interface HttpApiKeyAuth extends BaseHttpAuth {
-	type: 'api-key';
-	key: string;
-	addTo: ( typeof API_KEY_ADD_TO )[ number ];
-}
-
-export type HttpAuthFormState = {
-	authType: ( typeof AUTH_TYPES )[ number ];
-	authValue: string;
-	authKey: string;
-	authAddTo: ( typeof API_KEY_ADD_TO )[ number ];
-};
 
 export interface HttpConfig extends BaseDataSourceConfig {
 	service: 'http';
