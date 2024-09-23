@@ -21,6 +21,7 @@ interface DatasourceInterface {
 	public const BASE_SCHEMA = [
 		'type'       => 'object',
 		'properties' => [
+			'version' => ['type' => 'integer'],
 			'uuid'    => [
 				'type'     => 'string',
 				'callback' => 'wp_is_uuid',

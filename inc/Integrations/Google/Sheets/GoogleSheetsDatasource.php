@@ -2,31 +2,15 @@
 
 namespace RemoteDataBlocks\Integrations\Google\Sheets;
 
-<<<<<<< HEAD
 use RemoteDataBlocks\Config\ArraySerializableInterface;
-=======
->>>>>>> trunk
-use RemoteDataBlocks\Config\Datasource\DatasourceInterface;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
 
-<<<<<<< HEAD
 class GoogleSheetsDatasource extends HttpDatasource implements ArraySerializableInterface {
-	private const SERVICE_SCHEMA = [
-		'type'       => 'object',
-		'properties' => [       
-			'credentials' => [
-=======
-class GoogleSheetsDatasource extends HttpDatasource {
-	private array $credentials;
-	private string $endpoint;
-	private string $display_name;
-
-	private const SERVICE_SCHEMA = [
+	protected const SERVICE_SCHEMA = [
 		'type'       => 'object',
 		'properties' => [       
 			'credentials'    => [
->>>>>>> trunk
 				'type'       => 'object',
 				'properties' => [
 					'type'                        => [ 'type' => 'string' ],
@@ -58,31 +42,22 @@ class GoogleSheetsDatasource extends HttpDatasource {
 					'universe_domain'             => [ 'type' => 'string' ],
 				],
 			],
+			'display_name'   => [ 'type' => 'string' ],
 			'spreadsheet_id' => [ 'type' => 'string' ],
 		],
 	];
 
-	public function __construct( string $credentials, string $endpoint, string $display_name ) {
-		/**
-		 * Decodes Base64 encoded JSON string into an array
-		 * and assigns it to the $credentials property.
-		 */
-		$this->credentials  = json_decode( base64_decode( $credentials ), true );
-		$this->endpoint     = $endpoint;
-		$this->display_name = $display_name;
-	}
-
 	public function get_display_name(): string {
-		return sprintf( 'Google Sheets: %s', $this->display_name );
+		return sprintf( 'Google Sheets: %s', $this->config['display_name'] );
 	}
 
 	public function get_endpoint(): string {
-		return $this->endpoint;
+		return sprintf( 'https://sheets.googleapis.com/v4/spreadsheets/%s', $this->config['spreadsheet_id'] );
 	}
 
 	public function get_request_headers(): array {
 		$access_token = GoogleAuth::generate_token_from_service_account_key(
-			$this->credentials,
+			$this->config['credentials'],
 			GoogleAuth::GOOGLE_SHEETS_SCOPES
 		);
 

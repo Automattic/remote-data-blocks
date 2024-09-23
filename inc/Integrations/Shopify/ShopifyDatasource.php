@@ -3,7 +3,6 @@
 namespace RemoteDataBlocks\Integrations\Shopify;
 
 use RemoteDataBlocks\Config\ArraySerializableInterface;
-use RemoteDataBlocks\Config\Datasource\DatasourceInterface;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 
 use function plugins_url;
@@ -11,7 +10,7 @@ use function plugins_url;
 defined( 'ABSPATH' ) || exit();
 
 class ShopifyDatasource extends HttpDatasource implements ArraySerializableInterface {
-	private const SERVICE_SCHEMA = [
+	protected const SERVICE_SCHEMA = [
 		'type'       => 'object',
 		'properties' => [
 			'access_token' => [ 'type' => 'string' ],
@@ -40,11 +39,5 @@ class ShopifyDatasource extends HttpDatasource implements ArraySerializableInter
 
 	public function get_image_url(): string {
 		return plugins_url( '../../assets/shopify_logo_black.png', __FILE__ );
-	}
-
-	public static function get_config_schema(): array {
-		$schema               = DatasourceInterface::BASE_SCHEMA;
-		$schema['properties'] = array_merge( DatasourceInterface::BASE_SCHEMA['properties'], self::SERVICE_SCHEMA['properties'] );
-		return $schema;
 	}
 }

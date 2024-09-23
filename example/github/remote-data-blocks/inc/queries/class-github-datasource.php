@@ -2,7 +2,6 @@
 
 namespace RemoteDataBlocks\Example\GitHub;
 
-use RemoteDataBlocks\Config\Datasource\DatasourceInterface;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 
 class GitHubDatasource extends HttpDatasource {
@@ -38,11 +37,5 @@ class GitHubDatasource extends HttpDatasource {
 		return [
 			'Accept' => 'application/vnd.github+json',
 		];
-	}
-
-	public static function get_config_schema(): array {
-		$schema               = DatasourceInterface::BASE_SCHEMA;
-		$schema['properties'] = array_merge( DatasourceInterface::BASE_SCHEMA['properties'], self::SERVICE_SCHEMA['properties'] );
-		return $schema;
 	}
 }

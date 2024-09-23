@@ -20,6 +20,8 @@ use const RemoteDataBlocks\REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP;
  * @since 0.1.0
  */
 abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInterface, ArraySerializableInterface {
+	protected const SERVICE_SCHEMA = [];
+
 	final private function __construct( protected array $config ) {}
 
 	/**
@@ -47,7 +49,11 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 	/**
 	 * @inheritDoc
 	 */
-	abstract public static function get_config_schema(): array;
+	final public static function get_config_schema(): array {
+		$schema               = DatasourceInterface::BASE_SCHEMA;
+		$schema['properties'] = array_merge( DatasourceInterface::BASE_SCHEMA['properties'], static::SERVICE_SCHEMA['properties'] );
+		return $schema;
+	}
 
 	/**
 	 * @inheritDoc

@@ -8,14 +8,14 @@ class MockDatasource extends HttpDatasource {
 	private $endpoint = 'https://example.com/api';
 	private $headers  = [ 'Content-Type' => 'application/json' ];
 
-	const MOCK_CONFIG = [
+	public const MOCK_CONFIG = [
 		'uuid'    => 'e3458c42-4cf4-4214-aaf6-3628e33ed07a',
 		'service' => 'mock',
 		'slug'    => 'mock-thingy-1',
 		'api_key' => '1234567890',
 	];
 
-	const SERVICE_SCHEMA = [
+	protected const SERVICE_SCHEMA = [
 		'type'       => 'object',
 		'properties' => [
 			'api_key' => [
@@ -42,11 +42,5 @@ class MockDatasource extends HttpDatasource {
 
 	public function set_headers( array $headers ): void {
 		$this->headers = $headers;
-	}
-	
-	public static function get_config_schema(): array {
-		$schema               = DatasourceInterface::BASE_SCHEMA;
-		$schema['properties'] = array_merge( DatasourceInterface::BASE_SCHEMA['properties'], self::SERVICE_SCHEMA['properties'] );
-		return $schema;
 	}
 }

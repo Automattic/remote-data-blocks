@@ -2,12 +2,11 @@
 
 namespace RemoteDataBlocks\Integrations\Airtable;
 
-use RemoteDataBlocks\Config\Datasource\DatasourceInterface;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 use RemoteDataBlocks\Config\Datasource\HttpDatasourceInterface;
 
 class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterface {
-	private const SERVICE_SCHEMA = [
+	protected const SERVICE_SCHEMA = [
 		'type'       => 'object',
 		'properties' => [
 			'access_token' => [ 'type' => 'string' ],
@@ -59,11 +58,5 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 			'Authorization' => sprintf( 'Bearer %s', $this->get_access_token() ),
 			'Content-Type'  => 'application/json',
 		];
-	}
-
-	public static function get_config_schema(): array {
-		$schema               = DatasourceInterface::BASE_SCHEMA;
-		$schema['properties'] = array_merge( DatasourceInterface::BASE_SCHEMA['properties'], self::SERVICE_SCHEMA['properties'] );
-		return $schema;
 	}
 }

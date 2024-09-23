@@ -2,8 +2,6 @@
 
 namespace RemoteDataBlocks\Example\ArtInstituteOfChicago;
 
-use RemoteDataBlocks\Config\Datasource\HttpDatasource;
-
 require_once __DIR__ . '/inc/queries/class-art-institute-datasource.php';
 require_once __DIR__ . '/inc/queries/class-art-institute-get-query.php';
 require_once __DIR__ . '/inc/queries/class-art-institute-search-query.php';
