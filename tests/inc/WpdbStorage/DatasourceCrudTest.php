@@ -12,6 +12,16 @@ class DatasourceCrudTest extends TestCase {
 		clear_mocked_options();
 	}
 
+
+	public function test_validate_slug_with_valid_input() {
+		$this->assertTrue( DatasourceCrud::validate_slug( 'valid-slug' ) );
+	}
+
+	public function test_validate_slug_with_invalid_input() {
+		$this->assertInstanceOf( WP_Error::class, DatasourceCrud::validate_slug( '' ) );
+		$this->assertInstanceOf( WP_Error::class, DatasourceCrud::validate_slug( 'INVALID_SLUG' ) );
+	}
+	
 	public function test_register_new_data_source_with_valid_input() {
 		$valid_source = [
 			'service'                => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
@@ -101,9 +111,9 @@ class DatasourceCrudTest extends TestCase {
 		$this->assertSame( 'token1', $retrieved_source['access_token'] );
 		$this->assertSame( 'base_id1', $retrieved_source['base'] );
 		$this->assertSame( 'Crud Test', $retrieved_source['display_name'] );
-		$this->assertArrayHasKey( '_metadata', $retrieved_source );
-		$this->assertArrayHasKey( 'created_at', $retrieved_source['_metadata'] );
-		$this->assertArrayHasKey( 'updated_at', $retrieved_source['_metadata'] );
+		$this->assertArrayHasKey( '__metadata', $retrieved_source );
+		$this->assertArrayHasKey( 'created_at', $retrieved_source['__metadata'] );
+		$this->assertArrayHasKey( 'updated_at', $retrieved_source['__metadata'] );
 	}
 
 	public function test_get_item_by_uuid_with_invalid_uuid() {

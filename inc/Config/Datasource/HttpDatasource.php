@@ -3,13 +3,12 @@
 namespace RemoteDataBlocks\Config\Datasource;
 
 use RemoteDataBlocks\Config\ArraySerializableInterface;
+use RemoteDataBlocks\Config\UiDisplayableInterface;
 use RemoteDataBlocks\Sanitization\Sanitizer;
 use RemoteDataBlocks\Sanitization\SanitizerInterface;
 use RemoteDataBlocks\Validation\Validator;
 use RemoteDataBlocks\Validation\ValidatorInterface;
 use WP_Error;
-
-use const RemoteDataBlocks\REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP;
 
 /**
  * HttpDatasource class
@@ -19,7 +18,8 @@ use const RemoteDataBlocks\REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP;
  * @package remote-data-blocks
  * @since 0.1.0
  */
-abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInterface, ArraySerializableInterface {
+abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInterface, ArraySerializableInterface, UiDisplayableInterface {
+	protected const SERVICE_NAME = 'unknown';
 	protected const SERVICE_SCHEMA = [];
 
 	final private function __construct( protected array $config ) {}
@@ -83,5 +83,17 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 	 */
 	public function to_array(): array {
 		return $this->config;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function to_ui_display(): array {
+		// TODO: Implement remove from children and implement here in standardized way
+		return [
+			'display_name' => $this->get_display_name(),
+			'slug' => $this->get_display_name(),
+			'service' => static::SERVICE_NAME,
+		];
 	}
 }

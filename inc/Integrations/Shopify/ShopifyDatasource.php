@@ -10,6 +10,7 @@ use function plugins_url;
 defined( 'ABSPATH' ) || exit();
 
 class ShopifyDatasource extends HttpDatasource implements ArraySerializableInterface {
+	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE;
 	protected const SERVICE_SCHEMA_VERSION = 1;
 
 	protected const SERVICE_SCHEMA = [
@@ -59,5 +60,13 @@ class ShopifyDatasource extends HttpDatasource implements ArraySerializableInter
 			'access_token'           => $access_token,
 			'store_name'             => $store_name,
 		]);
+	}
+
+	public function to_ui_display(): array {
+		return [
+			'slug' => $this->get_display_name(),
+			'service' => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
+			'store' => $this->config['store_name'],
+		];
 	}
 }

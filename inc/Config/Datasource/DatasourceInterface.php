@@ -21,6 +21,10 @@ interface DatasourceInterface {
 	public const BASE_SCHEMA = [
 		'type'       => 'object',
 		'properties' => [
+			'__metadata' => [
+				'type' => 'object',
+				'required' => false,
+			],
 			'service'                => [ 'type' => 'string' ],
 			'service_schema_version' => [ 'type' => 'integer' ],
 			'slug'                   => [

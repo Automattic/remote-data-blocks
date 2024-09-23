@@ -1,23 +1,22 @@
 import {
-	__experimentalText as Text,
 	Button,
 	ButtonGroup,
-	Spinner,
-	Placeholder,
-	Icon,
-	Modal,
 	Card,
-	CardHeader,
 	CardBody,
+	CardHeader,
+	Dropdown,
+	Icon,
 	MenuGroup,
 	MenuItem,
-	Dropdown,
+	Modal,
+	Placeholder,
+	Spinner,
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown, edit, info, trash } from '@wordpress/icons';
 
-import { SUPPORTED_SERVICES } from './constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
@@ -25,6 +24,7 @@ import AirtableIcon from '@/settings/icons/airtable';
 import GoogleSheetsIcon from '@/settings/icons/google-sheets';
 import ShopifyIcon from '@/settings/icons/shopify';
 import { slugToTitleCase } from '@/utils/string';
+import { SUPPORTED_SERVICES } from './constants';
 
 import './data-source-list.scss';
 
@@ -161,32 +161,37 @@ const DataSourceList = () => {
 						</tr>
 					</thead>
 					<tbody className="table-body">
-						{ getValidDataSources().map( source => {
-							const { uuid, slug, service } = source;
-							return (
-								<tr key={ slug } className="table-row">
-									<td>
-										<Text className="data-source-slug">{ slug }</Text>
-									</td>
-									<td>
-										<Text>{ slugToTitleCase( service ) }</Text>
-									</td>
-									<td> { renderDataSourceMeta( source ) } </td>
-									<td className="data-source-actions">
-										{ uuid && (
-											<ButtonGroup className="data-source-actions">
-												<Button variant="secondary" onClick={ () => onEditDataSource( uuid ) }>
-													<Icon icon={ edit } />
-												</Button>
-												<Button variant="secondary" onClick={ () => onDeleteDataSource( source ) }>
-													<Icon icon={ trash } />
-												</Button>
-											</ButtonGroup>
-										) }
-									</td>
-								</tr>
-							);
-						} ) }
+						{ dataSources
+							.sort( ( a, b ) => a.slug.localeCompare( b.slug ) )
+							.map( source => {
+								const { uuid, slug, service } = source;
+								return (
+									<tr key={ slug } className="table-row">
+										<td>
+											<Text className="data-source-slug">{ slug }</Text>
+										</td>
+										<td>
+											<Text>{ slugToTitleCase( service ) }</Text>
+										</td>
+										<td> { renderDataSourceMeta( source ) } </td>
+										<td className="data-source-actions">
+											{ slug && (
+												<ButtonGroup className="data-source-actions">
+													<Button variant="secondary" onClick={ () => onEditDataSource( uuid ) }>
+														<Icon icon={ edit } />
+													</Button>
+													<Button
+														variant="secondary"
+														onClick={ () => onDeleteDataSource( source ) }
+													>
+														<Icon icon={ trash } />
+													</Button>
+												</ButtonGroup>
+											) }
+										</td>
+									</tr>
+								);
+							} ) }
 					</tbody>
 				</table>
 

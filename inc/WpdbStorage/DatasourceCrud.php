@@ -11,6 +11,38 @@ use const RemoteDataBlocks\REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP;
 class DatasourceCrud {
 	const CONFIG_OPTION_NAME = 'remote_data_blocks_config';
 
+	/**
+	 * Validate the slug to verify
+	 * - is not empty
+	 * - only contains lowercase alphanumeric characters and hyphens
+	 * - is not already taken
+	 *
+	 * @param string $slug The slug to validate.
+	 * @param string [$uuid] The UUID of the data source to exclude from the check.
+	 * @return WP_Error|true Returns true if the slug is valid, or a WP_Error object if not.
+	 */
+	public static function validate_slug( string $slug  ): WP_Error|bool {
+		if ( empty( $slug ) ) {
+			return new WP_Error( 'missing_slug', __( 'Missing slug.', 'remote-data-blocks' ) );
+		}
+
+		if ( ! preg_match( '/^[a-z0-9-]+$/', $slug ) ) {
+			return new WP_Error( 'invalid_slug', __( 'Invalid slug.', 'remote-data-blocks' ) );
+		}
+
+		$data_sources = self::get_data_sources();
+	
+		$slug_exists = array_filter( $data_sources, function ( $source ) use ( $slug ) {
+			return $source->slug === $slug;
+		} );
+
+		if ( ! empty( $slug_exists ) ) {
+			return new WP_Error( 'slug_already_taken', __( 'Slug already taken.', 'remote-data-blocks' ) );
+		}
+
+		return true;
+	}
+
 	public static function register_new_data_source( array $settings, ArraySerializableInterface $datasource = null ) {
 		$data_sources = self::get_data_sources();
 
@@ -88,17 +120,17 @@ class DatasourceCrud {
 	private static function save_datasource( ArraySerializableInterface $datasource, array $datasource_configs ): bool {
 		$config = $datasource->to_array();
 		
-		if ( ! isset( $config['_metadata'] ) ) {
-			$config['_metadata'] = [];
+		if ( ! isset( $config['__metadata'] ) ) {
+			$config['__metadata'] = [];
 		}
 
 		$now = gmdate( 'Y-m-d H:i:s' );
 		
-		if ( ! isset( $config['_metadata']['created_at'] ) ) {
-			$config['_metadata']['created_at'] = $now;
+		if ( ! isset( $config['__metadata']['created_at'] ) ) {
+			$config['__metadata']['created_at'] = $now;
 		}
 
-		$config['_metadata']['updated_at']     = $now;
+		$config['__metadata']['updated_at']     = $now;
 		$datasource_configs[ $config['uuid'] ] = $config;
 
 		return update_option( self::CONFIG_OPTION_NAME, $datasource_configs );
