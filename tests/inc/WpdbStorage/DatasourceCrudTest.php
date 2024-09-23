@@ -105,6 +105,7 @@ class DatasourceCrudTest extends TestCase {
 			'access_token'           => 'token1',
 			'base'                   => 'base_id1',
 			'display_name'           => 'Crud Test',
+			'slug'                   => 'source-1',
 		] );
 
 		$retrieved_source = DatasourceCrud::get_item_by_uuid( DatasourceCrud::get_data_sources(), $source->to_array()['uuid'] );
@@ -129,6 +130,7 @@ class DatasourceCrudTest extends TestCase {
 			'access_token'           => 'token1',
 			'base'                   => 'base_id1',
 			'display_name'           => 'Crud Test',
+			'slug'                   => 'source-1',
 		] );
 
 		$updated_source = DatasourceCrud::update_item_by_uuid( $source->to_array()['uuid'], [
@@ -154,6 +156,7 @@ class DatasourceCrudTest extends TestCase {
 			'access_token'           => 'token1',
 			'base'                   => 'base_id1',
 			'display_name'           => 'Crud Test',
+			'slug'                   => 'source-1',
 		] );
 
 		$result = DatasourceCrud::delete_item_by_uuid( $source->to_array()['uuid'] );

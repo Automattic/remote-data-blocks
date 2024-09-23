@@ -5,7 +5,7 @@ namespace RemoteDataBlocks\Integrations\GitHub;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 
 class GitHubDatasource extends HttpDatasource {
-	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_GITHUB_SERVICE;
+	protected const SERVICE_NAME           = REMOTE_DATA_BLOCKS_GITHUB_SERVICE;
 	protected const SERVICE_SCHEMA_VERSION = 1;
 	
 	protected const SERVICE_SCHEMA = [

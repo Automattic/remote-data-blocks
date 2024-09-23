@@ -21,20 +21,20 @@ interface DatasourceInterface {
 	public const BASE_SCHEMA = [
 		'type'       => 'object',
 		'properties' => [
-			'__metadata' => [
-				'type' => 'object',
+			'__metadata'             => [
+				'type'     => 'object',
 				'required' => false,
 			],
 			'service'                => [ 'type' => 'string' ],
 			'service_schema_version' => [ 'type' => 'integer' ],
 			'slug'                   => [
-				'type'     => 'string',
-				'pattern'  => '/^[a-z0-9-]+$/',
-				'required' => false,
+				'type'    => 'string',
+				'pattern' => '/^[a-z0-9-]+$/',
 			],
 			'uuid'                   => [
 				'type'     => 'string',
 				'callback' => 'wp_is_uuid',
+				'required' => false,
 			],
 		],
 	];

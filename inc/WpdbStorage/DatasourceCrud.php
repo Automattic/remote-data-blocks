@@ -21,7 +21,7 @@ class DatasourceCrud {
 	 * @param string [$uuid] The UUID of the data source to exclude from the check.
 	 * @return WP_Error|true Returns true if the slug is valid, or a WP_Error object if not.
 	 */
-	public static function validate_slug( string $slug  ): WP_Error|bool {
+	public static function validate_slug( string $slug ): WP_Error|bool {
 		if ( empty( $slug ) ) {
 			return new WP_Error( 'missing_slug', __( 'Missing slug.', 'remote-data-blocks' ) );
 		}
@@ -130,7 +130,7 @@ class DatasourceCrud {
 			$config['__metadata']['created_at'] = $now;
 		}
 
-		$config['__metadata']['updated_at']     = $now;
+		$config['__metadata']['updated_at']    = $now;
 		$datasource_configs[ $config['uuid'] ] = $config;
 
 		return update_option( self::CONFIG_OPTION_NAME, $datasource_configs );

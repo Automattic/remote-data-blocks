@@ -8,7 +8,7 @@ use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
 use WP_Error;
 
 class GoogleSheetsDatasource extends HttpDatasource implements ArraySerializableInterface {
-	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE;
+	protected const SERVICE_NAME           = REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE;
 	protected const SERVICE_SCHEMA_VERSION = 1;
 
 	protected const SERVICE_SCHEMA = [
@@ -84,10 +84,10 @@ class GoogleSheetsDatasource extends HttpDatasource implements ArraySerializable
 
 	public function to_ui_display(): array {
 		return [
-			'slug' => $this->get_display_name(),
-			'service' => REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE,
+			'slug'        => $this->get_display_name(),
+			'service'     => REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE,
 			'spreadsheet' => [ 'name' => $this->config['spreadsheet_id'] ],
-			'sheet' => [ 'name' => '' ],
+			'sheet'       => [ 'name' => '' ],
 		];
 	}
 }

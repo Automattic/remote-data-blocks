@@ -57,10 +57,10 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 
 	public function to_ui_display(): array {
 		return [
-			'slug' => $this->get_display_name(),
+			'slug'    => $this->get_display_name(),
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
-			'base' => [ 'name' => $this->config['base'] ],
-			'table' => [ 'name' => '' ],
+			'base'    => [ 'name' => $this->config['base'] ],
+			'table'   => [ 'name' => '' ],
 		];
 	}
 }

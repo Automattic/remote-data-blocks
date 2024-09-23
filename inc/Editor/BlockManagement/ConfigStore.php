@@ -97,11 +97,11 @@ class ConfigStore {
 				$data_source = $query->get_datasource();
 
 				if ( $data_source instanceof UiDisplayableInterface ) {
-					$data_sources[$data_source->to_array()['uuid']] = $data_source->to_ui_display();
+					$data_sources[ $data_source->to_array()['uuid'] ] = $data_source->to_ui_display();
 				}
 			}
 		}
 
-		return array_values($data_sources);
+		return array_values( $data_sources );
 	}
 }

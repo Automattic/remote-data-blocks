@@ -19,7 +19,7 @@ use WP_Error;
  * @since 0.1.0
  */
 abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInterface, ArraySerializableInterface, UiDisplayableInterface {
-	protected const SERVICE_NAME = 'unknown';
+	protected const SERVICE_NAME   = 'unknown';
 	protected const SERVICE_SCHEMA = [];
 
 	final private function __construct( protected array $config ) {}
@@ -46,6 +46,10 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 		return null;
 	}
 
+	public function get_slug(): string {
+		return $this->config['slug'];
+	}
+	
 	/**
 	 * @inheritDoc
 	 */
@@ -92,8 +96,8 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 		// TODO: Implement remove from children and implement here in standardized way
 		return [
 			'display_name' => $this->get_display_name(),
-			'slug' => $this->get_display_name(),
-			'service' => static::SERVICE_NAME,
+			'slug'         => $this->get_display_name(),
+			'service'      => static::SERVICE_NAME,
 		];
 	}
 }
