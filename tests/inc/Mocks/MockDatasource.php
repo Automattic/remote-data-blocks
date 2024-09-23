@@ -24,22 +24,37 @@ class MockDatasource extends HttpDatasource {
 		],
 	];
 
+	/**
+	 * @inheritDoc
+	 */
 	public function get_display_name(): string {
 		return 'Mock Datasource';
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function get_endpoint(): string {
 		return $this->endpoint;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function get_request_headers(): array {
 		return $this->headers;
 	}
 
+	/**
+	 * Override the endpoint.
+	 */
 	public function set_endpoint( string $endpoint ): void {
 		$this->endpoint = $endpoint;
 	}
 
+	/**
+	 * Override the headers.
+	 */
 	public function set_headers( array $headers ): void {
 		$this->headers = $headers;
 	}
