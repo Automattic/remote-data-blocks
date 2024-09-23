@@ -1,7 +1,6 @@
 <?php
 namespace RemoteDataBlocks\Tests\Mocks;
 
-use RemoteDataBlocks\Config\Datasource\DatasourceInterface;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 
 class MockDatasource extends HttpDatasource {
