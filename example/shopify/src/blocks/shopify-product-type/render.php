@@ -1,1 +1,1 @@
-<p>This is the category</p>
+<p>This is the product type</p>

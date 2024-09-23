@@ -20,7 +20,7 @@ class ShopifyGetProductQuery extends GraphqlQueryContext {
 				'path' => '$.data.product.descriptionHtml',
 				'type' => 'string',
 			],
-			'type'           => [
+			'product_type'   => [
 				'name' => 'Product Type',
 				'path' => '$.data.product.productType',
 				'type' => 'string',

@@ -9,7 +9,7 @@ export function Edit( { attributes } ) {
 		<>
 			<BlockControls />
 			<div { ...innerBlocksProps }>
-				<p>{ JSON.stringify( attributes ) }</p>
+				<p>The product type is: { attributes.shopify_product_type }</p>
 			</div>
 		</>
 	);
