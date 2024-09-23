@@ -78,11 +78,6 @@ class BlockRegistration {
 
 			// Register a default pattern that simply displays the available data.
 			BlockPatterns::register_default_block_pattern( $block_name, $config['title'], $config['queries']['__DISPLAY__'] );
-
-			// Register any user-provided patterns.
-			foreach ( $config['patterns'] as $pattern_name => $pattern_options ) {
-				register_block_pattern( $pattern_name, $pattern_options );
-			}
 		}
 
 		foreach ( array_unique( $scripts_to_localize ) as $script_handle ) {
