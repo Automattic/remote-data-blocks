@@ -73,17 +73,13 @@ export const HttpSettings = ( {
 	};
 
 	const shouldAllowSubmit = useMemo( () => {
-		if ( ! state.slug || ! state.url || ! state.authType || ! state.authValue ) {
-			return false;
-		}
-
 		if ( state.authType === 'api-key' ) {
 			if ( ! state.authKey || ! state.authAddTo ) {
 				return false;
 			}
 		}
 
-		return true;
+		return state.slug && state.url && state.authType && state.authValue;
 	}, [ state.slug, state.url, state.authType, state.authValue, state.authKey, state.authAddTo ] );
 
 	const onSaveClick = async () => {
