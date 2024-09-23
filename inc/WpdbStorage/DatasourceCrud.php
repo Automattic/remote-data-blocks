@@ -24,7 +24,7 @@ class DatasourceCrud {
 			return $new_datasource;
 		}
 
-		$result = self::save_datasource( $new_datasource->to_array(), $data_sources );
+		$result = self::save_datasource( $new_datasource, $data_sources );
 
 		if ( true !== $result ) {
 			return new WP_Error( 'failed_to_register_data_source', __( 'Failed to register data source.', 'remote-data-blocks' ) );
@@ -66,8 +66,7 @@ class DatasourceCrud {
 			return $datasource;
 		}
 
-		$updated = $datasource->to_array();
-		$result  = self::save_datasource( $updated, $data_sources );
+		$result = self::save_datasource( $datasource, $data_sources );
 		
 		if ( true !== $result ) {
 			return new WP_Error( 'failed_to_update_data_source', __( 'Failed to update data source.', 'remote-data-blocks' ) );
@@ -86,21 +85,23 @@ class DatasourceCrud {
 		return true;
 	}
 
-	private static function save_datasource( array $datasource, array $datasources ): bool {
-		if ( ! isset( $datasource['_metadata'] ) ) {
-			$datasource['_metadata'] = [];
+	private static function save_datasource( ArraySerializableInterface $datasource, array $datasource_configs ): bool {
+		$config = $datasource->to_array();
+		
+		if ( ! isset( $config['_metadata'] ) ) {
+			$config['_metadata'] = [];
 		}
 
 		$now = gmdate( 'Y-m-d H:i:s' );
 		
-		if ( ! isset( $datasource['_metadata']['created_at'] ) ) {
-			$datasource['_metadata']['created_at'] = $now;
+		if ( ! isset( $config['_metadata']['created_at'] ) ) {
+			$config['_metadata']['created_at'] = $now;
 		}
 
-		$datasource['_metadata']['updated_at'] = $now;
-		$datasources[ $datasource['uuid'] ]    = $datasource;
+		$config['_metadata']['updated_at']     = $now;
+		$datasource_configs[ $config['uuid'] ] = $config;
 
-		return update_option( self::CONFIG_OPTION_NAME, $datasources );
+		return update_option( self::CONFIG_OPTION_NAME, $datasource_configs );
 	}
 
 	private static function resolve_datasource( array $config ): HttpDatasourceInterface|WP_Error {

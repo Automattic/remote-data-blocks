@@ -49,6 +49,13 @@ class Validator implements ValidatorInterface {
 			return new WP_Error( 'invalid_value', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), $schema['const'], $data ) );
 		}
 
+		if ( isset( $schema['callback'] ) && is_callable( $schema['callback'] ) ) {
+			if ( false === call_user_func( $schema['callback'], $data ) ) {
+				// translators: %1$s is the callback name, %2$s is the value given to the callback.
+				return new WP_Error( 'invalid_value', sprintf( __( 'Validate callback %1$s failed with value %2$s.', 'remote-data-blocks' ), $schema['callback'], $data ) );
+			}
+		}
+
 		if ( isset( $schema['properties'] ) && is_array( $schema['properties'] ) ) {
 			foreach ( $schema['properties'] as $field => $field_schema ) {
 				if ( isset( $field_schema['required'] ) && false === $field_schema['required'] && ! isset( $data[ $field ] ) ) {

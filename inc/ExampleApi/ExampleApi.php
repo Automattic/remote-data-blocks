@@ -34,6 +34,7 @@ class ExampleApi {
 		$datasource = ExampleApiDatasource::from_array( [
 			'service'                => 'example_api',
 			'service_schema_version' => 1,
+			'uuid'                   => wp_generate_uuid4(),
 		] );
 		
 		$get_record_query = new ExampleApiGetRecordQuery( $datasource );
