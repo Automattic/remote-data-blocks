@@ -1,11 +1,4 @@
-import {
-	Button,
-	ButtonGroup,
-	Card,
-	CardBody,
-	CardHeader,
-	SelectControl,
-} from '@wordpress/components';
+import { Card, CardBody, CardHeader, SelectControl } from '@wordpress/components';
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -16,21 +9,16 @@ import {
 	useAirtableApiUserId,
 } from '@/data-sources/airtable/airtable-api-hooks';
 import { AirtableFormState } from '@/data-sources/airtable/types';
+import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
-import { AirtableConfig } from '@/data-sources/types';
+import { AirtableConfig, SettingsComponentProps } from '@/data-sources/types';
 import { getConnectionMessage } from '@/data-sources/utils';
 import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import { StringIdName } from '@/types/common';
 import { SelectOption } from '@/types/input';
-
-export interface AirtableSettingsProps {
-	mode: 'add' | 'edit';
-	uuid?: string;
-	config?: AirtableConfig;
-}
 
 const initialState: AirtableFormState = {
 	access_token: '',
@@ -59,7 +47,7 @@ export const AirtableSettings = ( {
 	mode,
 	uuid: uuidFromProps,
 	config,
-}: AirtableSettingsProps ) => {
+}: SettingsComponentProps< AirtableConfig > ) => {
 	const { goToMainScreen } = useSettingsContext();
 	const { updateDataSource, addDataSource, slugConflicts, loadingSlugConflicts } =
 		useDataSources( false );
@@ -76,11 +64,7 @@ export const AirtableSettings = ( {
 		userId ?? ''
 	);
 
-	const handleSaveError = ( error: unknown ) => {
-		console.error( error );
-	};
-
-	const onSaveClick = () => {
+	const onSaveClick = async () => {
 		if ( ! state.base ) {
 			// TODO: Error handling
 			return;
@@ -95,9 +79,11 @@ export const AirtableSettings = ( {
 		};
 
 		if ( mode === 'add' ) {
-			void addDataSource( airtableConfig ).then( goToMainScreen ).catch( handleSaveError );
+			await addDataSource( airtableConfig );
+		} else {
+			await updateDataSource( airtableConfig );
 		}
-		void updateDataSource( airtableConfig ).then( goToMainScreen ).catch( handleSaveError );
+		goToMainScreen();
 	};
 
 	const onTokenInputChange: InputChangeCallback = ( token: string | undefined ) => {
@@ -153,7 +139,7 @@ export const AirtableSettings = ( {
 	}, [ fetchingUserId, userId, userIdError ] );
 
 	const shouldAllowSubmit = useMemo( () => {
-		return bases === null || ! state.base || ! state.slug || loadingSlugConflicts || slugConflicts;
+		return bases !== null && state.base && state.slug && ! loadingSlugConflicts && ! slugConflicts;
 	}, [ bases, state.base, state.slug, loadingSlugConflicts, slugConflicts ] );
 
 	const basesHelpText = useMemo( () => {
@@ -221,20 +207,11 @@ export const AirtableSettings = ( {
 						/>
 					</div>
 
-					<div className="form-group">
-						<ButtonGroup className="form-actions">
-							<Button
-								variant="primary"
-								onClick={ () => void onSaveClick() }
-								disabled={ shouldAllowSubmit }
-							>
-								{ __( 'Save', 'remote-data-blocks' ) }
-							</Button>
-							<Button variant="secondary" onClick={ goToMainScreen }>
-								{ __( 'Cancel', 'remote-data-blocks' ) }
-							</Button>
-						</ButtonGroup>
-					</div>
+					<DataSourceFormActions
+						onSave={ onSaveClick }
+						onCancel={ goToMainScreen }
+						isSaveDisabled={ ! shouldAllowSubmit }
+					/>
 				</form>
 			</CardBody>
 		</Card>

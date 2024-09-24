@@ -1,7 +1,7 @@
 import { useDebounce } from '@wordpress/compose';
 import { useEffect, useMemo, useCallback } from '@wordpress/element';
 
-import { GoogleApi } from '@/data-sources/api/google';
+import { GoogleApi } from '@/data-sources/api-clients/google';
 import { useQuery } from '@/hooks/useQuery';
 
 export const useGoogleSpreadsheetsOptions = ( token: string | null ) => {
