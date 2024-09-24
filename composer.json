@@ -5,12 +5,25 @@
       "name": "WPVIP"
     }
   ],
+  "license": "GPL-2.0-or-later",
+  "autoload": {
+    "psr-4": {
+      "RemoteDataBlocks\\": "inc/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "RemoteDataBlocks\\Tests\\": "tests/inc/"
+    }
+  },
   "scripts": {
     "phpcs": "phpcs",
     "phpcs-fix": "phpcbf",
-    "test": "./vendor/bin/phpunit"
+    "test": "./vendor/bin/phpunit",
+    "test-coverage": "./vendor/bin/phpunit --coverage-clover ./coverage/phpunit/clover.xml"
   },
   "require": {
+    "php": ">=8.1",
     "galbar/jsonpath": "^3.0",
     "guzzlehttp/guzzle": "^7.8",
     "kevinrob/guzzle-cache-middleware": "^5.1",
@@ -19,7 +32,7 @@
   "require-dev": {
     "automattic/vipwpcs": "^3.0",
     "phpcompatibility/phpcompatibility-wp": "^2.1",
-    "phpunit/phpunit": "^11"
+    "phpunit/phpunit": "^10"
   },
   "config": {
     "allow-plugins": {

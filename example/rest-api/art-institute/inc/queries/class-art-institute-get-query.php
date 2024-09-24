@@ -2,17 +2,17 @@
 
 namespace RemoteDataBlocks\Example\ArtInstituteOfChicago;
 
-use RemoteDataBlocks\Config\HttpDatasourceConfig;
-use RemoteDataBlocks\Config\QueryContext;
+use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
-class ArtInstituteOfChicagoGetArtQuery extends QueryContext {
+class ArtInstituteOfChicagoGetArtQuery extends HttpQueryContext {
 	public array $input_variables = [
 		'id' => [
 			'type' => 'id',
 		],
 	];
 
-	public function __construct( HttpDatasourceConfig $datasource ) {
+	public function __construct( HttpDatasource $datasource ) {
 		parent::__construct( $datasource );
 
 		// Defining the output variables in the constructor allows us to provide

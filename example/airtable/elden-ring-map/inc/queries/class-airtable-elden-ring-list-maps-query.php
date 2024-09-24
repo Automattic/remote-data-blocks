@@ -2,9 +2,9 @@
 
 namespace RemoteDataBlocks\Example\Airtable\EldenRingMap;
 
-use RemoteDataBlocks\Config\QueryContext;
+use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
-class AirtableEldenRingListMapsQuery extends QueryContext {
+class AirtableEldenRingListMapsQuery extends HttpQueryContext {
 	public array $input_variables = [
 		'search' => [
 			'type' => 'string',
@@ -29,7 +29,7 @@ class AirtableEldenRingListMapsQuery extends QueryContext {
 	];
 
 	public function get_endpoint( $input_variables ): string {
-		return $this->get_datasource()->get_endpoint() . '/' . AirtableEldenRingMapDatasource::MAPS_TABLE;
+		return $this->get_datasource()->get_endpoint() . '/tblS3OYo8tZOg04CP';
 	}
 
 	public function get_query_name(): string {

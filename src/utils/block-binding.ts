@@ -1,5 +1,9 @@
 import { BLOCK_BINDING_SOURCE } from '@/config/constants';
+import { getClassName } from '@/utils/string';
 import { isObjectWithStringKeys } from '@/utils/type-narrowing';
+
+import type { BlockPattern } from '@wordpress/block-editor';
+import type { BlockInstance } from '@wordpress/blocks';
 
 function getAttributeValue( attributes: unknown, key: string | undefined | null ): string {
 	if ( ! key || ! isObjectWithStringKeys( attributes ) ) {
@@ -24,27 +28,48 @@ function getExpectedAttributeValue(
 
 	let expectedValue = result[ args.field ];
 	if ( args.label ) {
-		expectedValue = `${ args.label }: ${ expectedValue }`;
+		const labelClass = getClassName( 'block-label' );
+		expectedValue = `<span class="${ labelClass }">${ args.label }</span> ${ expectedValue }`;
 	}
 
 	return expectedValue ?? null;
 }
 
 export function getBoundAttributeEntries(
-	attributes: RemoteDataInnerBlockAttributes
+	attributes: RemoteDataInnerBlockAttributes,
+	remoteDataBlockName: string
 ): [ string, RemoteDataBlockBinding ][] {
 	return Object.entries( attributes.metadata?.bindings ?? {} ).filter(
-		( [ _target, binding ] ) => binding.source === BLOCK_BINDING_SOURCE
+		( [ _target, binding ] ) =>
+			binding.source === BLOCK_BINDING_SOURCE && binding.args?.block === remoteDataBlockName
 	);
+}
+
+export function getBoundBlockClassName(
+	attributes: RemoteDataInnerBlockAttributes,
+	remoteDataBlockName: string
+): string {
+	const existingClassNames = ( attributes.className ?? '' )
+		.split( /\s/ )
+		.filter( className => ! className.startsWith( 'rdb-block-data-' ) );
+	const classNames = new Set< string | undefined >( [
+		...existingClassNames,
+		...getBoundAttributeEntries( attributes, remoteDataBlockName ).map( ( [ _target, binding ] ) =>
+			getClassName( `block-data-${ binding.args.field }` )
+		),
+	] );
+
+	return Array.from( classNames.values() ).filter( Boolean ).join( ' ' );
 }
 
 export function getMismatchedAttributes(
 	attributes: RemoteDataInnerBlockAttributes,
 	results: RemoteData[ 'results' ],
+	remoteDataBlockName: string,
 	index = 0
 ): Partial< RemoteDataInnerBlockAttributes > {
 	return Object.fromEntries(
-		getBoundAttributeEntries( attributes )
+		getBoundAttributeEntries( attributes, remoteDataBlockName )
 			.map( ( [ target, binding ] ) => [
 				target,
 				getExpectedAttributeValue( results[ index ], binding.args ),
@@ -53,6 +78,23 @@ export function getMismatchedAttributes(
 				( [ target, value ] ) => null !== value && value !== getAttributeValue( attributes, target )
 			)
 	) as Partial< RemoteDataInnerBlockAttributes >;
+}
+
+/**
+ * Recursively determine if a block or its inner blocks have any block bindings.
+ */
+export function hasBlockBinding(
+	block: BlockInstance< RemoteDataInnerBlockAttributes >,
+	remoteDataBlockName: string
+): boolean {
+	if ( getBoundAttributeEntries( block.attributes, remoteDataBlockName ).length > 0 ) {
+		return true;
+	}
+
+	return (
+		block.innerBlocks?.some( innerBlock => hasBlockBinding( innerBlock, remoteDataBlockName ) ) ??
+		false
+	);
 }
 
 export function hasRemoteDataChanged( one: RemoteData, two: RemoteData ): boolean {
@@ -65,4 +107,11 @@ export function hasRemoteDataChanged( one: RemoteData, two: RemoteData ): boolea
 	const { metadata: _removed3, resultId: _removed4, ...clean2 } = two;
 
 	return JSON.stringify( clean1 ) !== JSON.stringify( clean2 );
+}
+
+/**
+ * Determine if a block pattern is a synced pattern / resuable block.
+ */
+export function isSyncedPattern( pattern: BlockPattern ): boolean {
+	return Boolean( pattern.id && pattern.syncStatus !== 'unsynced' );
 }

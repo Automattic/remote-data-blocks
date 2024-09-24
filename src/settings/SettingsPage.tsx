@@ -1,10 +1,11 @@
-import { Panel } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 import DataSourceList from '@/data-sources/DataSourceList';
 import DataSourceSettings from '@/data-sources/DataSourceSettings';
 import Notices from '@/settings/Notices';
 import { SettingsContext, useDataSourceRouter } from '@/settings/hooks/useSettingsNav';
+
+import './settings-page.scss';
 
 function versionAndBuild() {
 	const localized = window.REMOTE_DATA_BLOCKS_SETTINGS;
@@ -20,22 +21,27 @@ function versionAndBuild() {
 
 const SettingsPage = () => {
 	const settingsContext = useDataSourceRouter();
+
 	return (
-		<SettingsContext.Provider value={ settingsContext }>
-			<Notices />
-			<Panel
-				header={ sprintf(
-					__( 'Remote Data Blocks Settings -- Version %s', 'remote-data-blocks' ),
-					versionAndBuild()
-				) }
-			>
-				{ [ 'addDataSource', 'editDataSource' ].includes( settingsContext.screen ) ? (
-					<DataSourceSettings />
-				) : (
-					<DataSourceList />
-				) }
-			</Panel>
-		</SettingsContext.Provider>
+		<div className="rdb-settings-page">
+			<div className="page-title">
+				<h1>{ __( 'Remote Data Blocks', 'remote-data-blocks' ) }</h1>
+				<p className="plugin-version">
+					{ sprintf( __( '-- Version %s', 'remote-data-blocks' ), versionAndBuild() ) }
+				</p>
+			</div>
+			<div className="page-content">
+				<SettingsContext.Provider value={ settingsContext }>
+					<Notices />
+
+					{ [ 'addDataSource', 'editDataSource' ].includes( settingsContext.screen ) ? (
+						<DataSourceSettings />
+					) : (
+						<DataSourceList />
+					) }
+				</SettingsContext.Provider>
+			</div>
+		</div>
 	);
 };
 

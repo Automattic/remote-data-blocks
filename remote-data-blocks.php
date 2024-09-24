@@ -1,9 +1,10 @@
 <?php
 /**
  * Plugin Name: Remote Data Blocks
- * Plugin URI: https://github.com/Automattic/remote-data-blocks
+ * Plugin URI: https://remotedatablocks.com
  * Description: Integrate external data sources into WordPress blocks, enabling dynamic content from APIs and databases within the block editor and within your content.
  * Author: WPVIP
+ * Author URI: https://wpvip.com
  * Text Domain: remote-data-blocks
  * Version: 0.1.0
  * Requires at least: 6.6
@@ -22,24 +23,34 @@ define( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION', '0.1.0' );
 
 define( 'REMOTE_DATA_BLOCKS__REST_NAMESPACE', 'remote-data-blocks/v1' );
 
+// Datasource services
+require_once __DIR__ . '/inc/integrations/constants.php';
+
 // Autoloader
-require_once __DIR__ . '/inc/autoloader.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
+// Access functions
+require_once __DIR__ . '/functions.php';
+
 // Other editor modifications
-Editor\AdminNotices::init();
-Editor\BlockBindings::init();
-Editor\BlockRegistration::init();
-Editor\ConfigurationLoader::init();
-Editor\FieldShortcode::init();
-Editor\QueryOverrides::init();
-Editor\PatternEditor::init();
+Editor\AdminNotices\AdminNotices::init();
+Editor\DataBinding\BlockBindings::init();
+Editor\DataBinding\FieldShortcode::init();
+Editor\DataBinding\QueryOverrides::init();
+Editor\BlockManagement\BlockRegistration::init();
+Editor\BlockManagement\ConfigRegistry::init();
+Editor\PatternEditor\PatternEditor::init();
 
-// Integrations
-Integrations\VipBlockDataApi::init();
-
-// REST endpoints
-REST\RemoteData::init();
+// Example API
+ExampleApi\ExampleApi::init();
 
 // Load Settings Page
-PluginSettings::init();
+PluginSettings\PluginSettings::init();
+
+// Integrations
+Integrations\Airtable\AirtableIntegration::init();
+Integrations\Shopify\ShopifyIntegration::init();
+Integrations\VipBlockDataApi\VipBlockDataApi::init();
+
+// REST endpoints
+REST\RemoteDataController::init();

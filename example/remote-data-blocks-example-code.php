@@ -35,10 +35,11 @@ function load_only_if_parent_plugin_is_active() {
 	}
 
 	require_once __DIR__ . '/airtable/elden-ring-map/register.php';
-	require_once __DIR__ . '/airtable/events/register.php';
+	require_once __DIR__ . '/github/remote-data-blocks/register.php';
 	require_once __DIR__ . '/rest-api/art-institute/register.php';
 	require_once __DIR__ . '/rest-api/zip-code/register.php';
 	require_once __DIR__ . '/shopify/register.php';
+	require_once __DIR__ . '/google-sheets/westeros-houses/register.php';
 }
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\load_only_if_parent_plugin_is_active', 10, 0 );
 
@@ -53,6 +54,7 @@ function get_access_token( string $example_name ): string {
 		'airtable_elden_ring',
 		'airtable_events',
 		'shopify',
+		'google_sheets_westeros_houses',
 	];
 
 	if ( ! in_array( $example_name, $supported_tokens, true ) ) {

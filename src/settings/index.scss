@@ -1,72 +1,43 @@
-.add-data-source-modal {
+@import url( ./../styles/components/components.scss );
 
-	.components-button-group {
+.settings_page_remote-data-blocks-settings {
+
+	#wpcontent {
+		padding: 0;
+	}
+
+	#remote-data-blocks-settings-wrapper {
 		display: flex;
-		gap: 0.5rem;
-	}
-}
-
-#remote-data-blocks-settings {
-	max-width: 1200px;
-
-	.components-input-control__input {
-		min-width: 300px;
+		flex-direction: column;
+		align-items: center;
+		padding: 24px 20px;
 	}
 
-	.components-text-control__input {
-		min-width: 290px;
-	}
-
-	.components-select-control__input {
-		min-width: 332px;
-	}
-
-	.components-button-group {
-		display: flex;
-		gap: 0.5rem;
-	}
-
-	.components-button-group.settings-form-cta-button-group {
-		margin: 0.5rem;
-	}
-
-	.data-source-list-heading {
-		margin-bottom: 0;
-	}
-
-	table {
+	#remote-data-blocks-settings {
 		width: 100%;
-		border-collapse: collapse;
+		max-width: 1400px;
+	}
 
-		th {
-			text-align: left;
-			background-color: #007cba; // WordPress blue background for table headers
-			color: #fff; // White text color for better contrast
-			padding: 0.5rem;
+	.page-title {
+		display: flex;
+		align-items: center;
+
+		h1 {
+			font-weight: 500;
+			line-height: 32px;
+			margin: 0;
 		}
 
-		td {
-			padding: 0.5rem;
-		}
-
-		tr:nth-child(even) {
-			background-color: #e1f5ff; // Lighter shade of WordPress blue for alternate rows
+		p {
+			margin: 5px 0 0 6px;
 		}
 	}
 
-	.data-source-list {
+	.page-content {
+		margin-top: 24px;
 
-		td:last-child,
-		th:last-child {
-			width: 1%;
-			white-space: nowrap;
-			text-align: right;
-			padding-right: 0;
-		}
-
-		.data-source-meta {
-			display: flex;
-			gap: 0.5rem;
+		> *:not(:first-child) {
+			margin-top: 18px;
 		}
 	}
 }

@@ -28,7 +28,10 @@ declare module '@wordpress/block-editor' {
 	// Incomplete type for our use case.
 	interface BlockPattern {
 		blocks: BlockInstance< RemoteDataInnerBlockAttributes >[];
+		id?: number;
 		name: string;
+		source: string;
+		syncStatus: string;
 		title: string;
 	}
 
@@ -37,6 +40,7 @@ declare module '@wordpress/block-editor' {
 	}
 
 	interface BlockEditorStoreSelectors {
+		__experimentalGetAllowedPatterns: ( clientId: string ) => BlockPattern[];
 		getBlocks: < T extends BlockAttributes >( clientId: string ) => BlockInstance< T >[];
 		getBlocksByClientId: < T extends BlockAttributes >( clientId: string ) => BlockInstance< T >[];
 		getBlocksByName: ( name: string ) => string[];

@@ -18,7 +18,11 @@ interface ItemListProps {
 
 export function ItemList( props: ItemListProps ) {
 	const { getPatternsByBlockTypes } = usePatterns( props.blockName, '' );
-	const [ pattern ] = getPatternsByBlockTypes( props.blockName );
+
+	// Find the pattern that the plugin has registered that is guaranteed to work.
+	const pattern = getPatternsByBlockTypes( props.blockName ).find(
+		( { name } ) => `${ props.blockName }/pattern` === name
+	);
 
 	if ( props.loading || ! pattern ) {
 		return <Spinner />;
@@ -33,7 +37,9 @@ export function ItemList( props: ItemListProps ) {
 	}
 
 	return props.results.map( ( result, index ) => {
-		const blocks = pattern?.blocks.map( block => cloneBlockWithAttributes( block, result ) ) ?? [];
+		const blocks =
+			pattern?.blocks.map( block => cloneBlockWithAttributes( block, result, props.blockName ) ) ??
+			[];
 
 		return (
 			<ItemPreview key={ index } blocks={ blocks } onSelect={ () => props.onSelect( result ) } />

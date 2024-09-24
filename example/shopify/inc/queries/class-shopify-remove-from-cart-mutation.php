@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Example\Shopify;
 
-use RemoteDataBlocks\Config\GraphqlMutationContext;
+use RemoteDataBlocks\Config\QueryContext\GraphqlMutationContext;
 
 class ShopifyRemoveFromCartMutation extends GraphqlMutationContext {
 	public array $input_variables = [

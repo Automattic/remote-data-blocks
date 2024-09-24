@@ -2,35 +2,31 @@
 
 namespace RemoteDataBlocks\Example\Airtable\Events;
 
-use RemoteDataBlocks\Config\QueryContext;
+use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
-class AirtableListEventsQuery extends QueryContext {
-	public array $input_variables = [
-		'search' => [
-			'type' => 'string',
-		],
-	];
+class AirtableListEventsQuery extends HttpQueryContext {
+	public array $input_variables = [];
 
 	public array $output_variables = [
 		'root_path'     => '$.records[*]',
 		'is_collection' => true,
 		'mappings'      => [
-			'event_id' => [
-				'name' => 'Event ID',
+			'record_id' => [
+				'name' => 'Record ID',
 				'path' => '$.id',
 				'type' => 'id',
 			],
-			'title'    => [
+			'title'     => [
 				'name' => 'Title',
 				'path' => '$.fields.Activity',
 				'type' => 'string',
 			],
-			'location' => [
+			'location'  => [
 				'name' => 'Location',
 				'path' => '$.fields.Location',
 				'type' => 'string',
 			],
-			'type'     => [
+			'type'      => [
 				'name' => 'Type',
 				'path' => '$.fields.Type',
 				'type' => 'string',
@@ -40,5 +36,9 @@ class AirtableListEventsQuery extends QueryContext {
 
 	public function get_query_name(): string {
 		return 'List events';
+	}
+
+	public function get_endpoint( array $input_variables ): string {
+		return $this->get_datasource()->get_endpoint() . '/tblyGtuxblLtmoqMI';
 	}
 }
