@@ -2,12 +2,11 @@
 
 namespace RemoteDataBlocks\Integrations\Google\Sheets;
 
-use RemoteDataBlocks\Config\ArraySerializableInterface;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
 use WP_Error;
 
-class GoogleSheetsDatasource extends HttpDatasource implements ArraySerializableInterface {
+class GoogleSheetsDatasource extends HttpDatasource {
 	protected const SERVICE_NAME           = REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE;
 	protected const SERVICE_SCHEMA_VERSION = 1;
 
@@ -87,7 +86,7 @@ class GoogleSheetsDatasource extends HttpDatasource implements ArraySerializable
 			'service'     => REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE,
 			'spreadsheet' => [ 'name' => $this->config['spreadsheet_id'] ],
 			'sheet'       => [ 'name' => '' ],
-			'uuid'        => $this->config['uuid'],
+			'uuid'        => $this->config['uuid'] ?? null,
 		];
 	}
 }

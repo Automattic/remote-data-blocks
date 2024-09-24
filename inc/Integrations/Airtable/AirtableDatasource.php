@@ -3,9 +3,8 @@
 namespace RemoteDataBlocks\Integrations\Airtable;
 
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
-use RemoteDataBlocks\Config\Datasource\HttpDatasourceInterface;
 
-class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterface {
+class AirtableDatasource extends HttpDatasource {
 	protected const SERVICE_SCHEMA_VERSION = 1;
 
 	protected const SERVICE_SCHEMA = [
@@ -36,10 +35,6 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 			],
 		],
 	];
-
-	public function get_access_token(): string {
-		return $this->config['access_token'];
-	}
 
 	public function get_display_name(): string {
 		return sprintf( 'Airtable: %s', $this->config['display_name'] ?? $this->config['base_name'] );
@@ -72,9 +67,9 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'base'    => [
 				'id'   => $this->config['base']['id'],
-				'name' => $this->config['base']['name'],
+				'name' => $this->config['base']['name'] ?? null,
 			],
-			'uuid'    => $this->config['uuid'],
+			'uuid'    => $this->config['uuid'] ?? null,
 		];
 	}
 }

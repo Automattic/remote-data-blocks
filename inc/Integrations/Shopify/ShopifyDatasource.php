@@ -2,14 +2,13 @@
 
 namespace RemoteDataBlocks\Integrations\Shopify;
 
-use RemoteDataBlocks\Config\ArraySerializableInterface;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 
 use function plugins_url;
 
 defined( 'ABSPATH' ) || exit();
 
-class ShopifyDatasource extends HttpDatasource implements ArraySerializableInterface {
+class ShopifyDatasource extends HttpDatasource {
 	protected const SERVICE_NAME           = REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE;
 	protected const SERVICE_SCHEMA_VERSION = 1;
 
@@ -28,10 +27,6 @@ class ShopifyDatasource extends HttpDatasource implements ArraySerializableInter
 			'store_name'             => [ 'type' => 'string' ],
 		],
 	];
-
-	public function get_store_name(): string {
-		return $this->config['store_name'];
-	}
 
 	public function get_display_name(): string {
 		return 'Shopify (' . $this->config['slug'] . ')';
@@ -66,7 +61,7 @@ class ShopifyDatasource extends HttpDatasource implements ArraySerializableInter
 			'slug'       => $this->get_slug(),
 			'service'    => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
 			'store_name' => $this->config['store_name'],
-			'uuid'       => $this->config['uuid'],
+			'uuid'       => $this->config['uuid'] ?? null,
 		];
 	}
 }
