@@ -34,7 +34,7 @@ class ShopifyDatasource extends HttpDatasource implements ArraySerializableInter
 	}
 
 	public function get_display_name(): string {
-		return 'Shopify (' . $this->config['store_name'] . ')';
+		return 'Shopify (' . $this->config['slug'] . ')';
 	}
 
 	public function get_endpoint(): string {
