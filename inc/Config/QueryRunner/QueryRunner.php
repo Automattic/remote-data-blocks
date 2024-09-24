@@ -198,13 +198,13 @@ class QueryRunner implements QueryRunnerInterface {
 				return $field_value_single;
 
 			case 'price':
-				return sprintf( '$%s', number_format( $field_value_single, 2 ) );
+				return sprintf( '$%s', number_format( (float) $field_value_single, 2 ) );
 
 			case 'string':
 				return wp_strip_all_tags( $field_value_single );
 		}
 
-		return $field_value_single;
+		return (string) $field_value_single;
 	}
 
 	/**
