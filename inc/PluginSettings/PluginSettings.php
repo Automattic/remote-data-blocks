@@ -158,7 +158,7 @@ class PluginSettings {
 
 		try {
 			$decrypted = $decryptor->decrypt( $value );
-			return json_decode( $decrypted );
+			return json_decode( $decrypted, true );
 		} catch ( \Exception $e ) {
 			add_settings_error(
 				'remote_data_blocks_settings',

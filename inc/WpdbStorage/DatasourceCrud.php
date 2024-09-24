@@ -66,7 +66,7 @@ class DatasourceCrud {
 	}
 
 	public static function get_config(): array {
-		return json_decode( wp_json_encode( get_option( self::CONFIG_OPTION_NAME, [] ) ), true );
+		return get_option( self::CONFIG_OPTION_NAME, [] );
 	}
 
 	public static function get_data_sources( string $service = '' ): array {

@@ -5,6 +5,9 @@ namespace RemoteDataBlocks\REST;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\WpdbStorage\DatasourceCrud;
 use WP_REST_Controller;
+use WP_REST_Request;
+use WP_REST_Response;
+use WP_Error;
 
 defined( 'ABSPATH' ) || exit();
 
@@ -95,33 +98,63 @@ class DatasourceController extends WP_REST_Controller {
 		);
 	}
 
-	public function create_item( WP_REST_Request $request ): WP_REST_Response {
+	/**
+	 * Creates a new item.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function create_item( $request ) {
 		$item = DatasourceCrud::register_new_data_source( $request->get_json_params() );
 		return rest_ensure_response( $item );
 	}
 
-	public function get_items( WP_REST_Request $request ): WP_REST_Response {
+	/**
+	 * Retrieves a collection of items.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function get_items( $request ) {
 		$code_configured_data_sources = ConfigStore::get_datasources_displayable();
 		$ui_configured_data_sources   = DatasourceCrud::get_data_sources_list();
 		return rest_ensure_response( array_merge( $code_configured_data_sources, $ui_configured_data_sources ) );
 	}
 
-	public function get_item( WP_REST_Request $request ): WP_REST_Response {
+	/**
+	 * Retrieves a single item.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function get_item( $request ) {
 		$response = DatasourceCrud::get_item_by_uuid( DatasourceCrud::get_data_sources(), $request->get_param( 'uuid' ) );
 		return rest_ensure_response( $response );
 	}
 
-	public function update_item( WP_REST_Request $request ): WP_REST_Response {
+	/**
+	 * Updates a single item.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function update_item( $request ) {
 		$item = DatasourceCrud::update_item_by_uuid( $request->get_param( 'uuid' ), $request->get_json_params() );
 		return rest_ensure_response( $item );
 	}
 
-	public function delete_item( WP_REST_Request $request ): WP_REST_Response {
+	/**
+	 * Deletes a single item.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function delete_item( $request ) {
 		$result = DatasourceCrud::delete_item_by_uuid( $request->get_param( 'uuid' ) );
 		return rest_ensure_response( $result );
 	}
 
-	public function item_slug_conflicts( WP_REST_Request $request ): WP_REST_Response {
+	public function item_slug_conflicts( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$slug = $request->get_param( 'slug' );
 		$uuid = $request->get_param( 'uuid' ) ?? '';
 		if ( empty( $slug ) ) {
@@ -140,27 +173,51 @@ class DatasourceController extends WP_REST_Controller {
 
 	// These all require manage_options for now, but we can adjust as needed
 
-	public function get_item_permissions_check( WP_REST_Request $request ): bool {
+	/**
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return bool|WP_Error True if the request has access to read the item, WP_Error object otherwise.
+	 */
+	public function get_item_permissions_check( $request ) {
 		return current_user_can( 'manage_options' );
 	}
 
-	public function get_items_permissions_check( WP_REST_Request $request ): bool {
+	/**
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return bool|WP_Error True if the request has access to read the item, WP_Error object otherwise.
+	 */
+	public function get_items_permissions_check( $request ) {
 		return current_user_can( 'manage_options' );
 	}
 
-	public function create_item_permissions_check( WP_REST_Request $request ): bool {
+	/**
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return bool|WP_Error True if the request has access to read the item, WP_Error object otherwise.
+	 */
+	public function create_item_permissions_check( $request ) {
 		return current_user_can( 'manage_options' );
 	}
 
-	public function update_item_permissions_check( WP_REST_Request $request ): bool {
+	/**
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return bool|WP_Error True if the request has access to read the item, WP_Error object otherwise.
+	 */
+	public function update_item_permissions_check( $request ) {
 		return current_user_can( 'manage_options' );
 	}
 
-	public function delete_item_permissions_check( WP_REST_Request $request ): bool {
+	/**
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return bool|WP_Error True if the request has access to read the item, WP_Error object otherwise.
+	 */
+	public function delete_item_permissions_check( $request ) {
 		return current_user_can( 'manage_options' );
 	}
 
-	public function item_slug_conflicts_permissions_check( WP_REST_Request $request ): bool {
+	/**
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return bool|WP_Error True if the request has access to read the item, WP_Error object otherwise.
+	 */
+	public function item_slug_conflicts_permissions_check( $request ) {
 		return current_user_can( 'manage_options' );
 	}
 }
