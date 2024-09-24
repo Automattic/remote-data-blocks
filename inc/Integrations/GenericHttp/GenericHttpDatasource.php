@@ -27,6 +27,10 @@ class GenericHttpDatasource extends HttpDatasource {
 				'type'     => 'string',
 				'sanitize' => false,
 			],
+			'auth_add_to'            => [
+				'type' => 'string',
+				'enum' => [ 'header', 'query' ],
+			],
 			'url'                    => [
 				'type'     => 'string',
 				'sanitize' => 'sanitize_url',

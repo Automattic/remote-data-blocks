@@ -17,6 +17,7 @@ import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown, edit, info, trash } from '@wordpress/icons';
 
+import { SUPPORTED_SERVICES, SUPPORTED_SERVICES_LABELS } from './constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
@@ -24,7 +25,6 @@ import AirtableIcon from '@/settings/icons/airtable';
 import GoogleSheetsIcon from '@/settings/icons/google-sheets';
 import HttpIcon from '@/settings/icons/http';
 import ShopifyIcon from '@/settings/icons/shopify';
-import { SUPPORTED_SERVICES, SUPPORTED_SERVICES_LABELS } from './constants';
 
 import './data-source-list.scss';
 
