@@ -138,7 +138,7 @@ class PluginSettings {
 		return 'development' === wp_get_environment_type() && wp_is_development_mode( 'plugin' );
 	}
 
-	public static function pre_update_option_remote_data_blocks_config( array $new_value, string $old_value ): string|bool {
+	public static function pre_update_option_remote_data_blocks_config( array $new_value, array $old_value ): string|array|bool {
 		$encryptor = new \RemoteDataBlocks\WpdbStorage\DataEncryption();
 
 		try {
