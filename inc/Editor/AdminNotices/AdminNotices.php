@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Editor\AdminNotices;
 
@@ -11,20 +11,20 @@ defined( 'ABSPATH' ) || exit();
 class AdminNotices {
 	/**
 	 * An in-memory store for log messages used for display in an admin notice.
+	 *
+	 * @var array<int, array<string, string>>
 	 */
-	private static $log_store = [];
+	private static array $log_store = [];
 
 	/**
 	 * Log level threshold that must be met for user to see an admin notice.
 	 */
-	private static $log_level_threshold = LogLevel::ERROR;
+	private static string $log_level_threshold = LogLevel::ERROR;
 
 	/**
 	 * The number limit of messages to display in the admin notice.
-	 *
-	 * @var int
 	 */
-	private static $message_display_limit = 3;
+	private static int $message_display_limit = 3;
 
 	/**
 	 * Initialize the logger and provide WordPress hooks.

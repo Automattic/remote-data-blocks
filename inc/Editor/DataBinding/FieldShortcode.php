@@ -1,11 +1,11 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Editor\DataBinding;
 
 defined( 'ABSPATH' ) || exit();
 
 class FieldShortcode {
-	public static function init() {
+	public static function init(): void {
 		add_action( 'the_content', [ __CLASS__, 'render_frontend_fields' ] );
 	}
 
@@ -19,7 +19,7 @@ class FieldShortcode {
 		return null;
 	}
 
-	public static function render_frontend_fields( $content ) {
+	public static function render_frontend_fields( string $content ): string {
 		if ( ! str_contains( $content, 'remote-data-blocks-inline-field' ) ) {
 			return $content;
 		}

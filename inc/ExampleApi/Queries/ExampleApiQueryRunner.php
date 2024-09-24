@@ -1,10 +1,4 @@
-<?php
-
-/**
- * ExampleApiQueryRunner class
- *
- * @package remote-data-blocks
- */
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\ExampleApi\Queries;
 
@@ -15,6 +9,8 @@ use WP_Error;
 defined( 'ABSPATH' ) || exit();
 
 /**
+ * ExampleApiQueryRunner class
+ *
  * Execute the query by making an internal REST API request. This allows the
  * example API to work when running locally (inside a container). Otherwise,
  * there would be a mismatch between the public address (e.g., localhost:888) and
@@ -22,6 +18,9 @@ defined( 'ABSPATH' ) || exit();
  *
  * A nice side effect is that we avoid using Guzzle/cURL for this example, which
  * makes it runnable in environments like WP Now.
+ *
+ * @package remote-data-blocks
+ * @since 0.1.0
  */
 class ExampleApiQueryRunner extends QueryRunner {
 	protected function get_raw_response_data( array $input_variables ): array|WP_Error {

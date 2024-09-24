@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Validation;
 
@@ -13,14 +13,12 @@ interface ValidatorInterface {
 	/**
 	 * Constructor.
 	 * 
-	 * @param array $schema
 	 */
 	public function __construct( array $schema );
 
 	/**
 	 * Validate data against a schema.
 	 *
-	 * @param array $data
 	 *
 	 * @return true|\WP_Error WP_Error for invalid data, true otherwise
 	 */

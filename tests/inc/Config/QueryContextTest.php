@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Tests\Config;
 
@@ -8,9 +8,8 @@ use RemoteDataBlocks\Tests\Mocks\MockDatasource;
 use RemoteDataBlocks\Tests\Mocks\MockValidator;
 
 class QueryContextTest extends TestCase {
-
-	private $datasource;
-	private $query_context;
+	private MockDatasource $datasource;
+	private HttpQueryContext $query_context;
 
 	protected function setUp(): void {
 		$this->datasource    = MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator() );
@@ -25,21 +24,6 @@ class QueryContextTest extends TestCase {
 	public function testGetImageUrl() {
 		$result = $this->query_context->get_image_url();
 		$this->assertNull( $result );
-	}
-
-	public function testGetMetadata() {
-		$mock_response_metadata = [ 'age' => '60' ];
-		$mock_results           = [ [ 'id' => 1 ], [ 'id' => 2 ] ];
-
-		$metadata = $this->query_context->get_metadata( $mock_response_metadata, $mock_results );
-
-		$this->assertArrayHasKey( 'last_updated', $metadata );
-		$this->assertArrayHasKey( 'total_count', $metadata );
-		$this->assertSame( 'Last updated', $metadata['last_updated']['name'] );
-		$this->assertSame( 'string', $metadata['last_updated']['type'] );
-		$this->assertSame( 'Total count', $metadata['total_count']['name'] );
-		$this->assertSame( 'number', $metadata['total_count']['type'] );
-		$this->assertSame( 2, $metadata['total_count']['value'] );
 	}
 
 	public function testGetRequestMethod() {

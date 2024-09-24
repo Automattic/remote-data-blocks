@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Tests\Config;
 
@@ -14,10 +14,9 @@ use RemoteDataBlocks\Tests\Mocks\MockValidator;
 use WP_Error;
 
 class QueryRunnerTest extends TestCase {
-
-	private $http_datasource;
-	private $query_context;
-	private $http_client;
+	private MockDatasource $http_datasource;
+	private HttpQueryContext $query_context;
+	private HttpClient $http_client;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -26,12 +25,20 @@ class QueryRunnerTest extends TestCase {
 		$this->http_datasource = MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator() );
 
 		$this->query_context = new class($this->http_datasource, $this->http_client) extends HttpQueryContext {
-			private $request_method = 'GET';
-			private $request_body   = [ 'query' => 'test' ];
-			private $response_data  = null;
+			private string $request_method = 'GET';
+			private array $request_body    = [ 'query' => 'test' ];
+			private mixed $response_data   = null;
 
-			public function __construct( HttpDatasource $http_datasource, private HttpClient $http_client ) {
+			public function __construct( private HttpDatasource $http_datasource, private HttpClient $http_client ) {
 				parent::__construct( $http_datasource );
+			}
+
+			public function get_endpoint( array $input_variables = [] ): string {
+				return $this->http_datasource->get_endpoint();
+			}
+
+			public function get_image_url(): ?string {
+				return null;
 			}
 
 			public function get_request_method(): string {
@@ -170,6 +177,10 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'results', $result );
 		$this->assertFalse( $result['is_collection'] );
 
+		$this->assertArrayHasKey( 'metadata', $result );
+		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
+		$this->assertSame( 1, $result['metadata']['total_count']['value'] );
+
 		$expected_result = [
 			'result' => [
 				'test' => [
@@ -212,6 +223,10 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'results', $result );
 		$this->assertFalse( $result['is_collection'] );
 
+		$this->assertArrayHasKey( 'metadata', $result );
+		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
+		$this->assertSame( 1, $result['metadata']['total_count']['value'] );
+
 		$expected_result = [
 			'result' => [
 				'test' => [
@@ -253,6 +268,10 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
 		$this->assertFalse( $result['is_collection'] );
+
+		$this->assertArrayHasKey( 'metadata', $result );
+		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
+		$this->assertSame( 1, $result['metadata']['total_count']['value'] );
 
 		$expected_result = [
 			'result' => [
@@ -300,6 +319,10 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
 		$this->assertFalse( $result['is_collection'] );
+
+		$this->assertArrayHasKey( 'metadata', $result );
+		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
+		$this->assertSame( 1, $result['metadata']['total_count']['value'] );
 
 		$expected_result = [
 			'result' => [

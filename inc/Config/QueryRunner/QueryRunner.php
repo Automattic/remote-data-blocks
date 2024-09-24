@@ -1,11 +1,4 @@
-<?php
-
-/**
- * QueryRunner class
- *
- * @package remote-data-blocks
- * @since 0.1.0
- */
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Config\QueryRunner;
 
@@ -14,13 +7,17 @@ use GuzzleHttp\RequestOptions;
 use JsonPath\JsonObject;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\HttpClient\HttpClient;
-use RemoteDataBlocks\Logging\LoggerManager;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit();
 
 /**
- * Class that executes a query using HttpQueryContext.
+ * QueryRunner class
+ *
+ * Class that executes queries, leveraging provided QueryContext.
+ *
+ * @package remote-data-blocks
+ * @since 0.1.0
  */
 class QueryRunner implements QueryRunnerInterface {
 
@@ -111,6 +108,43 @@ class QueryRunner implements QueryRunnerInterface {
 		];
 	}
 
+	/**
+	 * Get the response metadata for the query.
+	 *
+	 * @param array $response_metadata The response metadata returned by the query runner.
+	 * @param array $query_results The results of the query.
+	 * @return array The response metadata.
+	 */
+	protected function get_response_metadata( array $response_metadata, array $query_results ): array {
+		$age  = intval( $response_metadata['age'] ?? 0 );
+		$time = time() - $age;
+
+		$query_response_metadata = [
+			'last_updated' => [
+				'name'  => 'Last updated',
+				'type'  => 'string',
+				'value' => gmdate( 'Y-m-d H:i:s', $time ),
+			],
+			'total_count'  => [
+				'name'  => 'Total count',
+				'type'  => 'number',
+				'value' => count( $query_results ),
+			],
+		];
+
+		/**
+		 * Filters the query response metadata, which are available as bindings for
+		 * field shortcodes.
+		 *
+		 * @param array $query_response_metadata The query response metadata.
+		 * @param HttpQueryContext $query_context The query context.
+		 * @param array $response_metadata The response metadata returned by the query runner.
+		 * @param array $query_results The results of the query.
+		 * @return array The filtered query response metadata.
+		 */
+		return apply_filters( 'remote_data_blocks_query_response_metadata', $query_response_metadata, $this->query_context, $response_metadata, $query_results );
+	}
+
 	public function execute( array $input_variables ): array|WP_Error {
 		$raw_response_data = $this->get_raw_response_data( $input_variables );
 
@@ -143,7 +177,7 @@ class QueryRunner implements QueryRunnerInterface {
 
 		return [
 			'is_collection' => $is_collection,
-			'metadata'      => $this->query_context->get_metadata( $metadata, $results ),
+			'metadata'      => $this->get_response_metadata( $metadata, $results ),
 			'results'       => $results,
 		];
 	}
@@ -161,13 +195,13 @@ class QueryRunner implements QueryRunnerInterface {
 				return $field_value_single;
 
 			case 'price':
-				return sprintf( '$%s', number_format( $field_value_single, 2 ) );
+				return sprintf( '$%s', number_format( (float) $field_value_single, 2 ) );
 
 			case 'string':
 				return wp_strip_all_tags( $field_value_single );
 		}
 
-		return $field_value_single;
+		return (string) $field_value_single;
 	}
 
 	/**

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Integrations\Airtable;
 
@@ -37,11 +37,11 @@ class AirtableDatasource extends HttpDatasource {
 	];
 
 	public function get_display_name(): string {
-		return sprintf( 'Airtable: %s', $this->config['display_name'] ?? $this->config['base_name'] );
+		return sprintf( 'Airtable: %s', $this->config['display_name'] ?? $this->config['base']['name'] );
 	}
 
 	public function get_endpoint( string $variation = '' ): string {
-		return 'https://api.airtable.com/v0/' . $this->config['base'];
+		return 'https://api.airtable.com/v0/' . $this->config['base']['id'];
 	}
 
 	public function get_request_headers(): array {

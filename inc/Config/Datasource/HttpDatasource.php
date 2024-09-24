@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Config\Datasource;
 
@@ -25,14 +25,8 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 
 	final private function __construct( protected array $config ) {}
 
-	/**
-	 * @inheritDoc
-	 */
 	abstract public function get_display_name(): string;
 
-	/**
-	 * @inheritDoc
-	 */
 	abstract public function get_endpoint(): string;
 
 	/**
@@ -40,9 +34,6 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 	 */
 	abstract public function get_request_headers(): array;
 
-	/**
-	 * @inheritDoc
-	 */
 	public function get_image_url(): ?string {
 		return null;
 	}
