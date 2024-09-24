@@ -1,5 +1,5 @@
 import { InspectorControls } from '@wordpress/block-editor';
-import { BlockEditProps } from '@wordpress/blocks';
+import { BlockConfiguration, BlockEditProps } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -134,3 +134,15 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 		);
 	};
 }, 'withBlockBinding' );
+
+/**
+ * Shim for the block binding HOC to be used with the `blocks.registerBlockType` filter.
+ */
+export function withBlockBindingShim(
+	settings: BlockConfiguration< RemoteDataInnerBlockAttributes >
+): BlockConfiguration< RemoteDataInnerBlockAttributes > {
+	return {
+		...settings,
+		edit: withBlockBinding( settings.edit ?? ( () => null ) ),
+	};
+}
