@@ -19,7 +19,10 @@ class GoogleSheetsDatasource extends HttpDatasource {
 					'type'                        => [ 'type' => 'string' ],
 					'project_id'                  => [ 'type' => 'string' ],
 					'private_key_id'              => [ 'type' => 'string' ],
-					'private_key'                 => [ 'type' => 'string' ],
+					'private_key'                 => [
+						'type'     => 'string',
+						'sanitize' => false,
+					],
 					'client_email'                => [
 						'type'     => 'string',
 						'callback' => 'is_email',
