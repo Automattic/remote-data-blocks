@@ -21,6 +21,7 @@ interface BlockConfig {
 	overrides: Record< string, InputVariableOverrides >;
 	patterns: {
 		default: string;
+		inner_blocks?: string;
 	};
 	selectors: {
 		image_url?: string;

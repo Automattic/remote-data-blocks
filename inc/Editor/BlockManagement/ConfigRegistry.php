@@ -95,6 +95,13 @@ class ConfigRegistry {
 
 		// Register the pattern.
 		register_block_pattern( $pattern_name, $pattern_properties );
+
+		// If the pattern role is specified and recognized, add it to the block configuration.
+		$recognized_roles = [ 'inner_blocks' ];
+		if ( isset( $pattern_options['role'] ) && in_array( $pattern_options['role'], $recognized_roles, true ) ) {
+			$config['patterns'][ $pattern_options['role'] ] = $pattern_name;
+			ConfigStore::set_configuration( $block_name, $config );
+		}
 	}
 
 	public static function register_page( string $block_title, string $page_slug ): void {
