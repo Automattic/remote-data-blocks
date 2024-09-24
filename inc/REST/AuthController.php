@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace RemoteDataBlocks\REST;
 
 use WP_REST_Controller;

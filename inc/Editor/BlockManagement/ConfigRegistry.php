@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace RemoteDataBlocks\Editor\BlockManagement;
 
 defined( 'ABSPATH' ) || exit();

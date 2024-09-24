@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace RemoteDataBlocks\ExampleApi\Data;
 
 use WP_Error;

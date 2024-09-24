@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace RemoteDataBlocks\Tests\Config;
 
 use PHPUnit\Framework\TestCase;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace RemoteDataBlocks\Example\ArtInstituteOfChicago;
 
 require_once __DIR__ . '/inc/queries/class-art-institute-datasource.php';

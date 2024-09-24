@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace RemoteDataBlocks\Example\ZipCode;
 
 require_once __DIR__ . '/inc/queries/class-zip-code-datasource.php';

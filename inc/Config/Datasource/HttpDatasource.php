@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace RemoteDataBlocks\Config\Datasource;
 
 use RemoteDataBlocks\Config\ArraySerializableInterface;

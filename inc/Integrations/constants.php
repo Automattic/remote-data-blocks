@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace RemoteDataBlocks;
 
 define( 'REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE', 'airtable' );

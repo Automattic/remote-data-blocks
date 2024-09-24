@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace RemoteDataBlocks\Validation;
 
 use WP_Error;
@@ -31,28 +33,28 @@ class Validator implements ValidatorInterface {
 
 		if ( isset( $schema['type'] ) && ! $this->check_type( $data, $schema['type'] ) ) {
 			// translators: %1$s is the expected PHP data type, %2$s is the actual PHP data type.
-			return new WP_Error( 'invalid_type', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), $schema['type'], gettype( $data ) ) );
+			return new WP_Error( 'invalid_type', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), $schema['type'], gettype( $data ) ), [ 'status' => 400 ] );
 		}
 
 		if ( isset( $schema['pattern'] ) && is_string( $data ) && ! preg_match( $schema['pattern'], $data ) ) {
 			// translators: %1$s is the expected regex pattern, %2$s is the actual value.
-			return new WP_Error( 'invalid_format', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), $schema['pattern'], $data ) );
+			return new WP_Error( 'invalid_format', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), $schema['pattern'], $data ), [ 'status' => 400 ] );
 		}
 
 		if ( isset( $schema['enum'] ) && ! in_array( $data, $schema['enum'] ) ) {
 			// translators: %1$s is the expected value, %2$s is the actual value.
-			return new WP_Error( 'invalid_value', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), implode( ', ', $schema['enum'] ), $data ) );
+			return new WP_Error( 'invalid_value', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), implode( ', ', $schema['enum'] ), $data ), [ 'status' => 400 ] );
 		}
 
 		if ( isset( $schema['const'] ) && $data !== $schema['const'] ) {
 			// translators: %1$s is the expected value, %2$s is the actual value.
-			return new WP_Error( 'invalid_value', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), $schema['const'], $data ) );
+			return new WP_Error( 'invalid_value', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), $schema['const'], $data ), [ 'status' => 400 ] );
 		}
 
 		if ( isset( $schema['callback'] ) && is_callable( $schema['callback'] ) ) {
 			if ( false === call_user_func( $schema['callback'], $data ) ) {
 				// translators: %1$s is the callback name, %2$s is the value given to the callback.
-				return new WP_Error( 'invalid_value', sprintf( __( 'Validate callback %1$s failed with value %2$s.', 'remote-data-blocks' ), $schema['callback'], $data ) );
+				return new WP_Error( 'invalid_value', sprintf( __( 'Validate callback %1$s failed with value %2$s.', 'remote-data-blocks' ), $schema['callback'], $data ), [ 'status' => 400 ] );
 			}
 		}
 
@@ -64,7 +66,7 @@ class Validator implements ValidatorInterface {
 
 				if ( ! isset( $data[ $field ] ) ) {
 					// translators: %1$s is the missing field name.
-					return new WP_Error( 'missing_field', sprintf( __( 'Missing field %1$s.', 'remote-data-blocks' ), $field ) );
+					return new WP_Error( 'missing_field', sprintf( __( 'Missing field %1$s.', 'remote-data-blocks' ), $field ), [ 'status' => 400 ] );
 				}
 				
 				$result = $this->validate_schema( $field_schema, $data[ $field ] );
@@ -77,7 +79,7 @@ class Validator implements ValidatorInterface {
 		if ( isset( $schema['items'] ) ) {
 			if ( ! is_array( $data ) ) {
 				// translators: %1$s is the expected PHP data type, %2$s is the actual PHP data type.
-				return new WP_Error( 'invalid_array', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), 'array', gettype( $data ) ) );
+				return new WP_Error( 'invalid_array', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), 'array', gettype( $data ) ), [ 'status' => 400 ] );
 			}
 
 			foreach ( $data as $item ) {

@@ -103,4 +103,6 @@
 		</properties>
 	</rule>
 
+    <rule ref="SlevomatCodingStandard/Sniffs/TypeHints/DeclareStrictTypesSniff.php" />
+
 </ruleset>

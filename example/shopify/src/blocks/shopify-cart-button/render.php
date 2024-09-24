@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 use RemoteDataBlocks\Example\Shopify\InteractivityStore;
 
 $interactive_context = InteractivityStore::get_cart_button_interactive_context( $block );

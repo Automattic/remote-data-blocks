@@ -13,6 +13,8 @@
  * @package remote-data-blocks
  */
 
+declare(strict_types = 1);
+
 namespace RemoteDataBlocks;
 
 defined( 'ABSPATH' ) || exit();
@@ -23,14 +25,8 @@ define( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION', '0.1.0' );
 
 define( 'REMOTE_DATA_BLOCKS__REST_NAMESPACE', 'remote-data-blocks/v1' );
 
-// Datasource services
-require_once __DIR__ . '/inc/integrations/constants.php';
-
 // Autoloader
 require_once __DIR__ . '/vendor/autoload.php';
-
-// Access functions
-require_once __DIR__ . '/functions.php';
 
 // Other editor modifications
 Editor\AdminNotices\AdminNotices::init();

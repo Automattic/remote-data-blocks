@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace RemoteDataBlocks\Integrations\GitHub;
 
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;

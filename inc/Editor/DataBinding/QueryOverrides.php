@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace RemoteDataBlocks\Editor\DataBinding;
 
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;

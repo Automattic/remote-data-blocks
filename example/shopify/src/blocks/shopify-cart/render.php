@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 use RemoteDataBlocks\Example\Shopify\InteractivityStore;
 
 $public_store_name = InteractivityStore::get_store_name();

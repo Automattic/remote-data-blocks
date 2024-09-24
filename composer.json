@@ -9,7 +9,12 @@
   "autoload": {
     "psr-4": {
       "RemoteDataBlocks\\": "inc/"
-    }
+    },
+    "files": [
+      "inc/Integrations/constants.php",
+      "inc/Validation/functions.php",
+      "functions.php"
+    ]
   },
   "autoload-dev": {
     "psr-4": {
@@ -32,7 +37,8 @@
   "require-dev": {
     "automattic/vipwpcs": "^3.0",
     "phpcompatibility/phpcompatibility-wp": "^2.1",
-    "phpunit/phpunit": "^10"
+    "phpunit/phpunit": "^10",
+    "slevomat/coding-standard": "^8.15"
   },
   "config": {
     "allow-plugins": {

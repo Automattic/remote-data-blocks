@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace RemoteDataBlocks\Example\GoogleSheets\WesterosHouses;
 
 use RemoteDataBlocks\Integrations\Google\Sheets\GoogleSheetsDatasource;

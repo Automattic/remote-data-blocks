@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace RemoteDataBlocks\Tests\Editor\BlockManagement;
 
 use Psr\Log\LogLevel;

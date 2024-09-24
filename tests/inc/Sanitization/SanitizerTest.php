@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace RemoteDataBlocks\Tests\Sanitization;
 
 use PHPUnit\Framework\TestCase;

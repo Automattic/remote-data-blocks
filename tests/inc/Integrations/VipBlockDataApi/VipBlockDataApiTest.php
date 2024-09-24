@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace RemoteDataBlocks\Tests\Integrations\VipBlockDataApi;
 
 use PHPUnit\Framework\TestCase;
