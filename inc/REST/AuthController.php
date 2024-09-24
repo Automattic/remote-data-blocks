@@ -21,7 +21,7 @@ class AuthController extends WP_REST_Controller {
 		$this->rest_base = 'auth';
 	}
 
-	public function register_routes() {
+	public function register_routes(): void {
 		/**
 		 * API to get Google Access Token using a Credentials/Keys JSON file.
 		 * Currently only supports service account keys.
@@ -38,7 +38,7 @@ class AuthController extends WP_REST_Controller {
 		);
 	}
 
-	public function get_google_auth_token( WP_REST_Request $request ) {
+	public function get_google_auth_token( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$params      = $request->get_json_params();
 		$credentials = $params['credentials'] ?? null;
 		$scopes      = $params['scopes'] ?? [];
@@ -71,7 +71,7 @@ class AuthController extends WP_REST_Controller {
 	 * These all require manage_options for now, but we can adjust as needed.
 	 * Taken from /inc/rest/datasource-controller/datasource-controller.php
 	 */
-	public function get_google_auth_token_permissions_check( $request ) {
+	public function get_google_auth_token_permissions_check( WP_REST_Request $request ): bool {
 		return current_user_can( 'manage_options' );
 	}
 }

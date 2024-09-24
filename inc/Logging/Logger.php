@@ -84,7 +84,6 @@ class Logger extends AbstractLogger {
 	 *
 	 * @param mixed $level1 The first log level.
 	 * @param mixed $level2 The second log level.
-	 * @return bool
 	 */
 	public function is_log_level_higher( mixed $level1, mixed $level2 ): bool {
 		if ( ! isset( $this->log_levels[ $level1 ], $this->log_levels[ $level2 ] ) ) {
