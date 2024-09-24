@@ -42,38 +42,42 @@ Next, define a query that describes the data that you want to extract from the d
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
 class AirtableGetEventQuery extends HttpQueryContext {
-	public array $input_variables = [
-		'record_id' => [
-			'name' => 'Record ID',
-			'type' => 'id',
-		],
-	];
-
-	public array $output_variables = [
-		'is_collection' => false,
-		'mappings'      => [
-			'id'       => [
+	public function define_input_variables(): array {
+		return [
+			'record_id' => [
 				'name' => 'Record ID',
-				'path' => '$.id',
 				'type' => 'id',
 			],
-			'title'    => [
-				'name' => 'Title',
-				'path' => '$.fields.Activity',
-				'type' => 'string',
+		];
+	}
+
+	public function define_output_variables(): array {
+		return [
+			'is_collection' => false,
+			'mappings'      => [
+				'id'       => [
+					'name' => 'Record ID',
+					'path' => '$.id',
+					'type' => 'id',
+				],
+				'title'    => [
+					'name' => 'Title',
+					'path' => '$.fields.Activity',
+					'type' => 'string',
+				],
+				'location' => [
+					'name' => 'Location',
+					'path' => '$.fields.Location',
+					'type' => 'string',
+				],
+				'type'     => [
+					'name' => 'Type',
+					'path' => '$.fields.Type',
+					'type' => 'string',
+				],
 			],
-			'location' => [
-				'name' => 'Location',
-				'path' => '$.fields.Location',
-				'type' => 'string',
-			],
-			'type'     => [
-				'name' => 'Type',
-				'path' => '$.fields.Type',
-				'type' => 'string',
-			],
-		],
-	];
+		];
+	}
 
 	/**
 	 * Airtable API endpoint for fetching a single table record.
@@ -135,34 +139,34 @@ Instead of requiring manual input of a record ID, you can enhance your remote da
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
 class AirtableListEventsQuery extends HttpQueryContext {
-	public array $input_variables = [];
-
-	public array $output_variables = [
-		'root_path'     => '$.records[*]',
-		'is_collection' => true,
-		'mappings'      => [
-			'record_id'       => [
-				'name' => 'Record ID',
-				'path' => '$.id',
-				'type' => 'id',
+	public function define_output_variables(): array {
+		return [
+			'root_path'     => '$.records[*]',
+			'is_collection' => true,
+			'mappings'      => [
+				'record_id'       => [
+					'name' => 'Record ID',
+					'path' => '$.id',
+					'type' => 'id',
+				],
+				'title'    => [
+					'name' => 'Title',
+					'path' => '$.fields.Activity',
+					'type' => 'string',
+				],
+				'location' => [
+					'name' => 'Location',
+					'path' => '$.fields.Location',
+					'type' => 'string',
+				],
+				'type'     => [
+					'name' => 'Type',
+					'path' => '$.fields.Type',
+					'type' => 'string',
+				],
 			],
-			'title'    => [
-				'name' => 'Title',
-				'path' => '$.fields.Activity',
-				'type' => 'string',
-			],
-			'location' => [
-				'name' => 'Location',
-				'path' => '$.fields.Location',
-				'type' => 'string',
-			],
-			'type'     => [
-				'name' => 'Type',
-				'path' => '$.fields.Type',
-				'type' => 'string',
-			],
-		],
-	];
+		];
+	}
 
 	public function get_query_name(): string {
 		return 'List events';
