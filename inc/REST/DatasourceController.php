@@ -173,50 +173,26 @@ class DatasourceController extends WP_REST_Controller {
 
 	// These all require manage_options for now, but we can adjust as needed
 
-	/**
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return bool|WP_Error True if the request has access to read the item, WP_Error object otherwise.
-	 */
 	public function get_item_permissions_check( $request ) {
 		return current_user_can( 'manage_options' );
 	}
 
-	/**
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return bool|WP_Error True if the request has access to read the item, WP_Error object otherwise.
-	 */
 	public function get_items_permissions_check( $request ) {
 		return current_user_can( 'manage_options' );
 	}
 
-	/**
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return bool|WP_Error True if the request has access to read the item, WP_Error object otherwise.
-	 */
 	public function create_item_permissions_check( $request ) {
 		return current_user_can( 'manage_options' );
 	}
 
-	/**
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return bool|WP_Error True if the request has access to read the item, WP_Error object otherwise.
-	 */
 	public function update_item_permissions_check( $request ) {
 		return current_user_can( 'manage_options' );
 	}
 
-	/**
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return bool|WP_Error True if the request has access to read the item, WP_Error object otherwise.
-	 */
 	public function delete_item_permissions_check( $request ) {
 		return current_user_can( 'manage_options' );
 	}
 
-	/**
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return bool|WP_Error True if the request has access to read the item, WP_Error object otherwise.
-	 */
 	public function item_slug_conflicts_permissions_check( $request ) {
 		return current_user_can( 'manage_options' );
 	}
