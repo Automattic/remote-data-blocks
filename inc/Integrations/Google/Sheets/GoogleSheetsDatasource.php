@@ -73,13 +73,11 @@ class GoogleSheetsDatasource extends HttpDatasource implements ArraySerializable
 
 	public static function create( array $credentials, string $spreadsheet_id, string $display_name ): self|WP_Error {
 		return parent::from_array([
-			'service'                => REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE,
-			'service_schema_version' => self::SERVICE_SCHEMA_VERSION,
-			'uuid'                   => wp_generate_uuid4(),
-			'credentials'            => $credentials,
-			'display_name'           => $display_name,
-			'spreadsheet_id'         => $spreadsheet_id,
-			'slug'                   => sanitize_title( $display_name ),
+			'service'        => REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE,
+			'credentials'    => $credentials,
+			'display_name'   => $display_name,
+			'spreadsheet_id' => $spreadsheet_id,
+			'slug'           => sanitize_title( $display_name ),
 		]);
 	}
 
@@ -89,6 +87,7 @@ class GoogleSheetsDatasource extends HttpDatasource implements ArraySerializable
 			'service'     => REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE,
 			'spreadsheet' => [ 'name' => $this->config['spreadsheet_id'] ],
 			'sheet'       => [ 'name' => '' ],
+			'uuid'        => $this->config['uuid'],
 		];
 	}
 }

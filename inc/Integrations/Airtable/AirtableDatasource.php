@@ -58,13 +58,11 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 
 	public static function create( string $access_token, string $base_id, string $display_name ): self {
 		return parent::from_array([
-			'service'                => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
-			'service_schema_version' => self::SERVICE_SCHEMA_VERSION,
-			'uuid'                   => wp_generate_uuid4(),
-			'access_token'           => $access_token,
-			'base'                   => [ 'id' => $base_id ],
-			'display_name'           => $display_name,
-			'slug'                   => sanitize_title( $display_name ),
+			'service'      => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
+			'access_token' => $access_token,
+			'base'         => [ 'id' => $base_id ],
+			'display_name' => $display_name,
+			'slug'         => sanitize_title( $display_name ),
 		]);
 	}
 
@@ -76,6 +74,7 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 				'id'   => $this->config['base']['id'],
 				'name' => $this->config['base']['name'],
 			],
+			'uuid'    => $this->config['uuid'],
 		];
 	}
 }

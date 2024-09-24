@@ -62,13 +62,11 @@ class GitHubDatasource extends HttpDatasource {
 	
 	public static function create( string $repo_owner, string $repo_name, string $ref ): self {
 		return parent::from_array([
-			'service'                => REMOTE_DATA_BLOCKS_GITHUB_SERVICE,
-			'service_schema_version' => self::SERVICE_SCHEMA_VERSION,
-			'uuid'                   => wp_generate_uuid4(),
-			'repo_owner'             => $repo_owner,
-			'repo_name'              => $repo_name,
-			'ref'                    => $ref,
-			'slug'                   => sanitize_title( sprintf( '%s/%s/%s', $repo_owner, $repo_name, $ref ) ),
+			'service'    => REMOTE_DATA_BLOCKS_GITHUB_SERVICE,
+			'repo_owner' => $repo_owner,
+			'repo_name'  => $repo_name,
+			'ref'        => $ref,
+			'slug'       => sanitize_title( sprintf( '%s/%s/%s', $repo_owner, $repo_name, $ref ) ),
 		]);
 	}
 }

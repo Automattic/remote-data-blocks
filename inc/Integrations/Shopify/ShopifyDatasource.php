@@ -54,12 +54,10 @@ class ShopifyDatasource extends HttpDatasource implements ArraySerializableInter
 
 	public static function create( string $access_token, string $store_name ): self {
 		return parent::from_array([
-			'service'                => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
-			'service_schema_version' => self::SERVICE_SCHEMA_VERSION,
-			'uuid'                   => wp_generate_uuid4(),
-			'access_token'           => $access_token,
-			'store_name'             => $store_name,
-			'slug'                   => $store_name,
+			'service'      => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
+			'access_token' => $access_token,
+			'store_name'   => $store_name,
+			'slug'         => $store_name,
 		]);
 	}
 
@@ -68,6 +66,7 @@ class ShopifyDatasource extends HttpDatasource implements ArraySerializableInter
 			'slug'       => $this->get_slug(),
 			'service'    => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
 			'store_name' => $this->config['store_name'],
+			'uuid'       => $this->config['uuid'],
 		];
 	}
 }
