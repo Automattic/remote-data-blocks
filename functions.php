@@ -1,12 +1,14 @@
 <?php
-
-declare(strict_types = 1);
-
 /**
- * Access functions for class methods in the global namespace.
+ * Remote Data Blocks API
+ *
+ * This file contains functions, in the global namespace, for registering and
+ * interacting with Remote Data Blocks.
  *
  * @package remote-data-blocks
  */
+
+declare(strict_types = 1);
 
 use RemoteDataBlocks\Config\QueryContext\QueryContextInterface;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;

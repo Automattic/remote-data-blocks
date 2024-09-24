@@ -2,13 +2,6 @@
 
 declare(strict_types = 1);
 
-/**
- * QueryRunner class
- *
- * @package remote-data-blocks
- * @since 0.1.0
- */
-
 namespace RemoteDataBlocks\Config\QueryRunner;
 
 use Exception;
@@ -22,7 +15,12 @@ use WP_Error;
 defined( 'ABSPATH' ) || exit();
 
 /**
- * Class that executes a query using HttpQueryContext.
+ * QueryRunner class
+ *
+ * Class that executes queries, leveraging provided QueryContext.
+ *
+ * @package remote-data-blocks
+ * @since 0.1.0
  */
 class QueryRunner implements QueryRunnerInterface {
 

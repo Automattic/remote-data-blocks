@@ -2,22 +2,20 @@
 
 declare(strict_types = 1);
 
-/**
- * DatasourceInterface
- *
- * @package remote-data-blocks
- * @since 0.1.0
- */
-
 namespace RemoteDataBlocks\Config\Datasource;
 
 /**
+ * DatasourceInterface
+ *
  * Interface used to define a Remote Data Blocks Datasource. It defines the
  * properties of a datasource that will be shared by queries against that
  * datasource.
  *
  * If you are a WPVIP customer, datasources are automatically provided by VIP.
  * Only implement this interface if you have additional custom datasources.
+ * 
+ * @package remote-data-blocks
+ * @since 0.1.0
  */
 interface DatasourceInterface {
 	public const BASE_SCHEMA = [

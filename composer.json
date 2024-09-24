@@ -12,7 +12,6 @@
     },
     "files": [
       "inc/Integrations/constants.php",
-      "inc/Validation/functions.php",
       "functions.php"
     ]
   },
