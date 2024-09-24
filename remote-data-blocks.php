@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types = 1);
+
 /**
  * Plugin Name: Remote Data Blocks
  * Plugin URI: https://remotedatablocks.com
@@ -12,8 +13,6 @@
  *
  * @package remote-data-blocks
  */
-
-declare(strict_types = 1);
 
 namespace RemoteDataBlocks;
 

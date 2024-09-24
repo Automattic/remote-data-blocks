@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types = 1);
+<?php declare(strict_types = 1);
 
 function apply_filters( string $_filter, mixed $thing ): mixed {
 	return $thing;

@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types = 1);
+
 /**
  * Plugin Name: Remote Data Blocks Examples
  * Plugin URI: https://github.com/Automattic/remote-data-blocks/blob/trunk/example
@@ -12,8 +13,6 @@
  *
  * @package remote-data-blocks
  */
-
-declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Example;
 

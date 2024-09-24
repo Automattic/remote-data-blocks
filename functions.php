@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types = 1);
+
 /**
  * Remote Data Blocks API
  *
@@ -7,8 +8,6 @@
  *
  * @package remote-data-blocks
  */
-
-declare(strict_types = 1);
 
 use RemoteDataBlocks\Config\QueryContext\QueryContextInterface;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;

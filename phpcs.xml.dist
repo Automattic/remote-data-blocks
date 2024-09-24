@@ -85,6 +85,13 @@
 		<exclude-pattern>/tests/*</exclude-pattern>
 	</rule>
 
+	<!-- Exclude PSR12.Files.FileHeader.IncorrectOrder for specific files -->
+	<rule ref="PSR12.Files.FileHeader.IncorrectOrder">
+		<exclude-pattern>remote-data-blocks.php</exclude-pattern>
+		<exclude-pattern>functions.php</exclude-pattern>
+		<exclude-pattern>example/remote-data-blocks-example-code.php</exclude-pattern>
+	</rule>
+
 	<!-- These functions are new via the Interactivity API and are auto-escaped -->
 	<rule ref="WordPress.Security.EscapeOutput">
 		<properties>
@@ -103,6 +110,11 @@
 		</properties>
 	</rule>
 
-    <rule ref="SlevomatCodingStandard/Sniffs/TypeHints/DeclareStrictTypesSniff.php" />
-
+	<!-- Slevomat Coding Standard -->
+	<rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
+		<properties>
+			<property name="declareOnFirstLine" value="true"/>
+		</properties>
+	</rule>
+	<rule ref="SlevomatCodingStandard.TypeHints.LongTypeHints"/>
 </ruleset>
