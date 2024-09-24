@@ -45,10 +45,6 @@ class QueryRunnerTest extends TestCase {
 				return null;
 			}
 
-			public function get_metadata( array $response_metadata, array $query_results ): array {
-				return [];
-			}
-
 			public function get_request_method(): string {
 				return $this->request_method;
 			}
@@ -191,6 +187,10 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'results', $result );
 		$this->assertFalse( $result['is_collection'] );
 
+		$this->assertArrayHasKey( 'metadata', $result );
+		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
+		$this->assertSame( 1, $result['metadata']['total_count']['value'] );
+
 		$expected_result = [
 			'result' => [
 				'test' => [
@@ -233,6 +233,10 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'results', $result );
 		$this->assertFalse( $result['is_collection'] );
 
+		$this->assertArrayHasKey( 'metadata', $result );
+		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
+		$this->assertSame( 1, $result['metadata']['total_count']['value'] );
+
 		$expected_result = [
 			'result' => [
 				'test' => [
@@ -274,6 +278,10 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
 		$this->assertFalse( $result['is_collection'] );
+
+		$this->assertArrayHasKey( 'metadata', $result );
+		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
+		$this->assertSame( 1, $result['metadata']['total_count']['value'] );
 
 		$expected_result = [
 			'result' => [
@@ -321,6 +329,10 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
 		$this->assertFalse( $result['is_collection'] );
+
+		$this->assertArrayHasKey( 'metadata', $result );
+		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
+		$this->assertSame( 1, $result['metadata']['total_count']['value'] );
 
 		$expected_result = [
 			'result' => [

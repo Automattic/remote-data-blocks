@@ -27,21 +27,6 @@ class QueryContextTest extends TestCase {
 		$this->assertNull( $result );
 	}
 
-	public function testGetMetadata() {
-		$mock_response_metadata = [ 'age' => '60' ];
-		$mock_results           = [ [ 'id' => 1 ], [ 'id' => 2 ] ];
-
-		$metadata = $this->query_context->get_metadata( $mock_response_metadata, $mock_results );
-
-		$this->assertArrayHasKey( 'last_updated', $metadata );
-		$this->assertArrayHasKey( 'total_count', $metadata );
-		$this->assertSame( 'Last updated', $metadata['last_updated']['name'] );
-		$this->assertSame( 'string', $metadata['last_updated']['type'] );
-		$this->assertSame( 'Total count', $metadata['total_count']['name'] );
-		$this->assertSame( 'number', $metadata['total_count']['type'] );
-		$this->assertSame( 2, $metadata['total_count']['value'] );
-	}
-
 	public function testGetRequestMethod() {
 		$this->assertSame( 'GET', $this->query_context->get_request_method() );
 	}
