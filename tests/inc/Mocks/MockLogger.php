@@ -7,7 +7,6 @@ use Psr\Log\LogLevel;
 use Stringable;
 
 class MockLogger implements LoggerInterface {
-
 	private array $logs = [];
 
 	public function log( $level, Stringable|string $message, array $context = [] ): void {

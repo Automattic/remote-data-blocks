@@ -8,9 +8,8 @@ use RemoteDataBlocks\Tests\Mocks\MockDatasource;
 use RemoteDataBlocks\Tests\Mocks\MockValidator;
 
 class QueryContextTest extends TestCase {
-
-	private $datasource;
-	private $query_context;
+	private MockDatasource $datasource;
+	private HttpQueryContext $query_context;
 
 	protected function setUp(): void {
 		$this->datasource    = MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator() );

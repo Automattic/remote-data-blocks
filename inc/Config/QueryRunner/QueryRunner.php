@@ -7,7 +7,6 @@ use GuzzleHttp\RequestOptions;
 use JsonPath\JsonObject;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\HttpClient\HttpClient;
-use RemoteDataBlocks\Logging\LoggerManager;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit();

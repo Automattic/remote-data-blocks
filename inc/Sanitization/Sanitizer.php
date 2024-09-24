@@ -6,6 +6,11 @@ namespace RemoteDataBlocks\Sanitization;
  * Sanitizer class.
  */
 class Sanitizer implements SanitizerInterface {
+	/**
+	 * The sanitization schema.
+	 *
+	 * @var array<string, mixed>
+	 */
 	private array $schema;
 
 	/**

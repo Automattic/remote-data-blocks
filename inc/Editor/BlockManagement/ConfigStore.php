@@ -6,17 +6,19 @@ defined( 'ABSPATH' ) || exit();
 
 use RemoteDataBlocks\Logging\LoggerManager;
 use Psr\Log\LoggerInterface;
-use RemoteDataBlocks\Config\Datasource\CodedHttpDatasource;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Config\UiDisplayableInterface;
 
 use function sanitize_title;
 
 class ConfigStore {
+	/**
+	 * @var array<string, array<string, mixed>>
+	 */
 	private static array $configurations;
 	private static LoggerInterface $logger;
 
-	public static function init( LoggerInterface $logger = null ): void {
+	public static function init( ?LoggerInterface $logger = null ): void {
 		self::$configurations = [];
 		self::$logger         = $logger ?? LoggerManager::instance();
 	}

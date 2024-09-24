@@ -10,16 +10,14 @@ class LoggerManager {
 	/**
 	 * The logger instance.
 	 *
-	 * @var LoggerInterface|null
 	 */
-	private static $instance = null;
+	private static ?LoggerInterface $instance = null;
 
 	/**
 	 * The namespace for the logger.
 	 *
-	 * @var string
 	 */
-	public static $log_namespace = 'remote-data-blocks';
+	public static string $log_namespace = 'remote-data-blocks';
 
 	/**
 	 * Get the logger singleton instance.

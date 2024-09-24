@@ -11,7 +11,7 @@ use WP_REST_Request;
 use function wp_generate_uuid4;
 
 class RemoteDataController {
-	private static $slug = 'remote-data';
+	private static string $slug = 'remote-data';
 
 	public static function init() {
 		add_action( 'rest_api_init', [ __CLASS__, 'register_rest_routes' ] );

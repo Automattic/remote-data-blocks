@@ -10,7 +10,10 @@ use RemoteDataBlocks\REST\RemoteDataController;
 use function register_block_type;
 
 class BlockRegistration {
-	public static $block_category = [
+	/**
+	 * @var array<string, string>
+	 */
+	public static array $block_category = [
 		'icon'  => null,
 		'slug'  => 'remote-data-blocks',
 		'title' => 'Remote Data Blocks',

@@ -23,10 +23,16 @@ class ExampleApiDataSource extends HttpDatasource {
 		return null;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function get_endpoint(): string {
 		return '';
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function get_request_headers(): array {
 		return [];
 	}

@@ -18,21 +18,21 @@ class Logger extends AbstractLogger {
 	/**
 	 * We use the factory pattern to provide access to namespaced instances.
 	 *
-	 * @var array Logger[]
+	 * @var Logger[]
 	 */
-	private static $instances = [];
+	private static array $instances = [];
 
 	/**
 	 * The minimum observed log level.
-	 *
-	 * @var string
 	 */
-	private $log_level;
+	private string $log_level;
 
 	/**
 	 * Log levels in ascending priority order.
+	 *
+	 * @var array<string, int>
 	 */
-	private $log_levels = [
+	private array $log_levels = [
 		LogLevel::DEBUG     => 1,
 		LogLevel::INFO      => 2,
 		LogLevel::NOTICE    => 3,
