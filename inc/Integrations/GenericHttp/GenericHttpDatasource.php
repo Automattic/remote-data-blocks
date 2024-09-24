@@ -77,7 +77,7 @@ class GenericHttpDatasource extends HttpDatasource {
 			'slug'      => $this->get_slug(),
 			'service'   => REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE,
 			'url'       => $this->config['url'],
-			'auth_type' => $this->config['auth_type'],
+			'auth_type' => $this->config['auth']['type'],
 			'uuid'      => $this->config['uuid'] ?? null,
 		];
 	}
