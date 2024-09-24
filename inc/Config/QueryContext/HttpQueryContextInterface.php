@@ -1,4 +1,6 @@
-<?php
+<?php declare(strict_types = 1);
+
+namespace RemoteDataBlocks\Config\QueryContext;
 
 /**
  * HttpQueryContextInterface interface
@@ -6,9 +8,6 @@
  * @package remote-data-blocks
  * @since 0.1.0
  */
-
-namespace RemoteDataBlocks\Config\QueryContext;
-
 interface HttpQueryContextInterface {
 	public function get_endpoint( array $input_variables ): string;
 	public function get_request_method(): string;

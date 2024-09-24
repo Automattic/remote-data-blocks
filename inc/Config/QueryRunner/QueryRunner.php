@@ -1,11 +1,4 @@
-<?php
-
-/**
- * QueryRunner class
- *
- * @package remote-data-blocks
- * @since 0.1.0
- */
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Config\QueryRunner;
 
@@ -20,7 +13,12 @@ use WP_Error;
 defined( 'ABSPATH' ) || exit();
 
 /**
- * Class that executes a query using HttpQueryContext.
+ * QueryRunner class
+ *
+ * Class that executes queries, leveraging provided QueryContext.
+ *
+ * @package remote-data-blocks
+ * @since 0.1.0
  */
 class QueryRunner implements QueryRunnerInterface {
 
@@ -198,13 +196,13 @@ class QueryRunner implements QueryRunnerInterface {
 				return $field_value_single;
 
 			case 'price':
-				return sprintf( '$%s', number_format( $field_value_single, 2 ) );
+				return sprintf( '$%s', number_format( (float) $field_value_single, 2 ) );
 
 			case 'string':
 				return wp_strip_all_tags( $field_value_single );
 		}
 
-		return $field_value_single;
+		return (string) $field_value_single;
 	}
 
 	/**

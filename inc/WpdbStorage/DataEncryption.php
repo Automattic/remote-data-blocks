@@ -1,19 +1,18 @@
-<?php
+<?php declare(strict_types = 1);
+
+namespace RemoteDataBlocks\WpdbStorage;
+
 /**
  * Class RemoteDataBlocks\Storage\DataEncryption
+ *
+ * Class responsible for encrypting and decrypting data. We use this to store sensitive data in the database.
  *
  * Adapted from Google Site Kit plugin.
  *
  * Original License   https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  * @see https://github.com/google/site-kit-wp/blob/e99bed8bfc08869427021bbd47bc57b2c866cc20/includes/Core/Storage/Data_Encryption.php
  * @see https://felix-arntz.me/blog/storing-confidential-data-in-wordpress/
- */
-
-namespace RemoteDataBlocks\WpdbStorage;
-
-/**
- * Class responsible for encrypting and decrypting data. We use this to store sensitive data in the database.
- *
+ * 
  * @access private
  * @ignore
  */
