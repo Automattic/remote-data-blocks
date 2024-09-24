@@ -148,7 +148,7 @@ export const HttpSettings = ( {
 					<DataSourceFormActions
 						onSave={ onSaveClick }
 						onCancel={ goToMainScreen }
-						IsSaveDisabled={ ! shouldAllowSubmit }
+						isSaveDisabled={ ! shouldAllowSubmit }
 					/>
 				</form>
 			</CardBody>

@@ -132,7 +132,7 @@ export const ShopifySettings = ( {
 					<DataSourceFormActions
 						onSave={ onSaveClick }
 						onCancel={ goToMainScreen }
-						IsSaveDisabled={ ! shouldAllowSubmit }
+						isSaveDisabled={ ! shouldAllowSubmit }
 					/>
 				</form>
 			</CardBody>

@@ -4,18 +4,18 @@ import { __ } from '@wordpress/i18n';
 interface DataSourceFormActionsProps {
 	onSave: () => Promise< void >;
 	onCancel: () => void;
-	IsSaveDisabled: boolean;
+	isSaveDisabled: boolean;
 }
 
 export const DataSourceFormActions = ( {
 	onSave,
 	onCancel,
-	IsSaveDisabled,
+	isSaveDisabled,
 }: DataSourceFormActionsProps ) => {
 	return (
 		<div className="form-group">
 			<ButtonGroup className="form-actions">
-				<Button variant="primary" onClick={ () => void onSave() } disabled={ IsSaveDisabled }>
+				<Button variant="primary" onClick={ () => void onSave() } disabled={ isSaveDisabled }>
 					{ __( 'Save', 'remote-data-blocks' ) }
 				</Button>
 				<Button variant="secondary" onClick={ onCancel }>

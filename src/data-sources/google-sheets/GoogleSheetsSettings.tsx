@@ -314,7 +314,7 @@ export const GoogleSheetsSettings = ( {
 					<DataSourceFormActions
 						onSave={ onSaveClick }
 						onCancel={ goToMainScreen }
-						IsSaveDisabled={ ! shouldAllowSubmit }
+						isSaveDisabled={ ! shouldAllowSubmit }
 					/>
 				</form>
 			</CardBody>
