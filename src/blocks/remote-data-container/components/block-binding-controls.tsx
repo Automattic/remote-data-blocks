@@ -42,6 +42,8 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 	const { attributes, availableBindings, blockName, removeBinding, updateBinding } = props;
 	const contentArgs = attributes.metadata?.bindings?.content?.args;
 	const contentField = contentArgs?.field ?? '';
+	const shopifyProductTypeField =
+		attributes.metadata?.bindings?.shopify_product_type?.args?.field ?? '';
 	const imageAltField = attributes.metadata?.bindings?.image_alt?.args?.field ?? '';
 	const imageUrlField = attributes.metadata?.bindings?.image_url?.args?.field ?? '';
 
@@ -68,6 +70,19 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 	}
 
 	switch ( blockName ) {
+		case 'remote-data-blocks/shopify-product-type':
+			return (
+				<>
+					<BlockBindingFieldControl
+						availableBindings={ availableBindings }
+						fieldTypes={ TEXT_FIELD_TYPES }
+						label="Shopify Product Type"
+						target="shopify_product_type"
+						updateFieldBinding={ updateFieldBinding }
+						value={ shopifyProductTypeField }
+					/>
+				</>
+			);
 		case 'core/heading':
 		case 'core/paragraph':
 			return (

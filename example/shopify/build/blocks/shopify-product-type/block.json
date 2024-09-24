@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "remote-data-blocks/shopify-product-type",
+  "usesContext": [
+    "remote-data-blocks/remoteData"
+  ],
+  "version": "0.1.0",
+  "title": "Shopify Product Type",
+  "category": "widgets",
+  "icon": "category",
+  "description": "Show a category from Shopify",
+  "example": {},
+  "supports": {
+    "html": false
+  },
+  "textdomain": "shopify-product-type",
+  "editorScript": "file:./index.js",
+  "render": "file:./render.php",
+  "viewScript": "file:./view.js"
+}
