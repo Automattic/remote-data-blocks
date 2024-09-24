@@ -22,7 +22,6 @@ class LoggerManager {
 	/**
 	 * Get the logger singleton instance.
 	 *
-	 * @return LoggerInterface
 	 */
 	public static function instance(): LoggerInterface {
 		if ( null === self::$instance ) {

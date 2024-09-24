@@ -24,12 +24,21 @@ class Validator implements ValidatorInterface {
 
 	/**
 	 * @inheritDoc
+	 * 
+	 * @param array<string, mixed> $data The data to validate.
 	 */
 	public function validate( array $data ): bool|WP_Error {
 		return $this->validate_schema( $this->schema, $data );
 	}
 
-	private function validate_schema( array $schema, $data ): bool|WP_Error {
+	/**
+	 * Validates the schema.
+	 *
+	 * @param array<string, mixed> $schema The schema to validate against.
+	 * @param mixed $data The data to validate.
+	 * @return bool|WP_Error Returns true if the data is valid, otherwise a WP_Error.
+	 */
+	private function validate_schema( array $schema, mixed $data ): bool|WP_Error {
 		if ( isset( $schema['required'] ) && false === $schema['required'] && ! isset( $data ) ) {
 			return true;
 		}
@@ -96,7 +105,7 @@ class Validator implements ValidatorInterface {
 		return true;
 	}
 
-	private function check_type( $value, string $expected_type ): bool {
+	private function check_type( mixed $value, string $expected_type ): bool {
 		switch ( $expected_type ) {
 			case 'array':
 				return is_array( $value );

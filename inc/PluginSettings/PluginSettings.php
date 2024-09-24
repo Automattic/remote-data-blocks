@@ -10,7 +10,7 @@ use function wp_is_development_mode;
 defined( 'ABSPATH' ) || exit();
 
 class PluginSettings {
-	public static function init() {
+	public static function init(): void {
 		add_action( 'admin_menu', [ __CLASS__, 'add_options_page' ] );
 		add_action( 'admin_enqueue_scripts', [ __CLASS__, 'enqueue_settings_assets' ] );
 		add_action( 'pre_update_option_remote_data_blocks_config', [ __CLASS__, 'pre_update_option_remote_data_blocks_config' ], 10, 3 );
@@ -18,7 +18,7 @@ class PluginSettings {
 		add_action( 'rest_api_init', [ __CLASS__, 'init_rest_routes' ] );
 	}
 
-	public static function add_options_page() {
+	public static function add_options_page(): void {
 		add_options_page(
 			__( 'Remote Data Blocks Settings', 'remote-data-blocks' ),
 			__( 'Remote Data Blocks', 'remote-data-blocks' ),
@@ -28,7 +28,7 @@ class PluginSettings {
 		);
 	}
 
-	public static function settings_page_content() {
+	public static function settings_page_content(): void {
 		printf(
 			'<div id="remote-data-blocks-settings-wrapper">
 				<div id="remote-data-blocks-settings">%s</div>
@@ -37,7 +37,7 @@ class PluginSettings {
 		);
 	}
 
-	public static function init_rest_routes() {
+	public static function init_rest_routes(): void {
 		$controller = new DatasourceController();
 		$controller->register_routes();
 
@@ -45,7 +45,7 @@ class PluginSettings {
 		$auth_controller->register_routes();
 	}
 
-	public static function enqueue_settings_assets( $admin_page ) {
+	public static function enqueue_settings_assets( string $admin_page ): void {
 		if ( 'settings_page_remote-data-blocks-settings' !== $admin_page ) {
 			return;
 		}
@@ -98,7 +98,7 @@ class PluginSettings {
 	 * This function is only called in development mode by default
 	 * (e.g. when `is_dev` returns true).
 	 */
-	public static function get_build() {
+	public static function get_build(): array {
 		$git_path  = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/.git';
 		$head_path = $git_path . '/HEAD';
 		if ( ! file_exists( $head_path ) ) {
@@ -127,22 +127,18 @@ class PluginSettings {
 	/**
 	 * Get the plugin version from the main plugin file.
 	 */
-	public static function get_version() {
+	public static function get_version(): string {
 		return REMOTE_DATA_BLOCKS__PLUGIN_VERSION;
 	}
 
 	/**
 	 * Check if the current environment is development.
 	 */
-	public static function is_dev() {
+	public static function is_dev(): bool {
 		return 'development' === wp_get_environment_type() && wp_is_development_mode( 'plugin' );
 	}
 
-<<<<<<< Updated upstream
-	public static function pre_update_option_remote_data_blocks_config( $new_value, $old_value ) {
-=======
 	public static function pre_update_option_remote_data_blocks_config( array $new_value, array $old_value ): string|array|bool {
->>>>>>> Stashed changes
 		$encryptor = new \RemoteDataBlocks\WpdbStorage\DataEncryption();
 
 		try {
@@ -157,12 +153,12 @@ class PluginSettings {
 		}
 	}
 
-	public static function decrypt_option( $value ) {
+	public static function decrypt_option( string $value ): array|null {
 		$decryptor = new \RemoteDataBlocks\WpdbStorage\DataEncryption();
 
 		try {
 			$decrypted = $decryptor->decrypt( $value );
-			return json_decode( $decrypted );
+			return json_decode( $decrypted, true );
 		} catch ( \Exception $e ) {
 			add_settings_error(
 				'remote_data_blocks_settings',
