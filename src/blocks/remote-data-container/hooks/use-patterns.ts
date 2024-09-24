@@ -14,6 +14,7 @@ import {
 	hasBlockBinding,
 	isSyncedPattern,
 } from '@/utils/block-binding';
+import { getBlockConfig } from '@/utils/localized-block-data';
 
 export function cloneBlockWithAttributes(
 	block: BlockInstance,
@@ -32,7 +33,8 @@ export function cloneBlockWithAttributes(
 	return cloneBlock( block, mismatchedAttributes, newInnerBlocks );
 }
 
-export function usePatterns( remoteDataBlockName: string, rootClientId: string ) {
+export function usePatterns( remoteDataBlockName: string, rootClientId: string = '' ) {
+	const { patterns } = getBlockConfig( remoteDataBlockName ) ?? {};
 	const { replaceInnerBlocks } = useDispatch< BlockEditorStoreActions >( blockEditorStore );
 	const { getBlocks, getPatternsByBlockTypes, __experimentalGetAllowedPatterns } =
 		useSelect< BlockEditorStoreSelectors >( blockEditorStore, [
@@ -41,7 +43,15 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string )
 		] );
 	const [ showPatternSelection, setShowPatternSelection ] = useState< boolean >( false );
 
-	return {
+	// Extract patterns with defined roles.
+	const patternsByBlockTypes = getPatternsByBlockTypes( remoteDataBlockName );
+	const defaultPattern = patternsByBlockTypes.find( ( { name } ) => name === patterns?.default );
+	const innerBlocksPattern = patternsByBlockTypes.find(
+		( { name } ) => name === patterns?.inner_blocks
+	);
+
+	const returnValue = {
+		defaultPattern,
 		getInnerBlocks: (
 			result: Record< string, string >
 		): BlockInstance< RemoteDataInnerBlockAttributes >[] => {
@@ -49,7 +59,6 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string )
 				cloneBlockWithAttributes( block, result, remoteDataBlockName )
 			);
 		},
-		getPatternsByBlockTypes,
 		getSupportedPatterns: ( result?: Record< string, string > ): BlockPattern[] => {
 			const supportedPatterns = __experimentalGetAllowedPatterns( rootClientId ).filter(
 				pattern =>
@@ -98,10 +107,20 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string )
 
 			replaceInnerBlocks( rootClientId, patternBlocks ).catch( () => {} );
 		},
-		removeInnerBlocks: (): void => {
-			replaceInnerBlocks( rootClientId, [] ).catch( () => {} );
+		markReadyForInsertion: (): void => {
+			if ( innerBlocksPattern ) {
+				returnValue.insertPatternBlocks( innerBlocksPattern );
+				return;
+			}
+
+			setShowPatternSelection( true );
 		},
-		setShowPatternSelection,
+		resetReadyForInsertion: (): void => {
+			replaceInnerBlocks( rootClientId, [] ).catch( () => {} );
+			setShowPatternSelection( false );
+		},
 		showPatternSelection,
 	};
+
+	return returnValue;
 }
