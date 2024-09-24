@@ -1,30 +1,30 @@
 import {
-	__experimentalText as Text,
 	Button,
 	ButtonGroup,
-	Spinner,
-	Placeholder,
-	Icon,
-	Modal,
 	Card,
-	CardHeader,
 	CardBody,
+	CardHeader,
+	Dropdown,
+	Icon,
 	MenuGroup,
 	MenuItem,
-	Dropdown,
+	Modal,
+	Placeholder,
+	Spinner,
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown, edit, info, trash } from '@wordpress/icons';
 
-import { SUPPORTED_SERVICES } from './constants';
+import { SUPPORTED_SERVICES, SUPPORTED_SERVICES_LABELS } from './constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import AirtableIcon from '@/settings/icons/airtable';
 import GoogleSheetsIcon from '@/settings/icons/google-sheets';
+import HttpIcon from '@/settings/icons/http';
 import ShopifyIcon from '@/settings/icons/shopify';
-import { slugToTitleCase } from '@/utils/string';
 
 import './data-source-list.scss';
 
@@ -51,21 +51,17 @@ const DataSourceList = () => {
 		await fetchDataSources().catch( () => null );
 	};
 
-	const getValidDataSources = () => {
-		return dataSources.filter( source => SUPPORTED_SERVICES.includes( source.service ) );
-	};
-
 	const renderDataSourceMeta = ( source: DataSourceConfig ) => {
 		const tags = [];
 		switch ( source.service ) {
 			case 'airtable':
-				tags.push( source.base.name, source.table.name );
+				tags.push( source.base.name ?? source.base.id );
 				break;
 			case 'shopify':
-				tags.push( source.store );
+				tags.push( source.store_name );
 				break;
 			case 'google-sheets':
-				tags.push( source.spreadsheet.name, source.sheet.name );
+				tags.push( source.spreadsheet.name );
 				break;
 		}
 
@@ -104,15 +100,24 @@ const DataSourceList = () => {
 						{ [
 							{
 								icon: AirtableIcon,
-								label: __( 'Airtable', 'remote-data-blocks' ),
+								label: SUPPORTED_SERVICES_LABELS.airtable,
 								value: 'airtable',
 							},
 							{
 								icon: GoogleSheetsIcon,
-								label: __( 'Google Sheets', 'remote-data-blocks' ),
+								label: SUPPORTED_SERVICES_LABELS[ 'google-sheets' ],
 								value: 'google-sheets',
 							},
-							{ icon: ShopifyIcon, label: __( 'Shopify', 'remote-data-blocks' ), value: 'shopify' },
+							{
+								icon: ShopifyIcon,
+								label: SUPPORTED_SERVICES_LABELS.shopify,
+								value: 'shopify',
+							},
+							{
+								icon: HttpIcon,
+								label: SUPPORTED_SERVICES_LABELS[ 'generic-http' ],
+								value: 'generic-http',
+							},
 						].map( ( { icon, label, value } ) => (
 							<MenuItem
 								key={ value }
@@ -127,6 +132,11 @@ const DataSourceList = () => {
 				) }
 			/>
 		);
+	};
+
+	const getServiceLabel = ( service: ( typeof SUPPORTED_SERVICES )[ number ] ) => {
+		// eslint-disable-next-line security/detect-object-injection
+		return SUPPORTED_SERVICES_LABELS[ service ];
 	};
 
 	const CardBodyContent = (): JSX.Element => {
@@ -161,32 +171,37 @@ const DataSourceList = () => {
 						</tr>
 					</thead>
 					<tbody className="table-body">
-						{ getValidDataSources().map( source => {
-							const { uuid, slug, service } = source;
-							return (
-								<tr key={ slug } className="table-row">
-									<td>
-										<Text className="data-source-slug">{ slug }</Text>
-									</td>
-									<td>
-										<Text>{ slugToTitleCase( service ) }</Text>
-									</td>
-									<td> { renderDataSourceMeta( source ) } </td>
-									<td className="data-source-actions">
-										{ uuid && (
-											<ButtonGroup className="data-source-actions">
-												<Button variant="secondary" onClick={ () => onEditDataSource( uuid ) }>
-													<Icon icon={ edit } />
-												</Button>
-												<Button variant="secondary" onClick={ () => onDeleteDataSource( source ) }>
-													<Icon icon={ trash } />
-												</Button>
-											</ButtonGroup>
-										) }
-									</td>
-								</tr>
-							);
-						} ) }
+						{ dataSources
+							.sort( ( a, b ) => a.slug.localeCompare( b.slug ) )
+							.map( source => {
+								const { uuid, slug, service } = source;
+								return (
+									<tr key={ slug } className="table-row">
+										<td>
+											<Text className="data-source-slug">{ slug }</Text>
+										</td>
+										<td>
+											<Text>{ getServiceLabel( service ) }</Text>
+										</td>
+										<td> { renderDataSourceMeta( source ) } </td>
+										<td className="data-source-actions">
+											{ uuid && (
+												<ButtonGroup className="data-source-actions">
+													<Button variant="secondary" onClick={ () => onEditDataSource( uuid ) }>
+														<Icon icon={ edit } />
+													</Button>
+													<Button
+														variant="secondary"
+														onClick={ () => onDeleteDataSource( source ) }
+													>
+														<Icon icon={ trash } />
+													</Button>
+												</ButtonGroup>
+											) }
+										</td>
+									</tr>
+								);
+							} ) }
 					</tbody>
 				</table>
 
@@ -209,7 +224,7 @@ const DataSourceList = () => {
 									'Are you sure you want to delete "%s" data source with slug "%s"?',
 									'remote-data-blocks'
 								),
-								slugToTitleCase( dataSourceToDelete.service ),
+								getServiceLabel( dataSourceToDelete.service ),
 								dataSourceToDelete.slug
 							) }
 						</p>

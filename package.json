@@ -75,7 +75,7 @@
     "@wordpress/rich-text": "7.7.0",
     "@wordpress/scripts": "27.9.0",
     "@wordpress/url": "4.7.0",
-    "eslint": "8.57.0",
+    "eslint": "8.57.1",
     "fork-ts-checker-webpack-plugin": "9.0.2",
     "happy-dom": "15.7.4",
     "phplint": "2.0.5",

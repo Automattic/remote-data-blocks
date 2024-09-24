@@ -111,6 +111,43 @@ class QueryRunner implements QueryRunnerInterface {
 		];
 	}
 
+	/**
+	 * Get the response metadata for the query.
+	 *
+	 * @param array $response_metadata The response metadata returned by the query runner.
+	 * @param array $query_results The results of the query.
+	 * @return array The response metadata.
+	 */
+	protected function get_response_metadata( array $response_metadata, array $query_results ): array {
+		$age  = intval( $response_metadata['age'] ?? 0 );
+		$time = time() - $age;
+
+		$query_response_metadata = [
+			'last_updated' => [
+				'name'  => 'Last updated',
+				'type'  => 'string',
+				'value' => gmdate( 'Y-m-d H:i:s', $time ),
+			],
+			'total_count'  => [
+				'name'  => 'Total count',
+				'type'  => 'number',
+				'value' => count( $query_results ),
+			],
+		];
+
+		/**
+		 * Filters the query response metadata, which are available as bindings for
+		 * field shortcodes.
+		 *
+		 * @param array $query_response_metadata The query response metadata.
+		 * @param HttpQueryContext $query_context The query context.
+		 * @param array $response_metadata The response metadata returned by the query runner.
+		 * @param array $query_results The results of the query.
+		 * @return array The filtered query response metadata.
+		 */
+		return apply_filters( 'remote_data_blocks_query_response_metadata', $query_response_metadata, $this->query_context, $response_metadata, $query_results );
+	}
+
 	public function execute( array $input_variables ): array|WP_Error {
 		$raw_response_data = $this->get_raw_response_data( $input_variables );
 
@@ -143,7 +180,7 @@ class QueryRunner implements QueryRunnerInterface {
 
 		return [
 			'is_collection' => $is_collection,
-			'metadata'      => $this->query_context->get_metadata( $metadata, $results ),
+			'metadata'      => $this->get_response_metadata( $metadata, $results ),
 			'results'       => $results,
 		];
 	}
@@ -207,7 +244,7 @@ class QueryRunner implements QueryRunnerInterface {
 
 					// JSONPath always returns values in an array, even if there's only one value.
 					// Because we're mostly interested in single values for field mapping, unwrap the array if it's only one item.
-					$field_value_single = self::get_field_value( $field_value, $mapping['defaultValue'] ?? '', $mapping['type'] );
+					$field_value_single = self::get_field_value( $field_value, $mapping['default_value'] ?? '', $mapping['type'] );
 				}
 
 				return array_merge( $mapping, [

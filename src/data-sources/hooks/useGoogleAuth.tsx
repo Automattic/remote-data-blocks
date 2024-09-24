@@ -1,7 +1,7 @@
 import { useDebounce } from '@wordpress/compose';
 import { useEffect, useCallback, useMemo } from '@wordpress/element';
 
-import { getGoogleAuthTokenFromServiceAccount } from '@/data-sources/api/auth';
+import { getGoogleAuthTokenFromServiceAccount } from '@/data-sources/api-clients/auth';
 import { useQuery } from '@/hooks/useQuery';
 import { GoogleServiceAccountKey } from '@/types/google';
 import { safeParseJSON } from '@/utils/string';

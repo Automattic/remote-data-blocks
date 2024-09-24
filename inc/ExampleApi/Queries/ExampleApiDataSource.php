@@ -19,13 +19,14 @@ class ExampleApiDataSource extends HttpDatasource {
 	/**
 	 * @inheritDoc
 	 */
-	public function get_endpoint(): string {
-		return 'https://example.com/api/v1';
+	public function get_image_url(): null {
+		return null;
 	}
 
-	/**
-	 * @inheritDoc
-	 */
+	public function get_endpoint(): string {
+		return '';
+	}
+
 	public function get_request_headers(): array {
 		return [];
 	}

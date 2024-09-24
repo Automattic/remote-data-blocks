@@ -1,4 +1,5 @@
 import { SUPPORTED_SERVICES } from '@/data-sources/constants';
+import { HttpAuth } from '@/data-sources/http/types';
 import { NumberIdName, StringIdName } from '@/types/common';
 import { GoogleServiceAccountKey } from '@/types/google';
 
@@ -25,15 +26,14 @@ export interface DataSourceQuery {
 
 export interface AirtableConfig extends BaseDataSourceConfig {
 	service: 'airtable';
-	token: string;
+	access_token: string;
 	base: StringIdName;
-	table: StringIdName;
 }
 
 export interface ShopifyConfig extends BaseDataSourceConfig {
 	service: 'shopify';
-	store: string;
-	token: string;
+	access_token: string;
+	store_name: string;
 }
 
 export interface GoogleSheetsConfig extends BaseDataSourceConfig {
@@ -43,4 +43,16 @@ export interface GoogleSheetsConfig extends BaseDataSourceConfig {
 	sheet: NumberIdName;
 }
 
-export type DataSourceConfig = AirtableConfig | ShopifyConfig | GoogleSheetsConfig;
+export interface HttpConfig extends BaseDataSourceConfig {
+	service: 'generic-http';
+	url: string;
+	auth: HttpAuth;
+}
+
+export type DataSourceConfig = AirtableConfig | ShopifyConfig | GoogleSheetsConfig | HttpConfig;
+
+export type SettingsComponentProps< T extends BaseDataSourceConfig > = {
+	mode: 'add' | 'edit';
+	uuid?: string;
+	config?: T;
+};

@@ -35,13 +35,17 @@ Example:
 
 ```php
 class YourCustomQuery extends HttpQueryContext {
-    public array $input_variables = [
-        // Implement your input variables here
-    ];
+    public function define_input_variables(): array {
+		return [
+			// Define your input variables here
+		];
+	}
 
-    public array $output_variables = [
-        // Implement your output variables here
-    ];
+    public function define_output_variables(): array {
+		return [
+			// Define your output variables here
+		];
+	}
 
     public function get_endpoint( array $input_variables ): string {
         // Optionally implemented override of datasource endpoint logic here

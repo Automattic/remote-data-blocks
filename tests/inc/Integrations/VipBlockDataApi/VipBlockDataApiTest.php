@@ -9,11 +9,13 @@ use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Integrations\VipBlockDataApi\VipBlockDataApi;
 use RemoteDataBlocks\Tests\Mocks\MockQueryRunner;
 use RemoteDataBlocks\Tests\Mocks\MockDatasource;
+use RemoteDataBlocks\Tests\Mocks\MockValidator;
+
 use function register_remote_data_block;
 
 class TestQueryContext extends HttpQueryContext {
 	public function __construct( private QueryRunnerInterface $mock_qr ) {
-		parent::__construct( new MockDatasource() );
+		parent::__construct( MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator() ) );
 	}
 
 	public function get_query_runner(): QueryRunnerInterface {

@@ -18,6 +18,27 @@ namespace RemoteDataBlocks\Config\Datasource;
  * Only implement this interface if you have additional custom datasources.
  */
 interface DatasourceInterface {
+	public const BASE_SCHEMA = [
+		'type'       => 'object',
+		'properties' => [
+			'__metadata'             => [
+				'type'     => 'object',
+				'required' => false,
+			],
+			'service'                => [ 'type' => 'string' ],
+			'service_schema_version' => [ 'type' => 'integer' ],
+			'slug'                   => [
+				'type'    => 'string',
+				'pattern' => '/^[a-z0-9-]+$/',
+			],
+			'uuid'                   => [
+				'type'     => 'string',
+				'callback' => 'wp_is_uuid',
+				'required' => false,
+			],
+		],
+	];
+
 	/**
 	 * Get a human-readable name for this datasource.
 	 *
@@ -27,6 +48,15 @@ interface DatasourceInterface {
 	 * @return string The display name of the datasource.
 	 */
 	public function get_display_name(): string;
+
+	/**
+	 * Get the schema for the datasource's configuration.
+	 *
+	 * This method should return an array that defines the schema for the datasource's configuration.
+	 *
+	 * @return array The schema for the datasource's configuration.
+	 */
+	public static function get_config_schema(): array;
 
 	/**
 	 * An optional image URL that can represent the datasource in the block editor

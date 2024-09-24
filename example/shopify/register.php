@@ -24,7 +24,7 @@ function register_shopify_block() {
 		return;
 	}
 
-	$shopify_datasource            = new ShopifyDatasource( $access_token, $store_name );
+	$shopify_datasource            = ShopifyDatasource::create( $access_token, $store_name );
 	$shopify_search_products_query = new ShopifySearchProductsQuery( $shopify_datasource );
 	$shopify_get_product_query     = new ShopifyGetProductQuery( $shopify_datasource );
 

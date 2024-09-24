@@ -1,5 +1,5 @@
-export interface SelectOption {
+export interface SelectOption< T = string > {
 	label: string;
-	value: string;
+	value: T;
 	disabled?: boolean;
 }
