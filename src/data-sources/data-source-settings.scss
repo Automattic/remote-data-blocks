@@ -16,6 +16,13 @@
 		max-width: 680px;
 	}
 
+	.form-group .code-input {
+
+		textarea {
+			font-family: monospace;
+		}
+	}
+
 	.form-actions {
 		margin-top: 32px;
 		display: flex;

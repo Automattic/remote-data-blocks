@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Editor\BlockPatterns;
 
@@ -11,9 +11,12 @@ use function register_block_pattern;
 use function wp_json_encode;
 
 class BlockPatterns {
-	private static $templates = [];
+	/**
+	 * @var array<string, string>
+	 */
+	private static array $templates = [];
 
-	private static function load_templates() {
+	private static function load_templates(): void {
 		if ( ! empty( self::$templates ) ) {
 			return;
 		}

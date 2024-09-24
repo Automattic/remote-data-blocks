@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Logging;
 
@@ -18,21 +18,21 @@ class Logger extends AbstractLogger {
 	/**
 	 * We use the factory pattern to provide access to namespaced instances.
 	 *
-	 * @var array Logger[]
+	 * @var Logger[]
 	 */
-	private static $instances = [];
+	private static array $instances = [];
 
 	/**
 	 * The minimum observed log level.
-	 *
-	 * @var string
 	 */
-	private $log_level;
+	private string $log_level;
 
 	/**
 	 * Log levels in ascending priority order.
+	 *
+	 * @var array<string, int>
 	 */
-	private $log_levels = [
+	private array $log_levels = [
 		LogLevel::DEBUG     => 1,
 		LogLevel::INFO      => 2,
 		LogLevel::NOTICE    => 3,
@@ -84,7 +84,6 @@ class Logger extends AbstractLogger {
 	 *
 	 * @param mixed $level1 The first log level.
 	 * @param mixed $level2 The second log level.
-	 * @return bool
 	 */
 	public function is_log_level_higher( mixed $level1, mixed $level2 ): bool {
 		if ( ! isset( $this->log_levels[ $level1 ], $this->log_levels[ $level2 ] ) ) {

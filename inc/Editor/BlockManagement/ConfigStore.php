@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Editor\BlockManagement;
 
@@ -6,17 +6,19 @@ defined( 'ABSPATH' ) || exit();
 
 use RemoteDataBlocks\Logging\LoggerManager;
 use Psr\Log\LoggerInterface;
-use RemoteDataBlocks\Config\Datasource\CodedHttpDatasource;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Config\UiDisplayableInterface;
 
 use function sanitize_title;
 
 class ConfigStore {
+	/**
+	 * @var array<string, array<string, mixed>>
+	 */
 	private static array $configurations;
 	private static LoggerInterface $logger;
 
-	public static function init( LoggerInterface $logger = null ): void {
+	public static function init( ?LoggerInterface $logger = null ): void {
 		self::$configurations = [];
 		self::$logger         = $logger ?? LoggerManager::instance();
 	}
@@ -26,8 +28,6 @@ class ConfigStore {
 	 * of configuration and to ensure that block names are unique (since block
 	 * titles must be unique).
 	 *
-	 * @param string $block_title
-	 * @return string
 	 */
 	public static function get_block_name( string $block_title ): string {
 		return 'remote-data-blocks/' . sanitize_title( $block_title );
@@ -44,9 +44,6 @@ class ConfigStore {
 
 	/**
 	 * Get the configuration for a block.
-	 *
-	 * @param string $block_name
-	 * @return array|null
 	 */
 	public static function get_configuration( string $block_name ): ?array {
 		if ( ! self::is_registered_block( $block_name ) ) {
@@ -59,10 +56,6 @@ class ConfigStore {
 
 	/**
 	 * Set or update the configuration for a block.
-	 *
-	 * @param string $block_name
-	 * @param array $config
-	 * @return void
 	 */
 	public static function set_configuration( string $block_name, array $config ): void {
 		// @TODO: Validate config shape.
@@ -71,9 +64,6 @@ class ConfigStore {
 
 	/**
 	 * Check if a block is registered.
-	 *
-	 * @param string $block_name
-	 * @return bool
 	 */
 	public static function is_registered_block( string $block_name ): bool {
 		return isset( self::$configurations[ $block_name ] );

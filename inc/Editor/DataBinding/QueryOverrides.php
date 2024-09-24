@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Editor\DataBinding;
 
@@ -7,14 +7,14 @@ use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 defined( 'ABSPATH' ) || exit();
 
 class QueryOverrides {
-	public static function init() {
+	public static function init(): void {
 		add_filter( 'query_vars', [ __CLASS__, 'add_query_vars' ] );
 	}
 
 	/**
 	 * Register the query vars indicated as potential overrides in display queries.
 	 */
-	public static function add_query_vars( $vars ) {
+	public static function add_query_vars( array $vars ): array {
 		$query_vars = [];
 
 		// Find all of the query variable overrides defined in display queries.

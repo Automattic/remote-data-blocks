@@ -1,11 +1,4 @@
-<?php
-
-/**
- * HttpQueryContext class
- *
- * @package remote-data-blocks
- * @since 0.1.0
- */
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Config\QueryContext;
 
@@ -16,8 +9,13 @@ use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 defined( 'ABSPATH' ) || exit();
 
 /**
+ * HttpQueryContext class
+ *
  * Base class used to define a Remote Data Blocks Query. This class defines a
  * composable query that allows it to be composed with another query or a block.
+ * 
+ * @package remote-data-blocks
+ * @since 0.1.0
  */
 class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterface {
 	const VERSION = '0.1.0';
@@ -39,6 +37,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 *     @type string $type         The variable type (string, number, boolean)
 	 *   }
 	 * }
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
 	 */
 	public array $input_variables = [];
 
@@ -53,6 +52,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 *     @type string $type          The variable type (string, number, boolean)
 	 *   }
 	 * }
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
 	 */
 	public array $output_variables = [];
 
@@ -73,8 +73,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 
 	/**
 	 * Override this method to specify a custom endpoint for this query.
-	 *
-	 * @return string
 	 */
 	public function get_endpoint( array $input_variables ): string {
 		return $this->get_datasource()->get_endpoint();
@@ -89,37 +87,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	}
 
 	/**
-	 * Override this method to provide different or additional metadata for this
-	 * query. This method is called after the query is run or is returned from
-	 * cache. These variables will be available as bindings for field shortcodes.
-	 *
-	 * @param array $response_metadata The response metadata returned by the query runner.
-	 * @param array $query_results     The results of the query.
-	 * @return array $var_name {
-	 *   @type string $name  Display name of the variable.
-	 *   @type string $type  The variable type (string, number, boolean)
-	 *   @type string $value Value of the variable.
-	 * }
-	 */
-	public function get_metadata( array $response_metadata, array $query_results ): array {
-		$age  = intval( $response_metadata['age'] ?? 0 );
-		$time = time() - $age;
-
-		return [
-			'last_updated' => [
-				'name'  => 'Last updated',
-				'type'  => 'string',
-				'value' => gmdate( 'Y-m-d H:i:s', $time ),
-			],
-			'total_count'  => [
-				'name'  => 'Total count',
-				'type'  => 'number',
-				'value' => count( $query_results ),
-			],
-		];
-	}
-
-	/**
 	 * Override this method to define a request method for this query.
 	 */
 	public function get_request_method(): string {
@@ -130,7 +97,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * Override this method to specify custom request headers for this query.
 	 *
 	 * @param array $input_variables The input variables for this query.
-	 * @return array
 	 */
 	public function get_request_headers( array $input_variables ): array {
 		return $this->get_datasource()->get_request_headers();
@@ -171,7 +137,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 *
 	 * @param string $raw_response_data The raw response data.
 	 * @param array  $input_variables   The input variables for this query.
-	 * @return string|array|object|null
 	 */
 	public function process_response( string $raw_response_data, array $input_variables ): string|array|object|null {
 		return $raw_response_data;
@@ -179,8 +144,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 
 	/**
 	 * Authoritative truth of whether output is expected to be a collection.
-	 *
-	 * @return bool
 	 */
 	final public function is_response_data_collection(): bool {
 		return $this->output_variables['is_collection'] ?? false;

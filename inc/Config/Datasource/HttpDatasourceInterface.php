@@ -1,15 +1,10 @@
-<?php
-
-/**
- * HttpDatasourceInterface
- *
- * @package remote-data-blocks
- * @since 0.1.0
- */
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Config\Datasource;
 
 /**
+ * HttpDatasourceInterface
+ *
  * Interface used to define a Remote Data Blocks Datasource for an HTTP API. It
  * defines the properties of an API that will be shared by queries against that
  * API.
@@ -23,6 +18,9 @@ namespace RemoteDataBlocks\Config\Datasource;
  *
  * If you are a WPVIP customer, datasources are automatically provided by VIP.
  * Only implement this interface if you have custom datasources not provided by VIP.
+ * 
+ * @package remote-data-blocks
+ * @since 0.1.0
  */
 interface HttpDatasourceInterface {
 	/**

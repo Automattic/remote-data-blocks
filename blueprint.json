@@ -9,7 +9,7 @@
   "features": {
     "networking": true
   },
-  "landingPage": "/wp-admin/",
+  "landingPage": "/wp-admin/admin.php?page=remote-data-blocks-settings",
   "login": true,
   "phpExtensionBundles": [ "light" ],
   "preferredVersions": {
@@ -21,7 +21,7 @@
       "step": "setSiteOptions",
       "options": {
         "blogname": "Remote Data Blocks",
-        "blogdescription": "A WordPress playground to explore the Remote Data Blocks plugin"
+        "blogdescription": "Explore the Remote Data Blocks plugin in a WordPress Playground"
       }
     },
     {
