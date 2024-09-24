@@ -151,9 +151,9 @@ class DatasourceCrudTest extends TestCase {
 			'slug'         => 'updated-slug',
 		] );
 
-		$this->assertIsArray( $updated_source );
-		$this->assertSame( 'updated_token', $updated_source['access_token'] );
-		$this->assertSame( 'updated-slug', $updated_source['slug'] );
+		$this->assertInstanceOf( HttpDatasource::class, $updated_source );
+		$this->assertSame( 'updated_token', $updated_source->to_array()['access_token'] );
+		$this->assertSame( 'updated-slug', $updated_source->to_array()['slug'] );
 	}
 
 	public function test_update_item_by_uuid_with_invalid_uuid() {

@@ -73,7 +73,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 
 	/**
 	 * Override this method to specify a custom endpoint for this query.
-	 *
 	 */
 	public function get_endpoint( array $input_variables ): string {
 		return $this->get_datasource()->get_endpoint();
@@ -145,7 +144,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 
 	/**
 	 * Authoritative truth of whether output is expected to be a collection.
-	 *
 	 */
 	final public function is_response_data_collection(): bool {
 		return $this->output_variables['is_collection'] ?? false;
