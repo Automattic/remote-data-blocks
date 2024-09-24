@@ -24,7 +24,7 @@ class BlockBindings {
 	 */
 	public static function register_block_bindings(): void {
 		register_block_bindings_source( self::$binding_source, [
-			'label'              => __( 'Remote Field Binding', 'remote-data-blocks' ),
+			'label'              => __( 'Remote Data Blocks', 'remote-data-blocks' ),
 			'get_value_callback' => [ __CLASS__, 'get_value' ],
 			'uses_context'       => [ self::$context_name ],
 		] );
