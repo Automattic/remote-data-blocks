@@ -13,7 +13,7 @@ class VipBlockDataApi {
 	 */
 	private static array $debug = [];
 
-	public static function init() {
+	public static function init(): void {
 		add_filter( 'vip_block_data_api__sourced_block_result', [ __CLASS__, 'resolve_remote_data' ], 5, 4 );
 		add_filter( 'vip_block_data_api__after_parse_blocks', [ __CLASS__, 'add_debug_info' ], 10, 2 );
 	}
@@ -70,7 +70,7 @@ class VipBlockDataApi {
 		return $attrs;
 	}
 
-	private static function iterate_blocks( $blocks, $block_callback ) {
+	private static function iterate_blocks( array $blocks, callable $block_callback ): array {
 		foreach ( $blocks as &$block ) {
 			$block = call_user_func( $block_callback, $block );
 
@@ -82,7 +82,7 @@ class VipBlockDataApi {
 		return $blocks;
 	}
 
-	public static function add_debug_info( $result, $post_id ) {
+	public static function add_debug_info( array $result, int $post_id ): array {
 		$debug = array_merge( $result['debug'] ?? [], self::$debug );
 
 		if ( ! empty( $debug ) ) {

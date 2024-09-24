@@ -28,8 +28,6 @@ class ConfigStore {
 	 * of configuration and to ensure that block names are unique (since block
 	 * titles must be unique).
 	 *
-	 * @param string $block_title
-	 * @return string
 	 */
 	public static function get_block_name( string $block_title ): string {
 		return 'remote-data-blocks/' . sanitize_title( $block_title );
@@ -47,7 +45,6 @@ class ConfigStore {
 	/**
 	 * Get the configuration for a block.
 	 *
-	 * @param string $block_name
 	 * @return array|null
 	 */
 	public static function get_configuration( string $block_name ): ?array {
@@ -62,9 +59,6 @@ class ConfigStore {
 	/**
 	 * Set or update the configuration for a block.
 	 *
-	 * @param string $block_name
-	 * @param array $config
-	 * @return void
 	 */
 	public static function set_configuration( string $block_name, array $config ): void {
 		// @TODO: Validate config shape.
@@ -74,8 +68,6 @@ class ConfigStore {
 	/**
 	 * Check if a block is registered.
 	 *
-	 * @param string $block_name
-	 * @return bool
 	 */
 	public static function is_registered_block( string $block_name ): bool {
 		return isset( self::$configurations[ $block_name ] );

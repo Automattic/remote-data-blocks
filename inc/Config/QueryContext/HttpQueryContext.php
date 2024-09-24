@@ -74,7 +74,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	/**
 	 * Override this method to specify a custom endpoint for this query.
 	 *
-	 * @return string
 	 */
 	public function get_endpoint( array $input_variables ): string {
 		return $this->get_datasource()->get_endpoint();
@@ -99,7 +98,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * Override this method to specify custom request headers for this query.
 	 *
 	 * @param array $input_variables The input variables for this query.
-	 * @return array
 	 */
 	public function get_request_headers( array $input_variables ): array {
 		return $this->get_datasource()->get_request_headers();
@@ -140,7 +138,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 *
 	 * @param string $raw_response_data The raw response data.
 	 * @param array  $input_variables   The input variables for this query.
-	 * @return string|array|object|null
 	 */
 	public function process_response( string $raw_response_data, array $input_variables ): string|array|object|null {
 		return $raw_response_data;
@@ -149,7 +146,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	/**
 	 * Authoritative truth of whether output is expected to be a collection.
 	 *
-	 * @return bool
 	 */
 	final public function is_response_data_collection(): bool {
 		return $this->output_variables['is_collection'] ?? false;

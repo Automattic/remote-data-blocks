@@ -14,7 +14,7 @@ class DatasourceController extends WP_REST_Controller {
 		$this->rest_base = 'data-sources';
 	}
 
-	public function register_routes() {
+	public function register_routes(): void {
 		// get_items list
 		register_rest_route(
 			$this->namespace,
@@ -95,33 +95,33 @@ class DatasourceController extends WP_REST_Controller {
 		);
 	}
 
-	public function create_item( $request ) {
+	public function create_item( WP_REST_Request $request ): WP_REST_Response {
 		$item = DatasourceCrud::register_new_data_source( $request->get_json_params() );
 		return rest_ensure_response( $item );
 	}
 
-	public function get_items( $request ) {
+	public function get_items( WP_REST_Request $request ): WP_REST_Response {
 		$code_configured_data_sources = ConfigStore::get_datasources_displayable();
 		$ui_configured_data_sources   = DatasourceCrud::get_data_sources_list();
 		return rest_ensure_response( array_merge( $code_configured_data_sources, $ui_configured_data_sources ) );
 	}
 
-	public function get_item( $request ) {
+	public function get_item( WP_REST_Request $request ): WP_REST_Response {
 		$response = DatasourceCrud::get_item_by_uuid( DatasourceCrud::get_data_sources(), $request->get_param( 'uuid' ) );
 		return rest_ensure_response( $response );
 	}
 
-	public function update_item( $request ) {
+	public function update_item( WP_REST_Request $request ): WP_REST_Response {
 		$item = DatasourceCrud::update_item_by_uuid( $request->get_param( 'uuid' ), $request->get_json_params() );
 		return rest_ensure_response( $item );
 	}
 
-	public function delete_item( $request ) {
+	public function delete_item( WP_REST_Request $request ): WP_REST_Response {
 		$result = DatasourceCrud::delete_item_by_uuid( $request->get_param( 'uuid' ) );
 		return rest_ensure_response( $result );
 	}
 
-	public function item_slug_conflicts( $request ) {
+	public function item_slug_conflicts( WP_REST_Request $request ): WP_REST_Response {
 		$slug = $request->get_param( 'slug' );
 		$uuid = $request->get_param( 'uuid' ) ?? '';
 		if ( empty( $slug ) ) {
@@ -140,27 +140,27 @@ class DatasourceController extends WP_REST_Controller {
 
 	// These all require manage_options for now, but we can adjust as needed
 
-	public function get_item_permissions_check( $request ) {
+	public function get_item_permissions_check( WP_REST_Request $request ): bool {
 		return current_user_can( 'manage_options' );
 	}
 
-	public function get_items_permissions_check( $request ) {
+	public function get_items_permissions_check( WP_REST_Request $request ): bool {
 		return current_user_can( 'manage_options' );
 	}
 
-	public function create_item_permissions_check( $request ) {
+	public function create_item_permissions_check( WP_REST_Request $request ): bool {
 		return current_user_can( 'manage_options' );
 	}
 
-	public function update_item_permissions_check( $request ) {
+	public function update_item_permissions_check( WP_REST_Request $request ): bool {
 		return current_user_can( 'manage_options' );
 	}
 
-	public function delete_item_permissions_check( $request ) {
+	public function delete_item_permissions_check( WP_REST_Request $request ): bool {
 		return current_user_can( 'manage_options' );
 	}
 
-	public function item_slug_conflicts_permissions_check( $request ) {
+	public function item_slug_conflicts_permissions_check( WP_REST_Request $request ): bool {
 		return current_user_can( 'manage_options' );
 	}
 }

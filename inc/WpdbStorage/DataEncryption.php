@@ -48,7 +48,7 @@ final class DataEncryption {
 	 * @param string $value Value to encrypt.
 	 * @return string|bool Encrypted value, or false on failure.
 	 */
-	public function encrypt( $value ) {
+	public function encrypt( string $value ): string|bool {
 		if ( ! extension_loaded( 'openssl' ) ) {
 			return $value;
 		}
@@ -74,7 +74,7 @@ final class DataEncryption {
 	 * @param string $raw_value Value to decrypt.
 	 * @return string|bool Decrypted value, or false on failure.
 	 */
-	public function decrypt( $raw_value ) {
+	public function decrypt( string $raw_value ): string|bool {
 		if ( ! extension_loaded( 'openssl' ) || ! is_string( $raw_value ) ) {
 			return $raw_value;
 		}
@@ -105,7 +105,7 @@ final class DataEncryption {
 	 *
 	 * @return string Default (not user-based) encryption key.
 	 */
-	private function get_default_key() {
+	private function get_default_key(): string {
 		if ( defined( 'REMOTE_DATA_BLOCKS_ENCRYPTION_KEY' ) && '' !== constant( 'REMOTE_DATA_BLOCKS_ENCRYPTION_KEY' ) ) {
 			return constant( 'REMOTE_DATA_BLOCKS_ENCRYPTION_KEY' );
 		}
@@ -124,7 +124,7 @@ final class DataEncryption {
 	 *
 	 * @return string Encryption salt.
 	 */
-	private function get_default_salt() {
+	private function get_default_salt(): string {
 		if ( defined( 'REMOTE_DATA_BLOCKS_ENCRYPTION_SALT' ) && '' !== constant( 'REMOTE_DATA_BLOCKS_ENCRYPTION_SALT' ) ) {
 			return constant( 'REMOTE_DATA_BLOCKS_ENCRYPTION_SALT' );
 		}

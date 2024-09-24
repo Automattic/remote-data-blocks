@@ -43,7 +43,7 @@ class DatasourceCrud {
 		return true;
 	}
 
-	public static function register_new_data_source( array $settings, ?ArraySerializableInterface $datasource = null ) {
+	public static function register_new_data_source( array $settings, ?ArraySerializableInterface $datasource = null ): HttpDatasourceInterface|WP_Error {
 		$data_sources = self::get_data_sources();
 
 		do {
@@ -92,7 +92,7 @@ class DatasourceCrud {
 		return $data_sources[ $uuid ] ?? false;
 	}
 
-	public static function update_item_by_uuid( string $uuid, $new_item, ?ArraySerializableInterface $datasource = null ) {
+	public static function update_item_by_uuid( string $uuid, array $new_item, ?ArraySerializableInterface $datasource = null ): HttpDatasourceInterface|WP_Error {
 		$data_sources = self::get_data_sources();
 		$item         = self::get_item_by_uuid( $data_sources, $uuid );
 		if ( ! $item ) {
@@ -111,7 +111,7 @@ class DatasourceCrud {
 			return new WP_Error( 'failed_to_update_data_source', __( 'Failed to update data source.', 'remote-data-blocks' ) );
 		}
 		
-		return $new_item;
+		return $datasource;
 	}
 
 	public static function delete_item_by_uuid( string $uuid ): WP_Error|bool {

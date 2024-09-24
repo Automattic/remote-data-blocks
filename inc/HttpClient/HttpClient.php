@@ -162,7 +162,7 @@ class HttpClient {
 	/**
 	 * Queue a request for later execution.
 	 */
-	public function queue_request( string $method, string|UriInterface $uri, array $options = [] ) {
+	public function queue_request( string $method, string|UriInterface $uri, array $options = [] ): void {
 		$this->queued_requests[] = [
 			'method'  => $method,
 			'uri'     => $uri,
