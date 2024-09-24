@@ -2,72 +2,74 @@
 
 namespace RemoteDataBlocks\Integrations\Airtable;
 
-use RemoteDataBlocks\Config\Datasource\CodedHttpDatasource;
+use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 
-class AirtableDatasource extends CodedHttpDatasource {
-	private $tables;
+class AirtableDatasource extends HttpDatasource {
+	protected const SERVICE_SCHEMA_VERSION = 1;
 
-	public function __construct( private string $access_token, private string $base, mixed $tables ) {
-		if ( ! is_array( $tables ) ) {
-			$tables = [ '' => $tables ];
-		}
-		$this->tables = $tables;
-	}
-
-	public function get_access_token(): string {
-		return $this->access_token;
-	}
-
-	public function get_base(): string {
-		return $this->base;
-	}
+	protected const SERVICE_SCHEMA = [
+		'type'       => 'object',
+		'properties' => [
+			'service'                => [
+				'type'  => 'string',
+				'const' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
+			],
+			'service_schema_version' => [
+				'type'  => 'integer',
+				'const' => self::SERVICE_SCHEMA_VERSION,
+			],
+			'access_token'           => [ 'type' => 'string' ],
+			'base'                   => [
+				'type'       => 'object',
+				'properties' => [
+					'id'   => [ 'type' => 'string' ],
+					'name' => [
+						'type'     => 'string',
+						'required' => false,
+					],
+				],
+			],
+			'display_name'           => [
+				'type'     => 'string',
+				'required' => false,
+			],
+		],
+	];
 
 	public function get_display_name(): string {
-		$suffix = count( $this->tables ) > 1 ? ' (' . implode( ', ', array_keys( $this->tables ) ) . ')' : '';
-		return trim( sprintf( 'Airtable: %s %s', $this->get_base(), $suffix ) );
-	}
-
-	public function get_table( string $variation = '' ): string {
-		return $this->tables[ $variation ] ?? '';
+		return sprintf( 'Airtable: %s', $this->config['display_name'] ?? $this->config['base_name'] );
 	}
 
 	public function get_endpoint( string $variation = '' ): string {
-		$url   = 'https://api.airtable.com/v0/' . $this->get_base();
-		$table = $this->get_table( $variation );
-		if ( $table ) {
-			$url .= '/' . $table;
-		}
-		return $url;
+		return 'https://api.airtable.com/v0/' . $this->config['base'];
 	}
 
 	public function get_request_headers(): array {
 		return [
-			'Authorization' => sprintf( 'Bearer %s', $this->get_access_token() ),
+			'Authorization' => sprintf( 'Bearer %s', $this->config['access_token'] ),
 			'Content-Type'  => 'application/json',
 		];
 	}
 
-	/**
-	 * @inheritDoc
-	 */
-	public function get_object_representations(): array {
-		$objects = [];
+	public static function create( string $access_token, string $base_id, string $display_name ): self {
+		return parent::from_array([
+			'service'      => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
+			'access_token' => $access_token,
+			'base'         => [ 'id' => $base_id ],
+			'display_name' => $display_name,
+			'slug'         => sanitize_title( $display_name ),
+		]);
+	}
 
-		foreach ( $this->tables as $table ) {
-			$slug = sprintf( 'Airtable: %s %s', $this->get_base(), $table );
-
-			$objects[ $slug ] = (object) [
-				'base'    => [
-					'name' => $this->get_base(),
-				],
-				'service' => 'airtable',
-				'slug'    => $slug,
-				'table'   => [
-					'name' => $table,
-				],
-			];
-		}
-
-		return $objects;
+	public function to_ui_display(): array {
+		return [
+			'slug'    => $this->get_slug(),
+			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
+			'base'    => [
+				'id'   => $this->config['base']['id'],
+				'name' => $this->config['base']['name'] ?? null,
+			],
+			'uuid'    => $this->config['uuid'] ?? null,
+		];
 	}
 }

@@ -9,11 +9,10 @@ require_once __DIR__ . '/inc/queries/class-list-westeros-houses-query.php';
 require_once __DIR__ . '/inc/queries/class-get-westeros-houses-query.php';
 
 function register_westeros_houses_block() {
-	$block_name   = 'Westeros House';
-	$endpoint     = 'https://sheets.googleapis.com/v4/spreadsheets/1EHdQg53Doz0B-ImrGz_hTleYeSvkVIk_NSJCOM1FQk0/values/Houses';
-	$access_token = \RemoteDataBlocks\Example\get_access_token( 'google_sheets_westeros_houses' );
+	$block_name  = 'Westeros House';
+	$credentials = json_decode( base64_decode( \RemoteDataBlocks\Example\get_access_token( 'google_sheets_westeros_houses' ) ), true );
 
-	if ( empty( $access_token ) ) {
+	if ( empty( $credentials ) ) {
 		$logger = LoggerManager::instance();
 		$logger->warning(
 			sprintf(
@@ -25,7 +24,7 @@ function register_westeros_houses_block() {
 		return;
 	}
 
-	$westeros_houses_datasource = new GoogleSheetsDatasource( $access_token, $endpoint, 'Westeros Houses' );
+	$westeros_houses_datasource = GoogleSheetsDatasource::create( $credentials, '1EHdQg53Doz0B-ImrGz_hTleYeSvkVIk_NSJCOM1FQk0', 'Westeros Houses', );
 	$list_westeros_houses_query = new ListWesterosHousesQuery( $westeros_houses_datasource );
 	$get_westeros_houses_query  = new GetWesterosHousesQuery( $westeros_houses_datasource );
 

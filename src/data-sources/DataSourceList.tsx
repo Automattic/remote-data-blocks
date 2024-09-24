@@ -1,23 +1,22 @@
 import {
-	__experimentalText as Text,
 	Button,
 	ButtonGroup,
-	Spinner,
-	Placeholder,
-	Icon,
-	Modal,
 	Card,
-	CardHeader,
 	CardBody,
+	CardHeader,
+	Dropdown,
+	Icon,
 	MenuGroup,
 	MenuItem,
-	Dropdown,
+	Modal,
+	Placeholder,
+	Spinner,
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown, edit, info, trash } from '@wordpress/icons';
 
-import { SUPPORTED_SERVICES } from './constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
@@ -51,21 +50,17 @@ const DataSourceList = () => {
 		await fetchDataSources().catch( () => null );
 	};
 
-	const getValidDataSources = () => {
-		return dataSources.filter( source => SUPPORTED_SERVICES.includes( source.service ) );
-	};
-
 	const renderDataSourceMeta = ( source: DataSourceConfig ) => {
 		const tags = [];
 		switch ( source.service ) {
 			case 'airtable':
-				tags.push( source.base.name, source.table.name );
+				tags.push( source.base.name ?? source.base.id );
 				break;
 			case 'shopify':
-				tags.push( source.store );
+				tags.push( source.store_name );
 				break;
 			case 'google-sheets':
-				tags.push( source.spreadsheet.name, source.sheet.name );
+				tags.push( source.spreadsheet.name );
 				break;
 		}
 
@@ -161,32 +156,37 @@ const DataSourceList = () => {
 						</tr>
 					</thead>
 					<tbody className="table-body">
-						{ getValidDataSources().map( source => {
-							const { uuid, slug, service } = source;
-							return (
-								<tr key={ slug } className="table-row">
-									<td>
-										<Text className="data-source-slug">{ slug }</Text>
-									</td>
-									<td>
-										<Text>{ slugToTitleCase( service ) }</Text>
-									</td>
-									<td> { renderDataSourceMeta( source ) } </td>
-									<td className="data-source-actions">
-										{ uuid && (
-											<ButtonGroup className="data-source-actions">
-												<Button variant="secondary" onClick={ () => onEditDataSource( uuid ) }>
-													<Icon icon={ edit } />
-												</Button>
-												<Button variant="secondary" onClick={ () => onDeleteDataSource( source ) }>
-													<Icon icon={ trash } />
-												</Button>
-											</ButtonGroup>
-										) }
-									</td>
-								</tr>
-							);
-						} ) }
+						{ dataSources
+							.sort( ( a, b ) => a.slug.localeCompare( b.slug ) )
+							.map( source => {
+								const { uuid, slug, service } = source;
+								return (
+									<tr key={ slug } className="table-row">
+										<td>
+											<Text className="data-source-slug">{ slug }</Text>
+										</td>
+										<td>
+											<Text>{ slugToTitleCase( service ) }</Text>
+										</td>
+										<td> { renderDataSourceMeta( source ) } </td>
+										<td className="data-source-actions">
+											{ uuid && (
+												<ButtonGroup className="data-source-actions">
+													<Button variant="secondary" onClick={ () => onEditDataSource( uuid ) }>
+														<Icon icon={ edit } />
+													</Button>
+													<Button
+														variant="secondary"
+														onClick={ () => onDeleteDataSource( source ) }
+													>
+														<Icon icon={ trash } />
+													</Button>
+												</ButtonGroup>
+											) }
+										</td>
+									</tr>
+								);
+							} ) }
 					</tbody>
 				</table>
 
