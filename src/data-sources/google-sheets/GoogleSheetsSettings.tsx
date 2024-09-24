@@ -1,17 +1,10 @@
-import {
-	Card,
-	CardHeader,
-	CardBody,
-	TextareaControl,
-	SelectControl,
-	ButtonGroup,
-	Button,
-} from '@wordpress/components';
+import { Card, CardHeader, CardBody, TextareaControl, SelectControl } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
 import { getConnectionMessage } from '../utils';
+import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import { SlugInput } from '@/data-sources/components/SlugInput';
 import { GOOGLE_SHEETS_API_SCOPES } from '@/data-sources/constants';
 import { GoogleSheetsFormState } from '@/data-sources/google-sheets/types';
@@ -21,18 +14,12 @@ import {
 	useGoogleSheetsOptions,
 } from '@/data-sources/hooks/useGoogleApi';
 import { useGoogleAuth } from '@/data-sources/hooks/useGoogleAuth';
-import { GoogleSheetsConfig } from '@/data-sources/types';
+import { GoogleSheetsConfig, SettingsComponentProps } from '@/data-sources/types';
 import { useForm, ValidationRules } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import { StringIdName } from '@/types/common';
 import { GoogleServiceAccountKey } from '@/types/google';
 import { SelectOption } from '@/types/input';
-
-export interface GoogleSheetsSettingsProps {
-	mode: 'add' | 'edit';
-	uuid?: string;
-	config?: GoogleSheetsConfig;
-}
 
 const initialState: GoogleSheetsFormState = {
 	slug: '',
@@ -87,7 +74,7 @@ export const GoogleSheetsSettings = ( {
 	mode,
 	uuid: uuidFromProps,
 	config,
-}: GoogleSheetsSettingsProps ) => {
+}: SettingsComponentProps< GoogleSheetsConfig > ) => {
 	const { goToMainScreen } = useSettingsContext();
 	const { updateDataSource, addDataSource, slugConflicts, loadingSlugConflicts } =
 		useDataSources( false );
@@ -121,11 +108,7 @@ export const GoogleSheetsSettings = ( {
 		state.spreadsheet?.id ?? ''
 	);
 
-	const handleSaveError = ( error: unknown ) => {
-		console.error( error );
-	};
-
-	const onSaveClick = () => {
+	const onSaveClick = async () => {
 		if ( ! state.spreadsheet || ! state.sheet || ! state.credentials ) {
 			// TODO: Error handling
 			return;
@@ -144,9 +127,11 @@ export const GoogleSheetsSettings = ( {
 		};
 
 		if ( mode === 'add' ) {
-			void addDataSource( data ).then( goToMainScreen ).catch( handleSaveError );
+			await addDataSource( data );
+		} else {
+			await updateDataSource( data );
 		}
-		void updateDataSource( data ).then( goToMainScreen ).catch( handleSaveError );
+		goToMainScreen();
 	};
 
 	const onCredentialsChange = ( nextValue: string ) => {
@@ -208,11 +193,11 @@ export const GoogleSheetsSettings = ( {
 
 	const shouldAllowSubmit = useMemo( () => {
 		return (
-			! state.spreadsheet ||
-			! state.sheet ||
-			! state.credentials ||
-			loadingSlugConflicts ||
-			slugConflicts
+			state.spreadsheet &&
+			state.sheet &&
+			state.credentials &&
+			! loadingSlugConflicts &&
+			! slugConflicts
 		);
 	}, [ state.spreadsheet, state.sheet, state.credentials, loadingSlugConflicts, slugConflicts ] );
 
@@ -297,6 +282,7 @@ export const GoogleSheetsSettings = ( {
 							onChange={ onCredentialsChange }
 							help={ credentialsHelpText }
 							rows={ 14 }
+							className="code-input"
 						/>
 					</div>
 
@@ -326,16 +312,11 @@ export const GoogleSheetsSettings = ( {
 						/>
 					</div>
 
-					<div className="form-group">
-						<ButtonGroup className="form-actions">
-							<Button variant="primary" onClick={ onSaveClick } disabled={ shouldAllowSubmit }>
-								{ __( 'Save', 'remote-data-blocks' ) }
-							</Button>
-							<Button variant="secondary" onClick={ goToMainScreen }>
-								{ __( 'Cancel', 'remote-data-blocks' ) }
-							</Button>
-						</ButtonGroup>
-					</div>
+					<DataSourceFormActions
+						onSave={ onSaveClick }
+						onCancel={ goToMainScreen }
+						isSaveDisabled={ ! shouldAllowSubmit }
+					/>
 				</form>
 			</CardBody>
 		</Card>
