@@ -4,7 +4,7 @@ export const SUPPORTED_SERVICES = [
 	'airtable',
 	'shopify',
 	'google-sheets',
-	'http',
+	'generic-http',
 	'example-api',
 ] as const;
 export const SUPPORTED_SERVICES_LABELS: Record< ( typeof SUPPORTED_SERVICES )[ number ], string > =
@@ -12,7 +12,7 @@ export const SUPPORTED_SERVICES_LABELS: Record< ( typeof SUPPORTED_SERVICES )[ n
 		airtable: 'Airtable',
 		shopify: 'Shopify',
 		'google-sheets': 'Google Sheets',
-		http: 'HTTP',
+		'generic-http': 'HTTP',
 		'example-api': 'Example API',
 	} as const;
 export const OPTIONS_PAGE_SLUG = 'remote-data-blocks-settings';

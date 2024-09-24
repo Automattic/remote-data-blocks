@@ -115,8 +115,8 @@ const DataSourceList = () => {
 							},
 							{
 								icon: HttpIcon,
-								label: __( SUPPORTED_SERVICES_LABELS.http, 'remote-data-blocks' ),
-								value: 'http',
+								label: __( SUPPORTED_SERVICES_LABELS[ 'generic-http' ], 'remote-data-blocks' ),
+								value: 'generic-http',
 							},
 						].map( ( { icon, label, value } ) => (
 							<MenuItem

@@ -32,7 +32,7 @@ const DataSourceEditSettings = ( { uuid }: DataSourceEditSettings ) => {
 	if ( 'google-sheets' === dataSource.service ) {
 		return <GoogleSheetsSettings mode="edit" uuid={ uuid } config={ dataSource } />;
 	}
-	if ( 'http' === dataSource.service ) {
+	if ( 'generic-http' === dataSource.service ) {
 		return <HttpSettings mode="edit" uuid={ uuid } config={ dataSource } />;
 	}
 
@@ -53,7 +53,7 @@ const DataSourceSettings = () => {
 		if ( 'google-sheets' === service ) {
 			return <GoogleSheetsSettings mode="add" />;
 		}
-		if ( 'http' === service ) {
+		if ( 'generic-http' === service ) {
 			return <HttpSettings mode="add" />;
 		}
 		return <>{ __( 'Service not (yet) supported.', 'remote-data-blocks' ) }</>;

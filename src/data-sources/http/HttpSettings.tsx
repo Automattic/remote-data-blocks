@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardBody, TextControl } from '@wordpress/components';
+import { Card, CardBody, CardHeader, TextControl } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -6,7 +6,7 @@ import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormA
 import { HttpAuthSettingsInput } from '@/data-sources/components/HttpAuthSettingsInput';
 import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
-import { HttpFormState, HttpAuth, HttpAuthFormState } from '@/data-sources/http/types';
+import { HttpAuth, HttpAuthFormState, HttpFormState } from '@/data-sources/http/types';
 import { HttpConfig, SettingsComponentProps } from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
@@ -105,7 +105,7 @@ export const HttpSettings = ( {
 
 		const httpConfig: HttpConfig = {
 			uuid: uuidFromProps ?? '',
-			service: 'http',
+			service: 'generic-http',
 			slug: state.slug,
 			url: state.url,
 			auth,

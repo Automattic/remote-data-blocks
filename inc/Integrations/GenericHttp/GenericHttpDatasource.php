@@ -19,17 +19,28 @@ class GenericHttpDatasource extends HttpDatasource {
 				'type'  => 'integer',
 				'const' => self::SERVICE_SCHEMA_VERSION,
 			],
-			'auth_type'              => [
-				'type' => 'string',
-				'enum' => [ 'basic', 'bearer', 'api-key' ],
-			],
-			'auth_value'             => [
-				'type'     => 'string',
-				'sanitize' => false,
-			],
-			'auth_add_to'            => [
-				'type' => 'string',
-				'enum' => [ 'header', 'query' ],
+			'auth'                   => [
+				'type'       => 'object',
+				'properties' => [
+					'type'   => [
+						'type' => 'string',
+						'enum' => [ 'basic', 'bearer', 'api-key' ],
+					],
+					'value'  => [
+						'type'     => 'string',
+						'sanitize' => false,
+					],
+					'key'    => [
+						'type'     => 'string',
+						'sanitize' => false,
+						'required' => false,
+					],
+					'add_to' => [
+						'type'     => 'string',
+						'enum'     => [ 'header', 'query' ],
+						'required' => false,
+					],
+				],
 			],
 			'url'                    => [
 				'type'     => 'string',
@@ -59,5 +70,15 @@ class GenericHttpDatasource extends HttpDatasource {
 			'auth'    => $auth,
 			'slug'    => sanitize_title( $display_name ),
 		]);
+	}
+
+	public function to_ui_display(): array {
+		return [
+			'slug'      => $this->get_slug(),
+			'service'   => REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE,
+			'url'       => $this->config['url'],
+			'auth_type' => $this->config['auth_type'],
+			'uuid'      => $this->config['uuid'] ?? null,
+		];
 	}
 }

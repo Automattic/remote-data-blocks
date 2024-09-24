@@ -44,7 +44,7 @@ export interface GoogleSheetsConfig extends BaseDataSourceConfig {
 }
 
 export interface HttpConfig extends BaseDataSourceConfig {
-	service: 'http';
+	service: 'generic-http';
 	url: string;
 	auth: HttpAuth;
 }
