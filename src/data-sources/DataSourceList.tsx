@@ -100,22 +100,22 @@ const DataSourceList = () => {
 						{ [
 							{
 								icon: AirtableIcon,
-								label: __( SUPPORTED_SERVICES_LABELS.airtable, 'remote-data-blocks' ),
+								label: SUPPORTED_SERVICES_LABELS.airtable,
 								value: 'airtable',
 							},
 							{
 								icon: GoogleSheetsIcon,
-								label: __( SUPPORTED_SERVICES_LABELS[ 'google-sheets' ], 'remote-data-blocks' ),
+								label: SUPPORTED_SERVICES_LABELS[ 'google-sheets' ],
 								value: 'google-sheets',
 							},
 							{
 								icon: ShopifyIcon,
-								label: __( SUPPORTED_SERVICES_LABELS.shopify, 'remote-data-blocks' ),
+								label: SUPPORTED_SERVICES_LABELS.shopify,
 								value: 'shopify',
 							},
 							{
 								icon: HttpIcon,
-								label: __( SUPPORTED_SERVICES_LABELS[ 'generic-http' ], 'remote-data-blocks' ),
+								label: SUPPORTED_SERVICES_LABELS[ 'generic-http' ],
 								value: 'generic-http',
 							},
 						].map( ( { icon, label, value } ) => (

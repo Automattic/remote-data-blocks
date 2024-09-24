@@ -1,3 +1,5 @@
+import { __ } from '@wordpress/i18n';
+
 import { SelectOption } from '@/types/input';
 
 export const SUPPORTED_SERVICES = [
@@ -9,11 +11,11 @@ export const SUPPORTED_SERVICES = [
 ] as const;
 export const SUPPORTED_SERVICES_LABELS: Record< ( typeof SUPPORTED_SERVICES )[ number ], string > =
 	{
-		airtable: 'Airtable',
-		shopify: 'Shopify',
-		'google-sheets': 'Google Sheets',
-		'generic-http': 'HTTP',
-		'example-api': 'Example API',
+		airtable: __( 'Airtable', 'remote-data-blocks' ),
+		shopify: __( 'Shopify', 'remote-data-blocks' ),
+		'google-sheets': __( 'Google Sheets', 'remote-data-blocks' ),
+		'generic-http': __( 'HTTP', 'remote-data-blocks' ),
+		'example-api': __( 'Example API', 'remote-data-blocks' ),
 	} as const;
 export const OPTIONS_PAGE_SLUG = 'remote-data-blocks-settings';
 export const REST_BASE = '/remote-data-blocks/v1';
@@ -39,13 +41,13 @@ export const API_KEY_ADD_TO = [ 'queryparams', 'header' ] as const;
 export const HTTP_SOURCE_AUTH_TYPE_SELECT_OPTIONS: SelectOption<
 	( typeof AUTH_TYPES )[ number ]
 >[] = [
-	{ label: 'Bearer', value: 'bearer' },
-	{ label: 'Basic', value: 'basic' },
-	{ label: 'API Key', value: 'api-key' },
+	{ label: __( 'Bearer', 'remote-data-blocks' ), value: 'bearer' },
+	{ label: __( 'Basic', 'remote-data-blocks' ), value: 'basic' },
+	{ label: __( 'API Key', 'remote-data-blocks' ), value: 'api-key' },
 ];
 export const HTTP_SOURCE_ADD_TO_SELECT_OPTIONS: SelectOption<
 	( typeof API_KEY_ADD_TO )[ number ]
 >[] = [
-	{ label: 'Header', value: 'header' },
-	{ label: 'Query Params', value: 'queryparams' },
+	{ label: __( 'Header', 'remote-data-blocks' ), value: 'header' },
+	{ label: __( 'Query Params', 'remote-data-blocks' ), value: 'queryparams' },
 ];
