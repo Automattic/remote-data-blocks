@@ -5,6 +5,7 @@ namespace RemoteDataBlocks\Tests\Config;
 use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Tests\Mocks\MockDatasource;
+use RemoteDataBlocks\Tests\Mocks\MockValidator;
 
 class QueryContextTest extends TestCase {
 
@@ -12,7 +13,7 @@ class QueryContextTest extends TestCase {
 	private $query_context;
 
 	protected function setUp(): void {
-		$this->datasource    = new MockDatasource();
+		$this->datasource    = MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator() );
 		$this->query_context = new HttpQueryContext( $this->datasource );
 	}
 

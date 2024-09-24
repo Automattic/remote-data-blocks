@@ -1,19 +1,18 @@
 import {
 	Button,
 	ButtonGroup,
-	SelectControl,
 	Card,
-	CardHeader,
 	CardBody,
+	CardHeader,
+	SelectControl,
 } from '@wordpress/components';
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
 import {
 	useAirtableApiBases,
-	useAirtableApiTables,
 	useAirtableApiUserId,
 } from '@/data-sources/airtable/airtable-api-hooks';
 import { AirtableFormState } from '@/data-sources/airtable/types';
@@ -34,9 +33,8 @@ export interface AirtableSettingsProps {
 }
 
 const initialState: AirtableFormState = {
-	token: '',
+	access_token: '',
 	base: null,
-	table: null,
 	slug: '',
 };
 
@@ -45,9 +43,8 @@ const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState
 		return initialState;
 	}
 	return {
-		token: config.token,
+		access_token: config.access_token,
 		base: config.base,
-		table: config.table,
 		slug: config.slug,
 	};
 };
@@ -55,12 +52,6 @@ const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState
 const defaultSelectBaseOption: SelectOption = {
 	disabled: true,
 	label: __( 'Auto-filled on successful connection.', 'remote-data-blocks' ),
-	value: '',
-};
-
-const defaultSelectTableOption: SelectOption = {
-	disabled: true,
-	label: __( 'Auto-filled on valid base.', 'remote-data-blocks' ),
 	value: '',
 };
 
@@ -78,15 +69,11 @@ export const AirtableSettings = ( {
 	} );
 
 	const [ baseOptions, setBaseOptions ] = useState< SelectOption[] >( [ defaultSelectBaseOption ] );
-	const [ tableOptions, setTableOptions ] = useState< SelectOption[] >( [
-		defaultSelectTableOption,
-	] );
 
-	const { fetchingUserId, userId, userIdError } = useAirtableApiUserId( state.token );
-	const { bases, basesError, fetchingBases } = useAirtableApiBases( state.token, userId ?? '' );
-	const { fetchingTables, tables, tablesError } = useAirtableApiTables(
-		state.token,
-		state.base?.id ?? ''
+	const { fetchingUserId, userId, userIdError } = useAirtableApiUserId( state.access_token );
+	const { bases, basesError, fetchingBases } = useAirtableApiBases(
+		state.access_token,
+		userId ?? ''
 	);
 
 	const handleSaveError = ( error: unknown ) => {
@@ -94,7 +81,7 @@ export const AirtableSettings = ( {
 	};
 
 	const onSaveClick = () => {
-		if ( ! state.base || ! state.table ) {
+		if ( ! state.base ) {
 			// TODO: Error handling
 			return;
 		}
@@ -102,9 +89,8 @@ export const AirtableSettings = ( {
 		const airtableConfig: AirtableConfig = {
 			uuid: uuidFromProps ?? '',
 			service: 'airtable',
-			token: state.token,
+			access_token: state.access_token,
 			base: state.base,
-			table: state.table,
 			slug: state.slug,
 		};
 
@@ -115,7 +101,7 @@ export const AirtableSettings = ( {
 	};
 
 	const onTokenInputChange: InputChangeCallback = ( token: string | undefined ) => {
-		handleOnChange( 'token', token ?? '' );
+		handleOnChange( 'access_token', token ?? '' );
 	};
 
 	const onSelectChange = (
@@ -128,9 +114,6 @@ export const AirtableSettings = ( {
 			if ( id === 'base' ) {
 				const selectedBase = bases?.find( base => base.id === value );
 				newValue = { id: value, name: selectedBase?.name ?? '' };
-			} else if ( id === 'table' ) {
-				const selectedTable = tables?.find( table => table.id === value );
-				newValue = { id: value, name: selectedTable?.name ?? '' };
 			}
 			handleOnChange( id, newValue );
 		}
@@ -170,16 +153,8 @@ export const AirtableSettings = ( {
 	}, [ fetchingUserId, userId, userIdError ] );
 
 	const shouldAllowSubmit = useMemo( () => {
-		return (
-			bases === null ||
-			tables === null ||
-			! state.base ||
-			! state.table ||
-			! state.slug ||
-			loadingSlugConflicts ||
-			slugConflicts
-		);
-	}, [ bases, tables, state.base, state.table, state.slug, loadingSlugConflicts, slugConflicts ] );
+		return bases === null || ! state.base || ! state.slug || loadingSlugConflicts || slugConflicts;
+	}, [ bases, state.base, state.slug, loadingSlugConflicts, slugConflicts ] );
 
 	const basesHelpText = useMemo( () => {
 		if ( userId ) {
@@ -197,38 +172,6 @@ export const AirtableSettings = ( {
 		return 'Select a base from which to fetch data.';
 	}, [ bases, basesError, fetchingBases, state.base, userId ] );
 
-	const tablesHelpText = useMemo( () => {
-		if ( bases?.length && state.base ) {
-			if ( tablesError ) {
-				return __(
-					'Failed to fetch tables. Please check that your access token has the `schema.tables:read` Scope.',
-					'remote-data-blocks'
-				);
-			} else if ( fetchingTables ) {
-				return __( 'Fetching tables...', 'remote-data-blocks' );
-			} else if ( tables ) {
-				if ( state.table ) {
-					const selectedTable = tables.find( table => table.id === state.table?.id );
-
-					if ( selectedTable ) {
-						return sprintf(
-							__( 'Fields: %s', 'remote-data-blocks' ),
-							selectedTable.fields.map( field => field.name ).join( ', ' )
-						);
-					}
-				}
-
-				if ( ! tables.length ) {
-					return __( 'No tables found', 'remote-data-blocks' );
-				}
-			}
-
-			return __( 'Select a table from which to fetch data.', 'remote-data-blocks' );
-		}
-
-		return 'Select a table to attach with this data source.';
-	}, [ bases, fetchingTables, state.base, state.table, tables, tablesError ] );
-
 	useEffect( () => {
 		if ( ! bases?.length ) {
 			return;
@@ -242,22 +185,6 @@ export const AirtableSettings = ( {
 			...( bases ?? [] ).map( ( { name, id } ) => ( { label: name, value: id } ) ),
 		] );
 	}, [ bases ] );
-
-	useEffect( () => {
-		if ( ! state?.base ) {
-			return;
-		}
-
-		if ( tables ) {
-			setTableOptions( [
-				{
-					...defaultSelectBaseOption,
-					label: __( 'Select a table', 'remote-data-blocks' ),
-				},
-				...tables.map( ( { name, id } ) => ( { label: name, value: id, disabled: false } ) ),
-			] );
-		}
-	}, [ state.base, tables ] );
 
 	return (
 		<Card className="add-update-data-source-card">
@@ -276,7 +203,7 @@ export const AirtableSettings = ( {
 						<PasswordInputControl
 							label={ __( 'Access Token', 'remote-data-blocks' ) }
 							onChange={ onTokenInputChange }
-							value={ state.token }
+							value={ state.access_token }
 							help={ connectionMessage }
 						/>
 					</div>
@@ -290,19 +217,6 @@ export const AirtableSettings = ( {
 							options={ baseOptions }
 							help={ basesHelpText }
 							disabled={ fetchingBases || ! bases?.length }
-							__next40pxDefaultSize
-						/>
-					</div>
-
-					<div className="form-group">
-						<SelectControl
-							id="table"
-							label={ __( 'Table', 'remote-data-blocks' ) }
-							value={ state.table?.id ?? '' }
-							onChange={ onSelectChange }
-							options={ tableOptions }
-							help={ tablesHelpText }
-							disabled={ fetchingTables || ! tables?.length }
 							__next40pxDefaultSize
 						/>
 					</div>

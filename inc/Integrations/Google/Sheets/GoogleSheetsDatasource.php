@@ -2,16 +2,15 @@
 
 namespace RemoteDataBlocks\Integrations\Google\Sheets;
 
-use RemoteDataBlocks\Config\Datasource\DatasourceInterface;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
+use WP_Error;
 
 class GoogleSheetsDatasource extends HttpDatasource {
-	private array $credentials;
-	private string $endpoint;
-	private string $display_name;
+	protected const SERVICE_NAME           = REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE;
+	protected const SERVICE_SCHEMA_VERSION = 1;
 
-	private const SERVICE_SCHEMA = [
+	protected const SERVICE_SCHEMA = [
 		'type'       => 'object',
 		'properties' => [       
 			'credentials'    => [
@@ -20,7 +19,10 @@ class GoogleSheetsDatasource extends HttpDatasource {
 					'type'                        => [ 'type' => 'string' ],
 					'project_id'                  => [ 'type' => 'string' ],
 					'private_key_id'              => [ 'type' => 'string' ],
-					'private_key'                 => [ 'type' => 'string' ],
+					'private_key'                 => [
+						'type'     => 'string',
+						'sanitize' => false,
+					],
 					'client_email'                => [
 						'type'     => 'string',
 						'callback' => 'is_email',
@@ -46,37 +48,48 @@ class GoogleSheetsDatasource extends HttpDatasource {
 					'universe_domain'             => [ 'type' => 'string' ],
 				],
 			],
+			'display_name'   => [ 'type' => 'string' ],
 			'spreadsheet_id' => [ 'type' => 'string' ],
 		],
 	];
 
-	public function __construct( string $credentials, string $endpoint, string $display_name ) {
-		/**
-		 * Decodes Base64 encoded JSON string into an array
-		 * and assigns it to the $credentials property.
-		 */
-		$this->credentials  = json_decode( base64_decode( $credentials ), true );
-		$this->endpoint     = $endpoint;
-		$this->display_name = $display_name;
-	}
-
 	public function get_display_name(): string {
-		return sprintf( 'Google Sheets: %s', $this->display_name );
+		return sprintf( 'Google Sheets: %s', $this->config['display_name'] );
 	}
 
 	public function get_endpoint(): string {
-		return $this->endpoint;
+		return sprintf( 'https://sheets.googleapis.com/v4/spreadsheets/%s', $this->config['spreadsheet_id'] );
 	}
 
 	public function get_request_headers(): array {
 		$access_token = GoogleAuth::generate_token_from_service_account_key(
-			$this->credentials,
+			$this->config['credentials'],
 			GoogleAuth::GOOGLE_SHEETS_SCOPES
 		);
 
 		return [
 			'Authorization' => sprintf( 'Bearer %s', $access_token ),
 			'Content-Type'  => 'application/json',
+		];
+	}
+
+	public static function create( array $credentials, string $spreadsheet_id, string $display_name ): self|WP_Error {
+		return parent::from_array([
+			'service'        => REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE,
+			'credentials'    => $credentials,
+			'display_name'   => $display_name,
+			'spreadsheet_id' => $spreadsheet_id,
+			'slug'           => sanitize_title( $display_name ),
+		]);
+	}
+
+	public function to_ui_display(): array {
+		return [
+			'slug'        => $this->get_slug(),
+			'service'     => REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE,
+			'spreadsheet' => [ 'name' => $this->config['spreadsheet_id'] ],
+			'sheet'       => [ 'name' => '' ],
+			'uuid'        => $this->config['uuid'] ?? null,
 		];
 	}
 }

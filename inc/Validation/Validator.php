@@ -25,6 +25,10 @@ class Validator implements ValidatorInterface {
 	}
 
 	private function validate_schema( array $schema, $data ): bool|WP_Error {
+		if ( isset( $schema['required'] ) && false === $schema['required'] && ! isset( $data ) ) {
+			return true;
+		}
+
 		if ( isset( $schema['type'] ) && ! $this->check_type( $data, $schema['type'] ) ) {
 			// translators: %1$s is the expected PHP data type, %2$s is the actual PHP data type.
 			return new WP_Error( 'invalid_type', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), $schema['type'], gettype( $data ) ) );
@@ -40,8 +44,24 @@ class Validator implements ValidatorInterface {
 			return new WP_Error( 'invalid_value', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), implode( ', ', $schema['enum'] ), $data ) );
 		}
 
+		if ( isset( $schema['const'] ) && $data !== $schema['const'] ) {
+			// translators: %1$s is the expected value, %2$s is the actual value.
+			return new WP_Error( 'invalid_value', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), $schema['const'], $data ) );
+		}
+
+		if ( isset( $schema['callback'] ) && is_callable( $schema['callback'] ) ) {
+			if ( false === call_user_func( $schema['callback'], $data ) ) {
+				// translators: %1$s is the callback name, %2$s is the value given to the callback.
+				return new WP_Error( 'invalid_value', sprintf( __( 'Validate callback %1$s failed with value %2$s.', 'remote-data-blocks' ), $schema['callback'], $data ) );
+			}
+		}
+
 		if ( isset( $schema['properties'] ) && is_array( $schema['properties'] ) ) {
 			foreach ( $schema['properties'] as $field => $field_schema ) {
+				if ( isset( $field_schema['required'] ) && false === $field_schema['required'] && ! isset( $data[ $field ] ) ) {
+					continue;
+				}
+
 				if ( ! isset( $data[ $field ] ) ) {
 					// translators: %1$s is the missing field name.
 					return new WP_Error( 'missing_field', sprintf( __( 'Missing field %1$s.', 'remote-data-blocks' ), $field ) );

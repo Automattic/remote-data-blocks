@@ -48,7 +48,7 @@ class AirtableGetEventQuery extends HttpQueryContext {
 	 * Airtable API endpoint for fetching a single event.
 	 */
 	public function get_endpoint( array $input_variables ): string {
-		return $this->get_datasource()->get_endpoint() . '/' . $input_variables['record_id'];
+		return $this->get_datasource()->get_endpoint() . '/tblyGtuxblLtmoqMI/' . $input_variables['record_id'];
 	}
 
 	public function get_query_name(): string {

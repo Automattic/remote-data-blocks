@@ -43,6 +43,11 @@ class Sanitizer implements SanitizerInterface {
 
 			$value = $config[ $key ];
 
+			if ( isset( $field_schema['sanitize'] ) && false === $field_schema['sanitize'] ) {
+				$sanitized[ $key ] = $value;
+				continue;
+			}
+
 			if ( isset( $field_schema['sanitize'] ) ) {
 				$sanitized[ $key ] = call_user_func( $field_schema['sanitize'], $value );
 				continue;
