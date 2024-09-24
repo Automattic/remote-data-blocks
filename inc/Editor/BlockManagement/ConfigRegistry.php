@@ -18,7 +18,7 @@ use function wp_insert_post;
 class ConfigRegistry {
 	private static LoggerInterface $logger;
 
-	public static function init( LoggerInterface $logger = null ): void {
+	public static function init( ?LoggerInterface $logger = null ): void {
 		self::$logger = $logger ?? LoggerManager::instance();
 		ConfigStore::init( self::$logger );
 	}

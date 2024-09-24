@@ -21,16 +21,14 @@ final class DataEncryption {
 	/**
 	 * Key to use for encryption.
 	 *
-	 * @var string
 	 */
-	private $key;
+	private string $key;
 
 	/**
 	 * Salt to use for encryption.
 	 *
-	 * @var string
 	 */
-	private $salt;
+	private string $salt;
 
 	/**
 	 * Constructor.

@@ -2,7 +2,6 @@
 
 namespace RemoteDataBlocks\ExampleApi;
 
-use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 use RemoteDataBlocks\ExampleApi\Queries\ExampleApiDataSource;
 use RemoteDataBlocks\ExampleApi\Queries\ExampleApiGetRecordQuery;
 use RemoteDataBlocks\ExampleApi\Queries\ExampleApiGetTableQuery;

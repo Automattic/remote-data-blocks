@@ -8,6 +8,11 @@ use WP_Error;
  * Validator class.
  */
 class Validator implements ValidatorInterface {
+	/**
+	 * The validation schema.
+	 *
+	 * @var array<string, mixed>
+	 */
 	private array $schema;
 
 	/**

@@ -3,9 +3,6 @@
 namespace RemoteDataBlocks\Tests\Validation;
 
 use PHPUnit\Framework\TestCase;
-use RemoteDataBlocks\Integrations\Airtable\AirtableDatasource;
-use RemoteDataBlocks\Integrations\Google\Sheets\GoogleSheetsDatasource;
-use RemoteDataBlocks\Integrations\Shopify\ShopifyDatasource;
 use RemoteDataBlocks\Validation\Validator;
 use WP_Error;
 

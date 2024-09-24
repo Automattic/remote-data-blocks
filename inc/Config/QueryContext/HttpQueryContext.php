@@ -37,6 +37,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 *     @type string $type         The variable type (string, number, boolean)
 	 *   }
 	 * }
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
 	 */
 	public array $input_variables = [];
 
@@ -51,6 +52,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 *     @type string $type          The variable type (string, number, boolean)
 	 *   }
 	 * }
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
 	 */
 	public array $output_variables = [];
 

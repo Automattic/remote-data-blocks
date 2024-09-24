@@ -8,7 +8,10 @@ use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 defined( 'ABSPATH' ) || exit();
 
 class VipBlockDataApi {
-	private static $debug = [];
+	/**
+	 * @var array<string, mixed>
+	 */
+	private static array $debug = [];
 
 	public static function init() {
 		add_filter( 'vip_block_data_api__sourced_block_result', [ __CLASS__, 'resolve_remote_data' ], 5, 4 );

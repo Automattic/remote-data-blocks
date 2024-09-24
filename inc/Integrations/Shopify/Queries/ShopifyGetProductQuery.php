@@ -5,12 +5,18 @@ namespace RemoteDataBlocks\Integrations\Shopify\Queries;
 use RemoteDataBlocks\Config\QueryContext\GraphqlQueryContext;
 
 class ShopifyGetProductQuery extends GraphqlQueryContext {
+	/**
+	 * @var array<string, mixed>
+	 */
 	public array $input_variables = [
 		'id' => [
 			'type' => 'id',
 		],
 	];
 
+	/**
+	 * @var array<string, mixed>
+	 */
 	public array $output_variables = [
 		'root_path'     => null,
 		'is_collection' => false,
