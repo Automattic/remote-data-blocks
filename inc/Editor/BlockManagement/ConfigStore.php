@@ -44,8 +44,6 @@ class ConfigStore {
 
 	/**
 	 * Get the configuration for a block.
-	 *
-	 * @return array|null
 	 */
 	public static function get_configuration( string $block_name ): ?array {
 		if ( ! self::is_registered_block( $block_name ) ) {
@@ -58,7 +56,6 @@ class ConfigStore {
 
 	/**
 	 * Set or update the configuration for a block.
-	 *
 	 */
 	public static function set_configuration( string $block_name, array $config ): void {
 		// @TODO: Validate config shape.
@@ -67,7 +64,6 @@ class ConfigStore {
 
 	/**
 	 * Check if a block is registered.
-	 *
 	 */
 	public static function is_registered_block( string $block_name ): bool {
 		return isset( self::$configurations[ $block_name ] );
