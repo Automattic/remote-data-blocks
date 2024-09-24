@@ -59,10 +59,6 @@ class HttpClient {
 
 	/**
 	 * Initialize the HTTP client.
-	 *
-	 * @param string $base_uri
-	 * @param array  $headers
-	 * @param array  $options
 	 */
 	public function init( string $base_uri, array $headers = [], array $options = [] ): void {
 		$this->base_uri = $base_uri;
@@ -165,10 +161,6 @@ class HttpClient {
 
 	/**
 	 * Queue a request for later execution.
-	 *
-	 * @param string $method
-	 * @param string|UriInterface $uri
-	 * @param array  $options
 	 */
 	public function queue_request( string $method, string|UriInterface $uri, array $options = [] ) {
 		$this->queued_requests[] = [
@@ -200,33 +192,21 @@ class HttpClient {
 	}
 
 	/**
-	 * @param string $method
-	 * @param string|UriInterface $uri
-	 * @param array  $options
-	 *
-	 * @return \Psr\Http\Message\ResponseInterface
+	 * Execute a request.
 	 */
 	public function request( string $method, string|UriInterface $uri, array $options = [] ): ResponseInterface {
 		return $this->client->request( $method, $uri, array_merge( $this->options, $options ) );
 	}
 
 	/**
-	 * @param string $method
-	 * @param string|UriInterface $uri
-	 * @param array  $options
-	 *
-	 * @return \Psr\Http\Message\ResponseInterface
+	 * Execute a GET request.
 	 */
 	public function get( string|UriInterface $uri, array $options = [] ): ResponseInterface {
 		return $this->request( 'GET', $uri, $options );
 	}
 
 	/**
-	 * @param string $method
-	 * @param string|UriInterface $uri
-	 * @param array  $options
-	 *
-	 * @return \Psr\Http\Message\ResponseInterface
+	 * Execute a POST request.
 	 */
 	public function post( string|UriInterface $uri, array $options = [] ): ResponseInterface {
 		return $this->request( 'POST', $uri, $options );
