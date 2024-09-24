@@ -187,12 +187,6 @@ export const AirtableSettings = ( {
 		] );
 	}, [ bases ] );
 
-	useEffect( () => {
-		if ( ! state?.base ) {
-			return;
-		}
-	}, [ state.base ] );
-
 	return (
 		<Card className="add-update-data-source-card">
 			<CardHeader>

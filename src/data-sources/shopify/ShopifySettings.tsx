@@ -100,8 +100,8 @@ export const ShopifySettings = ( { mode, uuid: uuidFromProps, config }: ShopifyS
 						<TextControl
 							type="url"
 							label={ __( 'Store Slug', 'remote-data-blocks' ) }
-							onChange={ store_name => {
-								handleOnChange( 'store_name', store_name ?? '' );
+							onChange={ storeName => {
+								handleOnChange( 'store_name', storeName ?? '' );
 							} }
 							value={ state.store_name }
 							placeholder="your-shop-name"
