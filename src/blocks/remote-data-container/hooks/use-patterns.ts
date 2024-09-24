@@ -51,8 +51,10 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string )
 		},
 		getPatternsByBlockTypes,
 		getSupportedPatterns: ( result?: Record< string, string > ): BlockPattern[] => {
-			const supportedPatterns = __experimentalGetAllowedPatterns( rootClientId ).filter( pattern =>
-				pattern.blocks.some( block => hasBlockBinding( block, remoteDataBlockName ) )
+			const supportedPatterns = __experimentalGetAllowedPatterns( rootClientId ).filter(
+				pattern =>
+					pattern.blockTypes?.includes( remoteDataBlockName ) ||
+					pattern.blocks.some( block => hasBlockBinding( block, remoteDataBlockName ) )
 			);
 
 			// If no result is provided, return the supported patterns as is.
