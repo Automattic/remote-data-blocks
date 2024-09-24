@@ -35,7 +35,6 @@ export interface AirtableSettingsProps {
 const initialState: AirtableFormState = {
 	access_token: '',
 	base: null,
-	table: null,
 	slug: '',
 };
 
