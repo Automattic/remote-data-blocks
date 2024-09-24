@@ -28,7 +28,10 @@ class DatasourceCrudTest extends TestCase {
 			'service_schema_version' => 1,
 			'uuid'                   => wp_generate_uuid4(),
 			'access_token'           => 'valid_token',
-			'base'                   => 'base_id',
+			'base'                   => [
+				'id'   => 'base_id',
+				'name' => 'Base Name',
+			],
 			'display_name'           => 'Crud Test',
 			'slug'                   => 'valid-slug',
 		];
@@ -66,7 +69,10 @@ class DatasourceCrudTest extends TestCase {
 			'service_schema_version' => 1,
 			'uuid'                   => wp_generate_uuid4(),
 			'access_token'           => 'token1',
-			'base'                   => 'base_id1',
+			'base'                   => [
+				'id'   => 'base_id1',
+				'name' => 'Base Name 1',
+			],
 			'display_name'           => 'Base Name 1',
 			'slug'                   => 'source-1',
 		] );
@@ -103,14 +109,18 @@ class DatasourceCrudTest extends TestCase {
 			'service_schema_version' => 1,
 			'uuid'                   => wp_generate_uuid4(),
 			'access_token'           => 'token1',
-			'base'                   => 'base_id1',
+			'base'                   => [
+				'id'   => 'base_id1',
+				'name' => 'Base Name 1',
+			],
 			'display_name'           => 'Crud Test',
 			'slug'                   => 'source-1',
 		] );
 
 		$retrieved_source = DatasourceCrud::get_item_by_uuid( DatasourceCrud::get_data_sources(), $source->to_array()['uuid'] );
 		$this->assertSame( 'token1', $retrieved_source['access_token'] );
-		$this->assertSame( 'base_id1', $retrieved_source['base'] );
+		$this->assertSame( 'base_id1', $retrieved_source['base']['id'] );
+		$this->assertSame( 'Base Name 1', $retrieved_source['base']['name'] );
 		$this->assertSame( 'Crud Test', $retrieved_source['display_name'] );
 		$this->assertArrayHasKey( '__metadata', $retrieved_source );
 		$this->assertArrayHasKey( 'created_at', $retrieved_source['__metadata'] );
@@ -128,7 +138,10 @@ class DatasourceCrudTest extends TestCase {
 			'service_schema_version' => 1,
 			'uuid'                   => wp_generate_uuid4(),
 			'access_token'           => 'token1',
-			'base'                   => 'base_id1',
+			'base'                   => [
+				'id'   => 'base_id1',
+				'name' => 'Base Name 1',
+			],
 			'display_name'           => 'Crud Test',
 			'slug'                   => 'source-1',
 		] );
@@ -154,7 +167,10 @@ class DatasourceCrudTest extends TestCase {
 			'service_schema_version' => 1,
 			'uuid'                   => wp_generate_uuid4(),
 			'access_token'           => 'token1',
-			'base'                   => 'base_id1',
+			'base'                   => [
+				'id'   => 'base_id1',
+				'name' => 'Base Name 1',
+			],
 			'display_name'           => 'Crud Test',
 			'slug'                   => 'source-1',
 		] );

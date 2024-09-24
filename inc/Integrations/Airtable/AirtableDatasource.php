@@ -20,8 +20,20 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 				'const' => self::SERVICE_SCHEMA_VERSION,
 			],
 			'access_token'           => [ 'type' => 'string' ],
-			'base'                   => [ 'type' => 'string' ],
-			'display_name'           => [ 'type' => 'string' ],
+			'base'                   => [
+				'type'       => 'object',
+				'properties' => [
+					'id'   => [ 'type' => 'string' ],
+					'name' => [
+						'type'     => 'string',
+						'required' => false,
+					],
+				],
+			],
+			'display_name'           => [
+				'type'     => 'string',
+				'required' => false,
+			],
 		],
 	];
 
@@ -30,7 +42,7 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 	}
 
 	public function get_display_name(): string {
-		return sprintf( 'Airtable: %s', $this->config['display_name'] );
+		return sprintf( 'Airtable: %s', $this->config['display_name'] ?? $this->config['base_name'] );
 	}
 
 	public function get_endpoint( string $variation = '' ): string {
@@ -44,13 +56,13 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 		];
 	}
 
-	public static function create( string $access_token, string $base, string $display_name ): self {
+	public static function create( string $access_token, string $base_id, string $display_name ): self {
 		return parent::from_array([
 			'service'                => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'service_schema_version' => self::SERVICE_SCHEMA_VERSION,
 			'uuid'                   => wp_generate_uuid4(),
 			'access_token'           => $access_token,
-			'base'                   => $base,
+			'base'                   => [ 'id' => $base_id ],
 			'display_name'           => $display_name,
 			'slug'                   => sanitize_title( $display_name ),
 		]);
@@ -60,8 +72,10 @@ class AirtableDatasource extends HttpDatasource implements HttpDatasourceInterfa
 		return [
 			'slug'    => $this->get_slug(),
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
-			'base'    => [ 'name' => $this->config['base'] ],
-			'table'   => [ 'name' => '' ],
+			'base'    => [
+				'id'   => $this->config['base']['id'],
+				'name' => $this->config['base']['name'],
+			],
 		];
 	}
 }

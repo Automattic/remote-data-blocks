@@ -54,13 +54,13 @@ const DataSourceList = () => {
 		const tags = [];
 		switch ( source.service ) {
 			case 'airtable':
-				tags.push( source.base.name, source.table.name );
+				tags.push( source.base.name ?? source.base.id );
 				break;
 			case 'shopify':
 				tags.push( source.store_name );
 				break;
 			case 'google-sheets':
-				tags.push( source.spreadsheet.name, source.sheet.name );
+				tags.push( source.spreadsheet.name );
 				break;
 		}
 
