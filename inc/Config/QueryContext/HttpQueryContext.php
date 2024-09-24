@@ -1,11 +1,4 @@
-<?php
-
-/**
- * HttpQueryContext class
- *
- * @package remote-data-blocks
- * @since 0.1.0
- */
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Config\QueryContext;
 
@@ -16,8 +9,13 @@ use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 defined( 'ABSPATH' ) || exit();
 
 /**
+ * HttpQueryContext class
+ *
  * Base class used to define a Remote Data Blocks Query. This class defines a
  * composable query that allows it to be composed with another query or a block.
+ * 
+ * @package remote-data-blocks
+ * @since 0.1.0
  */
 class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterface {
 	const VERSION = '0.1.0';
@@ -39,6 +37,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 *     @type string $type         The variable type (string, number, boolean)
 	 *   }
 	 * }
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
 	 */
 	public array $input_variables = [];
 
@@ -53,6 +52,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 *     @type string $type          The variable type (string, number, boolean)
 	 *   }
 	 * }
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
 	 */
 	public array $output_variables = [];
 

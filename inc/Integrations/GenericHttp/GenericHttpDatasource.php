@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Integrations\GenericHttp;
 
@@ -44,6 +44,7 @@ class GenericHttpDatasource extends HttpDatasource {
 			],
 			'url'                    => [
 				'type'     => 'string',
+				'callback' => '\RemoteDataBlocks\Validation\is_url',
 				'sanitize' => 'sanitize_url',
 			],
 		],

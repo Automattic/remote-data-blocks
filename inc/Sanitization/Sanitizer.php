@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Sanitization;
 
@@ -6,6 +6,11 @@ namespace RemoteDataBlocks\Sanitization;
  * Sanitizer class.
  */
 class Sanitizer implements SanitizerInterface {
+	/**
+	 * The sanitization schema.
+	 *
+	 * @var array<string, mixed>
+	 */
 	private array $schema;
 
 	/**

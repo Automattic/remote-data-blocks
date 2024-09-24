@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types = 1);
+
 define( 'ABSPATH', __FILE__ );
 define( 'REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY', __DIR__ . '/../../' );
 define( 'REMOTE_DATA_BLOCKS__UNIT_TEST', true );

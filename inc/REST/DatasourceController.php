@@ -1,9 +1,8 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\REST;
 
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
-use RemoteDataBlocks\Validation\DatasourceValidator;
 use RemoteDataBlocks\WpdbStorage\DatasourceCrud;
 use WP_REST_Controller;
 

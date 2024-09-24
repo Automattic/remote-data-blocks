@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Editor\BlockManagement;
 
@@ -7,11 +7,13 @@ defined( 'ABSPATH' ) || exit();
 use RemoteDataBlocks\Editor\BlockPatterns\BlockPatterns;
 use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 use RemoteDataBlocks\REST\RemoteDataController;
-use function register_block_pattern;
 use function register_block_type;
 
 class BlockRegistration {
-	public static $block_category = [
+	/**
+	 * @var array<string, string>
+	 */
+	public static array $block_category = [
 		'icon'  => null,
 		'slug'  => 'remote-data-blocks',
 		'title' => 'Remote Data Blocks',
