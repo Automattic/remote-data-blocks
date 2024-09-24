@@ -13,16 +13,16 @@ use function wp_generate_uuid4;
 class RemoteDataController {
 	private static string $slug = 'remote-data';
 
-	public static function init() {
+	public static function init(): void {
 		add_action( 'rest_api_init', [ __CLASS__, 'register_rest_routes' ] );
 	}
 
-	public static function get_url() {
+	public static function get_url(): string {
 		$url = rest_url( sprintf( '/%s/%s', REMOTE_DATA_BLOCKS__REST_NAMESPACE, self::$slug ) );
 		return add_query_arg( [ '_envelope' => 'true' ], $url );
 	}
 
-	public static function register_rest_routes() {
+	public static function register_rest_routes(): void {
 		register_rest_route( REMOTE_DATA_BLOCKS__REST_NAMESPACE, '/' . self::$slug, [
 			'methods'             => 'POST',
 			'callback'            => [ __CLASS__, 'execute_query' ],
@@ -85,7 +85,7 @@ class RemoteDataController {
 		);
 	}
 
-	public static function permission_callback() {
+	public static function permission_callback(): bool {
 		return true;
 	}
 }

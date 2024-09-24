@@ -30,7 +30,7 @@ class BlockRegistration {
 		return $block_categories;
 	}
 
-	public static function register_blocks() {
+	public static function register_blocks(): void {
 		$remote_data_blocks_config = [];
 		$scripts_to_localize       = [];
 

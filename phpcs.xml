@@ -111,6 +111,9 @@
 	</rule>
 
 	<!-- Slevomat Coding Standard -->
+	<rule ref="SlevomatCodingStandard.Commenting.AnnotationName"/>
+	<rule ref="SlevomatCodingStandard.Commenting.UselessFunctionDocComment"/>
+	<rule ref="SlevomatCodingStandard.Commenting.UselessInheritDocComment"/>
 	<rule ref="SlevomatCodingStandard.Namespaces.UnusedUses">
 		<properties>
 			<property name="searchAnnotations" value="true"/>
@@ -123,8 +126,20 @@
 	</rule>
 	<rule ref="SlevomatCodingStandard.TypeHints.LongTypeHints"/>
 	<rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue"/>
+	<rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint">
+		<exclude-pattern>/example/*</exclude-pattern>
+		<exclude-pattern>/tests/*</exclude-pattern>
+		<exclude-pattern>/inc/REST/DatasourceController.php</exclude-pattern>
+		<exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification" />
+	</rule>
 	<rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint">
 		<exclude-pattern>/example/*</exclude-pattern>
 		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint">
+		<exclude-pattern>/example/*</exclude-pattern>
+		<exclude-pattern>/tests/*</exclude-pattern>
+		<exclude-pattern>/inc/REST/DatasourceController.php</exclude-pattern>
+		<exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification" />
 	</rule>
 </ruleset>
