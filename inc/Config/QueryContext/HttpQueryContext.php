@@ -28,8 +28,8 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 *
 	 * @var array {
 	 *   @type array $var_name {
-	 *     @type string $defaultValue Optional default value of the variable.
-	 *     @type string $name         Display name of the variable.
+	 *     @type string $default_value Optional default value of the variable.
+	 *     @type string $name          Display name of the variable.
 	 *     @type array  $overrides {
 	 *       @type array {
 	 *         @type $target Targeted override.
@@ -47,10 +47,10 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 *
 	 * @var array {
 	 *   @type array $var_name {
-	 *     @type string $defaultValue Optional default value of the variable.
-	 *     @type string $name         Display name of the variable.
-	 *     @type string $path         JSONPath expression to find the variable value.
-	 *     @type string $type         The variable type (string, number, boolean)
+	 *     @type string $default_value Optional default value of the variable.
+	 *     @type string $name          Display name of the variable.
+	 *     @type string $path          JSONPath expression to find the variable value.
+	 *     @type string $type          The variable type (string, number, boolean)
 	 *   }
 	 * }
 	 */

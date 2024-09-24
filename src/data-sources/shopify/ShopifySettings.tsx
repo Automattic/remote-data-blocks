@@ -1,4 +1,4 @@
-import { TextControl, Card, CardHeader, CardBody } from '@wordpress/components';
+import { Card, CardBody, CardHeader, TextControl } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -7,15 +7,15 @@ import PasswordInputControl from '@/data-sources/components/PasswordInputControl
 import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { useShopifyShopName } from '@/data-sources/shopify/shopify-api-hooks';
-import { ShopifyConfig, SettingsComponentProps } from '@/data-sources/types';
+import { SettingsComponentProps, ShopifyConfig } from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
 export type ShopifyFormState = Omit< ShopifyConfig, 'service' | 'uuid' >;
 
 const initialState: ShopifyFormState = {
-	store: '',
-	token: '',
+	store_name: '',
+	access_token: '',
 	slug: '',
 };
 
@@ -24,8 +24,8 @@ const getInitialStateFromConfig = ( config?: ShopifyConfig ): ShopifyFormState =
 		return initialState;
 	}
 	return {
-		store: config.store,
-		token: config.token,
+		store_name: config.store_name,
+		access_token: config.access_token,
 		slug: config.slug,
 	};
 };
@@ -42,18 +42,21 @@ export const ShopifySettings = ( {
 		initialValues: getInitialStateFromConfig( config ),
 	} );
 
-	const { shopName, connectionMessage } = useShopifyShopName( state.store, state.token );
+	const { shopName, connectionMessage } = useShopifyShopName(
+		state.store_name,
+		state.access_token
+	);
 
 	const shouldAllowSubmit = useMemo( () => {
-		return state.slug && state.store && state.token;
-	}, [ state.slug, state.store, state.token ] );
+		return state.slug && state.store_name && state.access_token;
+	}, [ state.slug, state.store_name, state.access_token ] );
 
 	const onSaveClick = async () => {
 		const shopifyConfig: ShopifyConfig = {
 			uuid: uuidFromProps ?? '',
 			service: 'shopify',
-			store: state.store,
-			token: state.token,
+			store_name: state.store_name,
+			access_token: state.access_token,
 			slug: state.slug,
 		};
 
@@ -66,7 +69,7 @@ export const ShopifySettings = ( {
 	};
 
 	const onTokenInputChange = ( token: string | undefined ) => {
-		handleOnChange( 'token', token ?? '' );
+		handleOnChange( 'access_token', token ?? '' );
 	};
 
 	/**
@@ -94,10 +97,10 @@ export const ShopifySettings = ( {
 						<TextControl
 							type="url"
 							label={ __( 'Store Slug', 'remote-data-blocks' ) }
-							onChange={ store => {
-								handleOnChange( 'store', store ?? '' );
+							onChange={ storeName => {
+								handleOnChange( 'store_name', storeName ?? '' );
 							} }
-							value={ state.store }
+							value={ state.store_name }
 							placeholder="your-shop-name"
 							help={ __( 'Example: https://your-shop-name.myshopify.com', 'remote-data-blocks' ) }
 							autoComplete="off"
@@ -109,7 +112,7 @@ export const ShopifySettings = ( {
 						<PasswordInputControl
 							label={ __( 'Access Token', 'remote-data-blocks' ) }
 							onChange={ onTokenInputChange }
-							value={ state.token }
+							value={ state.access_token }
 							help={ connectionMessage }
 						/>
 					</div>
