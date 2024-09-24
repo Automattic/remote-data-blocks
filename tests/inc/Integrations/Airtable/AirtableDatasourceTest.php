@@ -55,7 +55,7 @@ class AirtableDatasourceTest extends TestCase {
 			'Content-Type'  => 'application/json',
 		];
 
-		$this->assertSame($expected_headers, $this->datasource->get_request_headers());
+		$this->assertSame( $expected_headers, $this->datasource->get_request_headers() );
 	}
 
 	public function test_create(): void {
@@ -65,8 +65,8 @@ class AirtableDatasourceTest extends TestCase {
 			'New Airtable Base'
 		);
 
-		$this->assertInstanceOf(AirtableDatasource::class, $datasource);
-		$this->assertSame('Airtable: New Airtable Base', $datasource->get_display_name());
-		$this->assertSame('https://api.airtable.com/v0/new_base_id', $datasource->get_endpoint());
+		$this->assertInstanceOf( AirtableDatasource::class, $datasource );
+		$this->assertSame( 'Airtable: New Airtable Base', $datasource->get_display_name() );
+		$this->assertSame( 'https://api.airtable.com/v0/new_base_id', $datasource->get_endpoint() );
 	}
 }
