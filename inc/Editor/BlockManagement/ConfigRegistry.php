@@ -36,6 +36,7 @@ class ConfigRegistry {
 			'description' => '',
 			'name'        => $block_name,
 			'loop'        => $options['loop'] ?? false,
+			'patterns'    => [],
 			'queries'     => [
 				'__DISPLAY__' => $display_query,
 			],

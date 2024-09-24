@@ -51,11 +51,13 @@ class BlockRegistration {
 				];
 			}
 
+			// Create the localized data that will be used by our block editor script.
 			$remote_data_blocks_config[ $block_name ] = [
 				'availableBindings' => $available_bindings,
 				'loop'              => $config['loop'],
 				'name'              => $block_name,
 				'overrides'         => $overrides,
+				'patterns'          => $config['patterns'],
 				'selectors'         => $config['selectors'],
 				'settings'          => [
 					'category' => self::$block_category['slug'],
@@ -79,7 +81,8 @@ class BlockRegistration {
 			$scripts_to_localize[] = $block_type->editor_script_handles[0];
 
 			// Register a default pattern that simply displays the available data.
-			BlockPatterns::register_default_block_pattern( $block_name, $config['title'], $config['queries']['__DISPLAY__'] );
+			$default_pattern_name = BlockPatterns::register_default_block_pattern( $block_name, $config['title'], $config['queries']['__DISPLAY__'] );
+			$remote_data_blocks_config[ $block_name ]['patterns']['default'] = $default_pattern_name;
 		}
 
 		foreach ( array_unique( $scripts_to_localize ) as $script_handle ) {
