@@ -17,13 +17,14 @@ import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown, edit, info, trash } from '@wordpress/icons';
 
+import { SUPPORTED_SERVICES, SUPPORTED_SERVICES_LABELS } from './constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import AirtableIcon from '@/settings/icons/airtable';
 import GoogleSheetsIcon from '@/settings/icons/google-sheets';
+import HttpIcon from '@/settings/icons/http';
 import ShopifyIcon from '@/settings/icons/shopify';
-import { slugToTitleCase } from '@/utils/string';
 
 import './data-source-list.scss';
 
@@ -99,15 +100,24 @@ const DataSourceList = () => {
 						{ [
 							{
 								icon: AirtableIcon,
-								label: __( 'Airtable', 'remote-data-blocks' ),
+								label: SUPPORTED_SERVICES_LABELS.airtable,
 								value: 'airtable',
 							},
 							{
 								icon: GoogleSheetsIcon,
-								label: __( 'Google Sheets', 'remote-data-blocks' ),
+								label: SUPPORTED_SERVICES_LABELS[ 'google-sheets' ],
 								value: 'google-sheets',
 							},
-							{ icon: ShopifyIcon, label: __( 'Shopify', 'remote-data-blocks' ), value: 'shopify' },
+							{
+								icon: ShopifyIcon,
+								label: SUPPORTED_SERVICES_LABELS.shopify,
+								value: 'shopify',
+							},
+							{
+								icon: HttpIcon,
+								label: SUPPORTED_SERVICES_LABELS[ 'generic-http' ],
+								value: 'generic-http',
+							},
 						].map( ( { icon, label, value } ) => (
 							<MenuItem
 								key={ value }
@@ -122,6 +132,11 @@ const DataSourceList = () => {
 				) }
 			/>
 		);
+	};
+
+	const getServiceLabel = ( service: ( typeof SUPPORTED_SERVICES )[ number ] ) => {
+		// eslint-disable-next-line security/detect-object-injection
+		return SUPPORTED_SERVICES_LABELS[ service ];
 	};
 
 	const CardBodyContent = (): JSX.Element => {
@@ -166,7 +181,7 @@ const DataSourceList = () => {
 											<Text className="data-source-slug">{ slug }</Text>
 										</td>
 										<td>
-											<Text>{ slugToTitleCase( service ) }</Text>
+											<Text>{ getServiceLabel( service ) }</Text>
 										</td>
 										<td> { renderDataSourceMeta( source ) } </td>
 										<td className="data-source-actions">
@@ -209,7 +224,7 @@ const DataSourceList = () => {
 									'Are you sure you want to delete "%s" data source with slug "%s"?',
 									'remote-data-blocks'
 								),
-								slugToTitleCase( dataSourceToDelete.service ),
+								getServiceLabel( dataSourceToDelete.service ),
 								dataSourceToDelete.slug
 							) }
 						</p>

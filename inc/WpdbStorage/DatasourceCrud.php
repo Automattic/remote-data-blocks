@@ -81,6 +81,13 @@ class DatasourceCrud {
 		return $data_sources;
 	}
 
+	/**
+	 * Get the array list of data sources
+	 */
+	public static function get_data_sources_list(): array {
+		return array_values( self::get_data_sources() );
+	}
+
 	public static function get_item_by_uuid( array $data_sources, string $uuid ): array|false {
 		return $data_sources[ $uuid ] ?? false;
 	}

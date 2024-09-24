@@ -4,7 +4,6 @@ import {
 	combineClassNames,
 	getClassName,
 	safeParseJSON,
-	slugToTitleCase,
 	toKebabCase,
 	toTitleCase,
 } from '@/utils/string';
@@ -45,13 +44,6 @@ describe( 'string utils', () => {
 			expect( toTitleCase( 'test string' ) ).toBe( 'Test String' );
 			expect( toTitleCase( 'TEST STRING' ) ).toBe( 'Test String' );
 			expect( toTitleCase( 'tEST sTRING' ) ).toBe( 'Test String' );
-		} );
-	} );
-
-	describe( 'slugToTitleCase', () => {
-		it( 'should convert slug to title case', () => {
-			expect( slugToTitleCase( 'test-string' ) ).toBe( 'Test String' );
-			expect( slugToTitleCase( 'another-test-string' ) ).toBe( 'Another Test String' );
 		} );
 	} );
 
