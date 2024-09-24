@@ -1,17 +1,22 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Editor\BlockPatterns;
 
 defined( 'ABSPATH' ) || exit();
 
 use RemoteDataBlocks\Config\QueryContext\QueryContextInterface;
+use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 
 use function register_block_pattern;
+use function wp_json_encode;
 
 class BlockPatterns {
-	private static $templates = [];
+	/**
+	 * @var array<string, string>
+	 */
+	private static array $templates = [];
 
-	private static function load_templates() {
+	private static function load_templates(): void {
 		if ( ! empty( self::$templates ) ) {
 			return;
 		}
@@ -35,7 +40,7 @@ class BlockPatterns {
 			}
 
 			$attributes['metadata']['bindings'][ $attribute ] = [
-				'source' => 'remote-data/binding',
+				'source' => BlockBindings::$binding_source,
 				'args'   => [
 					'block' => $block_name,
 					'field' => $binding[0],
@@ -148,5 +153,35 @@ class BlockPatterns {
 				'source'     => 'plugin',
 			]
 		);
+	}
+
+	/**
+	 * Bindings are difficult to hardcode, especially if you want to reuse them
+	 * across multiple remote data blocks. Ensure that the block arg is present in
+	 * the binding and matches the expected value. The block arg is important,
+	 * because it is used to determine "compatibility" between blocks and bindings.
+	 *
+	 * @param string $block_name     The block name.
+	 * @param array  $parsed_blocks  The parsed blocks.
+	 * @return array The parsed blocks with the block arg added to the bindings.
+	 */
+	public static function add_block_arg_to_bindings( string $block_name, array $parsed_blocks ): array {
+		return array_map( function ( $parsed_block ) use ( $block_name ) {
+			$attributes = $parsed_block['attrs'];
+
+			if ( isset( $attributes['metadata']['bindings'] ) ) {
+				foreach ( $attributes['metadata']['bindings'] as $target => $binding ) {
+					if ( BlockBindings::$binding_source === $binding['source'] ) {
+						$parsed_block['attrs']['metadata']['bindings'][ $target ]['args']['block'] = $block_name;
+					}
+				}
+			}
+
+			if ( isset( $parsed_block['innerBlocks'] ) ) {
+				$parsed_block['innerBlocks'] = self::add_block_arg_to_bindings( $block_name, $parsed_block['innerBlocks'] );
+			}
+
+			return $parsed_block;
+		}, $parsed_blocks );
 	}
 }

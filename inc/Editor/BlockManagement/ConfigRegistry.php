@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Editor\BlockManagement;
 
@@ -7,14 +7,18 @@ defined( 'ABSPATH' ) || exit();
 use RemoteDataBlocks\Config\QueryContext\QueryContextInterface;
 use RemoteDataBlocks\Logging\LoggerManager;
 use Psr\Log\LoggerInterface;
+use RemoteDataBlocks\Editor\BlockPatterns\BlockPatterns;
 
 use function get_page_by_path;
+use function parse_blocks;
+use function register_block_pattern;
+use function serialize_blocks;
 use function wp_insert_post;
 
 class ConfigRegistry {
 	private static LoggerInterface $logger;
 
-	public static function init( LoggerInterface $logger = null ): void {
+	public static function init( ?LoggerInterface $logger = null ): void {
 		self::$logger = $logger ?? LoggerManager::instance();
 		ConfigStore::init( self::$logger );
 	}
@@ -32,7 +36,6 @@ class ConfigRegistry {
 			'description' => '',
 			'name'        => $block_name,
 			'loop'        => $options['loop'] ?? false,
-			'patterns'    => [],
 			'queries'     => [
 				'__DISPLAY__' => $display_query,
 			],
@@ -70,7 +73,11 @@ class ConfigRegistry {
 			return;
 		}
 
-		$config['patterns'][ $pattern_name ] = array_merge(
+		// Add the block arg to any bindings present in the pattern.
+		$parsed_blocks   = parse_blocks( $pattern_content );
+		$parsed_blocks   = BlockPatterns::add_block_arg_to_bindings( $block_name, $parsed_blocks );
+		$pattern_content = serialize_blocks( $parsed_blocks );
+		$pattern_options = array_merge(
 			[
 				'blockTypes' => [ $block_name ],
 				'categories' => [ 'Remote Data' ],
@@ -81,7 +88,9 @@ class ConfigRegistry {
 			],
 			$pattern_options
 		);
-		ConfigStore::set_configuration( $block_name, $config );
+
+		// Register the pattern.
+		register_block_pattern( $pattern_name, $pattern_options );
 	}
 
 	public static function register_page( string $block_title, string $page_slug ): void {

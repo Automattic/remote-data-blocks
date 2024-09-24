@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Editor\BlockManagement;
 
@@ -7,11 +7,13 @@ defined( 'ABSPATH' ) || exit();
 use RemoteDataBlocks\Editor\BlockPatterns\BlockPatterns;
 use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 use RemoteDataBlocks\REST\RemoteDataController;
-use function register_block_pattern;
 use function register_block_type;
 
 class BlockRegistration {
-	public static $block_category = [
+	/**
+	 * @var array<string, string>
+	 */
+	public static array $block_category = [
 		'icon'  => null,
 		'slug'  => 'remote-data-blocks',
 		'title' => 'Remote Data Blocks',
@@ -78,11 +80,6 @@ class BlockRegistration {
 
 			// Register a default pattern that simply displays the available data.
 			BlockPatterns::register_default_block_pattern( $block_name, $config['title'], $config['queries']['__DISPLAY__'] );
-
-			// Register any user-provided patterns.
-			foreach ( $config['patterns'] as $pattern_name => $pattern_options ) {
-				register_block_pattern( $pattern_name, $pattern_options );
-			}
 		}
 
 		foreach ( array_unique( $scripts_to_localize ) as $script_handle ) {

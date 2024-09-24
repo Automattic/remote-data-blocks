@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\ExampleApi;
 
@@ -30,7 +30,11 @@ class ExampleApi {
 			return;
 		}
 
-		$datasource       = new ExampleApiDataSource();
+		$datasource = ExampleApiDatasource::from_array( [
+			'slug'    => 'example-api',
+			'service' => 'example_api',
+		] );
+		
 		$get_record_query = new ExampleApiGetRecordQuery( $datasource );
 		$get_table_query  = new ExampleApiGetTableQuery( $datasource );
 

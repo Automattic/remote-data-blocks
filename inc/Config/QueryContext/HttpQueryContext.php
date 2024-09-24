@@ -1,11 +1,4 @@
-<?php
-
-/**
- * HttpQueryContext class
- *
- * @package remote-data-blocks
- * @since 0.1.0
- */
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Config\QueryContext;
 
@@ -16,8 +9,13 @@ use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 defined( 'ABSPATH' ) || exit();
 
 /**
+ * HttpQueryContext class
+ *
  * Base class used to define a Remote Data Blocks Query. This class defines a
  * composable query that allows it to be composed with another query or a block.
+ * 
+ * @package remote-data-blocks
+ * @since 0.1.0
  */
 class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterface {
 	const VERSION = '0.1.0';
@@ -28,8 +26,8 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 *
 	 * @var array {
 	 *   @type array $var_name {
-	 *     @type string $defaultValue Optional default value of the variable.
-	 *     @type string $name         Display name of the variable.
+	 *     @type string $default_value Optional default value of the variable.
+	 *     @type string $name          Display name of the variable.
 	 *     @type array  $overrides {
 	 *       @type array {
 	 *         @type $target Targeted override.
@@ -39,6 +37,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 *     @type string $type         The variable type (string, number, boolean)
 	 *   }
 	 * }
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
 	 */
 	public array $input_variables = [];
 
@@ -47,12 +46,13 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 *
 	 * @var array {
 	 *   @type array $var_name {
-	 *     @type string $defaultValue Optional default value of the variable.
-	 *     @type string $name         Display name of the variable.
-	 *     @type string $path         JSONPath expression to find the variable value.
-	 *     @type string $type         The variable type (string, number, boolean)
+	 *     @type string $default_value Optional default value of the variable.
+	 *     @type string $name          Display name of the variable.
+	 *     @type string $path          JSONPath expression to find the variable value.
+	 *     @type string $type          The variable type (string, number, boolean)
 	 *   }
 	 * }
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
 	 */
 	public array $output_variables = [];
 
@@ -86,37 +86,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 */
 	public function get_image_url(): string|null {
 		return $this->get_datasource()->get_image_url();
-	}
-
-	/**
-	 * Override this method to provide different or additional metadata for this
-	 * query. This method is called after the query is run or is returned from
-	 * cache. These variables will be available as bindings for field shortcodes.
-	 *
-	 * @param array $response_metadata The response metadata returned by the query runner.
-	 * @param array $query_results     The results of the query.
-	 * @return array $var_name {
-	 *   @type string $name  Display name of the variable.
-	 *   @type string $type  The variable type (string, number, boolean)
-	 *   @type string $value Value of the variable.
-	 * }
-	 */
-	public function get_metadata( array $response_metadata, array $query_results ): array {
-		$age  = intval( $response_metadata['age'] ?? 0 );
-		$time = time() - $age;
-
-		return [
-			'last_updated' => [
-				'name'  => 'Last updated',
-				'type'  => 'string',
-				'value' => gmdate( 'Y-m-d H:i:s', $time ),
-			],
-			'total_count'  => [
-				'name'  => 'Total count',
-				'type'  => 'number',
-				'value' => count( $query_results ),
-			],
-		];
 	}
 
 	/**

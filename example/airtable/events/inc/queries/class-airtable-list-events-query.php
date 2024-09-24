@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Example\Airtable\Events;
 
@@ -36,5 +36,9 @@ class AirtableListEventsQuery extends HttpQueryContext {
 
 	public function get_query_name(): string {
 		return 'List events';
+	}
+
+	public function get_endpoint( array $input_variables ): string {
+		return $this->get_datasource()->get_endpoint() . '/tblyGtuxblLtmoqMI';
 	}
 }

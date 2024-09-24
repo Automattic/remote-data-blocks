@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Example\Airtable\EldenRingMap;
 
@@ -29,7 +29,7 @@ class AirtableEldenRingListMapsQuery extends HttpQueryContext {
 	];
 
 	public function get_endpoint( $input_variables ): string {
-		return $this->get_datasource()->get_endpoint( 'maps' );
+		return $this->get_datasource()->get_endpoint() . '/tblS3OYo8tZOg04CP';
 	}
 
 	public function get_query_name(): string {

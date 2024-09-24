@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Example\ArtInstituteOfChicago;
 
@@ -7,7 +7,11 @@ require_once __DIR__ . '/inc/queries/class-art-institute-get-query.php';
 require_once __DIR__ . '/inc/queries/class-art-institute-search-query.php';
 
 function register_aic_block() {
-	$aic_datasource   = new ArtInstituteOfChicagoDatasource();
+	$aic_datasource = ArtInstituteOfChicagoDatasource::from_array( [
+		'slug'    => 'art-institute-of-chicago',
+		'service' => 'art-institute-of-chicago',
+	] );
+
 	$get_art_query    = new ArtInstituteOfChicagoGetArtQuery( $aic_datasource );
 	$search_art_query = new ArtInstituteOfChicagoSearchArtQuery( $aic_datasource );
 

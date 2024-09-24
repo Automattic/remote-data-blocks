@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Tests\WpdbStorage;
 
@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\WpdbStorage\DataEncryption;
 
 class DataEncryptionTest extends TestCase {
-	private $data_encryption;
+	private DataEncryption $data_encryption;
 
 	protected function setUp(): void {
 		parent::setUp();

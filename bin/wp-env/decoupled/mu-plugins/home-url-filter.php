@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types = 1);
+
 add_filter('home_url', function ( $url, $path ) {
 	if ( have_posts() && is_singular() ) {
 		return site_url( $path );

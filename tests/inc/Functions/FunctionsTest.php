@@ -1,14 +1,16 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Tests\Editor\BlockManagement;
 
+use Psr\Log\LogLevel;
 use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\Tests\Mocks\MockLogger;
 use RemoteDataBlocks\Tests\Mocks\MockDatasource;
-use Psr\Log\LogLevel;
+use RemoteDataBlocks\Tests\Mocks\MockValidator;
+
 use function register_remote_data_block;
 use function register_remote_data_list_query;
 use function register_remote_data_search_query;
@@ -16,15 +18,17 @@ use function register_remote_data_loop_block;
 
 class FunctionsTest extends TestCase {
 	private MockLogger $mock_logger;
+	private MockDatasource $mock_datasource;
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->mock_logger = new MockLogger();
+		$this->mock_logger     = new MockLogger();
+		$this->mock_datasource = MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator() );
 		ConfigRegistry::init( $this->mock_logger );
 	}
 
 	public function testRegisterBlock() {
-		$query_context = new HttpQueryContext( new MockDatasource() );
+		$query_context = new HttpQueryContext( $this->mock_datasource );
 		register_remote_data_block( 'Test Block', $query_context );
 
 		$block_name = 'remote-data-blocks/test-block';
@@ -38,7 +42,7 @@ class FunctionsTest extends TestCase {
 	}
 
 	public function testRegisterLoopBlock() {
-		$query_context = new HttpQueryContext( new MockDatasource() );
+		$query_context = new HttpQueryContext( $this->mock_datasource );
 		register_remote_data_loop_block( 'Loop Block', $query_context );
 
 		$block_name = 'remote-data-blocks/loop-block';
@@ -49,22 +53,11 @@ class FunctionsTest extends TestCase {
 		$this->assertTrue( $config['loop'] );
 	}
 
-	public function testRegisterBlockPattern() {
-		$query_context = new HttpQueryContext( new MockDatasource() );
-		register_remote_data_block( 'Block with Pattern', $query_context );
-		register_remote_data_block_pattern( 'Block with Pattern', 'Test Pattern', '<!-- wp:paragraph -->Test<!-- /wp:paragraph -->' );
-
-		$block_name = 'remote-data-blocks/block-with-pattern';
-		$config     = ConfigStore::get_configuration( $block_name );
-		$this->assertArrayHasKey( 'patterns', $config );
-		$this->assertArrayHasKey( 'Test Pattern', $config['patterns'] );
-	}
-
 	public function testRegisterQuery() {
-		$query_context = new HttpQueryContext( new MockDatasource() );
+		$query_context = new HttpQueryContext( $this->mock_datasource );
 		register_remote_data_block( 'Query Block', $query_context );
 
-		$additional_query = new HttpQueryContext( new MockDatasource() );
+		$additional_query = new HttpQueryContext( $this->mock_datasource );
 		ConfigRegistry::register_query( 'Query Block', $additional_query );
 
 		$block_name = 'remote-data-blocks/query-block';
@@ -73,10 +66,10 @@ class FunctionsTest extends TestCase {
 	}
 
 	public function testRegisterListQuery() {
-		$query_context = new HttpQueryContext( new MockDatasource() );
+		$query_context = new HttpQueryContext( $this->mock_datasource );
 		register_remote_data_block( 'List Block', $query_context );
 
-		$list_query                               = new HttpQueryContext( new MockDatasource() );
+		$list_query                               = new HttpQueryContext( $this->mock_datasource );
 		$list_query->output_variables['mappings'] = [ 'test' => 'test' ];
 		register_remote_data_list_query( 'List Block', $list_query );
 
@@ -86,10 +79,10 @@ class FunctionsTest extends TestCase {
 	}
 
 	public function testRegisterSearchQuery() {
-		$query_context = new HttpQueryContext( new MockDatasource() );
+		$query_context = new HttpQueryContext( $this->mock_datasource );
 		register_remote_data_block( 'Search Block', $query_context );
 
-		$search_query                                  = new HttpQueryContext( new MockDatasource() );
+		$search_query                                  = new HttpQueryContext( $this->mock_datasource );
 		$search_query->input_variables['search_terms'] = [ 'type' => 'string' ];
 		$search_query->output_variables['mappings']    = [ 'test' => 'test' ];
 		register_remote_data_search_query( 'Search Block', $search_query );
@@ -100,8 +93,8 @@ class FunctionsTest extends TestCase {
 	}
 
 	public function testGetBlockNames() {
-		register_remote_data_block( 'Block One', new HttpQueryContext( new MockDatasource() ) );
-		register_remote_data_block( 'Block Two', new HttpQueryContext( new MockDatasource() ) );
+		register_remote_data_block( 'Block One', new HttpQueryContext( $this->mock_datasource ) );
+		register_remote_data_block( 'Block Two', new HttpQueryContext( $this->mock_datasource ) );
 
 		$block_names = ConfigStore::get_block_names();
 		$this->assertCount( 2, $block_names );
@@ -110,7 +103,7 @@ class FunctionsTest extends TestCase {
 	}
 
 	public function testIsRegisteredBlockReturnsTrueForRegisteredBlock() {
-		register_remote_data_block( 'Some Slick Block', new HttpQueryContext( new MockDatasource() ) );
+		register_remote_data_block( 'Some Slick Block', new HttpQueryContext( $this->mock_datasource ) );
 		$this->assertTrue( ConfigStore::is_registered_block( 'remote-data-blocks/some-slick-block' ) );
 	}
 
@@ -126,7 +119,7 @@ class FunctionsTest extends TestCase {
 	}
 
 	public function testRegisterDuplicateBlock() {
-		$query_context = new HttpQueryContext( new MockDatasource() );
+		$query_context = new HttpQueryContext( $this->mock_datasource );
 		register_remote_data_block( 'Duplicate Block', $query_context );
 		register_remote_data_block( 'Duplicate Block', $query_context );
 
@@ -136,10 +129,10 @@ class FunctionsTest extends TestCase {
 	}
 
 	public function testRegisterSearchQueryWithoutSearchTerms() {
-		$query_context = new HttpQueryContext( new MockDatasource() );
+		$query_context = new HttpQueryContext( $this->mock_datasource );
 		register_remote_data_block( 'Invalid Search Block', $query_context );
 
-		$search_query = new HttpQueryContext( new MockDatasource() );
+		$search_query = new HttpQueryContext( $this->mock_datasource );
 		register_remote_data_search_query( 'Invalid Search Block', $search_query );
 
 		$this->assertTrue( $this->mock_logger->hasLoggedLevel( LogLevel::ERROR ) );

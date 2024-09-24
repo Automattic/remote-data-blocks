@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\REST;
 
@@ -51,6 +51,13 @@ class DatasourceController extends WP_REST_Controller {
 				'methods'             => 'POST',
 				'callback'            => [ $this, 'create_item' ],
 				'permission_callback' => [ $this, 'create_item_permissions_check' ],
+				'args'                => [
+					'service' => [
+						'type'     => 'string',
+						'required' => true,
+						'enum'     => REMOTE_DATA_BLOCKS__SERVICES,
+					],
+				],
 			]
 		);
 
@@ -94,11 +101,9 @@ class DatasourceController extends WP_REST_Controller {
 	}
 
 	public function get_items( $request ) {
-		// Merge the UI-managed and user-defined sources.
-		$crud_sources         = DatasourceCrud::get_data_sources();
-		$user_defined_sources = ConfigStore::get_compatible_data_sources();
-
-		return rest_ensure_response( array_merge( $crud_sources, $user_defined_sources ) );
+		$code_configured_data_sources = ConfigStore::get_datasources_displayable();
+		$ui_configured_data_sources   = DatasourceCrud::get_data_sources_list();
+		return rest_ensure_response( array_merge( $code_configured_data_sources, $ui_configured_data_sources ) );
 	}
 
 	public function get_item( $request ) {

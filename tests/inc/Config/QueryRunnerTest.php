@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Tests\Config;
 
@@ -10,46 +10,28 @@ use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 use RemoteDataBlocks\HttpClient\HttpClient;
 use RemoteDataBlocks\Tests\Mocks\MockDatasource;
+use RemoteDataBlocks\Tests\Mocks\MockValidator;
 use WP_Error;
 
 class QueryRunnerTest extends TestCase {
-
-	private $http_datasource;
-	private $query_context;
-	private $http_client;
+	private MockDatasource $http_datasource;
+	private HttpQueryContext $query_context;
+	private HttpClient $http_client;
 
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->http_client = $this->createMock( HttpClient::class );
-
-		$this->http_datasource = new class() extends MockDatasource {
-			private $endpoint = 'https://example.com/api';
-			private $headers  = [ 'Content-Type' => 'application/json' ];
-
-			public function get_endpoint(): string {
-				return $this->endpoint;
-			}
-
-			public function get_request_headers(): array {
-				return $this->headers;
-			}
-
-			public function set_endpoint( string $endpoint ): void {
-				$this->endpoint = $endpoint;
-			}
-
-			public function set_headers( array $headers ): void {
-				$this->headers = $headers;
-			}
-		};
+		$this->http_client     = $this->createMock( HttpClient::class );
+		$this->http_datasource = MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator() );
 
 		$this->query_context = new class($this->http_datasource, $this->http_client) extends HttpQueryContext {
-			private $http_datasource;
-			private $http_client;
-			private $request_method = 'GET';
-			private $request_body   = [ 'query' => 'test' ];
-			private $response_data  = null;
+			public array $output_variables = [];
+
+			private HttpDatasource $http_datasource;
+			private HttpClient $http_client;
+			private string $request_method = 'GET';
+			private array $request_body    = [ 'query' => 'test' ];
+			private mixed $response_data   = null;
 
 			public function __construct( HttpDatasource $http_datasource, HttpClient $http_client ) {
 				$this->http_datasource = $http_datasource;
@@ -62,10 +44,6 @@ class QueryRunnerTest extends TestCase {
 
 			public function get_image_url(): ?string {
 				return null;
-			}
-
-			public function get_metadata( array $response_metadata, array $query_results ): array {
-				return [];
 			}
 
 			public function get_request_method(): string {
@@ -107,8 +85,6 @@ class QueryRunnerTest extends TestCase {
 			public function set_response_data( string|array|object|null $data ): void {
 				$this->response_data = $data;
 			}
-
-			public array $output_variables = [];
 		};
 	}
 
@@ -210,6 +186,10 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'results', $result );
 		$this->assertFalse( $result['is_collection'] );
 
+		$this->assertArrayHasKey( 'metadata', $result );
+		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
+		$this->assertSame( 1, $result['metadata']['total_count']['value'] );
+
 		$expected_result = [
 			'result' => [
 				'test' => [
@@ -252,6 +232,10 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'results', $result );
 		$this->assertFalse( $result['is_collection'] );
 
+		$this->assertArrayHasKey( 'metadata', $result );
+		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
+		$this->assertSame( 1, $result['metadata']['total_count']['value'] );
+
 		$expected_result = [
 			'result' => [
 				'test' => [
@@ -293,6 +277,10 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
 		$this->assertFalse( $result['is_collection'] );
+
+		$this->assertArrayHasKey( 'metadata', $result );
+		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
+		$this->assertSame( 1, $result['metadata']['total_count']['value'] );
 
 		$expected_result = [
 			'result' => [
@@ -340,6 +328,10 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
 		$this->assertFalse( $result['is_collection'] );
+
+		$this->assertArrayHasKey( 'metadata', $result );
+		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
+		$this->assertSame( 1, $result['metadata']['total_count']['value'] );
 
 		$expected_result = [
 			'result' => [

@@ -1,11 +1,11 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Editor\PatternEditor;
 
 defined( 'ABSPATH' ) || exit();
 
 class PatternEditor {
-	public static $block_type_meta_key = '_remote_data_blocks_block_type';
+	public static string $block_type_meta_key = '_remote_data_blocks_block_type';
 
 	public static function init() {
 		add_action( 'init', [ __CLASS__, 'register_meta' ], 10, 0 );

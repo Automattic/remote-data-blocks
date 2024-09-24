@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\ExampleApi\Queries;
 
@@ -6,6 +6,9 @@ use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 
 class ExampleApiGetRecordQuery extends HttpQueryContext {
+	/**
+	 * @var array<string, mixed>
+	 */
 	public array $input_variables = [
 		'record_id' => [
 			'name'      => 'Record ID',
@@ -19,6 +22,9 @@ class ExampleApiGetRecordQuery extends HttpQueryContext {
 		],
 	];
 
+	/**
+	 * @var array<string, mixed>
+	 */
 	public array $output_variables = [
 		'is_collection' => false,
 		'mappings'      => [

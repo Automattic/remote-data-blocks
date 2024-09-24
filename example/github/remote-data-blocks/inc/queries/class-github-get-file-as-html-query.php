@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Example\GitHub;
 
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
-
+use RemoteDataBlocks\Integrations\GitHub\GitHubDatasource;
 class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 	public array $input_variables = [
 		'file_path' => [
@@ -56,12 +56,15 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 	];
 
 	public function get_endpoint( array $input_variables ): string {
+		/** @var GitHubDatasource $datasource */
+		$datasource = $this->get_datasource();
+
 		return sprintf(
 			'https://api.github.com/repos/%s/%s/contents/%s?ref=%s',
-			$this->get_datasource()->repo_owner,
-			$this->get_datasource()->repo_name,
+			$datasource->get_repo_owner(),
+			$datasource->get_repo_name(),
 			$input_variables['file_path'],
-			$this->get_datasource()->ref
+			$datasource->get_ref()
 		);
 	}
 
@@ -71,7 +74,7 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 		];
 	}
 
-	public function process_response( string $html_response_data, array $input_variables ): string|array|object|null {
+	public function process_response( string $html_response_data, array $input_variables ): array {
 		return [
 			'content'   => $html_response_data,
 			'file_path' => $input_variables['file_path'],

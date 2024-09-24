@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Example\GoogleSheets\WesterosHouses;
 
@@ -51,6 +51,10 @@ class ListWesterosHousesQuery extends HttpQueryContext {
 			],
 		],
 	];
+
+	public function get_endpoint( array $input_variables ): string {
+		return $this->get_datasource()->get_endpoint() . '/values/Houses';
+	}
 
 	public function process_response( string $raw_response_data, array $input_variables ): string|array|object|null {
 		$parsed_response_data = json_decode( $raw_response_data, true );

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Sanitization;
 
@@ -6,6 +6,11 @@ namespace RemoteDataBlocks\Sanitization;
  * Sanitizer class.
  */
 class Sanitizer implements SanitizerInterface {
+	/**
+	 * The sanitization schema.
+	 *
+	 * @var array<string, mixed>
+	 */
 	private array $schema;
 
 	/**
@@ -42,6 +47,11 @@ class Sanitizer implements SanitizerInterface {
 			}
 
 			$value = $config[ $key ];
+
+			if ( isset( $field_schema['sanitize'] ) && false === $field_schema['sanitize'] ) {
+				$sanitized[ $key ] = $value;
+				continue;
+			}
 
 			if ( isset( $field_schema['sanitize'] ) ) {
 				$sanitized[ $key ] = call_user_func( $field_schema['sanitize'], $value );

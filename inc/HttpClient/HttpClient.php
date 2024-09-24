@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\HttpClient;
 
@@ -22,40 +22,30 @@ use RemoteDataBlocks\Logging\LoggerManager;
 defined( 'ABSPATH' ) || exit();
 
 class HttpClient {
+	public Client $client;
+
 	private const MAX_RETRIES                        = 3;
 	private const CACHE_TTL_IN_SECONDS               = 60;
 	private const WP_OBJECT_CACHE_GROUP              = 'remote-data-blocks';
 	private const CACHE_INVALIDATING_REQUEST_HEADERS = [ 'Authorization', 'Cache-Control' ];
 
-	/**
-	 * @var Client
-	 */
-	public $client;
+	private string $base_uri;
+	private HandlerStack $handler_stack;
 
 	/**
-	 * @var string
+	 * @var array<string, string>
 	 */
-	private $base_uri;
+	private array $headers = [];
 
 	/**
-	 * @var array
+	 * @var array<string, mixed>
 	 */
-	private $headers = [];
+	private array $options = [];
 
 	/**
-	 * @var array
+	 * @var array<string, mixed>
 	 */
-	private $options = [];
-
-	/**
-	 * @var HandlerStack
-	 */
-	private $handler_stack;
-
-	/**
-	 * @var array
-	 */
-	private $default_options = [
+	private array $default_options = [
 		'timeout' => 3,
 		'headers' => [
 			'User-Agent' => 'WordPress Remote Data Blocks/1.0',
@@ -63,9 +53,9 @@ class HttpClient {
 	];
 
 	/**
-	 * @var array
+	 * @var array<int, array{method: string, uri: string|UriInterface, options: array<string, mixed>}>
 	 */
-	private $queued_requests = [];
+	private array $queued_requests = [];
 
 	/**
 	 * Initialize the HTTP client.
