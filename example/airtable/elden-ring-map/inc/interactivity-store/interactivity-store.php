@@ -11,7 +11,7 @@ class InteractivityStore {
 	public static function get_map_interactive_context( WP_Block $block ): array {
 		$query_context = [
 			'blockName'  => 'remote-data-blocks/elden-ring-location', // Why doesn't this match: $block->name,
-			'queryInput' => $block->context['remote-data-blocks/remoteData']['queryInput'],
+			'queryInput' => $block->context[ BlockBindings::$context_name ]['queryInput'],
 		];
 		$response      = BlockBindings::execute_query( $query_context, 'GET' );
 		$coordinates   = array_map( function ( $value ) {
