@@ -102,7 +102,9 @@ class DatasourceController extends WP_REST_Controller {
 	}
 
 	public function get_items( $request ) {
-		return rest_ensure_response( ConfigStore::get_datasources_displayable() );
+		$code_configured_data_sources = ConfigStore::get_datasources_displayable();
+		$ui_configured_data_sources = DatasourceCrud::get_data_sources_list();
+		return rest_ensure_response( array_merge( $code_configured_data_sources, $ui_configured_data_sources ) );
 	}
 
 	public function get_item( $request ) {
