@@ -4,7 +4,6 @@ namespace RemoteDataBlocks\HttpClient;
 
 use Exception;
 use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\MessageFormatter;
@@ -26,9 +25,11 @@ class HttpClient {
 	public Client $client;
 
 	private const MAX_RETRIES                        = 3;
-	private const CACHE_TTL_IN_SECONDS               = 60;
+	private const FALLBACK_CACHE_TTL_IN_SECONDS      = 60;
 	private const WP_OBJECT_CACHE_GROUP              = 'remote-data-blocks';
 	private const CACHE_INVALIDATING_REQUEST_HEADERS = [ 'Authorization', 'Cache-Control' ];
+
+	public const CACHE_TTL_OPTION = '__default_cache_ttl';
 
 	private string $base_uri;
 	private HandlerStack $handler_stack;
@@ -70,7 +71,7 @@ class HttpClient {
 		return new RdbCacheMiddleware(
 			new RdbCacheStrategy(
 				$cache_storage,
-				$default_ttl ?? self::CACHE_TTL_IN_SECONDS,
+				$default_ttl ?? self::FALLBACK_CACHE_TTL_IN_SECONDS,
 				new KeyValueHttpHeader( self::CACHE_INVALIDATING_REQUEST_HEADERS )
 			)
 		);
@@ -84,11 +85,12 @@ class HttpClient {
 		$this->headers  = $headers;
 		$this->options  = $client_options;
 
-		$this->handler_stack = HandlerStack::create(
-			new CurlHandler(
-				// low-level curl options go here
-			)
-		);
+		// Initialize a request handler that uses wp_remote_request instead of cURL.
+		// PHP cURL bindings are not always available, e.g., in WASM environments
+		// like WP Now and WP Playground.
+		$request_handler = new WPRemoteRequestHandler();
+
+		$this->handler_stack = HandlerStack::create( $request_handler );
 
 		$this->handler_stack->push( Middleware::retry(
 			self::class . '::retry_decider',
@@ -103,7 +105,7 @@ class HttpClient {
 			return $request;
 		} ) );
 
-		$default_ttl      = $client_options['__default_cache_ttl'] ?? null;
+		$default_ttl      = $client_options[ self::CACHE_TTL_OPTION ] ?? null;
 		$cache_middleware = self::get_cache_middleware( self::get_cache_storage(), $default_ttl );
 		$this->handler_stack->push( $cache_middleware, 'remote_data_blocks_cache' );
 
