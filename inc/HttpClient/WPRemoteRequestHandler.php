@@ -66,7 +66,8 @@ class WPRemoteRequestHandler {
 				new Response(
 					$response_code,
 					$response_headers,
-					$response_body
+					$response_body,
+					$args['httpversion'],
 				)
 			);
 		} catch ( Exception $e ) {
