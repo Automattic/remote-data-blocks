@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\ExampleApi\Queries;
 
@@ -6,8 +6,14 @@ use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 
 class ExampleApiGetTableQuery extends HttpQueryContext {
+	/**
+	 * @var array<string, mixed>
+	 */
 	public array $input_variables = [];
 
+	/**
+	 * @var array<string, mixed>
+	 */
 	public array $output_variables = [
 		'root_path'     => '$.records[*]',
 		'is_collection' => true,

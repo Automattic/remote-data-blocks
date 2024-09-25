@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types = 1);
+
 namespace RemoteDataBlocks\Tests\Mocks;
 
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
@@ -23,16 +24,10 @@ class MockDatasource extends HttpDatasource {
 		],
 	];
 
-	/**
-	 * @inheritDoc
-	 */
 	public function get_display_name(): string {
 		return 'Mock Datasource';
 	}
 
-	/**
-	 * @inheritDoc
-	 */
 	public function get_endpoint(): string {
 		return $this->endpoint;
 	}

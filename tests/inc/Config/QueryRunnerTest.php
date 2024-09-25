@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Tests\Config;
 
@@ -14,10 +14,9 @@ use RemoteDataBlocks\Tests\Mocks\MockValidator;
 use WP_Error;
 
 class QueryRunnerTest extends TestCase {
-
-	private $http_datasource;
-	private $query_context;
-	private $http_client;
+	private MockDatasource $http_datasource;
+	private HttpQueryContext $query_context;
+	private HttpClient $http_client;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -26,11 +25,13 @@ class QueryRunnerTest extends TestCase {
 		$this->http_datasource = MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator() );
 
 		$this->query_context = new class($this->http_datasource, $this->http_client) extends HttpQueryContext {
-			private $http_datasource;
-			private $http_client;
-			private $request_method = 'GET';
-			private $request_body   = [ 'query' => 'test' ];
-			private $response_data  = null;
+			public array $output_variables = [];
+
+			private HttpDatasource $http_datasource;
+			private HttpClient $http_client;
+			private string $request_method = 'GET';
+			private array $request_body    = [ 'query' => 'test' ];
+			private mixed $response_data   = null;
 
 			public function __construct( HttpDatasource $http_datasource, HttpClient $http_client ) {
 				$this->http_datasource = $http_datasource;
@@ -84,8 +85,6 @@ class QueryRunnerTest extends TestCase {
 			public function set_response_data( string|array|object|null $data ): void {
 				$this->response_data = $data;
 			}
-
-			public array $output_variables = [];
 		};
 	}
 

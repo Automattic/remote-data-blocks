@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\HttpClient;
 
@@ -22,40 +22,30 @@ use RemoteDataBlocks\Logging\LoggerManager;
 defined( 'ABSPATH' ) || exit();
 
 class HttpClient {
+	public Client $client;
+
 	private const MAX_RETRIES                        = 3;
 	private const CACHE_TTL_IN_SECONDS               = 60;
 	private const WP_OBJECT_CACHE_GROUP              = 'remote-data-blocks';
 	private const CACHE_INVALIDATING_REQUEST_HEADERS = [ 'Authorization', 'Cache-Control' ];
 
-	/**
-	 * @var Client
-	 */
-	public $client;
+	private string $base_uri;
+	private HandlerStack $handler_stack;
 
 	/**
-	 * @var string
+	 * @var array<string, string>
 	 */
-	private $base_uri;
+	private array $headers = [];
 
 	/**
-	 * @var array
+	 * @var array<string, mixed>
 	 */
-	private $headers = [];
+	private array $options = [];
 
 	/**
-	 * @var array
+	 * @var array<string, mixed>
 	 */
-	private $options = [];
-
-	/**
-	 * @var HandlerStack
-	 */
-	private $handler_stack;
-
-	/**
-	 * @var array
-	 */
-	private $default_options = [
+	private array $default_options = [
 		'timeout' => 3,
 		'headers' => [
 			'User-Agent' => 'WordPress Remote Data Blocks/1.0',
@@ -63,16 +53,12 @@ class HttpClient {
 	];
 
 	/**
-	 * @var array
+	 * @var array<int, array{method: string, uri: string|UriInterface, options: array<string, mixed>}>
 	 */
-	private $queued_requests = [];
+	private array $queued_requests = [];
 
 	/**
 	 * Initialize the HTTP client.
-	 *
-	 * @param string $base_uri
-	 * @param array  $headers
-	 * @param array  $options
 	 */
 	public function init( string $base_uri, array $headers = [], array $options = [] ): void {
 		$this->base_uri = $base_uri;
@@ -175,12 +161,8 @@ class HttpClient {
 
 	/**
 	 * Queue a request for later execution.
-	 *
-	 * @param string $method
-	 * @param string|UriInterface $uri
-	 * @param array  $options
 	 */
-	public function queue_request( string $method, string|UriInterface $uri, array $options = [] ) {
+	public function queue_request( string $method, string|UriInterface $uri, array $options = [] ): void {
 		$this->queued_requests[] = [
 			'method'  => $method,
 			'uri'     => $uri,
@@ -210,33 +192,21 @@ class HttpClient {
 	}
 
 	/**
-	 * @param string $method
-	 * @param string|UriInterface $uri
-	 * @param array  $options
-	 *
-	 * @return \Psr\Http\Message\ResponseInterface
+	 * Execute a request.
 	 */
 	public function request( string $method, string|UriInterface $uri, array $options = [] ): ResponseInterface {
 		return $this->client->request( $method, $uri, array_merge( $this->options, $options ) );
 	}
 
 	/**
-	 * @param string $method
-	 * @param string|UriInterface $uri
-	 * @param array  $options
-	 *
-	 * @return \Psr\Http\Message\ResponseInterface
+	 * Execute a GET request.
 	 */
 	public function get( string|UriInterface $uri, array $options = [] ): ResponseInterface {
 		return $this->request( 'GET', $uri, $options );
 	}
 
 	/**
-	 * @param string $method
-	 * @param string|UriInterface $uri
-	 * @param array  $options
-	 *
-	 * @return \Psr\Http\Message\ResponseInterface
+	 * Execute a POST request.
 	 */
 	public function post( string|UriInterface $uri, array $options = [] ): ResponseInterface {
 		return $this->request( 'POST', $uri, $options );

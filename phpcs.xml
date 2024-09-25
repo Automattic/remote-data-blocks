@@ -85,6 +85,13 @@
 		<exclude-pattern>/tests/*</exclude-pattern>
 	</rule>
 
+	<!-- Exclude PSR12.Files.FileHeader.IncorrectOrder for specific files -->
+	<rule ref="PSR12.Files.FileHeader.IncorrectOrder">
+		<exclude-pattern>remote-data-blocks.php</exclude-pattern>
+		<exclude-pattern>functions.php</exclude-pattern>
+		<exclude-pattern>example/remote-data-blocks-example-code.php</exclude-pattern>
+	</rule>
+
 	<!-- These functions are new via the Interactivity API and are auto-escaped -->
 	<rule ref="WordPress.Security.EscapeOutput">
 		<properties>
@@ -103,4 +110,36 @@
 		</properties>
 	</rule>
 
+	<!-- Slevomat Coding Standard -->
+	<rule ref="SlevomatCodingStandard.Commenting.AnnotationName"/>
+	<rule ref="SlevomatCodingStandard.Commenting.UselessFunctionDocComment"/>
+	<rule ref="SlevomatCodingStandard.Commenting.UselessInheritDocComment"/>
+	<rule ref="SlevomatCodingStandard.Namespaces.UnusedUses">
+		<properties>
+			<property name="searchAnnotations" value="true"/>
+		</properties>
+	</rule>
+	<rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
+		<properties>
+			<property name="declareOnFirstLine" value="true"/>
+		</properties>
+	</rule>
+	<rule ref="SlevomatCodingStandard.TypeHints.LongTypeHints"/>
+	<rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue"/>
+	<rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint">
+		<exclude-pattern>/example/*</exclude-pattern>
+		<exclude-pattern>/tests/*</exclude-pattern>
+		<exclude-pattern>/inc/REST/DatasourceController.php</exclude-pattern>
+		<exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification" />
+	</rule>
+	<rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint">
+		<exclude-pattern>/example/*</exclude-pattern>
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+	<rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint">
+		<exclude-pattern>/example/*</exclude-pattern>
+		<exclude-pattern>/tests/*</exclude-pattern>
+		<exclude-pattern>/inc/REST/DatasourceController.php</exclude-pattern>
+		<exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification" />
+	</rule>
 </ruleset>

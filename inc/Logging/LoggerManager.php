@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Logging;
 
@@ -10,21 +10,18 @@ class LoggerManager {
 	/**
 	 * The logger instance.
 	 *
-	 * @var LoggerInterface|null
 	 */
-	private static $instance = null;
+	private static ?LoggerInterface $instance = null;
 
 	/**
 	 * The namespace for the logger.
 	 *
-	 * @var string
 	 */
-	public static $log_namespace = 'remote-data-blocks';
+	public static string $log_namespace = 'remote-data-blocks';
 
 	/**
 	 * Get the logger singleton instance.
 	 *
-	 * @return LoggerInterface
 	 */
 	public static function instance(): LoggerInterface {
 		if ( null === self::$instance ) {
