@@ -35,7 +35,7 @@ const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState
 	return {
 		access_token: config.access_token,
 		base: config.base,
-		table: config.table,
+		table: config.tables[ 0 ] ?? null,
 		slug: config.slug,
 	};
 };
@@ -90,7 +90,7 @@ export const AirtableSettings = ( {
 			service: 'airtable',
 			access_token: state.access_token,
 			base: state.base,
-			table: state.table,
+			tables: [ state.table ],
 			slug: state.slug,
 		};
 
@@ -159,13 +159,13 @@ export const AirtableSettings = ( {
 
 	const shouldAllowSubmit = useMemo( () => {
 		return (
-			bases === null ||
-			tables === null ||
-			! state.base ||
-			! state.table ||
-			! state.slug ||
-			loadingSlugConflicts ||
-			slugConflicts
+			bases !== null &&
+			tables !== null &&
+			!! state.base &&
+			!! state.table &&
+			!! state.slug &&
+			! loadingSlugConflicts &&
+			! slugConflicts
 		);
 	}, [ bases, tables, state.base, state.table, state.slug, loadingSlugConflicts, slugConflicts ] );
 

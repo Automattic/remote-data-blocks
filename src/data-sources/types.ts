@@ -28,7 +28,7 @@ export interface AirtableConfig extends BaseDataSourceConfig {
 	service: 'airtable';
 	access_token: string;
 	base: StringIdName;
-	table: StringIdName;
+	tables: StringIdName[];
 }
 
 export interface ShopifyConfig extends BaseDataSourceConfig {
