@@ -37,7 +37,7 @@ function register_shopify_block() {
 	ConfigRegistry::register_query( $block_name, new ShopifyRemoveFromCartMutation( $shopify_datasource ) );
 
 	$block_pattern = file_get_contents( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/inc/integrations/shopify/Patterns/product-teaser.html' );
-	register_remote_data_block_pattern( $block_name, 'remote-data-blocks/shopify-product-teaser', $block_pattern, [ 'title' => 'Shopify Product Teaser' ] );
+	register_remote_data_block_pattern( $block_name, 'Shopify Product Teaser', $block_pattern );
 
 	register_block_type( __DIR__ . '/build/blocks/shopify-cart' );
 	register_block_type( __DIR__ . '/build/blocks/shopify-cart-button' );
