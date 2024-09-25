@@ -19,6 +19,5 @@ class AirtableIntegration {
 
 		// $airtable_datasource = AirtableDatasource::from_array( $config );
 
-		// TODO: Block registration, remove that surpress, & all the rest...  This will only work if there is some mapping configured
-	}
+		// TODO: Block registration & all the rest...  This will only work if there is some mapping configured	}
 }
