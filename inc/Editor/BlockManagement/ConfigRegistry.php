@@ -165,7 +165,7 @@ class ConfigRegistry {
 			}
 		}
 
-		self::register_query( $block_title, $query, $type );
+		self::register_query( $block_title, $query );
 
 		// Add the selector to the configuration. Fetch config again since it was
 		// updated in register_query.

@@ -101,7 +101,7 @@ class QueryRunner implements QueryRunnerInterface {
 
 		return [
 			'metadata'      => [
-				'age'         => intval( $response->getHeaderLine( 'Age' ) ?? 0 ),
+				'age'         => intval( $response->getHeaderLine( 'Age' ) ),
 				'status_code' => $response_code,
 			],
 			'response_data' => $raw_response_string,
@@ -168,7 +168,7 @@ class QueryRunner implements QueryRunnerInterface {
 		}
 
 		// Determine if the response data is expected to be a collection.
-		$is_collection = $this->query_context->is_response_data_collection( $response_data );
+		$is_collection = $this->query_context->is_response_data_collection();
 
 		// This method always returns an array, even if it's a single item. This
 		// ensures a consistent response shape. The requestor is expected to inspect
