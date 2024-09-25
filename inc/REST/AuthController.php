@@ -5,7 +5,8 @@ namespace RemoteDataBlocks\REST;
 use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
 use WP_REST_Controller;
 use WP_REST_Request;
-
+use WP_REST_Response;
+use WP_Error;
 
 defined( 'ABSPATH' ) || exit();
 defined( 'ABSPATH' ) || exit();
@@ -39,7 +40,7 @@ class AuthController extends WP_REST_Controller {
 		);
 	}
 
-	public function get_google_auth_token( WP_REST_Request $request ): \WP_REST_Response|\WP_Error {
+	public function get_google_auth_token( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$params      = $request->get_json_params();
 		$credentials = $params['credentials'] ?? null;
 		$scopes      = $params['scopes'] ?? [];
