@@ -62,7 +62,7 @@ jobs:
         id: cache-node-modules
         with:
           path: node_modules
-          key: npm-modules-${{ hashFiles('package.json', 'package-lock.json') }}
+          key: ${{ runner.os }}-node-modules-${{ inputs.node-version }}-${{ hashFiles('package.json', 'package-lock.json', 'npm-shrinkwrap.json') }}
 
       - name: Install dependencies
         run: npm install --ignore-scripts
