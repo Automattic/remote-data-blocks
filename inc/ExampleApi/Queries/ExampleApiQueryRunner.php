@@ -16,9 +16,6 @@ defined( 'ABSPATH' ) || exit();
  * there would be a mismatch between the public address (e.g., localhost:888) and
  * what is reachable inside a container.
  *
- * A nice side effect is that we avoid using Guzzle/cURL for this example, which
- * makes it runnable in environments like WP Now.
- *
  * @package remote-data-blocks
  * @since 0.1.0
  */
