@@ -75,7 +75,7 @@ final class DataEncryption {
 	 * @return string|bool Decrypted value, or false on failure.
 	 */
 	public function decrypt( string $raw_value ): string|bool {
-		if ( ! extension_loaded( 'openssl' ) || ! is_string( $raw_value ) ) {
+		if ( ! extension_loaded( 'openssl' ) ) {
 			return $raw_value;
 		}
 

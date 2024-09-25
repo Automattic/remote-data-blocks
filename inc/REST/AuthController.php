@@ -2,9 +2,11 @@
 
 namespace RemoteDataBlocks\REST;
 
+use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
 use WP_REST_Controller;
 use WP_REST_Request;
-use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
+use WP_REST_Response;
+use WP_Error;
 
 defined( 'ABSPATH' ) || exit();
 defined( 'ABSPATH' ) || exit();
@@ -71,7 +73,7 @@ class AuthController extends WP_REST_Controller {
 	 * These all require manage_options for now, but we can adjust as needed.
 	 * Taken from /inc/rest/datasource-controller/datasource-controller.php
 	 */
-	public function get_google_auth_token_permissions_check( WP_REST_Request $request ): bool {
+	public function get_google_auth_token_permissions_check(): bool {
 		return current_user_can( 'manage_options' );
 	}
 }
