@@ -1,12 +1,5 @@
 <?php declare(strict_types = 1);
 
-/**
- * GraphqlMutationContext class
- *
- * @package remote-data-blocks
- * @since 0.1.0
- */
-
 namespace RemoteDataBlocks\Config\QueryContext;
 
 defined( 'ABSPATH' ) || exit();
