@@ -30,9 +30,9 @@ class AirtableDatasource extends HttpDatasource {
 				],
 			],
 			'tables'                 => [
-				'type' => 'array',
+				'type'  => 'array',
 				'items' => [
-					'type' => 'object',
+					'type'       => 'object',
 					'properties' => [
 						'id'   => [ 'type' => 'string' ],
 						'name' => [
@@ -71,7 +71,7 @@ class AirtableDatasource extends HttpDatasource {
 			'base'         => [ 'id' => $base_id ],
 			'tables'       => $tables,
 			'display_name' => $display_name,
-			'slug'         => $display_name ? sanitize_title( $display_name ) : sanitize_title( "Airtable " . $base_id ),
+			'slug'         => $display_name ? sanitize_title( $display_name ) : sanitize_title( 'Airtable ' . $base_id ),
 		]);
 	}
 
