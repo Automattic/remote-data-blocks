@@ -36,6 +36,7 @@ class ConfigRegistry {
 			'description' => '',
 			'name'        => $block_name,
 			'loop'        => $options['loop'] ?? false,
+			'patterns'    => [],
 			'queries'     => [
 				'__DISPLAY__' => $display_query,
 			],
@@ -65,7 +66,7 @@ class ConfigRegistry {
 		self::register_block( $block_title, $display_query, [ 'loop' => true ] );
 	}
 
-	public static function register_block_pattern( string $block_title, string $pattern_name, string $pattern_content, array $pattern_options = [] ): void {
+	public static function register_block_pattern( string $block_title, string $pattern_title, string $pattern_content, array $pattern_options = [] ): void {
 		$block_name = ConfigStore::get_block_name( $block_title );
 		$config     = ConfigStore::get_configuration( $block_name );
 
@@ -77,20 +78,30 @@ class ConfigRegistry {
 		$parsed_blocks   = parse_blocks( $pattern_content );
 		$parsed_blocks   = BlockPatterns::add_block_arg_to_bindings( $block_name, $parsed_blocks );
 		$pattern_content = serialize_blocks( $parsed_blocks );
-		$pattern_options = array_merge(
+		$pattern_name    = 'remote-data-blocks/' . sanitize_title( $pattern_title );
+
+		// Create the pattern properties, allowing overrides via pattern options.
+		$pattern_properties = array_merge(
 			[
 				'blockTypes' => [ $block_name ],
 				'categories' => [ 'Remote Data' ],
 				'content'    => $pattern_content,
 				'inserter'   => true,
 				'source'     => 'plugin',
-				'title'      => $pattern_name,
+				'title'      => $pattern_title,
 			],
-			$pattern_options
+			$pattern_options['properties'] ?? []
 		);
 
 		// Register the pattern.
-		register_block_pattern( $pattern_name, $pattern_options );
+		register_block_pattern( $pattern_name, $pattern_properties );
+
+		// If the pattern role is specified and recognized, add it to the block configuration.
+		$recognized_roles = [ 'inner_blocks' ];
+		if ( isset( $pattern_options['role'] ) && in_array( $pattern_options['role'], $recognized_roles, true ) ) {
+			$config['patterns'][ $pattern_options['role'] ] = $pattern_name;
+			ConfigStore::set_configuration( $block_name, $config );
+		}
 	}
 
 	public static function register_page( string $block_title, string $page_slug ): void {
