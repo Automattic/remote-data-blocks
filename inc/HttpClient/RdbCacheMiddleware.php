@@ -6,8 +6,8 @@ class RdbCacheMiddleware extends \Kevinrob\GuzzleCache\CacheMiddleware {
 	/**
 	 * @var array<string, bool>
 	 */
-	// phpcs:ignore WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase
-	protected array $httpMethods = [
+	// phpcs:ignore WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase, SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+	protected $httpMethods = [
 		'GET'  => true,
 		'POST' => true,
 	];
