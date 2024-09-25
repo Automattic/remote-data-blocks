@@ -164,7 +164,7 @@ class DatasourceController extends WP_REST_Controller {
 				array( 'status' => 400 )
 			);
 		}
-		$validation_status = DatasourceCrud::validate_slug( $slug, $uuid );
+		$validation_status = DatasourceCrud::validate_slug( $slug );
 		$result            = [
 			'exists' => true !== $validation_status,
 		];

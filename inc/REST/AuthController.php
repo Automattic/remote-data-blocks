@@ -2,8 +2,6 @@
 
 namespace RemoteDataBlocks\REST;
 
-use WP_REST_Controller;
-use WP_REST_Request;
 use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
 
 defined( 'ABSPATH' ) || exit();
@@ -15,7 +13,7 @@ defined( 'ABSPATH' ) || exit();
  * Authentication related endpoints for services which require multiple steps before the final
  * access token is obtained like OAuth2.
  */
-class AuthController extends WP_REST_Controller {
+class AuthController extends \WP_REST_Controller {
 	public function __construct() {
 		$this->namespace = REMOTE_DATA_BLOCKS__REST_NAMESPACE;
 		$this->rest_base = 'auth';
@@ -38,7 +36,7 @@ class AuthController extends WP_REST_Controller {
 		);
 	}
 
-	public function get_google_auth_token( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+	public function get_google_auth_token( \WP_REST_Request $request ): \WP_REST_Response|\WP_Error {
 		$params      = $request->get_json_params();
 		$credentials = $params['credentials'] ?? null;
 		$scopes      = $params['scopes'] ?? [];
@@ -71,7 +69,7 @@ class AuthController extends WP_REST_Controller {
 	 * These all require manage_options for now, but we can adjust as needed.
 	 * Taken from /inc/rest/datasource-controller/datasource-controller.php
 	 */
-	public function get_google_auth_token_permissions_check( WP_REST_Request $request ): bool {
+	public function get_google_auth_token_permissions_check( \WP_REST_Request $request ): bool {
 		return current_user_can( 'manage_options' );
 	}
 }
