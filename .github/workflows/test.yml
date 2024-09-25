@@ -52,7 +52,6 @@ jobs:
       - name: Setup Node.js
         uses: Automattic/vip-actions/nodejs-setup@3e82e8ce19632aec294b4c3df1610e8d4c982e9a
         with:
-          node-version: 22
           node-version-file: .nvmrc
           ignore-scripts: true
 
