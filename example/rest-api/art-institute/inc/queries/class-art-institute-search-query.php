@@ -2,24 +2,19 @@
 
 namespace RemoteDataBlocks\Example\ArtInstituteOfChicago;
 
-use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
 class ArtInstituteOfChicagoSearchArtQuery extends HttpQueryContext {
-	public array $input_variables = [
-		'search_terms' => [
-			'type' => 'string',
-		],
-	];
+	public function get_input_schema(): array {
+		return [
+			'search_terms' => [
+				'type' => 'string',
+			],
+		];
+	}
 
-	public array $output_variables = [];
-
-	public function __construct( HttpDatasource $datasource ) {
-		parent::__construct( $datasource );
-
-		// Defining the output variables in the constructor allows us to provide
-		// a generate function instead of a JSONPath selector.
-		$this->output_variables = [
+	public function get_output_schema(): array {
+		return [
 			'root_path'     => '$.data[*]',
 			'is_collection' => true,
 			'mappings'      => [

@@ -34,6 +34,7 @@ describe( 'withBlockBinding', () => {
 				loop: false,
 				name: 'test/block',
 				overrides: {},
+				patterns: { default: 'test/block/pattern' },
 				selectors: [],
 				settings: {
 					category: 'widget',

@@ -5,44 +5,42 @@ namespace RemoteDataBlocks\Integrations\Shopify\Queries;
 use RemoteDataBlocks\Config\QueryContext\GraphqlQueryContext;
 
 class ShopifySearchProductsQuery extends GraphqlQueryContext {
-	/**
-	 * @var array<string, mixed>
-	 */
-	public array $input_variables = [
-		'search_terms' => [
-			'type' => 'string',
-		],
-	];
-
-	/**
-	 * @var array<string, mixed>
-	 */
-	public array $output_variables = [
-		'root_path'     => '$.data.products.edges[*]',
-		'is_collection' => true,
-		'mappings'      => [
-			'id'        => [
-				'name' => 'Product ID',
-				'path' => '$.node.id',
-				'type' => 'id',
-			],
-			'title'     => [
-				'name' => 'Product title',
-				'path' => '$.node.title',
+	public function get_input_schema(): array {
+		return [
+			'search_terms' => [
 				'type' => 'string',
 			],
-			'price'     => [
-				'name' => 'Item price',
-				'path' => '$.node.priceRange.maxVariantPrice.amount',
-				'type' => 'price',
+		];
+	}
+
+	public function get_output_schema(): array {
+		return [
+			'root_path'     => '$.data.products.edges[*]',
+			'is_collection' => true,
+			'mappings'      => [
+				'id'        => [
+					'name' => 'Product ID',
+					'path' => '$.node.id',
+					'type' => 'id',
+				],
+				'title'     => [
+					'name' => 'Product title',
+					'path' => '$.node.title',
+					'type' => 'string',
+				],
+				'price'     => [
+					'name' => 'Item price',
+					'path' => '$.node.priceRange.maxVariantPrice.amount',
+					'type' => 'price',
+				],
+				'image_url' => [
+					'name' => 'Item image URL',
+					'path' => '$.node.images.edges[0].node.originalSrc',
+					'type' => 'image_url',
+				],
 			],
-			'image_url' => [
-				'name' => 'Item image URL',
-				'path' => '$.node.images.edges[0].node.originalSrc',
-				'type' => 'image_url',
-			],
-		],
-	];
+		];
+	}
 
 	public function get_query(): string {
 		return 'query SearchProducts($search_terms: String!) {
