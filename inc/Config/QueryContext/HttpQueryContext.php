@@ -45,8 +45,8 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * @type string $default_value Optional default value of the variable.
 	 * @type string $name          Display name of the variable.
 	 * @type array  $overrides     Overrides for the variable.
-	 * @type string $target       Targeted override.
-	 * @type string $type         The variable type (string, number, boolean) as a string.
+	 * @type string $target        Targeted override.
+	 * @type string $type          The variable type (string, number, boolean) as a string.
 	 *
 	 * @return array<string, array{
 	 *   default_value?: string,
@@ -54,7 +54,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 *   overrides?: array<array{target: string, type: string}>,
 	 *   type: string
 	 * }>
-	 * 
 	 */
 	public function get_input_schema(): array {
 		return $this->input_schema;
