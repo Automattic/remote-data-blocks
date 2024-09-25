@@ -18,6 +18,13 @@ class WPRemoteRequestHandler {
 	const DEFAULT_HTTP_VERSION = '1.1';
 	const DEFAULT_TIMEOUT      = 5;
 
+	/**
+	 * Handle a PSR-7 request via wp_remote_request and return a promise.
+	 *
+	 * @param RequestInterface $request The PSR-7 request to send.
+	 * @param array            $options Request options.
+	 * @return PromiseInterface A promise that resolves with a PSR-7 response.
+	 */
 	public function __invoke( RequestInterface $request, array $options ): PromiseInterface {
 		try {
 			// Convert Guzzle request to arguments for wp_remote_request.
