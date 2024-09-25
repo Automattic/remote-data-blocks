@@ -1,6 +1,6 @@
 # Query
 
-A query defines a request for data from a [data source](./data-source.md) and makes that data available to a remote data block. A query defines input and output variables so that the Remote Data Blocks plugin knows how to interact with it.
+A query defines a request for data from a [data source](data-source.md) and makes that data available to a remote data block. A query defines input and output variables so that the Remote Data Blocks plugin knows how to interact with it.
 
 ## HttpQueryContext
 
@@ -56,7 +56,7 @@ This example features a snall subset of the customization available for a query;
 
 ### VERSION
 
-The `VERSION` constant defines the semver of the current version of `HttpQueryContext`. It is currently ignored but in the future may be used to navigate breaking changes.
+The `VERSION` constant defines the current semver of `HttpQueryContext`. It is currently ignored but in the future may be used to navigate breaking changes.
 
 ### get_input_schema(): array
 
@@ -130,7 +130,7 @@ The `get_datasource` method returns the data source associated with the query. B
 
 ### get_endpoint( array $input_variables ): string
 
-By default, the `get_endpoint` method proxies to the `get_endpoint` method of query's data source. Override this method to set a custom endpoint for the query—for example, to construct the endpoints using an input variable. The current input variables are provided as an associative array (`[ $var_name => $value ]`).
+By default, the `get_endpoint` method proxies to the `get_endpoint` method of query's data source. Override this method to set a custom endpoint for the query—for example, to construct the endpoints using an input variable. The input variables for the current request are provided as an associative array (`[ $var_name => $value ]`).
 
 #### Example
 
@@ -150,7 +150,7 @@ By default, `get_request_method` returns `'GET'`. Override this method if your q
 
 ### get_request_headers( array $input_variables ): array
 
-By default, the `get_request_headers` method proxies to the `get_request_headers` method of the query's data source. Override this method to provide custom request headers for the query. The current input variables are provided as an associative array (`[ $var_name => $value ]`).
+By default, the `get_request_headers` method proxies to the `get_request_headers` method of the query's data source. Override this method to provide custom request headers for the query. The input variables for the current request are provided as an associative array (`[ $var_name => $value ]`).
 
 ### Example
 
@@ -165,7 +165,7 @@ public function get_request_headers( array $input_variables ): array {
 
 ### get_request_body( array $input_variables ): array|null
 
-Override this method to define a request body for this query. The return value will be converted to JSON using `wp_json_encode`. The current input variables are provided as an associative array (`[ $var_name => $value ]`).
+Override this method to define a request body for this query. The return value will be converted to JSON using `wp_json_encode`. The input variables for the current request are provided as an associative array (`[ $var_name => $value ]`).
 
 ### get_query_name(): string
 
