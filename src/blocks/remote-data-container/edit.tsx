@@ -32,8 +32,8 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 		getInnerBlocks,
 		getSupportedPatterns,
 		insertPatternBlocks,
-		removeInnerBlocks,
-		setShowPatternSelection,
+		markReadyForInsertion,
+		resetReadyForInsertion,
 		showPatternSelection,
 	} = usePatterns( props.name, rootClientId );
 	const { execute } = useRemoteData( props.name, DISPLAY_QUERY_KEY );
@@ -61,7 +61,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 		}
 
 		if ( insertBlocks ) {
-			setShowPatternSelection( true );
+			markReadyForInsertion();
 		}
 	}
 
@@ -75,8 +75,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 
 	function resetRemoteData() {
 		props.setAttributes( { remoteData: undefined } );
-		removeInnerBlocks();
-		setShowPatternSelection( false );
+		resetReadyForInsertion();
 	}
 
 	useEffect( () => {
@@ -101,7 +100,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 				<div { ...blockProps }>
 					<PatternSelection
 						insertPatternBlocks={ insertPatternBlocks }
-						onCancel={ () => setShowPatternSelection( false ) }
+						onCancel={ resetReadyForInsertion }
 						supportedPatterns={ supportedPatterns }
 					/>
 				</div>

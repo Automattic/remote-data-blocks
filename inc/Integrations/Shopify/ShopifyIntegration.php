@@ -29,7 +29,7 @@ class ShopifyIntegration {
 
 		register_remote_data_block( $block_name, $shopify_get_product_query );
 		register_remote_data_search_query( $block_name, $shopify_search_products_query );
-		register_remote_data_block_pattern( $block_name, 'remote-data-blocks/shopify-product-teaser', $block_pattern, [ 'title' => 'Shopify Product Teaser' ] );
+		register_remote_data_block_pattern( $block_name, 'Shopify Product Teaser', $block_pattern );
 
 		LoggerManager::instance()->info( 'Registered Shopify block', [ 'block_name' => $block_name ] );
 	}

@@ -8,7 +8,7 @@ Most HTTP-powered APIs can be queried by defining a class that extends `HttpQuer
 
 ```php
 class GetZipCodeQuery extends HttpQueryContext {
-	public function define_input_variables(): array {
+	public function get_input_schema(): array {
 		return [
 			'zip_code' => [
 				'name' => 'Zip Code',
@@ -17,7 +17,7 @@ class GetZipCodeQuery extends HttpQueryContext {
 		];
 	}
 
-	public function define_output_variables(): array {
+	public function get_output_schema(): array {
 		return [
 			'is_collection' => false,
 			'mappings'      => [
@@ -46,9 +46,9 @@ class GetZipCodeQuery extends HttpQueryContext {
 }
 ```
 
-The `define_input_variables` method describes the input data expected by the query. For some queries, input variables might be used to construct a request body, but in this case the `zip_code` input variable is used to customize the query endpoint via the `get_endpoint()` method.
+The `get_input_schema` method defines the input data expected by the query. For some queries, input variables might be used to construct a request body, but in this case the `zip_code` input variable is used to customize the query endpoint via the `get_endpoint()` method.
 
-The `define_output_variables` method defines how to extract data from the API response. The `path` property uses [JSONPath](https://jsonpath.com/) expressions to allow concise, no-code references to nested data.
+The `get_output_schema` method defines how to extract data from the API response. The `path` property uses [JSONPath](https://jsonpath.com/) expressions to allow concise, no-code references to nested data.
 
 This example features a snall subset of the customization available for a query; see the full documentation below for details.
 
@@ -58,9 +58,9 @@ This example features a snall subset of the customization available for a query;
 
 The `VERSION` constant defines the semver of the current version of `HttpQueryContext`. It is currently ignored but in the future may be used to navigate breaking changes.
 
-### define_input_variables(): array
+### get_input_schema(): array
 
-The `define_input_variables` method describes the input data expected by the query. The method should return an associative array of input variable definitions. The keys of the array are machine-friendly input variable names and the values are associative arrays with the following structure:
+The `get_input_schema` method defines the input data expected by the query. The method should return an associative array of input variable definitions. The keys of the array are machine-friendly input variable names and the values are associative arrays with the following structure:
 
 - `name` (optional): The human-friendly display name of the input variable
 - `default_value` (optional): The default value for the input variable.
@@ -72,7 +72,7 @@ The `define_input_variables` method describes the input data expected by the que
 #### Example
 
 ```php
-public function define_input_variables(): array {
+public function get_input_schema(): array {
 	return [
 		'zip_code' => [
 			'name' => 'Zip Code',
@@ -84,9 +84,9 @@ public function define_input_variables(): array {
 
 The default implementation returns an empty array.
 
-### define_output_variables(): array
+### get_output_schema(): array
 
-The `define_output_variables` method defines how to extract data from the API response. The method should return an associative array with the following structure:
+The `get_output_schema` method defines how to extract data from the API response. The method should return an associative array with the following structure:
 
 - `is_collection` (optional, default `false`): A boolean indicating whether the response data is a collection. If false, only a single item will be returned.
 - `mappings` (required): An associative array of output variable definitions. The keys of the array are machine-friendly output variable names and the values are associative arrays with the following structure:
@@ -98,7 +98,7 @@ The `define_output_variables` method defines how to extract data from the API re
 #### Example
 
 ```php
-public function define_output_variables(): array {
+public function get_output_schema(): array {
 	return [
 		'is_collection' => false,
 		'mappings'      => [
@@ -177,7 +177,7 @@ Override this method to specify a custom [query runner](query-runner.md) for thi
 
 ### process_response( string $raw_response_data, array $input_variables ): string|array|object|null
 
-The default query runner assumes a JSON response and decodes it. If you need to implement custom deserialization or want to process the response in some way before the output variables are extracted, override this method. The mappings and JSONPath expressions defined by `define_output_variables` will be applied to the return value of this method.
+The default query runner assumes a JSON response and decodes it. If you need to implement custom deserialization or want to process the response in some way before the output variables are extracted, override this method. The mappings and JSONPath expressions defined by `get_output_schema` will be applied to the return value of this method.
 
 ## QueryContextInterface
 

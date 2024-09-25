@@ -42,7 +42,7 @@ Next, define a query that describes the data that you want to extract from the d
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
 class AirtableGetEventQuery extends HttpQueryContext {
-	public function define_input_variables(): array {
+	public function get_input_schema(): array {
 		return [
 			'record_id' => [
 				'name' => 'Record ID',
@@ -51,7 +51,7 @@ class AirtableGetEventQuery extends HttpQueryContext {
 		];
 	}
 
-	public function define_output_variables(): array {
+	public function get_output_schema(): array {
 		return [
 			'is_collection' => false,
 			'mappings'      => [
@@ -139,7 +139,7 @@ Instead of requiring manual input of a record ID, you can enhance your remote da
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
 class AirtableListEventsQuery extends HttpQueryContext {
-	public function define_output_variables(): array {
+	public function get_output_schema(): array {
 		return [
 			'root_path'     => '$.records[*]',
 			'is_collection' => true,
