@@ -42,20 +42,19 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * return value of this function will be passed to several methods in this
 	 * class (e.g., `get_endpoint`, `get_request_body`).
 	 *
-	 * @return array {
-	 *   @type array $var_name {
-	 *     @type string $default_value Optional default value of the variable.
-	 *     @type string $name          Display name of the variable.
-	 *     @type array  $overrides {
-	 *       @type array {
-	 *         @type $target Targeted override.
-	 *         @type $type   Override type.
-	 *       }
-	 *     }
-	 *     @type string $type         The variable type (string, number, boolean)
-	 *   }
-	 * }
-	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
+	 * @type string $default_value Optional default value of the variable.
+	 * @type string $name          Display name of the variable.
+	 * @type array  $overrides     Overrides for the variable.
+	 * @type string $target       Targeted override.
+	 * @type string $type         The variable type (string, number, boolean) as a string.
+	 *
+	 * @return array<string, array{
+	 *   default_value?: string,
+	 *   name: string,
+	 *   overrides?: array<array{target: string, type: string}>,
+	 *   type: string
+	 * }>
+	 * 
 	 */
 	public function get_input_schema(): array {
 		return $this->input_schema;
@@ -64,15 +63,17 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	/**
 	 * Override this method to define output fields produced by this query.
 	 *
-	 * @return array {
-	 *   @type array $var_name {
-	 *     @type string $default_value Optional default value of the variable.
-	 *     @type string $name          Display name of the variable.
-	 *     @type string $path          JSONPath expression to find the variable value.
-	 *     @type string $type          The variable type (string, number, boolean)
-	 *   }
-	 * }
-	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
+	 * @type string $default_value Optional default value of the variable.
+	 * @type string $name          Display name of the variable.
+	 * @type string $path          JSONPath expression to find the variable value.
+	 * @type string $type          The variable type (string, number, boolean)
+	 *
+	 * @return array<string, array{
+	 *   default_value?: string,
+	 *   name: string,
+	 *   path: string,
+	 *   type: string
+	 * }>
 	 */
 	public function get_output_schema(): array {
 		return $this->output_schema;
