@@ -18,7 +18,7 @@ function register_airtable_elden_ring_map_block() {
 		return;
 	}
 
-	$elden_ring_datasource = AirtableDatasource::create( $access_token, 'appqI3sJ9R2NcML8Y', 'Elden Ring Locations' );
+	$elden_ring_datasource = AirtableDatasource::create( $access_token, 'appqI3sJ9R2NcML8Y', [], 'Elden Ring Locations' );
 	$list_locations_query  = new AirtableEldenRingListLocationsQuery( $elden_ring_datasource );
 	$list_maps_query       = new AirtableEldenRingListMapsQuery( $elden_ring_datasource );
 
@@ -26,7 +26,7 @@ function register_airtable_elden_ring_map_block() {
 	register_remote_data_list_query( $block_name, $list_maps_query );
 
 	$block_pattern = file_get_contents( __DIR__ . '/inc/patterns/map-pattern.html' );
-	register_remote_data_block_pattern( $block_name, 'remote-data-blocks/elden-ring-map/pattern', $block_pattern );
+	register_remote_data_block_pattern( $block_name, 'Elden Ring Map', $block_pattern, [ 'role' => 'inner_blocks' ] );
 
 	$elden_ring_map_block_path = __DIR__ . '/build/blocks/elden-ring-map';
 	wp_register_style( 'leaflet-style', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css', [], '1.9.4' );

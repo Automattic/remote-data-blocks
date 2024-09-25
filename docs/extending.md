@@ -35,13 +35,13 @@ Example:
 
 ```php
 class YourCustomQuery extends HttpQueryContext {
-    public function define_input_variables(): array {
+    public function get_input_schema(): array {
 		return [
 			// Define your input variables here
 		];
 	}
 
-    public function define_output_variables(): array {
+    public function get_output_schema(): array {
 		return [
 			// Define your output variables here
 		];
@@ -98,7 +98,7 @@ function register_your_block_pattern() {
     $block_name    = 'Your Custom Block';
     $block_pattern = file_get_contents( **DIR** . '/your-pattern.html' );
 
-    register_remote_data_block_pattern( $block_name, 'your-namespace/your-pattern', $block_pattern );
+    register_remote_data_block_pattern( $block_name, 'Pattern Title', $block_pattern );
 }
 add_action( 'init', 'YourNamespace\\register_your_block_pattern' );
 ```

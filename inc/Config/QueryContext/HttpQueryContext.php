@@ -21,42 +21,61 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	const VERSION = '0.1.0';
 
 	/**
-	 * A definition of input fields accepted by this query. These values of these
-	 * input fields will be passed to the `get_request_body` method.
-	 *
-	 * The variable type (string, number, boolean) for both cases of type.
-	 * 
-	 * @var array<string, array{
-	 *   default_value?: string,
-	 *   name: string,
-	 *   overrides?: array<array{target: string, type: string}>,
-	 *   type: string
-	 * }>
-	 * 
-	 * @psalm-suppress PossiblyUnusedProperty
-	 */
-	public array $input_variables = [];
-
-	/**
-	 * A definition of output fields produced by this query.
-	 * 
-	 * Uses JSONPath for path, the variable type (string, number, boolean) for type.
-	 * 
-	 * @var array<string, array{
-	 *   default_value?: string,
-	 *   name: string,
-	 *   path: string,
-	 *   type: string
-	 * }>
-	 */
-	public array $output_variables = [];
-
-	/**
 	 * Constructor.
 	 *
 	 * @param HttpDatasource $datasource The datasource that this query will use.
+	 * @param array          $input_schema The input schema for this query.
+	 * @param array          $output_schema The output schema for this query.
 	 */
-	public function __construct( private HttpDatasource $datasource ) {
+	public function __construct(
+		private HttpDatasource $datasource,
+		public array $input_schema = [],
+		public array $output_schema = []
+	) {
+		// Provide input and output variables as public properties.
+		$this->input_schema  = $this->get_input_schema();
+		$this->output_schema = $this->get_output_schema();
+	}
+
+	/**
+	 * Override this method to define the input fields accepted by this query. The
+	 * return value of this function will be passed to several methods in this
+	 * class (e.g., `get_endpoint`, `get_request_body`).
+	 *
+	 * @return array {
+	 *   @type array $var_name {
+	 *     @type string $default_value Optional default value of the variable.
+	 *     @type string $name          Display name of the variable.
+	 *     @type array  $overrides {
+	 *       @type array {
+	 *         @type $target Targeted override.
+	 *         @type $type   Override type.
+	 *       }
+	 *     }
+	 *     @type string $type         The variable type (string, number, boolean)
+	 *   }
+	 * }
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
+	 */
+	public function get_input_schema(): array {
+		return $this->input_schema;
+	}
+
+	/**
+	 * Override this method to define output fields produced by this query.
+	 *
+	 * @return array {
+	 *   @type array $var_name {
+	 *     @type string $default_value Optional default value of the variable.
+	 *     @type string $name          Display name of the variable.
+	 *     @type string $path          JSONPath expression to find the variable value.
+	 *     @type string $type          The variable type (string, number, boolean)
+	 *   }
+	 * }
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
+	 */
+	public function get_output_schema(): array {
+		return $this->output_schema;
 	}
 
 	/**
@@ -141,6 +160,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * Authoritative truth of whether output is expected to be a collection.
 	 */
 	final public function is_response_data_collection(): bool {
-		return $this->output_variables['is_collection'] ?? false;
+		return $this->output_schema['is_collection'] ?? false;
 	}
 }
