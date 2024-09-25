@@ -156,7 +156,7 @@ class DatasourceController extends WP_REST_Controller {
 
 	public function item_slug_conflicts( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$slug = $request->get_param( 'slug' );
-		$uuid = $request->get_param( 'uuid' ) ?? '';
+
 		if ( empty( $slug ) ) {
 			return new \WP_Error(
 				'missing_slug',

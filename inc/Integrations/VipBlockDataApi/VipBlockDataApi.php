@@ -15,14 +15,21 @@ class VipBlockDataApi {
 
 	public static function init(): void {
 		add_filter( 'vip_block_data_api__sourced_block_result', [ __CLASS__, 'resolve_remote_data' ], 5, 4 );
-		add_filter( 'vip_block_data_api__after_parse_blocks', [ __CLASS__, 'add_debug_info' ], 10, 2 );
+		add_filter( 'vip_block_data_api__after_parse_blocks', [ __CLASS__, 'add_debug_info' ], 10, 1 );
 	}
 
 	/**
 	 * Filters sourced block and, if a remote data block with remote data bindings metadata, executes
 	 * necessary queries to resolve the data within.
 	 *
-	 * phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+	 * @param array  $sourced_block The sourced block data.
+	 * @param string $block_name    The name of the block.
+	 * @param int    $post_id       The ID of the post.
+	 * @param array  $parsed_block  The parsed block data.
+	 * @return array The filtered sourced block data.
+	 *
+	 * @phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+	 * @psalm-suppress PossiblyUnusedParam
 	 */
 	public static function resolve_remote_data( array $sourced_block, string $block_name, int $post_id, array $parsed_block ): array {
 		if ( ! ConfigStore::is_registered_block( $block_name ) ) {
@@ -49,7 +56,7 @@ class VipBlockDataApi {
 			$block['context'] = $block_context;
 
 			foreach ( $block['attributes']['metadata']['bindings'] as $attr_name => $binding ) {
-				$block['attributes'][ $attr_name ] = BlockBindings::get_value( $binding['args'], $block, $attr_name );
+				$block['attributes'][ $attr_name ] = BlockBindings::get_value( $binding['args'], $block );
 			}
 
 			unset( $block['context'] );
@@ -82,7 +89,7 @@ class VipBlockDataApi {
 		return $blocks;
 	}
 
-	public static function add_debug_info( array $result, int $post_id ): array {
+	public static function add_debug_info( array $result ): array {
 		$debug = array_merge( $result['debug'] ?? [], self::$debug );
 
 		if ( ! empty( $debug ) ) {

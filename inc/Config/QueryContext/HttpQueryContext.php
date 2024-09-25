@@ -24,35 +24,26 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * A definition of input fields accepted by this query. These values of these
 	 * input fields will be passed to the `get_request_body` method.
 	 *
-	 * @var array {
-	 *   @type array $var_name {
-	 *     @type string $default_value Optional default value of the variable.
-	 *     @type string $name          Display name of the variable.
-	 *     @type array  $overrides {
-	 *       @type array {
-	 *         @type $target Targeted override.
-	 *         @type $type   Override type.
-	 *       }
-	 *     }
-	 *     @type string $type         The variable type (string, number, boolean)
-	 *   }
-	 * }
-	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
+	 * @var array<string, array{
+	 *   default_value?: string,
+	 *   name: string,
+	 *   overrides?: array<array{target: string, type: string}>,
+	 *   type: string
+	 * }>
+	 * 
+	 * @psalm-suppress PossiblyUnusedProperty
 	 */
 	public array $input_variables = [];
 
 	/**
 	 * A definition of output fields produced by this query.
 	 *
-	 * @var array {
-	 *   @type array $var_name {
-	 *     @type string $default_value Optional default value of the variable.
-	 *     @type string $name          Display name of the variable.
-	 *     @type string $path          JSONPath expression to find the variable value.
-	 *     @type string $type          The variable type (string, number, boolean)
-	 *   }
-	 * }
-	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
+	 * @var array<string, array{
+	 *   default_value?: string,
+	 *   name: string,
+	 *   path: string,
+	 *   type: string
+	 * }>
 	 */
 	public array $output_variables = [];
 
