@@ -71,6 +71,8 @@ jobs:
 
       - name: Run Psalm
         uses: docker://ghcr.io/psalm/psalm-github-actions
+        with:
+          composer_require_dev: true
 
   dependaban:
     name: Dependaban
