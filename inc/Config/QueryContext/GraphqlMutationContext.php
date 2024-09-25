@@ -7,6 +7,8 @@ defined( 'ABSPATH' ) || exit();
 /**
  * Base class used to define a Remote Data Query. This class defines a
  * composable query that allows it to be composed with another query or a block.
+ *
+ * @psalm-api
  */
 abstract class GraphqlMutationContext extends HttpQueryContext {
 
