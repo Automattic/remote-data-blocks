@@ -83,6 +83,7 @@ class AirtableDatasource extends HttpDatasource {
 				'id'   => $this->config['base']['id'],
 				'name' => $this->config['base']['name'] ?? null,
 			],
+			'tables'  => $this->config['tables'] ?? [],
 			'uuid'    => $this->config['uuid'] ?? null,
 		];
 	}
