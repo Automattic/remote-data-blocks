@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   lint:
-    name: Lint
+    name: eslint, prettier, wp-scripts
     runs-on: ubuntu-latest
     steps:
       - name: Setup PHP
@@ -40,7 +40,7 @@ jobs:
         run: npm run check-types
 
   phpcs:
-    name: PHPCS
+    name: phpcs
     runs-on: ubuntu-latest
     steps:
       - name: Setup PHP
@@ -61,6 +61,18 @@ jobs:
 
       - name: Run PHPCS
         run: npm run lint:phpcs
+
+  psalm:
+    name: Psalm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Psalm
+        uses: docker://ghcr.io/psalm/psalm-github-actions
+        with:
+          composer_require_dev: true
 
   dependaban:
     name: Dependaban
