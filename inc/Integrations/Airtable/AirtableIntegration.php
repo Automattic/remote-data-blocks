@@ -17,7 +17,8 @@ class AirtableIntegration {
 	private static function register_blocks_for_airtable_data_source( array $config ): void {
 		LoggerManager::instance()->info( 'Registering Airtable block for: ' . wp_json_encode( $config ) ); // TODO: Remove this or make it debug level, etc.
 
-		$airtable_datasource = AirtableDatasource::from_array( $config );
-		// TODO: Block registration & all the rest...  This will only work if there is some mapping configured
+		// $airtable_datasource = AirtableDatasource::from_array( $config );
+
+		// TODO: Block registration, remove that surpress, & all the rest...  This will only work if there is some mapping configured
 	}
 }

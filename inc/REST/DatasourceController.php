@@ -193,7 +193,7 @@ class DatasourceController extends WP_REST_Controller {
 		return current_user_can( 'manage_options' );
 	}
 
-	public function item_slug_conflicts_permissions_check( $request ) {
+	public function item_slug_conflicts_permissions_check() {
 		return current_user_can( 'manage_options' );
 	}
 }
