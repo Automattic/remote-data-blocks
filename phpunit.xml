@@ -5,8 +5,10 @@
   bootstrap="tests/inc/bootstrap.php"
   cacheDirectory=".phpunit.cache"
   colors="true"
+  displayDetailsOnPhpunitDeprecations="true"
   displayDetailsOnTestsThatTriggerDeprecations="true"
   displayDetailsOnTestsThatTriggerErrors="true"
+  displayDetailsOnTestsThatTriggerNotices="true"
   displayDetailsOnTestsThatTriggerWarnings="true"
 >
   <testsuites>
