@@ -49,23 +49,11 @@ jobs:
   vitest:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: Automattic/vip-actions/nodejs-setup@3e82e8ce19632aec294b4c3df1610e8d4c982e9a
         with:
           node-version-file: .nvmrc
-
-      - name: Cache dependffencies
-        uses: actions/cache@v4
-        id: cache-node-modules
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ inputs.node-version }}-${{ hashFiles('package.json', 'package-lock.json', 'npm-shrinkwrap.json') }}
-
-      - name: Install dependencies
-        run: npm install --ignore-scripts
+          ignore-scripts: true
 
       - name: Run tests
         run: npm run test:js:coverage
