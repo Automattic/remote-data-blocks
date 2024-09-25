@@ -24,6 +24,8 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * A definition of input fields accepted by this query. These values of these
 	 * input fields will be passed to the `get_request_body` method.
 	 *
+	 * The variable type (string, number, boolean) for both cases of type.
+	 * 
 	 * @var array<string, array{
 	 *   default_value?: string,
 	 *   name: string,
@@ -37,7 +39,9 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 
 	/**
 	 * A definition of output fields produced by this query.
-	 *
+	 * 
+	 * Uses JSONPath for path, the variable type (string, number, boolean) for type.
+	 * 
 	 * @var array<string, array{
 	 *   default_value?: string,
 	 *   name: string,
