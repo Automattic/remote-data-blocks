@@ -2,12 +2,13 @@
 
 namespace RemoteDataBlocks\HttpClient;
 
-use GuzzleHttp\Psr7\Response;
-use Psr\Http\Message\RequestInterface;
+use Exception;
 use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\RejectedPromise;
-use Exception;
+use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\RequestInterface;
+use WpOrg\Requests\Utility\CaseInsensitiveDictionary;
 use function is_wp_error;
 use function wp_remote_request;
 use function wp_remote_retrieve_body;
@@ -54,6 +55,11 @@ class WPRemoteRequestHandler {
 			$response_code    = wp_remote_retrieve_response_code( $response );
 			$response_body    = wp_remote_retrieve_body( $response );
 			$response_headers = wp_remote_retrieve_headers( $response );
+
+			// Convert the response headers to an array.
+			if ( $response_headers instanceof CaseInsensitiveDictionary ) {
+				$response_headers = $response_headers->getAll();
+			}
 
 			// Create a Guzzle-compatible promise response.
 			return Create::promiseFor(
