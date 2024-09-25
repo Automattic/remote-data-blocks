@@ -4,7 +4,6 @@ namespace RemoteDataBlocks\HttpClient;
 
 use Exception;
 use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\MessageFormatter;
@@ -65,11 +64,12 @@ class HttpClient {
 		$this->headers  = $headers;
 		$this->options  = $options;
 
-		$this->handler_stack = HandlerStack::create(
-			new CurlHandler(
-				// low-level curl options go here
-			)
-		);
+		// Initialize a request handler that uses wp_remote_request instead of cURL.
+		// PHP cURL bindings are not always available, e.g., in WASM environments
+		// like WP Now and WP Playground.
+		$request_handler = new WPRemoteRequestHandler();
+
+		$this->handler_stack = HandlerStack::create( $request_handler );
 
 		$this->handler_stack->push( Middleware::retry(
 			self::class . '::retry_decider',
