@@ -3,6 +3,9 @@
 namespace RemoteDataBlocks\REST;
 
 use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
+use WP_REST_Controller;
+use WP_REST_Request;
+
 
 defined( 'ABSPATH' ) || exit();
 defined( 'ABSPATH' ) || exit();
@@ -13,7 +16,7 @@ defined( 'ABSPATH' ) || exit();
  * Authentication related endpoints for services which require multiple steps before the final
  * access token is obtained like OAuth2.
  */
-class AuthController extends \WP_REST_Controller {
+class AuthController extends WP_REST_Controller {
 	public function __construct() {
 		$this->namespace = REMOTE_DATA_BLOCKS__REST_NAMESPACE;
 		$this->rest_base = 'auth';
@@ -36,7 +39,7 @@ class AuthController extends \WP_REST_Controller {
 		);
 	}
 
-	public function get_google_auth_token( \WP_REST_Request $request ): \WP_REST_Response|\WP_Error {
+	public function get_google_auth_token( WP_REST_Request $request ): \WP_REST_Response|\WP_Error {
 		$params      = $request->get_json_params();
 		$credentials = $params['credentials'] ?? null;
 		$scopes      = $params['scopes'] ?? [];
