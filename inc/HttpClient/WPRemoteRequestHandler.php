@@ -3,7 +3,7 @@
 namespace RemoteDataBlocks\HttpClient;
 
 use Exception;
-use GuzzleHttp\Promise\Create;
+use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\RejectedPromise;
 use GuzzleHttp\Psr7\Response;
@@ -62,7 +62,7 @@ class WPRemoteRequestHandler {
 			}
 
 			// Create a Guzzle-compatible promise response.
-			return Create::promiseFor(
+			return new FulfilledPromise(
 				new Response(
 					$response_code,
 					$response_headers,
