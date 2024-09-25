@@ -10,10 +10,10 @@ use WP_Block;
 class InteractivityStore {
 	public static function get_map_interactive_context( WP_Block $block ): array {
 		$query_context = [
-			'blockName'  => 'remote-data-blocks/elden-ring-location', // Why doesn't this match: $block->name,
+			'blockName'  => $block->context[ BlockBindings::$context_name ]['blockName'],
 			'queryInput' => $block->context[ BlockBindings::$context_name ]['queryInput'],
 		];
-		$response      = BlockBindings::execute_query( $query_context, 'GET' );
+		$response      = BlockBindings::execute_query( $query_context, 'GET Map Coordinates' );
 		$coordinates   = array_map( function ( $value ) {
 			$result = $value['result'];
 			return [
@@ -25,7 +25,7 @@ class InteractivityStore {
 
 		/**
 		 * We have the coordinate data that was saved in the Editor in:
-		 * $block->context['remote-data-blocks/remoteData']['results']
+		 * $block->context[ BlockBindings::$context_name ]['results']
 		 * 
 		 * We can potentially use it as a fallback if the query fails.
 		 */
