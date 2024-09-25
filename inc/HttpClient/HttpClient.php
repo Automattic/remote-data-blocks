@@ -65,8 +65,6 @@ class HttpClient {
 	/**
 	 * Get the cache middleware for the HTTP client.
 	 *
-	 * @param CacheStorageInterface $cache_storage
-	 * @param int|null              $default_ttl
 	 */
 	public static function get_cache_middleware( CacheStorageInterface $cache_storage, int|null $default_ttl = null ): callable {
 		return new RdbCacheMiddleware(

@@ -1,23 +1,25 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\HttpClient;
 
+use Kevinrob\GuzzleCache\CacheEntry;
 use Kevinrob\GuzzleCache\KeyValueHttpHeader;
 use Kevinrob\GuzzleCache\Storage\CacheStorageInterface;
 use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use RemoteDataBlocks\Logging\Logger;
 use RemoteDataBlocks\Logging\LoggerManager;
 
 class RdbCacheStrategy extends GreedyCacheStrategy {
 	private Logger $logger;
 
-	public function __construct( CacheStorageInterface $cache = null, $default_ttl, KeyValueHttpHeader $vary_headers = null ) {
+	public function __construct( CacheStorageInterface $cache, int $default_ttl, ?KeyValueHttpHeader $vary_headers = null ) {
 		parent::__construct( $cache, $default_ttl, $vary_headers );
 		$this->logger = LoggerManager::instance( __CLASS__ );
 	}
 
-	private static function getRequestString( RequestInterface $request ) {
+	private static function getRequestString( RequestInterface $request ): string {
 		$uri        = $request->getUri();
 		$uri_string = $uri->getScheme() . '://' . $uri->getHost() . $uri->getPath();
 		$method     = $request->getMethod();
@@ -25,7 +27,7 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 		return $method . ' ' . $uri_string . ' ' . $body;
 	}
 
-	private function should_bypass_cache( RequestInterface $request ) {
+	private function should_bypass_cache( RequestInterface $request ): bool {
 		if ( apply_filters( 'remote_data_blocks_bypass_cache', false, $request ) ) {
 			return true;
 		}
@@ -33,7 +35,7 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 		return false;
 	}
 
-	protected function getCacheKey( RequestInterface $request, KeyValueHttpHeader $vary_headers = null ) {
+	protected function getCacheKey( RequestInterface $request, ?KeyValueHttpHeader $vary_headers = null ): string {
 		$cache_key = parent::getCacheKey( $request, $vary_headers );
 
 		if ( $request->getMethod() === 'POST' ) {
@@ -41,13 +43,13 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 			if ( empty( $body ) ) {
 				return $cache_key;
 			}
-			$cache_key .= '-' . md5( $body );
+			$cache_key .= '-' . md5( (string) $body );
 		}
 
 		return $cache_key;
 	}
 
-	public function fetch( RequestInterface $request ) {
+	public function fetch( RequestInterface $request ): CacheEntry|null {
 		if ( $this->should_bypass_cache( $request ) ) {
 			$this->logger->debug( 'Cache Bypass: ' . self::getRequestString( $request ) );
 			return null;
@@ -63,7 +65,7 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 		return $result;
 	}
 
-	public function cache( RequestInterface $request, $response ): bool {
+	public function cache( RequestInterface $request, ResponseInterface $response ): bool {
 		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		$cache_ttl = $this->defaultTtl;
 
