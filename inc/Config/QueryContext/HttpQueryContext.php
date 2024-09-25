@@ -24,17 +24,17 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * Constructor.
 	 *
 	 * @param HttpDatasource $datasource The datasource that this query will use.
-	 * @param array          $input_variables The input variables for this query.
-	 * @param array          $output_variables The output variables for this query.
+	 * @param array          $input_schema The input schema for this query.
+	 * @param array          $output_schema The output schema for this query.
 	 */
 	public function __construct(
 		private HttpDatasource $datasource,
-		public array $input_variables = [],
-		public array $output_variables = []
+		public array $input_schema = [],
+		public array $output_schema = []
 	) {
 		// Provide input and output variables as public properties.
-		$this->input_variables  = $this->define_input_variables();
-		$this->output_variables = $this->define_output_variables();
+		$this->input_schema  = $this->get_input_schema();
+		$this->output_schema = $this->get_output_schema();
 	}
 
 	/**
@@ -57,8 +57,8 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * }
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
 	 */
-	public function define_input_variables(): array {
-		return $this->input_variables;
+	public function get_input_schema(): array {
+		return $this->input_schema;
 	}
 
 	/**
@@ -74,8 +74,8 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * }
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
 	 */
-	public function define_output_variables(): array {
-		return $this->output_variables;
+	public function get_output_schema(): array {
+		return $this->output_schema;
 	}
 
 	/**
@@ -160,6 +160,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * Authoritative truth of whether output is expected to be a collection.
 	 */
 	final public function is_response_data_collection(): bool {
-		return $this->output_variables['is_collection'] ?? false;
+		return $this->output_schema['is_collection'] ?? false;
 	}
 }

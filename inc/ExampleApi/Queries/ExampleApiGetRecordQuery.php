@@ -6,7 +6,7 @@ use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 
 class ExampleApiGetRecordQuery extends HttpQueryContext {
-	public function define_input_variables(): array {
+	public function get_input_schema(): array {
 		return [
 			'record_id' => [
 				'name'      => 'Record ID',
@@ -21,7 +21,7 @@ class ExampleApiGetRecordQuery extends HttpQueryContext {
 		];
 	}
 
-	public function define_output_variables(): array {
+	public function get_output_schema(): array {
 		return [
 			'is_collection' => false,
 			'mappings'      => [

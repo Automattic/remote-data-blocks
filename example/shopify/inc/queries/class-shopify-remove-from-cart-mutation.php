@@ -5,7 +5,7 @@ namespace RemoteDataBlocks\Example\Shopify;
 use RemoteDataBlocks\Config\QueryContext\GraphqlQueryContext;
 
 class ShopifyRemoveFromCartMutation extends GraphqlQueryContext {
-	public function define_input_variables(): array {
+	public function get_input_schema(): array {
 		return [
 			'cart_id' => [
 				'type' => 'id',
@@ -16,7 +16,7 @@ class ShopifyRemoveFromCartMutation extends GraphqlQueryContext {
 		];
 	}
 
-	public function define_output_variables(): array {
+	public function get_output_schema(): array {
 		return [
 			'root_path'     => '$.data.cartLinesAdd.cart.lines.edges[*].node',
 			'is_collection' => true,

@@ -11,9 +11,9 @@ use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
  * @since 0.1.0
  */
 interface QueryContextInterface {
-	public function define_input_variables(): array;
-	public function define_output_variables(): array;
 	public function get_image_url(): string|null;
+	public function get_input_schema(): array;
+	public function get_output_schema(): array;
 	public function get_query_name(): string;
 	public function get_query_runner(): QueryRunnerInterface;
 	public function is_response_data_collection(): bool;

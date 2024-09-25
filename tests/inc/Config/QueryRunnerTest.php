@@ -158,7 +158,7 @@ class QueryRunnerTest extends TestCase {
 
 		$this->http_client->method( 'request' )->willReturn( $response );
 
-		$this->query_context->output_variables = [
+		$this->query_context->output_schema = [
 			'is_collection' => false,
 			'mappings'      => [
 				'test' => [
@@ -204,7 +204,7 @@ class QueryRunnerTest extends TestCase {
 		$this->http_client->method( 'request' )->willReturn( $response );
 
 		$this->query_context->set_response_data( '{"test":"overridden in process_response as JSON string"}' );
-		$this->query_context->output_variables = [
+		$this->query_context->output_schema = [
 			'is_collection' => false,
 			'mappings'      => [
 				'test' => [
@@ -250,7 +250,7 @@ class QueryRunnerTest extends TestCase {
 		$this->http_client->method( 'request' )->willReturn( $response );
 
 		$this->query_context->set_response_data( [ 'test' => 'overridden in process_response as array' ] );
-		$this->query_context->output_variables = [
+		$this->query_context->output_schema = [
 			'is_collection' => false,
 			'mappings'      => [
 				'test' => [
@@ -301,7 +301,7 @@ class QueryRunnerTest extends TestCase {
 		$response_data->test = 'overridden in process_response as object';
 
 		$this->query_context->set_response_data( $response_data );
-		$this->query_context->output_variables = [
+		$this->query_context->output_schema = [
 			'is_collection' => false,
 			'mappings'      => [
 				'test' => [

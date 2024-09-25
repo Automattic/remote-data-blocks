@@ -5,7 +5,7 @@ namespace RemoteDataBlocks\Example\Shopify;
 use RemoteDataBlocks\Config\QueryContext\GraphqlQueryContext;
 
 class ShopifyCreateCartMutation extends GraphqlQueryContext {
-	public function define_output_variables(): array {
+	public function get_output_schema(): array {
 		return [
 			'root_path'     => '$.data.cartCreate.cart',
 			'is_collection' => false,

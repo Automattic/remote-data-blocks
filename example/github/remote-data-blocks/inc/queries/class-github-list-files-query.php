@@ -10,7 +10,7 @@ class GitHubListFilesQuery extends HttpQueryContext {
 		parent::__construct( $datasource );
 	}
 
-	public function define_input_variables(): array {
+	public function get_input_schema(): array {
 		return [
 			'file_extension' => [
 				'name' => 'File Extension',
@@ -19,7 +19,7 @@ class GitHubListFilesQuery extends HttpQueryContext {
 		];
 	}
 
-	public function define_output_variables(): array {
+	public function get_output_schema(): array {
 		return [
 			'root_path'     => sprintf( '$.tree[?(@.path =~ /\\.%s$/)]', ltrim( $this->file_extension, '.' ) ),
 			'is_collection' => true,

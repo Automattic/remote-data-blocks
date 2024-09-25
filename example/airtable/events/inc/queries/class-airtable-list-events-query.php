@@ -5,7 +5,7 @@ namespace RemoteDataBlocks\Example\Airtable\Events;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
 class AirtableListEventsQuery extends HttpQueryContext {
-	public function define_output_variables(): array {
+	public function get_output_schema(): array {
 		return [
 			'root_path'     => '$.records[*]',
 			'is_collection' => true,

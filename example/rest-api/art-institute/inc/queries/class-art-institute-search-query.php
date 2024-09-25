@@ -5,7 +5,7 @@ namespace RemoteDataBlocks\Example\ArtInstituteOfChicago;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
 class ArtInstituteOfChicagoSearchArtQuery extends HttpQueryContext {
-	public function define_input_variables(): array {
+	public function get_input_schema(): array {
 		return [
 			'search_terms' => [
 				'type' => 'string',
@@ -13,7 +13,7 @@ class ArtInstituteOfChicagoSearchArtQuery extends HttpQueryContext {
 		];
 	}
 
-	public function define_output_variables(): array {
+	public function get_output_schema(): array {
 		return [
 			'root_path'     => '$.data[*]',
 			'is_collection' => true,

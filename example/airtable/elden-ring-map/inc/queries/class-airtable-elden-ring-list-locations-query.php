@@ -5,7 +5,7 @@ namespace RemoteDataBlocks\Example\Airtable\EldenRingMap;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
 class AirtableEldenRingListLocationsQuery extends HttpQueryContext {
-	public function define_input_variables(): array {
+	public function get_input_schema(): array {
 		return [
 			'map_name' => [
 				'type' => 'string',
@@ -13,7 +13,7 @@ class AirtableEldenRingListLocationsQuery extends HttpQueryContext {
 		];
 	}
 
-	public function define_output_variables(): array {
+	public function get_output_schema(): array {
 		return [
 			'root_path'     => '$.records[*]',
 			'is_collection' => true,

@@ -5,7 +5,7 @@ namespace RemoteDataBlocks\Integrations\Shopify\Queries;
 use RemoteDataBlocks\Config\QueryContext\GraphqlQueryContext;
 
 class ShopifySearchProductsQuery extends GraphqlQueryContext {
-	public function define_input_variables(): array {
+	public function get_input_schema(): array {
 		return [
 			'search_terms' => [
 				'type' => 'string',
@@ -13,7 +13,7 @@ class ShopifySearchProductsQuery extends GraphqlQueryContext {
 		];
 	}
 
-	public function define_output_variables(): array {
+	public function get_output_schema(): array {
 		return [
 			'root_path'     => '$.data.products.edges[*]',
 			'is_collection' => true,

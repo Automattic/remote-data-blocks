@@ -13,7 +13,7 @@ class ListWesterosHousesQuery extends HttpQueryContext {
 		'Sigil',
 	];
 
-	public function define_output_variables(): array {
+	public function get_output_schema(): array {
 		return [
 			'root_path'     => '$.values[*]',
 			'is_collection' => true,

@@ -5,7 +5,7 @@ namespace RemoteDataBlocks\Example\GitHub;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Integrations\GitHub\GitHubDatasource;
 class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
-	public function define_input_variables(): array {
+	public function get_input_schema(): array {
 		return [
 			'file_path' => [
 				'name' => 'File Path',
@@ -26,7 +26,7 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 		];
 	}
 
-	public function define_output_variables(): array {
+	public function get_output_schema(): array {
 		return [
 			'is_collection' => false,
 			'mappings'      => [

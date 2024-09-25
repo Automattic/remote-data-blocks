@@ -6,7 +6,7 @@ use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 
 class ExampleApiGetTableQuery extends HttpQueryContext {
-	public function define_output_variables(): array {
+	public function get_output_schema(): array {
 		return [
 			'root_path'     => '$.records[*]',
 			'is_collection' => true,

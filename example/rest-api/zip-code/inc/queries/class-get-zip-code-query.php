@@ -5,7 +5,7 @@ namespace RemoteDataBlocks\Example\ZipCode;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
 class GetZipCodeQuery extends HttpQueryContext {
-	public function define_input_variables(): array {
+	public function get_input_schema(): array {
 		return [
 			'zip_code' => [
 				'name' => 'Zip Code',
@@ -14,7 +14,7 @@ class GetZipCodeQuery extends HttpQueryContext {
 		];
 	}
 
-	public function define_output_variables(): array {
+	public function get_output_schema(): array {
 		return [
 			'is_collection' => false,
 			'mappings'      => [

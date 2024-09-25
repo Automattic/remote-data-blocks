@@ -13,7 +13,7 @@ class GetWesterosHousesQuery extends HttpQueryContext {
 		'Sigil',
 	];
 
-	public function define_input_variables(): array {
+	public function get_input_schema(): array {
 		return [
 			'row_id' => [
 				'name'      => 'Row ID',
@@ -28,7 +28,7 @@ class GetWesterosHousesQuery extends HttpQueryContext {
 		];
 	}
 
-	public function define_output_variables(): array {
+	public function get_output_schema(): array {
 		return [
 			'is_collection' => false,
 			'mappings'      => [
