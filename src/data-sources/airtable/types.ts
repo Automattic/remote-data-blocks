@@ -1,4 +1,4 @@
-import { AirtableConfig } from '@/data-sources/types';
+import { StringIdName } from '@/types/common';
 
 export interface AirtableBase {
 	id: string;
@@ -15,7 +15,12 @@ export interface AirtableBaseSchema {
 	tables: AirtableTable[];
 }
 
-export type AirtableFormState = NullableKeys< Omit< AirtableConfig, 'service' | 'uuid' >, 'base' >;
+export type AirtableFormState = {
+	access_token: string;
+	base: StringIdName | null;
+	table: StringIdName | null;
+	slug: string;
+};
 
 export interface AirtableTable {
 	id: string;

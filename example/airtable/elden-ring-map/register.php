@@ -18,7 +18,7 @@ function register_airtable_elden_ring_map_block() {
 		return;
 	}
 
-	$elden_ring_datasource = AirtableDatasource::create( $access_token, 'appqI3sJ9R2NcML8Y', 'Elden Ring Locations' );
+	$elden_ring_datasource = AirtableDatasource::create( $access_token, 'appqI3sJ9R2NcML8Y', [], 'Elden Ring Locations' );
 	$list_locations_query  = new AirtableEldenRingListLocationsQuery( $elden_ring_datasource );
 	$list_maps_query       = new AirtableEldenRingListMapsQuery( $elden_ring_datasource );
 

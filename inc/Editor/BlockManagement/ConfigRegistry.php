@@ -50,7 +50,7 @@ class ConfigRegistry {
 							'slug'     => $slug,
 							'type'     => $input_var['type'] ?? 'string',
 						];
-					}, array_keys( $display_query->input_variables ), array_values( $display_query->input_variables ) ),
+					}, array_keys( $display_query->input_schema ), array_values( $display_query->input_schema ) ),
 					'name'      => 'Manual input',
 					'query_key' => '__DISPLAY__',
 					'type'      => 'input',
@@ -114,7 +114,7 @@ class ConfigRegistry {
 
 		$display_query = $config['queries']['__DISPLAY__'];
 
-		if ( empty( $display_query->input_variables ?? [] ) ) {
+		if ( empty( $display_query->input_schema ?? [] ) ) {
 			self::$logger->error( 'A page is only useful for queries with input variables.' );
 			return;
 		}
@@ -137,19 +137,19 @@ class ConfigRegistry {
 
 		// Add a rewrite rule targeting the provided page slug.
 		$query_var_pattern   = '/([^/]+)';
-		$query_vars          = array_keys( $display_query->input_variables );
+		$query_vars          = array_keys( $display_query->input_schema );
 		$rewrite_rule        = sprintf( '^%s%s/?$', $page_slug, str_repeat( $query_var_pattern, count( $query_vars ) ) );
 		$rewrite_rule_target = sprintf( 'index.php?pagename=%s', $page_slug );
 
 		foreach ( $query_vars as $index => $query_var ) {
 			$rewrite_rule_target .= sprintf( '&%s=$matches[%d]', $query_var, $index + 1 );
 
-			if ( ! isset( $display_query->input_variables[ $query_var ]['overrides'] ) ) {
-				$display_query->input_variables[ $query_var ]['overrides'] = [];
+			if ( ! isset( $display_query->input_schema[ $query_var ]['overrides'] ) ) {
+				$display_query->input_schema[ $query_var ]['overrides'] = [];
 			}
 
 			// Add the URL variable override to the display query.
-			$display_query->input_variables[ $query_var ]['overrides'][] = [
+			$display_query->input_schema[ $query_var ]['overrides'][] = [
 				'target' => $page_slug,
 				'type'   => 'url',
 			];
@@ -169,14 +169,14 @@ class ConfigRegistry {
 
 		// Verify mappings.
 		$to_query = $config['queries']['__DISPLAY__'];
-		foreach ( array_keys( $to_query->input_variables ) as $to ) {
-			if ( ! isset( $query->output_variables['mappings'][ $to ] ) ) {
+		foreach ( array_keys( $to_query->input_schema ) as $to ) {
+			if ( ! isset( $query->output_schema['mappings'][ $to ] ) ) {
 				self::$logger->error( sprintf( 'Cannot map key "%s" from query "%s"', esc_html( $to ), $query_key ) );
 				return;
 			}
 		}
 
-		self::register_query( $block_title, $query, $type );
+		self::register_query( $block_title, $query );
 
 		// Add the selector to the configuration. Fetch config again since it was
 		// updated in register_query.
@@ -218,7 +218,7 @@ class ConfigRegistry {
 	}
 
 	public static function register_search_query( string $block_title, QueryContextInterface $query ): void {
-		if ( ! isset( $query->input_variables['search_terms'] ) ) {
+		if ( ! isset( $query->input_schema['search_terms'] ) ) {
 			self::$logger->error( sprintf( 'A search query must have a "search_terms" input variable: %s', $query::class ) );
 			return;
 		}

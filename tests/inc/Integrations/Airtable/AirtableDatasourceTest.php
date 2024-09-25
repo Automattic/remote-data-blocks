@@ -14,6 +14,7 @@ class AirtableDatasourceTest extends TestCase {
 		$this->datasource = AirtableDatasource::create(
 			'test_access_token',
 			'test_base_id',
+			[],
 			'Test Airtable Base'
 		);
 	}
@@ -33,6 +34,7 @@ class AirtableDatasourceTest extends TestCase {
 				'id'   => 'test_base_id',
 				'name' => 'Test Base Name',
 			],
+			'tables'       => [],
 			'slug'         => 'test-airtable-base',
 		]);
 
@@ -62,6 +64,7 @@ class AirtableDatasourceTest extends TestCase {
 		$datasource = AirtableDatasource::create(
 			'new_access_token',
 			'new_base_id',
+			[],
 			'New Airtable Base'
 		);
 

@@ -101,7 +101,7 @@ class QueryRunner implements QueryRunnerInterface {
 
 		return [
 			'metadata'      => [
-				'age'         => intval( $response->getHeaderLine( 'Age' ) ?? 0 ),
+				'age'         => intval( $response->getHeaderLine( 'Age' ) ),
 				'status_code' => $response_code,
 			],
 			'response_data' => $raw_response_string,
@@ -168,7 +168,7 @@ class QueryRunner implements QueryRunnerInterface {
 		}
 
 		// Determine if the response data is expected to be a collection.
-		$is_collection = $this->query_context->is_response_data_collection( $response_data );
+		$is_collection = $this->query_context->is_response_data_collection();
 
 		// This method always returns an array, even if it's a single item. This
 		// ensures a consistent response shape. The requestor is expected to inspect
@@ -213,22 +213,22 @@ class QueryRunner implements QueryRunnerInterface {
 	 * @return array|null The mapped fields.
 	 */
 	private function map_fields( string|array|object|null $response_data, bool $is_collection ): ?array {
-		$root             = $response_data;
-		$output_variables = $this->query_context->output_variables;
+		$root          = $response_data;
+		$output_schema = $this->query_context->output_schema;
 
-		if ( ! empty( $output_variables['root_path'] ) ) {
+		if ( ! empty( $output_schema['root_path'] ) ) {
 			$json = new JsonObject( $root );
-			$root = $json->get( $output_variables['root_path'] );
+			$root = $json->get( $output_schema['root_path'] );
 		} else {
 			$root = $is_collection ? $root : [ $root ];
 		}
 
-		if ( empty( $root ) || empty( $output_variables['mappings'] ) ) {
+		if ( empty( $root ) || empty( $output_schema['mappings'] ) ) {
 			return $root;
 		}
 
 		// Loop over the returned items in the query result.
-		return array_map( function ( $item ) use ( $output_variables ) {
+		return array_map( function ( $item ) use ( $output_schema ) {
 			$json = new JsonObject( $item );
 
 			// Loop over the output variables and extract the values from the item.
@@ -247,7 +247,7 @@ class QueryRunner implements QueryRunnerInterface {
 				return array_merge( $mapping, [
 					'value' => $field_value_single,
 				] );
-			}, $output_variables['mappings'] );
+			}, $output_schema['mappings'] );
 
 			// Nest result property to reserve additional meta in the future.
 			return [

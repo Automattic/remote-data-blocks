@@ -2,8 +2,6 @@
 
 namespace RemoteDataBlocks\Logging;
 
-use Psr\Log\LoggerInterface;
-
 defined( 'ABSPATH' ) || exit();
 
 class LoggerManager {
@@ -11,7 +9,7 @@ class LoggerManager {
 	 * The logger instance.
 	 *
 	 */
-	private static ?LoggerInterface $instance = null;
+	private static ?Logger $instance = null;
 
 	/**
 	 * The namespace for the logger.
@@ -23,7 +21,7 @@ class LoggerManager {
 	 * Get the logger singleton instance.
 	 *
 	 */
-	public static function instance(): LoggerInterface {
+	public static function instance(): Logger {
 		if ( null === self::$instance ) {
 			self::$instance = Logger::create( self::$log_namespace );
 		}

@@ -40,7 +40,6 @@ class FieldShortcode {
 		foreach ( $matches as $match ) {
 			$original_tag   = $match[0];
 			$query_data     = json_decode( html_entity_decode( $match['query'] ), true /* associative */ );
-			$status         = 'fallback';
 			$fallback_value = $match['fallback_value'] ?? '';
 
 			if ( ! isset( $query_data['remoteData']['blockName'], $query_data['remoteData']['queryInput'], $query_data['selectedField'] ) ) {
