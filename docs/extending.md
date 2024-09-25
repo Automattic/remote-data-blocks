@@ -35,13 +35,13 @@ Example:
 
 ```php
 class YourCustomQuery extends HttpQueryContext {
-    public function define_input_variables(): array {
+    public function get_input_schema(): array {
 		return [
 			// Define your input variables here
 		];
 	}
 
-    public function define_output_variables(): array {
+    public function get_output_schema(): array {
 		return [
 			// Define your output variables here
 		];

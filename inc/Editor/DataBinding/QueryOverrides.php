@@ -21,11 +21,11 @@ class QueryOverrides {
 		foreach ( ConfigStore::get_block_names() as $block_name ) {
 			$config = ConfigStore::get_configuration( $block_name );
 
-			if ( ! isset( $config['queries']['__DISPLAY__']->input_variables ) ) {
+			if ( ! isset( $config['queries']['__DISPLAY__']->input_schema ) ) {
 				continue;
 			}
 
-			foreach ( $config['queries']['__DISPLAY__']->input_variables as $key => $input_var ) {
+			foreach ( $config['queries']['__DISPLAY__']->input_schema as $key => $input_var ) {
 				if ( ! isset( $input_var['overrides'] ) ) {
 					continue;
 				}

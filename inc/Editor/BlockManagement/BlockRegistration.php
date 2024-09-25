@@ -38,13 +38,13 @@ class BlockRegistration {
 			$block_path = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-container';
 			$config     = ConfigStore::get_configuration( $block_name );
 
-			$overrides = array_filter( $config['queries']['__DISPLAY__']->input_variables, function ( $input_var ) {
+			$overrides = array_filter( $config['queries']['__DISPLAY__']->input_schema, function ( $input_var ) {
 				return isset( $input_var['overrides'] );
 			} );
 
 			// Set available bindings from the display query output mappings.
 			$available_bindings = [];
-			foreach ( $config['queries']['__DISPLAY__']->output_variables['mappings'] ?? [] as $key => $mapping ) {
+			foreach ( $config['queries']['__DISPLAY__']->output_schema['mappings'] ?? [] as $key => $mapping ) {
 				$available_bindings[ $key ] = [
 					'name' => $mapping['name'],
 					'type' => $mapping['type'],

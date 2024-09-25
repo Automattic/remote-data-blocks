@@ -90,7 +90,7 @@ class BlockPatterns {
 			'paragraphs' => [],
 		];
 
-		foreach ( $display_query->output_variables['mappings'] as $field => $var ) {
+		foreach ( $display_query->output_schema['mappings'] as $field => $var ) {
 			$name = isset( $var['name'] ) ? $var['name'] : $field;
 
 			switch ( $var['type'] ) {

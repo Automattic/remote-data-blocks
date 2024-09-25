@@ -46,7 +46,7 @@ class QueryContextTest extends TestCase {
 	public function testIsResponseDataCollection() {
 		$this->assertFalse( $this->query_context->is_response_data_collection() );
 
-		$this->query_context->output_variables['is_collection'] = true;
+		$this->query_context->output_schema['is_collection'] = true;
 		$this->assertTrue( $this->query_context->is_response_data_collection() );
 	}
 
