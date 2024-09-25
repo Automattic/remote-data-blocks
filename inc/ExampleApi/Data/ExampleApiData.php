@@ -13,7 +13,6 @@ class ExampleApiData {
 	/**
 	 * Load the example data from a static file. The data is a collection of
 	 * records from an Airtable table.
-	 *
 	 */
 	public static function get_items(): array|WP_Error {
 		if ( is_wp_error( self::$api_data ) ) {
@@ -36,8 +35,7 @@ class ExampleApiData {
 	/**
 	 * Extract a single record from the example table data.
 	 *
-	 * @param string $record_id The ID of the record to extract.
-	 * @return array|WP_Error
+	 * @param string $item_id The ID of the record to extract.
 	 */
 	public static function get_item( string $item_id ): array|null|WP_Error {
 		$items = self::get_items();

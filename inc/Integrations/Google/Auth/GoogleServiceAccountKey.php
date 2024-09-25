@@ -4,6 +4,9 @@ namespace RemoteDataBlocks\Integrations\Google\Auth;
 
 use WP_Error;
 
+/**
+ * @psalm-suppress PossiblyUnusedProperty
+ */
 class GoogleServiceAccountKey {
 	public string $type;
 	public string $project_id;

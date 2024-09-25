@@ -96,7 +96,7 @@ class BlockBindings {
 			$rendered_content = call_user_func( $block_type_args['render_callback'], $attributes, $content, $synced_pattern_block );
 
 			// Remove the temporary filter.
-			remove_filter( 'render_block_context', $filter_block_context, 10, 1 );
+			remove_filter( 'render_block_context', $filter_block_context, 10 );
 
 			return $rendered_content;
 		};
@@ -149,7 +149,7 @@ class BlockBindings {
 			$block_name
 		);
 
-		return array_merge( $query_input, $query_input_overrides );
+		return array_merge( $query_input, $overrides );
 	}
 
 	public static function execute_query( array $block_context, string $operation_name ): array|null {
