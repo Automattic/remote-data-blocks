@@ -29,6 +29,19 @@ class AirtableDatasource extends HttpDatasource {
 					],
 				],
 			],
+			'tables'                 => [
+				'type' => 'array',
+				'items' => [
+					'type' => 'object',
+					'properties' => [
+						'id'   => [ 'type' => 'string' ],
+						'name' => [
+							'type'     => 'string',
+							'required' => false,
+						],
+					],
+				],
+			],
 			'display_name'           => [
 				'type'     => 'string',
 				'required' => false,
@@ -51,13 +64,14 @@ class AirtableDatasource extends HttpDatasource {
 		];
 	}
 
-	public static function create( string $access_token, string $base_id, string $display_name ): self {
+	public static function create( string $access_token, string $base_id, ?array $tables = [], ?string $display_name = null ): self {
 		return parent::from_array([
 			'service'      => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'access_token' => $access_token,
 			'base'         => [ 'id' => $base_id ],
+			'tables'       => $tables,
 			'display_name' => $display_name,
-			'slug'         => sanitize_title( $display_name ),
+			'slug'         => $display_name ? sanitize_title( $display_name ) : sanitize_title( "Airtable " . $base_id ),
 		]);
 	}
 
