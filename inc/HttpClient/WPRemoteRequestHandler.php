@@ -3,7 +3,7 @@
 namespace RemoteDataBlocks\HttpClient;
 
 use Exception;
-use GuzzleHttp\Promise\Create;
+use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\RejectedPromise;
 use GuzzleHttp\Psr7\Response;
@@ -31,7 +31,7 @@ class WPRemoteRequestHandler {
 			// Convert Guzzle request to arguments for wp_remote_request.
 			$url  = (string) $request->getUri();
 			$args = [
-				'body'        => $request->getBody()->getContents(),
+				'body'        => (string) $request->getBody(), // Stream has been read, let __toString() rewind and read it.
 				'headers'     => [],
 				'httpversion' => $options['httpversion'] ?? self::DEFAULT_HTTP_VERSION,
 				'method'      => $request->getMethod(),
@@ -62,11 +62,12 @@ class WPRemoteRequestHandler {
 			}
 
 			// Create a Guzzle-compatible promise response.
-			return Create::promiseFor(
+			return new FulfilledPromise(
 				new Response(
 					$response_code,
 					$response_headers,
-					$response_body
+					$response_body,
+					$args['httpversion'],
 				)
 			);
 		} catch ( Exception $e ) {
