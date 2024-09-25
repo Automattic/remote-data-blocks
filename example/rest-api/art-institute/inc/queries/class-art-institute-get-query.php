@@ -1,23 +1,20 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Example\ArtInstituteOfChicago;
 
-use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
 class ArtInstituteOfChicagoGetArtQuery extends HttpQueryContext {
-	public array $input_variables = [
-		'id' => [
-			'type' => 'id',
-		],
-	];
+	public function get_input_schema(): array {
+		return [
+			'id' => [
+				'type' => 'id',
+			],
+		];
+	}
 
-	public function __construct( HttpDatasource $datasource ) {
-		parent::__construct( $datasource );
-
-		// Defining the output variables in the constructor allows us to provide
-		// a generate function instead of a JSONPath selector.
-		$this->output_variables = [
+	public function get_output_schema(): array {
+		return [
 			'is_collection' => false,
 			'mappings'      => [
 				'id'        => [

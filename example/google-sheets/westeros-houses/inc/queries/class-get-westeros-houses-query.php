@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Example\GoogleSheets\WesterosHouses;
 
@@ -13,54 +13,58 @@ class GetWesterosHousesQuery extends HttpQueryContext {
 		'Sigil',
 	];
 
-	public array $input_variables = [
-		'row_id' => [
-			'name'      => 'Row ID',
-			'overrides' => [
-				[
-					'target' => 'utm_content',
-					'type'   => 'query_var',
+	public function get_input_schema(): array {
+		return [
+			'row_id' => [
+				'name'      => 'Row ID',
+				'overrides' => [
+					[
+						'target' => 'utm_content',
+						'type'   => 'query_var',
+					],
+				],
+				'type'      => 'id',
+			],
+		];
+	}
+
+	public function get_output_schema(): array {
+		return [
+			'is_collection' => false,
+			'mappings'      => [
+				'row_id'    => [
+					'name' => 'Row ID',
+					'path' => '$.RowId',
+					'type' => 'id',
+				],
+				'house'     => [
+					'name' => 'House',
+					'path' => '$.House',
+					'type' => 'string',
+				],
+				'seat'      => [
+					'name' => 'Seat',
+					'path' => '$.Seat',
+					'type' => 'string',
+				],
+				'region'    => [
+					'name' => 'Region',
+					'path' => '$.Region',
+					'type' => 'string',
+				],
+				'words'     => [
+					'name' => 'Words',
+					'path' => '$.Words',
+					'type' => 'string',
+				],
+				'image_url' => [
+					'name' => 'Sigil',
+					'path' => '$.Sigil',
+					'type' => 'image_url',
 				],
 			],
-			'type'      => 'id',
-		],
-	];
-
-	public array $output_variables = [
-		'is_collection' => false,
-		'mappings'      => [
-			'row_id'    => [
-				'name' => 'Row ID',
-				'path' => '$.RowId',
-				'type' => 'id',
-			],
-			'house'     => [
-				'name' => 'House',
-				'path' => '$.House',
-				'type' => 'string',
-			],
-			'seat'      => [
-				'name' => 'Seat',
-				'path' => '$.Seat',
-				'type' => 'string',
-			],
-			'region'    => [
-				'name' => 'Region',
-				'path' => '$.Region',
-				'type' => 'string',
-			],
-			'words'     => [
-				'name' => 'Words',
-				'path' => '$.Words',
-				'type' => 'string',
-			],
-			'image_url' => [
-				'name' => 'Sigil',
-				'path' => '$.Sigil',
-				'type' => 'image_url',
-			],
-		],
-	];
+		];
+	}
 
 	public function get_endpoint( array $input_variables ): string {
 		return $this->get_datasource()->get_endpoint() . '/values/Houses';

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Tests\Config;
 
@@ -14,10 +14,9 @@ use RemoteDataBlocks\Tests\Mocks\MockValidator;
 use WP_Error;
 
 class QueryRunnerTest extends TestCase {
-
-	private $http_datasource;
-	private $query_context;
-	private $http_client;
+	private MockDatasource $http_datasource;
+	private HttpQueryContext $query_context;
+	private HttpClient $http_client;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -26,15 +25,12 @@ class QueryRunnerTest extends TestCase {
 		$this->http_datasource = MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator() );
 
 		$this->query_context = new class($this->http_datasource, $this->http_client) extends HttpQueryContext {
-			private $http_datasource;
-			private $http_client;
-			private $request_method = 'GET';
-			private $request_body   = [ 'query' => 'test' ];
-			private $response_data  = null;
+			private string $request_method = 'GET';
+			private array $request_body    = [ 'query' => 'test' ];
+			private mixed $response_data   = null;
 
-			public function __construct( HttpDatasource $http_datasource, HttpClient $http_client ) {
-				$this->http_datasource = $http_datasource;
-				$this->http_client     = $http_client;
+			public function __construct( private HttpDatasource $http_datasource, private HttpClient $http_client ) {
+				parent::__construct( $http_datasource );
 			}
 
 			public function get_endpoint( array $input_variables = [] ): string {
@@ -47,10 +43,6 @@ class QueryRunnerTest extends TestCase {
 
 			public function get_request_method(): string {
 				return $this->request_method;
-			}
-
-			public function get_request_headers( array $input_variables = [] ): array {
-				return $this->http_datasource->get_request_headers();
 			}
 
 			public function get_request_body( array $input_variables ): array|null {
@@ -84,8 +76,6 @@ class QueryRunnerTest extends TestCase {
 			public function set_response_data( string|array|object|null $data ): void {
 				$this->response_data = $data;
 			}
-
-			public array $output_variables = [];
 		};
 	}
 
@@ -168,7 +158,7 @@ class QueryRunnerTest extends TestCase {
 
 		$this->http_client->method( 'request' )->willReturn( $response );
 
-		$this->query_context->output_variables = [
+		$this->query_context->output_schema = [
 			'is_collection' => false,
 			'mappings'      => [
 				'test' => [
@@ -214,7 +204,7 @@ class QueryRunnerTest extends TestCase {
 		$this->http_client->method( 'request' )->willReturn( $response );
 
 		$this->query_context->set_response_data( '{"test":"overridden in process_response as JSON string"}' );
-		$this->query_context->output_variables = [
+		$this->query_context->output_schema = [
 			'is_collection' => false,
 			'mappings'      => [
 				'test' => [
@@ -260,7 +250,7 @@ class QueryRunnerTest extends TestCase {
 		$this->http_client->method( 'request' )->willReturn( $response );
 
 		$this->query_context->set_response_data( [ 'test' => 'overridden in process_response as array' ] );
-		$this->query_context->output_variables = [
+		$this->query_context->output_schema = [
 			'is_collection' => false,
 			'mappings'      => [
 				'test' => [
@@ -311,7 +301,7 @@ class QueryRunnerTest extends TestCase {
 		$response_data->test = 'overridden in process_response as object';
 
 		$this->query_context->set_response_data( $response_data );
-		$this->query_context->output_variables = [
+		$this->query_context->output_schema = [
 			'is_collection' => false,
 			'mappings'      => [
 				'test' => [

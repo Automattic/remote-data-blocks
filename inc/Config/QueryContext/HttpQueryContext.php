@@ -1,11 +1,4 @@
-<?php
-
-/**
- * HttpQueryContext class
- *
- * @package remote-data-blocks
- * @since 0.1.0
- */
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Config\QueryContext;
 
@@ -16,17 +9,40 @@ use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 defined( 'ABSPATH' ) || exit();
 
 /**
+ * HttpQueryContext class
+ *
  * Base class used to define a Remote Data Blocks Query. This class defines a
  * composable query that allows it to be composed with another query or a block.
+ * 
+ * @package remote-data-blocks
+ * @since 0.1.0
  */
 class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterface {
 	const VERSION = '0.1.0';
 
 	/**
-	 * A definition of input fields accepted by this query. These values of these
-	 * input fields will be passed to the `get_request_body` method.
+	 * Constructor.
 	 *
-	 * @var array {
+	 * @param HttpDatasource $datasource The datasource that this query will use.
+	 * @param array          $input_schema The input schema for this query.
+	 * @param array          $output_schema The output schema for this query.
+	 */
+	public function __construct(
+		private HttpDatasource $datasource,
+		public array $input_schema = [],
+		public array $output_schema = []
+	) {
+		// Provide input and output variables as public properties.
+		$this->input_schema  = $this->get_input_schema();
+		$this->output_schema = $this->get_output_schema();
+	}
+
+	/**
+	 * Override this method to define the input fields accepted by this query. The
+	 * return value of this function will be passed to several methods in this
+	 * class (e.g., `get_endpoint`, `get_request_body`).
+	 *
+	 * @return array {
 	 *   @type array $var_name {
 	 *     @type string $default_value Optional default value of the variable.
 	 *     @type string $name          Display name of the variable.
@@ -39,13 +55,16 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 *     @type string $type         The variable type (string, number, boolean)
 	 *   }
 	 * }
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
 	 */
-	public array $input_variables = [];
+	public function get_input_schema(): array {
+		return $this->input_schema;
+	}
 
 	/**
-	 * A definition of output fields produced by this query.
+	 * Override this method to define output fields produced by this query.
 	 *
-	 * @var array {
+	 * @return array {
 	 *   @type array $var_name {
 	 *     @type string $default_value Optional default value of the variable.
 	 *     @type string $name          Display name of the variable.
@@ -53,15 +72,10 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 *     @type string $type          The variable type (string, number, boolean)
 	 *   }
 	 * }
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
 	 */
-	public array $output_variables = [];
-
-	/**
-	 * Constructor.
-	 *
-	 * @param HttpDatasource $datasource The datasource that this query will use.
-	 */
-	public function __construct( private HttpDatasource $datasource ) {
+	public function get_output_schema(): array {
+		return $this->output_schema;
 	}
 
 	/**
@@ -73,8 +87,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 
 	/**
 	 * Override this method to specify a custom endpoint for this query.
-	 *
-	 * @return string
 	 */
 	public function get_endpoint( array $input_variables ): string {
 		return $this->get_datasource()->get_endpoint();
@@ -99,7 +111,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * Override this method to specify custom request headers for this query.
 	 *
 	 * @param array $input_variables The input variables for this query.
-	 * @return array
 	 */
 	public function get_request_headers( array $input_variables ): array {
 		return $this->get_datasource()->get_request_headers();
@@ -158,7 +169,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 *
 	 * @param string $raw_response_data The raw response data.
 	 * @param array  $input_variables   The input variables for this query.
-	 * @return string|array|object|null
 	 */
 	public function process_response( string $raw_response_data, array $input_variables ): string|array|object|null {
 		return $raw_response_data;
@@ -166,10 +176,8 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 
 	/**
 	 * Authoritative truth of whether output is expected to be a collection.
-	 *
-	 * @return bool
 	 */
 	final public function is_response_data_collection(): bool {
-		return $this->output_variables['is_collection'] ?? false;
+		return $this->output_schema['is_collection'] ?? false;
 	}
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Tests\Editor\BlockManagement;
 
@@ -69,8 +69,11 @@ class FunctionsTest extends TestCase {
 		$query_context = new HttpQueryContext( $this->mock_datasource );
 		register_remote_data_block( 'List Block', $query_context );
 
-		$list_query                               = new HttpQueryContext( $this->mock_datasource );
-		$list_query->output_variables['mappings'] = [ 'test' => 'test' ];
+		$list_query = new HttpQueryContext(
+			$this->mock_datasource,
+			[],
+			[ 'mappings' => [ 'test' => 'test' ] ]
+		);
 		register_remote_data_list_query( 'List Block', $list_query );
 
 		$block_name = 'remote-data-blocks/list-block';
@@ -82,9 +85,11 @@ class FunctionsTest extends TestCase {
 		$query_context = new HttpQueryContext( $this->mock_datasource );
 		register_remote_data_block( 'Search Block', $query_context );
 
-		$search_query                                  = new HttpQueryContext( $this->mock_datasource );
-		$search_query->input_variables['search_terms'] = [ 'type' => 'string' ];
-		$search_query->output_variables['mappings']    = [ 'test' => 'test' ];
+		$search_query = new HttpQueryContext(
+			$this->mock_datasource,
+			[ 'search_terms' => [ 'type' => 'string' ] ],
+			[ 'mappings' => [ 'test' => 'test' ] ]
+		);
 		register_remote_data_search_query( 'Search Block', $search_query );
 
 		$block_name = 'remote-data-blocks/search-block';

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\ExampleApi\Data;
 
@@ -14,7 +14,6 @@ class ExampleApiData {
 	 * Load the example data from a static file. The data is a collection of
 	 * records from an Airtable table.
 	 *
-	 * @return array|WP_Error
 	 */
 	public static function get_items(): array|WP_Error {
 		if ( is_wp_error( self::$api_data ) ) {

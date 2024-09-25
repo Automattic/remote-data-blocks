@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\REST;
 
@@ -11,18 +11,18 @@ use WP_REST_Request;
 use function wp_generate_uuid4;
 
 class RemoteDataController {
-	private static $slug = 'remote-data';
+	private static string $slug = 'remote-data';
 
-	public static function init() {
+	public static function init(): void {
 		add_action( 'rest_api_init', [ __CLASS__, 'register_rest_routes' ] );
 	}
 
-	public static function get_url() {
+	public static function get_url(): string {
 		$url = rest_url( sprintf( '/%s/%s', REMOTE_DATA_BLOCKS__REST_NAMESPACE, self::$slug ) );
 		return add_query_arg( [ '_envelope' => 'true' ], $url );
 	}
 
-	public static function register_rest_routes() {
+	public static function register_rest_routes(): void {
 		register_rest_route( REMOTE_DATA_BLOCKS__REST_NAMESPACE, '/' . self::$slug, [
 			'methods'             => 'POST',
 			'callback'            => [ __CLASS__, 'execute_query' ],
@@ -63,7 +63,7 @@ class RemoteDataController {
 
 		// The frontend might send more input variables than the query needs or
 		// expects, so only include those defined by the query.
-		$query_input = array_intersect_key( $query_input, $query->input_variables );
+		$query_input = array_intersect_key( $query_input, $query->input_schema );
 
 		$query_runner = $query->get_query_runner();
 		$query_result = $query_runner->execute( $query_input );
@@ -85,7 +85,7 @@ class RemoteDataController {
 		);
 	}
 
-	public static function permission_callback() {
+	public static function permission_callback(): bool {
 		return true;
 	}
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Editor\BlockPatterns;
 
@@ -11,14 +11,18 @@ use function register_block_pattern;
 use function wp_json_encode;
 
 class BlockPatterns {
-	private static $templates = [];
+	/**
+	 * @var array<string, string>
+	 */
+	private static array $templates = [];
 
-	private static function load_templates() {
+	private static function load_templates(): void {
 		if ( ! empty( self::$templates ) ) {
 			return;
 		}
 
 		self::$templates['columns']   = file_get_contents( __DIR__ . '/templates/columns.html', false );
+		self::$templates['empty']     = file_get_contents( __DIR__ . '/templates/empty.html', false );
 		self::$templates['heading']   = file_get_contents( __DIR__ . '/templates/heading.html', false );
 		self::$templates['image']     = file_get_contents( __DIR__ . '/templates/image.html', false );
 		self::$templates['paragraph'] = file_get_contents( __DIR__ . '/templates/paragraph.html', false );
@@ -59,12 +63,16 @@ class BlockPatterns {
 		return sprintf( self::$templates[ $template_name ], wp_json_encode( $attributes ) );
 	}
 
-	public static function register_default_block_pattern( string $block_name, string $block_title, QueryContextInterface $display_query ): void {
-		// If there are no mappings, we can't generate a pattern.
-		if ( empty( $display_query->output_variables['mappings'] ) ) {
-			return;
-		}
-
+	/**
+	 * Register a default block pattern for a remote data block that can be used
+	 * even when no other patterns are available (e.g., in the item list view).
+	 *
+	 * @param string                 $block_name     The block name.
+	 * @param string                 $block_title    The block title.
+	 * @param QueryContextInterface  $display_query  The display query.
+	 * @return string The registered pattern name.
+	 */
+	public static function register_default_block_pattern( string $block_name, string $block_title, QueryContextInterface $display_query ): string {
 		self::load_templates();
 
 		// Loop through output variables and generate a pattern. Each text field will
@@ -82,7 +90,7 @@ class BlockPatterns {
 			'paragraphs' => [],
 		];
 
-		foreach ( $display_query->output_variables['mappings'] as $field => $var ) {
+		foreach ( $display_query->output_schema['mappings'] as $field => $var ) {
 			$name = isset( $var['name'] ) ? $var['name'] : $field;
 
 			switch ( $var['type'] ) {
@@ -139,8 +147,16 @@ class BlockPatterns {
 			$content        = sprintf( self::$templates['columns'], $image_content, $content );
 		}
 
+		// If the pattern content is still empty (probably because there are no
+		// output variables), register a pattern that explains why it is empty.
+		if ( empty( $content ) ) {
+			$content = self::populate_template( 'empty', [] );
+		}
+
+		$pattern_name = sprintf( '%s/pattern', $block_name );
+
 		register_block_pattern(
-			sprintf( '%s/pattern', $block_name ),
+			$pattern_name,
 			[
 				'title'      => sprintf( '%s Data', $block_title ),
 				'blockTypes' => [ $block_name ],
@@ -150,6 +166,8 @@ class BlockPatterns {
 				'source'     => 'plugin',
 			]
 		);
+
+		return $pattern_name;
 	}
 
 	/**

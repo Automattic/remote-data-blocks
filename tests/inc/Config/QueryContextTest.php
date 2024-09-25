@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Tests\Config;
 
@@ -8,9 +8,8 @@ use RemoteDataBlocks\Tests\Mocks\MockDatasource;
 use RemoteDataBlocks\Tests\Mocks\MockValidator;
 
 class QueryContextTest extends TestCase {
-
-	private $datasource;
-	private $query_context;
+	private MockDatasource $datasource;
+	private HttpQueryContext $query_context;
 
 	protected function setUp(): void {
 		$this->datasource    = MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator() );
@@ -47,7 +46,7 @@ class QueryContextTest extends TestCase {
 	public function testIsResponseDataCollection() {
 		$this->assertFalse( $this->query_context->is_response_data_collection() );
 
-		$this->query_context->output_variables['is_collection'] = true;
+		$this->query_context->output_schema['is_collection'] = true;
 		$this->assertTrue( $this->query_context->is_response_data_collection() );
 	}
 

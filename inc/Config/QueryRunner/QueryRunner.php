@@ -1,11 +1,4 @@
-<?php
-
-/**
- * QueryRunner class
- *
- * @package remote-data-blocks
- * @since 0.1.0
- */
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Config\QueryRunner;
 
@@ -14,13 +7,17 @@ use GuzzleHttp\RequestOptions;
 use JsonPath\JsonObject;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\HttpClient\HttpClient;
-use RemoteDataBlocks\Logging\LoggerManager;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit();
 
 /**
- * Class that executes a query using HttpQueryContext.
+ * QueryRunner class
+ *
+ * Class that executes queries, leveraging provided QueryContext.
+ *
+ * @package remote-data-blocks
+ * @since 0.1.0
  */
 class QueryRunner implements QueryRunnerInterface {
 
@@ -203,13 +200,13 @@ class QueryRunner implements QueryRunnerInterface {
 				return $field_value_single;
 
 			case 'price':
-				return sprintf( '$%s', number_format( $field_value_single, 2 ) );
+				return sprintf( '$%s', number_format( (float) $field_value_single, 2 ) );
 
 			case 'string':
 				return wp_strip_all_tags( $field_value_single );
 		}
 
-		return $field_value_single;
+		return (string) $field_value_single;
 	}
 
 	/**
@@ -221,22 +218,22 @@ class QueryRunner implements QueryRunnerInterface {
 	 * @return array|null The mapped fields.
 	 */
 	private function map_fields( string|array|object|null $response_data, bool $is_collection ): ?array {
-		$root             = $response_data;
-		$output_variables = $this->query_context->output_variables;
+		$root          = $response_data;
+		$output_schema = $this->query_context->output_schema;
 
-		if ( ! empty( $output_variables['root_path'] ) ) {
+		if ( ! empty( $output_schema['root_path'] ) ) {
 			$json = new JsonObject( $root );
-			$root = $json->get( $output_variables['root_path'] );
+			$root = $json->get( $output_schema['root_path'] );
 		} else {
 			$root = $is_collection ? $root : [ $root ];
 		}
 
-		if ( empty( $root ) || empty( $output_variables['mappings'] ) ) {
+		if ( empty( $root ) || empty( $output_schema['mappings'] ) ) {
 			return $root;
 		}
 
 		// Loop over the returned items in the query result.
-		return array_map( function ( $item ) use ( $output_variables ) {
+		return array_map( function ( $item ) use ( $output_schema ) {
 			$json = new JsonObject( $item );
 
 			// Loop over the output variables and extract the values from the item.
@@ -255,7 +252,7 @@ class QueryRunner implements QueryRunnerInterface {
 				return array_merge( $mapping, [
 					'value' => $field_value_single,
 				] );
-			}, $output_variables['mappings'] );
+			}, $output_schema['mappings'] );
 
 			// Nest result property to reserve additional meta in the future.
 			return [

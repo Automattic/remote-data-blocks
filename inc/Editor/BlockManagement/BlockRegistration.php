@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Editor\BlockManagement;
 
@@ -7,11 +7,13 @@ defined( 'ABSPATH' ) || exit();
 use RemoteDataBlocks\Editor\BlockPatterns\BlockPatterns;
 use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 use RemoteDataBlocks\REST\RemoteDataController;
-use function register_block_pattern;
 use function register_block_type;
 
 class BlockRegistration {
-	public static $block_category = [
+	/**
+	 * @var array<string, string>
+	 */
+	public static array $block_category = [
 		'icon'  => null,
 		'slug'  => 'remote-data-blocks',
 		'title' => 'Remote Data Blocks',
@@ -28,7 +30,7 @@ class BlockRegistration {
 		return $block_categories;
 	}
 
-	public static function register_blocks() {
+	public static function register_blocks(): void {
 		$remote_data_blocks_config = [];
 		$scripts_to_localize       = [];
 
@@ -36,24 +38,26 @@ class BlockRegistration {
 			$block_path = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-container';
 			$config     = ConfigStore::get_configuration( $block_name );
 
-			$overrides = array_filter( $config['queries']['__DISPLAY__']->input_variables, function ( $input_var ) {
+			$overrides = array_filter( $config['queries']['__DISPLAY__']->input_schema, function ( $input_var ) {
 				return isset( $input_var['overrides'] );
 			} );
 
 			// Set available bindings from the display query output mappings.
 			$available_bindings = [];
-			foreach ( $config['queries']['__DISPLAY__']->output_variables['mappings'] ?? [] as $key => $mapping ) {
+			foreach ( $config['queries']['__DISPLAY__']->output_schema['mappings'] ?? [] as $key => $mapping ) {
 				$available_bindings[ $key ] = [
 					'name' => $mapping['name'],
 					'type' => $mapping['type'],
 				];
 			}
 
+			// Create the localized data that will be used by our block editor script.
 			$remote_data_blocks_config[ $block_name ] = [
 				'availableBindings' => $available_bindings,
 				'loop'              => $config['loop'],
 				'name'              => $block_name,
 				'overrides'         => $overrides,
+				'patterns'          => $config['patterns'],
 				'selectors'         => $config['selectors'],
 				'settings'          => [
 					'category' => self::$block_category['slug'],
@@ -77,7 +81,8 @@ class BlockRegistration {
 			$scripts_to_localize[] = $block_type->editor_script_handles[0];
 
 			// Register a default pattern that simply displays the available data.
-			BlockPatterns::register_default_block_pattern( $block_name, $config['title'], $config['queries']['__DISPLAY__'] );
+			$default_pattern_name = BlockPatterns::register_default_block_pattern( $block_name, $config['title'], $config['queries']['__DISPLAY__'] );
+			$remote_data_blocks_config[ $block_name ]['patterns']['default'] = $default_pattern_name;
 		}
 
 		foreach ( array_unique( $scripts_to_localize ) as $script_handle ) {

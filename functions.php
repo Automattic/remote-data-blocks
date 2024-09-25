@@ -1,6 +1,10 @@
-<?php
+<?php declare(strict_types = 1);
+
 /**
- * Access functions for class methods in the global namespace.
+ * Remote Data Blocks API
+ *
+ * This file contains functions, in the global namespace, for registering and
+ * interacting with Remote Data Blocks.
  *
  * @package remote-data-blocks
  */
@@ -55,12 +59,12 @@ function register_remote_data_search_query( string $block_name, QueryContextInte
  * Register a block pattern that can used with a remote data block.
  *
  * @param string $block_name       The block name.
- * @param string $pattern_name     The pattern name.
+ * @param string $pattern_title    The pattern title.
  * @param string $pattern_html     The pattern HTML.
  * @param array  $pattern_options  The pattern options.
  */
-function register_remote_data_block_pattern( string $block_name, string $pattern_name, string $pattern_html, array $pattern_options = [] ): void {
-	ConfigRegistry::register_block_pattern( $block_name, $pattern_name, $pattern_html, $pattern_options );
+function register_remote_data_block_pattern( string $block_name, string $pattern_title, string $pattern_html, array $pattern_options = [] ): void {
+	ConfigRegistry::register_block_pattern( $block_name, $pattern_title, $pattern_html, $pattern_options );
 }
 
 /**

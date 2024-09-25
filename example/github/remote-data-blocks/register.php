@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace RemoteDataBlocks\Example\GitHub;
 
@@ -24,11 +24,12 @@ function register_github_file_as_html_block() {
 
 	$block_pattern1 = file_get_contents( __DIR__ . '/inc/patterns/file-picker.html' );
 	$block_pattern2 = file_get_contents( __DIR__ . '/inc/patterns/file-render.html' );
-	register_remote_data_block_pattern( $block_name, 'remote-data-blocks/github-file-picker', $block_pattern1, [
-		'title'    => 'GitHub File Picker',
-		'inserter' => false,
+	register_remote_data_block_pattern( $block_name, 'GitHub File Picker', $block_pattern1, [
+		'properties' => [
+			'inserter' => false,
+		],
 	] );
-	register_remote_data_block_pattern( $block_name, 'remote-data-blocks/github-file-render', $block_pattern2, [ 'title' => 'GitHub File Render' ] );
+	register_remote_data_block_pattern( $block_name, 'GitHub File Render', $block_pattern2 );
 
 	$logger = LoggerManager::instance();
 	$logger->info( sprintf( 'Registered %s block (branch: %s)', $block_name, $branch ) );
