@@ -31,7 +31,7 @@ class WPRemoteRequestHandler {
 			// Convert Guzzle request to arguments for wp_remote_request.
 			$url  = (string) $request->getUri();
 			$args = [
-				'body'        => $request->getBody()->getContents(),
+				'body'        => (string) $request->getBody(), // Stream has been read, let __toString() rewind and read it.
 				'headers'     => [],
 				'httpversion' => $options['httpversion'] ?? self::DEFAULT_HTTP_VERSION,
 				'method'      => $request->getMethod(),
