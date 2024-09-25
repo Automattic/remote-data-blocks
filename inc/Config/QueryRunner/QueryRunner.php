@@ -27,65 +27,104 @@ class QueryRunner implements QueryRunnerInterface {
 	) {
 	}
 
-	protected function get_raw_response_data( array $input_variables ): array|WP_Error {
-		$headers = $this->query_context->get_request_headers( $input_variables );
-		$method  = $this->query_context->get_request_method();
-
-		$body = $this->query_context->get_request_body( $input_variables );
-
+	/**
+	 * Get the HTTP request details for the query
+	 *
+	 * @param array<string, mixed> $input_variables The input variables for the current request.
+	 * @return WP_Error|array{
+	 *   method: string,
+	 *   options: array<string, mixed>,
+	 *   origin: string,
+	 *   uri: string,
+	 * } The request details.
+	 */
+	protected function get_request_details( array $input_variables ): array|WP_Error {
+		$headers  = $this->query_context->get_request_headers( $input_variables );
+		$method   = $this->query_context->get_request_method();
+		$body     = $this->query_context->get_request_body( $input_variables );
 		$endpoint = $this->query_context->get_endpoint( $input_variables );
 
 		$parsed_url = wp_parse_url( $endpoint );
 
 		if ( false === $parsed_url ) {
-			return new WP_Error( 'Invalid endpoint URL parse' );
+			return new WP_Error( 'Unable to parse endpoint URL' );
 		}
 
-		// Avoid PHP Warnings by setting expected keys to empty values.
-		$parsed = array_merge( [
-			'scheme'   => '',
-			'host'     => '',
-			'user'     => '',
-			'pass'     => '',
-			'port'     => '',
-			'path'     => '',
-			'query'    => '',
-			'fragment' => '',
-		], $parsed_url );
+		/**
+		 * Filters the allowed URL schemes for this request.
+		 *
+		 * @param array<string>    $allowed_url_schemes The allowed URL schemes.
+		 * @param HttpQueryContext $query_context       The current query context.
+		 * @return array<string> The filtered allowed URL schemes.
+		 */
+		$allowed_url_schemes = apply_filters( 'remote_data_blocks_allowed_url_schemes', [ 'https' ], $this->query_context );
 
-		if ( 'https' !== $parsed['scheme'] ) {
+		if ( empty( $parsed_url['scheme'] ?? '' ) || ! in_array( $parsed_url['scheme'], $allowed_url_schemes, true ) ) {
 			return new WP_Error( 'Invalid endpoint URL scheme' );
 		}
-		$scheme = $parsed['scheme'];
 
-		if ( empty( $parsed['host'] ) ) {
+		if ( empty( $parsed_url['host'] ?? '' ) ) {
 			return new WP_Error( 'Invalid endpoint URL host' );
 		}
-		$host = $parsed['host'];
 
-		$user     = $parsed['user'] ?? '';
-		$pass     = $parsed['pass'] ?? '';
-		$port     = $parsed['port'] ? ':' . $parsed['port'] : '';
-		$userpass = ( $user && $pass ) ? "$user:$pass@" : '';
+		$scheme = $parsed_url['scheme'];
+		$host   = $parsed_url['host'];
+		$user   = $parsed_url['user'] ?? '';
+		$path   = $parsed_url['path'] ?? '';
 
-		$path     = $parsed['path'] ?? '';
-		$query    = $parsed['query'] ? '?' . $parsed['query'] : '';
-		$fragment = $parsed['fragment'] ? '#' . $parsed['fragment'] : '';
+		$query = ! empty( $parsed_url['query'] ?? '' ) ? '?' . $parsed_url['query'] : '';
+		$port  = ! empty( $parsed_url['port'] ?? '' ) ? ':' . $parsed_url['port'] : '';
+		$pass  = ! empty( $parsed_url['pass'] ?? '' ) ? ':' . $parsed_url['pass'] : '';
+		$pass  = ( $user || $pass ) ? $pass . '@' : '';
 
-		// Input for the HTTP client.
-		$endpoint_base = "$scheme://$userpass$host$port";
-		$uri           = "$path$query$fragment";
-		$options       = [
-			RequestOptions::HEADERS => array_merge( [
-				'User-Agent' => 'WordPress Remote Data Blocks/1.0',
-			], $headers ),
-			RequestOptions::JSON    => $body,
+		$request_details = [
+			'method'  => $method,
+			'options' => [
+				RequestOptions::HEADERS => array_merge( [
+					'User-Agent' => 'WordPress Remote Data Blocks/1.0',
+				], $headers ),
+				RequestOptions::JSON    => $body,
+			],
+			'origin'  => sprintf( '%s://%s%s%s%s', $scheme, $user, $pass, $host, $port ),
+			'uri'     => sprintf( '%s%s', $path, $query ),
 		];
 
-		$this->http_client->init( $endpoint_base );
+		/**
+		 * Filters the request details before the HTTP request is dispatched.
+		 *
+		 * @param array<string, mixed> $request_details The request details.
+		 * @param HttpQueryContext $query_context The query context.
+		 * @param array<string, mixed> $input_variables The input variables for the current request.
+		 * @return array<string, array{
+		 *   method: string,
+		 *   options: array<string, mixed>,
+		 *   origin: string,
+		 *   uri: string,
+		 * }>
+		 */
+		return apply_filters( 'remote_data_blocks_request_details', $request_details, $this->query_context, $input_variables );
+	}
+
+	/**
+	 * Dispatch the HTTP request and assemble the raw (pre-processed) response data.
+	 *
+	 * @param array<string, mixed> $input_variables The input variables for the current request.
+	 * @return WP_Error|array{
+	 *   metadata:      array<string, string|int|null>,
+	 *   response_data: string|array|object|null,
+	 * }
+	 */
+	protected function get_raw_response_data( array $input_variables ): array|WP_Error {
+		$request_details = $this->get_request_details( $input_variables );
+
+		if ( is_wp_error( $request_details ) ) {
+			return $request_details;
+		}
+
+		$this->http_client->init( $request_details['origin'] );
 
 		try {
-			$response = $this->http_client->request( $method, $uri, $options );
+			$response = $this->http_client->request( $request_details['method'], $request_details['uri'], $request_details['options'] );
 		} catch ( Exception $e ) {
 			return new WP_Error( 'remote-data-blocks-unexpected-exception', $e->getMessage() );
 		}
@@ -109,11 +148,16 @@ class QueryRunner implements QueryRunnerInterface {
 	}
 
 	/**
-	 * Get the response metadata for the query.
+	 * Get the response metadata for the query, which are available as bindings for
+	 * field shortcodes.
 	 *
 	 * @param array $response_metadata The response metadata returned by the query runner.
-	 * @param array $query_results The results of the query.
-	 * @return array The response metadata.
+	 * @param array $query_results     The results of the query.
+	 * @return array array<string, array{
+	 *   name:  string,
+	 *   type:  string,
+	 *   value: string|int|null,
+	 * }>,
 	 */
 	protected function get_response_metadata( array $response_metadata, array $query_results ): array {
 		$age  = intval( $response_metadata['age'] ?? 0 );
@@ -145,6 +189,9 @@ class QueryRunner implements QueryRunnerInterface {
 		return apply_filters( 'remote_data_blocks_query_response_metadata', $query_response_metadata, $this->query_context, $response_metadata, $query_results );
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function execute( array $input_variables ): array|WP_Error {
 		$raw_response_data = $this->get_raw_response_data( $input_variables );
 
@@ -182,7 +229,16 @@ class QueryRunner implements QueryRunnerInterface {
 		];
 	}
 
-	private function get_field_value( array|string $field_value, string $default_value = '', string $field_type = 'string' ): string {
+	/**
+	 * Get the field value based on the field type. This method casts the field
+	 * value to a string (since this will ultimately be used as block content).
+	 *
+	 * @param array|string $field_value   The field value.
+	 * @param string       $default_value The default value.
+	 * @param string       $field_type    The field type.
+	 * @return string The field value.
+	 */
+	protected function get_field_value( array|string $field_value, string $default_value = '', string $field_type = 'string' ): string {
 		$field_value_single = is_array( $field_value ) && count( $field_value ) > 1
 			? $field_value
 			: ( $field_value[0] ?? $default_value );
@@ -205,14 +261,20 @@ class QueryRunner implements QueryRunnerInterface {
 	}
 
 	/**
-	 * Map fields from the response data using the output variables defined by
+	 * Map fields from the response data, adhering to the output schema defined by
 	 * the query.
 	 *
 	 * @param string|array|object|null $response_data The response data to map. Can be JSON string, PHP associative array, PHP object, or null.
-	 * @param bool $is_collection Whether the response data is a collection.
-	 * @return array|null The mapped fields.
+	 * @param bool                     $is_collection Whether the response data is a collection.
+	 * @return null|array<int, array{
+	 *   result: array{
+	 *     name: string,
+	 *     type: string,
+	 *     value: string,
+	 *   },
+	 * }>
 	 */
-	private function map_fields( string|array|object|null $response_data, bool $is_collection ): ?array {
+	protected function map_fields( string|array|object|null $response_data, bool $is_collection ): ?array {
 		$root          = $response_data;
 		$output_schema = $this->query_context->output_schema;
 

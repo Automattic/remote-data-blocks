@@ -79,7 +79,39 @@ class QueryRunnerTest extends TestCase {
 		};
 	}
 
-	public function testExecuteSuccessfulRequest() {
+	public static function provideValidEndpoints(): array {
+		return [
+			[
+				'https://example.com/api',
+			],
+			[
+				'https://example.com/api?foo=bar',
+			],
+			[
+				'https://user@example.com/api?foo=bar',
+			],
+			[
+				'https://user:pass@example.com/api?foo=bar',
+			],
+			[
+				'https://:pass@example.com/api?foo=bar',
+			],
+			[
+				'https://example.com:80/api?foo=bar',
+			],
+			[
+				'https://user:pass@example.com:80/api?foo=bar',
+			],
+			[
+				'https://🤡@🚗/🎉',
+			],
+		];
+	}
+
+	/**
+		* @dataProvider provideValidEndpoints
+	 */
+	public function testExecuteSuccessfulRequest( string $endpoint ) {
 		$input_variables = [ 'key' => 'value' ];
 		$response_body   = wp_json_encode( [
 			'data' => [
@@ -89,6 +121,7 @@ class QueryRunnerTest extends TestCase {
 		] );
 		$response        = new Response( 200, [], $response_body );
 
+		$this->http_datasource->set_endpoint( $endpoint );
 		$this->http_client->method( 'request' )->willReturn( $response );
 
 		$query_runner = $this->query_context->get_query_runner();
@@ -99,28 +132,60 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'results', $result );
 	}
 
-	public function testExecuteInvalidScheme() {
-		$input_variables = [ 'key' => 'value' ];
-
-		$this->http_datasource->set_endpoint( 'http://api.example.com' );
-
-		$query_runner = $this->query_context->get_query_runner();
-		$result       = $query_runner->execute( $input_variables );
-
-		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Invalid endpoint URL scheme', $result->get_error_code() );
+	public static function provideInvalidEndpoints(): array {
+		return [
+			[
+				'https://:80/hello',
+				'Unable to parse endpoint URL',
+			],
+			[
+				'https:///hello',
+				'Unable to parse endpoint URL',
+			],
+			[
+				'https://example.com:PORT/hello',
+				'Unable to parse endpoint URL',
+			],
+			[
+				'http://api.example.com',
+				'Invalid endpoint URL scheme',
+			],
+			[
+				'ftp://api.example.com',
+				'Invalid endpoint URL scheme',
+			],
+			[
+				'//api.example.com',
+				'Invalid endpoint URL scheme',
+			],
+			[
+				'://api.example.com',
+				'Invalid endpoint URL scheme',
+			],
+			[
+				'🤡://example.com/hello',
+				'Invalid endpoint URL scheme',
+			],
+			[
+				'https:/hello',
+				'Invalid endpoint URL host',
+			],
+		];
 	}
 
-	public function testExecuteInvalidHost() {
+	/**
+		* @dataProvider provideInvalidEndpoints
+	 */
+	public function testExecuteInvalidEndpoints( string $endpoint, string $expected_error_code ) {
 		$input_variables = [ 'key' => 'value' ];
 
-		$this->http_datasource->set_endpoint( 'https://' );
+		$this->http_datasource->set_endpoint( $endpoint );
 
 		$query_runner = $this->query_context->get_query_runner();
 		$result       = $query_runner->execute( $input_variables );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Invalid endpoint URL parse', $result->get_error_code() );
+		$this->assertSame( $expected_error_code, $result->get_error_code() );
 	}
 
 	public function testExecuteHttpClientException() {
