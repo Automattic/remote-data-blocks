@@ -32,6 +32,7 @@ class DatasourceCrudTest extends TestCase {
 				'id'   => 'base_id',
 				'name' => 'Base Name',
 			],
+			'tables'                 => [],
 			'display_name'           => 'Crud Test',
 			'slug'                   => 'valid-slug',
 		];
@@ -73,6 +74,7 @@ class DatasourceCrudTest extends TestCase {
 				'id'   => 'base_id1',
 				'name' => 'Base Name 1',
 			],
+			'tables'                 => [],
 			'display_name'           => 'Base Name 1',
 			'slug'                   => 'source-1',
 		] );
@@ -113,6 +115,7 @@ class DatasourceCrudTest extends TestCase {
 				'id'   => 'base_id1',
 				'name' => 'Base Name 1',
 			],
+			'tables'                 => [],
 			'display_name'           => 'Crud Test',
 			'slug'                   => 'source-1',
 		] );
@@ -142,6 +145,7 @@ class DatasourceCrudTest extends TestCase {
 				'id'   => 'base_id1',
 				'name' => 'Base Name 1',
 			],
+			'tables'                 => [],
 			'display_name'           => 'Crud Test',
 			'slug'                   => 'source-1',
 		] );
@@ -171,6 +175,7 @@ class DatasourceCrudTest extends TestCase {
 				'id'   => 'base_id1',
 				'name' => 'Base Name 1',
 			],
+			'tables'                 => [],
 			'display_name'           => 'Crud Test',
 			'slug'                   => 'source-1',
 		] );
