@@ -11,8 +11,8 @@
       "RemoteDataBlocks\\": "inc/"
     },
     "files": [
-      "inc/Integrations/constants.php",
-      "functions.php"
+      "functions.php",
+      "inc/Integrations/constants.php"
     ]
   },
   "autoload-dev": {
@@ -23,8 +23,9 @@
   "scripts": {
     "phpcs": "phpcs",
     "phpcs-fix": "phpcbf",
-    "test": "./vendor/bin/phpunit",
-    "test-coverage": "./vendor/bin/phpunit --coverage-clover ./coverage/phpunit/clover.xml"
+    "psalm": "psalm",
+    "test": "phpunit",
+    "test-coverage": "phpunit --coverage-clover ./coverage/phpunit/clover.xml"
   },
   "require": {
     "php": ">=8.1",
@@ -37,7 +38,9 @@
     "automattic/vipwpcs": "^3.0",
     "phpcompatibility/phpcompatibility-wp": "^2.1",
     "phpunit/phpunit": "^10",
-    "slevomat/coding-standard": "^8.15"
+    "slevomat/coding-standard": "^8.15",
+    "vimeo/psalm": "^5.26",
+    "php-stubs/wordpress-stubs": "^6.6"
   },
   "config": {
     "allow-plugins": {
