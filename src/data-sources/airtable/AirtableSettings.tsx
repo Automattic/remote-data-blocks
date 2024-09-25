@@ -161,9 +161,9 @@ export const AirtableSettings = ( {
 		return (
 			bases !== null &&
 			tables !== null &&
-			!! state.base &&
-			!! state.table &&
-			!! state.slug &&
+			Boolean( state.base ) &&
+			Boolean( state.table ) &&
+			Boolean( state.slug ) &&
 			! loadingSlugConflicts &&
 			! slugConflicts
 		);
