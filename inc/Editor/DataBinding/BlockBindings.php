@@ -149,7 +149,7 @@ class BlockBindings {
 			$block_name
 		);
 
-		return array_merge( $query_input, $query_input_overrides );
+		return array_merge( $query_input, $overrides );
 	}
 
 	public static function execute_query( array $block_context, string $operation_name ): array|null {
