@@ -39,6 +39,15 @@ class AirtableDatasource extends HttpDatasource {
 							'type'     => 'string',
 							'required' => false,
 						],
+						'output_query_mappings' => [
+							'type'  => 'array',
+							'items' => [
+								'type'  => 'object',
+								'properties' => [
+									'name' => [ 'type' => 'string' ],
+								],
+							],
+						],
 					],
 				],
 			],
