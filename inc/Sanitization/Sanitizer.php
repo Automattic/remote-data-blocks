@@ -72,6 +72,9 @@ class Sanitizer implements SanitizerInterface {
 					if ( is_array( $value ) ) {
 						if ( isset( $field_schema['items'] ) ) {
 							$sanitized[ $key ] = array_map(function ( $item ) use ( $field_schema ) {
+								if ( is_array( $item ) && isset( $field_schema['items']['properties'] ) ) {
+									return $this->sanitize_config( $item, $field_schema['items']['properties'] );
+								}
 								return $this->sanitize_config( $item, $field_schema['items'] );
 							}, $value);
 						} else {

@@ -9,6 +9,7 @@ namespace RemoteDataBlocks\Config\QueryContext;
  * @since 0.1.0
  */
 interface HttpQueryContextInterface {
+	public function get_cache_ttl( array $input_variables ): null|int;
 	public function get_endpoint( array $input_variables ): string;
 	public function get_request_method(): string;
 	public function get_request_headers( array $input_variables ): array;

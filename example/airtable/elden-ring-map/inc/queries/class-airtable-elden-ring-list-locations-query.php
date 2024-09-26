@@ -18,22 +18,27 @@ class AirtableEldenRingListLocationsQuery extends HttpQueryContext {
 			'root_path'     => '$.records[*]',
 			'is_collection' => true,
 			'mappings'      => [
-				'id'    => [
+				'id'       => [
 					'name' => 'Location ID',
 					'path' => '$.id',
 					'type' => 'id',
 				],
-				'title' => [
+				'map_name' => [
 					'name' => 'Name',
 					'path' => '$.fields.Name',
 					'type' => 'string',
 				],
-				'x'     => [
+				'title'    => [
+					'name' => 'Name',
+					'path' => '$.fields.Name',
+					'type' => 'string',
+				],
+				'x'        => [
 					'name' => 'x',
 					'path' => '$.fields.x',
 					'type' => 'string',
 				],
-				'y'     => [
+				'y'        => [
 					'name' => 'y',
 					'path' => '$.fields.y',
 					'type' => 'string',

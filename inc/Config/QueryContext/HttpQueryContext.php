@@ -145,6 +145,24 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	}
 
 	/**
+	 * Override this method to define the cache object TTL for this query. Return
+	 * -1 to disable caching. Return null to use the default cache TTL.
+	 *
+	 * @return int|null The cache object TTL in seconds.
+	 */
+	public function get_cache_ttl( array $input_variables ): null|int {
+		// For most HTTP requests, we only want to cache GET requests. This is
+		// overridden for GraphQL queries when using GraphqlQueryContext
+		if ( 'GET' !== strtoupper( $this->get_request_method() ) ) {
+			// Disable caching.
+			return -1;
+		}
+
+		// Use default cache TTL.
+		return null;
+	}
+
+	/**
 	 * Override this method to process the raw response data from the query before
 	 * it is passed to the query runner and the output variables are extracted. The
 	 * result can be a JSON string, a PHP associative array, a PHP object, or null.

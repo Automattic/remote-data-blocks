@@ -18,7 +18,11 @@ import { registerBlockType } from '@wordpress/blocks';
  * Internal dependencies
  */
 import metadata from './block.json';
-import edit from './edit';
-import save from './save';
+import { Edit } from './edit';
+import { Save } from './save';
 
-registerBlockType( metadata.name, { ...metadata, edit, save } );
+registerBlockType( metadata.name, {
+	...metadata,
+	edit: Edit,
+	save: Save,
+} );
