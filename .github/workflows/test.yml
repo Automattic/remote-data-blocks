@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Node.ts
-        uses: Automattic/vip-actions/nodejs-setup@a430b095ce5adc30beace82eade2653abd5deedf
+        uses: Automattic/vip-actions/nodejs-setup@01590cc951467cd6eaadda9e6bf88a170703be1d
         with:
           node-version-file: .nvmrc
 
