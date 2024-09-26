@@ -1,4 +1,11 @@
-import { Card, CardBody, CardHeader, SelectControl } from '@wordpress/components';
+import {
+	BaseControl,
+	Card,
+	CardBody,
+	CardHeader,
+	CheckboxControl,
+	SelectControl,
+} from '@wordpress/components';
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -25,6 +32,7 @@ const initialState: AirtableFormState = {
 	access_token: '',
 	base: null,
 	table: null,
+	table_fields: new Set< string >(),
 	slug: '',
 };
 
@@ -32,12 +40,29 @@ const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState
 	if ( ! config ) {
 		return initialState;
 	}
-	return {
+	const initialStateFromConfig: AirtableFormState = {
 		access_token: config.access_token,
 		base: config.base,
-		table: config.tables[ 0 ] ?? null,
+		table: null,
+		table_fields: new Set< string >(),
 		slug: config.slug,
 	};
+
+	if ( Array.isArray( config.tables ) ) {
+		const [ table ] = config.tables;
+
+		if ( table ) {
+			initialStateFromConfig.table = {
+				id: table.id,
+				name: table.name,
+			};
+			initialStateFromConfig.table_fields = new Set(
+				table.output_query_mappings.map( ( { name } ) => name )
+			);
+		}
+	}
+
+	return initialStateFromConfig;
 };
 
 const defaultSelectBaseOption: SelectOption = {
@@ -69,6 +94,7 @@ export const AirtableSettings = ( {
 	const [ tableOptions, setTableOptions ] = useState< SelectOption[] >( [
 		defaultSelectTableOption,
 	] );
+	const [ availableTableFields, setAvailableTableFields ] = useState< string[] >( [] );
 	const { fetchingUserId, userId, userIdError } = useAirtableApiUserId( state.access_token );
 	const { bases, basesError, fetchingBases } = useAirtableApiBases(
 		state.access_token,
@@ -90,7 +116,13 @@ export const AirtableSettings = ( {
 			service: 'airtable',
 			access_token: state.access_token,
 			base: state.base,
-			tables: [ state.table ],
+			tables: [
+				{
+					id: state.table.id,
+					name: state.table.name,
+					output_query_mappings: Array.from( state.table_fields ).map( name => ( { name } ) ),
+				},
+			],
 			slug: state.slug,
 		};
 
@@ -183,7 +215,7 @@ export const AirtableSettings = ( {
 		}
 
 		return 'Select a base from which to fetch data.';
-	}, [ bases, basesError, fetchingBases, state.base, userId ] );
+	}, [ bases, basesError, fetchingBases, userId ] );
 
 	const tablesHelpText = useMemo( () => {
 		if ( bases?.length && state.base ) {
@@ -247,6 +279,22 @@ export const AirtableSettings = ( {
 		}
 	}, [ state.base, tables ] );
 
+	useEffect( () => {
+		const newAvailableTableFields: string[] = [];
+
+		if ( state.table && tables ) {
+			const selectedTable = tables.find( table => table.id === state.table?.id );
+
+			if ( selectedTable ) {
+				selectedTable.fields.forEach( field => {
+					newAvailableTableFields.push( field.name );
+				} );
+			}
+		}
+
+		setAvailableTableFields( newAvailableTableFields );
+	}, [ state.table, tables ] );
+
 	return (
 		<Card className="add-update-data-source-card">
 			<CardHeader>
@@ -294,6 +342,34 @@ export const AirtableSettings = ( {
 							__next40pxDefaultSize
 						/>
 					</div>
+
+					{ state.table && availableTableFields.length && (
+						<div className="form-group">
+							<BaseControl
+								label={ __( 'Table Fields', 'remote-data-blocks' ) }
+								help={ __(
+									'Select the fields to be used in the remote data block.',
+									'remote-data-blocks'
+								) }
+							>
+								{ availableTableFields.map( field => (
+									<CheckboxControl
+										key={ field }
+										label={ field }
+										checked={ state.table_fields.has( field ) }
+										onChange={ checked =>
+											handleOnChange(
+												'table_fields',
+												checked
+													? new Set( [ ...state.table_fields, field ] )
+													: new Set( [ ...state.table_fields ].filter( fld => fld !== field ) )
+											)
+										}
+									/>
+								) ) }
+							</BaseControl>
+						</div>
+					) }
 
 					<DataSourceFormActions
 						onSave={ onSaveClick }

@@ -24,11 +24,24 @@ export interface DataSourceQuery {
 	mappings?: DataSourceQueryMapping;
 }
 
+/**
+ * Currently this is an subset of DataSourceQueryMappingValue. Following fields are inferred:
+ * - `path` can be constructed automatically assuming we use same field names we get from Airtable.
+ * - `type` is always string for now.
+ */
+export interface AirtableOutputQueryMappingValue {
+	name: string;
+}
+
+export interface AirtableTableConfig extends StringIdName {
+	output_query_mappings: AirtableOutputQueryMappingValue[];
+}
+
 export interface AirtableConfig extends BaseDataSourceConfig {
 	service: 'airtable';
 	access_token: string;
 	base: StringIdName;
-	tables: StringIdName[];
+	tables: AirtableTableConfig[];
 }
 
 export interface ShopifyConfig extends BaseDataSourceConfig {
