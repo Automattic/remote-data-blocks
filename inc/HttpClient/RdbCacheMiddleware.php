@@ -8,8 +8,8 @@ class RdbCacheMiddleware extends \Kevinrob\GuzzleCache\CacheMiddleware {
 	 *
 	 * @psalm-suppress NonInvariantPropertyType reason: we are right per Kevinrob's comment in parent
 	 */
-	// phpcs:ignore WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase
-	protected array $httpMethods = [
+	// phpcs:ignore WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase, SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+	protected $httpMethods = [
 		'GET'  => true,
 		'POST' => true,
 	];
