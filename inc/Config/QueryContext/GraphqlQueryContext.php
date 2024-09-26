@@ -30,7 +30,7 @@ abstract class GraphqlQueryContext extends HttpQueryContext {
 	abstract public function get_query(): string;
 
 	/**
-	 * Override this method to define the GraphQL query document.
+	 * Override this method to define the GraphQL query variables.
 	 *
 	 * @return array The GraphQL query variables.
 	 */
@@ -48,5 +48,16 @@ abstract class GraphqlQueryContext extends HttpQueryContext {
 			'query'     => $this->get_query(),
 			'variables' => empty( $variables ) ? null : $variables,
 		];
+	}
+
+	/**
+	 * Override this method to define the cache object TTL for this query. Return
+	 * -1 to disable caching. Return null to use the default cache TTL.
+	 *
+	 * @return int|null The cache object TTL in seconds.
+	 */
+	public function get_cache_ttl( array $input_variables ): ?int {
+		// Use default cache TTL.
+		return null;
 	}
 }
