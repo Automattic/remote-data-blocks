@@ -5,6 +5,7 @@ namespace RemoteDataBlocks\Example\Airtable\EldenRingMap;
 use RemoteDataBlocks\Integrations\Airtable\AirtableDatasource;
 use RemoteDataBlocks\Logging\LoggerManager;
 
+require_once __DIR__ . '/inc/interactivity-store/interactivity-store.php';
 require_once __DIR__ . '/inc/queries/class-airtable-elden-ring-list-locations-query.php';
 require_once __DIR__ . '/inc/queries/class-airtable-elden-ring-list-maps-query.php';
 
