@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Node.js
-        uses: Automattic/vip-actions/nodejs-setup@trunk
+        uses: Automattic/vip-actions/nodejs-setup@0e641b0bac6eeb37770c61df4b2e603060b7458b
         with:
           node-version-file: .nvmrc
           ignore-scripts: true
