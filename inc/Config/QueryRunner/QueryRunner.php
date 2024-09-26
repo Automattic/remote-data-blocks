@@ -123,7 +123,7 @@ class QueryRunner implements QueryRunnerInterface {
 		}
 
 		$client_options = [
-			HttpClient::CACHE_TTL_OPTION => $request_details['ttl'],
+			HttpClient::CACHE_TTL_CLIENT_OPTION_KEY => $request_details['ttl'],
 		];
 
 		$this->http_client->init( $request_details['origin'], [], $client_options );

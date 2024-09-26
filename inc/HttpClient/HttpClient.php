@@ -29,7 +29,7 @@ class HttpClient {
 	private const WP_OBJECT_CACHE_GROUP              = 'remote-data-blocks';
 	private const CACHE_INVALIDATING_REQUEST_HEADERS = [ 'Authorization', 'Cache-Control' ];
 
-	public const CACHE_TTL_OPTION = '__default_cache_ttl';
+	public const CACHE_TTL_CLIENT_OPTION_KEY = '__default_cache_ttl';
 
 	private string $base_uri;
 	private HandlerStack $handler_stack;
@@ -104,7 +104,7 @@ class HttpClient {
 			return $request;
 		} ) );
 
-		$default_ttl      = $client_options[ self::CACHE_TTL_OPTION ] ?? null;
+		$default_ttl      = $client_options[ self::CACHE_TTL_CLIENT_OPTION_KEY ] ?? null;
 		$cache_middleware = self::get_cache_middleware( self::get_cache_storage(), $default_ttl );
 		$this->handler_stack->push( $cache_middleware, 'remote_data_blocks_cache' );
 
