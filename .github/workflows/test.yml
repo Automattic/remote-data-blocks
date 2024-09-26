@@ -49,15 +49,11 @@ jobs:
   vitest:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-
       - name: Setup Node.js
         uses: Automattic/vip-actions/nodejs-setup@trunk
         with:
           node-version-file: .nvmrc
+          ignore-scripts: true
 
       - name: Run tests
         run: npm run test:js:coverage
