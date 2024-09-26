@@ -4,7 +4,7 @@ namespace RemoteDataBlocks\HttpClient;
 
 class RdbCacheMiddleware extends \Kevinrob\GuzzleCache\CacheMiddleware {
 	/**
-	 * @var array<string, bool>
+	 * @var array<string, true>
 	 */
 	// phpcs:ignore WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase, SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
 	protected $httpMethods = [

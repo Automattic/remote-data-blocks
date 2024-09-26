@@ -57,6 +57,7 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 
 	/**
 	 * @inheritDoc
+	 * @psalm-suppress ParamNameMismatch reason: we want the clarity provided by the rename here
 	 */
 	final public static function from_array( array $config, ?ValidatorInterface $validator = null, ?SanitizerInterface $sanitizer = null ): DatasourceInterface|WP_Error {
 		$config['service_schema_version'] = static::SERVICE_SCHEMA_VERSION;
