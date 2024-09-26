@@ -117,7 +117,7 @@ class SanitizerTest extends TestCase {
 				'users' => [
 					'type'  => 'array',
 					'items' => [
-						'type'  => 'object',
+						'type'       => 'object',
 						'properties' => [
 							'name' => [ 'type' => 'string' ],
 							'age'  => [ 'type' => 'integer' ],
@@ -129,14 +129,14 @@ class SanitizerTest extends TestCase {
 		$data   = [
 			'users' => [
 				[
-					'name' => 'Alice',
-					'age'  => 30,
+					'name'                     => 'Alice',
+					'age'                      => 30,
 					'additional_unknown_field' => 'unknown_value',
 				],
 				[
 					'name' => 'Bob',
 					'age'  => 25,
-				]
+				],
 			],
 		];
 		
