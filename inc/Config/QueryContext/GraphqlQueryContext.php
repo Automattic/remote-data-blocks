@@ -56,7 +56,7 @@ abstract class GraphqlQueryContext extends HttpQueryContext {
 	 *
 	 * @return int|null The cache object TTL in seconds.
 	 */
-	public function get_cache_ttl( array $input_variables ): null {
+	public function get_cache_ttl( array $input_variables ): ?int {
 		// Use default cache TTL.
 		return null;
 	}
