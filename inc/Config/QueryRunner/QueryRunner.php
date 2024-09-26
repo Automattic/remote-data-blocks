@@ -35,14 +35,16 @@ class QueryRunner implements QueryRunnerInterface {
 	 *   method: string,
 	 *   options: array<string, mixed>,
 	 *   origin: string,
+	 *   ttl: int|null,
 	 *   uri: string,
 	 * } The request details.
 	 */
 	protected function get_request_details( array $input_variables ): array|WP_Error {
-		$headers  = $this->query_context->get_request_headers( $input_variables );
-		$method   = $this->query_context->get_request_method();
-		$body     = $this->query_context->get_request_body( $input_variables );
-		$endpoint = $this->query_context->get_endpoint( $input_variables );
+		$headers   = $this->query_context->get_request_headers( $input_variables );
+		$method    = $this->query_context->get_request_method();
+		$body      = $this->query_context->get_request_body( $input_variables );
+		$endpoint  = $this->query_context->get_endpoint( $input_variables );
+		$cache_ttl = $this->query_context->get_cache_ttl( $input_variables );
 
 		$parsed_url = wp_parse_url( $endpoint );
 
@@ -80,12 +82,11 @@ class QueryRunner implements QueryRunnerInterface {
 		$request_details = [
 			'method'  => $method,
 			'options' => [
-				RequestOptions::HEADERS => array_merge( [
-					'User-Agent' => 'WordPress Remote Data Blocks/1.0',
-				], $headers ),
+				RequestOptions::HEADERS => $headers,
 				RequestOptions::JSON    => $body,
 			],
 			'origin'  => sprintf( '%s://%s%s%s%s', $scheme, $user, $pass, $host, $port ),
+			'ttl'     => $cache_ttl,
 			'uri'     => sprintf( '%s%s', $path, $query ),
 		];
 
@@ -121,7 +122,11 @@ class QueryRunner implements QueryRunnerInterface {
 			return $request_details;
 		}
 
-		$this->http_client->init( $request_details['origin'] );
+		$client_options = [
+			HttpClient::CACHE_TTL_CLIENT_OPTION_KEY => $request_details['ttl'],
+		];
+
+		$this->http_client->init( $request_details['origin'], [], $client_options );
 
 		try {
 			$response = $this->http_client->request( $request_details['method'], $request_details['uri'], $request_details['options'] );

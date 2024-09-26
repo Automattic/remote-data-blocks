@@ -2,9 +2,9 @@
 
 namespace RemoteDataBlocks\Example\Shopify;
 
-use RemoteDataBlocks\Config\QueryContext\GraphqlQueryContext;
+use RemoteDataBlocks\Config\QueryContext\GraphqlMutationContext;
 
-class ShopifyAddToCartMutation extends GraphqlQueryContext {
+class ShopifyAddToCartMutation extends GraphqlMutationContext {
 	public function get_input_schema(): array {
 		return [
 			'cart_id'    => [
@@ -48,7 +48,7 @@ class ShopifyAddToCartMutation extends GraphqlQueryContext {
 		];
 	}
 
-	public function get_query(): string {
+	public function get_mutation(): string {
 		return '
 			mutation AddProductToCart( $cart_id: ID!, $variant_id: ID!, $quantity: Int = 1 ){
 				cartLinesAdd(cartId: $cart_id, lines: [{ quantity: $quantity, merchandiseId: $variant_id }]) {
