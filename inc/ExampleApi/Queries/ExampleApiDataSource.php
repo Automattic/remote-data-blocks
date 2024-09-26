@@ -13,7 +13,7 @@ class ExampleApiDataSource extends HttpDatasource {
 		return 'Example API';
 	}
 
-	public function get_image_url(): null {
+	public function get_image_url(): ?string {
 		return null;
 	}
 

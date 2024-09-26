@@ -48,7 +48,6 @@ class HttpClient {
 	 * @var array<string, mixed>
 	 */
 	private array $default_options = [
-		'timeout' => 3,
 		'headers' => [
 			'User-Agent' => 'WordPress Remote Data Blocks/1.0',
 		],
