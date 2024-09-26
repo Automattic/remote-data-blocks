@@ -348,7 +348,7 @@ export const AirtableSettings = ( {
 							<BaseControl
 								label={ __( 'Table Fields', 'remote-data-blocks' ) }
 								help={ __(
-									'Select the fields to be used for binding with the remote data block.',
+									'Select the fields to be used in the remote data block.',
 									'remote-data-blocks'
 								) }
 							>
