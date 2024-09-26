@@ -49,7 +49,7 @@ jobs:
   vitest:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Node.js
+      - name: Setup Node.ts
         uses: Automattic/vip-actions/nodejs-setup@a430b095ce5adc30beace82eade2653abd5deedf
         with:
           node-version-file: .nvmrc
