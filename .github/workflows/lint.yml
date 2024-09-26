@@ -21,6 +21,7 @@ jobs:
         uses: Automattic/vip-actions/nodejs-setup@trunk
         with:
           node-version-file: .nvmrc
+          ignore-scripts: true
 
       - name: Run ESLint
         run: npm run lint
@@ -49,7 +50,7 @@ jobs:
       - name: Install dependencies
         run: composer install
 
-      - name: Run PHPCS
+      - name: Run phpcs
         run: composer phpcs
 
   psalm:
