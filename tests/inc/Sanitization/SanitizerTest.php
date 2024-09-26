@@ -110,6 +110,55 @@ class SanitizerTest extends TestCase {
 		$this->assertSame( $expected, $result );
 	}
 
+	public function test_sanitize_nested_array_of_objects() {
+		$schema = [
+			'type'       => 'object',
+			'properties' => [
+				'users' => [
+					'type'  => 'array',
+					'items' => [
+						'type'  => 'object',
+						'properties' => [
+							'name' => [ 'type' => 'string' ],
+							'age'  => [ 'type' => 'integer' ],
+						],
+					],
+				],
+			],
+		];
+		$data   = [
+			'users' => [
+				[
+					'name' => 'Alice',
+					'age'  => 30,
+					'additional_unknown_field' => 'unknown_value',
+				],
+				[
+					'name' => 'Bob',
+					'age'  => 25,
+				]
+			],
+		];
+		
+		$sanitizer = new Sanitizer( $schema );
+		$result    = $sanitizer->sanitize( $data );
+		
+		$expected = [
+			'users' => [
+				[
+					'name' => 'Alice',
+					'age'  => 30,
+				],
+				[
+					'name' => 'Bob',
+					'age'  => 25,
+				],
+			],
+		];
+		$this->assertSame( $expected, $result );
+	}
+
+
 	public function test_sanitize_object() {
 		$schema = [
 			'type'       => 'object',
