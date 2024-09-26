@@ -10,6 +10,13 @@
         "/var/www/html/wp-content/plugins/remote-data-blocks": "${workspaceFolder}/",
         "/var/www/html/wp-content/plugins/example": "${workspaceFolder}/example"
       }
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Launch Chrome against localhost",
+      "url": "http://localhost:8888/",
+      "webRoot": "${workspaceFolder}"
     }
   ]
 }
