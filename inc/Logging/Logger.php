@@ -33,13 +33,13 @@ class Logger extends AbstractLogger {
 	 * @var array<string, int>
 	 */
 	private array $log_levels = [
-		LogLevel::DEBUG     => 1,
-		LogLevel::INFO      => 2,
-		LogLevel::NOTICE    => 3,
-		LogLevel::WARNING   => 4,
-		LogLevel::ERROR     => 5,
-		LogLevel::CRITICAL  => 6,
-		LogLevel::ALERT     => 7,
+		LogLevel::DEBUG => 1,
+		LogLevel::INFO => 2,
+		LogLevel::NOTICE => 3,
+		LogLevel::WARNING => 4,
+		LogLevel::ERROR => 5,
+		LogLevel::CRITICAL => 6,
+		LogLevel::ALERT => 7,
 		LogLevel::EMERGENCY => 8,
 	];
 

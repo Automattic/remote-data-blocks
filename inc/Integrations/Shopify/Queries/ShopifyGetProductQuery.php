@@ -15,20 +15,20 @@ class ShopifyGetProductQuery extends GraphqlQueryContext {
 
 	public function get_output_schema(): array {
 		return [
-			'root_path'     => null,
+			'root_path' => null,
 			'is_collection' => false,
-			'mappings'      => [
-				'description'    => [
+			'mappings' => [
+				'description' => [
 					'name' => 'Product description',
 					'path' => '$.data.product.descriptionHtml',
 					'type' => 'string',
 				],
-				'title'          => [
+				'title' => [
 					'name' => 'Title',
 					'path' => '$.data.product.title',
 					'type' => 'string',
 				],
-				'image_url'      => [
+				'image_url' => [
 					'name' => 'Image URL',
 					'path' => '$.data.product.featuredImage.url',
 					'type' => 'image_url',
@@ -38,12 +38,12 @@ class ShopifyGetProductQuery extends GraphqlQueryContext {
 					'path' => '$.data.product.featuredImage.altText',
 					'type' => 'image_alt',
 				],
-				'price'          => [
+				'price' => [
 					'name' => 'Item price',
 					'path' => '$.data.product.priceRange.maxVariantPrice.amount',
 					'type' => 'price',
 				],
-				'variant_id'     => [
+				'variant_id' => [
 					'name' => 'Variant ID',
 					'path' => '$.data.product.variants.edges[0].node.id',
 					'type' => 'id',

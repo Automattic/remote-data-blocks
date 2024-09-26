@@ -3,7 +3,7 @@
 use RemoteDataBlocks\Example\Shopify\InteractivityStore;
 
 $interactive_context = InteractivityStore::get_cart_button_interactive_context( $block );
-$public_store_name   = InteractivityStore::get_store_name();
+$public_store_name = InteractivityStore::get_store_name();
 
 ?>
 <div

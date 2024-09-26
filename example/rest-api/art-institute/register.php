@@ -8,11 +8,11 @@ require_once __DIR__ . '/inc/queries/class-art-institute-search-query.php';
 
 function register_aic_block() {
 	$aic_datasource = ArtInstituteOfChicagoDatasource::from_array( [
-		'slug'    => 'art-institute-of-chicago',
+		'slug' => 'art-institute-of-chicago',
 		'service' => 'art-institute-of-chicago',
 	] );
 
-	$get_art_query    = new ArtInstituteOfChicagoGetArtQuery( $aic_datasource );
+	$get_art_query = new ArtInstituteOfChicagoGetArtQuery( $aic_datasource );
 	$search_art_query = new ArtInstituteOfChicagoSearchArtQuery( $aic_datasource );
 
 	register_remote_data_block( 'Art Institute of Chicago', $get_art_query );

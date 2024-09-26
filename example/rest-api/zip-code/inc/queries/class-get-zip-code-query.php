@@ -17,18 +17,18 @@ class GetZipCodeQuery extends HttpQueryContext {
 	public function get_output_schema(): array {
 		return [
 			'is_collection' => false,
-			'mappings'      => [
+			'mappings' => [
 				'zip_code' => [
 					'name' => 'Zip Code',
 					'path' => '$["post code"]',
 					'type' => 'string',
 				],
-				'city'     => [
+				'city' => [
 					'name' => 'City',
 					'path' => '$.places[0]["place name"]',
 					'type' => 'string',
 				],
-				'state'    => [
+				'state' => [
 					'name' => 'State',
 					'path' => '$.places[0].state',
 					'type' => 'string',

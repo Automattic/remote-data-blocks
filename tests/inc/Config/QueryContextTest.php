@@ -12,7 +12,7 @@ class QueryContextTest extends TestCase {
 	private HttpQueryContext $query_context;
 
 	protected function setUp(): void {
-		$this->datasource    = MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator() );
+		$this->datasource = MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator() );
 		$this->query_context = new HttpQueryContext( $this->datasource );
 	}
 
@@ -62,16 +62,16 @@ class QueryContextTest extends TestCase {
 				$dom = new \DOMDocument();
 				$dom->loadHTML( $raw_response_data, LIBXML_NOERROR );
 				// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-				$title      = $dom->getElementsByTagName( 'title' )->item( 0 )->nodeValue;
+				$title = $dom->getElementsByTagName( 'title' )->item( 0 )->nodeValue;
 				$paragraphs = $dom->getElementsByTagName( 'p' );
-				$content    = [];
+				$content = [];
 				foreach ( $paragraphs as $p ) {
 					// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 					$content[] = $p->nodeValue;
 				}
 				
 				$data = [
-					'title'   => $title,
+					'title' => $title,
 					'content' => $content,
 				];
 				
@@ -79,7 +79,7 @@ class QueryContextTest extends TestCase {
 			}
 		};
 
-		$html_data     = '<html><head><title>Test Page</title></head><body><p>Paragraph 1</p><p>Paragraph 2</p></body></html>';
+		$html_data = '<html><head><title>Test Page</title></head><body><p>Paragraph 1</p><p>Paragraph 2</p></body></html>';
 		$expected_json = '{"title":"Test Page","content":["Paragraph 1","Paragraph 2"]}';
 		
 		$this->assertSame( $expected_json, $custom_query_context->process_response( $html_data, [] ) );

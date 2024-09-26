@@ -16,14 +16,14 @@ class GetWesterosHousesQuery extends HttpQueryContext {
 	public function get_input_schema(): array {
 		return [
 			'row_id' => [
-				'name'      => 'Row ID',
+				'name' => 'Row ID',
 				'overrides' => [
 					[
 						'target' => 'utm_content',
-						'type'   => 'query_var',
+						'type' => 'query_var',
 					],
 				],
-				'type'      => 'id',
+				'type' => 'id',
 			],
 		];
 	}
@@ -31,28 +31,28 @@ class GetWesterosHousesQuery extends HttpQueryContext {
 	public function get_output_schema(): array {
 		return [
 			'is_collection' => false,
-			'mappings'      => [
-				'row_id'    => [
+			'mappings' => [
+				'row_id' => [
 					'name' => 'Row ID',
 					'path' => '$.RowId',
 					'type' => 'id',
 				],
-				'house'     => [
+				'house' => [
 					'name' => 'House',
 					'path' => '$.House',
 					'type' => 'string',
 				],
-				'seat'      => [
+				'seat' => [
 					'name' => 'Seat',
 					'path' => '$.Seat',
 					'type' => 'string',
 				],
-				'region'    => [
+				'region' => [
 					'name' => 'Region',
 					'path' => '$.Region',
 					'type' => 'string',
 				],
-				'words'     => [
+				'words' => [
 					'name' => 'Words',
 					'path' => '$.Words',
 					'type' => 'string',
@@ -72,14 +72,14 @@ class GetWesterosHousesQuery extends HttpQueryContext {
 
 	public function process_response( string $raw_response_data, array $input_variables ): string|array|object|null {
 		$parsed_response_data = json_decode( $raw_response_data, true );
-		$selected_row         = null;
-		$row_id               = $input_variables['row_id'];
+		$selected_row = null;
+		$row_id = $input_variables['row_id'];
 
 		if ( isset( $parsed_response_data['values'] ) && is_array( $parsed_response_data['values'] ) ) {
 			$raw_selected_row = $parsed_response_data['values'][ $row_id ];
 			if ( is_array( $raw_selected_row ) ) {
-				$selected_row          = array_combine( self::COLUMNS, $raw_selected_row );
-				$selected_row          = array_combine( self::COLUMNS, $selected_row );
+				$selected_row = array_combine( self::COLUMNS, $raw_selected_row );
+				$selected_row = array_combine( self::COLUMNS, $selected_row );
 				$selected_row['RowId'] = $row_id;
 			}
 		}

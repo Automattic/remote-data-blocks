@@ -11,7 +11,7 @@ use WP_Block;
 use function register_block_bindings_source;
 
 class BlockBindings {
-	public static string $context_name   = 'remote-data-blocks/remoteData';
+	public static string $context_name = 'remote-data-blocks/remoteData';
 	public static string $binding_source = 'remote-data/binding';
 
 	public static function init(): void {
@@ -24,9 +24,9 @@ class BlockBindings {
 	 */
 	public static function register_block_bindings(): void {
 		register_block_bindings_source( self::$binding_source, [
-			'label'              => __( 'Remote Data Blocks', 'remote-data-blocks' ),
+			'label' => __( 'Remote Data Blocks', 'remote-data-blocks' ),
 			'get_value_callback' => [ __CLASS__, 'get_value' ],
-			'uses_context'       => [ self::$context_name ],
+			'uses_context' => [ self::$context_name ],
 		] );
 	}
 
@@ -153,9 +153,9 @@ class BlockBindings {
 	}
 
 	public static function execute_query( array $block_context, string $operation_name ): array|null {
-		$block_name   = $block_context['blockName'];
-		$query_input  = $block_context['queryInput'];
-		$overrides    = $block_context['queryInputOverrides'] ?? [];
+		$block_name = $block_context['blockName'];
+		$query_input = $block_context['queryInput'];
+		$overrides = $block_context['queryInputOverrides'] ?? [];
 		$block_config = ConfigStore::get_configuration( $block_name );
 
 		if ( null === $block_config ) {
@@ -164,9 +164,9 @@ class BlockBindings {
 
 		try {
 			$query_config = $block_config['queries']['__DISPLAY__'];
-			$query_input  = self::apply_query_input_overrides( $query_input, $overrides, $block_name );
+			$query_input = self::apply_query_input_overrides( $query_input, $overrides, $block_name );
 
-			$query_runner  = $query_config->get_query_runner();
+			$query_runner = $query_config->get_query_runner();
 			$query_results = $query_runner->execute( $query_input );
 
 			if ( is_wp_error( $query_results ) ) {
@@ -186,10 +186,10 @@ class BlockBindings {
 		// array (by our hooks into the Block Data API).
 		if ( $block instanceof WP_Block ) {
 			$fallback_content = $block->attributes['content'] ?? '';
-			$block_context    = $block->context[ self::$context_name ] ?? [];
+			$block_context = $block->context[ self::$context_name ] ?? [];
 		} else {
 			$fallback_content = $block['attributes']['content'] ?? '';
-			$block_context    = $block['context'][ self::$context_name ] ?? [];
+			$block_context = $block['context'][ self::$context_name ] ?? [];
 		}
 
 		// Fallback to the content if we don't have the expected context.
@@ -212,7 +212,7 @@ class BlockBindings {
 	public static function get_remote_value( array $block_context, array $source_args ): string|null {
 		$block_name = $block_context['blockName'];
 		$field_name = $source_args['field'];
-		$index      = $source_args['index'] ?? 0; // Index is only set for loop queries.
+		$index = $source_args['index'] ?? 0; // Index is only set for loop queries.
 
 		if ( isset( $source_args['block'] ) && $source_args['block'] !== $block_name ) {
 			self::log_error( 'Block binding belongs to a different remote data block', $block_name, $field_name );
@@ -243,16 +243,16 @@ class BlockBindings {
 		// block.json#providesContext), so we can access it directly.
 		$block_context = $attributes['remoteData'];
 
-		$loop_template         = $block->parsed_block['innerBlocks'];
+		$loop_template = $block->parsed_block['innerBlocks'];
 		$loop_template_content = $block->parsed_block['innerContent'];
-		$query_results         = self::execute_query( $block_context, 'loop' );
+		$query_results = self::execute_query( $block_context, 'loop' );
 
 		if ( ! isset( $query_results['results'] ) ) {
 			self::log_error( 'Cannot load results for data loop', $block->name, 'loop' );
 			return $content;
 		}
 
-		$block->parsed_block['innerBlocks']  = [];
+		$block->parsed_block['innerBlocks'] = [];
 		$block->parsed_block['innerContent'] = [];
 
 		// Loop through the query results and make a copy of the template for each
@@ -262,7 +262,7 @@ class BlockBindings {
 
 			// Loop over the inner blocks of the template and update the bindings to
 			// include the current index.
-			$updated_inner_blocks               = self::add_loop_index_to_inner_blocks( $loop_template, $index );
+			$updated_inner_blocks = self::add_loop_index_to_inner_blocks( $loop_template, $index );
 			$block->parsed_block['innerBlocks'] = array_merge( $block->parsed_block['innerBlocks'], $updated_inner_blocks );
 
 			// We don't care too much what the content is, we just need to make sure

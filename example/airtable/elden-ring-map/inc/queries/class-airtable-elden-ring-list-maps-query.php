@@ -15,10 +15,10 @@ class AirtableEldenRingListMapsQuery extends HttpQueryContext {
 
 	public function get_output_schema(): array {
 		return [
-			'root_path'     => '$.records[*]',
+			'root_path' => '$.records[*]',
 			'is_collection' => true,
-			'mappings'      => [
-				'id'       => [
+			'mappings' => [
+				'id' => [
 					'name' => 'Map ID',
 					'path' => '$.id',
 					'type' => 'id',

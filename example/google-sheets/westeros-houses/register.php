@@ -9,7 +9,7 @@ require_once __DIR__ . '/inc/queries/class-list-westeros-houses-query.php';
 require_once __DIR__ . '/inc/queries/class-get-westeros-houses-query.php';
 
 function register_westeros_houses_block() {
-	$block_name  = 'Westeros House';
+	$block_name = 'Westeros House';
 	$credentials = json_decode( base64_decode( \RemoteDataBlocks\Example\get_access_token( 'google_sheets_westeros_houses' ) ), true );
 
 	if ( empty( $credentials ) ) {
@@ -26,7 +26,7 @@ function register_westeros_houses_block() {
 
 	$westeros_houses_datasource = GoogleSheetsDatasource::create( $credentials, '1EHdQg53Doz0B-ImrGz_hTleYeSvkVIk_NSJCOM1FQk0', 'Westeros Houses', );
 	$list_westeros_houses_query = new ListWesterosHousesQuery( $westeros_houses_datasource );
-	$get_westeros_houses_query  = new GetWesterosHousesQuery( $westeros_houses_datasource );
+	$get_westeros_houses_query = new GetWesterosHousesQuery( $westeros_houses_datasource );
 
 	register_remote_data_block( $block_name, $get_westeros_houses_query );
 	register_remote_data_list_query( $block_name, $list_westeros_houses_query );

@@ -10,7 +10,7 @@ require_once __DIR__ . '/inc/queries/class-airtable-elden-ring-list-locations-qu
 require_once __DIR__ . '/inc/queries/class-airtable-elden-ring-list-maps-query.php';
 
 function register_airtable_elden_ring_map_block() {
-	$block_name   = 'Elden Ring Location';
+	$block_name = 'Elden Ring Location';
 	$access_token = \RemoteDataBlocks\Example\get_access_token( 'airtable_elden_ring' );
 
 	if ( empty( $access_token ) ) {
@@ -20,8 +20,8 @@ function register_airtable_elden_ring_map_block() {
 	}
 
 	$elden_ring_datasource = AirtableDatasource::create( $access_token, 'appqI3sJ9R2NcML8Y', [], 'Elden Ring Locations' );
-	$list_locations_query  = new AirtableEldenRingListLocationsQuery( $elden_ring_datasource );
-	$list_maps_query       = new AirtableEldenRingListMapsQuery( $elden_ring_datasource );
+	$list_locations_query = new AirtableEldenRingListLocationsQuery( $elden_ring_datasource );
+	$list_maps_query = new AirtableEldenRingListMapsQuery( $elden_ring_datasource );
 
 	register_remote_data_block( $block_name, $list_locations_query );
 	register_remote_data_list_query( $block_name, $list_maps_query );

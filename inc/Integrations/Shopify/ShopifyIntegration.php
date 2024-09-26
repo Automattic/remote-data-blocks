@@ -20,11 +20,11 @@ class ShopifyIntegration {
 	}
 
 	private static function register_blocks_for_shopify_data_source( array $config ): void {
-		$shopify_datasource            = ShopifyDatasource::from_array( $config );
+		$shopify_datasource = ShopifyDatasource::from_array( $config );
 		$shopify_search_products_query = new ShopifySearchProductsQuery( $shopify_datasource );
-		$shopify_get_product_query     = new ShopifyGetProductQuery( $shopify_datasource );
+		$shopify_get_product_query = new ShopifyGetProductQuery( $shopify_datasource );
 
-		$block_name    = $shopify_datasource->get_display_name();
+		$block_name = $shopify_datasource->get_display_name();
 		$block_pattern = file_get_contents( __DIR__ . '/Patterns/product-teaser.html' );
 
 		register_remote_data_block( $block_name, $shopify_get_product_query );

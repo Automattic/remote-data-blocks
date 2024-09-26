@@ -99,7 +99,7 @@ class PluginSettings {
 	 * (e.g. when `is_dev` returns true).
 	 */
 	public static function get_build(): array {
-		$git_path  = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/.git';
+		$git_path = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/.git';
 		$head_path = $git_path . '/HEAD';
 		if ( ! file_exists( $head_path ) ) {
 			return [];
@@ -111,8 +111,8 @@ class PluginSettings {
 			return [];
 		}
 
-		$ref      = $matches[1];
-		$branch   = $matches[2];
+		$ref = $matches[1];
+		$branch = $matches[2];
 		$ref_path = $git_path . '/' . $ref;
 
 		if ( ! file_exists( $ref_path ) ) {

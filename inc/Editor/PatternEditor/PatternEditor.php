@@ -17,9 +17,9 @@ class PatternEditor {
 			'auth_callback' => function ( bool $_allowed, string $meta_key, int $object_id ) {
 				return current_user_can( 'edit_post_meta', $object_id );
 			},
-			'show_in_rest'  => true,
-			'single'        => true,
-			'type'          => 'string',
+			'show_in_rest' => true,
+			'single' => true,
+			'type' => 'string',
 		] );
 	}
 

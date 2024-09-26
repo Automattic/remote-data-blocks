@@ -22,7 +22,7 @@ class FunctionsTest extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->mock_logger     = new MockLogger();
+		$this->mock_logger = new MockLogger();
 		$this->mock_datasource = MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator() );
 		ConfigRegistry::init( $this->mock_logger );
 	}
@@ -61,7 +61,7 @@ class FunctionsTest extends TestCase {
 		ConfigRegistry::register_query( 'Query Block', $additional_query );
 
 		$block_name = 'remote-data-blocks/query-block';
-		$config     = ConfigStore::get_configuration( $block_name );
+		$config = ConfigStore::get_configuration( $block_name );
 		$this->assertArrayHasKey( get_class( $additional_query ), $config['queries'] );
 	}
 
@@ -77,7 +77,7 @@ class FunctionsTest extends TestCase {
 		register_remote_data_list_query( 'List Block', $list_query );
 
 		$block_name = 'remote-data-blocks/list-block';
-		$config     = ConfigStore::get_configuration( $block_name );
+		$config = ConfigStore::get_configuration( $block_name );
 		$this->assertSame( 'list', $config['selectors'][0]['type'] );
 	}
 
@@ -93,7 +93,7 @@ class FunctionsTest extends TestCase {
 		register_remote_data_search_query( 'Search Block', $search_query );
 
 		$block_name = 'remote-data-blocks/search-block';
-		$config     = ConfigStore::get_configuration( $block_name );
+		$config = ConfigStore::get_configuration( $block_name );
 		$this->assertSame( 'search', $config['selectors'][0]['type'] );
 	}
 

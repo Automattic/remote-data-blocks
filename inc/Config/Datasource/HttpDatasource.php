@@ -19,9 +19,9 @@ use WP_Error;
  * @since 0.1.0
  */
 abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInterface, ArraySerializableInterface, UiDisplayableInterface {
-	protected const SERVICE_NAME           = 'unknown';
+	protected const SERVICE_NAME = 'unknown';
 	protected const SERVICE_SCHEMA_VERSION = -1;
-	protected const SERVICE_SCHEMA         = [];
+	protected const SERVICE_SCHEMA = [];
 
 	final private function __construct( protected array $config ) {}
 
@@ -61,7 +61,7 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 	 */
 	final public static function from_array( array $config, ?ValidatorInterface $validator = null, ?SanitizerInterface $sanitizer = null ): DatasourceInterface|WP_Error {
 		$config['service_schema_version'] = static::SERVICE_SCHEMA_VERSION;
-		$schema                           = static::get_config_schema();
+		$schema = static::get_config_schema();
 
 		$validator = $validator ?? new Validator( $schema );
 		$validated = $validator->validate( $config );
@@ -90,8 +90,8 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 		// TODO: Implement remove from children and implement here in standardized way
 		return [
 			'display_name' => $this->get_display_name(),
-			'slug'         => $this->get_slug(),
-			'service'      => static::SERVICE_NAME,
+			'slug' => $this->get_slug(),
+			'service' => static::SERVICE_NAME,
 		];
 	}
 }

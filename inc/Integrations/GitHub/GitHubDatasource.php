@@ -5,23 +5,23 @@ namespace RemoteDataBlocks\Integrations\GitHub;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 
 class GitHubDatasource extends HttpDatasource {
-	protected const SERVICE_NAME           = REMOTE_DATA_BLOCKS_GITHUB_SERVICE;
+	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_GITHUB_SERVICE;
 	protected const SERVICE_SCHEMA_VERSION = 1;
 	
 	protected const SERVICE_SCHEMA = [
-		'type'       => 'object',
+		'type' => 'object',
 		'properties' => [
-			'service'                => [
-				'type'  => 'string',
+			'service' => [
+				'type' => 'string',
 				'const' => REMOTE_DATA_BLOCKS_GITHUB_SERVICE,
 			],
 			'service_schema_version' => [
-				'type'  => 'integer',
+				'type' => 'integer',
 				'const' => self::SERVICE_SCHEMA_VERSION,
 			],
-			'repo_owner'             => [ 'type' => 'string' ],
-			'repo_name'              => [ 'type' => 'string' ],
-			'ref'                    => [ 'type' => 'string' ],
+			'repo_owner' => [ 'type' => 'string' ],
+			'repo_name' => [ 'type' => 'string' ],
+			'ref' => [ 'type' => 'string' ],
 		],
 	];
 
@@ -62,11 +62,11 @@ class GitHubDatasource extends HttpDatasource {
 	
 	public static function create( string $repo_owner, string $repo_name, string $ref ): self {
 		return parent::from_array([
-			'service'    => REMOTE_DATA_BLOCKS_GITHUB_SERVICE,
+			'service' => REMOTE_DATA_BLOCKS_GITHUB_SERVICE,
 			'repo_owner' => $repo_owner,
-			'repo_name'  => $repo_name,
-			'ref'        => $ref,
-			'slug'       => sanitize_title( sprintf( '%s/%s/%s', $repo_owner, $repo_name, $ref ) ),
+			'repo_name' => $repo_name,
+			'ref' => $ref,
+			'slug' => sanitize_title( sprintf( '%s/%s/%s', $repo_owner, $repo_name, $ref ) ),
 		]);
 	}
 }
