@@ -19,6 +19,7 @@ export type AirtableFormState = {
 	access_token: string;
 	base: StringIdName | null;
 	table: StringIdName | null;
+	table_fields: Set< string >;
 	slug: string;
 };
 
