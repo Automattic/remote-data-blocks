@@ -17,15 +17,11 @@ jobs:
     name: eslint, prettier, wp-scripts
     runs-on: ubuntu-latest
     steps:
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-
       - name: Setup Node.js
         uses: Automattic/vip-actions/nodejs-setup@trunk
         with:
           node-version-file: .nvmrc
+          ignore-scripts: true
 
       - name: Run ESLint
         run: npm run lint
@@ -43,24 +39,19 @@ jobs:
     name: phpcs
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
-
-      - name: Setup Node.js
-        uses: Automattic/vip-actions/nodejs-setup@trunk
-        with:
-          node-version-file: .nvmrc
+          php-version: '8.1'
 
       - name: Install dependencies
         run: composer install
 
-      - name: Run PHPLint
-        run: npm run lint:php
-
-      - name: Run PHPCS
-        run: npm run lint:phpcs
+      - name: Run phpcs
+        run: composer phpcs
 
   psalm:
     name: Psalm
