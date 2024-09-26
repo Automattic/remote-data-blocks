@@ -35,6 +35,7 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 		return false;
 	}
 
+	/** @psalm-suppress ParamNameMismatch reason: parent is camelCase, but we want snake_case */
 	protected function getCacheKey( RequestInterface $request, ?KeyValueHttpHeader $vary_headers = null ): string {
 		$cache_key = parent::getCacheKey( $request, $vary_headers );
 
