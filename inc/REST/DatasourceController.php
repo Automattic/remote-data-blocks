@@ -4,6 +4,7 @@ namespace RemoteDataBlocks\REST;
 
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\WpdbStorage\DatasourceCrud;
+use RemoteDataBlocks\Utils\Utils;
 use WP_REST_Controller;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -110,15 +111,28 @@ class DatasourceController extends WP_REST_Controller {
 	}
 
 	/**
-	 * Retrieves a collection of items.
+	 * Retrieves a collection of unique data sources.
+	 *
+	 * This method compiles a comprehensive list of data sources by:
+	 * 1. Merging data sources from registered blocks and those configured in the settings page UI.
+	 * 2. Removing duplicates based on the 'slug' key.
+	 *
+	 * The deduplication process is necessary because:
+	 * - Some remote data blocks may use data sources configured in the settings page UI.
+	 * - Not all UI-configured data sources are registered as blocks and vice versa.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
-		$code_configured_data_sources = ConfigStore::get_datasources_displayable();
 		$ui_configured_data_sources   = DatasourceCrud::get_data_sources_list();
-		return rest_ensure_response( array_merge( $code_configured_data_sources, $ui_configured_data_sources ) );
+		$data_sources_from_registered_blocks = ConfigStore::get_datasources_displayable();
+		$merged_data_sources = array_merge(
+			$data_sources_from_registered_blocks,
+			$ui_configured_data_sources
+		);
+		$unique_data_sources = Utils::remove_duplicates_by_key( $merged_data_sources, 'slug' );
+		return rest_ensure_response( $unique_data_sources );
 	}
 
 	/**
