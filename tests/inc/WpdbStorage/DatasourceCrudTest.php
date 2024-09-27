@@ -186,4 +186,31 @@ class DatasourceCrudTest extends TestCase {
 		$deleted_source = DatasourceCrud::get_item_by_uuid( DatasourceCrud::get_data_sources(), $source->to_array()['uuid'] );
 		$this->assertFalse( $deleted_source );
 	}
+
+	public function test_get_by_slug_with_existing_slug() {
+		DatasourceCrud::register_new_data_source([
+			'service'                => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
+			'service_schema_version' => 1,
+			'uuid'                   => wp_generate_uuid4(),
+			'access_token'           => 'token1',
+			'base'                   => [
+				'id'   => 'base_id1',
+				'name' => 'Base Name 1',
+			],
+			'tables'                 => [],
+			'display_name'           => 'Crud Test',
+			'slug'                   => 'existing-slug',
+		]);
+
+		$source = DatasourceCrud::get_by_slug( 'existing-slug' );
+		$this->assertIsArray( $source );
+		$this->assertSame( 'existing-slug', $source['slug'] );
+		$this->assertSame( 'token1', $source['access_token'] );
+		$this->assertSame( 'base_id1', $source['base']['id'] );
+	}
+
+	public function test_get_by_slug_with_non_existent_slug() {
+		$non_existent = DatasourceCrud::get_by_slug( 'non-existent-slug' );
+		$this->assertFalse( $non_existent );
+	}
 }
