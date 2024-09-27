@@ -74,29 +74,6 @@ class AirtableDatasource extends HttpDatasource {
 		];
 	}
 
-	public function __temp_get_query(): HttpQueryContext|\WP_Error {
-		$output_schema = [
-			'root_path'     => '$.records[*]',
-			'is_collection' => true,
-			'mappings'      => [],
-		];
-
-		foreach ( $this->config['tables'][0]['output_query_mappings'] as $mapping ) {
-			$output_schema['mappings'][] = [
-				'name' => $mapping['name'],
-				'path' => '$.fields.' . ucfirst( $mapping['name'] ),
-				'type' => $mapping['type'] ?? 'string',
-			];
-		}
-
-		return HttpQueryContext::from_array([
-			'datasource'    => $this,
-			'input_schema'  => [],
-			'output_schema' => $output_schema,
-			'endpoint'      => $this->get_endpoint() . '/' . $this->config['tables'][0]['id'],
-		]);
-	}
-
 	public static function create( string $access_token, string $base_id, ?array $tables = [], ?string $display_name = null ): self {
 		return parent::from_array([
 			'service'      => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
@@ -119,5 +96,71 @@ class AirtableDatasource extends HttpDatasource {
 			'tables'  => $this->config['tables'] ?? [],
 			'uuid'    => $this->config['uuid'] ?? null,
 		];
+	}
+
+
+	public function __temp_get_query(): HttpQueryContext|\WP_Error {
+		$input_schema = [
+			'record_id' => [
+				'name' => 'Record ID',
+				'type' => 'id',
+			],
+		];
+
+		$output_schema = [
+			'is_collection' => false,
+			'mappings'      => [
+				'id' => [
+					'name' => 'Record ID',
+					'path' => '$.id',
+					'type' => 'id',
+				],
+			],
+		];
+
+		foreach ( $this->config['tables'][0]['output_query_mappings'] as $mapping ) {
+			$output_schema['mappings'][strtolower($mapping['name'])] = [
+				'name' => $mapping['name'],
+				'path' => '$.fields.' . ucfirst( $mapping['name'] ),
+				'type' => $mapping['type'] ?? 'string',
+			];
+		}
+
+		return HttpQueryContext::from_array([
+			'datasource'    => $this,
+			'input_schema'  => $input_schema,
+			'output_schema' => $output_schema,
+			'endpoint'      => $this->get_endpoint() . '/' . $this->config['tables'][0]['id'],
+		]);
+	}
+
+	public function __temp_get_list_query(): HttpQueryContext|\WP_Error {
+		$output_schema = [
+			'root_path'     => '$.records[*]',
+			'is_collection' => true,
+			'mappings'      => [
+				'record_id' => [
+					'name' => 'Record ID',
+					'path' => '$.id',
+					'type' => 'id',
+				],
+			],
+		];
+
+		foreach ( $this->config['tables'][0]['output_query_mappings'] as $mapping ) {
+			$output_schema['mappings'][strtolower($mapping['name'])] = [
+				'name' => $mapping['name'],
+				'path' => '$.fields.' . ucfirst( $mapping['name'] ),
+				'type' => $mapping['type'] ?? 'string',
+			];
+		}
+
+		return HttpQueryContext::from_array([
+			'datasource'    => $this,
+			'query_name'    => $this->config['tables'][0]['name'],
+			'input_schema'  => [],
+			'output_schema' => $output_schema,
+			'endpoint'      => $this->get_endpoint() . '/' . $this->config['tables'][0]['id'],
+		]);
 	}
 }

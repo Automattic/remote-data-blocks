@@ -28,9 +28,9 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 		'type'       => 'object',
 		'properties' => [
 			'input_schema'  => [
-				'type' => 'array',
+				'type'  => 'array',
 				'items' => [
-					'type' => 'object',
+					'type'       => 'object',
 					'properties' => [
 						'type'          => [ 'type' => 'string' ],
 						'name'          => [ 'type' => 'string' ],
@@ -48,7 +48,10 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 			'output_schema' => [
 				'type'       => 'object',
 				'properties' => [
-					'root_path'     => [ 'type' => 'string' ],
+					'root_path'     => [
+						'type'     => 'string',
+						'required' => false,
+					],
 					'is_collection' => [ 'type' => 'boolean' ],
 					'mappings'      => [
 						'type'  => 'array',
@@ -64,7 +67,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 				],
 			],
 			'endpoint'      => [
-				'type'     => 'string',
+				'type' => 'string',
 				//'callback' => 'is_url',
 			],
 			'image_url'     => [
@@ -241,7 +244,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	}
 
 	final public static function from_array( array $config, ?ValidatorInterface $validator = null ): self|\WP_Error {
-		if ( ! isset( $config['datasource'] ) || !$config['datasource'] instanceof HttpDatasourceInterface ) {
+		if ( ! isset( $config['datasource'] ) || ! $config['datasource'] instanceof HttpDatasourceInterface ) {
 			return new \WP_Error( 'missing_datasource', __( 'Missing datasource.', 'remote-data-blocks' ) );
 		}
 

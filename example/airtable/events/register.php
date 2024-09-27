@@ -11,7 +11,7 @@ function register_airtable_events_block() {
 	$block_name   = 'Conference Event';
 	$access_token = \RemoteDataBlocks\Example\get_access_token( 'airtable_events' );
 
-	$airtable_datasource        = AirtableDatasource::create( $access_token, 'appVQ2PAl95wQSo9S', 'Conference Events' );
+	$airtable_datasource        = AirtableDatasource::create( $access_token, 'appVQ2PAl95wQSo9S', [], 'Conference Events' );
 	$airtable_get_event_query   = new AirtableGetEventQuery( $airtable_datasource );
 	$airtable_list_events_query = new AirtableListEventsQuery( $airtable_datasource );
 
