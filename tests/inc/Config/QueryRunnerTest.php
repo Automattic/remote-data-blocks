@@ -21,7 +21,7 @@ class QueryRunnerTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->http_client     = $this->createMock( HttpClient::class );
+		$this->http_client      = $this->createMock( HttpClient::class );
 		$this->http_data_source = MockDataSource::from_array( MockDataSource::MOCK_CONFIG, new MockValidator() );
 
 		$this->query_context = new class($this->http_data_source, $this->http_client) extends HttpQueryContext {

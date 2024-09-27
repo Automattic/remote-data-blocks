@@ -12,8 +12,8 @@ class QueryContextTest extends TestCase {
 	private HttpQueryContext $query_context;
 
 	protected function setUp(): void {
-		$this->data_source    = MockDataSource::from_array( MockDataSource::MOCK_CONFIG, new MockValidator() );
-		$this->query_context  = new HttpQueryContext( $this->data_source );
+		$this->data_source   = MockDataSource::from_array( MockDataSource::MOCK_CONFIG, new MockValidator() );
+		$this->query_context = new HttpQueryContext( $this->data_source );
 	}
 
 	public function testGetEndpoint() {

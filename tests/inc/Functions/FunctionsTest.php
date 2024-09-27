@@ -22,7 +22,7 @@ class FunctionsTest extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->mock_logger     = new MockLogger();
+		$this->mock_logger      = new MockLogger();
 		$this->mock_data_source = MockDataSource::from_array( MockDataSource::MOCK_CONFIG, new MockValidator() );
 		ConfigRegistry::init( $this->mock_logger );
 	}
