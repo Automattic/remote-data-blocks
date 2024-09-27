@@ -5,7 +5,6 @@ namespace RemoteDataBlocks\Example\ZipCode;
 use RemoteDataBlocks\Integrations\GenericHttp\GenericHttpDatasource;
 use RemoteDataBlocks\Logging\LoggerManager;
 
-require_once __DIR__ . '/inc/queries/class-zip-code-datasource.php';
 require_once __DIR__ . '/inc/queries/class-get-zip-code-query.php';
 
 function register_zipcode_block() {
