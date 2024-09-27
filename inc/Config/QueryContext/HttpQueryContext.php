@@ -68,7 +68,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 			],
 			'endpoint'      => [
 				'type' => 'string',
-				//'callback' => 'is_url',
 			],
 			'image_url'     => [
 				'type'     => 'string',

@@ -60,7 +60,7 @@ class AirtableDatasource extends HttpDatasource {
 	];
 
 	public function get_display_name(): string {
-		return sprintf( 'Airtable (%s)', $this->config['slug'] );
+		return sprintf( 'Airtable (%s)', $this->config['display_name'] ?? $this->config['slug'] ?? $this->config['base']['name']  );
 	}
 
 	public function get_endpoint(): string {
@@ -118,7 +118,7 @@ class AirtableDatasource extends HttpDatasource {
 		];
 
 		foreach ( $this->config['tables'][0]['output_query_mappings'] as $mapping ) {
-			$output_schema['mappings'][strtolower($mapping['name'])] = [
+			$output_schema['mappings'][ strtolower( $mapping['name'] ) ] = [
 				'name' => $mapping['name'],
 				'path' => '$.fields.' . ucfirst( $mapping['name'] ),
 				'type' => $mapping['type'] ?? 'string',
@@ -147,7 +147,7 @@ class AirtableDatasource extends HttpDatasource {
 		];
 
 		foreach ( $this->config['tables'][0]['output_query_mappings'] as $mapping ) {
-			$output_schema['mappings'][strtolower($mapping['name'])] = [
+			$output_schema['mappings'][ strtolower( $mapping['name'] ) ] = [
 				'name' => $mapping['name'],
 				'path' => '$.fields.' . ucfirst( $mapping['name'] ),
 				'type' => $mapping['type'] ?? 'string',
