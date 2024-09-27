@@ -4,6 +4,7 @@ namespace RemoteDataBlocks\Config\QueryContext;
 
 use RemoteDataBlocks\Config\ArraySerializableInterface;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+use RemoteDataBlocks\Config\Datasource\HttpDatasourceInterface;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 use RemoteDataBlocks\Validation\Validator;
@@ -27,30 +28,33 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 		'type'       => 'object',
 		'properties' => [
 			'input_schema'  => [
-				'type'       => 'object',
-				'properties' => [
-					'type'          => [ 'type' => 'string' ],
-					'name'          => [ 'type' => 'string' ],
-					'default_value' => [
-						'type'     => 'string',
-						'required' => false,
-					],
-					'overrides'     => [
-						'type'     => 'array',
-						'required' => false,
+				'type' => 'array',
+				'items' => [
+					'type' => 'object',
+					'properties' => [
+						'type'          => [ 'type' => 'string' ],
+						'name'          => [ 'type' => 'string' ],
+						'default_value' => [
+							'type'     => 'string',
+							'required' => false,
+						],
+						'overrides'     => [
+							'type'     => 'array',
+							'required' => false,
+						],
 					],
 				],
 			],
 			'output_schema' => [
 				'type'       => 'object',
 				'properties' => [
+					'root_path'     => [ 'type' => 'string' ],
 					'is_collection' => [ 'type' => 'boolean' ],
 					'mappings'      => [
 						'type'  => 'array',
 						'items' => [
 							'type'       => 'object',
 							'properties' => [
-								'id'   => [ 'type' => 'string' ],
 								'name' => [ 'type' => 'string' ],
 								'path' => [ 'type' => 'string' ],
 								'type' => [ 'type' => 'string' ],
@@ -61,7 +65,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 			],
 			'endpoint'      => [
 				'type'     => 'string',
-				'callback' => 'is_url',
+				//'callback' => 'is_url',
 			],
 			'image_url'     => [
 				'type'     => 'string',
@@ -237,6 +241,10 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	}
 
 	final public static function from_array( array $config, ?ValidatorInterface $validator = null ): self|\WP_Error {
+		if ( ! isset( $config['datasource'] ) || !$config['datasource'] instanceof HttpDatasourceInterface ) {
+			return new \WP_Error( 'missing_datasource', __( 'Missing datasource.', 'remote-data-blocks' ) );
+		}
+
 		$validator = $validator ?? new Validator( self::SCHEMA );
 		$validated = $validator->validate( $config );
 

@@ -74,7 +74,7 @@ class AirtableDatasource extends HttpDatasource {
 		];
 	}
 
-	public function __temp_get_query(): HttpQueryContext {
+	public function __temp_get_query(): HttpQueryContext|\WP_Error {
 		$output_schema = [
 			'root_path'     => '$.records[*]',
 			'is_collection' => true,
@@ -94,7 +94,6 @@ class AirtableDatasource extends HttpDatasource {
 			'input_schema'  => [],
 			'output_schema' => $output_schema,
 			'endpoint'      => $this->get_endpoint() . '/' . $this->config['tables'][0]['id'],
-			'table_id'      => $this->config['tables'][0]['id'],
 		]);
 	}
 

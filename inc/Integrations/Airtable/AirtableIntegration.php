@@ -21,6 +21,11 @@ class AirtableIntegration {
 		$block_name = $airtable_datasource->get_display_name();
 		$query      = $airtable_datasource->__temp_get_query();
 
+		if ( is_wp_error( $query ) ) {
+			LoggerManager::instance()->error( 'Failed to get query for Airtable block' );
+			return;
+		}
+
 		register_remote_data_block( $block_name, $query );
 		register_remote_data_list_query( $block_name, $query );
 		
