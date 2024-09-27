@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace RemoteDataBlocks\Config\Datasource;
+namespace RemoteDataBlocks\Config\DataSource;
 
 use RemoteDataBlocks\Config\ArraySerializableInterface;
 use RemoteDataBlocks\Config\UiDisplayableInterface;
@@ -11,14 +11,14 @@ use RemoteDataBlocks\Validation\ValidatorInterface;
 use WP_Error;
 
 /**
- * HttpDatasource class
+ * HttpDataSource class
  *
- * Implements the HttpDatasourceInterface to define a generic HTTP datasource.
+ * Implements the HttpDataSourceInterface to define a generic HTTP data source.
  *
  * @package remote-data-blocks
  * @since 0.1.0
  */
-abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInterface, ArraySerializableInterface, UiDisplayableInterface {
+abstract class HttpDataSource implements DataSourceInterface, HttpDataSourceInterface, ArraySerializableInterface, UiDisplayableInterface {
 	protected const SERVICE_NAME           = 'unknown';
 	protected const SERVICE_SCHEMA_VERSION = -1;
 	protected const SERVICE_SCHEMA         = [];
@@ -46,10 +46,10 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 	 * @inheritDoc
 	 */
 	final public static function get_config_schema(): array {
-		$schema = DatasourceInterface::BASE_SCHEMA;
+		$schema = DataSourceInterface::BASE_SCHEMA;
 
 		if ( isset( static::SERVICE_SCHEMA['properties'] ) ) {
-			$schema['properties'] = array_merge( DatasourceInterface::BASE_SCHEMA['properties'], static::SERVICE_SCHEMA['properties'] );
+			$schema['properties'] = array_merge( DataSourceInterface::BASE_SCHEMA['properties'], static::SERVICE_SCHEMA['properties'] );
 		}
 
 		return $schema;
@@ -59,7 +59,7 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 	 * @inheritDoc
 	 * @psalm-suppress ParamNameMismatch reason: we want the clarity provided by the rename here
 	 */
-	final public static function from_array( array $config, ?ValidatorInterface $validator = null, ?SanitizerInterface $sanitizer = null ): DatasourceInterface|WP_Error {
+	final public static function from_array( array $config, ?ValidatorInterface $validator = null, ?SanitizerInterface $sanitizer = null ): DataSourceInterface|WP_Error {
 		$config['service_schema_version'] = static::SERVICE_SCHEMA_VERSION;
 		$schema                           = static::get_config_schema();
 

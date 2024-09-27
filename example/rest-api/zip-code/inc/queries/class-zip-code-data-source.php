@@ -2,11 +2,11 @@
 
 namespace RemoteDataBlocks\Example\ZipCode;
 
-use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 
-class ZipCodeDatasource extends HttpDatasource {
+class ZipCodeDataSource extends HttpDataSource {
 	public function get_display_name(): string {
-		return 'Zip Code Datasource';
+		return 'Zip Code Data Source';
 	}
 
 	public function get_endpoint(): string {

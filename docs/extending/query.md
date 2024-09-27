@@ -41,7 +41,7 @@ class GetZipCodeQuery extends HttpQueryContext {
 	}
 
 	public function get_endpoint( $input_variables ): string {
-		return $this->get_datasource()->get_endpoint() . $input_variables['zip_code'];
+		return $this->get_data_source()->get_endpoint() . $input_variables['zip_code'];
 	}
 }
 ```
@@ -124,9 +124,9 @@ public function get_output_schema(): array {
 
 The default implementation returns an empty array.
 
-### get_datasource(): DataSourceInterface
+### get_data_source(): DataSourceInterface
 
-The `get_datasource` method returns the data source associated with the query. By default, this method returns the data source that was provided to the class constructor. In most instances, you should not need to override this method.
+The `get_data_source` method returns the data source associated with the query. By default, this method returns the data source that was provided to the class constructor. In most instances, you should not need to override this method.
 
 ### get_endpoint( array $input_variables ): string
 
@@ -136,7 +136,7 @@ By default, the `get_endpoint` method proxies to the `get_endpoint` method of qu
 
 ```php
 public function get_endpoint( $input_variables ): string {
-	return $this->get_datasource()->get_endpoint() . $input_variables['zip_code'];
+	return $this->get_data_source()->get_endpoint() . $input_variables['zip_code'];
 }
 ```
 
@@ -157,7 +157,7 @@ By default, the `get_request_headers` method proxies to the `get_request_headers
 ```php
 public function get_request_headers( array $input_variables ): array {
 	return array_merge(
-		$this->get_datasource()->get_request_headers(),
+		$this->get_data_source()->get_request_headers(),
 		[ 'X-Product-ID' => $input_variables['product_id'] ]
 	);
 }

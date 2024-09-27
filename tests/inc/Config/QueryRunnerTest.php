@@ -4,17 +4,17 @@ namespace RemoteDataBlocks\Tests\Config;
 
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 use RemoteDataBlocks\HttpClient\HttpClient;
-use RemoteDataBlocks\Tests\Mocks\MockDatasource;
+use RemoteDataBlocks\Tests\Mocks\MockDataSource;
 use RemoteDataBlocks\Tests\Mocks\MockValidator;
 use WP_Error;
 
 class QueryRunnerTest extends TestCase {
-	private MockDatasource $http_datasource;
+	private MockDataSource $http_data_source;
 	private HttpQueryContext $query_context;
 	private HttpClient $http_client;
 
@@ -22,19 +22,19 @@ class QueryRunnerTest extends TestCase {
 		parent::setUp();
 
 		$this->http_client     = $this->createMock( HttpClient::class );
-		$this->http_datasource = MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator() );
+		$this->http_data_source = MockDataSource::from_array( MockDataSource::MOCK_CONFIG, new MockValidator() );
 
-		$this->query_context = new class($this->http_datasource, $this->http_client) extends HttpQueryContext {
+		$this->query_context = new class($this->http_data_source, $this->http_client) extends HttpQueryContext {
 			private string $request_method = 'GET';
 			private array $request_body    = [ 'query' => 'test' ];
 			private mixed $response_data   = null;
 
-			public function __construct( private HttpDatasource $http_datasource, private HttpClient $http_client ) {
-				parent::__construct( $http_datasource );
+			public function __construct( private HttpDataSource $http_data_source, private HttpClient $http_client ) {
+				parent::__construct( $http_data_source );
 			}
 
 			public function get_endpoint( array $input_variables = [] ): string {
-				return $this->http_datasource->get_endpoint();
+				return $this->http_data_source->get_endpoint();
 			}
 
 			public function get_image_url(): ?string {
@@ -121,7 +121,7 @@ class QueryRunnerTest extends TestCase {
 		] );
 		$response        = new Response( 200, [], $response_body );
 
-		$this->http_datasource->set_endpoint( $endpoint );
+		$this->http_data_source->set_endpoint( $endpoint );
 		$this->http_client->method( 'request' )->willReturn( $response );
 
 		$query_runner = $this->query_context->get_query_runner();
@@ -179,7 +179,7 @@ class QueryRunnerTest extends TestCase {
 	public function testExecuteInvalidEndpoints( string $endpoint, string $expected_error_code ) {
 		$input_variables = [ 'key' => 'value' ];
 
-		$this->http_datasource->set_endpoint( $endpoint );
+		$this->http_data_source->set_endpoint( $endpoint );
 
 		$query_runner = $this->query_context->get_query_runner();
 		$result       = $query_runner->execute( $input_variables );
