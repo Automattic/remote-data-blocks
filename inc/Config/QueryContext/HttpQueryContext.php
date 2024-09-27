@@ -66,13 +66,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 					],
 				],
 			],
-			'endpoint'      => [
-				'type' => 'string',
-			],
-			'image_url'     => [
-				'type'     => 'string',
-				'required' => false,
-			],
 			'query_name'    => [
 				'type'     => 'string',
 				'required' => false,
@@ -150,8 +143,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * Override this method to specify a custom endpoint for this query.
 	 */
 	public function get_endpoint( array $input_variables ): string {
-		$endpoint = $this->config['endpoint'] ?? $this->get_datasource()->get_endpoint();
-		return $this->replace_endpoint_placeholders( $endpoint, $input_variables );
+		return $this->get_datasource()->get_endpoint();
 	}
 
 	/**
@@ -159,7 +151,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * represent it in the UI.
 	 */
 	public function get_image_url(): string|null {
-		return $this->config['image_url'] ?? $this->get_datasource()->get_image_url();
+		return $this->get_datasource()->get_image_url();
 	}
 
 	/**
@@ -196,7 +188,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * block editor.
 	 */
 	public function get_query_name(): string {
-		return $this->config['query_name'] ?? 'Query';
+		return 'Query';
 	}
 
 	/**
@@ -248,7 +240,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	// runner execution. ie: $query_runner->execute( $query, $datasource );
 	//
 	/** @psalm-suppress ParamNameMismatch reason: we want the clarity provided by the rename here */
-	final public static function from_array( array $config, ?ValidatorInterface $validator = null ): self|\WP_Error {
+	final public static function from_array( array $config, ?ValidatorInterface $validator = null ): static|\WP_Error {
 		if ( ! isset( $config['datasource'] ) || ! $config['datasource'] instanceof HttpDatasourceInterface ) {
 			return new \WP_Error( 'missing_datasource', __( 'Missing datasource.', 'remote-data-blocks' ) );
 		}
@@ -260,7 +252,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 			return $validated;
 		}
 
-		return new self( $config['datasource'], $config['input_schema'], $config['output_schema'], $config );
+		return new static( $config['datasource'], $config['input_schema'], $config['output_schema'], $config );
 	}
 
 	public function to_array(): array {
@@ -269,22 +261,5 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 			'input_schema'  => $this->input_schema,
 			'output_schema' => $this->output_schema,
 		];
-	}
-
-	/**
-	 * Replace placeholders in the endpoint url with matching input variables.
-	 * 
-	 * The placeholders are expected to be in the Ruby on Rails/Express.js/Phoenix/etc
-	 * placeholder format of :placeholder, eg, `/path/:variable_name`.
-	 */
-	protected function replace_endpoint_placeholders( string $endpoint, array $input_variables ): string {
-		return preg_replace_callback(
-			'/:(\w+)(?=[\/]|$)/',
-			function ( $matches ) use ( $input_variables ) {
-				$key = $matches[1];
-				return isset( $input_variables[ $key ] ) ? urlencode( $input_variables[ $key ] ) : $matches[0];
-			},
-			$endpoint
-		);
 	}
 }

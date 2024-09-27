@@ -3,7 +3,6 @@
 namespace RemoteDataBlocks\Integrations\Airtable;
 
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
-use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
 class AirtableDatasource extends HttpDatasource {
 	protected const SERVICE_SCHEMA_VERSION = 1;
@@ -98,7 +97,7 @@ class AirtableDatasource extends HttpDatasource {
 		];
 	}
 
-	public function ___temp_get_query(): HttpQueryContext|\WP_Error {
+	public function ___temp_get_query(): AirtableGetItemQuery|\WP_Error {
 		$input_schema = [
 			'record_id' => [
 				'name' => 'Record ID',
@@ -125,15 +124,14 @@ class AirtableDatasource extends HttpDatasource {
 			];
 		}
 
-		return HttpQueryContext::from_array([
+		return AirtableGetItemQuery::from_array([
 			'datasource'    => $this,
 			'input_schema'  => $input_schema,
 			'output_schema' => $output_schema,
-			'endpoint'      => $this->get_endpoint() . "/{$this->config['tables'][0]['id']}/:record_id",
 		]);
 	}
 
-	public function ___temp_get_list_query(): HttpQueryContext|\WP_Error {
+	public function ___temp_get_list_query(): AirtableListItemsQuery|\WP_Error {
 		$output_schema = [
 			'root_path'     => '$.records[*]',
 			'is_collection' => true,
@@ -154,12 +152,11 @@ class AirtableDatasource extends HttpDatasource {
 			];
 		}
 
-		return HttpQueryContext::from_array([
+		return AirtableListItemsQuery::from_array([
 			'datasource'    => $this,
 			'input_schema'  => [],
 			'output_schema' => $output_schema,
 			'query_name'    => $this->config['tables'][0]['name'],
-			'endpoint'      => $this->get_endpoint() . '/' . $this->config['tables'][0]['id'],
 		]);
 	}
 }
