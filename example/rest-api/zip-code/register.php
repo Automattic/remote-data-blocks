@@ -10,7 +10,7 @@ require_once __DIR__ . '/inc/queries/class-get-zip-code-query.php';
 function register_zipcode_block() {
 	$zipcode_datasource = GenericHttpDatasource::from_slug( 'zip-code' );
 
-	if ( !$zipcode_datasource instanceof GenericHttpDatasource ) {
+	if ( ! $zipcode_datasource instanceof GenericHttpDatasource ) {
 		LoggerManager::instance()->debug( 'Zip Code datasource not found' );
 		return;
 	}
