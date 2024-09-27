@@ -2,9 +2,12 @@
 
 namespace RemoteDataBlocks\Config\QueryContext;
 
+use RemoteDataBlocks\Config\ArraySerializableInterface;
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
+use RemoteDataBlocks\Validation\Validator;
+use RemoteDataBlocks\Validation\ValidatorInterface;
 
 defined( 'ABSPATH' ) || exit();
 
@@ -17,8 +20,59 @@ defined( 'ABSPATH' ) || exit();
  * @package remote-data-blocks
  * @since 0.1.0
  */
-class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterface {
+class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterface, ArraySerializableInterface {
 	const VERSION = '0.1.0';
+
+	protected const SCHEMA = [
+		'type'       => 'object',
+		'properties' => [
+			'input_schema'  => [
+				'type'       => 'object',
+				'properties' => [
+					'type'          => [ 'type' => 'string' ],
+					'name'          => [ 'type' => 'string' ],
+					'default_value' => [
+						'type'     => 'string',
+						'required' => false,
+					],
+					'overrides'     => [
+						'type'     => 'array',
+						'required' => false,
+					],
+				],
+			],
+			'output_schema' => [
+				'type'       => 'object',
+				'properties' => [
+					'is_collection' => [ 'type' => 'boolean' ],
+					'mappings'      => [
+						'type'  => 'array',
+						'items' => [
+							'type'       => 'object',
+							'properties' => [
+								'id'   => [ 'type' => 'string' ],
+								'name' => [ 'type' => 'string' ],
+								'path' => [ 'type' => 'string' ],
+								'type' => [ 'type' => 'string' ],
+							],
+						],
+					],
+				],
+			],
+			'endpoint'      => [
+				'type'     => 'string',
+				'callback' => 'is_url',
+			],
+			'image_url'     => [
+				'type'     => 'string',
+				'required' => false,
+			],
+			'query_name'    => [
+				'type'     => 'string',
+				'required' => false,
+			],
+		],
+	];
 
 	/**
 	 * Constructor.
@@ -30,7 +84,8 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	public function __construct(
 		private HttpDatasource $datasource,
 		public array $input_schema = [],
-		public array $output_schema = []
+		public array $output_schema = [],
+		private array $config = [],
 	) {
 		// Provide input and output variables as public properties.
 		$this->input_schema  = $this->get_input_schema();
@@ -89,7 +144,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * Override this method to specify a custom endpoint for this query.
 	 */
 	public function get_endpoint( array $input_variables ): string {
-		return $this->get_datasource()->get_endpoint();
+		return $this->config['endpoint'] ?? $this->get_datasource()->get_endpoint();
 	}
 
 	/**
@@ -97,7 +152,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * represent it in the UI.
 	 */
 	public function get_image_url(): string|null {
-		return $this->get_datasource()->get_image_url();
+		return $this->config['image_url'] ?? $this->get_datasource()->get_image_url();
 	}
 
 	/**
@@ -134,7 +189,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * block editor.
 	 */
 	public function get_query_name(): string {
-		return 'Query';
+		return $this->config['query_name'] ?? 'Query';
 	}
 
 	/**
@@ -179,5 +234,24 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 */
 	final public function is_response_data_collection(): bool {
 		return $this->output_schema['is_collection'] ?? false;
+	}
+
+	final public static function from_array( array $config, ?ValidatorInterface $validator = null ): self|\WP_Error {
+		$validator = $validator ?? new Validator( self::SCHEMA );
+		$validated = $validator->validate( $config );
+
+		if ( is_wp_error( $validated ) ) {
+			return $validated;
+		}
+
+		return new self( $config['datasource'], $config['input_schema'], $config['output_schema'], $config );
+	}
+
+	public function to_array(): array {
+		return [
+			'datasource'    => get_class( $this->get_datasource() ),
+			'input_schema'  => $this->input_schema,
+			'output_schema' => $this->output_schema,
+		];
 	}
 }

@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Integrations\Airtable;
 
 use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
 class AirtableDatasource extends HttpDatasource {
 	protected const SERVICE_SCHEMA_VERSION = 1;
@@ -59,10 +60,10 @@ class AirtableDatasource extends HttpDatasource {
 	];
 
 	public function get_display_name(): string {
-		return sprintf( 'Airtable: %s', $this->config['display_name'] ?? $this->config['base']['name'] );
+		return sprintf( 'Airtable (%s)', $this->config['slug'] );
 	}
 
-	public function get_endpoint( string $variation = '' ): string {
+	public function get_endpoint(): string {
 		return 'https://api.airtable.com/v0/' . $this->config['base']['id'];
 	}
 
@@ -71,6 +72,30 @@ class AirtableDatasource extends HttpDatasource {
 			'Authorization' => sprintf( 'Bearer %s', $this->config['access_token'] ),
 			'Content-Type'  => 'application/json',
 		];
+	}
+
+	public function __temp_get_query(): HttpQueryContext {
+		$output_schema = [
+			'root_path'     => '$.records[*]',
+			'is_collection' => true,
+			'mappings'      => [],
+		];
+
+		foreach ( $this->config['tables'][0]['output_query_mappings'] as $mapping ) {
+			$output_schema['mappings'][] = [
+				'name' => $mapping['name'],
+				'path' => '$.fields.' . ucfirst( $mapping['name'] ),
+				'type' => $mapping['type'] ?? 'string',
+			];
+		}
+
+		return HttpQueryContext::from_array([
+			'datasource'    => $this,
+			'input_schema'  => [],
+			'output_schema' => $output_schema,
+			'endpoint'      => $this->get_endpoint() . '/' . $this->config['tables'][0]['id'],
+			'table_id'      => $this->config['tables'][0]['id'],
+		]);
 	}
 
 	public static function create( string $access_token, string $base_id, ?array $tables = [], ?string $display_name = null ): self {

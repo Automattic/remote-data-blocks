@@ -15,9 +15,15 @@ class AirtableIntegration {
 	}
 
 	private static function register_blocks_for_airtable_data_source( array $config ): void {
-		LoggerManager::instance()->info( 'Registering Airtable block for: ' . wp_json_encode( $config ) ); // TODO: Remove this or make it debug level, etc.
+		/** @var AirtableDatasource $airtable_datasource */
+		$airtable_datasource = AirtableDatasource::from_array( $config );
 
-		AirtableDatasource::from_array( $config );
-		// TODO: Block registration & all the rest...  This will only work if there is some mapping configured
+		$block_name = $airtable_datasource->get_display_name();
+		$query      = $airtable_datasource->__temp_get_query();
+
+		register_remote_data_block( $block_name, $query );
+		register_remote_data_list_query( $block_name, $query );
+		
+		LoggerManager::instance()->info( 'Registered Airtable block', [ 'block_name' => $block_name ] );
 	}
 }
