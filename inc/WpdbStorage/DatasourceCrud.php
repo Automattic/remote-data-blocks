@@ -124,6 +124,18 @@ class DatasourceCrud {
 		return true;
 	}
 
+	/**
+	 * Get a data source by its slug.
+	 * 
+	 * The easiest way to think of the slug relative to data sources is it
+	 * provides a developer-friendly "contract" for the data source. The developer
+	 * can define the slug pre-emptively in their code and then customers can add it
+	 * when configuring specific data sources later.
+	 * 
+	 * This function naively returns the first data source it finds. In theory, that
+	 * should be the only one as we check for slug conflicts at present. In the future,
+	 * it's be good to holistically improve how those interactions work
+	 */
 	public static function get_by_slug( string $slug ): array|false {
 		$data_sources = self::get_data_sources();
 		foreach ( $data_sources as $source ) {
