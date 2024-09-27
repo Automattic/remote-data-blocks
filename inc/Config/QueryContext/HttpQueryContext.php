@@ -259,10 +259,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	}
 
 	public function to_array(): array {
-		return [
-			'datasource'    => get_class( $this->get_datasource() ),
-			'input_schema'  => $this->input_schema,
-			'output_schema' => $this->output_schema,
-		];
+		return $this->config;
 	}
 }
