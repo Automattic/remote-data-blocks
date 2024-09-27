@@ -129,7 +129,7 @@ class AirtableDatasource extends HttpDatasource {
 			'datasource'    => $this,
 			'input_schema'  => $input_schema,
 			'output_schema' => $output_schema,
-			'endpoint'      => $this->get_endpoint() . "/{$this->config['tables'][0]['id']}/:record_id:",
+			'endpoint'      => $this->get_endpoint() . "/{$this->config['tables'][0]['id']}/:record_id",
 		]);
 	}
 

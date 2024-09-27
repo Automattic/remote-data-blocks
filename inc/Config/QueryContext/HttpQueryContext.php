@@ -155,7 +155,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 
 		// Replace placeholders in the endpoint with input variables
 		return preg_replace_callback(
-			'/:(\w+):/',
+			'/:(\w+)(?=[\/]|$)/',
 			function ( $matches ) use ( $input_variables ) {
 				$key = $matches[1];
 				return isset( $input_variables[ $key ] ) ? urlencode( $input_variables[ $key ] ) : $matches[0];
