@@ -24,7 +24,7 @@ defined( 'ABSPATH' ) || exit();
 class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterface, ArraySerializableInterface {
 	const VERSION = '0.1.0';
 
-	protected const SCHEMA = [
+	protected const CONFIG_SCHEMA = [
 		'type'       => 'object',
 		'properties' => [
 			'input_schema'  => [
@@ -151,7 +151,17 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * Override this method to specify a custom endpoint for this query.
 	 */
 	public function get_endpoint( array $input_variables ): string {
-		return $this->config['endpoint'] ?? $this->get_datasource()->get_endpoint();
+		$endpoint = $this->config['endpoint'] ?? $this->get_datasource()->get_endpoint();
+
+		// Replace placeholders in the endpoint with input variables
+		return preg_replace_callback(
+			'/:(\w+):/',
+			function ( $matches ) use ( $input_variables ) {
+				$key = $matches[1];
+				return isset( $input_variables[ $key ] ) ? urlencode( $input_variables[ $key ] ) : $matches[0];
+			},
+			$endpoint
+		);
 	}
 
 	/**
@@ -243,12 +253,13 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 		return $this->output_schema['is_collection'] ?? false;
 	}
 
+	/** @psalm-suppress ParamNameMismatch reason: we want the clarity provided by the rename here */
 	final public static function from_array( array $config, ?ValidatorInterface $validator = null ): self|\WP_Error {
 		if ( ! isset( $config['datasource'] ) || ! $config['datasource'] instanceof HttpDatasourceInterface ) {
 			return new \WP_Error( 'missing_datasource', __( 'Missing datasource.', 'remote-data-blocks' ) );
 		}
 
-		$validator = $validator ?? new Validator( self::SCHEMA );
+		$validator = $validator ?? new Validator( self::CONFIG_SCHEMA );
 		$validated = $validator->validate( $config );
 
 		if ( is_wp_error( $validated ) ) {

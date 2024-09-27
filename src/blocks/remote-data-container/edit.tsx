@@ -94,7 +94,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 
 	if ( showPatternSelection ) {
 		const supportedPatterns = getSupportedPatterns( props.attributes.remoteData?.results[ 0 ] );
-
+		console.log( supportedPatterns );
 		if ( supportedPatterns.length ) {
 			return (
 				<div { ...blockProps }>
