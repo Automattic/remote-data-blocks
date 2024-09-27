@@ -11,21 +11,20 @@ class Utils {
 	 * @return array The array with duplicates removed.
 	 */
 	public static function remove_duplicates_by_key( array $array, string $key ): array {
-		$seen = [];
+		$seen   = [];
 		$result = [];
 
 		foreach ( $array as $item ) {
-			if ( ! isset( $item[$key] ) ) {
+			if ( ! isset( $item[ $key ] ) ) {
 				continue;
 			}
-			$keyValue = $item[$key];
-			if ( ! isset( $seen[$keyValue] ) ) {
-				$seen[$keyValue] = true;
-				$result[] = $item;
+			$key_value = $item[ $key ];
+			if ( ! isset( $seen[ $key_value ] ) ) {
+				$seen[ $key_value ] = true;
+				$result[]           = $item;
 			}
 		}
 
 		return $result;
 	}
 }
-
