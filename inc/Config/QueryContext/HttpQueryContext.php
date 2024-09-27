@@ -84,11 +84,14 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 		private HttpDatasource $datasource,
 		public array $input_schema = [],
 		public array $output_schema = [],
-		private array $config = [],
+		protected array $config = [],
 	) {
 		// Provide input and output variables as public properties.
 		$this->input_schema  = $this->get_input_schema();
 		$this->output_schema = $this->get_output_schema();
+
+		// @todo: expand or kill this
+		$this->config = $config;
 	}
 
 	/**
