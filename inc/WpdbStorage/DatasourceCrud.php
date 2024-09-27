@@ -124,6 +124,16 @@ class DatasourceCrud {
 		return true;
 	}
 
+	public static function get_by_slug( string $slug ): array|false {
+		$data_sources = self::get_data_sources();
+		foreach ( $data_sources as $source ) {
+			if ( $source['slug'] === $slug ) {
+				return $source;
+			}
+		}
+		return false;
+	}
+
 	private static function save_datasource( ArraySerializableInterface $datasource, array $datasource_configs ): bool {
 		$config = $datasource->to_array();
 		
