@@ -8,6 +8,7 @@ use RemoteDataBlocks\Sanitization\Sanitizer;
 use RemoteDataBlocks\Sanitization\SanitizerInterface;
 use RemoteDataBlocks\Validation\Validator;
 use RemoteDataBlocks\Validation\ValidatorInterface;
+use RemoteDataBlocks\WpdbStorage\DatasourceCrud;
 use WP_Error;
 
 /**
@@ -53,6 +54,16 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 		}
 
 		return $schema;
+	}
+
+	public static function from_slug( string $slug ): DatasourceInterface|WP_Error {
+		$config = DatasourceCrud::get_by_slug( $slug );
+
+		if ( ! $config ) {
+			return new WP_Error( 'data_source_not_found', __( 'Data source not found.', 'remote-data-blocks' ), [ 'status' => 404 ] );
+		}
+
+		return static::from_array( $config );
 	}
 
 	/**
