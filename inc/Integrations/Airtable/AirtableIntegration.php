@@ -19,8 +19,8 @@ class AirtableIntegration {
 		$airtable_datasource = AirtableDatasource::from_array( $config );
 
 		$block_name = $airtable_datasource->get_display_name();
-		$query      = $airtable_datasource->__temp_get_query();
-		$list_query = $airtable_datasource->__temp_get_list_query();
+		$query      = $airtable_datasource->_temp_get_query();
+		$list_query = $airtable_datasource->_temp_get_list_query();
 
 		if ( is_wp_error( $query ) || is_wp_error( $list_query ) ) {
 			LoggerManager::instance()->error( 'Failed to get query for Airtable block' );

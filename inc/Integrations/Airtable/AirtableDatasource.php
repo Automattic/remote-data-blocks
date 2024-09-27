@@ -60,7 +60,7 @@ class AirtableDatasource extends HttpDatasource {
 	];
 
 	public function get_display_name(): string {
-		return sprintf( 'Airtable (%s)', $this->config['display_name'] ?? $this->config['slug'] ?? $this->config['base']['name']  );
+		return sprintf( 'Airtable (%s)', $this->config['display_name'] ?? $this->config['slug'] ?? $this->config['base']['name'] );
 	}
 
 	public function get_endpoint(): string {
@@ -98,7 +98,7 @@ class AirtableDatasource extends HttpDatasource {
 		];
 	}
 
-	public function __temp_get_query(): HttpQueryContext|\WP_Error {
+	public function _temp_get_query(): HttpQueryContext|\WP_Error {
 		$input_schema = [
 			'record_id' => [
 				'name' => 'Record ID',
@@ -133,7 +133,7 @@ class AirtableDatasource extends HttpDatasource {
 		]);
 	}
 
-	public function __temp_get_list_query(): HttpQueryContext|\WP_Error {
+	public function _temp_get_list_query(): HttpQueryContext|\WP_Error {
 		$output_schema = [
 			'root_path'     => '$.records[*]',
 			'is_collection' => true,
