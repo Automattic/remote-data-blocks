@@ -151,16 +151,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 */
 	public function get_endpoint( array $input_variables ): string {
 		$endpoint = $this->config['endpoint'] ?? $this->get_datasource()->get_endpoint();
-
-		// Replace placeholders in the endpoint with input variables
-		return preg_replace_callback(
-			'/:(\w+)(?=[\/]|$)/',
-			function ( $matches ) use ( $input_variables ) {
-				$key = $matches[1];
-				return isset( $input_variables[ $key ] ) ? urlencode( $input_variables[ $key ] ) : $matches[0];
-			},
-			$endpoint
-		);
+		return $this->replace_endpoint_placeholders( $endpoint, $input_variables );
 	}
 
 	/**
@@ -278,5 +269,22 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 			'input_schema'  => $this->input_schema,
 			'output_schema' => $this->output_schema,
 		];
+	}
+
+	/**
+	 * Replace placeholders in the endpoint url with matching input variables.
+	 * 
+	 * The placeholders are expected to be in the Ruby on Rails/Express.js/Phoenix/etc
+	 * placeholder format of :placeholder, eg, `/path/:variable_name`.
+	 */
+	protected function replace_endpoint_placeholders( string $endpoint, array $input_variables ): string {
+		return preg_replace_callback(
+			'/:(\w+)(?=[\/]|$)/',
+			function ( $matches ) use ( $input_variables ) {
+				$key = $matches[1];
+				return isset( $input_variables[ $key ] ) ? urlencode( $input_variables[ $key ] ) : $matches[0];
+			},
+			$endpoint
+		);
 	}
 }
