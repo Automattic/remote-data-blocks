@@ -39,7 +39,7 @@
     "start:decoupled": "./bin/start decoupled",
     "start:monolith": "./bin/start monolith",
     "start:monolith-xdebug": "./bin/start monolith-xdebug",
-    "start:playground": "npx @wp-now/wp-now start --php=8.2",
+    "start:playground": "npx @wp-now/wp-now start --php=8.2 --blueprint=blueprint.local.json",
     "start:playground:reset": "npm run start:playground -- --reset",
     "stop": "./bin/stop",
     "test": "npm run test:php && npm run test:js",
