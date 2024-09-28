@@ -20,7 +20,7 @@ A [persistent object cache](https://developer.wordpress.org/reference/classes/wp
 ## Next steps
 
 > [!WARNING]
-> This plugin is still under heavy active development and breaking changes may land without warning. If you are interested in evaluating or testing this plugin, please [open an issue](https://github.com/Automattic/remote-data-blocks/issues/new/choose) and we'll be in touch!
+> This plugin is under heavy active development and breaking changes may land without warning. If you are interested in evaluating or testing this plugin, please [open an issue](https://github.com/Automattic/remote-data-blocks/issues/new/choose) and we'll be in touch!
 
 - Learn about the [core concepts](docs/concepts/index.md) behind Remote Data Blocks.
 - Follow along with [example workflows](docs/workflows/index.md) to see Remote Data Blocks in action.
