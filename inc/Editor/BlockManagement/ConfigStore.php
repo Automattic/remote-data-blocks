@@ -70,12 +70,12 @@ class ConfigStore {
 	}
 
 	/**
-	 * Return an unprivileged representation of the datasources that can be
+	 * Return an unprivileged representation of the data sources that can be
 	 * displayed in settings screens.
 	 *
 	 * @return UiDisplayableInterface[]
 	 */
-	public static function get_datasources_displayable(): array {
+	public static function get_data_sources_displayable(): array {
 		$data_sources = [];
 
 		foreach ( self::$configurations as $config ) {
@@ -84,7 +84,7 @@ class ConfigStore {
 					continue;
 				}
 
-				$data_source = $query->get_datasource();
+				$data_source = $query->get_data_source();
 
 				if ( $data_source instanceof UiDisplayableInterface ) {
 					$data_sources[ $data_source->to_array()['slug'] ] = $data_source->to_ui_display();
