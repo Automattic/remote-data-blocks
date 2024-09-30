@@ -126,10 +126,10 @@ class DataSourceController extends WP_REST_Controller {
 		 * single source of truth for data source configurations
 		 */
 		$data_sources = array_values(array_reduce(
-			array_merge($code_configured_data_sources, $ui_configured_data_sources),
-			function($carry, $item) {
-				$carry[$item['slug']] = $item;
-				return $carry;
+			array_merge( $code_configured_data_sources, $ui_configured_data_sources ),
+			function ( $acc, $item ) {
+				$acc[ $item['slug'] ] = $item;
+				return $acc;
 			},
 			[]
 		));
