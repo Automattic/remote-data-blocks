@@ -238,14 +238,14 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 		return $this->output_schema['is_collection'] ?? false;
 	}
 
-	// @todo: consider splitting the datasource injection out from query context so we don't have to tie a query
-	// to a datasource when instantiating. instead, we can just require applying queries to datasources in query
-	// runner execution. ie: $query_runner->execute( $query, $datasource );
+	// @todo: consider splitting the data source injection out from query context so we don't have to tie a query
+	// to a data source when instantiating. instead, we can just require applying queries to data sources in query
+	// runner execution. ie: $query_runner->execute( $query, $data_source );
 	//
 	/** @psalm-suppress ParamNameMismatch reason: we want the clarity provided by the rename here */
 	final public static function from_array( array $config, ?ValidatorInterface $validator = null ): static|\WP_Error {
-		if ( ! isset( $config['datasource'] ) || ! $config['datasource'] instanceof HttpDataSourceInterface ) {
-			return new \WP_Error( 'missing_datasource', __( 'Missing datasource.', 'remote-data-blocks' ) );
+		if ( ! isset( $config['data_source'] ) || ! $config['data_source'] instanceof HttpDataSourceInterface ) {
+			return new \WP_Error( 'missing_data_source', __( 'Missing data source.', 'remote-data-blocks' ) );
 		}
 
 		$validator = $validator ?? new Validator( self::CONFIG_SCHEMA );
@@ -255,7 +255,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 			return $validated;
 		}
 
-		return new static( $config['datasource'], $config['input_schema'], $config['output_schema'], $config );
+		return new static( $config['data_source'], $config['input_schema'], $config['output_schema'], $config );
 	}
 
 	public function to_array(): array {

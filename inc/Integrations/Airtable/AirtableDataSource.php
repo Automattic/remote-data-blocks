@@ -125,7 +125,7 @@ class AirtableDataSource extends HttpDataSource {
 		}
 
 		return AirtableGetItemQuery::from_array([
-			'datasource'    => $this,
+			'data_source'    => $this,
 			'input_schema'  => $input_schema,
 			'output_schema' => $output_schema,
 		]);
@@ -153,7 +153,7 @@ class AirtableDataSource extends HttpDataSource {
 		}
 
 		return AirtableListItemsQuery::from_array([
-			'datasource'    => $this,
+			'data_source'    => $this,
 			'input_schema'  => [],
 			'output_schema' => $output_schema,
 			'query_name'    => $this->config['tables'][0]['name'],

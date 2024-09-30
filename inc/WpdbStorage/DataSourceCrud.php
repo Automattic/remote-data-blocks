@@ -146,8 +146,8 @@ class DataSourceCrud {
 		return false;
 	}
 
-	private static function save_data_source( ArraySerializableInterface $datasource, array $data_source_configs ): bool {
-		$config = $datasource->to_array();
+	private static function save_data_source( ArraySerializableInterface $data_source, array $data_source_configs ): bool {
+		$config = $data_source->to_array();
 		
 		if ( ! isset( $config['__metadata'] ) ) {
 			$config['__metadata'] = [];

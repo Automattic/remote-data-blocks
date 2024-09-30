@@ -15,12 +15,12 @@ class AirtableIntegration {
 	}
 
 	private static function register_blocks_for_airtable_data_source( array $config ): void {
-		/** @var AirtableDataSource $airtable_datasource */
-		$airtable_datasource = AirtableDataSource::from_array( $config );
+		/** @var AirtableDataSource $airtable_data_source */
+		$airtable_data_source = AirtableDataSource::from_array( $config );
 
-		$block_name = $airtable_datasource->get_display_name();
-		$query      = $airtable_datasource->___temp_get_query();
-		$list_query = $airtable_datasource->___temp_get_list_query();
+		$block_name = $airtable_data_source->get_display_name();
+		$query      = $airtable_data_source->___temp_get_query();
+		$list_query = $airtable_data_source->___temp_get_list_query();
 
 		if ( is_wp_error( $query ) || is_wp_error( $list_query ) ) {
 			LoggerManager::instance()->error( 'Failed to get query for Airtable block' );
