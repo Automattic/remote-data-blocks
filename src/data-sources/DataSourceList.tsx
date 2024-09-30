@@ -65,7 +65,7 @@ const DataSourceList = () => {
 				break;
 		}
 
-		return tags.map( tag => (
+		return tags.filter( Boolean ).map( tag => (
 			<span key={ tag } className="data-source-meta">
 				{ tag }
 			</span>
