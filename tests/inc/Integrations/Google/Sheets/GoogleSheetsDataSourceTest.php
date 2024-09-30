@@ -3,7 +3,13 @@
 namespace RemoteDataBlocks\Tests\Integrations\Google\Sheets;
 
 use PHPUnit\Framework\TestCase;
+use Mockery;
 use RemoteDataBlocks\Integrations\Google\Sheets\GoogleSheetsDataSource;
+use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
+
+class GoogleAuthStub {
+	const GOOGLE_SHEETS_SCOPES = [ 'scope1', 'scope2' ];
+}
 
 class GoogleSheetsDataSourceTest extends TestCase {
 	private GoogleSheetsDataSource $data_source;
@@ -45,6 +51,32 @@ class GoogleSheetsDataSourceTest extends TestCase {
 		$this->assertSame(
 			'https://sheets.googleapis.com/v4/spreadsheets/test_spreadsheet_id',
 			$this->data_source->get_endpoint()
+		);
+	}
+
+	public function test_get_request_headers(): void {
+		// Setup the GoogleAuth mock to return a mocked access token
+		$mock = Mockery::namedMock( GoogleAuth::class, GoogleAuthStub::class );
+		// Set up the expectation for the static method
+        $mock->shouldReceive('generate_token_from_service_account_key')
+            ->once()
+            ->with(
+                Mockery::type('array'),
+                [
+					'scope1',
+					'scope2',
+				]
+            )
+            ->andReturn('mocked_access_token');
+
+		$headers = $this->data_source->get_request_headers();
+
+		$this->assertEquals(
+			[
+				'Authorization' => 'Bearer mocked_access_token',
+				'Content-Type'  => 'application/json',
+			],
+			$headers
 		);
 	}
 
