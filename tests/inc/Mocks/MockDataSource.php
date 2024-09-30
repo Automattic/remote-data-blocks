@@ -2,9 +2,9 @@
 
 namespace RemoteDataBlocks\Tests\Mocks;
 
-use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 
-class MockDatasource extends HttpDatasource {
+class MockDataSource extends HttpDataSource {
 	private $endpoint = 'https://example.com/api';
 	private $headers  = [ 'Content-Type' => 'application/json' ];
 
@@ -25,7 +25,7 @@ class MockDatasource extends HttpDatasource {
 	];
 
 	public function get_display_name(): string {
-		return 'Mock Datasource';
+		return 'Mock Data Source';
 	}
 
 	public function get_endpoint(): string {

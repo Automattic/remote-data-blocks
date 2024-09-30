@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Example\GoogleSheets\WesterosHouses;
 
-use RemoteDataBlocks\Integrations\Google\Sheets\GoogleSheetsDatasource;
+use RemoteDataBlocks\Integrations\Google\Sheets\GoogleSheetsDataSource;
 use RemoteDataBlocks\Logging\LoggerManager;
 
 require_once __DIR__ . '/inc/queries/class-list-westeros-houses-query.php';
@@ -24,9 +24,9 @@ function register_westeros_houses_block() {
 		return;
 	}
 
-	$westeros_houses_datasource = GoogleSheetsDatasource::create( $credentials, '1EHdQg53Doz0B-ImrGz_hTleYeSvkVIk_NSJCOM1FQk0', 'Westeros Houses', );
-	$list_westeros_houses_query = new ListWesterosHousesQuery( $westeros_houses_datasource );
-	$get_westeros_houses_query  = new GetWesterosHousesQuery( $westeros_houses_datasource );
+	$westeros_houses_data_source = GoogleSheetsDataSource::create( $credentials, '1EHdQg53Doz0B-ImrGz_hTleYeSvkVIk_NSJCOM1FQk0', 'Westeros Houses', );
+	$list_westeros_houses_query  = new ListWesterosHousesQuery( $westeros_houses_data_source );
+	$get_westeros_houses_query   = new GetWesterosHousesQuery( $westeros_houses_data_source );
 
 	register_remote_data_block( $block_name, $get_westeros_houses_query );
 	register_remote_data_list_query( $block_name, $list_westeros_houses_query );

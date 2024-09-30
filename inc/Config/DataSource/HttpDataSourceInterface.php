@@ -1,11 +1,11 @@
 <?php declare(strict_types = 1);
 
-namespace RemoteDataBlocks\Config\Datasource;
+namespace RemoteDataBlocks\Config\DataSource;
 
 /**
- * HttpDatasourceInterface
+ * HttpDataSourceInterface
  *
- * Interface used to define a Remote Data Blocks Datasource for an HTTP API. It
+ * Interface used to define a Remote Data Blocks DataSource for an HTTP API. It
  * defines the properties of an API that will be shared by queries against that
  * API.
  *
@@ -16,17 +16,17 @@ namespace RemoteDataBlocks\Config\Datasource;
  * - The API returns 4XX or 5XX for unrecoverable errors, in which case the
  *   response should be ignored.
  *
- * If you are a WPVIP customer, datasources are automatically provided by VIP.
- * Only implement this interface if you have custom datasources not provided by VIP.
+ * If you are a WPVIP customer, data sources are automatically provided by VIP.
+ * Only implement this interface if you have custom data sources not provided by VIP.
  * 
  * @package remote-data-blocks
  * @since 0.1.0
  */
-interface HttpDatasourceInterface {
+interface HttpDataSourceInterface {
 	/**
 	 * Get the endpoint for the query. Note that the query configuration has an
 	 * opportunity to change / override the endpoint at request time. For REST
-	 * APIs, a useful pattern is for the datasource to define a base endpoint and
+	 * APIs, a useful pattern is for the data source to define a base endpoint and
 	 * the query config to target a specific resource.
 	 *
 	 * @return string The endpoint for the query.

@@ -6,13 +6,13 @@ Remote Data Blocks is designed to be extensible, allowing developers to create n
 
 To create a new data source:
 
-1. Create a new PHP class that extends the `HttpDatasource` class.
+1. Create a new PHP class that extends the `HttpDataSource` class.
 2. Implement the required methods for fetching and processing data.
 
 Example:
 
 ```php
-class YourCustomDatasource extends HttpDatasource {
+class YourCustomDataSource extends HttpDataSource {
 	public function get_endpoint(): string {
         // Implement your endpoint logic here
 	}
@@ -48,7 +48,7 @@ class YourCustomQuery extends HttpQueryContext {
 	}
 
     public function get_endpoint( array $input_variables ): string {
-        // Optionally implemented override of datasource endpoint logic here
+        // Optionally implemented override of data source endpoint logic here
         // eg, to add additional query parameters
     }
 }
@@ -65,9 +65,9 @@ Example:
 
 ```php
 function register_your_custom_block() {
-    $block_name      = 'Your Custom Block';
-    $your_datasource = new YourCustomDatasource();
-    $your_query      = new YourCustomQuery( $your_datasource );
+    $block_name       = 'Your Custom Block';
+    $your_data_source = new YourCustomDataSource();
+    $your_query       = new YourCustomQuery( $your_data_source );
 
     register_remote_data_block( $block_name, $your_query );
 }

@@ -38,6 +38,6 @@ class GetZipCodeQuery extends HttpQueryContext {
 	}
 
 	public function get_endpoint( $input_variables ): string {
-		return $this->get_datasource()->get_endpoint() . $input_variables['zip_code'];
+		return $this->get_data_source()->get_endpoint() . $input_variables['zip_code'];
 	}
 }
