@@ -2,20 +2,20 @@
 
 namespace RemoteDataBlocks\Example\ZipCode;
 
-use RemoteDataBlocks\Integrations\GenericHttp\GenericHttpDatasource;
+use RemoteDataBlocks\Integrations\GenericHttp\GenericHttpDataSource;
 use RemoteDataBlocks\Logging\LoggerManager;
 
 require_once __DIR__ . '/inc/queries/class-get-zip-code-query.php';
 
 function register_zipcode_block() {
-	$zipcode_datasource = GenericHttpDatasource::from_slug( 'zip-code' );
+	$zipcode_data_source = GenericHttpDataSource::from_slug( 'zip-code' );
 
-	if ( ! $zipcode_datasource instanceof GenericHttpDatasource ) {
-		LoggerManager::instance()->debug( 'Zip Code datasource not found' );
+	if ( ! $zipcode_data_source instanceof GenericHttpDataSource ) {
+		LoggerManager::instance()->debug( 'Zip Code data source not found' );
 		return;
 	}
 
-	$zipcode_query = new GetZipCodeQuery( $zipcode_datasource );
+	$zipcode_query = new GetZipCodeQuery( $zipcode_data_source );
 
 	register_remote_data_block( 'Zip Code', $zipcode_query );
 }

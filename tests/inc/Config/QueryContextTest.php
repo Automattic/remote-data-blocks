@@ -4,16 +4,16 @@ namespace RemoteDataBlocks\Tests\Config;
 
 use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
-use RemoteDataBlocks\Tests\Mocks\MockDatasource;
+use RemoteDataBlocks\Tests\Mocks\MockDataSource;
 use RemoteDataBlocks\Tests\Mocks\MockValidator;
 
 class QueryContextTest extends TestCase {
-	private MockDatasource $datasource;
+	private MockDataSource $data_source;
 	private HttpQueryContext $query_context;
 
 	protected function setUp(): void {
-		$this->datasource    = MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator() );
-		$this->query_context = new HttpQueryContext( $this->datasource );
+		$this->data_source   = MockDataSource::from_array( MockDataSource::MOCK_CONFIG, new MockValidator() );
+		$this->query_context = new HttpQueryContext( $this->data_source );
 	}
 
 	public function testGetEndpoint() {
@@ -56,7 +56,7 @@ class QueryContextTest extends TestCase {
 	}
 
 	public function testCustomProcessResponse() {
-		$custom_query_context = new class($this->datasource) extends HttpQueryContext {
+		$custom_query_context = new class($this->data_source) extends HttpQueryContext {
 			public function process_response( string $raw_response_data, array $input_variables ): string {
 				// Convert HTML to JSON
 				$dom = new \DOMDocument();

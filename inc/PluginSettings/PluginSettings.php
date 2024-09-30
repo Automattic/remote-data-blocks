@@ -2,9 +2,9 @@
 
 namespace RemoteDataBlocks\PluginSettings;
 
-use RemoteDataBlocks\REST\DatasourceController;
+use RemoteDataBlocks\REST\DataSourceController;
 use RemoteDataBlocks\REST\AuthController;
-use RemoteDataBlocks\WpdbStorage\DatasourceCrud;
+use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use function wp_get_environment_type;
 use function wp_is_development_mode;
 
@@ -14,8 +14,8 @@ class PluginSettings {
 	public static function init(): void {
 		add_action( 'admin_menu', [ __CLASS__, 'add_options_page' ] );
 		add_action( 'admin_enqueue_scripts', [ __CLASS__, 'enqueue_settings_assets' ] );
-		add_action( 'pre_update_option_' . DatasourceCrud::CONFIG_OPTION_NAME, [ __CLASS__, 'encrypt_option' ], 10, 2 );
-		add_action( 'option_' . DatasourceCrud::CONFIG_OPTION_NAME, [ __CLASS__, 'decrypt_option' ], 10, 1 );
+		add_action( 'pre_update_option_' . DataSourceCrud::CONFIG_OPTION_NAME, [ __CLASS__, 'encrypt_option' ], 10, 2 );
+		add_action( 'option_' . DataSourceCrud::CONFIG_OPTION_NAME, [ __CLASS__, 'decrypt_option' ], 10, 1 );
 		add_action( 'rest_api_init', [ __CLASS__, 'init_rest_routes' ] );
 	}
 
@@ -39,7 +39,7 @@ class PluginSettings {
 	}
 
 	public static function init_rest_routes(): void {
-		$controller = new DatasourceController();
+		$controller = new DataSourceController();
 		$controller->register_routes();
 
 		$auth_controller = new AuthController();

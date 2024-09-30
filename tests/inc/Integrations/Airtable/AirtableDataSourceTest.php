@@ -3,15 +3,15 @@
 namespace RemoteDataBlocks\Tests\Integrations\Airtable;
 
 use PHPUnit\Framework\TestCase;
-use RemoteDataBlocks\Integrations\Airtable\AirtableDatasource;
+use RemoteDataBlocks\Integrations\Airtable\AirtableDataSource;
 
-class AirtableDatasourceTest extends TestCase {
-	private AirtableDatasource $datasource;
+class AirtableDataSourceTest extends TestCase {
+	private AirtableDataSource $data_source;
 
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->datasource = AirtableDatasource::create(
+		$this->data_source = AirtableDataSource::create(
 			'test_access_token',
 			'test_base_id',
 			[],
@@ -22,12 +22,12 @@ class AirtableDatasourceTest extends TestCase {
 	public function test_get_display_name(): void {
 		$this->assertSame(
 			'Airtable (Test Airtable Base)',
-			$this->datasource->get_display_name()
+			$this->data_source->get_display_name()
 		);
 	}
 
 	public function test_get_display_name_with_base_name_override(): void {
-		$datasource = AirtableDatasource::from_array([
+		$data_source = AirtableDataSource::from_array([
 			'service'      => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'access_token' => 'test_access_token',
 			'base'         => [
@@ -40,14 +40,14 @@ class AirtableDatasourceTest extends TestCase {
 
 		$this->assertSame(
 			'Airtable (test-airtable-base)',
-			$datasource->get_display_name()
+			$data_source->get_display_name()
 		);
 	}
 
 	public function test_get_endpoint(): void {
 		$this->assertSame(
 			'https://api.airtable.com/v0/test_base_id',
-			$this->datasource->get_endpoint()
+			$this->data_source->get_endpoint()
 		);
 	}
 
@@ -57,19 +57,19 @@ class AirtableDatasourceTest extends TestCase {
 			'Content-Type'  => 'application/json',
 		];
 
-		$this->assertSame( $expected_headers, $this->datasource->get_request_headers() );
+		$this->assertSame( $expected_headers, $this->data_source->get_request_headers() );
 	}
 
 	public function test_create(): void {
-		$datasource = AirtableDatasource::create(
+		$data_source = AirtableDataSource::create(
 			'new_access_token',
 			'new_base_id',
 			[],
 			'New Airtable Base'
 		);
 
-		$this->assertInstanceOf( AirtableDatasource::class, $datasource );
-		$this->assertSame( 'Airtable (New Airtable Base)', $datasource->get_display_name() );
-		$this->assertSame( 'https://api.airtable.com/v0/new_base_id', $datasource->get_endpoint() );
+		$this->assertInstanceOf( AirtableDataSource::class, $data_source );
+		$this->assertSame( 'Airtable (New Airtable Base)', $data_source->get_display_name() );
+		$this->assertSame( 'https://api.airtable.com/v0/new_base_id', $data_source->get_endpoint() );
 	}
 }

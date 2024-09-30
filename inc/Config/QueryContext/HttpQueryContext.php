@@ -3,8 +3,8 @@
 namespace RemoteDataBlocks\Config\QueryContext;
 
 use RemoteDataBlocks\Config\ArraySerializableInterface;
-use RemoteDataBlocks\Config\Datasource\HttpDatasource;
-use RemoteDataBlocks\Config\Datasource\HttpDatasourceInterface;
+use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use RemoteDataBlocks\Config\DataSource\HttpDataSourceInterface;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 use RemoteDataBlocks\Validation\Validator;
@@ -76,12 +76,12 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	/**
 	 * Constructor.
 	 *
-	 * @param HttpDatasource $datasource The datasource that this query will use.
+	 * @param HttpDataSource $data_source The data source that this query will use.
 	 * @param array          $input_schema The input schema for this query.
 	 * @param array          $output_schema The output schema for this query.
 	 */
 	public function __construct(
-		private HttpDatasource $datasource,
+		private HttpDataSource $data_source,
 		public array $input_schema = [],
 		public array $output_schema = [],
 		protected array $config = [],
@@ -136,17 +136,17 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	}
 
 	/**
-	 * Get the datasource associated with this query.
+	 * Get the data source associated with this query.
 	 */
-	public function get_datasource(): HttpDatasource {
-		return $this->datasource;
+	public function get_data_source(): HttpDataSource {
+		return $this->data_source;
 	}
 
 	/**
 	 * Override this method to specify a custom endpoint for this query.
 	 */
 	public function get_endpoint( array $input_variables ): string {
-		return $this->get_datasource()->get_endpoint();
+		return $this->get_data_source()->get_endpoint();
 	}
 
 	/**
@@ -154,7 +154,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * represent it in the UI.
 	 */
 	public function get_image_url(): string|null {
-		return $this->get_datasource()->get_image_url();
+		return $this->get_data_source()->get_image_url();
 	}
 
 	/**
@@ -170,7 +170,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 * @param array $input_variables The input variables for this query.
 	 */
 	public function get_request_headers( array $input_variables ): array {
-		return $this->get_datasource()->get_request_headers();
+		return $this->get_data_source()->get_request_headers();
 	}
 
 	/**
@@ -244,7 +244,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	//
 	/** @psalm-suppress ParamNameMismatch reason: we want the clarity provided by the rename here */
 	final public static function from_array( array $config, ?ValidatorInterface $validator = null ): static|\WP_Error {
-		if ( ! isset( $config['datasource'] ) || ! $config['datasource'] instanceof HttpDatasourceInterface ) {
+		if ( ! isset( $config['datasource'] ) || ! $config['datasource'] instanceof HttpDataSourceInterface ) {
 			return new \WP_Error( 'missing_datasource', __( 'Missing datasource.', 'remote-data-blocks' ) );
 		}
 

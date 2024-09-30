@@ -8,14 +8,14 @@ use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Integrations\VipBlockDataApi\VipBlockDataApi;
 use RemoteDataBlocks\Tests\Mocks\MockQueryRunner;
-use RemoteDataBlocks\Tests\Mocks\MockDatasource;
+use RemoteDataBlocks\Tests\Mocks\MockDataSource;
 use RemoteDataBlocks\Tests\Mocks\MockValidator;
 
 use function register_remote_data_block;
 
 class TestQueryContext extends HttpQueryContext {
 	public function __construct( private QueryRunnerInterface $mock_qr ) {
-		parent::__construct( MockDatasource::from_array( MockDatasource::MOCK_CONFIG, new MockValidator() ) );
+		parent::__construct( MockDataSource::from_array( MockDataSource::MOCK_CONFIG, new MockValidator() ) );
 	}
 
 	public function get_query_runner(): QueryRunnerInterface {

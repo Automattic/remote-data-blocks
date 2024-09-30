@@ -3,11 +3,11 @@
 namespace RemoteDataBlocks\Integrations\Airtable;
 
 use RemoteDataBlocks\Logging\LoggerManager;
-use RemoteDataBlocks\WpdbStorage\DatasourceCrud;
+use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 
 class AirtableIntegration {
 	public static function init(): void {
-		$data_sources = DatasourceCrud::get_data_sources( REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE );
+		$data_sources = DataSourceCrud::get_data_sources( REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE );
 
 		foreach ( $data_sources as $config ) {
 			self::register_blocks_for_airtable_data_source( $config );
@@ -15,8 +15,8 @@ class AirtableIntegration {
 	}
 
 	private static function register_blocks_for_airtable_data_source( array $config ): void {
-		/** @var AirtableDatasource $airtable_datasource */
-		$airtable_datasource = AirtableDatasource::from_array( $config );
+		/** @var AirtableDataSource $airtable_datasource */
+		$airtable_datasource = AirtableDataSource::from_array( $config );
 
 		$block_name = $airtable_datasource->get_display_name();
 		$query      = $airtable_datasource->___temp_get_query();

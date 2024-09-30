@@ -4,6 +4,7 @@ namespace RemoteDataBlocks\REST;
 
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\WpdbStorage\DatasourceCrud;
+use RemoteDataBlocks\Utils\ArrayUtils;
 use WP_REST_Controller;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -11,7 +12,7 @@ use WP_Error;
 
 defined( 'ABSPATH' ) || exit();
 
-class DatasourceController extends WP_REST_Controller {
+class DataSourceController extends WP_REST_Controller {
 	public function __construct() {
 		$this->namespace = REMOTE_DATA_BLOCKS__REST_NAMESPACE;
 		$this->rest_base = 'data-sources';
@@ -105,20 +106,35 @@ class DatasourceController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
-		$item = DatasourceCrud::register_new_data_source( $request->get_json_params() );
+		$item = DataSourceCrud::register_new_data_source( $request->get_json_params() );
 		return rest_ensure_response( $item );
 	}
 
 	/**
-	 * Retrieves a collection of items.
+	 * Retrieves a collection of unique data sources.
+	 *
+	 * This method compiles a comprehensive list of data sources by:
+	 * 1. Merging data sources from registered blocks and those configured in the settings page UI.
+	 * 2. Removing duplicates based on the 'slug' key.
+	 *
+	 * TEMPORARY: The deduplication process is necessary because:
+	 * - Some remote data blocks may use data sources configured in the settings page UI.
+	 * - Not all UI-configured data sources are registered as blocks and vice versa.
+	 * 
+	 * The deduplication is temporary fix and won't be required when we moved towards a single data sources store.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
-		$code_configured_data_sources = ConfigStore::get_datasources_displayable();
-		$ui_configured_data_sources   = DatasourceCrud::get_data_sources_list();
-		return rest_ensure_response( array_merge( $code_configured_data_sources, $ui_configured_data_sources ) );
+		$ui_configured_data_sources          = DatasourceCrud::get_data_sources_list();
+		$data_sources_from_registered_blocks = ConfigStore::get_data_sources_displayable();
+		$merged_data_sources                 = array_merge(
+			$ui_configured_data_sources,
+			$data_sources_from_registered_blocks,
+		);
+		$unique_data_sources                 = ArrayUtils::merge_duplicates_by_key( $merged_data_sources, 'slug' );
+		return rest_ensure_response( $unique_data_sources );
 	}
 
 	/**
@@ -128,7 +144,7 @@ class DatasourceController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_item( $request ) {
-		$response = DatasourceCrud::get_item_by_uuid( DatasourceCrud::get_data_sources(), $request->get_param( 'uuid' ) );
+		$response = DataSourceCrud::get_item_by_uuid( DataSourceCrud::get_data_sources(), $request->get_param( 'uuid' ) );
 		return rest_ensure_response( $response );
 	}
 
@@ -139,7 +155,7 @@ class DatasourceController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function update_item( $request ) {
-		$item = DatasourceCrud::update_item_by_uuid( $request->get_param( 'uuid' ), $request->get_json_params() );
+		$item = DataSourceCrud::update_item_by_uuid( $request->get_param( 'uuid' ), $request->get_json_params() );
 		return rest_ensure_response( $item );
 	}
 
@@ -150,7 +166,7 @@ class DatasourceController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function delete_item( $request ) {
-		$result = DatasourceCrud::delete_item_by_uuid( $request->get_param( 'uuid' ) );
+		$result = DataSourceCrud::delete_item_by_uuid( $request->get_param( 'uuid' ) );
 		return rest_ensure_response( $result );
 	}
 
@@ -164,7 +180,7 @@ class DatasourceController extends WP_REST_Controller {
 				array( 'status' => 400 )
 			);
 		}
-		$validation_status = DatasourceCrud::validate_slug( $slug );
+		$validation_status = DataSourceCrud::validate_slug( $slug );
 		$result            = [
 			'exists' => true !== $validation_status,
 		];

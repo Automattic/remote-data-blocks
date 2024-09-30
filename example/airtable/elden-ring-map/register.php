@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Example\Airtable\EldenRingMap;
 
-use RemoteDataBlocks\Integrations\Airtable\AirtableDatasource;
+use RemoteDataBlocks\Integrations\Airtable\AirtableDataSource;
 use RemoteDataBlocks\Logging\LoggerManager;
 
 require_once __DIR__ . '/inc/interactivity-store/interactivity-store.php';
@@ -19,9 +19,9 @@ function register_airtable_elden_ring_map_block() {
 		return;
 	}
 
-	$elden_ring_datasource = AirtableDatasource::create( $access_token, 'appqI3sJ9R2NcML8Y', [], 'Elden Ring Locations' );
-	$list_locations_query  = new AirtableEldenRingListLocationsQuery( $elden_ring_datasource );
-	$list_maps_query       = new AirtableEldenRingListMapsQuery( $elden_ring_datasource );
+	$elden_ring_data_source = AirtableDataSource::create( $access_token, 'appqI3sJ9R2NcML8Y', [], 'Elden Ring Locations' );
+	$list_locations_query   = new AirtableEldenRingListLocationsQuery( $elden_ring_data_source );
+	$list_maps_query        = new AirtableEldenRingListMapsQuery( $elden_ring_data_source );
 
 	register_remote_data_block( $block_name, $list_locations_query );
 	register_remote_data_list_query( $block_name, $list_maps_query );

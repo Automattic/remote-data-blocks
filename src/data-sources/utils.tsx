@@ -1,7 +1,7 @@
 import CheckIcon from '@/settings/icons/check';
 import ErrorIcon from '@/settings/icons/error';
 
-export const sanitizeDatasourceSlug = ( slug: string ) => {
+export const sanitizeDataSourceSlug = ( slug: string ) => {
 	return slug.replace( /[^a-z0-9-]/g, '' ).toLowerCase();
 };
 

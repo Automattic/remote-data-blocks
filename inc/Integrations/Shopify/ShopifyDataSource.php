@@ -2,13 +2,13 @@
 
 namespace RemoteDataBlocks\Integrations\Shopify;
 
-use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 
 use function plugins_url;
 
 defined( 'ABSPATH' ) || exit();
 
-class ShopifyDatasource extends HttpDatasource {
+class ShopifyDataSource extends HttpDataSource {
 	protected const SERVICE_NAME           = REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE;
 	protected const SERVICE_SCHEMA_VERSION = 1;
 
