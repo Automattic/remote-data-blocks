@@ -77,7 +77,7 @@ class GoogleSheetsDataSource extends HttpDataSource {
 	}
 
 	public function get_endpoint(): string {
-		return sprintf( 'https://sheets.googleapis.com/v4/spreadsheets/%s', $this->config['spreadsheet_id'] );
+		return sprintf( 'https://sheets.googleapis.com/v4/spreadsheets/%s', $this->config['spreadsheet']['id'] );
 	}
 
 	public function get_request_headers(): array {
