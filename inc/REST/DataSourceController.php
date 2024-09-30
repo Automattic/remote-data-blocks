@@ -3,8 +3,7 @@
 namespace RemoteDataBlocks\REST;
 
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
-use RemoteDataBlocks\WpdbStorage\DatasourceCrud;
-use RemoteDataBlocks\Utils\ArrayUtils;
+use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use WP_REST_Controller;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -111,30 +110,15 @@ class DataSourceController extends WP_REST_Controller {
 	}
 
 	/**
-	 * Retrieves a collection of unique data sources.
-	 *
-	 * This method compiles a comprehensive list of data sources by:
-	 * 1. Merging data sources from registered blocks and those configured in the settings page UI.
-	 * 2. Removing duplicates based on the 'slug' key.
-	 *
-	 * TEMPORARY: The deduplication process is necessary because:
-	 * - Some remote data blocks may use data sources configured in the settings page UI.
-	 * - Not all UI-configured data sources are registered as blocks and vice versa.
-	 * 
-	 * The deduplication is temporary fix and won't be required when we moved towards a single data sources store.
+	 * Retrieves a collection of items.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
-		$ui_configured_data_sources          = DatasourceCrud::get_data_sources_list();
-		$data_sources_from_registered_blocks = ConfigStore::get_data_sources_displayable();
-		$merged_data_sources                 = array_merge(
-			$ui_configured_data_sources,
-			$data_sources_from_registered_blocks,
-		);
-		$unique_data_sources                 = ArrayUtils::merge_duplicates_by_key( $merged_data_sources, 'slug' );
-		return rest_ensure_response( $unique_data_sources );
+		$code_configured_data_sources = ConfigStore::get_data_sources_displayable();
+		$ui_configured_data_sources   = DataSourceCrud::get_data_sources_list();
+		return rest_ensure_response( array_merge( $code_configured_data_sources, $ui_configured_data_sources ) );
 	}
 
 	/**
