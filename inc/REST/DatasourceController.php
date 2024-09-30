@@ -127,13 +127,13 @@ class DatasourceController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
-		$ui_configured_data_sources   = DatasourceCrud::get_data_sources_list();
+		$ui_configured_data_sources          = DatasourceCrud::get_data_sources_list();
 		$data_sources_from_registered_blocks = ConfigStore::get_datasources_displayable();
-		$merged_data_sources = array_merge(
+		$merged_data_sources                 = array_merge(
 			$ui_configured_data_sources,
 			$data_sources_from_registered_blocks,
 		);
-		$unique_data_sources = ArrayUtils::merge_duplicates_by_key( $merged_data_sources, 'slug' );
+		$unique_data_sources                 = ArrayUtils::merge_duplicates_by_key( $merged_data_sources, 'slug' );
 		return rest_ensure_response( $unique_data_sources );
 	}
 
