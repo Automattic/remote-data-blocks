@@ -4,6 +4,7 @@ namespace RemoteDataBlocks\PluginSettings;
 
 use RemoteDataBlocks\REST\DataSourceController;
 use RemoteDataBlocks\REST\AuthController;
+use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use function wp_get_environment_type;
 use function wp_is_development_mode;
 
@@ -13,8 +14,8 @@ class PluginSettings {
 	public static function init(): void {
 		add_action( 'admin_menu', [ __CLASS__, 'add_options_page' ] );
 		add_action( 'admin_enqueue_scripts', [ __CLASS__, 'enqueue_settings_assets' ] );
-		add_action( 'pre_update_option_remote_data_blocks_config', [ __CLASS__, 'pre_update_option_remote_data_blocks_config' ], 10, 3 );
-		add_action( 'option_remote_data_blocks_config', [ __CLASS__, 'decrypt_option' ], 10, 3 );
+		add_action( 'pre_update_option_' . DataSourceCrud::CONFIG_OPTION_NAME, [ __CLASS__, 'encrypt_option' ], 10, 2 );
+		add_action( 'option_' . DataSourceCrud::CONFIG_OPTION_NAME, [ __CLASS__, 'decrypt_option' ], 10, 1 );
 		add_action( 'rest_api_init', [ __CLASS__, 'init_rest_routes' ] );
 	}
 
@@ -138,7 +139,7 @@ class PluginSettings {
 		return 'development' === wp_get_environment_type() && wp_is_development_mode( 'plugin' );
 	}
 
-	public static function pre_update_option_remote_data_blocks_config( array $new_value, array $old_value ): string|array|bool {
+	public static function encrypt_option( array $new_value, string|array|bool $old_value ): string|array|bool {
 		$encryptor = new \RemoteDataBlocks\WpdbStorage\DataEncryption();
 
 		try {

@@ -39,12 +39,15 @@
     "start:decoupled": "./bin/start decoupled",
     "start:monolith": "./bin/start monolith",
     "start:monolith-xdebug": "./bin/start monolith-xdebug",
+    "start:playground": "npx @wp-now/wp-now start --php=8.2",
+    "start:playground:reset": "npm run start:playground -- --reset",
     "stop": "./bin/stop",
     "test": "npm run test:php && npm run test:js",
     "test:php": "composer test",
     "test:php:coverage": "composer test-coverage",
     "test:js": "vitest --watch=false",
-    "test:js:coverage": "vitest --coverage --watch=false"
+    "test:js:coverage": "vitest --coverage --watch=false",
+    "wp-cli": "wp-env run cli -- wp"
   },
   "devDependencies": {
     "@automattic/eslint-plugin-wpvip": "0.13.0",
