@@ -122,7 +122,10 @@ class DataSourceController extends WP_REST_Controller {
 		/**
 		 * quick and dirty deduplication of data sources by slug
 		 *
-		 * we intend to refactor this out in the near future in favor of an upstream
+		 * ui configured data sources take precedence over code configured ones
+		 * here due to the ordering of the two arrays passed to array_reduce
+		 *
+		 * @todo: refactor this out in the near future in favor of an upstream
 		 * single source of truth for data source configurations
 		 */
 		$data_sources = array_values(array_reduce(
