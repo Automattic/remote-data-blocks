@@ -2,9 +2,9 @@
 
 namespace RemoteDataBlocks\Integrations\GenericHttp;
 
-use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 
-class GenericHttpDatasource extends HttpDatasource {
+class GenericHttpDataSource extends HttpDataSource {
 	protected const SERVICE_NAME           = REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE;
 	protected const SERVICE_SCHEMA_VERSION = 1;
 	

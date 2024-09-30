@@ -129,7 +129,7 @@
 	<rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint">
 		<exclude-pattern>/example/*</exclude-pattern>
 		<exclude-pattern>/tests/*</exclude-pattern>
-		<exclude-pattern>/inc/REST/DatasourceController.php</exclude-pattern>
+		<exclude-pattern>/inc/REST/DataSourceController.php</exclude-pattern>
 		<exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification" />
 	</rule>
 	<rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint">
@@ -139,7 +139,7 @@
 	<rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint">
 		<exclude-pattern>/example/*</exclude-pattern>
 		<exclude-pattern>/tests/*</exclude-pattern>
-		<exclude-pattern>/inc/REST/DatasourceController.php</exclude-pattern>
+		<exclude-pattern>/inc/REST/DataSourceController.php</exclude-pattern>
 		<exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification" />
 	</rule>
 </ruleset>

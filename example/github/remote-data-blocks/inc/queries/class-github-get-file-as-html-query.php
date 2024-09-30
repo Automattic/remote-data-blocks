@@ -3,7 +3,7 @@
 namespace RemoteDataBlocks\Example\GitHub;
 
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
-use RemoteDataBlocks\Integrations\GitHub\GitHubDatasource;
+use RemoteDataBlocks\Integrations\GitHub\GitHubDataSource;
 class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 	public function get_input_schema(): array {
 		return [
@@ -60,15 +60,15 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 	}
 
 	public function get_endpoint( array $input_variables ): string {
-		/** @var GitHubDatasource $datasource */
-		$datasource = $this->get_datasource();
+		/** @var GitHubDataSource $data_source */
+		$data_source = $this->get_data_source();
 
 		return sprintf(
 			'https://api.github.com/repos/%s/%s/contents/%s?ref=%s',
-			$datasource->get_repo_owner(),
-			$datasource->get_repo_name(),
+			$data_source->get_repo_owner(),
+			$data_source->get_repo_name(),
 			$input_variables['file_path'],
-			$datasource->get_ref()
+			$data_source->get_ref()
 		);
 	}
 

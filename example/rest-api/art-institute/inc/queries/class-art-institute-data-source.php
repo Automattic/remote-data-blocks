@@ -2,9 +2,9 @@
 
 namespace RemoteDataBlocks\Example\ArtInstituteOfChicago;
 
-use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 
-class ArtInstituteOfChicagoDatasource extends HttpDatasource {
+class ArtInstituteOfChicagoDataSource extends HttpDataSource {
 	public function get_display_name(): string {
 		return 'Art Institute of Chicago';
 	}

@@ -2,11 +2,11 @@
 
 namespace RemoteDataBlocks\Integrations\Google\Sheets;
 
-use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
 use WP_Error;
 
-class GoogleSheetsDatasource extends HttpDatasource {
+class GoogleSheetsDataSource extends HttpDataSource {
 	protected const SERVICE_NAME           = REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE;
 	protected const SERVICE_SCHEMA_VERSION = 1;
 

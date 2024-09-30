@@ -16,18 +16,18 @@ This personal access token is a secret that should be provided to your applicati
 
 ## Define the data source
 
-In a file in your theme code, create a data source that provides the personal access token, the Airtable base ID, and the table ID (see ["Finding Airtable IDs"](https://support.airtable.com/docs/finding-airtable-ids#finding-base-url-ids)). The Remote Data Blocks plugin provides an AirtableDatasource class that makes this easier than defining a data source from scratch [link tk]:
+In a file in your theme code, create a data source that provides the personal access token, the Airtable base ID, and the table ID (see ["Finding Airtable IDs"](https://support.airtable.com/docs/finding-airtable-ids#finding-base-url-ids)). The Remote Data Blocks plugin provides an AirtableDataSource class that makes this easier than defining a data source from scratch [link tk]:
 
 ```php
 /* register-conference-event-block.php */
 
-use RemoteDataBlocks\Integrations\Airtable\AirtableDatasource;
+use RemoteDataBlocks\Integrations\Airtable\AirtableDataSource;
 
 $access_token = AIRTABLE_EVENTS_ACCESS_TOKEN;
 $base_id      = 'base-id';
 $table_id     = 'table-id';
 
-$airtable_datasource = new AirtableDatasource( $access_token, $base_id, $table_id );
+$airtable_data_source = new AirtableDataSource( $access_token, $base_id, $table_id );
 ```
 
 This data source provides basic details needed to communicate with the Airtable API.
@@ -83,7 +83,7 @@ class AirtableGetEventQuery extends HttpQueryContext {
 	 * Airtable API endpoint for fetching a single table record.
 	 */
 	public function get_endpoint( array $input_variables ): string {
-		return $this->get_datasource()->get_endpoint() . '/' . $input_variables['record_id'];
+		return $this->get_data_source()->get_endpoint() . '/' . $input_variables['record_id'];
 	}
 }
 ```
@@ -97,7 +97,7 @@ Now that you have a data source and query defined, you can register a WordPress 
 ```php
 /* register-conference-event-block.php */
 
-use RemoteDataBlocks\Integrations\Airtable\AirtableDatasource;
+use RemoteDataBlocks\Integrations\Airtable\AirtableDataSource;
 
 // AirtableGetEventQuery
 require_once __DIR__ . '/class-airtable-get-event-query.php';
@@ -108,8 +108,8 @@ function register_conference_event_block() {
 	$base_id      = 'base-id';
 	$table_id     = 'table-id';
 
-	$datasource      = new AirtableDatasource( $access_token, $base_id, $table_id );
-	$get_event_query = new AirtableGetEventQuery( $datasource );
+	$data_source      = new AirtableDataSource( $access_token, $base_id, $table_id );
+	$get_event_query  = new AirtableGetEventQuery( $data_source );
 
 	\register_remote_data_block( $block_name, $get_event_query );
 }
@@ -181,7 +181,7 @@ Here's an updated example that registers this list query:
 ```php
 /* register-conference-event-block.php */
 
-use RemoteDataBlocks\Integrations\Airtable\AirtableDatasource;
+use RemoteDataBlocks\Integrations\Airtable\AirtableDataSource;
 
 // AirtableGetEventQuery
 require_once __DIR__ . '/class-airtable-get-event-query.php';
@@ -195,12 +195,12 @@ function register_conference_event_block() {
 	$base_id      = 'base-id';
 	$table_id     = 'table-id';
 
-	$datasource      = new AirtableDatasource( $access_token, $base_id, $table_id );
-	$get_event_query = new AirtableGetEventQuery( $datasource );
+	$data_source      = new AirtableDataSource( $access_token, $base_id, $table_id );
+	$get_event_query  = new AirtableGetEventQuery( $data_source );
 
 	\register_remote_data_block( $block_name, $get_event_query );
 
-	$list_events_query = new AirtableListEventsQuery( $datasource );
+	$list_events_query = new AirtableListEventsQuery( $data_source );
 	\register_remote_data_list_query( $block_name, $airtable_list_events_query );
 }
 
