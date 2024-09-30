@@ -22,8 +22,6 @@ class GoogleSheetsDataSourceTest extends TestCase {
 		'client_id'                   => 'test_client_id',
 		'auth_uri'                    => 'https://accounts.google.com/o/oauth2/auth',
 		'token_uri'                   => 'https://oauth2.googleapis.com/token',
-		'auth_provider_x509_cert_url' => 'test_auth_provider_x509_cert_url',
-		'client_id'                   => 'test_client_id',
 		'client_secret'               => 'test_client_secret',
 		'auth_provider_x509_cert_url' => 'https://www.googleapis.com/oauth2/v1/certs',
 		'client_x509_cert_url'        => 'https://www.googleapis.com/robot/v1/metadata/x509/test%40test-project-id.iam.gserviceaccount.com',
@@ -58,16 +56,16 @@ class GoogleSheetsDataSourceTest extends TestCase {
 		// Setup the GoogleAuth mock to return a mocked access token
 		$mock = Mockery::namedMock( GoogleAuth::class, GoogleAuthStub::class );
 		// Set up the expectation for the static method
-        $mock->shouldReceive('generate_token_from_service_account_key')
-            ->once()
-            ->with(
-                Mockery::type('array'),
-                [
+		$mock->shouldReceive( 'generate_token_from_service_account_key' )
+			->once()
+			->with(
+				Mockery::type( 'array' ),
+				[
 					'scope1',
 					'scope2',
 				]
-            )
-            ->andReturn('mocked_access_token');
+			)
+			->andReturn( 'mocked_access_token' );
 
 		$headers = $this->data_source->get_request_headers();
 
