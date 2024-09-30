@@ -1,18 +1,10 @@
-# Integration templates
+# Create a zip code remote data block
 
-Developers can [extend](index.md) the plugin to meet uses cases that require custom logic. Often, the full details are known up front to the developer, in which case they can simply write a complete implementation.
-
-However, sometimes the developer may not know the final data source details.
-
-Integration templates bridge the gap between developers and WordPress instance admins when implementing custom data fetching solutions. These templates support scenarios where developers need to create custom blocks that interact with third-party APIs, but may not have full access to authentication details managed by other teams.
+This page will walk you through building [Zippopotam.us](https://zippopotam.us/) queries, registering a remote data block to display zip code information, and then connecting a data source later. It will require you to commit code to a WordPress theme or plugin. If you have not yet installed and activated the Remote Data Blocks plugin, visit [Getting Started](https://remotedatablocks.com/getting-started/).
 
 ## The contract
 
-Developers can code a "slug" to define a "contract" between the integration template they write and the admins managing the Remote Data Blocks settings in WordPress.
-
-This page will walk through creating an integration template for displaying information about a given zip code to demonstrate the process.
-
-## Create a Zip Code remote data block
+Developers can code a "slug" to define a "contract" between the remote data block integration they build and the admins managing the Remote Data Blocks settings in WordPress.
 
 ## Define a query
 
@@ -96,13 +88,13 @@ add_action( 'init', __NAMESPACE__ . '\\register_zipcode_block' );
 
 ```
 
-Note the `zip-code` slug in the `GenericHttpDataSource::from_slug` call. That's our "contract" in our integration template.
+Note the `zip-code` slug in the `GenericHttpDataSource::from_slug` call. That's the "contract" in our implementation.
 
 We're done!
 
 ## Later on
 
-An admin can set up the data source via the following steps:
+An admin can seperately set up the data source via the following steps:
 
 1. Go to the Remote Data Blocks settings page in your WordPress admin area.
 2. Click on "Add Data Source".
