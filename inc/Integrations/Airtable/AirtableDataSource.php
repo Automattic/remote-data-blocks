@@ -59,10 +59,10 @@ class AirtableDataSource extends HttpDataSource {
 	];
 
 	public function get_display_name(): string {
-		return sprintf( 'Airtable: %s', $this->config['display_name'] ?? $this->config['base']['name'] );
+		return sprintf( 'Airtable (%s)', $this->config['display_name'] ?? $this->config['slug'] ?? $this->config['base']['name'] );
 	}
 
-	public function get_endpoint( string $variation = '' ): string {
+	public function get_endpoint(): string {
 		return 'https://api.airtable.com/v0/' . $this->config['base']['id'];
 	}
 
@@ -95,5 +95,68 @@ class AirtableDataSource extends HttpDataSource {
 			'tables'  => $this->config['tables'] ?? [],
 			'uuid'    => $this->config['uuid'] ?? null,
 		];
+	}
+
+	public function ___temp_get_query(): AirtableGetItemQuery|\WP_Error {
+		$input_schema = [
+			'record_id' => [
+				'name' => 'Record ID',
+				'type' => 'id',
+			],
+		];
+
+		$output_schema = [
+			'is_collection' => false,
+			'mappings'      => [
+				'id' => [
+					'name' => 'Record ID',
+					'path' => '$.id',
+					'type' => 'id',
+				],
+			],
+		];
+
+		foreach ( $this->config['tables'][0]['output_query_mappings'] as $mapping ) {
+			$output_schema['mappings'][ strtolower( $mapping['name'] ) ] = [
+				'name' => $mapping['name'],
+				'path' => '$.fields.' . ucfirst( $mapping['name'] ),
+				'type' => $mapping['type'] ?? 'string',
+			];
+		}
+
+		return AirtableGetItemQuery::from_array([
+			'data_source'   => $this,
+			'input_schema'  => $input_schema,
+			'output_schema' => $output_schema,
+		]);
+	}
+
+	public function ___temp_get_list_query(): AirtableListItemsQuery|\WP_Error {
+		$output_schema = [
+			'root_path'     => '$.records[*]',
+			'is_collection' => true,
+			'mappings'      => [
+				'record_id' => [
+					'name' => 'Record ID',
+					'path' => '$.id',
+					'type' => 'id',
+				],
+			],
+		];
+
+		foreach ( $this->config['tables'][0]['output_query_mappings'] as $mapping ) {
+			$output_schema['mappings'][ strtolower( $mapping['name'] ) ] = [
+				'name' => $mapping['name'],
+				'path' => '$.fields.' . ucfirst( $mapping['name'] ),
+				'type' => $mapping['type'] ?? 'string',
+			];
+		}
+
+		return AirtableListItemsQuery::from_array([
+			'data_source'   => $this,
+			'input_schema'  => [],
+			'output_schema' => $output_schema,
+			'query_name'    => $this->config['tables'][0]['name'],
+		]);
 	}
 }
