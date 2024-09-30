@@ -2,9 +2,13 @@
 
 namespace RemoteDataBlocks\Config\QueryContext;
 
+use RemoteDataBlocks\Config\ArraySerializableInterface;
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use RemoteDataBlocks\Config\DataSource\HttpDataSourceInterface;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
+use RemoteDataBlocks\Validation\Validator;
+use RemoteDataBlocks\Validation\ValidatorInterface;
 
 defined( 'ABSPATH' ) || exit();
 
@@ -17,8 +21,57 @@ defined( 'ABSPATH' ) || exit();
  * @package remote-data-blocks
  * @since 0.1.0
  */
-class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterface {
+class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterface, ArraySerializableInterface {
 	const VERSION = '0.1.0';
+
+	protected const CONFIG_SCHEMA = [
+		'type'       => 'object',
+		'properties' => [
+			'input_schema'  => [
+				'type'  => 'array',
+				'items' => [
+					'type'       => 'object',
+					'properties' => [
+						'type'          => [ 'type' => 'string' ],
+						'name'          => [ 'type' => 'string' ],
+						'default_value' => [
+							'type'     => 'string',
+							'required' => false,
+						],
+						'overrides'     => [
+							'type'     => 'array',
+							'required' => false,
+						],
+					],
+				],
+			],
+			'output_schema' => [
+				'type'       => 'object',
+				'properties' => [
+					'root_path'     => [
+						'type'     => 'string',
+						'required' => false,
+					],
+					'is_collection' => [ 'type' => 'boolean' ],
+					'mappings'      => [
+						'type'  => 'array',
+						'items' => [
+							'type'       => 'object',
+							'properties' => [
+								'name' => [ 'type' => 'string' ],
+								'path' => [ 'type' => 'string' ],
+								'type' => [ 'type' => 'string' ],
+							],
+						],
+					],
+				],
+			],
+			'query_name'    => [
+				'type'     => 'string',
+				'required' => false,
+			],
+		],
+	];
 
 	/**
 	 * Constructor.
@@ -30,11 +83,15 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	public function __construct(
 		private HttpDataSource $data_source,
 		public array $input_schema = [],
-		public array $output_schema = []
+		public array $output_schema = [],
+		protected array $config = [],
 	) {
 		// Provide input and output variables as public properties.
 		$this->input_schema  = $this->get_input_schema();
 		$this->output_schema = $this->get_output_schema();
+
+		// @todo: expand or kill this
+		$this->config = $config;
 	}
 
 	/**
@@ -179,5 +236,29 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 */
 	final public function is_response_data_collection(): bool {
 		return $this->output_schema['is_collection'] ?? false;
+	}
+
+	// @todo: consider splitting the data source injection out from query context so we don't have to tie a query
+	// to a data source when instantiating. instead, we can just require applying queries to data sources in query
+	// runner execution. ie: $query_runner->execute( $query, $data_source );
+	//
+	/** @psalm-suppress ParamNameMismatch reason: we want the clarity provided by the rename here */
+	final public static function from_array( array $config, ?ValidatorInterface $validator = null ): static|\WP_Error {
+		if ( ! isset( $config['data_source'] ) || ! $config['data_source'] instanceof HttpDataSourceInterface ) {
+			return new \WP_Error( 'missing_data_source', __( 'Missing data source.', 'remote-data-blocks' ) );
+		}
+
+		$validator = $validator ?? new Validator( self::CONFIG_SCHEMA );
+		$validated = $validator->validate( $config );
+
+		if ( is_wp_error( $validated ) ) {
+			return $validated;
+		}
+
+		return new static( $config['data_source'], $config['input_schema'], $config['output_schema'], $config );
+	}
+
+	public function to_array(): array {
+		return $this->config;
 	}
 }

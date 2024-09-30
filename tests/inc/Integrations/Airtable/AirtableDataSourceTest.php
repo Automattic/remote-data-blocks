@@ -21,7 +21,7 @@ class AirtableDataSourceTest extends TestCase {
 
 	public function test_get_display_name(): void {
 		$this->assertSame(
-			'Airtable: Test Airtable Base',
+			'Airtable (Test Airtable Base)',
 			$this->data_source->get_display_name()
 		);
 	}
@@ -39,7 +39,7 @@ class AirtableDataSourceTest extends TestCase {
 		]);
 
 		$this->assertSame(
-			'Airtable: Test Base Name',
+			'Airtable (test-airtable-base)',
 			$data_source->get_display_name()
 		);
 	}
@@ -69,7 +69,7 @@ class AirtableDataSourceTest extends TestCase {
 		);
 
 		$this->assertInstanceOf( AirtableDataSource::class, $data_source );
-		$this->assertSame( 'Airtable: New Airtable Base', $data_source->get_display_name() );
+		$this->assertSame( 'Airtable (New Airtable Base)', $data_source->get_display_name() );
 		$this->assertSame( 'https://api.airtable.com/v0/new_base_id', $data_source->get_endpoint() );
 	}
 }
