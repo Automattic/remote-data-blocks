@@ -118,7 +118,26 @@ class DataSourceController extends WP_REST_Controller {
 	public function get_items( $request ) {
 		$code_configured_data_sources = ConfigStore::get_data_sources_displayable();
 		$ui_configured_data_sources   = DataSourceCrud::get_data_sources_list();
-		return rest_ensure_response( array_merge( $code_configured_data_sources, $ui_configured_data_sources ) );
+
+		/**
+		 * quick and dirty deduplication of data sources by slug
+		 *
+		 * ui configured data sources take precedence over code configured ones
+		 * here due to the ordering of the two arrays passed to array_reduce
+		 *
+		 * @todo: refactor this out in the near future in favor of an upstream
+		 * single source of truth for data source configurations
+		 */
+		$data_sources = array_values(array_reduce(
+			array_merge( $code_configured_data_sources, $ui_configured_data_sources ),
+			function ( $acc, $item ) {
+				$acc[ $item['slug'] ] = $item;
+				return $acc;
+			},
+			[]
+		));
+	
+		return rest_ensure_response( $data_sources );
 	}
 
 	/**
