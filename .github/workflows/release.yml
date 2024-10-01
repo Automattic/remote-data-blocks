@@ -1,37 +1,44 @@
 name: Release
 on:
-  push:
-    tags:
-      - 'v*.*.*'
+  workflow_run:
+    workflows: [Test]
+    branches: [trunk]
+    types: [completed]
 
 jobs:
-  push:
+  check_and_release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Verify tag version matches plugin version
+      - name: Check for version change
+        id: version_check
         run: |
-          TAG_VERSION=$(echo ${{ github.ref_name }} | sed 's/^v//')
-          PLUGIN_VERSION=$(grep -oP "Version: \K[^\s]+(?=\s*$)" remote-data-blocks.php)
-          if [ "$TAG_VERSION" != "$PLUGIN_VERSION" ]; then
-            echo "Error: Tag version ($TAG_VERSION) does not match plugin version ($PLUGIN_VERSION)"
-            exit 1
+          git diff origin/trunk..HEAD -- remote-data-blocks.php | grep -oP "Version: \K[^\s]+" > new_version.txt
+          if [ -s new_version.txt ]; then
+            NEW_VERSION=$(cat new_version.txt)
+            echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+            echo "Version changed to: $NEW_VERSION"
+          else
+            echo "No version change detected"
           fi
-          echo "Version match confirmed: $TAG_VERSION"
 
       - name: Setup PHP
+        if: steps.version_check.outputs.new_version
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.1'
 
       - name: Build plugin zip
-        run: npm install && npm run plugin-zip
+        if: steps.version_check.outputs.new_version
+        run: npm ci && npm run plugin-zip
 
-      - name: 'Release'
+      - name: Create Release
+        if: steps.version_check.outputs.new_version
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: v${{ steps.version_check.outputs.new_version }}
           files: remote-data-blocks.zip
           generate_release_notes: true
