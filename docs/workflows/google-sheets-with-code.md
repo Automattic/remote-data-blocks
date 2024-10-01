@@ -39,12 +39,12 @@ Check out [a working example](https://github.com/Automattic/remote-data-blocks/t
 Follow following setup steps to get the Westeros Houses example working:
 
 - [Configure the Google Sheet API Access](./google-sheets-with-code.md#google-sheets-api-access) and [Create a new Google Sheet](./google-sheets-with-code.md#setting-up-the-google-sheet) by following the steps above.
-- Add sheet named `Houses` inside the newly created Google Sheet with columns with headers as 
-	- House
-	- Seat
-	- Region
-	- Words
-	- Sigil (image url)
+- Add sheet named `Houses` inside the newly created Google Sheet with columns with headers as
+  - House
+  - Seat
+  - Region
+  - Words
+  - Sigil (image url)
 - Add some data to the sheet.
 - Base64 encode the JSON key file and set it so that its available via `REMOTE_DATA_BLOCKS_EXAMPLE_GOOGLE_SHEETS_WESTEROS_HOUSES_ACCESS_TOKEN` constant.
 
