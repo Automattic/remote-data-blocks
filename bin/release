@@ -52,3 +52,9 @@ rm "${php_file}.bak"
 echo "Updated $php_file from $current_version to $new_version"
 
 echo "Version bump complete: $new_version"
+
+# Commit the changes
+git add "$php_file"
+git commit -m "v$new_version"
+
+echo "Changes committed to the current branch"
