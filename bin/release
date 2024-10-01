@@ -51,16 +51,4 @@ rm "${php_file}.bak"
 
 echo "Updated $php_file from $current_version to $new_version"
 
-# Update package.json
-json_file="package.json"
-sed -i.bak "s/\"version\": \".*\"/\"version\": \"$new_version\"/" "$json_file"
-rm "${json_file}.bak"
-
-echo "Updated $json_file to $new_version"
-
-# Update package-lock.json
-npm install --package-lock-only
-
-echo "Updated package-lock.json"
-
 echo "Version bump complete: $new_version"
