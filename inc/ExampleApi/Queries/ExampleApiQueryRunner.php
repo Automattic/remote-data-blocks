@@ -16,8 +16,6 @@ defined( 'ABSPATH' ) || exit();
  * there would be a mismatch between the public address (e.g., localhost:888) and
  * what is reachable inside a container.
  *
- * @package remote-data-blocks
- * @since 0.1.0
  */
 class ExampleApiQueryRunner extends QueryRunner {
 	protected function get_raw_response_data( array $input_variables ): array|WP_Error {

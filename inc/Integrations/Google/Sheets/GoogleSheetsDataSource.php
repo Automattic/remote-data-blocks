@@ -2,18 +2,18 @@
 
 namespace RemoteDataBlocks\Integrations\Google\Sheets;
 
-use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
 use WP_Error;
 
-class GoogleSheetsDatasource extends HttpDatasource {
+class GoogleSheetsDataSource extends HttpDataSource {
 	protected const SERVICE_NAME           = REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE;
 	protected const SERVICE_SCHEMA_VERSION = 1;
 
 	protected const SERVICE_SCHEMA = [
 		'type'       => 'object',
 		'properties' => [       
-			'credentials'    => [
+			'credentials'  => [
 				'type'       => 'object',
 				'properties' => [
 					'type'                        => [ 'type' => 'string' ],
@@ -48,8 +48,27 @@ class GoogleSheetsDatasource extends HttpDatasource {
 					'universe_domain'             => [ 'type' => 'string' ],
 				],
 			],
-			'display_name'   => [ 'type' => 'string' ],
-			'spreadsheet_id' => [ 'type' => 'string' ],
+			'display_name' => [
+				'type'     => 'string',
+				'required' => false,
+			],
+			'spreadsheet'  => [
+				'type'       => 'object',
+				'properties' => [
+					'name' => [
+						'type'     => 'string',
+						'required' => false, // Spreadsheet name is not required to fetch data.
+					],
+					'id'   => [ 'type' => 'string' ],
+				],
+			],
+			'sheet'        => [
+				'type'       => 'object',
+				'properties' => [
+					'name' => [ 'type' => 'string' ],
+					'id'   => [ 'type' => 'integer' ],
+				],
+			],
 		],
 	];
 
@@ -58,7 +77,7 @@ class GoogleSheetsDatasource extends HttpDatasource {
 	}
 
 	public function get_endpoint(): string {
-		return sprintf( 'https://sheets.googleapis.com/v4/spreadsheets/%s', $this->config['spreadsheet_id'] );
+		return sprintf( 'https://sheets.googleapis.com/v4/spreadsheets/%s', $this->config['spreadsheet']['id'] );
 	}
 
 	public function get_request_headers(): array {
@@ -75,11 +94,18 @@ class GoogleSheetsDatasource extends HttpDatasource {
 
 	public static function create( array $credentials, string $spreadsheet_id, string $display_name ): self|WP_Error {
 		return parent::from_array([
-			'service'        => REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE,
-			'credentials'    => $credentials,
-			'display_name'   => $display_name,
-			'spreadsheet_id' => $spreadsheet_id,
-			'slug'           => sanitize_title( $display_name ),
+			'service'      => REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE,
+			'credentials'  => $credentials,
+			'display_name' => $display_name,
+			'spreadsheet'  => [
+				'name' => '',
+				'id'   => $spreadsheet_id,
+			],
+			'sheet'        => [
+				'name' => '',
+				'id'   => 0,
+			],
+			'slug'         => sanitize_title( $display_name ),
 		]);
 	}
 

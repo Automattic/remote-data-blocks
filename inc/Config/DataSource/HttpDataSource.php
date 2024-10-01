@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace RemoteDataBlocks\Config\Datasource;
+namespace RemoteDataBlocks\Config\DataSource;
 
 use RemoteDataBlocks\Config\ArraySerializableInterface;
 use RemoteDataBlocks\Config\UiDisplayableInterface;
@@ -8,18 +8,15 @@ use RemoteDataBlocks\Sanitization\Sanitizer;
 use RemoteDataBlocks\Sanitization\SanitizerInterface;
 use RemoteDataBlocks\Validation\Validator;
 use RemoteDataBlocks\Validation\ValidatorInterface;
-use RemoteDataBlocks\WpdbStorage\DatasourceCrud;
+use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use WP_Error;
 
 /**
- * HttpDatasource class
+ * HttpDataSource class
  *
- * Implements the HttpDatasourceInterface to define a generic HTTP datasource.
- *
- * @package remote-data-blocks
- * @since 0.1.0
+ * Implements the HttpDataSourceInterface to define a generic HTTP data source.
  */
-abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInterface, ArraySerializableInterface, UiDisplayableInterface {
+abstract class HttpDataSource implements DataSourceInterface, HttpDataSourceInterface, ArraySerializableInterface, UiDisplayableInterface {
 	protected const SERVICE_NAME           = 'unknown';
 	protected const SERVICE_SCHEMA_VERSION = -1;
 	protected const SERVICE_SCHEMA         = [];
@@ -47,17 +44,17 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 	 * @inheritDoc
 	 */
 	final public static function get_config_schema(): array {
-		$schema = DatasourceInterface::BASE_SCHEMA;
+		$schema = DataSourceInterface::BASE_SCHEMA;
 
 		if ( isset( static::SERVICE_SCHEMA['properties'] ) ) {
-			$schema['properties'] = array_merge( DatasourceInterface::BASE_SCHEMA['properties'], static::SERVICE_SCHEMA['properties'] );
+			$schema['properties'] = array_merge( DataSourceInterface::BASE_SCHEMA['properties'], static::SERVICE_SCHEMA['properties'] );
 		}
 
 		return $schema;
 	}
 
-	public static function from_slug( string $slug ): DatasourceInterface|WP_Error {
-		$config = DatasourceCrud::get_by_slug( $slug );
+	public static function from_slug( string $slug ): DataSourceInterface|WP_Error {
+		$config = DataSourceCrud::get_by_slug( $slug );
 
 		if ( ! $config ) {
 			return new WP_Error( 'data_source_not_found', __( 'Data source not found.', 'remote-data-blocks' ), [ 'status' => 404 ] );
@@ -70,7 +67,7 @@ abstract class HttpDatasource implements DatasourceInterface, HttpDatasourceInte
 	 * @inheritDoc
 	 * @psalm-suppress ParamNameMismatch reason: we want the clarity provided by the rename here
 	 */
-	final public static function from_array( array $config, ?ValidatorInterface $validator = null, ?SanitizerInterface $sanitizer = null ): DatasourceInterface|WP_Error {
+	final public static function from_array( array $config, ?ValidatorInterface $validator = null, ?SanitizerInterface $sanitizer = null ): DataSourceInterface|WP_Error {
 		$config['service_schema_version'] = static::SERVICE_SCHEMA_VERSION;
 		$schema                           = static::get_config_schema();
 

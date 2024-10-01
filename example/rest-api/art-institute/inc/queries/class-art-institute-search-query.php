@@ -46,7 +46,7 @@ class ArtInstituteOfChicagoSearchArtQuery extends HttpQueryContext {
 
 	public function get_endpoint( $input_variables ): string {
 		$query    = $input_variables['search_terms'];
-		$endpoint = $this->get_datasource()->get_endpoint() . '/search';
+		$endpoint = $this->get_data_source()->get_endpoint() . '/search';
 
 		return add_query_arg( [ 'q' => $query ], $endpoint );
 	}

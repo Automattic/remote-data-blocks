@@ -3,7 +3,7 @@
 namespace RemoteDataBlocks\REST;
 
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
-use RemoteDataBlocks\WpdbStorage\DatasourceCrud;
+use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use WP_REST_Controller;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -11,7 +11,7 @@ use WP_Error;
 
 defined( 'ABSPATH' ) || exit();
 
-class DatasourceController extends WP_REST_Controller {
+class DataSourceController extends WP_REST_Controller {
 	public function __construct() {
 		$this->namespace = REMOTE_DATA_BLOCKS__REST_NAMESPACE;
 		$this->rest_base = 'data-sources';
@@ -105,7 +105,7 @@ class DatasourceController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
-		$item = DatasourceCrud::register_new_data_source( $request->get_json_params() );
+		$item = DataSourceCrud::register_new_data_source( $request->get_json_params() );
 		return rest_ensure_response( $item );
 	}
 
@@ -116,9 +116,28 @@ class DatasourceController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
-		$code_configured_data_sources = ConfigStore::get_datasources_displayable();
-		$ui_configured_data_sources   = DatasourceCrud::get_data_sources_list();
-		return rest_ensure_response( array_merge( $code_configured_data_sources, $ui_configured_data_sources ) );
+		$code_configured_data_sources = ConfigStore::get_data_sources_displayable();
+		$ui_configured_data_sources   = DataSourceCrud::get_data_sources_list();
+
+		/**
+		 * quick and dirty deduplication of data sources by slug
+		 *
+		 * ui configured data sources take precedence over code configured ones
+		 * here due to the ordering of the two arrays passed to array_reduce
+		 *
+		 * @todo: refactor this out in the near future in favor of an upstream
+		 * single source of truth for data source configurations
+		 */
+		$data_sources = array_values(array_reduce(
+			array_merge( $code_configured_data_sources, $ui_configured_data_sources ),
+			function ( $acc, $item ) {
+				$acc[ $item['slug'] ] = $item;
+				return $acc;
+			},
+			[]
+		));
+	
+		return rest_ensure_response( $data_sources );
 	}
 
 	/**
@@ -128,7 +147,7 @@ class DatasourceController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_item( $request ) {
-		$response = DatasourceCrud::get_item_by_uuid( DatasourceCrud::get_data_sources(), $request->get_param( 'uuid' ) );
+		$response = DataSourceCrud::get_item_by_uuid( DataSourceCrud::get_data_sources(), $request->get_param( 'uuid' ) );
 		return rest_ensure_response( $response );
 	}
 
@@ -139,7 +158,7 @@ class DatasourceController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function update_item( $request ) {
-		$item = DatasourceCrud::update_item_by_uuid( $request->get_param( 'uuid' ), $request->get_json_params() );
+		$item = DataSourceCrud::update_item_by_uuid( $request->get_param( 'uuid' ), $request->get_json_params() );
 		return rest_ensure_response( $item );
 	}
 
@@ -150,7 +169,7 @@ class DatasourceController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function delete_item( $request ) {
-		$result = DatasourceCrud::delete_item_by_uuid( $request->get_param( 'uuid' ) );
+		$result = DataSourceCrud::delete_item_by_uuid( $request->get_param( 'uuid' ) );
 		return rest_ensure_response( $result );
 	}
 
@@ -164,7 +183,7 @@ class DatasourceController extends WP_REST_Controller {
 				array( 'status' => 400 )
 			);
 		}
-		$validation_status = DatasourceCrud::validate_slug( $slug );
+		$validation_status = DataSourceCrud::validate_slug( $slug );
 		$result            = [
 			'exists' => true !== $validation_status,
 		];
