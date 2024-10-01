@@ -1,14 +1,18 @@
 <?php declare(strict_types = 1);
 
-namespace RemoteDataBlocks\WpdbStorage;
+namespace RemoteDataBlocks\Data\WpdbStorage;
 
 use RemoteDataBlocks\Config\ArraySerializableInterface;
-use RemoteDataBlocks\Config\DataSource\HttpDataSourceInterface;
+use RemoteDataBlocks\Config\Datasource\DatasourceInterface;
+use RemoteDataBlocks\Config\Datasource\HttpDatasourceInterface;
+use RemoteDataBlocks\Data\DataSourceProviderInterface;
+use RemoteDataBlocks\Data\DataSourceWriterInterface;
+use RemoteDataBlocks\Logging\LoggerManager;
 use WP_Error;
 
-use const RemoteDataBlocks\REMOTE_DATA_BLOCKS__DATA_SOURCE_CLASSMAP;
+use const RemoteDataBlocks\REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP;
 
-class DataSourceCrud {
+class DatasourceCrud implements DataSourceProviderInterface, DataSourceWriterInterface {
 	const CONFIG_OPTION_NAME = 'remote_data_blocks_config';
 
 	/**
@@ -29,12 +33,8 @@ class DataSourceCrud {
 		if ( ! preg_match( '/^[a-z0-9-]+$/', $slug ) ) {
 			return new WP_Error( 'invalid_slug', __( 'Invalid slug.', 'remote-data-blocks' ) );
 		}
-
-		$data_sources = self::get_data_sources();
 	
-		$slug_exists = array_filter( $data_sources, function ( $source ) use ( $slug ) {
-			return $source->slug === $slug;
-		} );
+		$slug_exists = self::get( $slug );
 
 		if ( ! empty( $slug_exists ) ) {
 			return new WP_Error( 'slug_already_taken', __( 'Slug already taken.', 'remote-data-blocks' ) );
@@ -43,75 +43,73 @@ class DataSourceCrud {
 		return true;
 	}
 
-	public static function register_new_data_source( array $settings, ?ArraySerializableInterface $data_source = null ): HttpDataSourceInterface|WP_Error {
+	public static function register_new_data_source( array $settings, ?ArraySerializableInterface $datasource = null ): HttpDatasourceInterface|WP_Error {
 		$data_sources = self::get_data_sources();
 
 		do {
 			$uuid = wp_generate_uuid4();
 		} while ( ! empty( self::get_item_by_uuid( self::get_data_sources(), $uuid ) ) );
 
-		$new_data_source = $data_source ?? self::resolve_data_source( array_merge( $settings, [ 'uuid' => $uuid ] ) );
+		$new_datasource = $datasource ?? self::resolve_datasource( array_merge( $settings, [ 'uuid' => $uuid ] ) );
 
-		if ( is_wp_error( $new_data_source ) ) {
-			return $new_data_source;
+		if ( is_wp_error( $new_datasource ) ) {
+			return $new_datasource;
 		}
 
-		$result = self::save_data_source( $new_data_source, $data_sources );
+		$result = self::save_datasource( $new_datasource, $data_sources );
 
 		if ( true !== $result ) {
 			return new WP_Error( 'failed_to_register_data_source', __( 'Failed to register data source.', 'remote-data-blocks' ) );
 		}
 
-		return $new_data_source;
+		return $new_datasource;
 	}
 
 	public static function get_config(): array {
 		return get_option( self::CONFIG_OPTION_NAME, [] );
 	}
 
-	public static function get_data_sources( string $service = '' ): array {
-		$data_sources = self::get_config();
+	public static function get_data_sources(): array {
+		$data_sources = [];
 
-		if ( $service ) {
-			return array_values( array_filter($data_sources, function ( $config ) use ( $service ) {
-				return $config['service'] === $service;
-			} ) );
+		foreach ( self::get_config() as $data_source_config ) {
+			$datasource = self::resolve_datasource( $data_source_config );
+			
+			if ( is_wp_error( $datasource ) ) {
+				LoggerManager::instance()->error( $datasource->get_error_message() );
+				continue;
+			}
+
+			$data_sources[] = $datasource;
 		}
 
 		return $data_sources;
-	}
-
-	/**
-	 * Get the array list of data sources
-	 */
-	public static function get_data_sources_list(): array {
-		return array_values( self::get_data_sources() );
 	}
 
 	public static function get_item_by_uuid( array $data_sources, string $uuid ): array|false {
 		return $data_sources[ $uuid ] ?? false;
 	}
 
-	public static function update_item_by_uuid( string $uuid, array $new_item, ?ArraySerializableInterface $data_source = null ): HttpDataSourceInterface|WP_Error {
+	public static function update_item_by_uuid( string $uuid, array $new_item, ?ArraySerializableInterface $datasource = null ): HttpDatasourceInterface|WP_Error {
 		$data_sources = self::get_data_sources();
 		$item         = self::get_item_by_uuid( $data_sources, $uuid );
 		if ( ! $item ) {
 			return new WP_Error( 'data_source_not_found', __( 'Data source not found.', 'remote-data-blocks' ), [ 'status' => 404 ] );
 		}
 
-		$data_source = $data_source ?? self::resolve_data_source( array_merge( $item, $new_item ) );
+		$datasource = $datasource ?? self::resolve_datasource( array_merge( $item, $new_item ) );
 
-		if ( is_wp_error( $data_source ) ) {
-			return $data_source;
+		if ( is_wp_error( $datasource ) ) {
+			return $datasource;
 		}
 
-		$result = self::save_data_source( $data_source, $data_sources );
+		$result = self::save_datasource( $datasource, $data_sources );
 		
 		if ( true !== $result ) {
 			return new WP_Error( 'failed_to_update_data_source', __( 'Failed to update data source.', 'remote-data-blocks' ) );
 		}
 		
-		return $data_source;
+		return $datasource;
 	}
 
 	public static function delete_item_by_uuid( string $uuid ): WP_Error|bool {
@@ -136,21 +134,66 @@ class DataSourceCrud {
 	 * should be the only one as we check for slug conflicts at present. In the future,
 	 * it's be good to holistically improve how those interactions work
 	 */
-	public static function get_by_slug( string $slug ): array|false {
+	public static function get( string $slug ): ?DatasourceInterface {
 		$data_sources = self::get_data_sources();
 		foreach ( $data_sources as $source ) {
-			if ( $source['slug'] === $slug ) {
+			if ( $source->get_slug() === $slug ) {
 				return $source;
 			}
 		}
-		return false;
+		return null;
 	}
 
-	private static function save_data_source( ArraySerializableInterface $data_source, array $data_source_configs ): bool {
-		$config = $data_source->to_array();
+	public static function find_by( array $criteria ): array {
+		$data_sources = self::get_data_sources();
+		$results      = [];
+
+		foreach ( $data_sources as $data_source ) {
+			$match = true;
+			foreach ( $criteria as $key => $value ) {
+				if ( ! isset( $data_source[ $key ] ) || $data_source[ $key ] !== $value ) {
+					$match = false;
+					break;
+				}
+			}
+			if ( $match ) {
+				$results[] = $data_source;
+			}
+		}
+
+		return $results;	
+	}
+
+	public function insert( DatasourceInterface $datasource ): bool {
+		$data_sources                            = self::get_data_sources();
+		$data_sources[ $datasource->get_slug() ] = $datasource->to_array();
+		return update_option( self::CONFIG_OPTION_NAME, $data_sources );
+	}
+
+	public function update( DatasourceInterface $datasource ): bool {
+		$result = self::save_datasource( $datasource, self::get_data_sources() );
+		return ! is_wp_error( $result );
+	}   
+
+	public function delete( DatasourceInterface $datasource ): bool {
+		$result = self::delete_item_by_uuid( $datasource->get_uuid() );
+		return ! is_wp_error( $result );
+	}
+
+	public static function is_responsible_for_data_source( DatasourceInterface $datasource ): bool {
+		if ( ! $datasource instanceof ArraySerializableInterface ) {
+			return false;
+		}
+
+		$config = $datasource->to_array();
+		return isset( $config['__metadata']['writer'] ) && $config['__metadata']['writer'] === self::class;
+	}
+
+	private static function save_datasource( ArraySerializableInterface $datasource, array $datasource_configs ): bool {
+		$config = $datasource->to_array();
 		
 		if ( ! isset( $config['__metadata'] ) ) {
-			$config['__metadata'] = [];
+			$config['__metadata'] = [ 'writer' => self::class ];
 		}
 
 		$now = gmdate( 'Y-m-d H:i:s' );
@@ -159,17 +202,17 @@ class DataSourceCrud {
 			$config['__metadata']['created_at'] = $now;
 		}
 
-		$config['__metadata']['updated_at']     = $now;
-		$data_source_configs[ $config['uuid'] ] = $config;
+		$config['__metadata']['updated_at']    = $now;
+		$datasource_configs[ $config['uuid'] ] = $config;
 
-		return update_option( self::CONFIG_OPTION_NAME, $data_source_configs );
+		return update_option( self::CONFIG_OPTION_NAME, $datasource_configs );
 	}
 
-	private static function resolve_data_source( array $config ): HttpDataSourceInterface|WP_Error {
-		if ( isset( REMOTE_DATA_BLOCKS__DATA_SOURCE_CLASSMAP[ $config['service'] ] ) ) {
-			return REMOTE_DATA_BLOCKS__DATA_SOURCE_CLASSMAP[ $config['service'] ]::from_array( $config );
+	private static function resolve_datasource( array $config ): HttpDatasourceInterface|WP_Error {
+		if ( isset( REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP[ $config['service'] ] ) ) {
+			return REMOTE_DATA_BLOCKS__DATASOURCE_CLASSMAP[ $config['service'] ]::from_array( $config );
 		}
 
-		return new WP_Error( 'unsupported_data_source', __( 'DataSource class not found.', 'remote-data-blocks' ) );
+		return new WP_Error( 'unsupported_datasource', __( 'Datasource class not found.', 'remote-data-blocks' ) );
 	}
 }
