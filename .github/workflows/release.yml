@@ -1,14 +1,12 @@
 name: Release
 on:
-  workflow_run:
-    workflows: [Test]
-    branches: [trunk]
-    types: [completed]
+  push:
+    branches:
+      - trunk
 
 jobs:
   check_and_release:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -17,7 +15,7 @@ jobs:
       - name: Check for version change
         id: version_check
         run: |
-          OLD_VERSION=$(git show origin/trunk:remote-data-blocks.php | sed -n 's/.*Version: *//p' | tr -d '[:space:]')
+          OLD_VERSION=$(git show HEAD^:remote-data-blocks.php | sed -n 's/.*Version: *//p' | tr -d '[:space:]')
           NEW_VERSION=$(git show HEAD:remote-data-blocks.php | sed -n 's/.*Version: *//p' | tr -d '[:space:]')
           if [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
             echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
