@@ -1,104 +1,44 @@
 # Extending
 
-Remote Data Blocks is designed to be extensible, allowing developers to create new data sources and queries. This guide will walk you through the process of extending the core plugin.
+> [!TIP]
+> Make sure you've read the [core concepts](../concepts/index.md) behind Remote Data Blocks before extending the plugin.
 
-## 1. Create a New Data Source
+Data sources and queries can be configured on the settings screen, but sometimes you need to extend the plugin to implement custom functionality. Remote Data Blocks provides extendable classes, global functions, hooks, and filters to help you connect remote data blocks to any data source and customize their behavior.
 
-To create a new data source:
+## Data flow
 
-1. Create a new PHP class that extends the `HttpDataSource` class.
-2. Implement the required methods for fetching and processing data.
+Here's a short overview of how data flows through the plugin when a post with a remote data block is rendered:
 
-Example:
+1. WordPress core loads the post content, parses the blocks, and recognizes that a paragraph block has a [block binding](https://make.wordpress.org/core/2024/03/06/new-feature-the-block-bindings-api/).
+2. WordPress core calls the block binding callback function: `BlockBindings::get_value()`.
+3. The callback function inspects the paragraph block. Using the block context supplied by the parent remote data block, it determines which query to execute.
+4. The query runner is loaded: `$query->get_query_runner()`.
+5. The query runner executes the query: `$query_runner->execute()`.
+6. Various properties of the query are requested by the query runner, including the endpoint, request headers, request method, and request body. Some of these properties are delegated to the data source (`$query->get_data_source()`).
+7. The query is dispatched and the response data is inspected, formatted into a consistent shape, and returned to the block binding callback function.
+8. The callback function extracts the requested field from the response data and returns it to WordPress core for rendering.
 
-```php
-class YourCustomDataSource extends HttpDataSource {
-	public function get_endpoint(): string {
-        // Implement your endpoint logic here
-	}
+## Customization
 
-	public function get_request_headers(): array {
-        // Implement your headers logic here
-	}
-}
-```
+Providing a custom data source, query, or query runner gives you full control over how data is fetched, processed, and rendered. In most cases, you only need to extend one of these classes to implement custom behavior. A common approach is to define a data source on the settings screen and then commit a custom query in code to fetch and process the data.
 
-## 2. Create a New Query
+Here are some detailed overviews of these classes with notes on how and why to extend them:
 
-To create a new query:
+- [Data source](data-source.md)
+- [Query](query.md)
+- [Query runner](query-runner.md)
 
-1. Create a new PHP class that extends the `HttpQueryContext` class.
-2. Implement the required input and output variables for executing the query.
-3. Optionally implement overrides of base class methods if needed.
+Once you've defined your custom classes, you can [register a remote data block](block-registration.md) that uses them.
 
-Example:
+### Additional customization
 
-```php
-class YourCustomQuery extends HttpQueryContext {
-    public function get_input_schema(): array {
-		return [
-			// Define your input variables here
-		];
-	}
+- [Block patterns](block-patterns.md)
+- [Hooks (actions and filters](hooks.md)
 
-    public function get_output_schema(): array {
-		return [
-			// Define your output variables here
-		];
-	}
+## Workflows
 
-    public function get_endpoint( array $input_variables ): string {
-        // Optionally implemented override of data source endpoint logic here
-        // eg, to add additional query parameters
-    }
-}
-```
+The [workflows guide](../workflows/index.md) provides detailed code examples of various methods of extending the plugin.
 
-## 3. Register Your New Block
+## Create a local development environment
 
-To register your new block:
-
-1. Create a new PHP file for registering your block.
-2. Use the `register_remote_data_block` function to register your block.
-
-Example:
-
-```php
-function register_your_custom_block() {
-    $block_name       = 'Your Custom Block';
-    $your_data_source = new YourCustomDataSource();
-    $your_query       = new YourCustomQuery( $your_data_source );
-
-    register_remote_data_block( $block_name, $your_query );
-}
-add_action( 'init', 'YourNamespace\\register_your_custom_block' );
-```
-
-## 4. Create Block Patterns (optional)
-
-Patterns allow you to represent your remote data if different ways. By default, the plugin registers a unstyled block pattern that you can use out of the box. You can create additional patterns in the WordPress Dashboard or programmatically using the `register_remote_data_block_pattern` function.
-
-Example:
-
-```html
-<!-- wp:group {"layout":{"type":"constrained"}} -->
-<div class="wp-block-group">
-	<!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"title"}}}}} -->
-	<h2 class="wp-block-heading"></h2>
-	<!-- /wp:heading -->
-	<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"description"}}}}} -->
-	<p></p>
-	<!-- /wp:paragraph -->
-</div>
-<!-- /wp:group -->
-```
-
-```php
-function register_your_block_pattern() {
-    $block_name    = 'Your Custom Block';
-    $block_pattern = file_get_contents( **DIR** . '/your-pattern.html' );
-
-    register_remote_data_block_pattern( $block_name, 'Pattern Title', $block_pattern );
-}
-add_action( 'init', 'YourNamespace\\register_your_block_pattern' );
-```
+This repository includes tools for quickly starting a [local development environment](../local-development.md).
