@@ -39,11 +39,12 @@ fi
 
 release_type=$1
 
-# Update remote-data-blocks.php
+# Get current version from remote-data-blocks.php
 php_file="remote-data-blocks.php"
 current_version=$(sed -n "s/.*Version: \([0-9.]*\).*/\1/p" "$php_file")
 new_version=$(increment_version "$current_version" "$release_type")
 
+# Update remote-data-blocks.php
 sed -i.bak "s/Version: $current_version/Version: $new_version/" "$php_file"
 sed -i.bak "s/define( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION', '$current_version' );/define( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION', '$new_version' );/" "$php_file"
 rm "${php_file}.bak"
@@ -52,12 +53,14 @@ echo "Updated $php_file from $current_version to $new_version"
 
 # Update package.json
 json_file="package.json"
-current_version=$(sed -n 's/.*"version": "\([0-9.]*\)".*/\1/p' "$json_file")
-new_version=$(increment_version "$current_version" "$release_type")
-
-sed -i.bak "s/\"version\": \"$current_version\"/\"version\": \"$new_version\"/" "$json_file"
+sed -i.bak "s/\"version\": \".*\"/\"version\": \"$new_version\"/" "$json_file"
 rm "${json_file}.bak"
 
-echo "Updated $json_file from $current_version to $new_version"
+echo "Updated $json_file to $new_version"
+
+# Update package-lock.json
+npm install --package-lock-only
+
+echo "Updated package-lock.json"
 
 echo "Version bump complete: $new_version"
