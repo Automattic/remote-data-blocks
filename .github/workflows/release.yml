@@ -1,0 +1,45 @@
+name: Release
+on:
+  workflow_run:
+    workflows: [Test]
+    branches: [trunk]
+    types: [completed]
+
+jobs:
+  check_and_release:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for version change
+        id: version_check
+        run: |
+          OLD_VERSION=$(git show origin/trunk:remote-data-blocks.php | sed -n 's/.*Version: *//p' | tr -d '[:space:]')
+          NEW_VERSION=$(git show HEAD:remote-data-blocks.php | sed -n 's/.*Version: *//p' | tr -d '[:space:]')
+          if [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
+            echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+            echo "Version changed from $OLD_VERSION to $NEW_VERSION"
+          else
+            echo "No version change detected"
+          fi
+
+      - name: Setup PHP
+        if: steps.version_check.outputs.new_version
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+
+      - name: Build plugin zip
+        if: steps.version_check.outputs.new_version
+        run: npm ci && npm run plugin-zip
+
+      - name: Create Release
+        if: steps.version_check.outputs.new_version
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version_check.outputs.new_version }}
+          files: remote-data-blocks.zip
+          generate_release_notes: true

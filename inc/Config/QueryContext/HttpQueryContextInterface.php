@@ -5,8 +5,6 @@ namespace RemoteDataBlocks\Config\QueryContext;
 /**
  * HttpQueryContextInterface interface
  *
- * @package remote-data-blocks
- * @since 0.1.0
  */
 interface HttpQueryContextInterface {
 	public function get_cache_ttl( array $input_variables ): null|int;

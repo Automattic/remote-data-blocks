@@ -11,9 +11,6 @@ namespace RemoteDataBlocks\Config\DataSource;
  *
  * If you are a WPVIP customer, data sources are automatically provided by VIP.
  * Only implement this interface if you have additional custom data sources.
- * 
- * @package remote-data-blocks
- * @since 0.1.0
  */
 interface DataSourceInterface {
 	public const BASE_SCHEMA = [
