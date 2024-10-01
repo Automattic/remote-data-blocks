@@ -10,8 +10,6 @@
  * Requires at least: 6.6
  * Requires PHP: 8.1
  * Requires plugins: remote-data-blocks
- *
- * @package remote-data-blocks
  */
 
 namespace RemoteDataBlocks\Example;

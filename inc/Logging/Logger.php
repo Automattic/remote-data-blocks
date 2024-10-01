@@ -55,7 +55,6 @@ class Logger extends AbstractLogger {
 		 * Filter the log level threshhold. Must supply a valid PSR log level.
 		 *
 		 * @param string $default_log_level The default log level.
-		 * @since 0.1.0
 		 */
 		$this->log_level = apply_filters( 'wpcomvip_log_level', $default_log_level );
 
@@ -109,7 +108,6 @@ class Logger extends AbstractLogger {
 		 * @param string $level     The log level.
 		 * @param string $message   The log message.
 		 * @param array  $context   Additional context for the log message.
-		 * @since 0.1.0
 		 */
 		do_action( 'wpcomvip_log', $this->namespace, strval( $level ), strval( $message ), $context );
 
