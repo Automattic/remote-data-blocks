@@ -19,8 +19,6 @@ namespace RemoteDataBlocks\Config\DataSource;
  * If you are a WPVIP customer, data sources are automatically provided by VIP.
  * Only implement this interface if you have custom data sources not provided by VIP.
  * 
- * @package remote-data-blocks
- * @since 0.1.0
  */
 interface HttpDataSourceInterface {
 	/**

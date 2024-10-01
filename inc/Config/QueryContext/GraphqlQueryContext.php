@@ -10,8 +10,6 @@ defined( 'ABSPATH' ) || exit();
  * Base class used to define a Remote Data Query. This class defines a
  * composable query that allows it to be composed with another query or a block.
  *
- * @package remote-data-blocks
- * @since 0.1.0
  */
 abstract class GraphqlQueryContext extends HttpQueryContext {
 

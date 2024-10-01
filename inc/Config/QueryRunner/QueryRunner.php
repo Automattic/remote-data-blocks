@@ -16,8 +16,6 @@ defined( 'ABSPATH' ) || exit();
  *
  * Class that executes queries, leveraging provided QueryContext.
  *
- * @package remote-data-blocks
- * @since 0.1.0
  */
 class QueryRunner implements QueryRunnerInterface {
 

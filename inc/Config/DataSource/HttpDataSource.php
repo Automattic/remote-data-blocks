@@ -15,9 +15,6 @@ use WP_Error;
  * HttpDataSource class
  *
  * Implements the HttpDataSourceInterface to define a generic HTTP data source.
- *
- * @package remote-data-blocks
- * @since 0.1.0
  */
 abstract class HttpDataSource implements DataSourceInterface, HttpDataSourceInterface, ArraySerializableInterface, UiDisplayableInterface {
 	protected const SERVICE_NAME           = 'unknown';
