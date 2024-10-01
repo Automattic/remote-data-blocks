@@ -5,8 +5,6 @@
  *
  * This file contains functions, in the global namespace, for registering and
  * interacting with Remote Data Blocks.
- *
- * @package remote-data-blocks
  */
 
 use RemoteDataBlocks\Config\QueryContext\QueryContextInterface;

@@ -15,7 +15,7 @@ export const SUPPORTED_SERVICES_LABELS: Record< ( typeof SUPPORTED_SERVICES )[ n
 		shopify: __( 'Shopify', 'remote-data-blocks' ),
 		'google-sheets': __( 'Google Sheets', 'remote-data-blocks' ),
 		'generic-http': __( 'HTTP', 'remote-data-blocks' ),
-		'example-api': __( 'Example API', 'remote-data-blocks' ),
+		'example-api': __( 'Conference Events Example API', 'remote-data-blocks' ),
 	} as const;
 export const OPTIONS_PAGE_SLUG = 'remote-data-blocks-settings';
 export const REST_BASE = '/remote-data-blocks/v1';

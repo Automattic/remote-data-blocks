@@ -1,8 +1,8 @@
 {
   "$schema": "https://playground.wordpress.net/blueprint-schema.json",
   "meta": {
-    "title": "Remote Data Blocks latest",
-    "description": "Installs the latest release of remote-data-blocks plugin to WordPress Playground",
+    "title": "Remote Data Blocks local playground",
+    "description": "Runs Remote Data Blocks plugin in a local WordPress Playground",
     "author": "WordPress VIP",
     "categories": [ "Content" ]
   },
@@ -30,10 +30,13 @@
         "activate": true
       },
       "pluginZipFile": {
-        "caption": "Installing Remote Data Blocks",
-        "resource": "url",
-        "url": "https://github-proxy.com/proxy/?repo=Automattic/remote-data-blocks&release=bba85f9&asset=remote-data-blocks.zip"
+        "resource": "wordpress.org/plugins",
+        "slug": "query-monitor"
       }
+    },
+    {
+      "step": "activatePlugin",
+      "pluginPath": "remote-data-blocks/remote-data-blocks.php"
     }
   ]
 }
