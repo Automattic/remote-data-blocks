@@ -1,15 +1,18 @@
 #!/bin/sh
 
 root_dir=$(pwd)
-script_dir=$(dirname "$0")
 
-echo "Shutting down..."
-
-cd ./bin/wp-env/decoupled
-npx wp-env stop 2>/dev/null
-cd "$root_dir"
-npx wp-env stop 2>/dev/null
-pkill -f 'remote-data-blocks/node_modules/'
+echo "Shutting down Valkey / Redis..."
 docker compose -f "$root_dir/docker-compose.overrides.yml" down
 
-echo "Shutdown complete"
+# We don't know which environment is running, so we'll stop both and suppress output.
+echo "Stopping WordPress..."
+cd ./bin/wp-env/decoupled || exit 1
+npx wp-env stop 2>/dev/null
+cd "$root_dir" || exit 1
+npx wp-env stop 2>/dev/null
+
+# Kill any lingering Node.js processes.
+pkill -f 'remote-data-blocks/node_modules/'
+
+echo "⏸️ Rerun \`npm run start:*\` command to resume or \`npm run destroy\` to clean up."
