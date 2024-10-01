@@ -53,8 +53,11 @@ echo "Updated $php_file from $current_version to $new_version"
 
 echo "Version bump complete: $new_version"
 
+# Create a new branch for the release
+git checkout -b release/v"$new_version"
+
 # Commit the changes
 git add "$php_file"
 git commit -m "v$new_version"
 
-echo "Changes committed to the current branch"
+echo "Changes committed to release/v$new_version branch. Push the branch to the remote repository and create a pull request."
