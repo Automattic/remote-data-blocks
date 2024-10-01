@@ -35,6 +35,7 @@
     "packages-update": "wp-scripts packages-update",
     "plugin-zip": "npm run build && composer install --prefer-dist --optimize-autoloader --no-dev && wp-scripts plugin-zip",
     "postinstall": "composer install",
+    "release": "./bin/release",
     "start": "wp-scripts start --experimental-modules",
     "start:decoupled": "./bin/start decoupled",
     "start:monolith": "./bin/start monolith",
