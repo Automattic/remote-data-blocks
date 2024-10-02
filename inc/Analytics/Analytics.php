@@ -24,6 +24,7 @@ class Analytics {
 				'remote_data_blocks',
 				[
 					'plugin_version'   => constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ),
+					'is_multisite'     => is_multisite(),
 					'wp_version'       => get_bloginfo( 'version' ),
 					'hosting_provider' => self::get_hosting_provider(),
 				]

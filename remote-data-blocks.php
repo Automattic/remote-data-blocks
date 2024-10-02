@@ -14,6 +14,8 @@
 
 namespace RemoteDataBlocks;
 
+use RemoteDataBlocks\Analytics\Analytics;
+
 defined( 'ABSPATH' ) || exit();
 
 define( 'REMOTE_DATA_BLOCKS__PLUGIN_ROOT', __FILE__ );
@@ -35,7 +37,7 @@ Editor\BlockManagement\ConfigRegistry::init();
 Editor\PatternEditor\PatternEditor::init();
 
 // Analytics.
-Analytics\Analytics::init();
+Analytics::init();
 
 // Example API.
 ExampleApi\ExampleApi::init();
@@ -50,3 +52,32 @@ Integrations\VipBlockDataApi\VipBlockDataApi::init();
 
 // REST endpoints.
 REST\RemoteDataController::init();
+
+
+/**
+ * Activation hook.
+ *
+ * @param string $plugin_path Path of the plugin that was activated.
+ */
+function rdb_plugin_activation( string $plugin_path ): void {
+	if ( $plugin_path !== plugin_basename( __FILE__ ) ) {
+		return;
+	}
+
+	Analytics::track_event( 'remotedatablocks_plugin_toggle', [ 'action' => 'activate' ] );
+}
+add_action( 'activated_plugin', __NAMESPACE__ . '\\rdb_plugin_activation' );
+
+/**
+ * Deactivation hook.
+ *
+ * @param string $plugin_path Path of the plugin that was deactivated.
+ */
+function rdb_plugin_deactivation( string $plugin_path ): void {
+	if ( $plugin_path !== plugin_basename( __FILE__ ) ) {
+		return;
+	}
+
+	Analytics::track_event( 'remotedatablocks_plugin_toggle', [ 'action' => 'deactivate' ] );
+}
+add_action( 'deactivated_plugin', __NAMESPACE__ . '\\rdb_plugin_deactivation' );
