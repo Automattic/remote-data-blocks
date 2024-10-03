@@ -161,7 +161,7 @@ class DatasourceCrud implements DataSourceProviderInterface, DataSourceWriterInt
 			}
 		}
 
-		return $results;	
+		return $results;    
 	}
 
 	public function insert( DatasourceInterface $datasource ): bool {
