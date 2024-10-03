@@ -156,7 +156,7 @@ class DataSourceController extends WP_REST_Controller {
 		// Tracks Analytics.
 		$code_configured_data_sources_count = count( $code_configured_data_sources );
 		$ui_configured_data_sources_count   = count( $ui_configured_data_sources );
-		Analytics::track_event( 'remotedatablocks_data_sources_stats', [
+		Analytics::track_event( 'remotedatablocks_view_data_sources', [
 			'total_data_sources_count'           => $code_configured_data_sources_count + $ui_configured_data_sources_count,
 			'code_configured_data_sources_count' => $code_configured_data_sources_count,
 			'ui_configured_data_sources_count'   => $ui_configured_data_sources_count,
