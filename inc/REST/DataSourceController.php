@@ -117,7 +117,7 @@ class DataSourceController extends WP_REST_Controller {
 			$additional_track_props['api_key_location']    = $auth['addTo'] ?? '';
 		}
 
-		Analytics::track_event( 'remotedatablocks_data_sources', array_merge( [
+		Analytics::track_event( 'remotedatablocks_data_source_interaction', array_merge( [
 			'data_source_type' => $data_source_properties['service'],
 			'action'           => 'added',
 		], $additional_track_props ) );
@@ -199,7 +199,7 @@ class DataSourceController extends WP_REST_Controller {
 			$additional_track_props['api_key_location']    = $auth['addTo'] ?? '';
 		}
 
-		Analytics::track_event( 'remotedatablocks_data_sources', array_merge( [
+		Analytics::track_event( 'remotedatablocks_data_source_interaction', array_merge( [
 			'data_source_type' => $data_source_properties['service'],
 			'action'           => 'updated',
 		], $additional_track_props ) );
@@ -218,7 +218,7 @@ class DataSourceController extends WP_REST_Controller {
 		$result = DataSourceCrud::delete_item_by_uuid( $request->get_param( 'uuid' ) );
 
 		// Tracks Analytics.
-		Analytics::track_event( 'remotedatablocks_data_sources', [
+		Analytics::track_event( 'remotedatablocks_data_source_interaction', [
 			'data_source_type' => $data_source_properties['service'],
 			'action'           => 'deleted',
 		] );
