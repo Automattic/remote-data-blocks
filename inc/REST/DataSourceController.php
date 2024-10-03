@@ -106,7 +106,22 @@ class DataSourceController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
-		$item = DataSourceCrud::register_new_data_source( $request->get_json_params() );
+		$data_source_properties = $request->get_json_params();
+		$item                   = DataSourceCrud::register_new_data_source( $data_source_properties );
+
+		// Tracks Analytics.
+		$additional_track_props = [];
+		if ( 'generic-http' === $data_source_properties['service'] ) {
+			$auth = $data_source_properties['auth'];
+			$additional_track_props['authentication_type'] = $auth['type'] ?? '';
+			$additional_track_props['api_key_location']    = $auth['addTo'] ?? '';
+		}
+
+		Analytics::track_event( 'remotedatablocks_data_sources', array_merge( [
+			'data_source_type' => $data_source_properties['service'],
+			'action'           => 'added',
+		], $additional_track_props ) );
+
 		return rest_ensure_response( $item );
 	}
 
@@ -139,12 +154,12 @@ class DataSourceController extends WP_REST_Controller {
 		));
 
 		// Tracks Analytics.
-		$code_configured_data_sources_count = count ( $code_configured_data_sources );
-		$ui_configured_data_sources_count = count ( $ui_configured_data_sources );
+		$code_configured_data_sources_count = count( $code_configured_data_sources );
+		$ui_configured_data_sources_count   = count( $ui_configured_data_sources );
 		Analytics::track_event( 'remotedatablocks_data_sources_stats', [
-			'total_data_sources_count' => $code_configured_data_sources_count + $ui_configured_data_sources_count,
+			'total_data_sources_count'           => $code_configured_data_sources_count + $ui_configured_data_sources_count,
 			'code_configured_data_sources_count' => $code_configured_data_sources_count,
-			'ui_configured_data_sources_count' => $ui_configured_data_sources_count,
+			'ui_configured_data_sources_count'   => $ui_configured_data_sources_count,
 		] );
 	
 		return rest_ensure_response( $data_sources );
@@ -168,7 +183,22 @@ class DataSourceController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function update_item( $request ) {
-		$item = DataSourceCrud::update_item_by_uuid( $request->get_param( 'uuid' ), $request->get_json_params() );
+		$data_source_properties = $request->get_json_params();
+		$item = DataSourceCrud::update_item_by_uuid( $request->get_param( 'uuid' ), $data_source_properties );
+
+		// Tracks Analytics.
+		$additional_track_props = [];
+		if ( 'generic-http' === $data_source_properties['service'] ) {
+			$auth = $data_source_properties['auth'];
+			$additional_track_props['authentication_type'] = $auth['type'] ?? '';
+			$additional_track_props['api_key_location']    = $auth['addTo'] ?? '';
+		}
+
+		Analytics::track_event( 'remotedatablocks_data_sources', array_merge( [
+			'data_source_type' => $data_source_properties['service'],
+			'action'           => 'updated',
+		], $additional_track_props ) );
+
 		return rest_ensure_response( $item );
 	}
 
@@ -179,7 +209,15 @@ class DataSourceController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function delete_item( $request ) {
+		$data_source_properties = $request->get_json_params();
 		$result = DataSourceCrud::delete_item_by_uuid( $request->get_param( 'uuid' ) );
+
+		// Tracks Analytics.
+		Analytics::track_event( 'remotedatablocks_data_sources', [
+			'data_source_type' => $data_source_properties['service'],
+			'action'           => 'deleted',
+		] );
+
 		return rest_ensure_response( $result );
 	}
 
