@@ -21,7 +21,7 @@ class Analytics {
 	public static function init(): void {
 		if ( class_exists( 'Automattic\VIP\Telemetry\Tracks' ) ) {
 			self::$tracks = new Tracks(
-				'remote_data_blocks',
+				'',
 				[
 					'plugin_version'   => constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ),
 					'is_multisite'     => is_multisite(),
