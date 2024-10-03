@@ -153,15 +153,20 @@ class DataSourceController extends WP_REST_Controller {
 			[]
 		));
 
-		// Tracks Analytics.
-		$code_configured_data_sources_count = count( $code_configured_data_sources );
-		$ui_configured_data_sources_count   = count( $ui_configured_data_sources );
-		Analytics::track_event( 'remotedatablocks_view_data_sources', [
-			'total_data_sources_count'           => $code_configured_data_sources_count + $ui_configured_data_sources_count,
-			'code_configured_data_sources_count' => $code_configured_data_sources_count,
-			'ui_configured_data_sources_count'   => $ui_configured_data_sources_count,
-		] );
-	
+		// Tracks Analytics. Only once per hour to reduce noise.
+		$track_transient_key = 'remotedatablocks_view_data_sources_tracked';
+		if ( ! get_transient( $track_transient_key ) ) {
+			$code_configured_data_sources_count = count( $code_configured_data_sources );
+			$ui_configured_data_sources_count   = count( $ui_configured_data_sources );
+
+			Analytics::track_event( 'remotedatablocks_view_data_sources', [
+				'total_data_sources_count'           => $code_configured_data_sources_count + $ui_configured_data_sources_count,
+				'code_configured_data_sources_count' => $code_configured_data_sources_count,
+				'ui_configured_data_sources_count'   => $ui_configured_data_sources_count,
+			] );
+			set_transient( $track_transient_key, true, HOUR_IN_SECONDS );
+		}
+
 		return rest_ensure_response( $data_sources );
 	}
 
