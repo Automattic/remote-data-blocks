@@ -1,1 +1,6 @@
+if [ -d "$(git rev-parse --git-path rebase-merge)" ] || [ -d "$(git rev-parse --git-path rebase-apply)" ]; then
+  echo "Rebase in progress. Skipping pre-commit hook.\n";
+  exit 0;
+fi
+
 lint-staged
