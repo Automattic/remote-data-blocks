@@ -2,6 +2,7 @@
 
 namespace RemoteDataBlocks\REST;
 
+use RemoteDataBlocks\Data\DataSourceRepository;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use WP_REST_Controller;
@@ -115,29 +116,8 @@ class DataSourceController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function get_items( $request ) {
-		$code_configured_data_sources = ConfigStore::get_data_sources_displayable();
-		$ui_configured_data_sources   = DataSourceCrud::get_data_sources_list();
-
-		/**
-		 * quick and dirty deduplication of data sources by slug
-		 *
-		 * ui configured data sources take precedence over code configured ones
-		 * here due to the ordering of the two arrays passed to array_reduce
-		 *
-		 * @todo: refactor this out in the near future in favor of an upstream
-		 * single source of truth for data source configurations
-		 */
-		$data_sources = array_values(array_reduce(
-			array_merge( $code_configured_data_sources, $ui_configured_data_sources ),
-			function ( $acc, $item ) {
-				$acc[ $item['slug'] ] = $item;
-				return $acc;
-			},
-			[]
-		));
-	
-		return rest_ensure_response( $data_sources );
+	public function get_items( $request ) {	
+		return rest_ensure_response( DataSourceRepository::get_data_sources() );
 	}
 
 	/**
