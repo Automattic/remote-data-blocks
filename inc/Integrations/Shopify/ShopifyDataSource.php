@@ -44,7 +44,7 @@ class ShopifyDataSource extends HttpDataSource {
 	}
 
 	public function get_image_url(): string {
-		return plugins_url( '../../assets/shopify_logo_black.png', __FILE__ );
+		return plugins_url( './assets/shopify_logo_black.png', __FILE__ );
 	}
 
 	public static function create( string $access_token, string $store_name ): self {
