@@ -12,6 +12,8 @@ use Automattic\VIP\Telemetry\Tracks;
 class Analytics {
 	/**
 	 * The tracks instance.
+	 *
+	 * @var Tracks
 	 */
 	private static $tracks;
 

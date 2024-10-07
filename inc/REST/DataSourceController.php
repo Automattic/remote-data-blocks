@@ -189,7 +189,7 @@ class DataSourceController extends WP_REST_Controller {
 	 */
 	public function update_item( $request ) {
 		$data_source_properties = $request->get_json_params();
-		$item = DataSourceCrud::update_item_by_uuid( $request->get_param( 'uuid' ), $data_source_properties );
+		$item                   = DataSourceCrud::update_item_by_uuid( $request->get_param( 'uuid' ), $data_source_properties );
 
 		// Tracks Analytics.
 		$additional_track_props = [];
@@ -215,7 +215,7 @@ class DataSourceController extends WP_REST_Controller {
 	 */
 	public function delete_item( $request ) {
 		$data_source_properties = $request->get_json_params();
-		$result = DataSourceCrud::delete_item_by_uuid( $request->get_param( 'uuid' ) );
+		$result                 = DataSourceCrud::delete_item_by_uuid( $request->get_param( 'uuid' ) );
 
 		// Tracks Analytics.
 		Analytics::track_event( 'remotedatablocks_data_source_interaction', [
