@@ -5,6 +5,9 @@
     "WP_ENVIRONMENT_TYPE": "development",
     "WP_REDIS_HOST": "host.docker.internal"
   },
+  "mappings": {
+    ".htaccess": "./bin/conf/htaccess"
+  },
   "plugins": [
     ".",
     "./example",

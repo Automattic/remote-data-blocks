@@ -14,7 +14,7 @@ composer install
 To start a development environment with Xdebug enabled:
 
 ```sh
-npm run start:monolith-xdebug
+npm run dev
 ```
 
 This will spin up a WordPress environment and a Valkey (Redis) instance for object cache. It will also build the block editor scripts, watch for changes, and open a Node.js debugging port. The WordPress environment will be available at `http://localhost:8888` (admin user: `admin`, password: `password`).
@@ -50,8 +50,8 @@ npm run destroy
 While not a suitable for local developement, it can sometimes be useful to quickly spin up a local WordPress playground using `@wp-now/wp-now`:
 
 ```sh
-npm run build # or `npm run start` in a separate terminal
-npm run start:playground
+npm run build # or `npm start` in a separate terminal
+npm run playground
 ```
 
-Playgrounds do not closely mirror production environments and are missing persistent object cache, debugging tools, and other important features. Use `npm run start:monolith-xdebug` for local development.
+Playgrounds do not closely mirror production environments and are missing persistent object cache, debugging tools, and other important features. Use `npm run dev` for local development.

@@ -1,86 +1,125 @@
 #!/bin/sh
 
 set -e
-root_dir=$(pwd)
-env_type=$1
+
+APP_MODE="$1" # "decoupled" or empty
+
+# Set WordPress port and home URL.
+PORT="${WP_ENV_PORT-8888}"
+WP_HOME="${WP_ENV_HOME_URL-http://localhost:$PORT}"
+
+if [ "$APP_MODE" = "decoupled" ]; then
+    # When running in decoupled mode, listen on a different port to avoid
+    # sticky cached redirects.
+    PORT="${WP_ENV_PORT-8899}"
+
+    WP_HOME="${WP_ENV_HOME_URL-http://localhost:3000}"
+fi
+
+FLAGS="${WP_ENV_FLAGS---xdebug}"
+WP_ADMIN="http://localhost:$PORT/wp-admin/"
+
+cleanup() {
+    echo ""
+    echo "✊ Caught SIG signal. Stopping..."
+
+    npm run -s dev:stop
+    exit 0
+}
+
+activate_plugin() {
+    slug="$1"
+
+    if (npm run -s wp-cli plugin is-active "$slug" 2>/dev/null); then
+        echo "✏️ $slug is already active."
+    else
+        echo "✏️ Activating $slug..."
+        npm run -s wp-cli plugin activate "$slug"
+    fi
+}
+
+deactivate_plugin() {
+    slug="$1"
+
+    if (npm run -s wp-cli plugin is-active "$slug" 2>/dev/null); then
+        echo "✏️ Deactivating $slug..."
+        npm run -s wp-cli plugin deactivate "$slug"
+    fi
+}
+
+install_and_activate_plugin() {
+    plugin="$1"
+    slug="$2"
+
+    if (npm run -s wp-cli plugin is-installed "$slug" 2>/dev/null); then
+        echo "✏️ $slug is already installed."
+    else
+        echo "✏️ Installing $slug..."
+        npm run -s wp-cli plugin install "$plugin"
+    fi
+
+    activate_plugin "$slug"
+}
+
+configure_wordpress() {
+    echo "✏️ Enabling Redis..."
+    npm run -s wp-cli redis enable
+
+    echo "✏️ Updating home option..."
+    npm run -s wp-cli config set WP_HOME "$WP_HOME"
+
+    if [ "$APP_MODE" = "decoupled" ]; then
+        configure_decoupled_wordpress
+    else
+        deactivate_plugin "vip-decoupled-bundle"
+    fi
+}
+
+configure_decoupled_wordpress() {
+    # We don't do this by default so we don't accidentally write code that
+    # depends on a particular permalink structure.
+    echo "✏️ Updating permalink structure..."
+    npm run -s wp-cli rewrite structure '/%postname%/'
+
+    install_and_activate_plugin "$DECOUPLED_PLUGIN_URL" "vip-decoupled-bundle"
+
+    echo "✅ Decoupled configuration complete."
+}
+
+start_redis() {
+    echo "🔼 Starting Redis..."
+    docker compose -f docker-compose.overrides.yml up -d
+}
+
+start_wordpress() {
+    echo "🔼 Starting WordPress..."
+    WP_ENV_PORT="$PORT" npx wp-env start "$FLAGS"
+}
+
+open_browser() {
+    UNAME="$(uname -s)"
+
+    echo ""
+    echo "> 🌐 $WP_ADMIN"
+    echo "> 🔑 Username: admin"
+    echo "> 🔑 Password: password"
+    echo ""
+
+    if [ "Darwin" = "$UNAME" ]; then
+        open "$WP_ADMIN"
+    elif [ "Linux" = "$UNAME" ]; then
+        xdg-open "$WP_ADMIN"
+    fi
+}
 
 # Cleanup after error or trapping SIGINT (Ctrl+C) and SIGTERM signals
-cleanup() {
-    exit_code=0
-    echo ""
-
-    if [ -n "$1" ]; then
-        exit_code=1
-        echo "⚠️ Error: $1"
-    else
-        echo "✊ Caught SIG signal. Shutting down..."
-    fi
-
-    if [ -n "$BACKEND_PID" ]; then
-        echo "Killing npm start process..."
-        kill "$BACKEND_PID" 2>/dev/null || true
-    fi
-
-    echo "Shutting down Valkey / Redis..."
-    docker compose -f "$root_dir/docker-compose.overrides.yml" down
-
-    # This command echoes good status messages.
-    npx wp-env stop
-
-    echo ""
-    echo "⏸️ Run \`npm run start:$env_type\` to resume or \`npm run destroy\` to clean up."
-    exit "$exit_code"
-}
-
-setup_object_cache() {
-    echo "Setting up object cache..."
-    docker compose -f "$root_dir/docker-compose.overrides.yml" up -d
-    # npx wp-env run cli -- wp redis enable
-}
-
-composer install
-
 trap 'cleanup' INT TERM
 
-# Monolith via wp-env
-if [ "$env_type" = "monolith" ]; then
-    # npx looks in node_modules/.bin first
-    setup_object_cache
-    npx wp-env start
-    npm start
-    exit 0
-fi
+start_redis
+start_wordpress
+configure_wordpress
+open_browser
 
-# Monolith w/xdebug via wp-env
-if [ "$env_type" = "monolith-xdebug" ]; then
-    setup_object_cache
-    npx wp-env start --xdebug=debug,develop,trace
-    npm start
-    exit 0
-fi
-
-# Decoupled via wp-env
-if [ "$env_type" = "decoupled" ]; then
-    if [ ! -d "$root_dir/../wp-components" ]; then
-        echo "⚠️ The wp-components repo does not exist. Please clone at sibling level to this repo."
-        exit 1
-    fi
-
-    cd ./bin/wp-env/decoupled
-
-    setup_object_cache
-    npx wp-env start
-    npx wp-env run cli -- wp rewrite structure '/%postname%/'
-
-    if [ $? -ne 0 ]; then
-        cleanup "Failed to set permalink structure"
-    fi
-
-    npm start &
-    BACKEND_PID=$!
-    cd "$root_dir/../wp-components" && npm install && npm run build &&  ./.frontend-env/start react-next
-    exit 0
-fi
-
-echo "⚠️ Error: can't start the unknown!"
-exit 1
+# Start hot-reloading wp-scripts start
+echo "🔼 Starting wp-scripts build process..."
+npm start
