@@ -57,7 +57,7 @@
     "@testing-library/react": "16.0.1",
     "@types/wordpress__block-editor": "11.5.15",
     "@types/wordpress__editor": "14.3.0",
-    "@vitest/coverage-v8": "2.1.1",
+    "@vitest/coverage-v8": "2.1.2",
     "@wordpress/api-fetch": "7.9.0",
     "@wordpress/block-editor": "14.4.0",
     "@wordpress/blocks": "13.9.0",
@@ -89,7 +89,7 @@
     "stylelint": "14.16.1",
     "ts-loader": "9.5.1",
     "typescript": "5.6.2",
-    "vitest": "2.1.1"
+    "vitest": "2.1.2"
   },
   "stylelint": {
     "extends": "./node_modules/@wordpress/scripts/config/.stylelintrc.json"
