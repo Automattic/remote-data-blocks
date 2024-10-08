@@ -91,6 +91,12 @@
     "typescript": "5.6.2",
     "vitest": "2.1.2"
   },
+  "overrides": {
+    "react-autosize-textarea": {
+      "react": "^18",
+      "react-dom": "^18"
+    }
+  },
   "stylelint": {
     "extends": "./node_modules/@wordpress/scripts/config/.stylelintrc.json"
   }
