@@ -97,13 +97,18 @@ start_wordpress() {
 }
 
 open_browser() {
-    UNAME="$(uname -s)"
-
     echo ""
     echo "> 🌐 $WP_ADMIN"
     echo "> 🔑 Username: admin"
     echo "> 🔑 Password: password"
     echo ""
+
+    # Opening the browser is disruptive, make users opt-in.
+    if [ -z "$WP_ENV_OPEN_BROWSER" ]; then
+        return
+    fi
+
+    UNAME="$(uname -s)"
 
     if [ "Darwin" = "$UNAME" ]; then
         open "$WP_ADMIN"
