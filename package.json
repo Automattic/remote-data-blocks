@@ -86,7 +86,7 @@
     "lint-staged": "15.2.10",
     "prettier": "npm:wp-prettier@2.8.5",
     "react": "18.3.1",
-    "stylelint": "14.16.1",
+    "stylelint": "16.9.0",
     "ts-loader": "9.5.1",
     "typescript": "5.6.2",
     "vitest": "2.1.2"
