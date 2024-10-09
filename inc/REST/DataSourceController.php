@@ -2,7 +2,6 @@
 
 namespace RemoteDataBlocks\REST;
 
-use RemoteDataBlocks\Analytics\TracksAnalytics;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use WP_REST_Controller;
@@ -117,7 +116,8 @@ class DataSourceController extends WP_REST_Controller {
 			$additional_track_props['api_key_location']    = $auth['addTo'] ?? '';
 		}
 
-		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', array_merge( [
+		global $rdb_tracks;
+		$rdb_tracks->record_event( 'remotedatablocks_data_source_interaction', array_merge( [
 			'data_source_type' => $data_source_properties['service'],
 			'action'           => 'added',
 		], $additional_track_props ) );
@@ -159,7 +159,8 @@ class DataSourceController extends WP_REST_Controller {
 			$code_configured_data_sources_count = count( $code_configured_data_sources );
 			$ui_configured_data_sources_count   = count( $ui_configured_data_sources );
 
-			TracksAnalytics::record_event( 'remotedatablocks_view_data_sources', [
+			global $rdb_tracks;
+			$rdb_tracks->record_event( 'remotedatablocks_view_data_sources', [
 				'total_data_sources_count'           => $code_configured_data_sources_count + $ui_configured_data_sources_count,
 				'code_configured_data_sources_count' => $code_configured_data_sources_count,
 				'ui_configured_data_sources_count'   => $ui_configured_data_sources_count,
@@ -199,7 +200,8 @@ class DataSourceController extends WP_REST_Controller {
 			$additional_track_props['api_key_location']    = $auth['addTo'] ?? '';
 		}
 
-		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', array_merge( [
+		global $rdb_tracks;
+		$rdb_tracks->record_event( 'remotedatablocks_data_source_interaction', array_merge( [
 			'data_source_type' => $data_source_properties['service'],
 			'action'           => 'updated',
 		], $additional_track_props ) );
@@ -217,8 +219,8 @@ class DataSourceController extends WP_REST_Controller {
 		$data_source_properties = $request->get_json_params();
 		$result                 = DataSourceCrud::delete_item_by_uuid( $request->get_param( 'uuid' ) );
 
-		// Tracks Analytics.
-		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', [
+		global $rdb_tracks;
+		$rdb_tracks->record_event( 'remotedatablocks_data_source_interaction', [
 			'data_source_type' => $data_source_properties['service'],
 			'action'           => 'deleted',
 		] );

@@ -16,41 +16,38 @@ class TracksAnalytics {
 	 *
 	 * @psalm-suppress UndefinedClass
 	 */
-	private static Tracks $instance;
+	private Tracks $instance;
 
-	/**
-	 * Initialize the analytics.
-	 */
-	public static function init(): void {
-		if ( ! self::have_tracks_library() ) {
+	public function __construct() {
+		if ( ! $this->have_tracks_library() ) {
 			return;
 		}
 
-		if ( self::is_wpvip_site() || self::is_enabled_via_filter() ) {
-			$class = self::get_tracks_library();
+		if ( $this->is_wpvip_site() || $this->is_enabled_via_filter() ) {
+			$class = $this->get_tracks_library();
 			if ( null === $class ) {
 				return;
 			}
 
-			self::$instance = new $class(
+			$this->instance = new $class(
 				'',
 				[
-					'plugin_version'   => constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ),
+					'plugin_version'   => defined( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) ? constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) : '',
 					'is_multisite'     => is_multisite(),
 					'wp_version'       => get_bloginfo( 'version' ),
-					'hosting_provider' => self::get_hosting_provider(),
+					'hosting_provider' => $this->get_hosting_provider(),
 				]
 			);
 
-			self::setup_tracking_via_hooks();
+			$this->setup_tracking_via_hooks();
 		}
 	}
 
-	public static function have_tracks_library(): bool {
+	public function have_tracks_library(): bool {
 		return class_exists( 'Automattic\VIP\Telemetry\Tracks' );
 	}
 
-	public static function is_enabled_via_filter(): bool {
+	public function is_enabled_via_filter(): bool {
 		return apply_filters( 'remote_data_blocks_enable_tracks_analytics', false );
 	}
 
@@ -59,8 +56,8 @@ class TracksAnalytics {
 	 *
 	 * @psalm-suppress UndefinedClass
 	 */
-	public static function get_tracks_library(): ?string {
-		if ( ! self::have_tracks_library() ) {
+	public function get_tracks_library(): ?string {
+		if ( ! $this->have_tracks_library() ) {
 			return null;
 		}
 
@@ -70,11 +67,11 @@ class TracksAnalytics {
 	/**
 	 * Setup tracking via hooks.
 	 */
-	public static function setup_tracking_via_hooks(): void {
+	public function setup_tracking_via_hooks(): void {
 		// WordPress Dashboard Hooks.
-		add_action( 'activated_plugin', [ __CLASS__, 'track_plugin_activation' ] );
-		add_action( 'deactivated_plugin', [ __CLASS__, 'track_plugin_deactivation' ] );
-		add_action( 'save_post', [ __CLASS__, 'track_remote_data_blocks_usage' ], 10, 2 );
+		add_action( 'activated_plugin', [ $this, 'track_plugin_activation' ] );
+		add_action( 'deactivated_plugin', [ $this, 'track_plugin_deactivation' ] );
+		add_action( 'save_post', [ $this, 'track_remote_data_blocks_usage' ], 10, 2 );
 	}
 
 	/**
@@ -82,12 +79,12 @@ class TracksAnalytics {
 	 *
 	 * @param string $plugin_path Path of the plugin that was activated.
 	 */
-	public static function track_plugin_activation( string $plugin_path ): void {
+	public function track_plugin_activation( string $plugin_path ): void {
 		if ( plugin_basename( __FILE__ ) !== $plugin_path ) {
 			return;
 		}
 
-		self::record_event( 'remotedatablocks_plugin_toggle', [ 'action' => 'activate' ] );
+		$this->record_event( 'remotedatablocks_plugin_toggle', [ 'action' => 'activate' ] );
 	}
 
 	/**
@@ -95,12 +92,12 @@ class TracksAnalytics {
 	 *
 	 * @param string $plugin_path Path of the plugin that was deactivated.
 	 */
-	public static function track_plugin_deactivation( string $plugin_path ): void {
+	public function track_plugin_deactivation( string $plugin_path ): void {
 		if ( plugin_basename( __FILE__ ) !== $plugin_path ) {
 			return;
 		}
 
-		self::record_event( 'remotedatablocks_plugin_toggle', [ 'action' => 'deactivate' ] );
+		$this->record_event( 'remotedatablocks_plugin_toggle', [ 'action' => 'deactivate' ] );
 	}
 
 	/**
@@ -109,7 +106,7 @@ class TracksAnalytics {
 	 * @param int      $post_id Post ID.
 	 * @param \WP_Post $post Post object.
 	 */
-	public static function track_remote_data_blocks_usage( int $post_id, \WP_Post $post ): void {
+	public function track_remote_data_blocks_usage( int $post_id, \WP_Post $post ): void {
 		// Ensure this is not an auto-save or revision.
 		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
 			return;
@@ -141,7 +138,7 @@ class TracksAnalytics {
 			$track_props['remote_data_blocks_total_count'] = ( $track_props['remote_data_blocks_total_count'] ?? 0 ) + 1;
 		}
 
-		self::record_event( 'remotedatablocks_blocks_usage_stats', $track_props );
+		$this->record_event( 'remotedatablocks_blocks_usage_stats', $track_props );
 	}
 
 	/**
@@ -150,19 +147,19 @@ class TracksAnalytics {
 	 * @param string $event_name The name of the event.
 	 * @param array  $props      The properties to send with the event.
 	 */
-	public static function record_event( string $event_name, array $props ): void {
-		if ( ! isset( self::$instance ) ) {
+	public function record_event( string $event_name, array $props ): void {
+		if ( ! isset( $this->instance ) ) {
 			return;
 		}
 
 		/** @psalm-suppress UndefinedClass */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
-		self::$instance->record_event( $event_name, $props );
+		$this->instance->record_event( $event_name, $props );
 	}
 
 	/**
 	 * Check if the site is a WPVIP site.
 	 */
-	public static function is_wpvip_site(): bool {
+	public function is_wpvip_site(): bool {
 		return defined( 'WPCOM_IS_VIP_ENV' ) && constant( 'WPCOM_IS_VIP_ENV' ) === true
 			&& defined( 'WPCOM_SANDBOXED' ) && constant( 'WPCOM_SANDBOXED' ) === false;
 	}
@@ -170,8 +167,8 @@ class TracksAnalytics {
 	/**
 	 * Get the hosting provider.
 	 */
-	public static function get_hosting_provider(): string {
-		if ( self::is_wpvip_site() ) {
+	public function get_hosting_provider(): string {
+		if ( $this->is_wpvip_site() ) {
 			return 'wpvip';
 		}
 
@@ -183,7 +180,7 @@ class TracksAnalytics {
 	 *
 	 * @psalm-suppress UndefinedClass
 	 */
-	public static function get_instance(): ?Tracks {
-		return isset( self::$instance ) ? self::$instance : null;
+	public function get_instance(): ?Tracks {
+		return isset( $this->instance ) ? $this->instance : null;
 	}
 }
