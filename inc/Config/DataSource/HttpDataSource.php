@@ -39,8 +39,8 @@ abstract class HttpDataSource implements DataSourceInterface, HttpDataSourceInte
 	/**
 	 * Get the service name.
 	 */
-	public function get_service(): string {
-		return $this->config['service'];
+	public function get_service(): ?string {
+		return isset( $this->config['service'] ) ? $this->config['service'] : null;
 	}
 
 	public function get_slug(): string {
