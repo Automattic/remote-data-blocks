@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "build": "npm run cmd:build && npm run build:examples",
-    "build:examples": "EXAMPLE=shopify npm run cmd:build:example && EXAMPLE=airtable/elden-ring-map npm run cmd:build:example",
+    "build:examples": "EXAMPLE=airtable/elden-ring-map npm run cmd:build:example",
     "check-types": "tsc --noEmit",
     "cmd:build": "wp-scripts build --experimental-modules",
     "cmd:build:example": "npm run cmd:build -- --config=example/$EXAMPLE/webpack.config.js --output-path=example/$EXAMPLE/build --webpack-src-dir=example/$EXAMPLE/src",
