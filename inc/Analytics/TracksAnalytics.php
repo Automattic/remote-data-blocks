@@ -26,17 +26,21 @@ class TracksAnalytics {
 			return;
 		}
 
-		self::$tracks = new Tracks(
-			'',
-			[
-				'plugin_version'   => constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ),
-				'is_multisite'     => is_multisite(),
-				'wp_version'       => get_bloginfo( 'version' ),
-				'hosting_provider' => self::get_hosting_provider(),
-			]
-		);
+		$is_enabled_via_filter = apply_filters( 'remote_data_blocks_enable_tracks_analytics', false );
 
-		self::setup_tracking_via_hooks();
+		if ( self::is_wpvip_site() || $is_enabled_via_filter ) {
+			self::$tracks = new Tracks(
+				'',
+				[
+					'plugin_version'   => constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ),
+					'is_multisite'     => is_multisite(),
+					'wp_version'       => get_bloginfo( 'version' ),
+					'hosting_provider' => self::get_hosting_provider(),
+				]
+			);
+
+			self::setup_tracking_via_hooks();
+		}
 	}
 
 	/**
@@ -123,25 +127,12 @@ class TracksAnalytics {
 	 * @param array  $props      The properties to send with the event.
 	 */
 	public static function record_event( string $event_name, array $props ): void {
-		if ( ! self::is_enabled() ) {
+		if ( ! isset( self::$tracks ) ) {
 			return;
 		}
 
 		/** @psalm-suppress UndefinedClass */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 		self::$tracks->record_event( $event_name, $props );
-	}
-
-	/**
-	 * Checks if tracking is enabled.
-	 */
-	private static function is_enabled(): bool {
-		if ( ! isset( self::$tracks ) ) {
-			return false;
-		}
-
-		$is_enabled_via_filter = apply_filters( 'remote_data_blocks_enable_analytics', false );
-
-		return self::is_wpvip_site() || $is_enabled_via_filter;
 	}
 
 	/**
