@@ -154,12 +154,12 @@ class DataSourceController extends WP_REST_Controller {
 		));
 
 		// Tracks Analytics. Only once per day to reduce noise.
+		global $rdb_tracks;
 		$track_transient_key = 'remotedatablocks_view_data_sources_tracked';
 		if ( ! get_transient( $track_transient_key ) ) {
 			$code_configured_data_sources_count = count( $code_configured_data_sources );
 			$ui_configured_data_sources_count   = count( $ui_configured_data_sources );
 
-			global $rdb_tracks;
 			$rdb_tracks->record_event( 'remotedatablocks_view_data_sources', [
 				'total_data_sources_count'           => $code_configured_data_sources_count + $ui_configured_data_sources_count,
 				'code_configured_data_sources_count' => $code_configured_data_sources_count,
