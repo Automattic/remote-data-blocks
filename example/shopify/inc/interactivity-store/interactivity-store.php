@@ -4,9 +4,9 @@ namespace RemoteDataBlocks\Example\Shopify;
 
 defined( 'ABSPATH' ) || exit();
 
-use RemoteDataBlocks\Editor\BlockBindings;
-use RemoteDataBlocks\Editor\ConfigStore;
-use RemoteDataBlocks\REST\RemoteData;
+use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
+use RemoteDataBlocks\REST\RemoteDataController;
 use WP_Block;
 
 class InteractivityStore {
@@ -22,7 +22,7 @@ class InteractivityStore {
 
 	public static function get_cart_interactive_state(): array {
 		$block_name = ConfigStore::get_block_name( 'Shopify Product' );
-		$rest_url   = RemoteData::get_url() . '?_envelope=true';
+		$rest_url   = RemoteDataController::get_url();
 
 		return [
 			'blockName' => $block_name,
