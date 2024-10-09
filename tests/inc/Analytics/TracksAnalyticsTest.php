@@ -48,6 +48,6 @@ class TracksAnalyticsTest extends TestCase {
 
 		$this->assertEquals( true, $mock->have_tracks_library() );
 		$this->assertEquals( true, $mock->is_enabled_via_filter() );
-		$this->assertEquals( null, $mock->get_instance() );
+		$this->assertInstanceOf( MockTracks::class, $mock->get_instance() );
 	}
 }

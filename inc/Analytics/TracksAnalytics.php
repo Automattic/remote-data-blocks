@@ -14,9 +14,10 @@ class TracksAnalytics {
 	/**
 	 * The tracks instance.
 	 *
+	 * @var Tracks|null
 	 * @psalm-suppress UndefinedClass
 	 */
-	private Tracks $instance;
+	private $instance = null;
 
 	public function __construct() {
 		if ( ! $this->have_tracks_library() ) {
@@ -48,7 +49,7 @@ class TracksAnalytics {
 	}
 
 	public function is_enabled_via_filter(): bool {
-		return apply_filters( 'remote_data_blocks_enable_tracks_analytics', false );
+		return apply_filters( 'remote_data_blocks_enable_tracks_analytics', false ) ?? false;
 	}
 
 	/**
@@ -179,8 +180,10 @@ class TracksAnalytics {
 	 * Returns the tracks instance.
 	 *
 	 * @psalm-suppress UndefinedClass
+	 *
+	 * @return Tracks|null
 	 */
-	public function get_instance(): ?Tracks {
+	public function get_instance() {
 		return isset( $this->instance ) ? $this->instance : null;
 	}
 }
