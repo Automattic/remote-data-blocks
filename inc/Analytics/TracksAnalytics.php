@@ -16,7 +16,7 @@ class TracksAnalytics {
 	 *
 	 * @psalm-suppress UndefinedClass
 	 */
-	private static Tracks $tracks;
+	private static Tracks $instance;
 
 	/**
 	 * Initialize the analytics.
@@ -27,12 +27,12 @@ class TracksAnalytics {
 		}
 
 		if ( self::is_wpvip_site() || self::is_enabled_via_filter() ) {
-			$tracks_class = self::get_tracks_library();
-			if ( null === $tracks_class ) {
+			$class = self::get_tracks_library();
+			if ( null === $class ) {
 				return;
 			}
 
-			self::$tracks = new $tracks_class(
+			self::$instance = new $class(
 				'',
 				[
 					'plugin_version'   => constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ),
@@ -151,12 +151,12 @@ class TracksAnalytics {
 	 * @param array  $props      The properties to send with the event.
 	 */
 	public static function record_event( string $event_name, array $props ): void {
-		if ( ! isset( self::$tracks ) ) {
+		if ( ! isset( self::$instance ) ) {
 			return;
 		}
 
 		/** @psalm-suppress UndefinedClass */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
-		self::$tracks->record_event( $event_name, $props );
+		self::$instance->record_event( $event_name, $props );
 	}
 
 	/**
@@ -183,7 +183,7 @@ class TracksAnalytics {
 	 *
 	 * @psalm-suppress UndefinedClass
 	 */
-	public static function get_tracks_instance(): ?Tracks {
-		return isset( self::$tracks ) ? self::$tracks : null;
+	public static function get_instance(): ?Tracks {
+		return isset( self::$instance ) ? self::$instance : null;
 	}
 }
