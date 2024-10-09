@@ -8,9 +8,9 @@ use Automattic\VIP\Telemetry\Tracks;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 
 /**
- * Analytics class.
+ * Tracks Analytics class.
  */
-class Analytics {
+class TracksAnalytics {
 	/**
 	 * The tracks instance.
 	 *
@@ -22,25 +22,28 @@ class Analytics {
 	 * Initialize the analytics.
 	 */
 	public static function init(): void {
-		if ( class_exists( 'Automattic\VIP\Telemetry\Tracks' ) ) {
-			self::$tracks = new Tracks(
-				'',
-				[
-					'plugin_version'   => constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ),
-					'is_multisite'     => is_multisite(),
-					'wp_version'       => get_bloginfo( 'version' ),
-					'hosting_provider' => self::get_hosting_provider(),
-				]
-			);
-
-			self::setup_tracking_via_hooks();
+		if ( ! class_exists( 'Automattic\VIP\Telemetry\Tracks' ) ) {
+			return;
 		}
+
+		self::$tracks = new Tracks(
+			'',
+			[
+				'plugin_version'   => constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ),
+				'is_multisite'     => is_multisite(),
+				'wp_version'       => get_bloginfo( 'version' ),
+				'hosting_provider' => self::get_hosting_provider(),
+			]
+		);
+
+		self::setup_tracking_via_hooks();
 	}
 
 	/**
 	 * Setup tracking via hooks.
 	 */
 	public static function setup_tracking_via_hooks(): void {
+		// WordPress Dashboard Hooks.
 		add_action( 'activated_plugin', [ __CLASS__, 'track_plugin_activation' ] );
 		add_action( 'deactivated_plugin', [ __CLASS__, 'track_plugin_deactivation' ] );
 		add_action( 'save_post', [ __CLASS__, 'track_remote_data_blocks_usage' ], 10, 2 );
@@ -56,7 +59,7 @@ class Analytics {
 			return;
 		}
 
-		self::track_event( 'remotedatablocks_plugin_toggle', [ 'action' => 'activate' ] );
+		self::record_event( 'remotedatablocks_plugin_toggle', [ 'action' => 'activate' ] );
 	}
 
 	/**
@@ -69,7 +72,7 @@ class Analytics {
 			return;
 		}
 
-		self::track_event( 'remotedatablocks_plugin_toggle', [ 'action' => 'deactivate' ] );
+		self::record_event( 'remotedatablocks_plugin_toggle', [ 'action' => 'deactivate' ] );
 	}
 
 	/**
@@ -110,7 +113,7 @@ class Analytics {
 			$track_props['remote_data_blocks_total_count'] = ( $track_props['remote_data_blocks_total_count'] ?? 0 ) + 1;
 		}
 
-		self::track_event( 'remotedatablocks_blocks_usage_stats', $track_props );
+		self::record_event( 'remotedatablocks_blocks_usage_stats', $track_props );
 	}
 
 	/**
@@ -119,7 +122,7 @@ class Analytics {
 	 * @param string $event_name The name of the event.
 	 * @param array  $props      The properties to send with the event.
 	 */
-	public static function track_event( string $event_name, array $props ): void {
+	public static function record_event( string $event_name, array $props ): void {
 		if ( ! self::is_enabled() ) {
 			return;
 		}

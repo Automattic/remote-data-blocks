@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\REST;
 
-use RemoteDataBlocks\Analytics\Analytics;
+use RemoteDataBlocks\Analytics\TracksAnalytics;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use WP_REST_Controller;
@@ -117,7 +117,7 @@ class DataSourceController extends WP_REST_Controller {
 			$additional_track_props['api_key_location']    = $auth['addTo'] ?? '';
 		}
 
-		Analytics::track_event( 'remotedatablocks_data_source_interaction', array_merge( [
+		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', array_merge( [
 			'data_source_type' => $data_source_properties['service'],
 			'action'           => 'added',
 		], $additional_track_props ) );
@@ -153,18 +153,18 @@ class DataSourceController extends WP_REST_Controller {
 			[]
 		));
 
-		// Tracks Analytics. Only once per hour to reduce noise.
+		// Tracks Analytics. Only once per day to reduce noise.
 		$track_transient_key = 'remotedatablocks_view_data_sources_tracked';
 		if ( ! get_transient( $track_transient_key ) ) {
 			$code_configured_data_sources_count = count( $code_configured_data_sources );
 			$ui_configured_data_sources_count   = count( $ui_configured_data_sources );
 
-			Analytics::track_event( 'remotedatablocks_view_data_sources', [
+			TracksAnalytics::record_event( 'remotedatablocks_view_data_sources', [
 				'total_data_sources_count'           => $code_configured_data_sources_count + $ui_configured_data_sources_count,
 				'code_configured_data_sources_count' => $code_configured_data_sources_count,
 				'ui_configured_data_sources_count'   => $ui_configured_data_sources_count,
 			] );
-			set_transient( $track_transient_key, true, HOUR_IN_SECONDS );
+			set_transient( $track_transient_key, true, DAY_IN_SECONDS );
 		}
 
 		return rest_ensure_response( $data_sources );
@@ -199,7 +199,7 @@ class DataSourceController extends WP_REST_Controller {
 			$additional_track_props['api_key_location']    = $auth['addTo'] ?? '';
 		}
 
-		Analytics::track_event( 'remotedatablocks_data_source_interaction', array_merge( [
+		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', array_merge( [
 			'data_source_type' => $data_source_properties['service'],
 			'action'           => 'updated',
 		], $additional_track_props ) );
@@ -218,7 +218,7 @@ class DataSourceController extends WP_REST_Controller {
 		$result                 = DataSourceCrud::delete_item_by_uuid( $request->get_param( 'uuid' ) );
 
 		// Tracks Analytics.
-		Analytics::track_event( 'remotedatablocks_data_source_interaction', [
+		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', [
 			'data_source_type' => $data_source_properties['service'],
 			'action'           => 'deleted',
 		] );

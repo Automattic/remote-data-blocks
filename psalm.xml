@@ -20,6 +20,7 @@
         <PossiblyUnusedMethod errorLevel="suppress"/>
     </issueHandlers>
     <stubs>
+        <file name="vendor/php-stubs/wordpress-globals/wordpress-globals.php"/>
         <file name="vendor/php-stubs/wordpress-stubs/wordpress-stubs.php"/>
         <file name="remote-data-blocks.php"/>
     </stubs>
