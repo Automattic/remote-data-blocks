@@ -22,14 +22,17 @@ class TracksAnalytics {
 	 * Initialize the analytics.
 	 */
 	public static function init(): void {
-		if ( ! class_exists( 'Automattic\VIP\Telemetry\Tracks' ) ) {
+		if ( ! self::have_tracks_library() ) {
 			return;
 		}
 
-		$is_enabled_via_filter = apply_filters( 'remote_data_blocks_enable_tracks_analytics', false );
+		if ( self::is_wpvip_site() || self::is_enabled_via_filter() ) {
+			$tracks_class = self::get_tracks_library();
+			if ( null === $tracks_class ) {
+				return;
+			}
 
-		if ( self::is_wpvip_site() || $is_enabled_via_filter ) {
-			self::$tracks = new Tracks(
+			self::$tracks = new $tracks_class(
 				'',
 				[
 					'plugin_version'   => constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ),
@@ -41,6 +44,27 @@ class TracksAnalytics {
 
 			self::setup_tracking_via_hooks();
 		}
+	}
+
+	public static function have_tracks_library(): bool {
+		return class_exists( 'Automattic\VIP\Telemetry\Tracks' );
+	}
+
+	public static function is_enabled_via_filter(): bool {
+		return apply_filters( 'remote_data_blocks_enable_tracks_analytics', false );
+	}
+
+	/**
+	 * Returns the Tracks library class.
+	 *
+	 * @psalm-suppress UndefinedClass
+	 */
+	public static function get_tracks_library(): ?string {
+		if ( ! self::have_tracks_library() ) {
+			return null;
+		}
+
+		return Tracks::class;
 	}
 
 	/**
@@ -138,7 +162,7 @@ class TracksAnalytics {
 	/**
 	 * Check if the site is a WPVIP site.
 	 */
-	private static function is_wpvip_site(): bool {
+	public static function is_wpvip_site(): bool {
 		return defined( 'WPCOM_IS_VIP_ENV' ) && constant( 'WPCOM_IS_VIP_ENV' ) === true
 			&& defined( 'WPCOM_SANDBOXED' ) && constant( 'WPCOM_SANDBOXED' ) === false;
 	}
@@ -146,11 +170,20 @@ class TracksAnalytics {
 	/**
 	 * Get the hosting provider.
 	 */
-	private static function get_hosting_provider(): string {
+	public static function get_hosting_provider(): string {
 		if ( self::is_wpvip_site() ) {
 			return 'wpvip';
 		}
 
 		return 'other';
+	}
+
+	/**
+	 * Returns the tracks instance.
+	 *
+	 * @psalm-suppress UndefinedClass
+	 */
+	public static function get_tracks_instance(): ?Tracks {
+		return isset( self::$tracks ) ? self::$tracks : null;
 	}
 }
