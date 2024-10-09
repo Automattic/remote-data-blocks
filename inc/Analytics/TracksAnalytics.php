@@ -13,11 +13,8 @@ use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 class TracksAnalytics {
 	/**
 	 * The tracks instance.
-	 *
-	 * @var Tracks|null
-	 * @psalm-suppress UndefinedClass
 	 */
-	private $instance = null;
+	private object|null $instance = null;
 
 	public function __construct() {
 		if ( ! $this->have_tracks_library() ) {
@@ -54,14 +51,13 @@ class TracksAnalytics {
 
 	/**
 	 * Returns the Tracks library class.
-	 *
-	 * @psalm-suppress UndefinedClass
 	 */
 	public function get_tracks_library(): ?string {
 		if ( ! $this->have_tracks_library() ) {
 			return null;
 		}
 
+		/** @psalm-suppress UndefinedClass */
 		return Tracks::class;
 	}
 
@@ -153,7 +149,6 @@ class TracksAnalytics {
 			return;
 		}
 
-		/** @psalm-suppress UndefinedClass */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 		$this->instance->record_event( $event_name, $props );
 	}
 
@@ -178,12 +173,8 @@ class TracksAnalytics {
 
 	/**
 	 * Returns the tracks instance.
-	 *
-	 * @psalm-suppress UndefinedClass
-	 *
-	 * @return Tracks|null
 	 */
-	public function get_instance() {
+	public function get_instance(): ?object {
 		return isset( $this->instance ) ? $this->instance : null;
 	}
 }

@@ -16,7 +16,15 @@ function esc_html( string $text ): string {
 	return $text;
 }
 
-function register_block_pattern( string $name, array $options ): void {
+function register_block_pattern( string $_name, array $_options ): void {
+	// Do nothing
+}
+
+function is_multisite(): void {
+	// Do nothing
+}
+
+function get_bloginfo( $_property ): void {
 	// Do nothing
 }
 
@@ -98,7 +106,7 @@ function get_page_by_path( string $path ): string {
 	return $path ?? 'fake WP_Post';
 }
 
-function add_rewrite_rule( string $regex, string $target, string $position ): void {
+function add_rewrite_rule( string $_regex, string $_target, string $_position ): void {
 	// Do nothing
 }
 
@@ -180,7 +188,7 @@ class WP_Error {
 		// Return all messages if no code specified.
 		if ( empty( $code ) ) {
 			$all_messages = array();
-			foreach ( (array) $this->errors as $code => $messages ) {
+			foreach ( (array) $this->errors as $_code => $messages ) {
 				$all_messages = array_merge( $all_messages, $messages );
 			}
 
