@@ -192,6 +192,8 @@ class ConfigRegistry {
 			]
 		);
 
+		$config['outputSchema'] = $query->get_output_schema();
+
 		ConfigStore::set_configuration( $block_name, $config );
 	}
 

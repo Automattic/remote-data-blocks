@@ -18,6 +18,16 @@ interface BlockConfig {
 	availableBindings: AvailableBindings;
 	loop: boolean;
 	name: string;
+	outputSchema?: {
+		mappings?: Record<
+			string,
+			{
+				name: string;
+				path: string;
+				type: string;
+			}
+		>;
+	};
 	overrides: Record< string, InputVariableOverrides >;
 	patterns: {
 		default: string;
