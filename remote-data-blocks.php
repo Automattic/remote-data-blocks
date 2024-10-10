@@ -24,10 +24,10 @@ define( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION', '0.2.1' );
 
 define( 'REMOTE_DATA_BLOCKS__REST_NAMESPACE', 'remote-data-blocks/v1' );
 
-// Autoloader.
+// Autoloader
 require_once __DIR__ . '/vendor/autoload.php';
 
-// Other editor modifications.
+// Other editor modifications
 Editor\AdminNotices\AdminNotices::init();
 Editor\DataBinding\BlockBindings::init();
 Editor\DataBinding\FieldShortcode::init();
@@ -36,19 +36,19 @@ Editor\BlockManagement\BlockRegistration::init();
 Editor\BlockManagement\ConfigRegistry::init();
 Editor\PatternEditor\PatternEditor::init();
 
-// Analytics.
+// Analytics
 $GLOBALS['rdb_tracks'] = new TracksAnalytics();
 
-// Example API.
+// Example API
 ExampleApi\ExampleApi::init();
 
-// Load Settings Page.
+// Load Settings Page
 PluginSettings\PluginSettings::init();
 
-// Integrations.
+// Integrations
 Integrations\Airtable\AirtableIntegration::init();
 Integrations\Shopify\ShopifyIntegration::init();
 Integrations\VipBlockDataApi\VipBlockDataApi::init();
 
-// REST endpoints.
+// REST endpoints
 REST\RemoteDataController::init();
