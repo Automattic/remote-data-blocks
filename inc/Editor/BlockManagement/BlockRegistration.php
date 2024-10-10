@@ -80,6 +80,7 @@ class BlockRegistration {
 				'overrides' => $formatted_overrides,
 				'patterns' => $config['patterns'],
 				'selectors' => $config['selectors'],
+				'outputSchema' => $config['outputSchema'] ?? null,
 				'settings' => [
 					'category' => self::$block_category['slug'],
 					'title' => $config['title'],
