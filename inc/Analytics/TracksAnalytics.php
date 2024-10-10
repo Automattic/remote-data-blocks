@@ -41,29 +41,14 @@ class TracksAnalytics {
 		}
 	}
 
-	public function have_tracks_library(): bool {
-		return class_exists( 'Automattic\VIP\Telemetry\Tracks' );
-	}
-
-	public function is_enabled_via_filter(): bool {
-		return apply_filters( 'remote_data_blocks_enable_tracks_analytics', false ) ?? false;
-	}
-
-	/**
-	 * Returns the Tracks library class.
-	 */
-	public function get_tracks_library(): ?string {
-		if ( ! $this->have_tracks_library() ) {
-			return null;
+	private function get_hosting_provider(): string {
+		if ( $this->is_wpvip_site() ) {
+			return 'wpvip';
 		}
 
-		/** @psalm-suppress UndefinedClass */
-		return Tracks::class;
+		return 'other';
 	}
 
-	/**
-	 * Setup tracking via hooks.
-	 */
 	public function setup_tracking_via_hooks(): void {
 		// WordPress Dashboard Hooks.
 		add_action( 'activated_plugin', [ $this, 'track_plugin_activation' ] );
@@ -77,7 +62,7 @@ class TracksAnalytics {
 	 * @param string $plugin_path Path of the plugin that was activated.
 	 */
 	public function track_plugin_activation( string $plugin_path ): void {
-		if ( plugin_basename( __FILE__ ) !== $plugin_path ) {
+		if ( ! $this->is_remote_data_blocks_plugin( $plugin_path ) ) {
 			return;
 		}
 
@@ -90,7 +75,7 @@ class TracksAnalytics {
 	 * @param string $plugin_path Path of the plugin that was deactivated.
 	 */
 	public function track_plugin_deactivation( string $plugin_path ): void {
-		if ( plugin_basename( __FILE__ ) !== $plugin_path ) {
+		if ( ! $this->is_remote_data_blocks_plugin( $plugin_path ) ) {
 			return;
 		}
 
@@ -103,22 +88,27 @@ class TracksAnalytics {
 	 * @param int      $post_id Post ID.
 	 * @param \WP_Post $post Post object.
 	 */
-	public function track_remote_data_blocks_usage( int $post_id, \WP_Post $post ): void {
+	public function track_remote_data_blocks_usage( int $post_id, object $post ): void {
 		// Ensure this is not an auto-save or revision.
-		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
+		if ( ! $this->should_track_blocks_usage( $post_id ) ) {
+			return;
+		}
+
+		$post_status = $post->post_status;
+		if ( 'publish' !== $post_status ) {
 			return;
 		}
 
 		// Regular expression to match all remote data blocks present in the post content.
 		$reg_exp = '/<!--\s{1}wp:remote-data-blocks\/([^\s]+)\s/';
 		preg_match_all( $reg_exp, $post->post_content, $matches );
-		if ( count( $matches ) === 0 ) {
+		if ( count( $matches[1] ) === 0 ) {
 			return;
 		}
 
 		// Get data source and track usage.
 		$track_props = [
-			'post_status' => $post->post_status,
+			'post_status' => $post_status,
 			'post_type'   => $post->post_type,
 		];
 		foreach ( $matches[1] as $match ) {
@@ -143,37 +133,56 @@ class TracksAnalytics {
 	 *
 	 * @param string $event_name The name of the event.
 	 * @param array  $props      The properties to send with the event.
+	 *
+	 * @return bool True if the event was recorded, false otherwise.
 	 */
-	public function record_event( string $event_name, array $props ): void {
+	public function record_event( string $event_name, array $props ): bool {
 		if ( ! isset( $this->instance ) ) {
-			return;
+			return false;
 		}
 
 		$this->instance->record_event( $event_name, $props );
+		return true;
+	}
+
+	public function have_tracks_library(): bool {
+		return class_exists( 'Automattic\VIP\Telemetry\Tracks' );
+	}
+
+	public function is_enabled_via_filter(): bool {
+		return apply_filters( 'remote_data_blocks_enable_tracks_analytics', false ) ?? false;
 	}
 
 	/**
-	 * Check if the site is a WPVIP site.
+	 * Check if the plugin is Remote Data Blocks.
 	 */
+	public function is_remote_data_blocks_plugin( string $plugin_path ): bool {
+		return plugin_basename( __FILE__ ) === $plugin_path;
+	}
+
+	public function get_tracks_library(): ?string {
+		if ( ! $this->have_tracks_library() ) {
+			return null;
+		}
+
+		/** @psalm-suppress UndefinedClass */
+		return Tracks::class;
+	}
+
 	public function is_wpvip_site(): bool {
 		return defined( 'WPCOM_IS_VIP_ENV' ) && constant( 'WPCOM_IS_VIP_ENV' ) === true
 			&& defined( 'WPCOM_SANDBOXED' ) && constant( 'WPCOM_SANDBOXED' ) === false;
 	}
 
-	/**
-	 * Get the hosting provider.
-	 */
-	public function get_hosting_provider(): string {
-		if ( $this->is_wpvip_site() ) {
-			return 'wpvip';
+	public function should_track_blocks_usage( int $post_id ): bool {
+		// Ensure post is not an auto-save or revision.
+		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
+			return false;
 		}
 
-		return 'other';
+		return true;
 	}
 
-	/**
-	 * Returns the tracks instance.
-	 */
 	public function get_instance(): ?object {
 		return isset( $this->instance ) ? $this->instance : null;
 	}
