@@ -4,7 +4,8 @@ function apply_filters( string $_filter, mixed $thing ): mixed {
 	return $thing;
 }
 
-function add_action( string $_filter, mixed ...$_args ): void {}
+function add_action( string $_action, mixed ...$_args ): void {}
+function add_filter( string $_filter, mixed ...$_args ): void {}
 
 $GLOBALS['__wordpress_done_actions'] = [];
 function do_action( string $action, mixed ...$args ): void {

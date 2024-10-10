@@ -198,7 +198,6 @@ class BlockBindings {
 			return $fallback_content;
 		}
 
-
 		$value = self::get_remote_value( $block_context, $source_args );
 
 		if ( ! is_string( $value ) ) {
@@ -241,7 +240,13 @@ class BlockBindings {
 		// context available on the block's context property. However, context for
 		// children blocks comes from this block's `remoteData` attribtue (see
 		// block.json#providesContext), so we can access it directly.
-		$block_context = $attributes['remoteData'];
+		$block_context = $attributes['remoteData'] ?? [];
+
+		// Fallback to the content if we don't have the expected context.
+		if ( ! isset( $block_context['blockName'] ) || ! isset( $block_context['queryInput'] ) ) {
+			self::log_error( sprintf( 'Missing block context for block binding %s', self::$context_name ), 'unknown' );
+			return $content;
+		}
 
 		$loop_template         = $block->parsed_block['innerBlocks'];
 		$loop_template_content = $block->parsed_block['innerContent'];
