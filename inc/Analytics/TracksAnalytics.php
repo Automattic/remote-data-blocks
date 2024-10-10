@@ -8,26 +8,22 @@ use Automattic\VIP\Telemetry\Tracks;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 
 /**
- * Tracks Analytics class.
+ * Class to implement Tracks Analytics in the codebase.
  */
 class TracksAnalytics {
 	/**
-	 * The tracks instance.
+	 * The tracks instance (not using Tracks as type because it is not present in the codebase).
 	 */
 	private object|null $instance = null;
 
 	public function __construct() {
-		if ( ! $this->have_tracks_library() ) {
+		$tracks_class = $this->get_tracks_lib_class();
+		if ( ! $tracks_class ) {
 			return;
 		}
 
 		if ( $this->is_wpvip_site() || $this->is_enabled_via_filter() ) {
-			$class = $this->get_tracks_library();
-			if ( null === $class ) {
-				return;
-			}
-
-			$this->instance = new $class(
+			$this->instance = new $tracks_class(
 				'',
 				[
 					'plugin_version'   => defined( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) ? constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) : '',
@@ -89,7 +85,6 @@ class TracksAnalytics {
 	 * @param \WP_Post $post Post object.
 	 */
 	public function track_remote_data_blocks_usage( int $post_id, object $post ): void {
-		// Ensure this is not an auto-save or revision.
 		if ( ! $this->should_track_blocks_usage( $post_id ) ) {
 			return;
 		}
@@ -112,9 +107,7 @@ class TracksAnalytics {
 			'post_type'   => $post->post_type,
 		];
 		foreach ( $matches[1] as $match ) {
-			$block_name  = 'remote-data-blocks/' . $match;
-			$data_source = ConfigStore::get_data_source( $block_name );
-
+			$data_source = ConfigStore::get_data_source( 'remote-data-blocks/' . $match );
 			if ( ! $data_source ) {
 				continue;
 			}
@@ -145,10 +138,6 @@ class TracksAnalytics {
 		return true;
 	}
 
-	public function have_tracks_library(): bool {
-		return class_exists( 'Automattic\VIP\Telemetry\Tracks' );
-	}
-
 	public function is_enabled_via_filter(): bool {
 		return apply_filters( 'remote_data_blocks_enable_tracks_analytics', false ) ?? false;
 	}
@@ -160,12 +149,11 @@ class TracksAnalytics {
 		return plugin_basename( __FILE__ ) === $plugin_path;
 	}
 
-	public function get_tracks_library(): ?string {
-		if ( ! $this->have_tracks_library() ) {
+	public function get_tracks_lib_class(): ?string {
+		if ( ! class_exists( 'Automattic\VIP\Telemetry\Tracks' ) ) {
 			return null;
 		}
 
-		/** @psalm-suppress UndefinedClass */
 		return Tracks::class;
 	}
 
@@ -175,7 +163,7 @@ class TracksAnalytics {
 	}
 
 	public function should_track_blocks_usage( int $post_id ): bool {
-		// Ensure post is not an auto-save or revision.
+		// Ensure this is not an auto-save or revision.
 		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
 			return false;
 		}

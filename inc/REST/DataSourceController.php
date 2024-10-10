@@ -219,6 +219,7 @@ class DataSourceController extends WP_REST_Controller {
 		$data_source_properties = $request->get_json_params();
 		$result                 = DataSourceCrud::delete_item_by_uuid( $request->get_param( 'uuid' ) );
 
+		// Tracks Analytics.
 		global $rdb_tracks;
 		$rdb_tracks->record_event( 'remotedatablocks_data_source_interaction', [
 			'data_source_type' => $data_source_properties['service'],
