@@ -1,40 +1,36 @@
 # Remote Data Blocks
 
-Remote Data Blocks is a WordPress plugin that brings an assortment of flexible, data-enrichable WordPress blocks into Gutenberg. These blocks make it easy for authors to mix local WordPress data, remote data, and layouts in the block editor.
+**Remote Data Blocks** is a WordPress plugin that makes it easy to combine content and remote data in the block editor. Easily register blocks that load data from Airtable, Google Sheets, Shopify, GitHub, or any other API. Your data stays in sync. Built-in caching ensures performance and reliability.
 
-## Setup
+[![Launch in WordPress Playground](https://img.shields.io/badge/Launch%20in%20WordPress%20Playground-blue?style=for-the-badge)](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/blueprint.json)
 
-_Required: PHP 8.1+, WordPress 6.6+_
+[Launch the plugin in WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/blueprint.json) and explore. An example API ("Conference Events") is included, or visit Settings > Remote Data Blocks to add your own. Visit the [workflows guide](docs/workflows/index.md) to dive in.
 
-1. Download the [Remote Data Blocks plugin zip file](https://github.com/Automattic/remote-data-blocks/releases/latest/download/remote-data-blocks.zip).
-2. Log in to your WordPress admin panel.
-3. Navigate to Plugins > Add New.
-4. Click the "Upload Plugin" button at the top of the page.
-5. Choose the downloaded zip file and click "Install Now".
-6. After installation, click "Activate Plugin".
+## Installation
 
-## How to Use
+[![Download Latest Release](https://img.shields.io/badge/Download%20Latest%20Release-blue?style=for-the-badge)](https://github.com/Automattic/remote-data-blocks/releases/latest/download/remote-data-blocks.zip)
 
-1. In the WordPress editor, add a new block by clicking the "+" icon.
-2. Search for "remote" in the block inserter.
-3. Choose from the available blocks, such as:
+### Requirements
 
-   - Airtable Events
-   - Art Institute of Chicago
-   - GitHub Files
-   - Zip Code Information
-   - Shopify Products
+- PHP 8.1+
+- WordPress 6.6+
 
-4. Configure the block settings in the sidebar:
+A [persistent object cache](https://developer.wordpress.org/reference/classes/wp_object_cache/#persistent-cache-plugins) is not strictly required, but it is highly recommended for optimal performance and to help avoid rate limiting from remote data sources. If your WordPress environment does not provide persistent object cache, the plugin will utilize in-memory (per-request) caching.
 
-   - For data-driven blocks, use the search or list panels to select specific items.
-   - Adjust any available display options.
+## Next steps
 
-5. Some blocks may require additional setup:
+> [!WARNING]
+> This plugin is under heavy active development and breaking changes may land without warning. If you are interested in evaluating or testing this plugin, please [open an issue](https://github.com/Automattic/remote-data-blocks/issues/new/choose) and we'll be in touch!
 
-   - For Airtable blocks, ensure you have the correct API key and base ID.
-   - For Shopify blocks, configure your store URL and access token.
+- Learn about the [core concepts](docs/concepts/index.md) behind Remote Data Blocks.
+- Follow along with [example workflows](docs/workflows/index.md) to see Remote Data Blocks in action.
+- If you're a developer, you're ready to [extend Remote Data Blocks with custom code](docs/extending/index.md).
+- Interested in contributing? Issues, pull requests, and discussions are welcome. Please see our [contribution guide](CONTRIBUTING.md) for more information.
 
-6. Use the blocks to display dynamic content from various sources directly in your posts or pages.
+## License
 
-_Developers! You can [extend](https://github.com/Automattic/remote-data-blocks/blob/trunk/docs/extending.md) the plugin by creating new datasources and queries._
+Remote Data Blocks is licensed under the [GPLv2 (or later)](LICENSE).
+
+---
+
+Made with ❤️ by [WordPress VIP](https://wpvip.com/).

@@ -2,13 +2,13 @@
 
 namespace RemoteDataBlocks\ExampleApi\Queries;
 
-use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 
 /**
- * This is a placeholder datasource used only to represent the data source in the
+ * This is a placeholder DataSource used only to represent the data source in the
  * settings UI. The actual data loading is implemented by ExampleApiQueryRunner.
  */
-class ExampleApiDataSource extends HttpDatasource {
+class ExampleApiDataSource extends HttpDataSource {
 	public function get_display_name(): string {
 		return 'Example API';
 	}

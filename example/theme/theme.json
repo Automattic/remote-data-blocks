@@ -3,7 +3,7 @@
   "version": 3,
   "settings": {
     "blocks": {
-      "remote-data-blocks/airtable-event": {
+      "remote-data-blocks/conference-event": {
         "custom": {
           "remote-data-blocks": {}
         }
@@ -13,7 +13,7 @@
   "styles": {
     "elements": {},
     "blocks": {
-      "remote-data-blocks/airtable-event": {
+      "remote-data-blocks/conference-event": {
         "color": {
           "background": "#e9c9f9",
           "text": "#290939"

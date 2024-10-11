@@ -39,6 +39,6 @@ class AirtableListEventsQuery extends HttpQueryContext {
 	}
 
 	public function get_endpoint( array $input_variables ): string {
-		return $this->get_datasource()->get_endpoint() . '/tblyGtuxblLtmoqMI';
+		return $this->get_data_source()->get_endpoint() . '/tblyGtuxblLtmoqMI';
 	}
 }

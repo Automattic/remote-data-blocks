@@ -1,15 +1,24 @@
 #!/bin/sh
 
-root_dir=$(pwd)
-script_dir=$(dirname "$0")
+TASK="${1-stop}"
 
-echo "Shutting down..."
+teardown_redis() {
+	echo "🔽 Shutting down Redis..."
+	docker compose -f docker-compose.overrides.yml down
+}
 
-cd ./bin/wp-env/decoupled
-npx wp-env stop 2>/dev/null
-cd "$root_dir"
-npx wp-env stop 2>/dev/null
+teardown_wordpress() {
+	if [ "$TASK" = "destroy" ]; then
+		npx wp-env destroy
+		echo "👋 Run \`npm run dev\` to recreate."
+	else
+		npx wp-env stop
+		echo "⏹️ Rerun \`npm run dev\` to resume or \`npm run dev:destroy\` to clean up."
+	fi
+}
+
+# Kill any lingering Node.js processes.
 pkill -f 'remote-data-blocks/node_modules/'
-docker compose -f "$root_dir/docker-compose.overrides.yml" down
 
-echo "Shutdown complete"
+teardown_redis
+teardown_wordpress

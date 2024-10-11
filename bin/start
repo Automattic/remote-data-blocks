@@ -1,66 +1,130 @@
 #!/bin/sh
 
 set -e
-root_dir=$(pwd)
-script_dir=$(dirname "$0")
 
-# Cleanup after trapping SIGINT (Ctrl+C) and SIGTERM signals
+APP_MODE="$1" # "decoupled" or empty
+
+# Set WordPress port and home URL.
+PORT="${WP_ENV_PORT-8888}"
+WP_HOME="${WP_ENV_HOME_URL-http://localhost:$PORT}"
+
+if [ "$APP_MODE" = "decoupled" ]; then
+    # When running in decoupled mode, listen on a different port to avoid
+    # sticky cached redirects.
+    PORT="${WP_ENV_PORT-8899}"
+
+    WP_HOME="${WP_ENV_HOME_URL-http://localhost:3000}"
+fi
+
+FLAGS="${WP_ENV_FLAGS---xdebug}"
+WP_ADMIN="http://localhost:$PORT/wp-admin/"
+
 cleanup() {
-    echo "Caught SIGINT signal. Shutting down..."
-    kill $BACKEND_PID 2>/dev/null || true
-    docker compose -f "$root_dir/docker-compose.overrides.yml" down
+    echo ""
+    echo "✊ Caught SIG signal. Stopping..."
+
+    npm run -s dev:stop
     exit 0
 }
 
-setup_object_cache() {
-    echo "Setting up object cache..."
-    docker compose -f "$root_dir/docker-compose.overrides.yml" up -d
-    # npx wp-env run cli -- wp redis enable
+activate_plugin() {
+    slug="$1"
+
+    if (npm run -s wp-cli plugin is-active "$slug" 2>/dev/null); then
+        echo "✏️ $slug is already active."
+    else
+        echo "✏️ Activating $slug..."
+        npm run -s wp-cli plugin activate "$slug"
+    fi
 }
 
-composer install
+deactivate_plugin() {
+    slug="$1"
 
-# Monolith via wp-env
-if [ "$1" = "monolith" ]; then
-    # npx looks in node_modules/.bin first
-    npx wp-env start
-    setup_object_cache
-    npm start
-    exit 0
-fi
+    if (npm run -s wp-cli plugin is-active "$slug" 2>/dev/null); then
+        echo "✏️ Deactivating $slug..."
+        npm run -s wp-cli plugin deactivate "$slug"
+    fi
+}
 
-# Monolith w/xdebug via wp-env
-if [ "$1" = "monolith-xdebug" ]; then
-    npx wp-env start --xdebug
-    setup_object_cache
-    npm start
-    exit 0
-fi
+install_and_activate_plugin() {
+    plugin="$1"
+    slug="$2"
 
-# Decoupled via wp-env
-if [ "$1" = "decoupled" ]; then
-    if [ ! -d "$root_dir/../wp-components" ]; then
-        echo "The wp-components repo does not exist. Please clone at sibling level to this repo."
-        exit 1
+    if (npm run -s wp-cli plugin is-installed "$slug" 2>/dev/null); then
+        echo "✏️ $slug is already installed."
+    else
+        echo "✏️ Installing $slug..."
+        npm run -s wp-cli plugin install "$plugin"
     fi
 
-    trap 'cleanup' SIGINT SIGTERM
-    cd ./bin/wp-env/decoupled
+    activate_plugin "$slug"
+}
 
-    npx wp-env start
-    setup_object_cache
-    npx wp-env run cli -- wp rewrite structure '/%postname%/'
+configure_wordpress() {
+    echo "✏️ Enabling Redis..."
+    npm run -s wp-cli redis enable
 
-    if [ $? -ne 0 ]; then
-        cleanup
-        exit 1
+    echo "✏️ Updating home option..."
+    npm run -s wp-cli config set WP_HOME "$WP_HOME"
+
+    if [ "$APP_MODE" = "decoupled" ]; then
+        configure_decoupled_wordpress
+    else
+        deactivate_plugin "vip-decoupled-bundle"
+    fi
+}
+
+configure_decoupled_wordpress() {
+    # We don't do this by default so we don't accidentally write code that
+    # depends on a particular permalink structure.
+    echo "✏️ Updating permalink structure..."
+    npm run -s wp-cli rewrite structure '/%postname%/'
+
+    install_and_activate_plugin "$DECOUPLED_PLUGIN_URL" "vip-decoupled-bundle"
+
+    echo "✅ Decoupled configuration complete."
+}
+
+start_redis() {
+    echo "🔼 Starting Redis..."
+    docker compose -f docker-compose.overrides.yml up -d
+}
+
+start_wordpress() {
+    echo "🔼 Starting WordPress..."
+    WP_ENV_PORT="$PORT" npx wp-env start "$FLAGS"
+}
+
+open_browser() {
+    echo ""
+    echo "> 🌐 $WP_ADMIN"
+    echo "> 🔑 Username: admin"
+    echo "> 🔑 Password: password"
+    echo ""
+
+    # Opening the browser is disruptive, make users opt-in.
+    if [ -z "$WP_ENV_OPEN_BROWSER" ]; then
+        return
     fi
 
-    npm start &
-    BACKEND_PID=$!
-    cd "$root_dir/../wp-components" && npm install && npm run build &&  ./.frontend-env/start react-next
-    exit 0
-fi
+    UNAME="$(uname -s)"
 
-echo "Error: can't start the unknown!"
-exit 1
+    if [ "Darwin" = "$UNAME" ]; then
+        open "$WP_ADMIN"
+    elif [ "Linux" = "$UNAME" ]; then
+        xdg-open "$WP_ADMIN"
+    fi
+}
+
+# Cleanup after error or trapping SIGINT (Ctrl+C) and SIGTERM signals
+trap 'cleanup' INT TERM
+
+start_redis
+start_wordpress
+configure_wordpress
+open_browser
+
+# Start hot-reloading wp-scripts start
+echo "🔼 Starting wp-scripts build process..."
+npm start

@@ -2,12 +2,12 @@
 
 namespace RemoteDataBlocks\Example\GitHub;
 
-use RemoteDataBlocks\Config\Datasource\HttpDatasource;
+use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
 class GitHubListFilesQuery extends HttpQueryContext {
-	public function __construct( private HttpDatasource $datasource, private string $file_extension ) {
-		parent::__construct( $datasource );
+	public function __construct( private HttpDataSource $data_source, private string $file_extension ) {
+		parent::__construct( $data_source );
 	}
 
 	public function get_input_schema(): array {

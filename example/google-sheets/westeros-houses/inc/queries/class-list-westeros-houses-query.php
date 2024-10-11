@@ -53,7 +53,7 @@ class ListWesterosHousesQuery extends HttpQueryContext {
 	}
 
 	public function get_endpoint( array $input_variables ): string {
-		return $this->get_datasource()->get_endpoint() . '/values/Houses';
+		return $this->get_data_source()->get_endpoint() . '/values/Houses';
 	}
 
 	public function process_response( string $raw_response_data, array $input_variables ): string|array|object|null {

@@ -71,7 +71,7 @@ class AuthController extends WP_REST_Controller {
 
 	/**
 	 * These all require manage_options for now, but we can adjust as needed.
-	 * Taken from /inc/rest/datasource-controller/datasource-controller.php
+	 * Taken from /inc/REST/DataSourceController.php
 	 */
 	public function get_google_auth_token_permissions_check(): bool {
 		return current_user_can( 'manage_options' );
