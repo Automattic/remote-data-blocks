@@ -33,7 +33,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 		public array $output_schema = []
 	) {
 		// Provide input and output variables as public properties.
-		$this->input_schema = $this->get_input_schema();
+		$this->input_schema  = $this->get_input_schema();
 		$this->output_schema = $this->get_output_schema();
 	}
 

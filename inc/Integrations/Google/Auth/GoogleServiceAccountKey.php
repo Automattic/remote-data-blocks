@@ -61,17 +61,17 @@ class GoogleServiceAccountKey {
 	}
 
 	public function __construct( array $raw_service_account_key ) {
-		$this->type = $raw_service_account_key['type'];
-		$this->project_id = $raw_service_account_key['project_id'];
-		$this->private_key_id = $raw_service_account_key['private_key_id'];
-		$this->private_key = $raw_service_account_key['private_key'];
-		$this->client_email = $raw_service_account_key['client_email'];
-		$this->client_id = $raw_service_account_key['client_id'];
-		$this->auth_uri = $raw_service_account_key['auth_uri'];
-		$this->token_uri = $raw_service_account_key['token_uri'];
+		$this->type                        = $raw_service_account_key['type'];
+		$this->project_id                  = $raw_service_account_key['project_id'];
+		$this->private_key_id              = $raw_service_account_key['private_key_id'];
+		$this->private_key                 = $raw_service_account_key['private_key'];
+		$this->client_email                = $raw_service_account_key['client_email'];
+		$this->client_id                   = $raw_service_account_key['client_id'];
+		$this->auth_uri                    = $raw_service_account_key['auth_uri'];
+		$this->token_uri                   = $raw_service_account_key['token_uri'];
 		$this->auth_provider_x509_cert_url = $raw_service_account_key['auth_provider_x509_cert_url'];
-		$this->client_x509_cert_url = $raw_service_account_key['client_x509_cert_url'];
-		$this->universe_domain = $raw_service_account_key['universe_domain'];
+		$this->client_x509_cert_url        = $raw_service_account_key['client_x509_cert_url'];
+		$this->universe_domain             = $raw_service_account_key['universe_domain'];
 	}
 
 	public static function from_array( array $raw_service_account_key ): WP_Error|GoogleServiceAccountKey {

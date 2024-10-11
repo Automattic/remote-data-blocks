@@ -9,22 +9,22 @@ use function plugins_url;
 defined( 'ABSPATH' ) || exit();
 
 class ShopifyDatasource extends HttpDatasource {
-	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE;
+	protected const SERVICE_NAME           = REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE;
 	protected const SERVICE_SCHEMA_VERSION = 1;
 
 	protected const SERVICE_SCHEMA = [
-		'type' => 'object',
+		'type'       => 'object',
 		'properties' => [
-			'service' => [
-				'type' => 'string',
+			'service'                => [
+				'type'  => 'string',
 				'const' => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
 			],
 			'service_schema_version' => [
-				'type' => 'integer',
+				'type'  => 'integer',
 				'const' => self::SERVICE_SCHEMA_VERSION,
 			],
-			'access_token' => [ 'type' => 'string' ],
-			'store_name' => [ 'type' => 'string' ],
+			'access_token'           => [ 'type' => 'string' ],
+			'store_name'             => [ 'type' => 'string' ],
 		],
 	];
 
@@ -38,7 +38,7 @@ class ShopifyDatasource extends HttpDatasource {
 
 	public function get_request_headers(): array {
 		return [
-			'Content-Type' => 'application/json',
+			'Content-Type'                      => 'application/json',
 			'X-Shopify-Storefront-Access-Token' => $this->config['access_token'],
 		];
 	}
@@ -49,19 +49,19 @@ class ShopifyDatasource extends HttpDatasource {
 
 	public static function create( string $access_token, string $store_name ): self {
 		return parent::from_array([
-			'service' => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
+			'service'      => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
 			'access_token' => $access_token,
-			'store_name' => $store_name,
-			'slug' => $store_name,
+			'store_name'   => $store_name,
+			'slug'         => $store_name,
 		]);
 	}
 
 	public function to_ui_display(): array {
 		return [
-			'slug' => $this->get_slug(),
-			'service' => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
+			'slug'       => $this->get_slug(),
+			'service'    => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
 			'store_name' => $this->config['store_name'],
-			'uuid' => $this->config['uuid'] ?? null,
+			'uuid'       => $this->config['uuid'] ?? null,
 		];
 	}
 }

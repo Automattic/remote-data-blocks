@@ -8,7 +8,7 @@ class RdbCacheMiddleware extends \Kevinrob\GuzzleCache\CacheMiddleware {
 	 */
 	// phpcs:ignore WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase, SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
 	protected $httpMethods = [
-		'GET' => true,
+		'GET'  => true,
 		'POST' => true,
 	];
 }

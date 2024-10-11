@@ -25,10 +25,10 @@ class TestQueryContext extends HttpQueryContext {
 
 class VipBlockDataApiTest extends TestCase {
 	private static $sourced_block1 = [
-		'name' => 'remote-data-blocks/events',
-		'attributes' => [
+		'name'        => 'remote-data-blocks/events',
+		'attributes'  => [
 			'remoteData' => [
-				'blockName' => 'remote-data-blocks/events',
+				'blockName'  => 'remote-data-blocks/events',
 				'queryInput' => [
 					'record_id' => 'rec9H65WdbaeuxxaU',
 				],
@@ -36,95 +36,95 @@ class VipBlockDataApiTest extends TestCase {
 		],
 		'innerBlocks' => [
 			[
-				'name' => 'core/paragraph',
+				'name'       => 'core/paragraph',
 				'attributes' => [
 					'metadata' => [
 						'bindings' => [
 							'content' => [
 								'source' => 'remote-data/binding',
-								'args' => [
+								'args'   => [
 									'field' => 'title',
 								],
 							],
 						],
 					],
-					'content' => 'Happy hour &amp; networking',
-					'dropCap' => false,
+					'content'  => 'Happy hour &amp; networking',
+					'dropCap'  => false,
 				],
 			],
 			[
-				'name' => 'core/heading',
+				'name'       => 'core/heading',
 				'attributes' => [
 					'metadata' => [
 						'bindings' => [
 							'content' => [
 								'source' => 'remote-data/binding',
-								'args' => [
+								'args'   => [
 									'field' => 'location',
 								],
 							],
 						],
 					],
-					'content' => "President's dining hall",
-					'level' => 2,
+					'content'  => "President's dining hall",
+					'level'    => 2,
 				],
 			],
 		],
 	];
 
 	private static $parsed_block1 = [
-		'blockName' => 'remote-data-blocks/events',
-		'attrs' => [
+		'blockName'    => 'remote-data-blocks/events',
+		'attrs'        => [
 			'remoteData' => [
-				'blockName' => 'remote-data-blocks/events',
+				'blockName'  => 'remote-data-blocks/events',
 				'queryInput' => [
 					'record_id' => 'rec9H65WdbaeuxxaU',
 				],
 			],
 		],
-		'innerBlocks' => [
+		'innerBlocks'  => [
 			[
-				'blockName' => 'core/paragraph',
-				'attrs' => [
+				'blockName'    => 'core/paragraph',
+				'attrs'        => [
 					'metadata' => [
 						'bindings' => [
 							'content' => [
 								'source' => 'remote-data/binding',
-								'args' => [
+								'args'   => [
 									'field' => 'title',
 								],
 							],
 						],
 					],
 				],
-				'innerBlocks' => [],
-				'innerHTML' => "\n<p>Happy hour &amp; networking</p>\n",
+				'innerBlocks'  => [],
+				'innerHTML'    => "\n<p>Happy hour &amp; networking</p>\n",
 				'innerContent' => [
 					"\n<p>Happy hour &amp; networking</p>\n",
 				],
 			],
 			[
-				'blockName' => 'core/heading',
-				'attrs' => [
+				'blockName'    => 'core/heading',
+				'attrs'        => [
 					'metadata' => [
 						'bindings' => [
 							'content' => [
 								'source' => 'remote-data/binding',
-								'args' => [
+								'args'   => [
 									'field' => 'location',
 								],
 							],
 						],
 					],
 				],
-				'innerBlocks' => [],
-				'innerHTML' => "\n<h2 class=\"wp-block-heading\">President's dining hall</h2>\n",
+				'innerBlocks'  => [],
+				'innerHTML'    => "\n<h2 class=\"wp-block-heading\">President's dining hall</h2>\n",
 				'innerContent' => [
 					"\n<h2 class=\"wp-block-heading\">President's dining v</h2>\n",
 				],
 			],
 		],
-		'innerHTML' => "\n<div class=\"wp-block-remote-data-blocks-events\">\n\n</div>\n",
+		'innerHTML'    => "\n<div class=\"wp-block-remote-data-blocks-events\">\n\n</div>\n",
 		'innerContent' => [
 			"\n<div class=\"wp-block-remote-data-blocks-events\">",
 			null,

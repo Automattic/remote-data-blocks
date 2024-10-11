@@ -14,9 +14,9 @@ require_once __DIR__ . '/inc/queries/class-shopify-create-cart-mutation.php';
 require_once __DIR__ . '/inc/queries/class-shopify-remove-from-cart-mutation.php';
 
 function register_shopify_block() {
-	$block_name = 'Shopify Example';
+	$block_name   = 'Shopify Example';
 	$access_token = \RemoteDataBlocks\Example\get_access_token( 'shopify' );
-	$store_name = 'stoph-test';
+	$store_name   = 'stoph-test';
 
 	if ( empty( $access_token ) ) {
 		$logger = LoggerManager::instance();
@@ -24,9 +24,9 @@ function register_shopify_block() {
 		return;
 	}
 
-	$shopify_datasource = ShopifyDatasource::create( $access_token, $store_name );
+	$shopify_datasource            = ShopifyDatasource::create( $access_token, $store_name );
 	$shopify_search_products_query = new ShopifySearchProductsQuery( $shopify_datasource );
-	$shopify_get_product_query = new ShopifyGetProductQuery( $shopify_datasource );
+	$shopify_get_product_query     = new ShopifyGetProductQuery( $shopify_datasource );
 
 	register_remote_data_block( $block_name, $shopify_get_product_query );
 	register_remote_data_search_query( $block_name, $shopify_search_products_query );

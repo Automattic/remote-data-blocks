@@ -8,14 +8,14 @@ class AirtableGetEventQuery extends HttpQueryContext {
 	public function get_input_schema(): array {
 		return [
 			'record_id' => [
-				'name' => 'Record ID',
+				'name'      => 'Record ID',
 				'overrides' => [
 					[
 						'target' => 'utm_content',
-						'type' => 'query_var',
+						'type'   => 'query_var',
 					],
 				],
-				'type' => 'id',
+				'type'      => 'id',
 			],
 		];
 	}
@@ -23,13 +23,13 @@ class AirtableGetEventQuery extends HttpQueryContext {
 	public function get_output_schema(): array {
 		return [
 			'is_collection' => false,
-			'mappings' => [
-				'id' => [
+			'mappings'      => [
+				'id'       => [
 					'name' => 'Record ID',
 					'path' => '$.id',
 					'type' => 'id',
 				],
-				'title' => [
+				'title'    => [
 					'name' => 'Title',
 					'path' => '$.fields.Activity',
 					'type' => 'string',
@@ -39,7 +39,7 @@ class AirtableGetEventQuery extends HttpQueryContext {
 					'path' => '$.fields.Location',
 					'type' => 'string',
 				],
-				'type' => [
+				'type'     => [
 					'name' => 'Type',
 					'path' => '$.fields.Type',
 					'type' => 'string',

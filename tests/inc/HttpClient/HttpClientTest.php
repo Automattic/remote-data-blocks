@@ -21,12 +21,12 @@ class HttpClientTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->mock_handler = new MockHandler();
-		$handler = HandlerStack::create( $this->mock_handler );
+		$handler            = HandlerStack::create( $this->mock_handler );
 
 		$handler->push( HttpClient::get_cache_middleware( new VolatileRuntimeStorage() ), 'phpunit_remote_data_blocks_cache' );
 		$client = new Client( [ 'handler' => $handler ] );
 
-		$this->http_client = new HttpClient( 'https://api.example.com' );
+		$this->http_client         = new HttpClient( 'https://api.example.com' );
 		$this->http_client->client = $client;
 	}
 
@@ -80,16 +80,16 @@ class HttpClientTest extends TestCase {
 
 	public function testRetryDelay() {
 		$response = new Response( 429, [ 'Retry-After' => '120' ] );
-		$delay = HttpClient::retry_delay( 1, $response );
+		$delay    = HttpClient::retry_delay( 1, $response );
 		$this->assertSame( 120000, $delay );
 
 		$response = new Response( 429, [ 'Retry-After' => ( new \DateTime( '+2 minutes' ) )->format( \DateTime::RFC7231 ) ] );
-		$delay = HttpClient::retry_delay( 1, $response );
+		$delay    = HttpClient::retry_delay( 1, $response );
 		$this->assertGreaterThan( 119000, $delay );
 		$this->assertLessThan( 121000, $delay );
 
 		$response = new Response( 500 );
-		$delay = HttpClient::retry_delay( 2, $response );
+		$delay    = HttpClient::retry_delay( 2, $response );
 		$this->assertSame( 2000, $delay );
 	}
 
@@ -316,7 +316,7 @@ class HttpClientTest extends TestCase {
 		// Make the first POST request with an Authorization header
 		$first_response = $this->http_client->post( '/test', [
 			'headers' => [ 'Authorization' => 'Bearer token1' ],
-			'body' => 'test data',
+			'body'    => 'test data',
 		] );
 
 		$this->assertEquals( 1, $this->mock_handler->count(), 'The mock handler should have one request left after the first request' );
@@ -329,7 +329,7 @@ class HttpClientTest extends TestCase {
 		// Make the second POST request to the same endpoint but with a different Authorization header
 		$second_response = $this->http_client->post( '/test', [
 			'headers' => [ 'Authorization' => 'Bearer token2' ],
-			'body' => 'test data',
+			'body'    => 'test data',
 		] );
 
 		// Assert the second response
@@ -407,8 +407,8 @@ class HttpClientTest extends TestCase {
 		// Make the first POST request
 		$first_response = $this->http_client->post( '/graphql', [
 			'headers' => [ 'Content-Type' => 'application/json' ],
-			'json' => [
-				'query' => $first_mutation,
+			'json'    => [
+				'query'     => $first_mutation,
 				'variables' => $variables,
 			],
 		] );
@@ -423,7 +423,7 @@ class HttpClientTest extends TestCase {
 		// Make the second POST request with a different GraphQL mutation
 		$second_response = $this->http_client->post( '/graphql', [
 			'json' => [
-				'query' => $second_mutation,
+				'query'     => $second_mutation,
 				'variables' => array_merge( $variables, [ 'id' => '1' ] ),
 			],
 		] );
@@ -456,8 +456,8 @@ class HttpClientTest extends TestCase {
 		// Make the first POST request
 		$first_response = $this->http_client->post( '/graphql', [
 			'headers' => [ 'Content-Type' => 'application/json' ],
-			'json' => [
-				'query' => $query,
+			'json'    => [
+				'query'     => $query,
 				'variables' => $variables,
 			],
 		] );
@@ -472,8 +472,8 @@ class HttpClientTest extends TestCase {
 		// Make the second POST request with the same GraphQL query
 		$second_response = $this->http_client->post( '/graphql', [
 			'headers' => [ 'Content-Type' => 'application/json' ],
-			'json' => [
-				'query' => $query,
+			'json'    => [
+				'query'     => $query,
 				'variables' => $variables,
 			],
 		] );
@@ -518,8 +518,8 @@ class HttpClientTest extends TestCase {
 		// Make the first POST request
 		$first_response = $this->http_client->post( '/graphql', [
 			'headers' => [ 'Content-Type' => 'application/json' ],
-			'json' => [
-				'query' => $first_query,
+			'json'    => [
+				'query'     => $first_query,
 				'variables' => $variables,
 			],
 		] );
@@ -534,8 +534,8 @@ class HttpClientTest extends TestCase {
 		// Make the second POST request with a different GraphQL query
 		$second_response = $this->http_client->post( '/graphql', [
 			'headers' => [ 'Content-Type' => 'application/json' ],
-			'json' => [
-				'query' => $second_query,
+			'json'    => [
+				'query'     => $second_query,
 				'variables' => $variables,
 			],
 		] );
@@ -575,8 +575,8 @@ class HttpClientTest extends TestCase {
 		// Make the first POST request
 		$first_response = $this->http_client->post( '/graphql', [
 			'headers' => [ 'Content-Type' => 'application/json' ],
-			'json' => [
-				'query' => $query,
+			'json'    => [
+				'query'     => $query,
 				'variables' => $first_variables,
 			],
 		] );
@@ -591,8 +591,8 @@ class HttpClientTest extends TestCase {
 		// Make the second POST request with the same GraphQL query but different variables
 		$second_response = $this->http_client->post( '/graphql', [
 			'headers' => [ 'Content-Type' => 'application/json' ],
-			'json' => [
-				'query' => $query,
+			'json'    => [
+				'query'     => $query,
 				'variables' => $second_variables,
 			],
 		] );

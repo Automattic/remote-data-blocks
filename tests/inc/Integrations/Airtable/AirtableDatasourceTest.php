@@ -28,14 +28,14 @@ class AirtableDatasourceTest extends TestCase {
 
 	public function test_get_display_name_with_base_name_override(): void {
 		$datasource = AirtableDatasource::from_array([
-			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
+			'service'      => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'access_token' => 'test_access_token',
-			'base' => [
-				'id' => 'test_base_id',
+			'base'         => [
+				'id'   => 'test_base_id',
 				'name' => 'Test Base Name',
 			],
-			'tables' => [],
-			'slug' => 'test-airtable-base',
+			'tables'       => [],
+			'slug'         => 'test-airtable-base',
 		]);
 
 		$this->assertSame(
@@ -54,7 +54,7 @@ class AirtableDatasourceTest extends TestCase {
 	public function test_get_request_headers(): void {
 		$expected_headers = [
 			'Authorization' => 'Bearer test_access_token',
-			'Content-Type' => 'application/json',
+			'Content-Type'  => 'application/json',
 		];
 
 		$this->assertSame( $expected_headers, $this->datasource->get_request_headers() );

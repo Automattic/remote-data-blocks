@@ -21,10 +21,10 @@ class BlockPatterns {
 			return;
 		}
 
-		self::$templates['columns'] = file_get_contents( __DIR__ . '/templates/columns.html', false );
-		self::$templates['empty'] = file_get_contents( __DIR__ . '/templates/empty.html', false );
-		self::$templates['heading'] = file_get_contents( __DIR__ . '/templates/heading.html', false );
-		self::$templates['image'] = file_get_contents( __DIR__ . '/templates/image.html', false );
+		self::$templates['columns']   = file_get_contents( __DIR__ . '/templates/columns.html', false );
+		self::$templates['empty']     = file_get_contents( __DIR__ . '/templates/empty.html', false );
+		self::$templates['heading']   = file_get_contents( __DIR__ . '/templates/heading.html', false );
+		self::$templates['image']     = file_get_contents( __DIR__ . '/templates/image.html', false );
 		self::$templates['paragraph'] = file_get_contents( __DIR__ . '/templates/paragraph.html', false );
 	}
 
@@ -42,7 +42,7 @@ class BlockPatterns {
 
 			$attributes['metadata']['bindings'][ $attribute ] = [
 				'source' => BlockBindings::$binding_source,
-				'args' => [
+				'args'   => [
 					'block' => $block_name,
 					'field' => $binding[0],
 				],
@@ -80,10 +80,10 @@ class BlockPatterns {
 		// single heading block. If a field is an image URL, target a single image block.
 
 		$bindings = [
-			'heading' => [
+			'heading'    => [
 				'content' => null,
 			],
-			'image' => [
+			'image'      => [
 				'alt' => null,
 				'url' => null,
 			],
@@ -97,7 +97,7 @@ class BlockPatterns {
 				case 'string':
 					// Attempt to autodetect headings.
 					$normalized_name = trim( strtolower( $name ) );
-					$heading_names = [ 'head', 'header', 'heading', 'name', 'title' ];
+					$heading_names   = [ 'head', 'header', 'heading', 'name', 'title' ];
 					if ( null === $bindings['heading']['content'] && in_array( $normalized_name, $heading_names, true ) ) {
 						$bindings['heading']['content'] = [ $field, $name ];
 						break;
@@ -143,8 +143,8 @@ class BlockPatterns {
 		// If there is an image URL, create two-column layout with left-aligned image.
 		if ( ! empty( $bindings['image']['url'] ) ) {
 			$image_bindings = self::generate_attribute_bindings( $block_name, $bindings['image'] );
-			$image_content = self::populate_template( 'image', $image_bindings );
-			$content = sprintf( self::$templates['columns'], $image_content, $content );
+			$image_content  = self::populate_template( 'image', $image_bindings );
+			$content        = sprintf( self::$templates['columns'], $image_content, $content );
 		}
 
 		// If the pattern content is still empty (probably because there are no
@@ -158,12 +158,12 @@ class BlockPatterns {
 		register_block_pattern(
 			$pattern_name,
 			[
-				'title' => sprintf( '%s Data', $block_title ),
+				'title'      => sprintf( '%s Data', $block_title ),
 				'blockTypes' => [ $block_name ],
 				'categories' => [ 'Remote Data Blocks' ],
-				'content' => $content,
-				'inserter' => true,
-				'source' => 'plugin',
+				'content'    => $content,
+				'inserter'   => true,
+				'source'     => 'plugin',
 			]
 		);
 

@@ -15,10 +15,10 @@ class AirtableEldenRingListLocationsQuery extends HttpQueryContext {
 
 	public function get_output_schema(): array {
 		return [
-			'root_path' => '$.records[*]',
+			'root_path'     => '$.records[*]',
 			'is_collection' => true,
-			'mappings' => [
-				'id' => [
+			'mappings'      => [
+				'id'       => [
 					'name' => 'Location ID',
 					'path' => '$.id',
 					'type' => 'id',
@@ -28,17 +28,17 @@ class AirtableEldenRingListLocationsQuery extends HttpQueryContext {
 					'path' => '$.fields.Name',
 					'type' => 'string',
 				],
-				'title' => [
+				'title'    => [
 					'name' => 'Name',
 					'path' => '$.fields.Name',
 					'type' => 'string',
 				],
-				'x' => [
+				'x'        => [
 					'name' => 'x',
 					'path' => '$.fields.x',
 					'type' => 'string',
 				],
-				'y' => [
+				'y'        => [
 					'name' => 'y',
 					'path' => '$.fields.y',
 					'type' => 'string',

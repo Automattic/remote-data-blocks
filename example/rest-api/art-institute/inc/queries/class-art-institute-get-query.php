@@ -16,28 +16,28 @@ class ArtInstituteOfChicagoGetArtQuery extends HttpQueryContext {
 	public function get_output_schema(): array {
 		return [
 			'is_collection' => false,
-			'mappings' => [
-				'id' => [
+			'mappings'      => [
+				'id'        => [
 					'name' => 'ID',
 					'path' => '$.data.id',
 					'type' => 'id',
 				],
-				'title' => [
+				'title'     => [
 					'name' => 'Title',
 					'path' => '$.data.title',
 					'type' => 'string',
 				],
-				'image_id' => [
+				'image_id'  => [
 					'name' => 'Image ID',
 					'path' => '$.data.image_id',
 					'type' => 'id',
 				],
 				'image_url' => [
-					'name' => 'Image URL',
+					'name'     => 'Image URL',
 					'generate' => function ( $data ) {
 						return 'https://www.artic.edu/iiif/2/' . $data['data']['image_id'] . '/full/843,/0/default.jpg';
 					},
-					'type' => 'image_url',
+					'type'     => 'image_url',
 				],
 			],
 		];

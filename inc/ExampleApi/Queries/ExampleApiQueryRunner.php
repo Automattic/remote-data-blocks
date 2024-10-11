@@ -23,13 +23,13 @@ class ExampleApiQueryRunner extends QueryRunner {
 	protected function get_raw_response_data( array $input_variables ): array|WP_Error {
 		if ( isset( $input_variables['record_id'] ) ) {
 			return [
-				'metadata' => [],
+				'metadata'      => [],
 				'response_data' => ExampleApiData::get_item( $input_variables['record_id'] ),
 			];
 		}
 
 		return [
-			'metadata' => [],
+			'metadata'      => [],
 			'response_data' => ExampleApiData::get_items(),
 		];
 	}

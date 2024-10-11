@@ -7,16 +7,16 @@ use RemoteDataBlocks\Editor\BlockPatterns\BlockPatterns;
 
 class BlockPatternsTest extends TestCase {
 	public function testAddBlockArgToBindings(): void {
-		$block_name = 'test-block';
+		$block_name    = 'test-block';
 		$parsed_blocks = [
 			[
 				'blockName' => 'core/paragraph',
-				'attrs' => [
+				'attrs'     => [
 					'metadata' => [
 						'bindings' => [
 							'content' => [
 								'source' => 'not-ours',
-								'args' => [
+								'args'   => [
 									'field' => 'content',
 								],
 							],
@@ -26,12 +26,12 @@ class BlockPatternsTest extends TestCase {
 			],
 			[
 				'blockName' => 'core/paragraph',
-				'attrs' => [
+				'attrs'     => [
 					'metadata' => [
 						'bindings' => [
 							'content' => [
 								'source' => 'remote-data/binding',
-								'args' => [
+								'args'   => [
 									'field' => 'content',
 								],
 							],
@@ -41,7 +41,7 @@ class BlockPatternsTest extends TestCase {
 			],
 			[
 				'blockName' => 'core/paragraph',
-				'attrs' => [
+				'attrs'     => [
 					'content' => 'Goodbye, world!',
 				],
 			],
@@ -53,12 +53,12 @@ class BlockPatternsTest extends TestCase {
 		$this->assertSame(
 			[
 				'blockName' => 'core/paragraph',
-				'attrs' => [
+				'attrs'     => [
 					'metadata' => [
 						'bindings' => [
 							'content' => [
 								'source' => 'remote-data/binding',
-								'args' => [
+								'args'   => [
 									'field' => 'content',
 									'block' => 'test-block',
 								],

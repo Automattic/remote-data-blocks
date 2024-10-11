@@ -15,7 +15,7 @@ class MockQueryRunner implements QueryRunnerInterface {
 
 		array_push( $this->query_results, [
 			'is_collection' => false,
-			'results' => [
+			'results'       => [
 				[
 					'result' => [
 						$field => [ 'value' => $result ],

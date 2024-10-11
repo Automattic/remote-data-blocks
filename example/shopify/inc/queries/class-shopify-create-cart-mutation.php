@@ -7,10 +7,10 @@ use RemoteDataBlocks\Config\QueryContext\GraphqlMutationContext;
 class ShopifyCreateCartMutation extends GraphqlMutationContext {
 	public function get_output_schema(): array {
 		return [
-			'root_path' => '$.data.cartCreate.cart',
+			'root_path'     => '$.data.cartCreate.cart',
 			'is_collection' => false,
-			'mappings' => [
-				'cart_id' => [
+			'mappings'      => [
+				'cart_id'      => [
 					'name' => 'Shopping cart ID',
 					'path' => '$.id',
 					'type' => 'id',

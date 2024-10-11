@@ -11,7 +11,7 @@ class MockLogger implements LoggerInterface {
 
 	public function log( $level, Stringable|string $message, array $context = [] ): void {
 		$this->logs[] = [
-			'level' => $level,
+			'level'   => $level,
 			'message' => (string) $message,
 			'context' => $context,
 		];

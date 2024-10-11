@@ -71,7 +71,7 @@ class GoogleAuth {
 			}
 		}
 
-		$jwt = self::generate_jwt( $service_account_key, $scope );
+		$jwt       = self::generate_jwt( $service_account_key, $scope );
 		$token_uri = $service_account_key->token_uri;
 
 		$token = self::get_token_using_jwt( $jwt, $token_uri );
@@ -101,7 +101,7 @@ class GoogleAuth {
 			[
 				'body' => [
 					'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-					'assertion' => $jwt,
+					'assertion'  => $jwt,
 				],
 			]
 		);
@@ -137,17 +137,17 @@ class GoogleAuth {
 		GoogleServiceAccountKey $service_account_key,
 		string $scope
 	): string {
-		$header = self::generate_jwt_header();
+		$header  = self::generate_jwt_header();
 		$payload = self::generate_jwt_payload(
 			$service_account_key->client_email,
 			$service_account_key->token_uri,
 			$scope
 		);
 
-		$base64_url_header = base64_encode( wp_json_encode( $header ) );
+		$base64_url_header  = base64_encode( wp_json_encode( $header ) );
 		$base64_url_payload = base64_encode( wp_json_encode( $payload ) );
 
-		$signature = self::generate_jwt_signature(
+		$signature            = self::generate_jwt_signature(
 			$base64_url_header,
 			$base64_url_payload,
 			$service_account_key->private_key
@@ -203,15 +203,15 @@ class GoogleAuth {
 		string $token_uri,
 		string $scope
 	): array {
-		$now = time();
+		$now    = time();
 		$expiry = $now + self::TOKEN_EXPIRY_SECONDS;
 
 		$payload = [
-			'iss' => $client_email,
+			'iss'   => $client_email,
 			'scope' => $scope,
-			'aud' => $token_uri,
-			'exp' => $expiry,
-			'iat' => $now,
+			'aud'   => $token_uri,
+			'exp'   => $expiry,
+			'iat'   => $now,
 		];
 
 		return $payload;

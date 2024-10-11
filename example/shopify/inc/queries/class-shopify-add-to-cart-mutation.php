@@ -7,13 +7,13 @@ use RemoteDataBlocks\Config\QueryContext\GraphqlMutationContext;
 class ShopifyAddToCartMutation extends GraphqlMutationContext {
 	public function get_input_schema(): array {
 		return [
-			'cart_id' => [
+			'cart_id'    => [
 				'type' => 'id',
 			],
 			'variant_id' => [
 				'type' => 'id',
 			],
-			'quantity' => [
+			'quantity'   => [
 				'type' => 'number',
 			],
 		];
@@ -21,20 +21,20 @@ class ShopifyAddToCartMutation extends GraphqlMutationContext {
 
 	public function get_output_schema(): array {
 		return [
-			'root_path' => '$.data.cartLinesAdd.cart.lines.edges[*]',
+			'root_path'     => '$.data.cartLinesAdd.cart.lines.edges[*]',
 			'is_collection' => true,
-			'mappings' => [
-				'id' => [
+			'mappings'      => [
+				'id'            => [
 					'name' => 'Line ID',
 					'path' => '$.node.id',
 					'type' => 'id',
 				],
-				'quantity' => [
+				'quantity'      => [
 					'name' => 'Quantity',
 					'path' => '$.node.quantity',
 					'type' => 'string',
 				],
-				'variant_id' => [
+				'variant_id'    => [
 					'name' => 'Variant ID',
 					'path' => '$.node.merchandise.id',
 					'type' => 'id',

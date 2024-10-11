@@ -15,20 +15,20 @@ class ShopifySearchProductsQuery extends GraphqlQueryContext {
 
 	public function get_output_schema(): array {
 		return [
-			'root_path' => '$.data.products.edges[*]',
+			'root_path'     => '$.data.products.edges[*]',
 			'is_collection' => true,
-			'mappings' => [
-				'id' => [
+			'mappings'      => [
+				'id'        => [
 					'name' => 'Product ID',
 					'path' => '$.node.id',
 					'type' => 'id',
 				],
-				'title' => [
+				'title'     => [
 					'name' => 'Product title',
 					'path' => '$.node.title',
 					'type' => 'string',
 				],
-				'price' => [
+				'price'     => [
 					'name' => 'Item price',
 					'path' => '$.node.priceRange.maxVariantPrice.amount',
 					'type' => 'price',

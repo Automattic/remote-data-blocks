@@ -10,16 +10,16 @@ use WP_Block;
 class InteractivityStore {
 	public static function get_map_interactive_context( WP_Block $block ): array {
 		$query_context = [
-			'blockName' => $block->context[ BlockBindings::$context_name ]['blockName'],
+			'blockName'  => $block->context[ BlockBindings::$context_name ]['blockName'],
 			'queryInput' => $block->context[ BlockBindings::$context_name ]['queryInput'],
 		];
-		$response = BlockBindings::execute_query( $query_context, 'GET Map Coordinates' );
-		$coordinates = array_map( function ( $value ) {
+		$response      = BlockBindings::execute_query( $query_context, 'GET Map Coordinates' );
+		$coordinates   = array_map( function ( $value ) {
 			$result = $value['result'];
 			return [
 				'name' => $result['map_name']['value'],
-				'x' => $result['x']['value'],
-				'y' => $result['y']['value'],
+				'x'    => $result['x']['value'],
+				'y'    => $result['y']['value'],
 			];
 		}, $response['results'] );
 

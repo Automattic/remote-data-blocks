@@ -35,7 +35,7 @@ final class DataEncryption {
 	 *
 	 */
 	public function __construct() {
-		$this->key = $this->get_default_key();
+		$this->key  = $this->get_default_key();
 		$this->salt = $this->get_default_salt();
 	}
 
@@ -54,8 +54,8 @@ final class DataEncryption {
 		}
 
 		$method = 'aes-256-ctr';
-		$ivlen = openssl_cipher_iv_length( $method );
-		$iv = openssl_random_pseudo_bytes( $ivlen );
+		$ivlen  = openssl_cipher_iv_length( $method );
+		$iv     = openssl_random_pseudo_bytes( $ivlen );
 
 		$raw_value = openssl_encrypt( $value . $this->salt, $method, $this->key, 0, $iv );
 		if ( ! $raw_value ) {
@@ -86,8 +86,8 @@ final class DataEncryption {
 		}
 
 		$method = 'aes-256-ctr';
-		$ivlen = openssl_cipher_iv_length( $method );
-		$iv = substr( $decoded_value, 0, $ivlen );
+		$ivlen  = openssl_cipher_iv_length( $method );
+		$iv     = substr( $decoded_value, 0, $ivlen );
 
 		$decoded_value = substr( $decoded_value, $ivlen );
 

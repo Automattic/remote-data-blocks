@@ -40,10 +40,10 @@ class QueryRunner implements QueryRunnerInterface {
 	 * } The request details.
 	 */
 	protected function get_request_details( array $input_variables ): array|WP_Error {
-		$headers = $this->query_context->get_request_headers( $input_variables );
-		$method = $this->query_context->get_request_method();
-		$body = $this->query_context->get_request_body( $input_variables );
-		$endpoint = $this->query_context->get_endpoint( $input_variables );
+		$headers   = $this->query_context->get_request_headers( $input_variables );
+		$method    = $this->query_context->get_request_method();
+		$body      = $this->query_context->get_request_body( $input_variables );
+		$endpoint  = $this->query_context->get_endpoint( $input_variables );
 		$cache_ttl = $this->query_context->get_cache_ttl( $input_variables );
 
 		$parsed_url = wp_parse_url( $endpoint );
@@ -70,24 +70,24 @@ class QueryRunner implements QueryRunnerInterface {
 		}
 
 		$scheme = $parsed_url['scheme'];
-		$host = $parsed_url['host'];
-		$user = $parsed_url['user'] ?? '';
-		$path = $parsed_url['path'] ?? '';
+		$host   = $parsed_url['host'];
+		$user   = $parsed_url['user'] ?? '';
+		$path   = $parsed_url['path'] ?? '';
 
 		$query = ! empty( $parsed_url['query'] ?? '' ) ? '?' . $parsed_url['query'] : '';
-		$port = ! empty( $parsed_url['port'] ?? '' ) ? ':' . $parsed_url['port'] : '';
-		$pass = ! empty( $parsed_url['pass'] ?? '' ) ? ':' . $parsed_url['pass'] : '';
-		$pass = ( $user || $pass ) ? $pass . '@' : '';
+		$port  = ! empty( $parsed_url['port'] ?? '' ) ? ':' . $parsed_url['port'] : '';
+		$pass  = ! empty( $parsed_url['pass'] ?? '' ) ? ':' . $parsed_url['pass'] : '';
+		$pass  = ( $user || $pass ) ? $pass . '@' : '';
 
 		$request_details = [
-			'method' => $method,
+			'method'  => $method,
 			'options' => [
 				RequestOptions::HEADERS => $headers,
-				RequestOptions::JSON => $body,
+				RequestOptions::JSON    => $body,
 			],
-			'origin' => sprintf( '%s://%s%s%s%s', $scheme, $user, $pass, $host, $port ),
-			'ttl' => $cache_ttl,
-			'uri' => sprintf( '%s%s', $path, $query ),
+			'origin'  => sprintf( '%s://%s%s%s%s', $scheme, $user, $pass, $host, $port ),
+			'ttl'     => $cache_ttl,
+			'uri'     => sprintf( '%s%s', $path, $query ),
 		];
 
 		/**
@@ -144,8 +144,8 @@ class QueryRunner implements QueryRunnerInterface {
 		$raw_response_string = $response->getBody()->getContents();
 
 		return [
-			'metadata' => [
-				'age' => intval( $response->getHeaderLine( 'Age' ) ),
+			'metadata'      => [
+				'age'         => intval( $response->getHeaderLine( 'Age' ) ),
 				'status_code' => $response_code,
 			],
 			'response_data' => $raw_response_string,
@@ -165,18 +165,18 @@ class QueryRunner implements QueryRunnerInterface {
 	 * }>,
 	 */
 	protected function get_response_metadata( array $response_metadata, array $query_results ): array {
-		$age = intval( $response_metadata['age'] ?? 0 );
+		$age  = intval( $response_metadata['age'] ?? 0 );
 		$time = time() - $age;
 
 		$query_response_metadata = [
 			'last_updated' => [
-				'name' => 'Last updated',
-				'type' => 'string',
+				'name'  => 'Last updated',
+				'type'  => 'string',
 				'value' => gmdate( 'Y-m-d H:i:s', $time ),
 			],
-			'total_count' => [
-				'name' => 'Total count',
-				'type' => 'number',
+			'total_count'  => [
+				'name'  => 'Total count',
+				'type'  => 'number',
 				'value' => count( $query_results ),
 			],
 		];
@@ -209,7 +209,7 @@ class QueryRunner implements QueryRunnerInterface {
 			return new WP_Error( 'Invalid raw response data' );
 		}
 
-		$metadata = $raw_response_data['metadata'];
+		$metadata      = $raw_response_data['metadata'];
 		$response_data = $raw_response_data['response_data'];
 
 		// If the response data is a string, allow queries to implement their own
@@ -229,8 +229,8 @@ class QueryRunner implements QueryRunnerInterface {
 
 		return [
 			'is_collection' => $is_collection,
-			'metadata' => $this->get_response_metadata( $metadata, $results ),
-			'results' => $results,
+			'metadata'      => $this->get_response_metadata( $metadata, $results ),
+			'results'       => $results,
 		];
 	}
 
@@ -244,7 +244,9 @@ class QueryRunner implements QueryRunnerInterface {
 	 * @return string The field value.
 	 */
 	protected function get_field_value( array|string $field_value, string $default_value = '', string $field_type = 'string' ): string {
-		$field_value_single = is_array( $field_value ) && count( $field_value ) > 1 ? $field_value : ( $field_value[0] ?? $default_value );
+		$field_value_single = is_array( $field_value ) && count( $field_value ) > 1
+			? $field_value
+			: ( $field_value[0] ?? $default_value );
 
 		switch ( $field_type ) {
 			case 'base64':
@@ -278,7 +280,7 @@ class QueryRunner implements QueryRunnerInterface {
 	 * }>
 	 */
 	protected function map_fields( string|array|object|null $response_data, bool $is_collection ): ?array {
-		$root = $response_data;
+		$root          = $response_data;
 		$output_schema = $this->query_context->output_schema;
 
 		if ( ! empty( $output_schema['root_path'] ) ) {
@@ -301,7 +303,7 @@ class QueryRunner implements QueryRunnerInterface {
 				if ( array_key_exists( 'generate', $mapping ) && is_callable( $mapping['generate'] ) ) {
 					$field_value_single = $mapping['generate']( json_decode( $json->getJson(), true ) );
 				} else {
-					$field_path = $mapping['path'] ?? null;
+					$field_path  = $mapping['path'] ?? null;
 					$field_value = $field_path ? $json->get( $field_path ) : '';
 
 					// JSONPath always returns values in an array, even if there's only one value.

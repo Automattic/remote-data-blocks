@@ -14,7 +14,7 @@ class DataEncryptionTest extends TestCase {
 	}
 
 	public function testEncryptAndDecrypt(): void {
-		$original_value = 'sensitive data';
+		$original_value  = 'sensitive data';
 		$encrypted_value = $this->data_encryption->encrypt( $original_value );
 
 		$this->assertNotEquals( $original_value, $encrypted_value );
@@ -37,7 +37,7 @@ class DataEncryptionTest extends TestCase {
 	}
 
 	public function testDecryptWithInvalidInput(): void {
-		$invalid_input = 'not_encrypted_data';
+		$invalid_input   = 'not_encrypted_data';
 		$decrypted_value = $this->data_encryption->decrypt( $invalid_input );
 
 		$this->assertSame( $invalid_input, $decrypted_value );

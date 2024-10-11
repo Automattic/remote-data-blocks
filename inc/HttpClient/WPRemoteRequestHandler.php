@@ -17,7 +17,7 @@ use function wp_remote_retrieve_response_code;
 
 class WPRemoteRequestHandler {
 	const DEFAULT_HTTP_VERSION = '1.1';
-	const DEFAULT_TIMEOUT = 5;
+	const DEFAULT_TIMEOUT      = 5;
 
 	/**
 	 * Handle a PSR-7 request via wp_remote_request and return a promise.
@@ -29,13 +29,13 @@ class WPRemoteRequestHandler {
 	public function __invoke( RequestInterface $request, array $options ): PromiseInterface {
 		try {
 			// Convert Guzzle request to arguments for wp_remote_request.
-			$url = (string) $request->getUri();
+			$url  = (string) $request->getUri();
 			$args = [
-				'body' => (string) $request->getBody(), // Stream has been read, let __toString() rewind and read it.
-				'headers' => [],
+				'body'        => (string) $request->getBody(), // Stream has been read, let __toString() rewind and read it.
+				'headers'     => [],
 				'httpversion' => $options['httpversion'] ?? self::DEFAULT_HTTP_VERSION,
-				'method' => $request->getMethod(),
-				'timeout' => $options['timeout'] ?? self::DEFAULT_TIMEOUT,
+				'method'      => $request->getMethod(),
+				'timeout'     => $options['timeout'] ?? self::DEFAULT_TIMEOUT,
 			];
 
 			// Collapse duplicate headers into a single comma-separated header.
@@ -52,8 +52,8 @@ class WPRemoteRequestHandler {
 			}
 
 			// Get the response data
-			$response_code = wp_remote_retrieve_response_code( $response );
-			$response_body = wp_remote_retrieve_body( $response );
+			$response_code    = wp_remote_retrieve_response_code( $response );
+			$response_body    = wp_remote_retrieve_body( $response );
 			$response_headers = wp_remote_retrieve_headers( $response );
 
 			// Convert the response headers to an array.
