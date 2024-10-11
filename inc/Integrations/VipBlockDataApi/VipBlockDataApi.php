@@ -36,9 +36,9 @@ class VipBlockDataApi {
 			return $sourced_block;
 		}
 
-		$block_context  = self::extract_block_context( $parsed_block );
+		$block_context = self::extract_block_context( $parsed_block );
 		$resolved_block = [
-			'name'       => $sourced_block['name'],
+			'name' => $sourced_block['name'],
 			'attributes' => array_diff_key( $sourced_block['attributes'], [ 'remoteData' => '' ] ),
 		];
 

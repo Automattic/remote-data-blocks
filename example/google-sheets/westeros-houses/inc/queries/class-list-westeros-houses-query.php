@@ -15,30 +15,30 @@ class ListWesterosHousesQuery extends HttpQueryContext {
 
 	public function get_output_schema(): array {
 		return [
-			'root_path'     => '$.values[*]',
+			'root_path' => '$.values[*]',
 			'is_collection' => true,
-			'mappings'      => [
-				'row_id'    => [
+			'mappings' => [
+				'row_id' => [
 					'name' => 'Row ID',
 					'path' => '$.RowId',
 					'type' => 'id',
 				],
-				'house'     => [
+				'house' => [
 					'name' => 'House',
 					'path' => '$.House',
 					'type' => 'string',
 				],
-				'seat'      => [
+				'seat' => [
 					'name' => 'Seat',
 					'path' => '$.Seat',
 					'type' => 'string',
 				],
-				'region'    => [
+				'region' => [
 					'name' => 'Region',
 					'path' => '$.Region',
 					'type' => 'string',
 				],
-				'words'     => [
+				'words' => [
 					'name' => 'Words',
 					'path' => '$.Words',
 					'type' => 'string',
@@ -65,7 +65,7 @@ class ListWesterosHousesQuery extends HttpQueryContext {
 
 			$parsed_response_data['values'] = array_map(
 				function ( $row, $index ) {
-					$combined          = array_combine( self::COLUMNS, $row );
+					$combined = array_combine( self::COLUMNS, $row );
 					$combined['RowId'] = $index + 1; // Add row_id field, starting from 1
 					return $combined;
 				},

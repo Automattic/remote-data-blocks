@@ -24,17 +24,17 @@ class DataSourceCrudTest extends TestCase {
 	
 	public function test_register_new_data_source_with_valid_input() {
 		$valid_source = [
-			'service'                => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
+			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'service_schema_version' => 1,
-			'uuid'                   => wp_generate_uuid4(),
-			'access_token'           => 'valid_token',
-			'base'                   => [
-				'id'   => 'base_id',
+			'uuid' => wp_generate_uuid4(),
+			'access_token' => 'valid_token',
+			'base' => [
+				'id' => 'base_id',
 				'name' => 'Base Name',
 			],
-			'tables'                 => [],
-			'display_name'           => 'Crud Test',
-			'slug'                   => 'valid-slug',
+			'tables' => [],
+			'display_name' => 'Crud Test',
+			'slug' => 'valid-slug',
 		];
 
 		$result = DataSourceCrud::register_new_data_source( $valid_source );
@@ -45,9 +45,9 @@ class DataSourceCrudTest extends TestCase {
 
 	public function test_register_new_data_source_with_invalid_input() {
 		$invalid_source = [
-			'service'                => 'unsupported',
+			'service' => 'unsupported',
 			'service_schema_version' => 1,
-			'uuid'                   => wp_generate_uuid4(),
+			'uuid' => wp_generate_uuid4(),
 		];
 
 		// phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
@@ -66,26 +66,26 @@ class DataSourceCrudTest extends TestCase {
 
 	public function test_get_data_sources() {
 		$source1 = DataSourceCrud::register_new_data_source( [
-			'service'                => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
+			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'service_schema_version' => 1,
-			'uuid'                   => wp_generate_uuid4(),
-			'access_token'           => 'token1',
-			'base'                   => [
-				'id'   => 'base_id1',
+			'uuid' => wp_generate_uuid4(),
+			'access_token' => 'token1',
+			'base' => [
+				'id' => 'base_id1',
 				'name' => 'Base Name 1',
 			],
-			'tables'                 => [],
-			'display_name'           => 'Base Name 1',
-			'slug'                   => 'source-1',
+			'tables' => [],
+			'display_name' => 'Base Name 1',
+			'slug' => 'source-1',
 		] );
 
 		$source2 = DataSourceCrud::register_new_data_source( [
-			'service'                => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
+			'service' => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
 			'service_schema_version' => 1,
-			'uuid'                   => wp_generate_uuid4(),
-			'access_token'           => 'token2',
-			'store_name'             => 'mystore',
-			'slug'                   => 'source-2',
+			'uuid' => wp_generate_uuid4(),
+			'access_token' => 'token2',
+			'store_name' => 'mystore',
+			'slug' => 'source-2',
 		] );
 
 		set_mocked_option( DataSourceCrud::CONFIG_OPTION_NAME, [
@@ -107,17 +107,17 @@ class DataSourceCrudTest extends TestCase {
 
 	public function test_get_item_by_uuid_with_valid_uuid() {
 		$source = DataSourceCrud::register_new_data_source( [
-			'service'                => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
+			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'service_schema_version' => 1,
-			'uuid'                   => wp_generate_uuid4(),
-			'access_token'           => 'token1',
-			'base'                   => [
-				'id'   => 'base_id1',
+			'uuid' => wp_generate_uuid4(),
+			'access_token' => 'token1',
+			'base' => [
+				'id' => 'base_id1',
 				'name' => 'Base Name 1',
 			],
-			'tables'                 => [],
-			'display_name'           => 'Crud Test',
-			'slug'                   => 'source-1',
+			'tables' => [],
+			'display_name' => 'Crud Test',
+			'slug' => 'source-1',
 		] );
 
 		$retrieved_source = DataSourceCrud::get_item_by_uuid( DataSourceCrud::get_data_sources(), $source->to_array()['uuid'] );
@@ -137,22 +137,22 @@ class DataSourceCrudTest extends TestCase {
 
 	public function test_update_item_by_uuid_with_valid_uuid() {
 		$source = DataSourceCrud::register_new_data_source( [
-			'service'                => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
+			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'service_schema_version' => 1,
-			'uuid'                   => wp_generate_uuid4(),
-			'access_token'           => 'token1',
-			'base'                   => [
-				'id'   => 'base_id1',
+			'uuid' => wp_generate_uuid4(),
+			'access_token' => 'token1',
+			'base' => [
+				'id' => 'base_id1',
 				'name' => 'Base Name 1',
 			],
-			'tables'                 => [],
-			'display_name'           => 'Crud Test',
-			'slug'                   => 'source-1',
+			'tables' => [],
+			'display_name' => 'Crud Test',
+			'slug' => 'source-1',
 		] );
 
 		$updated_source = DataSourceCrud::update_item_by_uuid( $source->to_array()['uuid'], [
 			'access_token' => 'updated_token',
-			'slug'         => 'updated-slug',
+			'slug' => 'updated-slug',
 		] );
 
 		$this->assertInstanceOf( HttpDataSource::class, $updated_source );
@@ -167,17 +167,17 @@ class DataSourceCrudTest extends TestCase {
 
 	public function test_delete_item_by_uuid() {
 		$source = DataSourceCrud::register_new_data_source( [
-			'service'                => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
+			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'service_schema_version' => 1,
-			'uuid'                   => wp_generate_uuid4(),
-			'access_token'           => 'token1',
-			'base'                   => [
-				'id'   => 'base_id1',
+			'uuid' => wp_generate_uuid4(),
+			'access_token' => 'token1',
+			'base' => [
+				'id' => 'base_id1',
 				'name' => 'Base Name 1',
 			],
-			'tables'                 => [],
-			'display_name'           => 'Crud Test',
-			'slug'                   => 'source-1',
+			'tables' => [],
+			'display_name' => 'Crud Test',
+			'slug' => 'source-1',
 		] );
 
 		$result = DataSourceCrud::delete_item_by_uuid( $source->to_array()['uuid'] );
@@ -189,17 +189,17 @@ class DataSourceCrudTest extends TestCase {
 
 	public function test_get_by_slug_with_existing_slug() {
 		DataSourceCrud::register_new_data_source([
-			'service'                => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
+			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'service_schema_version' => 1,
-			'uuid'                   => wp_generate_uuid4(),
-			'access_token'           => 'token1',
-			'base'                   => [
-				'id'   => 'base_id1',
+			'uuid' => wp_generate_uuid4(),
+			'access_token' => 'token1',
+			'base' => [
+				'id' => 'base_id1',
 				'name' => 'Base Name 1',
 			],
-			'tables'                 => [],
-			'display_name'           => 'Crud Test',
-			'slug'                   => 'existing-slug',
+			'tables' => [],
+			'display_name' => 'Crud Test',
+			'slug' => 'existing-slug',
 		]);
 
 		$source = DataSourceCrud::get_by_slug( 'existing-slug' );

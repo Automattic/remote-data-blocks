@@ -18,20 +18,20 @@ class ShopifyRemoveFromCartMutation extends GraphqlMutationContext {
 
 	public function get_output_schema(): array {
 		return [
-			'root_path'     => '$.data.cartLinesAdd.cart.lines.edges[*].node',
+			'root_path' => '$.data.cartLinesAdd.cart.lines.edges[*].node',
 			'is_collection' => true,
-			'mappings'      => [
-				'id'            => [
+			'mappings' => [
+				'id' => [
 					'name' => 'Line ID',
 					'path' => '$.id',
 					'type' => 'id',
 				],
-				'quantity'      => [
+				'quantity' => [
 					'name' => 'Quantity',
 					'path' => '$.quantity',
 					'type' => 'string',
 				],
-				'variant_id'    => [
+				'variant_id' => [
 					'name' => 'Variant ID',
 					'path' => '$.merchandise.id',
 					'type' => 'id',

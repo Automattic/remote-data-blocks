@@ -44,7 +44,7 @@ class AdminNotices {
 		}
 
 		self::$log_store[] = [
-			'level'   => $log_level,
+			'level' => $log_level,
 			'message' => $message,
 		];
 	}
@@ -59,12 +59,10 @@ class AdminNotices {
 
 		// Get the first 3 messages.
 		$recent_messages = array_slice( self::$log_store, 0, self::$message_display_limit );
-		$overflow_count  = count( self::$log_store ) - self::$message_display_limit;
+		$overflow_count = count( self::$log_store ) - self::$message_display_limit;
 
 		// Provide instructions depending on whether Query Monitor is active.
-		$instructions = defined( 'QM_VERSION' )
-			? 'Please review Query Monitor’s “Logs” panel for more information.'
-			: 'Please install the Query Monitor plugin and review the “Logs” panel for more information.';
+		$instructions = defined( 'QM_VERSION' ) ? 'Please review Query Monitor’s “Logs” panel for more information.' : 'Please install the Query Monitor plugin and review the “Logs” panel for more information.';
 
 		?>
 		<div class="notice notice-error">

@@ -33,18 +33,18 @@ class AuthController extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/google/token',
 			[
-				'methods'             => 'POST',
-				'callback'            => [ $this, 'get_google_auth_token' ],
+				'methods' => 'POST',
+				'callback' => [ $this, 'get_google_auth_token' ],
 				'permission_callback' => [ $this, 'get_google_auth_token_permissions_check' ],
 			]
 		);
 	}
 
 	public function get_google_auth_token( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		$params      = $request->get_json_params();
+		$params = $request->get_json_params();
 		$credentials = $params['credentials'] ?? null;
-		$scopes      = $params['scopes'] ?? [];
-		$type        = $params['type'] ?? null;
+		$scopes = $params['scopes'] ?? [];
+		$type = $params['type'] ?? null;
 
 		if ( ! $credentials || ! $type || ! $scopes ) {
 			return new \WP_Error(

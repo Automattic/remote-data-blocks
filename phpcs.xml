@@ -67,6 +67,22 @@
 		<exclude name="WordPress.PHP.DevelopmentFunctions.error_log_trigger_error" />
 
 		<exclude name="Universal.NamingConventions.NoReservedKeywordParameterNames" />
+
+		<!--
+			Coordinates with Squiz.WhiteSpace.OperatorSpacing | ignoreSpacingBeforeAssignments=false
+			We don't want to enforce all subsequent assignments to have the same spacing before the assignment operator.
+			Doing so means a single change to one line can result in a large changeset that's more difficult to review.
+		-->
+		<exclude name="Generic.Formatting.MultipleStatementAlignment.NotSameWarning" />
+		<exclude name="WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned" />
+		<exclude name="WordPress.WhiteSpace.OperatorSpacing" />
+	</rule>
+
+	<rule ref="Squiz.WhiteSpace.OperatorSpacing">
+		<properties>
+			<!-- Standardize on a single space after assignments -->
+			<property name="ignoreSpacingBeforeAssignments" value="false" />
+		</properties>
 	</rule>
 
 	<!-- Relax a few rules for tests and example code -->

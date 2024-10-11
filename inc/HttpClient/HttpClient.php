@@ -24,9 +24,9 @@ defined( 'ABSPATH' ) || exit();
 class HttpClient {
 	public Client $client;
 
-	private const MAX_RETRIES                        = 3;
-	private const FALLBACK_CACHE_TTL_IN_SECONDS      = 60;
-	private const WP_OBJECT_CACHE_GROUP              = 'remote-data-blocks';
+	private const MAX_RETRIES = 3;
+	private const FALLBACK_CACHE_TTL_IN_SECONDS = 60;
+	private const WP_OBJECT_CACHE_GROUP = 'remote-data-blocks';
 	private const CACHE_INVALIDATING_REQUEST_HEADERS = [ 'Authorization', 'Cache-Control' ];
 
 	public const CACHE_TTL_CLIENT_OPTION_KEY = '__default_cache_ttl';
@@ -81,8 +81,8 @@ class HttpClient {
 	 */
 	public function init( string $base_uri, array $headers = [], array $client_options = [] ): void {
 		$this->base_uri = $base_uri;
-		$this->headers  = $headers;
-		$this->options  = $client_options;
+		$this->headers = $headers;
+		$this->options = $client_options;
 
 		// Initialize a request handler that uses wp_remote_request instead of cURL.
 		// PHP cURL bindings are not always available, e.g., in WASM environments
@@ -104,7 +104,7 @@ class HttpClient {
 			return $request;
 		} ) );
 
-		$default_ttl      = $client_options[ self::CACHE_TTL_CLIENT_OPTION_KEY ] ?? null;
+		$default_ttl = $client_options[ self::CACHE_TTL_CLIENT_OPTION_KEY ] ?? null;
 		$cache_middleware = self::get_cache_middleware( self::get_cache_storage(), $default_ttl );
 		$this->handler_stack->push( $cache_middleware, 'remote_data_blocks_cache' );
 
@@ -115,7 +115,7 @@ class HttpClient {
 
 		$this->client = new Client( array_merge( $this->default_options, $this->options, [
 			'base_uri' => $this->base_uri,
-			'handler'  => $this->handler_stack,
+			'handler' => $this->handler_stack,
 		] ) );
 	}
 
@@ -177,8 +177,8 @@ class HttpClient {
 	 */
 	public function queue_request( string $method, string|UriInterface $uri, array $options = [] ): void {
 		$this->queued_requests[] = [
-			'method'  => $method,
-			'uri'     => $uri,
+			'method' => $method,
+			'uri' => $uri,
 			'options' => array_merge( $this->options, $options ),
 		];
 	}
