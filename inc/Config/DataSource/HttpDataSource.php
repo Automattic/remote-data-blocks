@@ -17,9 +17,9 @@ use WP_Error;
  * Implements the HttpDataSourceInterface to define a generic HTTP data source.
  */
 abstract class HttpDataSource implements DataSourceInterface, HttpDataSourceInterface, ArraySerializableInterface, UiDisplayableInterface {
-	protected const SERVICE_NAME           = 'unknown';
+	protected const SERVICE_NAME = 'unknown';
 	protected const SERVICE_SCHEMA_VERSION = -1;
-	protected const SERVICE_SCHEMA         = [];
+	protected const SERVICE_SCHEMA = [];
 
 	final private function __construct( protected array $config ) {}
 
@@ -69,7 +69,7 @@ abstract class HttpDataSource implements DataSourceInterface, HttpDataSourceInte
 	 */
 	final public static function from_array( array $config, ?ValidatorInterface $validator = null, ?SanitizerInterface $sanitizer = null ): DataSourceInterface|WP_Error {
 		$config['service_schema_version'] = static::SERVICE_SCHEMA_VERSION;
-		$schema                           = static::get_config_schema();
+		$schema = static::get_config_schema();
 
 		$validator = $validator ?? new Validator( $schema );
 		$validated = $validator->validate( $config );
@@ -98,8 +98,8 @@ abstract class HttpDataSource implements DataSourceInterface, HttpDataSourceInte
 		// TODO: Implement remove from children and implement here in standardized way
 		return [
 			'display_name' => $this->get_display_name(),
-			'slug'         => $this->get_slug(),
-			'service'      => static::SERVICE_NAME,
+			'slug' => $this->get_slug(),
+			'service' => static::SERVICE_NAME,
 		];
 	}
 }

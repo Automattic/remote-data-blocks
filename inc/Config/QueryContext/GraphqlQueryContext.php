@@ -43,7 +43,7 @@ abstract class GraphqlQueryContext extends HttpQueryContext {
 		$variables = $this->get_query_variables( $input_variables );
 
 		return [
-			'query'     => $this->get_query(),
+			'query' => $this->get_query(),
 			'variables' => empty( $variables ) ? null : $variables,
 		];
 	}

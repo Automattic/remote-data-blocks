@@ -10,14 +10,14 @@ require_once __DIR__ . '/inc/queries/class-github-list-files-query.php';
 
 function register_github_file_as_html_block() {
 	$repo_owner = 'Automattic';
-	$repo_name  = 'remote-data-blocks';
-	$branch     = 'trunk';
+	$repo_name = 'remote-data-blocks';
+	$branch = 'trunk';
 
 	$block_name = sprintf( 'GitHub File As HTML (%s/%s)', $repo_owner, $repo_name );
 
-	$github_data_source            = GitHubDataSource::create( $repo_owner, $repo_name, $branch );
+	$github_data_source = GitHubDataSource::create( $repo_owner, $repo_name, $branch );
 	$github_get_file_as_html_query = new GitHubGetFileAsHtmlQuery( $github_data_source );
-	$github_get_list_files_query   = new GitHubListFilesQuery( $github_data_source, '.md' );
+	$github_get_list_files_query = new GitHubListFilesQuery( $github_data_source, '.md' );
 
 	register_remote_data_block( $block_name, $github_get_file_as_html_query );
 	register_remote_data_list_query( $block_name, $github_get_list_files_query );
