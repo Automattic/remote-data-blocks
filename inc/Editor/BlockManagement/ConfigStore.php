@@ -6,12 +6,11 @@ defined( 'ABSPATH' ) || exit();
 
 use RemoteDataBlocks\Logging\LoggerManager;
 use Psr\Log\LoggerInterface;
-use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
-use RemoteDataBlocks\Config\UiDisplayableInterface;
+use RemoteDataBlocks\Data\DataSourceProviderInterface;
 
 use function sanitize_title;
 
-class ConfigStore {
+class ConfigStore implements DataSourceProviderInterface {
 	/**
 	 * @var array<string, array<string, mixed>>
 	 */
@@ -69,29 +68,15 @@ class ConfigStore {
 		return isset( self::$configurations[ $block_name ] );
 	}
 
-	/**
-	 * Return an unprivileged representation of the data sources that can be
-	 * displayed in settings screens.
-	 *
-	 * @return UiDisplayableInterface[]
-	 */
-	public static function get_data_sources_displayable(): array {
-		$data_sources = [];
+	public static function get_data_sources(): array {
+		/* do the thing */
+	}
 
-		foreach ( self::$configurations as $config ) {
-			foreach ( $config['queries'] as $query ) {
-				if ( ! $query instanceof HttpQueryContext ) {
-					continue;
-				}
+	public static function get( string $whatever_uid ): ?array {
+		/* do the thing */
+	}
 
-				$data_source = $query->get_data_source();
-
-				if ( $data_source instanceof UiDisplayableInterface ) {
-					$data_sources[ $data_source->to_array()['slug'] ] = $data_source->to_ui_display();
-				}
-			}
-		}
-
-		return array_values( $data_sources );
+	public static function find_by( string $key, mixed $value ): ?array {
+		/* do the thing */
 	}
 }
