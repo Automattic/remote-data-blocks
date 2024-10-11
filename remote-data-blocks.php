@@ -37,7 +37,7 @@ Editor\BlockManagement\ConfigRegistry::init();
 Editor\PatternEditor\PatternEditor::init();
 
 // Analytics
-$GLOBALS['rdb_tracks'] = new TracksAnalytics();
+TracksAnalytics::init();
 
 // Example API
 ExampleApi\ExampleApi::init();
