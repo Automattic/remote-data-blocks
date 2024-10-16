@@ -7,7 +7,7 @@
  * Author: WPVIP
  * Author URI: https://wpvip.com
  * Text Domain: remote-data-blocks
- * Version: 0.2.1
+ * Version: 0.2.2
  * Requires at least: 6.6
  * Requires PHP: 8.1
  */
@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit();
 
 define( 'REMOTE_DATA_BLOCKS__PLUGIN_ROOT', __FILE__ );
 define( 'REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
-define( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION', '0.2.1' );
+define( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION', '0.2.2' );
 
 define( 'REMOTE_DATA_BLOCKS__REST_NAMESPACE', 'remote-data-blocks/v1' );
 
