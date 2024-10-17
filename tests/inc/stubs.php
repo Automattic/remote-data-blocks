@@ -1,7 +1,8 @@
 <?php declare(strict_types = 1);
 
-function apply_filters( string $_filter, mixed $thing ): mixed {
-	return $thing;
+$GLOBALS['__wordpress_filters'] = [];
+function apply_filters( string $filter, mixed $thing ): mixed {
+	return $GLOBALS['__wordpress_filters'][ $filter ] ?? $thing;
 }
 
 function add_action( string $_action, mixed ...$_args ): void {}

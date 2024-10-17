@@ -15,6 +15,10 @@ if ( ! class_exists( 'Automattic\VIP\Telemetry\Tracks' ) ) {
 }
 
 class TracksAnalyticsTest extends TestCase {
+	public function setUp(): void {
+		$GLOBALS['__wordpress_filters'] = [];
+	}
+
 	public function tearDown(): void {
 		Mockery::close();
 	}
