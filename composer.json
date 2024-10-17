@@ -41,7 +41,8 @@
     "slevomat/coding-standard": "^8.15",
     "php-stubs/wordpress-stubs": "^6.6",
     "psalm/phar": "^5.26",
-    "mockery/mockery": "^1.6"
+    "mockery/mockery": "^1.6",
+    "php-stubs/wordpress-globals": "^0.2.0"
   },
   "config": {
     "allow-plugins": {

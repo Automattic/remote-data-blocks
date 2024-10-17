@@ -14,6 +14,8 @@
 
 namespace RemoteDataBlocks;
 
+use RemoteDataBlocks\Analytics\TracksAnalytics;
+
 defined( 'ABSPATH' ) || exit();
 
 define( 'REMOTE_DATA_BLOCKS__PLUGIN_ROOT', __FILE__ );
@@ -33,6 +35,9 @@ Editor\DataBinding\QueryOverrides::init();
 Editor\BlockManagement\BlockRegistration::init();
 Editor\BlockManagement\ConfigRegistry::init();
 Editor\PatternEditor\PatternEditor::init();
+
+// Analytics
+TracksAnalytics::init();
 
 // Example API
 ExampleApi\ExampleApi::init();

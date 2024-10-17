@@ -96,6 +96,7 @@ export const useDataSources = ( loadOnMount = true ) => {
 			await apiFetch( {
 				path: `${ REST_BASE_DATA_SOURCES }/${ source.uuid }`,
 				method: 'DELETE',
+				data: source,
 			} );
 		} catch ( error ) {
 			showSnackbar( 'error', __( 'Failed to delete data source.', 'remote-data-blocks' ) );
