@@ -13,7 +13,7 @@ interface BlockBindingFieldControlProps {
 
 export function BlockBindingFieldControl( props: BlockBindingFieldControlProps ) {
 	const { availableBindings, fieldTypes, label, target, updateFieldBinding, value } = props;
-	console.log( { props, availableBindings } );
+
 	const options = Object.entries( availableBindings )
 		.filter( ( [ _key, mapping ] ) => fieldTypes.includes( mapping.type ) )
 		.map( ( [ key, mapping ] ) => {
