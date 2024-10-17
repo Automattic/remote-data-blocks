@@ -13,6 +13,7 @@ interface BlockBindingFieldControlProps {
 
 export function BlockBindingFieldControl( props: BlockBindingFieldControlProps ) {
 	const { availableBindings, fieldTypes, label, target, updateFieldBinding, value } = props;
+	console.log( { props, availableBindings } );
 	const options = Object.entries( availableBindings )
 		.filter( ( [ _key, mapping ] ) => fieldTypes.includes( mapping.type ) )
 		.map( ( [ key, mapping ] ) => {
@@ -42,8 +43,8 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 	const { attributes, availableBindings, blockName, removeBinding, updateBinding } = props;
 	const contentArgs = attributes.metadata?.bindings?.content?.args;
 	const contentField = contentArgs?.field ?? '';
-	const imageAltField = attributes.metadata?.bindings?.image_alt?.args?.field ?? '';
-	const imageUrlField = attributes.metadata?.bindings?.image_url?.args?.field ?? '';
+	const imageAltField = attributes.metadata?.bindings?.alt?.args?.field ?? '';
+	const imageUrlField = attributes.metadata?.bindings?.url?.args?.field ?? '';
 
 	function updateFieldBinding( target: string, field: string ): void {
 		if ( ! field ) {
@@ -97,15 +98,15 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 						availableBindings={ availableBindings }
 						fieldTypes={ [ 'image_url' ] }
 						label="Image URL"
-						target="image_url"
+						target="url"
 						updateFieldBinding={ updateFieldBinding }
 						value={ imageUrlField }
 					/>
 					<BlockBindingFieldControl
 						availableBindings={ availableBindings }
-						fieldTypes={ [ 'image_alt' ] }
+						fieldTypes={ [ 'image_alt', 'string' ] }
 						label="Image alt text"
-						target="image_alt"
+						target="alt"
 						updateFieldBinding={ updateFieldBinding }
 						value={ imageAltField }
 					/>
