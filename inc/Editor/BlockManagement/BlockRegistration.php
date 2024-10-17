@@ -45,7 +45,7 @@ class BlockRegistration {
 			// Set available bindings from the display query output mappings.
 			$available_bindings = [];
 			foreach ( $config['queries']['__DISPLAY__']->output_schema['mappings'] ?? [] as $key => $mapping ) {
-				$available_bindings[ $key ] = [
+				$available_bindings[ ucfirst( $key ) ] = [
 					'name' => $mapping['name'],
 					'type' => $mapping['type'],
 				];
