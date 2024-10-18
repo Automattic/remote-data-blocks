@@ -45,6 +45,8 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 	const contentField = contentArgs?.field ?? '';
 	const imageAltField = attributes.metadata?.bindings?.alt?.args?.field ?? '';
 	const imageUrlField = attributes.metadata?.bindings?.url?.args?.field ?? '';
+	const buttonUrlField = attributes.metadata?.bindings?.url?.args?.field ?? '';
+	const buttonTextField = attributes.metadata?.bindings?.text?.args?.field ?? '';
 
 	function updateFieldBinding( target: string, field: string ): void {
 		if ( ! field ) {
@@ -109,6 +111,27 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 						target="alt"
 						updateFieldBinding={ updateFieldBinding }
 						value={ imageAltField }
+					/>
+				</>
+			);
+		case 'core/button':
+			return (
+				<>
+					<BlockBindingFieldControl
+						availableBindings={ availableBindings }
+						fieldTypes={ [ 'button_url' ] }
+						label="Button URL"
+						target="url"
+						updateFieldBinding={ updateFieldBinding }
+						value={ buttonUrlField }
+					/>
+					<BlockBindingFieldControl
+						availableBindings={ availableBindings }
+						fieldTypes={ [ 'button_text', 'string' ] }
+						label="Button Text"
+						target="text"
+						updateFieldBinding={ updateFieldBinding }
+						value={ buttonTextField }
 					/>
 				</>
 			);

@@ -38,14 +38,32 @@ class BlockRegistration {
 			$block_path = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-container';
 			$config     = ConfigStore::get_configuration( $block_name );
 
-			$overrides = array_filter( $config['queries']['__DISPLAY__']->input_schema, function ( $input_var ) {
+			$input_vars_with_overrides = array_filter( $config['queries']['__DISPLAY__']->input_schema, function ( $input_var ) {
 				return isset( $input_var['overrides'] );
 			} );
+
+			$input_vars_with_overrides = array_map(function($name, $input_var ) {
+				$input_var['overrides'] = array_map( function( $override ) use ( $name ) {
+					$display = '';
+					switch ( $override['type'] ) {
+						case 'query_var':
+							$display = sprintf( '?%s={%s}', $override['target'], $name );
+							break;
+						case 'url':
+							$display = sprintf( '/%s/{%s}', $override['target'], $name );
+							break;
+					}
+					$override['display'] = $override['display'] ?? $display;
+				return $override;
+			}, $input_var['overrides'] );
+
+			return $input_var;
+			}, array_keys( $input_vars_with_overrides ),$input_vars_with_overrides );
 
 			// Set available bindings from the display query output mappings.
 			$available_bindings = [];
 			foreach ( $config['queries']['__DISPLAY__']->output_schema['mappings'] ?? [] as $key => $mapping ) {
-				$available_bindings[ ucfirst( $key ) ] = [
+				$available_bindings[ $key ] = [
 					'name' => $mapping['name'],
 					'type' => $mapping['type'],
 				];
@@ -56,7 +74,7 @@ class BlockRegistration {
 				'availableBindings' => $available_bindings,
 				'loop'              => $config['loop'],
 				'name'              => $block_name,
-				'overrides'         => $overrides,
+				'overrides'         => $input_vars_with_overrides,
 				'patterns'          => $config['patterns'],
 				'selectors'         => $config['selectors'],
 				'settings'          => [

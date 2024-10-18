@@ -9,6 +9,12 @@ class ShopifyGetProductQuery extends GraphqlQueryContext {
 		return [
 			'id' => [
 				'type' => 'id',
+				'overrides' => [
+					[
+						'target' => 'product-details',
+						'type' => 'url',
+					],
+				],
 			],
 		];
 	}
@@ -47,6 +53,13 @@ class ShopifyGetProductQuery extends GraphqlQueryContext {
 					'name' => 'Variant ID',
 					'path' => '$.data.product.variants.edges[0].node.id',
 					'type' => 'id',
+				],
+				'details_button_url' => [
+					'name' => 'Details URL',
+					'generate' => function ( $data ) {
+						return '/path-to-page/' . $data['data']['product']['id'];
+					},
+					'type' => 'button_url',
 				],
 			],
 		];
