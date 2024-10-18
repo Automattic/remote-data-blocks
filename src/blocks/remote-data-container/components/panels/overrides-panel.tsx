@@ -60,7 +60,7 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 					options={ [
 						{ label: 'Choose an override', value: '' },
 						...value.overrides.map( ( override, index ) => ( {
-							label: `${ override.type }: ${ override.target }`,
+							label: override.display,
 							value: index.toString(),
 						} ) ),
 					] }
