@@ -8,7 +8,7 @@ class ShopifyGetProductQuery extends GraphqlQueryContext {
 	public function get_input_schema(): array {
 		return [
 			'id' => [
-				'type' => 'id',
+				'type'      => 'id',
 				'overrides' => [
 					[
 						'target' => 'product-details',
@@ -55,11 +55,11 @@ class ShopifyGetProductQuery extends GraphqlQueryContext {
 					'type' => 'id',
 				],
 				'details_button_url' => [
-					'name' => 'Details URL',
+					'name'     => 'Details URL',
 					'generate' => function ( $data ) {
 						return '/path-to-page/' . $data['data']['product']['id'];
 					},
-					'type' => 'button_url',
+					'type'     => 'button_url',
 				],
 			],
 		];
