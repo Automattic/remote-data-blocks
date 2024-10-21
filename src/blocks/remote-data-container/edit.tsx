@@ -39,8 +39,12 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	const { execute } = useRemoteData( props.name, DISPLAY_QUERY_KEY );
 	const [ initialLoad, setInitialLoad ] = useState< boolean >( true );
 
-	function fetchRemoteData( input: RemoteDataQueryInput, insertBlocks = true ) {
-		execute( input, true )
+	function fetchRemoteData(
+		input: RemoteDataQueryInput,
+		overrides: Record< string, QueryInputOverride > | undefined,
+		insertBlocks = true
+	) {
+		execute( input, overrides, true )
 			.then( remoteData => {
 				if ( remoteData ) {
 					updateRemoteData( remoteData, insertBlocks );
@@ -70,7 +74,11 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 			return;
 		}
 
-		fetchRemoteData( props.attributes.remoteData.queryInput, false );
+		fetchRemoteData(
+			props.attributes.remoteData.queryInput,
+			props.attributes.remoteData.queryInputOverrides,
+			false
+		);
 	}
 
 	function resetRemoteData() {
