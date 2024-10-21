@@ -32,7 +32,7 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 	function updateOverrides( inputVar: string, index: number ) {
 		const overrides = availableOverrides[ inputVar ]?.overrides[ index ];
 
-		if ( ! overrides ) {
+		if ( ! overrides || index === -1 ) {
 			return;
 		}
 
@@ -58,7 +58,7 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 					key={ key }
 					label={ value.name }
 					options={ [
-						{ label: 'Choose an override', value: '' },
+						{ label: 'Choose an override', value: '-1' },
 						...value.overrides.map( ( override, index ) => ( {
 							label: override.display,
 							value: index.toString(),
