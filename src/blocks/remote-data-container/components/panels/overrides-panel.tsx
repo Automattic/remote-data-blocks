@@ -31,17 +31,17 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 
 	function updateOverrides( inputVar: string, index: number ) {
 		const overrides = availableOverrides[ inputVar ]?.overrides[ index ];
+		const copyOfQueryInputOverrides = { ...remoteData.queryInputOverrides };
 
 		if ( ! overrides || index === -1 ) {
-			return;
+			delete copyOfQueryInputOverrides?.[ inputVar ];
+		} else {
+			Object.assign( copyOfQueryInputOverrides, { [ inputVar ]: overrides } );
 		}
 
 		updateRemoteData( {
 			...remoteData,
-			queryInputOverrides: {
-				...( remoteData.queryInputOverrides ?? {} ),
-				[ inputVar ]: overrides,
-			},
+			queryInputOverrides: copyOfQueryInputOverrides,
 		} );
 	}
 
