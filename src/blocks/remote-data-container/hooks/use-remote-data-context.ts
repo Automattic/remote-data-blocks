@@ -12,6 +12,7 @@ export interface RemoteDataContext {
 }
 
 export function useRemoteDataContext( context: Record< string, unknown > ): RemoteDataContext {
+	console.log( { context } );
 	// If we are editing a pattern and that pattern has been associated with a
 	// remote data block, we need to inject some example remote data into the
 	// block that blocks can bind to.

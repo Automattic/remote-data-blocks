@@ -116,11 +116,13 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 			...getMismatchedAttributes( attributes, remoteData.results, remoteData.blockName, index ),
 		};
 
+		console.log( { remoteData } );
+
 		// If the block is not writable, render it as usual.
 		if ( isInSyncedPattern && ! hasEnabledOverrides ) {
 			return <BlockEdit { ...props } attributes={ mergedAttributes } />;
 		}
-
+		console.log( { _rd: remoteData } );
 		return (
 			<BoundBlockEdit
 				attributes={ mergedAttributes }

@@ -45,6 +45,7 @@ export function useRemoteData( blockName: string, queryKey: string ) {
 
 	async function execute(
 		queryInput: RemoteDataQueryInput,
+		overrides: Record< string, QueryInputOverride > | undefined,
 		updateDataState = true
 	): Promise< RemoteData | null > {
 		setLoading( true );
@@ -55,7 +56,11 @@ export function useRemoteData( blockName: string, queryKey: string ) {
 			query_input: queryInput,
 		};
 
-		const remoteData = await fetchRemoteData( requestData ).catch( () => null );
+		let remoteData = await fetchRemoteData( requestData ).catch( () => null );
+
+		if ( remoteData && overrides ) {
+			remoteData = { ...remoteData, queryInputOverrides: overrides };
+		}
 
 		if ( updateDataState ) {
 			setData( remoteData );
