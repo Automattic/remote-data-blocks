@@ -31,17 +31,17 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 
 	function updateOverrides( inputVar: string, index: number ) {
 		const overrides = availableOverrides[ inputVar ]?.overrides[ index ];
+		const copyOfQueryInputOverrides = { ...remoteData.queryInputOverrides };
 
-		if ( ! overrides ) {
-			return;
+		if ( ! overrides || index === -1 ) {
+			delete copyOfQueryInputOverrides?.[ inputVar ];
+		} else {
+			Object.assign( copyOfQueryInputOverrides, { [ inputVar ]: overrides } );
 		}
 
 		updateRemoteData( {
 			...remoteData,
-			queryInputOverrides: {
-				...( remoteData.queryInputOverrides ?? {} ),
-				[ inputVar ]: overrides,
-			},
+			queryInputOverrides: copyOfQueryInputOverrides,
 		} );
 	}
 
@@ -58,7 +58,7 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 					key={ key }
 					label={ value.name }
 					options={ [
-						{ label: 'Choose an override', value: '' },
+						{ label: 'Choose an override', value: '-1' },
 						...value.overrides.map( ( override, index ) => ( {
 							label: override.display,
 							value: index.toString(),

@@ -42,25 +42,26 @@ class BlockRegistration {
 				return isset( $input_var['overrides'] );
 			} );
 
-			$input_vars_with_overrides = array_map( function ( $name, $input_var ) {
-				$input_var['overrides'] = array_map( function ( $override ) use ( $name ) {
-					$display = '';
-					switch ( $override['type'] ) {
-						case 'query_var':
-							$display = sprintf( '?%s={%s}', $override['target'], $name );
-							break;
-						case 'url':
-							$display = sprintf( '/%s/{%s}', $override['target'], $name );
-							break;
-					}
+			$formatted_overrides = [];
+			foreach ( $input_vars_with_overrides as $name => $input_var ) {
+				$formatted_overrides[ $name ] = array_merge( $input_var, [
+					'overrides' => array_map( function ( $override ) use ( $name ) {
+						$display = '';
+						switch ( $override['type'] ) {
+							case 'query_var':
+								$display = sprintf( '?%s={%s}', $override['target'], $name );
+								break;
+							case 'url':
+								$display = sprintf( '/%s/{%s}', $override['target'], $name );
+								break;
+						}
 
-					$override['display'] = $override['display'] ?? $display;
+						$override['display'] = $override['display'] ?? $display;
 
-					return $override;
-				}, $input_var['overrides'] );
-
-				return $input_var;
-			}, array_keys( $input_vars_with_overrides ), $input_vars_with_overrides );
+						return $override;
+					}, $input_var['overrides'] ),
+				] );
+			}
 
 			// Set available bindings from the display query output mappings.
 			$available_bindings = [];
@@ -76,7 +77,7 @@ class BlockRegistration {
 				'availableBindings' => $available_bindings,
 				'loop'              => $config['loop'],
 				'name'              => $block_name,
-				'overrides'         => $input_vars_with_overrides,
+				'overrides'         => $formatted_overrides,
 				'patterns'          => $config['patterns'],
 				'selectors'         => $config['selectors'],
 				'settings'          => [
