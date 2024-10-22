@@ -119,6 +119,8 @@ class Validator implements ValidatorInterface {
 				return is_bool( $value );
 			case 'null':
 				return is_null( $value );
+			case 'function':
+				return is_callable( $value );
 			default:
 				return false;
 		}

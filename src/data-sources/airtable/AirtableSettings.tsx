@@ -120,7 +120,10 @@ export const AirtableSettings = ( {
 				{
 					id: state.table.id,
 					name: state.table.name,
-					output_query_mappings: Array.from( state.table_fields ).map( name => ( { name } ) ),
+					output_query_mappings: Array.from( state.table_fields ).map( name => ( {
+						name,
+						type: name.endsWith( '.url' ) ? 'image_url' : 'string',
+					} ) ),
 				},
 			],
 			slug: state.slug,
@@ -287,7 +290,20 @@ export const AirtableSettings = ( {
 
 			if ( selectedTable ) {
 				selectedTable.fields.forEach( field => {
-					newAvailableTableFields.push( field.name );
+					const simpleFieldTypes = [
+						'singlelineText',
+						'multilineText',
+						'email',
+						'phone',
+						'url',
+						'number',
+					];
+
+					if ( simpleFieldTypes.includes( field.type ) ) {
+						newAvailableTableFields.push( field.name );
+					} else if ( field.type === 'multipleAttachments' ) {
+						newAvailableTableFields.push( `${ field.name }[0].url` );
+					}
 				} );
 			}
 		}

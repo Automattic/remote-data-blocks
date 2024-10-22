@@ -38,6 +38,7 @@ export function LoopTemplate( props: LoopTemplateProps ) {
 	// for each block context, but the preview for the active block context is hidden.
 	// This ensures that when it is displayed again, the cached rendering of the
 	// block preview is used, instead of having to re-render the preview from scratch.
+
 	return (
 		<ul className="remote-data-blocks-loop-template">
 			{ remoteData.results.map( ( result, index ) => {
