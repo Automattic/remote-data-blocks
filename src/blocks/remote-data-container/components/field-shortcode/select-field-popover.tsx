@@ -43,10 +43,10 @@ export function FieldShortcodeSelectFieldPopover( props: FieldShortcodeSelectFie
 				</CardHeader>
 				<CardBody>
 					<FieldShortcodeSelectField
-						blockName={ props.fieldSelection.remoteData.blockName }
+						blockName={ props.fieldSelection.remoteData?.blockName ?? 'Remote Data Block' }
 						fieldType={ props.fieldSelection.type ?? 'field' }
 						onSelectField={ props.onSelectField }
-						queryInput={ props.fieldSelection.remoteData.queryInput }
+						queryInput={ props.fieldSelection.remoteData?.queryInput ?? {} }
 						selectedField={ props.fieldSelection.selectedField }
 					/>
 				</CardBody>
