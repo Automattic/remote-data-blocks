@@ -4,7 +4,6 @@ namespace RemoteDataBlocks\Analytics;
 
 defined( 'ABSPATH' ) || exit();
 
-use Automattic\VIP\Telemetry\Tracks;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 
 /**
@@ -16,20 +15,28 @@ class TracksAnalytics {
 	 */
 	private static object|null $instance = null;
 
-	public static function init(): void {
-		$tracks_class = self::get_tracks_lib_class();
+	/**
+	 * Environment configuration.
+	 *
+	 */
+	private static ?EnvironmentConfig $env_config = null;
+
+	public static function init( EnvironmentConfig $env_config ): void {
+		self::$env_config = $env_config;
+
+		$tracks_class = self::$env_config->get_tracks_lib_class();
 		if ( ! $tracks_class ) {
 			return;
 		}
 
-		if ( self::is_wpvip_site() || self::is_enabled_via_filter() ) {
+		if ( self::$env_config->is_wpvip_site() || self::$env_config->is_enabled_via_filter() ) {
 			self::$instance = new $tracks_class(
 				'',
 				[
 					'plugin_version'   => defined( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) ? constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) : '',
 					'is_multisite'     => is_multisite(),
 					'wp_version'       => get_bloginfo( 'version' ),
-					'hosting_provider' => self::get_hosting_provider(),
+					'hosting_provider' => self::$env_config->get_hosting_provider(),
 				]
 			);
 
@@ -37,15 +44,7 @@ class TracksAnalytics {
 		}
 	}
 
-	private static function get_hosting_provider(): string {
-		if ( self::is_wpvip_site() ) {
-			return 'wpvip';
-		}
-
-		return 'other';
-	}
-
-	public static function setup_tracking_via_hooks(): void {
+	private static function setup_tracking_via_hooks(): void {
 		// WordPress Dashboard Hooks.
 		add_action( 'activated_plugin', [ __CLASS__, 'track_plugin_activation' ] );
 		add_action( 'deactivated_plugin', [ __CLASS__, 'track_plugin_deactivation' ] );
@@ -58,7 +57,7 @@ class TracksAnalytics {
 	 * @param string $plugin_path Path of the plugin that was activated.
 	 */
 	public static function track_plugin_activation( string $plugin_path ): void {
-		if ( ! self::is_remote_data_blocks_plugin( $plugin_path ) ) {
+		if ( ! self::$env_config->is_remote_data_blocks_plugin( $plugin_path ) ) {
 			return;
 		}
 
@@ -71,7 +70,7 @@ class TracksAnalytics {
 	 * @param string $plugin_path Path of the plugin that was deactivated.
 	 */
 	public static function track_plugin_deactivation( string $plugin_path ): void {
-		if ( ! self::is_remote_data_blocks_plugin( $plugin_path ) ) {
+		if ( ! self::$env_config->is_remote_data_blocks_plugin( $plugin_path ) ) {
 			return;
 		}
 
@@ -85,7 +84,7 @@ class TracksAnalytics {
 	 * @param \WP_Post $post Post object.
 	 */
 	public static function track_remote_data_blocks_usage( int $post_id, object $post ): void {
-		if ( ! self::should_track_blocks_usage( $post_id ) ) {
+		if ( ! self::$env_config->should_track_post_having_remote_data_blocks( $post_id ) ) {
 			return;
 		}
 
@@ -138,40 +137,16 @@ class TracksAnalytics {
 		return true;
 	}
 
-	public static function is_enabled_via_filter(): bool {
-		return apply_filters( 'remote_data_blocks_enable_tracks_analytics', false ) ?? false;
-	}
-
-	/**
-	 * Check if the plugin is Remote Data Blocks.
-	 */
-	public static function is_remote_data_blocks_plugin( string $plugin_path ): bool {
-		return plugin_basename( __FILE__ ) === $plugin_path;
-	}
-
-	public static function get_tracks_lib_class(): ?string {
-		if ( ! class_exists( 'Automattic\VIP\Telemetry\Tracks' ) ) {
-			return null;
-		}
-
-		return Tracks::class;
-	}
-
-	public static function is_wpvip_site(): bool {
-		return defined( 'WPCOM_IS_VIP_ENV' ) && constant( 'WPCOM_IS_VIP_ENV' ) === true
-			&& defined( 'WPCOM_SANDBOXED' ) && constant( 'WPCOM_SANDBOXED' ) === false;
-	}
-
-	public static function should_track_blocks_usage( int $post_id ): bool {
-		// Ensure this is not an auto-save or revision.
-		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
-			return false;
-		}
-
-		return true;
-	}
-
 	public static function get_instance(): ?object {
 		return self::$instance;
+	}
+
+	public static function get_env_config(): ?object {
+		return self::$env_config;
+	}
+
+	public static function reset(): void {
+		self::$instance   = null;
+		self::$env_config = null;
 	}
 }

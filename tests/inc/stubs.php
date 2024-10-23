@@ -5,12 +5,16 @@ function apply_filters( string $filter, mixed $thing ): mixed {
 	return $GLOBALS['__wordpress_filters'][ $filter ] ?? $thing;
 }
 
-function add_action( string $_action, mixed ...$_args ): void {}
-function add_filter( string $_filter, mixed ...$_args ): void {}
+$GLOBALS['__wordpress_actions'] = [];
+function add_action( string $action, mixed ...$args ): void {
+	$GLOBALS['__wordpress_actions'][ $action ][] = $args;
+}
+function add_filter( string $filter, mixed ...$args ): void {
+	$GLOBALS['__wordpress_filters'][ $filter ][] = $args;
+}
 
 $GLOBALS['__wordpress_done_actions'] = [];
 function do_action( string $action, mixed ...$args ): void {
-	$GLOBALS['__wordpress_done_actions'][ $action ]   = $GLOBALS['__wordpress_done_actions'][ $action ] ?? [];
 	$GLOBALS['__wordpress_done_actions'][ $action ][] = $args;
 }
 
