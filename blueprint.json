@@ -11,7 +11,6 @@
   },
   "landingPage": "/wp-admin/admin.php?page=remote-data-blocks-settings",
   "login": true,
-  "phpExtensionBundles": [ "light" ],
   "preferredVersions": {
     "php": "8.2",
     "wp": "latest"
@@ -35,7 +34,7 @@
       "options": {
         "activate": true
       },
-      "pluginZipFile": {
+      "pluginData": {
         "caption": "Installing Remote Data Blocks",
         "resource": "url",
         "url": "https://github-proxy.com/proxy/?repo=Automattic/remote-data-blocks&release=latest&asset=remote-data-blocks.zip"
