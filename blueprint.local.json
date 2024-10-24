@@ -11,7 +11,6 @@
   },
   "landingPage": "/wp-admin/admin.php?page=remote-data-blocks-settings",
   "login": true,
-  "phpExtensionBundles": [ "light" ],
   "preferredVersions": {
     "php": "8.2",
     "wp": "latest"
@@ -29,7 +28,7 @@
       "options": {
         "activate": true
       },
-      "pluginZipFile": {
+      "pluginData": {
         "resource": "wordpress.org/plugins",
         "slug": "query-monitor"
       }
