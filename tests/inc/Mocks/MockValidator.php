@@ -6,13 +6,17 @@ use RemoteDataBlocks\Validation\ValidatorInterface;
 use WP_Error;
 
 class MockValidator implements ValidatorInterface {
+	/**
+	 * @psalm-suppress UnusedProperty
+	 */
 	private array $schema;
+
 	private bool $should_pass;
 
 	/**
 	 * Constructor.
-	 * 
-	 * @param array $schema
+	 *
+	 * @param array $schema      Validation schema.
 	 * @param bool  $should_pass Whether the validation should pass or fail.
 	 */
 	public function __construct( array $schema = [], bool $should_pass = true ) {

@@ -358,8 +358,6 @@ class QueryRunnerTest extends TestCase {
 		$response_body = $this->createMock( \Psr\Http\Message\StreamInterface::class );
 		$response      = new Response( 200, [], $response_body );
 
-		$response = new Response( 200, [], $response_body );
-
 		$this->http_client->method( 'request' )->willReturn( $response );
 
 		$response_data       = new \stdClass();
