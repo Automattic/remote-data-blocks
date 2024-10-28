@@ -11,13 +11,22 @@
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
 >
     <projectFiles>
-        <file name="functions.php"/>
-        <file name="remote-data-blocks.php"/>
-        <directory name="inc/"/>
+        <directory name="."/>
+        <ignoreFiles>
+            <directory name="build/"/>
+            <directory name="example/"/>
+            <directory name="node_modules/"/>
+            <directory name="vendor/"/>
+        </ignoreFiles>
     </projectFiles>
     <issueHandlers>
         <PossiblyUnusedReturnValue errorLevel="suppress"/>
         <PossiblyUnusedMethod errorLevel="suppress"/>
+        <UnusedClass>
+            <errorLevel type="suppress">
+                <directory name="tests/" />
+            </errorLevel>
+        </UnusedClass>
     </issueHandlers>
     <stubs>
         <file name="vendor/php-stubs/wordpress-stubs/wordpress-stubs.php"/>

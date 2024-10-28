@@ -6,19 +6,13 @@ use RemoteDataBlocks\Validation\ValidatorInterface;
 use WP_Error;
 
 class MockValidator implements ValidatorInterface {
-	private array $schema;
-	private bool $should_pass;
-
 	/**
 	 * Constructor.
-	 * 
-	 * @param array $schema
+	 *
+	 * @param array $_schema     Validation schema.
 	 * @param bool  $should_pass Whether the validation should pass or fail.
 	 */
-	public function __construct( array $schema = [], bool $should_pass = true ) {
-		$this->schema      = $schema;
-		$this->should_pass = $should_pass;
-	}
+	public function __construct( private array $_schema = [], private bool $should_pass = true ) {}
 
 	/**
 	 * Validate data against a schema.
