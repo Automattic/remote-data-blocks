@@ -17,7 +17,7 @@ interface FieldShortcodeSelectFieldPopoverProps {
 	formatTypeSettings: WPFormat;
 	onSelectField: ( data: FieldSelection, fieldValue: string ) => void;
 	onClose: () => void;
-	resetField: ( dataSource: string ) => void;
+	resetField: ( dataSource?: string ) => void;
 }
 
 export function FieldShortcodeSelectFieldPopover( props: FieldShortcodeSelectFieldPopoverProps ) {
@@ -44,17 +44,17 @@ export function FieldShortcodeSelectFieldPopover( props: FieldShortcodeSelectFie
 				</CardHeader>
 				<CardBody>
 					<FieldShortcodeSelectField
-						blockName={ remoteData.blockName }
+						blockName={ remoteData?.blockName ?? 'Remote Data Block' }
 						fieldType={ type ?? 'field' }
 						onSelectField={ ( data, fieldValue ) =>
 							props.onSelectField( { ...data, action: 'field_updated' }, fieldValue )
 						}
-						queryInput={ remoteData.queryInput }
+						queryInput={ remoteData?.queryInput ?? {} }
 						selectedField={ selectedField }
 					/>
 				</CardBody>
 				<CardFooter>
-					<Button onClick={ () => props.resetField( remoteData.dataSource ) } isDestructive>
+					<Button onClick={ () => props.resetField( remoteData?.dataSource ) } isDestructive>
 						Reset field
 					</Button>
 				</CardFooter>

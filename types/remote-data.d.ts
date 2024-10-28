@@ -26,7 +26,7 @@ interface RemoteData {
 }
 
 interface RemoteDataBlockAttributes {
-	remoteData: RemoteData;
+	remoteData?: RemoteData;
 }
 
 interface FieldSelection extends RemoteDataBlockAttributes {

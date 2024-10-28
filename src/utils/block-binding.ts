@@ -97,7 +97,7 @@ export function hasBlockBinding(
 	);
 }
 
-export function hasRemoteDataChanged( one: RemoteData, two: RemoteData ): boolean {
+export function hasRemoteDataChanged( one?: RemoteData, two?: RemoteData ): boolean {
 	if ( ! one || ! two ) {
 		return true;
 	}
