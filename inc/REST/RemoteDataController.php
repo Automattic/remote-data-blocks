@@ -77,6 +77,7 @@ class RemoteDataController {
 		return array_merge(
 			[
 				'block_name'  => $block_name,
+				'data_source' => ConfigStore::get_data_source( $block_name ),
 				'result_id'   => wp_generate_uuid4(),
 				'query_key'   => $query_key,
 				'query_input' => $query_input,

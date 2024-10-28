@@ -29,7 +29,9 @@ export function FieldShortcodeSelectMeta( props: FieldShortcodeSelectMetaProps )
 					</Heading>
 
 					<FieldSelectionFromMetaFields
-						onSelectField={ props.onSelectField }
+						onSelectField={ ( data, fieldValue ) =>
+							props.onSelectField( { ...data, selectionPath: 'select_meta_tab' }, fieldValue )
+						}
 						remoteData={ remoteData }
 					/>
 				</div>

@@ -16,6 +16,7 @@ interface QueryInputOverride {
 
 interface RemoteData {
 	blockName: string;
+	dataSource: string;
 	isCollection: boolean;
 	metadata: Record< string, RemoteDataResultFields >;
 	queryInput: Record< string, string >;
@@ -30,7 +31,9 @@ interface RemoteDataBlockAttributes {
 
 interface FieldSelection extends RemoteDataBlockAttributes {
 	selectedField: string;
+	action: 'field_added' | 'field_updated';
 	type: 'field' | 'meta';
+	selectionPath: 'select_new_tab' | 'select_existing_tab' | 'select_meta_tab' | 'popover' | 'other';
 }
 
 interface MetaFieldSelection extends FieldSelection {
@@ -75,6 +78,7 @@ interface RemoteDataApiResult {
 
 interface RemoteDataApiResponseBody {
 	block_name: string;
+	data_source: string;
 	is_collection: boolean;
 	metadata: Record< string, RemoteDataResultFields >;
 	query_input: RemoteDataQueryInput;

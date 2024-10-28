@@ -31,7 +31,9 @@ export function FieldShortcodeSelectExisting( props: FieldShortcodeSelectExistin
 					</Heading>
 
 					<FieldSelectionFromAvailableBindings
-						onSelectField={ props.onSelectField }
+						onSelectField={ ( data, fieldValue ) =>
+							props.onSelectField( { ...data, selectionPath: 'select_existing_tab' }, fieldValue )
+						}
 						remoteData={ remoteData }
 					/>
 				</div>
