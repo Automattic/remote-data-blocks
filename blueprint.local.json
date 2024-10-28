@@ -24,11 +24,17 @@
       }
     },
     {
+      "step": "defineWpConfigConsts",
+      "consts": {
+        "USE_PLAYGROUND_CORS_PROXY": false
+      }
+    },
+    {
       "step": "installPlugin",
       "options": {
         "activate": true
       },
-      "pluginData": {
+      "pluginZipFile": {
         "resource": "wordpress.org/plugins",
         "slug": "query-monitor"
       }
