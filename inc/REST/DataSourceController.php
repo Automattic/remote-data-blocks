@@ -23,8 +23,8 @@ class DataSourceController extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base,
 			[
-				'methods'             => 'GET',
-				'callback'            => [ $this, 'get_items' ],
+				'methods' => 'GET',
+				'callback' => [ $this, 'get_items' ],
 				'permission_callback' => [ $this, 'get_items_permissions_check' ],
 			]
 		);
@@ -34,12 +34,12 @@ class DataSourceController extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<uuid>[\w-]+)',
 			[
-				'methods'             => 'GET',
-				'callback'            => [ $this, 'get_item' ],
+				'methods' => 'GET',
+				'callback' => [ $this, 'get_item' ],
 				'permission_callback' => [ $this, 'get_item_permissions_check' ],
-				'args'                => [
+				'args' => [
 					'uuid' => [
-						'type'     => 'string',
+						'type' => 'string',
 						'required' => true,
 					],
 				],
@@ -51,14 +51,14 @@ class DataSourceController extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base,
 			[
-				'methods'             => 'POST',
-				'callback'            => [ $this, 'create_item' ],
+				'methods' => 'POST',
+				'callback' => [ $this, 'create_item' ],
 				'permission_callback' => [ $this, 'create_item_permissions_check' ],
-				'args'                => [
+				'args' => [
 					'service' => [
-						'type'     => 'string',
+						'type' => 'string',
 						'required' => true,
-						'enum'     => REMOTE_DATA_BLOCKS__SERVICES,
+						'enum' => REMOTE_DATA_BLOCKS__SERVICES,
 					],
 				],
 			]
@@ -69,8 +69,8 @@ class DataSourceController extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<uuid>[\w-]+)',
 			[
-				'methods'             => 'PUT',
-				'callback'            => [ $this, 'update_item' ],
+				'methods' => 'PUT',
+				'callback' => [ $this, 'update_item' ],
 				'permission_callback' => [ $this, 'update_item_permissions_check' ],
 			]
 		);
@@ -80,8 +80,8 @@ class DataSourceController extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<uuid>[\w-]+)',
 			[
-				'methods'             => 'DELETE',
-				'callback'            => [ $this, 'delete_item' ],
+				'methods' => 'DELETE',
+				'callback' => [ $this, 'delete_item' ],
 				'permission_callback' => [ $this, 'delete_item_permissions_check' ],
 			]
 		);
@@ -91,8 +91,8 @@ class DataSourceController extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/slug-conflicts',
 			[
-				'methods'             => 'POST',
-				'callback'            => [ $this, 'item_slug_conflicts' ],
+				'methods' => 'POST',
+				'callback' => [ $this, 'item_slug_conflicts' ],
 				'permission_callback' => [ $this, 'item_slug_conflicts_permissions_check' ],
 			]
 		);
@@ -117,7 +117,7 @@ class DataSourceController extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) {
 		$code_configured_data_sources = ConfigStore::get_data_sources_displayable();
-		$ui_configured_data_sources   = DataSourceCrud::get_data_sources_list();
+		$ui_configured_data_sources = DataSourceCrud::get_data_sources_list();
 
 		/**
 		 * quick and dirty deduplication of data sources by slug
@@ -184,7 +184,7 @@ class DataSourceController extends WP_REST_Controller {
 			);
 		}
 		$validation_status = DataSourceCrud::validate_slug( $slug );
-		$result            = [
+		$result = [
 			'exists' => true !== $validation_status,
 		];
 		return rest_ensure_response( $result );

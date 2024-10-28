@@ -20,7 +20,7 @@ class ConfigStore {
 
 	public static function init( ?LoggerInterface $logger = null ): void {
 		self::$configurations = [];
-		self::$logger         = $logger ?? LoggerManager::instance();
+		self::$logger = $logger ?? LoggerManager::instance();
 	}
 
 	/**
