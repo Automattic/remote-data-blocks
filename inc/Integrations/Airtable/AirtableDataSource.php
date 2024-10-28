@@ -45,6 +45,10 @@ class AirtableDataSource extends HttpDataSource {
 								'type'       => 'object',
 								'properties' => [
 									'name' => [ 'type' => 'string' ],
+									'type' => [
+										'type'     => 'string',
+										'required' => false,
+									],
 								],
 							],
 						],
@@ -117,9 +121,9 @@ class AirtableDataSource extends HttpDataSource {
 		];
 
 		foreach ( $this->config['tables'][0]['output_query_mappings'] as $mapping ) {
-			$output_schema['mappings'][ strtolower( $mapping['name'] ) ] = [
+			$output_schema['mappings'][ ucfirst( $mapping['name'] ) ] = [
 				'name' => $mapping['name'],
-				'path' => '$.fields.' . ucfirst( $mapping['name'] ),
+				'path' => '$.fields.' . $mapping['name'],
 				'type' => $mapping['type'] ?? 'string',
 			];
 		}
@@ -145,9 +149,9 @@ class AirtableDataSource extends HttpDataSource {
 		];
 
 		foreach ( $this->config['tables'][0]['output_query_mappings'] as $mapping ) {
-			$output_schema['mappings'][ strtolower( $mapping['name'] ) ] = [
+			$output_schema['mappings'][ $mapping['name'] ] = [
 				'name' => $mapping['name'],
-				'path' => '$.fields.' . ucfirst( $mapping['name'] ),
+				'path' => '$.fields.' . $mapping['name'],
 				'type' => $mapping['type'] ?? 'string',
 			];
 		}

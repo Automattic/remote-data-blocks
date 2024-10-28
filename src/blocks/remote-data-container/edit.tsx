@@ -43,7 +43,13 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 		execute( input, true )
 			.then( remoteData => {
 				if ( remoteData ) {
-					updateRemoteData( remoteData, insertBlocks );
+					updateRemoteData(
+						{
+							queryInputOverrides: props.attributes.remoteData?.queryInputOverrides,
+							...remoteData,
+						},
+						insertBlocks
+					);
 				}
 			} )
 			.catch( () => {} )

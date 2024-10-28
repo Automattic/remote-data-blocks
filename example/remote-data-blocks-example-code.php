@@ -37,6 +37,7 @@ function load_only_if_parent_plugin_is_active() {
 	require_once __DIR__ . '/github/remote-data-blocks/register.php';
 	require_once __DIR__ . '/rest-api/art-institute/register.php';
 	require_once __DIR__ . '/rest-api/zip-code/register.php';
+	require_once __DIR__ . '/shopify/register.php';
 	require_once __DIR__ . '/google-sheets/westeros-houses/register.php';
 }
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\load_only_if_parent_plugin_is_active', 10, 0 );

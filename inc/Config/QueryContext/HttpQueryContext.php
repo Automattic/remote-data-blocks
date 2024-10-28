@@ -53,9 +53,16 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 						'items' => [
 							'type'       => 'object',
 							'properties' => [
-								'name' => [ 'type' => 'string' ],
-								'path' => [ 'type' => 'string' ],
-								'type' => [ 'type' => 'string' ],
+								'name'     => [ 'type' => 'string' ],
+								'path'     => [
+									'type'     => 'string',
+									'required' => false,
+								],
+								'generate' => [
+									'type'     => 'function',
+									'required' => false,
+								],
+								'type'     => [ 'type' => 'string' ],
 							],
 						],
 					],
