@@ -53,7 +53,7 @@
   "devDependencies": {
     "@automattic/eslint-plugin-wpvip": "0.13.0",
     "@babel/preset-react": "7.25.9",
-    "@testing-library/jest-dom": "6.5.0",
+    "@testing-library/jest-dom": "6.6.2",
     "@testing-library/react": "16.0.1",
     "@types/wordpress__block-editor": "11.5.15",
     "@types/wordpress__editor": "14.3.1",
