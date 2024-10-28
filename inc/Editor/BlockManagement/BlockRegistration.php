@@ -38,9 +38,30 @@ class BlockRegistration {
 			$block_path = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-container';
 			$config     = ConfigStore::get_configuration( $block_name );
 
-			$overrides = array_filter( $config['queries']['__DISPLAY__']->input_schema, function ( $input_var ) {
+			$input_vars_with_overrides = array_filter( $config['queries']['__DISPLAY__']->input_schema, function ( $input_var ) {
 				return isset( $input_var['overrides'] );
 			} );
+
+			$formatted_overrides = [];
+			foreach ( $input_vars_with_overrides as $name => $input_var ) {
+				$formatted_overrides[ $name ] = array_merge( $input_var, [
+					'overrides' => array_map( function ( $override ) use ( $name ) {
+						$display = '';
+						switch ( $override['type'] ) {
+							case 'query_var':
+								$display = sprintf( '?%s={%s}', $override['target'], $name );
+								break;
+							case 'url':
+								$display = sprintf( '/%s/{%s}', $override['target'], $name );
+								break;
+						}
+
+						$override['display'] = $override['display'] ?? $display;
+
+						return $override;
+					}, $input_var['overrides'] ),
+				] );
+			}
 
 			// Set available bindings from the display query output mappings.
 			$available_bindings = [];
@@ -56,7 +77,7 @@ class BlockRegistration {
 				'availableBindings' => $available_bindings,
 				'loop'              => $config['loop'],
 				'name'              => $block_name,
-				'overrides'         => $overrides,
+				'overrides'         => $formatted_overrides,
 				'patterns'          => $config['patterns'],
 				'selectors'         => $config['selectors'],
 				'settings'          => [

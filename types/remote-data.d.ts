@@ -9,6 +9,7 @@ interface RemoteDataResultFields {
 }
 
 interface QueryInputOverride {
+	display: string;
 	target: string;
 	type: 'query_var' | 'url';
 }
@@ -24,7 +25,7 @@ interface RemoteData {
 }
 
 interface RemoteDataBlockAttributes {
-	remoteData: RemoteData;
+	remoteData?: RemoteData;
 }
 
 interface FieldSelection extends RemoteDataBlockAttributes {
