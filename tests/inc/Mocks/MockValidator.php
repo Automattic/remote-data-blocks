@@ -20,7 +20,7 @@ class MockValidator implements ValidatorInterface {
 	 * @param bool  $should_pass Whether the validation should pass or fail.
 	 */
 	public function __construct( array $schema = [], bool $should_pass = true ) {
-		$this->schema      = $schema;
+		$this->schema = $schema;
 		$this->should_pass = $should_pass;
 	}
 

@@ -14,18 +14,18 @@ class GoogleAuthStub {
 class GoogleSheetsDataSourceTest extends TestCase {
 	private GoogleSheetsDataSource $data_source;
 	private const MOCK_CREDENTIALS = [
-		'type'                        => 'service_account',
-		'project_id'                  => 'test_project_id',
-		'private_key_id'              => 'test_private_key_id',
-		'private_key'                 => 'test_private_key',
-		'client_email'                => 'test@example.com',
-		'client_id'                   => 'test_client_id',
-		'auth_uri'                    => 'https://accounts.google.com/o/oauth2/auth',
-		'token_uri'                   => 'https://oauth2.googleapis.com/token',
-		'client_secret'               => 'test_client_secret',
+		'type' => 'service_account',
+		'project_id' => 'test_project_id',
+		'private_key_id' => 'test_private_key_id',
+		'private_key' => 'test_private_key',
+		'client_email' => 'test@example.com',
+		'client_id' => 'test_client_id',
+		'auth_uri' => 'https://accounts.google.com/o/oauth2/auth',
+		'token_uri' => 'https://oauth2.googleapis.com/token',
+		'client_secret' => 'test_client_secret',
 		'auth_provider_x509_cert_url' => 'https://www.googleapis.com/oauth2/v1/certs',
-		'client_x509_cert_url'        => 'https://www.googleapis.com/robot/v1/metadata/x509/test%40test-project-id.iam.gserviceaccount.com',
-		'universe_domain'             => 'googleapis.com',
+		'client_x509_cert_url' => 'https://www.googleapis.com/robot/v1/metadata/x509/test%40test-project-id.iam.gserviceaccount.com',
+		'universe_domain' => 'googleapis.com',
 	];
 
 	protected function setUp(): void {
@@ -72,7 +72,7 @@ class GoogleSheetsDataSourceTest extends TestCase {
 		$this->assertEquals(
 			[
 				'Authorization' => 'Bearer mocked_access_token',
-				'Content-Type'  => 'application/json',
+				'Content-Type' => 'application/json',
 			],
 			$headers
 		);

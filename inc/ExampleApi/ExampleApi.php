@@ -31,12 +31,12 @@ class ExampleApi {
 		}
 
 		$data_source = ExampleApiDataSource::from_array( [
-			'slug'    => 'example-api',
+			'slug' => 'example-api',
 			'service' => 'example_api',
 		] );
 		
 		$get_record_query = new ExampleApiGetRecordQuery( $data_source );
-		$get_table_query  = new ExampleApiGetTableQuery( $data_source );
+		$get_table_query = new ExampleApiGetTableQuery( $data_source );
 
 		register_remote_data_block( self::$block_name, $get_record_query );
 		register_remote_data_list_query( self::$block_name, $get_table_query );

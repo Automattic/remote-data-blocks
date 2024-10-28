@@ -20,10 +20,10 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 	}
 
 	private static function getRequestString( RequestInterface $request ): string {
-		$uri        = $request->getUri();
+		$uri = $request->getUri();
 		$uri_string = $uri->getScheme() . '://' . $uri->getHost() . $uri->getPath();
-		$method     = $request->getMethod();
-		$body       = $request->getBody()->getContents();
+		$method = $request->getMethod();
+		$body = $request->getBody()->getContents();
 		return $method . ' ' . $uri_string . ' ' . $body;
 	}
 
