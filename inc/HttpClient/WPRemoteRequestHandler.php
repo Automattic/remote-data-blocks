@@ -39,7 +39,7 @@ class WPRemoteRequestHandler {
 					->withPath( '/cors-proxy.php' )
 					->withQuery( $url );
 				$request = $request->withUri( $new_uri );
-				$url     = (string) $new_uri;
+				$url = (string) $new_uri;
 			}
 
 			$args = [
