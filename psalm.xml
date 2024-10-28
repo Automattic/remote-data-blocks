@@ -11,7 +11,8 @@
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
 >
     <projectFiles>
-        <directory name="."/>
+        <file name="*.php"/>
+        <directory name="*"/>
         <ignoreFiles allowMissingFiles="true">
             <directory name="build/"/>
             <directory name="example/"/>
