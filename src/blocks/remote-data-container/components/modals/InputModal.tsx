@@ -1,7 +1,7 @@
 import { Button, TextControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
-import { ModalWithButtonTrigger } from '@/blocks/remote-data-container/components/modals/base-modal';
+import { ModalWithButtonTrigger } from '@/blocks/remote-data-container/components/modals/BaseModal';
 import { useModalState } from '@/blocks/remote-data-container/hooks/useModalState';
 import { __ } from '@/utils/i18n';
 
