@@ -26,7 +26,7 @@ import GoogleSheetsIcon from '@/settings/icons/GoogleSheetsIcon';
 import HttpIcon from '@/settings/icons/HttpIcon';
 import ShopifyIcon from '@/settings/icons/ShopifyIcon';
 
-import './data-source-list.scss';
+import './DataSourceList.scss';
 
 const DataSourceList = () => {
 	const { dataSources, loadingDataSources, deleteDataSource, fetchDataSources } = useDataSources();

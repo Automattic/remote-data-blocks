@@ -1,7 +1,7 @@
 import { useDebounce } from '@wordpress/compose';
 import { useEffect, useMemo, useCallback } from '@wordpress/element';
 
-import { AirtableApi } from '@/data-sources/airtable/api';
+import { AirtableApi } from '@/data-sources/api-clients/airtable';
 import { useQuery } from '@/hooks/useQuery';
 
 export const useAirtableApiUserId = ( token: string ) => {
