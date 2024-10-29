@@ -4,7 +4,7 @@ import { ItemPreview } from '@/blocks/remote-data-container/components/item-list
 import {
 	cloneBlockWithAttributes,
 	usePatterns,
-} from '@/blocks/remote-data-container/hooks/use-patterns';
+} from '@/blocks/remote-data-container/hooks/usePatterns';
 import { __ } from '@/utils/i18n';
 
 interface ItemListProps {
