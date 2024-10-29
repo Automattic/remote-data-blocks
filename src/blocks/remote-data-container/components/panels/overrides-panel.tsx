@@ -18,14 +18,22 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 	function findIndex( key: string ): number {
 		const override = remoteData.queryInputOverrides?.[ key ];
 		if ( ! override ) {
+			console.log( { one: { key, props, rd: remoteData } } );
 			return -1;
 		}
 
 		const overrides = availableOverrides[ key ]?.overrides;
 		if ( ! overrides ) {
+			console.log( { two: { key, ao: availableOverrides } } );
 			return -1;
 		}
 
+		console.log( {
+			three: {
+				key,
+				o: overrides.findIndex( o => o.type === override.type && o.target === override.target ),
+			},
+		} );
 		return overrides.findIndex( o => o.type === override.type && o.target === override.target );
 	}
 
@@ -38,7 +46,7 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 		} else {
 			Object.assign( copyOfQueryInputOverrides, { [ inputVar ]: overrides } );
 		}
-
+		console.log( { updateOverrides: { inputVar, index } } );
 		updateRemoteData( {
 			...remoteData,
 			queryInputOverrides: copyOfQueryInputOverrides,
@@ -64,7 +72,10 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 							value: index.toString(),
 						} ) ),
 					] }
-					onChange={ index => updateOverrides( key, parseInt( index, 10 ) ) }
+					onChange={ index => {
+						console.log( { index, key, pi: parseInt( index, 10 ) } );
+						updateOverrides( key, parseInt( index, 10 ) );
+					} }
 					value={ findIndex( key ).toString() }
 				/>
 			) ) }
