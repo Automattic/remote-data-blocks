@@ -4,7 +4,7 @@ import { PanelBody } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
-import { BlockBindingControls } from '@/blocks/remote-data-container/components/block-binding-controls';
+import { BlockBindingControls } from '@/blocks/remote-data-container/components/BlockBindingControls';
 import { useRemoteDataContext } from '@/blocks/remote-data-container/hooks/useRemoteDataContext';
 import {
 	BLOCK_BINDING_SOURCE,
