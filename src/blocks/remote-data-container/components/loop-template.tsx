@@ -8,7 +8,7 @@ import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { ItemPreview } from '@/blocks/remote-data-container/components/item-list/item-preview';
+import { ItemPreview } from '@/blocks/remote-data-container/components/item-list/ItemPreview';
 import { LoopTemplateInnerBlocks } from '@/blocks/remote-data-container/components/loop-template-inner-blocks';
 import { LoopIndexContext } from '@/blocks/remote-data-container/context/LoopIndexContext';
 

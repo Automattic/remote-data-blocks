@@ -1,6 +1,6 @@
 import { Spinner } from '@wordpress/components';
 
-import { ItemPreview } from '@/blocks/remote-data-container/components/item-list/item-preview';
+import { ItemPreview } from '@/blocks/remote-data-container/components/item-list/ItemPreview';
 import {
 	cloneBlockWithAttributes,
 	usePatterns,
