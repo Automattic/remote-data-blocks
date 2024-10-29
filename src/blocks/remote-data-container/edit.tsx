@@ -7,7 +7,7 @@ import { InnerBlocks } from '@/blocks/remote-data-container/components/inner-blo
 import { DataPanel } from '@/blocks/remote-data-container/components/panels/DataPanel';
 import { OverridesPanel } from '@/blocks/remote-data-container/components/panels/OverridesPanel';
 import { PatternSelection } from '@/blocks/remote-data-container/components/pattern-selection';
-import { Placeholder } from '@/blocks/remote-data-container/components/placeholder';
+import { Placeholder } from '@/blocks/remote-data-container/components/placeholders/Placeholder';
 import {
 	CONTAINER_CLASS_NAME,
 	DISPLAY_QUERY_KEY,
