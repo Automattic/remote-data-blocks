@@ -2,27 +2,15 @@ import { BlockControls } from '@wordpress/block-editor';
 import { Modal, ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { RichTextFormat, insertObject, WPFormat, WPFormatEditProps } from '@wordpress/rich-text';
+import { RichTextFormat, insertObject, WPFormatEditProps } from '@wordpress/rich-text';
 
-import { FieldShortcodeSelectField } from '@/blocks/remote-data-container/components/field-shortcode/select-field';
-import { FieldShortcodeSelectFieldPopover } from '@/blocks/remote-data-container/components/field-shortcode/select-field-popover';
-import { FieldShortcodeSelectTabs } from '@/blocks/remote-data-container/components/field-shortcode/select-tabs';
-
-const formatName = 'remote-data-blocks/inline-field';
-
-export const formatTypeSettings: WPFormat = {
-	attributes: {
-		'data-query': 'data-query',
-	},
-	className: null,
-	contentEditable: false,
-	edit: FieldShortcodeButton,
-	interactive: true,
-	name: formatName,
-	object: false,
-	tagName: 'remote-data-blocks-inline-field',
-	title: 'Field Shortcode',
-} as WPFormat;
+import {
+	formatName,
+	formatTypeSettings,
+} from '@/blocks/remote-data-container/components/field-shortcode';
+import { FieldShortcodeSelectFieldPopover } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelectFieldPopover';
+import { FieldShortcodeSelectTabs } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelectTabs';
+import { FieldShortcodeSelectField } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelection';
 
 function parseDataQuery( dataQuery?: string ): FieldSelection | null {
 	if ( ! dataQuery ) {
@@ -41,7 +29,7 @@ interface QueryInput {
 	queryInput: RemoteDataQueryInput;
 }
 
-function FieldShortcodeButton( props: WPFormatEditProps ) {
+export function FieldShortcodeButton( props: WPFormatEditProps ) {
 	const { onChange, onFocus, value, isObjectActive, activeObjectAttributes, contentRef } = props;
 	const fieldSelection = parseDataQuery( activeObjectAttributes?.[ 'data-query' ] );
 
