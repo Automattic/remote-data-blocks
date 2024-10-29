@@ -5,7 +5,7 @@ import DataSourceSettings from '@/data-sources/DataSourceSettings';
 import Notices from '@/settings/Notices';
 import { SettingsContext, useDataSourceRouter } from '@/settings/hooks/useSettingsNav';
 
-import './settings-page.scss';
+import './SettingsPage.scss';
 
 function versionAndBuild() {
 	const localized = window.REMOTE_DATA_BLOCKS_SETTINGS;

@@ -1,10 +1,10 @@
 import { Spinner } from '@wordpress/components';
 
-import { ItemPreview } from '@/blocks/remote-data-container/components/item-list/item-preview';
+import { ItemPreview } from '@/blocks/remote-data-container/components/item-list/ItemPreview';
 import {
 	cloneBlockWithAttributes,
 	usePatterns,
-} from '@/blocks/remote-data-container/hooks/use-patterns';
+} from '@/blocks/remote-data-container/hooks/usePatterns';
 import { __ } from '@/utils/i18n';
 
 interface ItemListProps {

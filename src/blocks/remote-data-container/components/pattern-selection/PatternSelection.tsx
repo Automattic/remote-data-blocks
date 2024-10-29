@@ -4,7 +4,7 @@ import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { blockDefault } from '@wordpress/icons';
 
-import { PatternSelectionModal } from '@/blocks/remote-data-container/components/pattern-selection-modal';
+import { PatternSelectionModal } from '@/blocks/remote-data-container/components/pattern-selection/PatternSelectionModal';
 
 interface PatternSelectionProps {
 	insertPatternBlocks: ( pattern: BlockPattern ) => void;

@@ -1,7 +1,7 @@
 import { __experimentalHeading as Heading } from '@wordpress/components';
 
-import { FieldSelectionFromMetaFields } from '@/blocks/remote-data-container/components/field-shortcode/select-field';
-import { useExistingRemoteData } from '@/blocks/remote-data-container/hooks/use-existing-remote-data';
+import { FieldSelectionFromMetaFields } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelection';
+import { useExistingRemoteData } from '@/blocks/remote-data-container/hooks/useExistingRemoteData';
 import { getBlocksConfig } from '@/utils/localized-block-data';
 
 interface FieldShortcodeSelectMetaProps {
