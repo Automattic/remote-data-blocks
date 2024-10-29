@@ -8,9 +8,9 @@ export function sendTracksEvent( eventName: string, props: object ): void {
 		return;
 	}
 
-	if ( baseProps.vipgo_env === 'local' ) {
-		return;
-	}
+	// if ( baseProps.vipgo_env === 'local' ) {
+	// 	return;
+	// }
 
 	recordTracksEvent( eventName, {
 		...window.wpvipTracksBaseProps,

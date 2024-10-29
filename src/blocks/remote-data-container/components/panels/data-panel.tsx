@@ -7,6 +7,8 @@ import {
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
+import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
+
 interface DataPanelProps {
 	refreshRemoteData: () => void;
 	remoteData: RemoteData;
@@ -18,9 +20,23 @@ export function DataPanel( props: DataPanelProps ) {
 
 	const [ isResetConfirmOpen, setResetConfirmOpen ] = useState< boolean >( false );
 
+	function onRefreshRemoteData(): void {
+		refreshRemoteData();
+
+		sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
+			action: 'refresh',
+			data_source: remoteData.dataSource,
+		} );
+	}
+
 	function resetBlock(): void {
 		resetRemoteData();
 		setResetConfirmOpen( false );
+
+		sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
+			action: 'reset',
+			data_source: remoteData.dataSource,
+		} );
 	}
 
 	if ( ! remoteData ) {
@@ -31,7 +47,7 @@ export function DataPanel( props: DataPanelProps ) {
 		<PanelBody title={ __( 'Remote data management', 'remote-data-blocks' ) }>
 			<ButtonGroup>
 				<Button
-					onClick={ refreshRemoteData }
+					onClick={ onRefreshRemoteData }
 					style={ {
 						marginRight: '10px',
 					} }
@@ -44,11 +60,12 @@ export function DataPanel( props: DataPanelProps ) {
 					onClick={ () => setResetConfirmOpen( true ) }
 					variant="secondary"
 				>
-					{ __( 'Reset block', 'remote-data-blocks' ) }
+					{ __( 'Reset Block', 'remote-data-blocks' ) }
 				</Button>
 				{ isResetConfirmOpen && (
 					<ConfirmDialog
 						isOpen={ isResetConfirmOpen }
+						confirmButtonText={ __( 'Reset Block', 'remote-data-blocks' ) }
 						onCancel={ () => setResetConfirmOpen( false ) }
 						onConfirm={ resetBlock }
 						style={ {
