@@ -6,7 +6,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { InnerBlocks } from '@/blocks/remote-data-container/components/InnerBlocks';
 import { DataPanel } from '@/blocks/remote-data-container/components/panels/DataPanel';
 import { OverridesPanel } from '@/blocks/remote-data-container/components/panels/OverridesPanel';
-import { PatternSelection } from '@/blocks/remote-data-container/components/pattern-selection';
+import { PatternSelection } from '@/blocks/remote-data-container/components/pattern-selection/PatternSelection';
 import { Placeholder } from '@/blocks/remote-data-container/components/placeholders/Placeholder';
 import {
 	CONTAINER_CLASS_NAME,
