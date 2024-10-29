@@ -4,7 +4,7 @@ import { registerFormatType } from '@wordpress/rich-text';
 
 import { formatTypeSettings } from '@/blocks/remote-data-container/components/field-shortcode/field-shortcode';
 import { Edit } from '@/blocks/remote-data-container/edit';
-import { withBlockBindingShim } from '@/blocks/remote-data-container/filters/with-block-binding';
+import { withBlockBindingShim } from '@/blocks/remote-data-container/filters/withBlockBinding';
 import { Save } from '@/blocks/remote-data-container/save';
 import { getBlocksConfig } from '@/utils/localized-block-data';
 import './style.scss';
@@ -37,7 +37,7 @@ registerFormatType( 'remote-data-blocks/field-shortcode', formatTypeSettings );
  */
 addFilter(
 	'blocks.registerBlockType',
-	'remote-data-blocks/with-block-binding',
+	'remote-data-blocks/withBlockBinding',
 	withBlockBindingShim,
 	5 // Ensure this runs before core filters
 );
