@@ -1,6 +1,7 @@
 import { CheckboxControl, SelectControl } from '@wordpress/components';
 
 import { TEXT_FIELD_TYPES } from '@/blocks/remote-data-container/config/constants';
+import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
 
 interface BlockBindingFieldControlProps {
 	availableBindings: AvailableBindings;
@@ -35,12 +36,14 @@ interface BlockBindingControlsProps {
 	attributes: RemoteDataInnerBlockAttributes;
 	availableBindings: AvailableBindings;
 	blockName: string;
+	dataSource: string;
 	removeBinding: ( target: string ) => void;
 	updateBinding: ( target: string, args: Omit< RemoteDataBlockBindingArgs, 'block' > ) => void;
 }
 
 export function BlockBindingControls( props: BlockBindingControlsProps ) {
-	const { attributes, availableBindings, blockName, removeBinding, updateBinding } = props;
+	const { attributes, availableBindings, blockName, dataSource, removeBinding, updateBinding } =
+		props;
 	const contentArgs = attributes.metadata?.bindings?.content?.args;
 	const contentField = contentArgs?.field ?? '';
 	const imageAltField = attributes.metadata?.bindings?.alt?.args?.field ?? '';
@@ -51,11 +54,25 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 	function updateFieldBinding( target: string, field: string ): void {
 		if ( ! field ) {
 			removeBinding( target );
+
+			sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
+				action: 'remove_binding',
+				data_source: dataSource,
+				block_target_attribute: target,
+			} );
+
 			return;
 		}
 
 		const args = attributes.metadata?.bindings?.[ target ]?.args ?? {};
 		updateBinding( target, { ...args, field } );
+
+		sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
+			action: 'update_binding',
+			data_source: dataSource,
+			remote_data_field: field,
+			block_target_attribute: target,
+		} );
 	}
 
 	function updateFieldLabel( showLabel: boolean ): void {
@@ -68,6 +85,12 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 			? Object.entries( availableBindings ).find( ( [ key ] ) => key === contentField )?.[ 1 ]?.name
 			: undefined;
 		updateBinding( 'content', { ...contentArgs, field: contentField, label } );
+
+		sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
+			action: 'show_label',
+			data_source: dataSource,
+			value: showLabel,
+		} );
 	}
 
 	switch ( blockName ) {
