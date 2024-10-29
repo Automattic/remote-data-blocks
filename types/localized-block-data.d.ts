@@ -16,6 +16,7 @@ interface InputVariable {
 
 interface BlockConfig {
 	availableBindings: AvailableBindings;
+	dataSource: string;
 	loop: boolean;
 	name: string;
 	overrides: Record< string, InputVariableOverrides >;

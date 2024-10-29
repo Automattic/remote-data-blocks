@@ -77,6 +77,7 @@ class BlockRegistration {
 				'availableBindings' => $available_bindings,
 				'loop'              => $config['loop'],
 				'name'              => $block_name,
+				'data_source'       => ConfigStore::get_data_source( $block_name ),
 				'overrides'         => $formatted_overrides,
 				'patterns'          => $config['patterns'],
 				'selectors'         => $config['selectors'],

@@ -31,6 +31,7 @@ describe( 'withBlockBinding', () => {
 		config: {
 			'test/block': {
 				availableBindings: { field1: { name: 'Field 1', type: 'string' } },
+				dataSource: 'test-source',
 				loop: false,
 				name: 'test/block',
 				overrides: {},
