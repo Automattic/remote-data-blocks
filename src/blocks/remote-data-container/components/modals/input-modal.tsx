@@ -3,9 +3,12 @@ import { useState } from '@wordpress/element';
 
 import { ModalWithButtonTrigger } from '@/blocks/remote-data-container/components/modals/base-modal';
 import { useModalState } from '@/blocks/remote-data-container/hooks/use-modal-state';
+import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
 import { __ } from '@/utils/i18n';
+import { getBlockDataSource } from '@/utils/localized-block-data';
 
 interface InputModalProps {
+	blockName: string;
 	headerImage?: string;
 	inputs: InputVariable[];
 	onSelect: ( data: RemoteDataQueryInput ) => void;
@@ -28,6 +31,12 @@ export function InputModal( props: InputModalProps ) {
 	function wrappedOnSelect(): void {
 		props.onSelect( inputState );
 		close();
+
+		sendTracksEvent( 'remotedatablocks_add_block', {
+			action: 'select_item',
+			selected_option: 'manual_input',
+			data_source: getBlockDataSource( props.blockName ?? '' ),
+		} );
 	}
 
 	return (

@@ -6,6 +6,7 @@ import { InputModal } from '@/blocks/remote-data-container/components/modals/inp
 describe( 'InputModal', () => {
 	const mockOnSelect = vi.fn();
 	const defaultProps = {
+		blockName: 'test-block',
 		inputs: [
 			{ slug: 'input1', name: 'Input 1', required: true, type: 'text' },
 			{ slug: 'input2', name: 'Input 2', required: false, type: 'text' },

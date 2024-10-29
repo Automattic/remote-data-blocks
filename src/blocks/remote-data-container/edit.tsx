@@ -19,10 +19,11 @@ import { getBlockConfig } from '@/utils/localized-block-data';
 import './editor.scss';
 
 export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
-	const blockConfig = getBlockConfig( props.name );
+	const blockName = props.name;
+	const blockConfig = getBlockConfig( blockName );
 
 	if ( ! blockConfig ) {
-		throw new Error( `Block configuration not found for block: ${ props.name }` );
+		throw new Error( `Block configuration not found for block: ${ blockName }` );
 	}
 
 	const rootClientId = props.clientId;
@@ -35,8 +36,8 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 		markReadyForInsertion,
 		resetReadyForInsertion,
 		showPatternSelection,
-	} = usePatterns( props.name, rootClientId );
-	const { execute } = useRemoteData( props.name, DISPLAY_QUERY_KEY );
+	} = usePatterns( blockName, rootClientId );
+	const { execute } = useRemoteData( blockName, DISPLAY_QUERY_KEY );
 	const [ initialLoad, setInitialLoad ] = useState< boolean >( true );
 
 	function fetchRemoteData( input: RemoteDataQueryInput, insertBlocks = true ) {
@@ -105,6 +106,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 			return (
 				<div { ...blockProps }>
 					<PatternSelection
+						blockName={ blockName }
 						insertPatternBlocks={ insertPatternBlocks }
 						onCancel={ resetReadyForInsertion }
 						supportedPatterns={ supportedPatterns }
