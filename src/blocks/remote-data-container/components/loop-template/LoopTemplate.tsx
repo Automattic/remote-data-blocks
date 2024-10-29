@@ -9,7 +9,7 @@ import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { ItemPreview } from '@/blocks/remote-data-container/components/item-list/ItemPreview';
-import { LoopTemplateInnerBlocks } from '@/blocks/remote-data-container/components/loop-template-inner-blocks';
+import { LoopTemplateInnerBlocks } from '@/blocks/remote-data-container/components/loop-template/LoopTemplateInnerBlocks';
 import { LoopIndexContext } from '@/blocks/remote-data-container/context/LoopIndexContext';
 
 interface LoopTemplateProps {
