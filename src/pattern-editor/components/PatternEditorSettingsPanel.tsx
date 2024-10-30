@@ -1,16 +1,18 @@
 import { SelectControl } from '@wordpress/components';
 import { PluginDocumentSettingPanel } from '@wordpress/editor';
 
+import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
 import { PATTERN_BLOCK_TYPE_POST_META_KEY } from '@/config/constants';
 import { useEditedPostAttribute } from '@/hooks/useEditedPostAttribute';
 import { usePostMeta } from '@/hooks/usePostMeta';
 import { __ } from '@/utils/i18n';
-import { getBlocksConfig } from '@/utils/localized-block-data';
+import { getBlockDataSource, getBlocksConfig } from '@/utils/localized-block-data';
 
 export function PatternEditorSettingsPanel() {
-	const { postId, postType } = useEditedPostAttribute( getEditedPostAttribute => ( {
+	const { postId, postType, isSynced } = useEditedPostAttribute( getEditedPostAttribute => ( {
 		postId: getEditedPostAttribute< number >( 'id' ) ?? 0,
 		postType: getEditedPostAttribute< string >( 'type' ) ?? '',
+		isSynced: getEditedPostAttribute< string >( 'wp_pattern_sync_status' ) !== 'unsynced',
 	} ) );
 	const { postMeta, updatePostMeta } = usePostMeta( postId, postType );
 
@@ -21,8 +23,12 @@ export function PatternEditorSettingsPanel() {
 	const blocksConfig = getBlocksConfig();
 	const blockType = String( postMeta?.[ PATTERN_BLOCK_TYPE_POST_META_KEY ] ?? '' );
 
-	function updateBlockTypes( newBlockType: string ) {
-		updatePostMeta( { ...postMeta, [ PATTERN_BLOCK_TYPE_POST_META_KEY ]: newBlockType } );
+	function updateBlockTypes( blockName: string ) {
+		updatePostMeta( { ...postMeta, [ PATTERN_BLOCK_TYPE_POST_META_KEY ]: blockName } );
+		sendTracksEvent( 'remotedatablocks_associate_block_type_to_pattern', {
+			data_source: getBlockDataSource( blockName ),
+			is_synced: isSynced,
+		} );
 	}
 
 	const options = Object.entries( blocksConfig ).map( ( [ value, blockConfig ] ) => {
