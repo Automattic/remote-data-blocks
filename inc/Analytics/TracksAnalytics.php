@@ -29,6 +29,11 @@ class TracksAnalytics {
 			return;
 		}
 
+		// Do not track on local environment.
+		if ( self::$env_config->is_local_env() ) {
+			return;
+		}
+
 		if ( self::$env_config->is_wpvip_site() || self::$env_config->is_enabled_via_filter() ) {
 			self::$instance = new $tracks_class(
 				'',

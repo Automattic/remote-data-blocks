@@ -36,6 +36,20 @@ class TracksAnalyticsTest extends TestCase {
 		$this->assertEquals( null, TracksAnalytics::get_instance() );
 	}
 
+	public function testInitDoesNotSetTracksOnLocalEnvironment(): void {
+		/** @var MockObject|EnvironmentConfig */
+		$env_config_mock = $this->getMockBuilder( EnvironmentConfig::class )->onlyMethods( [ 'get_tracks_lib_class', 'is_local_env', 'is_enabled_via_filter' ] )->getMock();
+		$env_config_mock->method( 'get_tracks_lib_class' )->with()->willReturn( MockTracks::class );
+		$env_config_mock->method( 'is_local_env' )->with()->willReturn( true );
+		$env_config_mock->method( 'is_enabled_via_filter' )->with()->willReturn( true );
+
+		/** @var TracksAnalytics|MockInterface */
+		Mockery::mock( TracksAnalytics::class )->makePartial();
+		TracksAnalytics::init( $env_config_mock );
+
+		$this->assertEquals( null, TracksAnalytics::get_instance() );
+	}
+
 	public function testInitDoesSetTracksIfTrackingIsEnabledViaFilter(): void {
 		/** @var MockObject|EnvironmentConfig */
 		$env_config_mock = $this->getMockBuilder( EnvironmentConfig::class )->onlyMethods( [ 'is_enabled_via_filter', 'get_tracks_lib_class' ] )->getMock();
