@@ -4,6 +4,7 @@ namespace RemoteDataBlocks\Editor\BlockManagement;
 
 defined( 'ABSPATH' ) || exit();
 
+use RemoteDataBlocks\Analytics\TracksAnalytics;
 use RemoteDataBlocks\Editor\BlockPatterns\BlockPatterns;
 use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 use RemoteDataBlocks\REST\RemoteDataController;
@@ -109,8 +110,9 @@ class BlockRegistration {
 
 		foreach ( array_unique( $scripts_to_localize ) as $script_handle ) {
 			wp_localize_script( $script_handle, 'REMOTE_DATA_BLOCKS', [
-				'config'   => $remote_data_blocks_config,
-				'rest_url' => RemoteDataController::get_url(),
+				'config'           => $remote_data_blocks_config,
+				'rest_url'         => RemoteDataController::get_url(),
+				'track_base_props' => TracksAnalytics::get_base_props(),
 			] );
 		}
 	}

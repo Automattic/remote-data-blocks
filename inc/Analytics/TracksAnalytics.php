@@ -30,18 +30,19 @@ class TracksAnalytics {
 		}
 
 		if ( self::$env_config->is_wpvip_site() || self::$env_config->is_enabled_via_filter() ) {
-			self::$instance = new $tracks_class(
-				'',
-				[
-					'plugin_version'   => defined( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) ? constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) : '',
-					'is_multisite'     => is_multisite(),
-					'wp_version'       => get_bloginfo( 'version' ),
-					'hosting_provider' => self::$env_config->get_hosting_provider(),
-				]
-			);
+			self::$instance = new $tracks_class( '', self::get_base_props() );
 
 			self::setup_tracking_via_hooks();
 		}
+	}
+
+	public static function get_base_props(): array {
+		return [
+			'plugin_version'   => defined( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) ? constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) : '',
+			'is_multisite'     => is_multisite(),
+			'wp_version'       => get_bloginfo( 'version' ),
+			'hosting_provider' => self::$env_config->get_hosting_provider(),
+		];
 	}
 
 	private static function setup_tracking_via_hooks(): void {
