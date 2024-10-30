@@ -45,5 +45,5 @@ interface BlocksConfig {
 interface LocalizedBlockData {
 	config: BlocksConfig;
 	rest_url: string;
-	track_base_props?: Record<string, string | boolean>;
+	track_base_props?: Record< string, string | boolean >;
 }
