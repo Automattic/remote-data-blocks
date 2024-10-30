@@ -1,6 +1,6 @@
 import { __experimentalHeading as Heading } from '@wordpress/components';
 
-import { ItemSelectQueryType } from '@/blocks/remote-data-container/components/item-select-query-type';
+import { ItemSelectQueryType } from '@/blocks/remote-data-container/components/placeholders/ItemSelectQueryType';
 import { getBlocksConfig } from '@/utils/localized-block-data';
 
 interface FieldShortcodeSelectNewProps {

@@ -7,7 +7,7 @@ import { HttpSettings } from '@/data-sources/http/HttpSettings';
 import { ShopifySettings } from '@/data-sources/shopify/ShopifySettings';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
-import './data-source-settings.scss';
+import './DataSourceSettings.scss';
 
 interface DataSourceEditSettings {
 	uuid: string;

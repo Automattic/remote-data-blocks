@@ -94,7 +94,7 @@ class DataSourceCrud {
 
 	public static function update_item_by_uuid( string $uuid, array $new_item, ?ArraySerializableInterface $data_source = null ): HttpDataSourceInterface|WP_Error {
 		$data_sources = self::get_data_sources();
-		$item         = self::get_item_by_uuid( $data_sources, $uuid );
+		$item = self::get_item_by_uuid( $data_sources, $uuid );
 		if ( ! $item ) {
 			return new WP_Error( 'data_source_not_found', __( 'Data source not found.', 'remote-data-blocks' ), [ 'status' => 404 ] );
 		}
@@ -159,7 +159,7 @@ class DataSourceCrud {
 			$config['__metadata']['created_at'] = $now;
 		}
 
-		$config['__metadata']['updated_at']     = $now;
+		$config['__metadata']['updated_at'] = $now;
 		$data_source_configs[ $config['uuid'] ] = $config;
 
 		return update_option( self::CONFIG_OPTION_NAME, $data_source_configs );

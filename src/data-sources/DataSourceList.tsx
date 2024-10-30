@@ -21,12 +21,12 @@ import { SUPPORTED_SERVICES, SUPPORTED_SERVICES_LABELS } from './constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
-import AirtableIcon from '@/settings/icons/airtable';
-import GoogleSheetsIcon from '@/settings/icons/google-sheets';
-import HttpIcon from '@/settings/icons/http';
-import ShopifyIcon from '@/settings/icons/shopify';
+import AirtableIcon from '@/settings/icons/AirtableIcon';
+import GoogleSheetsIcon from '@/settings/icons/GoogleSheetsIcon';
+import HttpIcon from '@/settings/icons/HttpIcon';
+import ShopifyIcon from '@/settings/icons/ShopifyIcon';
 
-import './data-source-list.scss';
+import './DataSourceList.scss';
 
 const DataSourceList = () => {
 	const { dataSources, loadingDataSources, deleteDataSource, fetchDataSources } = useDataSources();

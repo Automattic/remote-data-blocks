@@ -3,17 +3,17 @@ import { BlockEditProps } from '@wordpress/blocks';
 import { Spinner } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 
-import { InnerBlocks } from '@/blocks/remote-data-container/components/inner-blocks';
-import { DataPanel } from '@/blocks/remote-data-container/components/panels/data-panel';
-import { OverridesPanel } from '@/blocks/remote-data-container/components/panels/overrides-panel';
-import { PatternSelection } from '@/blocks/remote-data-container/components/pattern-selection';
-import { Placeholder } from '@/blocks/remote-data-container/components/placeholder';
+import { InnerBlocks } from '@/blocks/remote-data-container/components/InnerBlocks';
+import { DataPanel } from '@/blocks/remote-data-container/components/panels/DataPanel';
+import { OverridesPanel } from '@/blocks/remote-data-container/components/panels/OverridesPanel';
+import { PatternSelection } from '@/blocks/remote-data-container/components/pattern-selection/PatternSelection';
+import { Placeholder } from '@/blocks/remote-data-container/components/placeholders/Placeholder';
 import {
 	CONTAINER_CLASS_NAME,
 	DISPLAY_QUERY_KEY,
 } from '@/blocks/remote-data-container/config/constants';
-import { usePatterns } from '@/blocks/remote-data-container/hooks/use-patterns';
-import { useRemoteData } from '@/blocks/remote-data-container/hooks/use-remote-data';
+import { usePatterns } from '@/blocks/remote-data-container/hooks/usePatterns';
+import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteData';
 import { hasRemoteDataChanged } from '@/utils/block-binding';
 import { getBlockConfig } from '@/utils/localized-block-data';
 import './editor.scss';

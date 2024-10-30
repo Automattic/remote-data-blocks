@@ -15,8 +15,8 @@ class BlockRegistration {
 	 * @var array<string, string>
 	 */
 	public static array $block_category = [
-		'icon'  => null,
-		'slug'  => 'remote-data-blocks',
+		'icon' => null,
+		'slug' => 'remote-data-blocks',
 		'title' => 'Remote Data Blocks',
 	];
 
@@ -33,11 +33,11 @@ class BlockRegistration {
 
 	public static function register_blocks(): void {
 		$remote_data_blocks_config = [];
-		$scripts_to_localize       = [];
+		$scripts_to_localize = [];
 
 		foreach ( ConfigStore::get_block_names() as $block_name ) {
 			$block_path = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-container';
-			$config     = ConfigStore::get_configuration( $block_name );
+			$config = ConfigStore::get_configuration( $block_name );
 
 			$input_vars_with_overrides = array_filter( $config['queries']['__DISPLAY__']->input_schema, function ( $input_var ) {
 				return isset( $input_var['overrides'] );
@@ -76,20 +76,20 @@ class BlockRegistration {
 			// Create the localized data that will be used by our block editor script.
 			$remote_data_blocks_config[ $block_name ] = [
 				'availableBindings' => $available_bindings,
-				'loop'              => $config['loop'],
-				'name'              => $block_name,
-				'dataSource'        => ConfigStore::get_data_source( $block_name ),
-				'overrides'         => $formatted_overrides,
-				'patterns'          => $config['patterns'],
-				'selectors'         => $config['selectors'],
-				'settings'          => [
+				'loop' => $config['loop'],
+				'name' => $block_name,
+				'dataSource' => ConfigStore::get_data_source( $block_name ),
+				'overrides' => $formatted_overrides,
+				'patterns' => $config['patterns'],
+				'selectors' => $config['selectors'],
+				'settings' => [
 					'category' => self::$block_category['slug'],
-					'title'    => $config['title'],
+					'title' => $config['title'],
 				],
 			];
 
 			$block_options = [
-				'name'  => $block_name,
+				'name' => $block_name,
 				'title' => $config['title'],
 			];
 
@@ -110,8 +110,8 @@ class BlockRegistration {
 
 		foreach ( array_unique( $scripts_to_localize ) as $script_handle ) {
 			wp_localize_script( $script_handle, 'REMOTE_DATA_BLOCKS', [
-				'config'           => $remote_data_blocks_config,
-				'rest_url'         => RemoteDataController::get_url(),
+				'config' => $remote_data_blocks_config,
+				'rest_url' => RemoteDataController::get_url(),
 				'track_base_props' => TracksAnalytics::get_base_props(),
 			] );
 		}

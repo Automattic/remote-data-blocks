@@ -19,7 +19,7 @@ class AirtableIntegration {
 		$airtable_data_source = AirtableDataSource::from_array( $config );
 
 		$block_name = $airtable_data_source->get_display_name();
-		$query      = $airtable_data_source->___temp_get_query();
+		$query = $airtable_data_source->___temp_get_query();
 		$list_query = $airtable_data_source->___temp_get_list_query();
 
 		if ( is_wp_error( $query ) || is_wp_error( $list_query ) ) {

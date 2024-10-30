@@ -1,8 +1,8 @@
 import { TabPanel } from '@wordpress/components';
 
-import { FieldShortcodeSelectExisting } from '@/blocks/remote-data-container/components/field-shortcode/select-existing';
-import { FieldShortcodeSelectMeta } from '@/blocks/remote-data-container/components/field-shortcode/select-meta';
-import { FieldShortcodeSelectNew } from '@/blocks/remote-data-container/components/field-shortcode/select-new';
+import { FieldShortcodeSelectExisting } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelectExisting';
+import { FieldShortcodeSelectMeta } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelectMeta';
+import { FieldShortcodeSelectNew } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelectNew';
 
 interface FieldShortcodeSelectTabsProps {
 	onSelectField: ( data: FieldSelection, fieldValue: string ) => void;

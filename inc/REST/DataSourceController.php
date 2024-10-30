@@ -24,8 +24,8 @@ class DataSourceController extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base,
 			[
-				'methods'             => 'GET',
-				'callback'            => [ $this, 'get_items' ],
+				'methods' => 'GET',
+				'callback' => [ $this, 'get_items' ],
 				'permission_callback' => [ $this, 'get_items_permissions_check' ],
 			]
 		);
@@ -35,12 +35,12 @@ class DataSourceController extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<uuid>[\w-]+)',
 			[
-				'methods'             => 'GET',
-				'callback'            => [ $this, 'get_item' ],
+				'methods' => 'GET',
+				'callback' => [ $this, 'get_item' ],
 				'permission_callback' => [ $this, 'get_item_permissions_check' ],
-				'args'                => [
+				'args' => [
 					'uuid' => [
-						'type'     => 'string',
+						'type' => 'string',
 						'required' => true,
 					],
 				],
@@ -52,14 +52,14 @@ class DataSourceController extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base,
 			[
-				'methods'             => 'POST',
-				'callback'            => [ $this, 'create_item' ],
+				'methods' => 'POST',
+				'callback' => [ $this, 'create_item' ],
 				'permission_callback' => [ $this, 'create_item_permissions_check' ],
-				'args'                => [
+				'args' => [
 					'service' => [
-						'type'     => 'string',
+						'type' => 'string',
 						'required' => true,
-						'enum'     => REMOTE_DATA_BLOCKS__SERVICES,
+						'enum' => REMOTE_DATA_BLOCKS__SERVICES,
 					],
 				],
 			]
@@ -70,8 +70,8 @@ class DataSourceController extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<uuid>[\w-]+)',
 			[
-				'methods'             => 'PUT',
-				'callback'            => [ $this, 'update_item' ],
+				'methods' => 'PUT',
+				'callback' => [ $this, 'update_item' ],
 				'permission_callback' => [ $this, 'update_item_permissions_check' ],
 			]
 		);
@@ -81,8 +81,8 @@ class DataSourceController extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<uuid>[\w-]+)',
 			[
-				'methods'             => 'DELETE',
-				'callback'            => [ $this, 'delete_item' ],
+				'methods' => 'DELETE',
+				'callback' => [ $this, 'delete_item' ],
 				'permission_callback' => [ $this, 'delete_item_permissions_check' ],
 			]
 		);
@@ -92,8 +92,8 @@ class DataSourceController extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/slug-conflicts',
 			[
-				'methods'             => 'POST',
-				'callback'            => [ $this, 'item_slug_conflicts' ],
+				'methods' => 'POST',
+				'callback' => [ $this, 'item_slug_conflicts' ],
 				'permission_callback' => [ $this, 'item_slug_conflicts_permissions_check' ],
 			]
 		);
@@ -107,19 +107,19 @@ class DataSourceController extends WP_REST_Controller {
 	 */
 	public function create_item( $request ) {
 		$data_source_properties = $request->get_json_params();
-		$item                   = DataSourceCrud::register_new_data_source( $data_source_properties );
+		$item = DataSourceCrud::register_new_data_source( $data_source_properties );
 
 		// Tracks Analytics.
 		$additional_track_props = [];
 		if ( 'generic-http' === $data_source_properties['service'] ) {
 			$auth = $data_source_properties['auth'];
 			$additional_track_props['authentication_type'] = $auth['type'] ?? '';
-			$additional_track_props['api_key_location']    = $auth['addTo'] ?? '';
+			$additional_track_props['api_key_location'] = $auth['addTo'] ?? '';
 		}
 
 		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', array_merge( [
 			'data_source_type' => $data_source_properties['service'],
-			'action'           => 'added',
+			'action' => 'added',
 		], $additional_track_props ) );
 
 		return rest_ensure_response( $item );
@@ -133,7 +133,7 @@ class DataSourceController extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) {
 		$code_configured_data_sources = ConfigStore::get_data_sources_displayable();
-		$ui_configured_data_sources   = DataSourceCrud::get_data_sources_list();
+		$ui_configured_data_sources = DataSourceCrud::get_data_sources_list();
 
 		/**
 		 * Quick and dirty de-duplication of data sources by slug.
@@ -157,12 +157,12 @@ class DataSourceController extends WP_REST_Controller {
 		$track_transient_key = 'remotedatablocks_view_data_sources_tracked';
 		if ( ! get_transient( $track_transient_key ) ) {
 			$code_configured_data_sources_count = count( $code_configured_data_sources );
-			$ui_configured_data_sources_count   = count( $ui_configured_data_sources );
+			$ui_configured_data_sources_count = count( $ui_configured_data_sources );
 
 			TracksAnalytics::record_event( 'remotedatablocks_view_data_sources', [
-				'total_data_sources_count'           => $code_configured_data_sources_count + $ui_configured_data_sources_count,
+				'total_data_sources_count' => $code_configured_data_sources_count + $ui_configured_data_sources_count,
 				'code_configured_data_sources_count' => $code_configured_data_sources_count,
-				'ui_configured_data_sources_count'   => $ui_configured_data_sources_count,
+				'ui_configured_data_sources_count' => $ui_configured_data_sources_count,
 			] );
 			set_transient( $track_transient_key, true, DAY_IN_SECONDS );
 		}
@@ -189,19 +189,19 @@ class DataSourceController extends WP_REST_Controller {
 	 */
 	public function update_item( $request ) {
 		$data_source_properties = $request->get_json_params();
-		$item                   = DataSourceCrud::update_item_by_uuid( $request->get_param( 'uuid' ), $data_source_properties );
+		$item = DataSourceCrud::update_item_by_uuid( $request->get_param( 'uuid' ), $data_source_properties );
 
 		// Tracks Analytics.
 		$additional_track_props = [];
 		if ( 'generic-http' === $data_source_properties['service'] ) {
 			$auth = $data_source_properties['auth'];
 			$additional_track_props['authentication_type'] = $auth['type'] ?? '';
-			$additional_track_props['api_key_location']    = $auth['addTo'] ?? '';
+			$additional_track_props['api_key_location'] = $auth['addTo'] ?? '';
 		}
 
 		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', array_merge( [
 			'data_source_type' => $data_source_properties['service'],
-			'action'           => 'updated',
+			'action' => 'updated',
 		], $additional_track_props ) );
 
 		return rest_ensure_response( $item );
@@ -215,12 +215,12 @@ class DataSourceController extends WP_REST_Controller {
 	 */
 	public function delete_item( $request ) {
 		$data_source_properties = $request->get_json_params();
-		$result                 = DataSourceCrud::delete_item_by_uuid( $request->get_param( 'uuid' ) );
+		$result = DataSourceCrud::delete_item_by_uuid( $request->get_param( 'uuid' ) );
 
 		// Tracks Analytics.
 		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', [
 			'data_source_type' => $data_source_properties['service'],
-			'action'           => 'deleted',
+			'action' => 'deleted',
 		] );
 
 		return rest_ensure_response( $result );
@@ -237,7 +237,7 @@ class DataSourceController extends WP_REST_Controller {
 			);
 		}
 		$validation_status = DataSourceCrud::validate_slug( $slug );
-		$result            = [
+		$result = [
 			'exists' => true !== $validation_status,
 		];
 		return rest_ensure_response( $result );

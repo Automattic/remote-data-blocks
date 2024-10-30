@@ -1,7 +1,7 @@
 import { InnerBlocks as CoreInnerBlocks } from '@wordpress/block-editor';
 import { BlockInstance } from '@wordpress/blocks';
 
-import { LoopTemplate } from '@/blocks/remote-data-container/components/loop-template';
+import { LoopTemplate } from '@/blocks/remote-data-container/components/loop-template/LoopTemplate';
 
 interface InnerBlocksProps {
 	blockConfig: BlockConfig;

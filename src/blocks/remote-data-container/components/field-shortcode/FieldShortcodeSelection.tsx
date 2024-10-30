@@ -6,7 +6,7 @@ import {
 	DISPLAY_QUERY_KEY,
 	TEXT_FIELD_TYPES,
 } from '@/blocks/remote-data-container/config/constants';
-import { useRemoteData } from '@/blocks/remote-data-container/hooks/use-remote-data';
+import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteData';
 import { getBlockAvailableBindings } from '@/utils/localized-block-data';
 
 interface FieldSelectionProps {

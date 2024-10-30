@@ -7,66 +7,66 @@ use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
 use WP_Error;
 
 class GoogleSheetsDataSource extends HttpDataSource {
-	protected const SERVICE_NAME           = REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE;
+	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE;
 	protected const SERVICE_SCHEMA_VERSION = 1;
 
 	protected const SERVICE_SCHEMA = [
-		'type'       => 'object',
+		'type' => 'object',
 		'properties' => [       
-			'credentials'  => [
-				'type'       => 'object',
+			'credentials' => [
+				'type' => 'object',
 				'properties' => [
-					'type'                        => [ 'type' => 'string' ],
-					'project_id'                  => [ 'type' => 'string' ],
-					'private_key_id'              => [ 'type' => 'string' ],
-					'private_key'                 => [
-						'type'     => 'string',
+					'type' => [ 'type' => 'string' ],
+					'project_id' => [ 'type' => 'string' ],
+					'private_key_id' => [ 'type' => 'string' ],
+					'private_key' => [
+						'type' => 'string',
 						'sanitize' => false,
 					],
-					'client_email'                => [
-						'type'     => 'string',
+					'client_email' => [
+						'type' => 'string',
 						'callback' => 'is_email',
 						'sanitize' => 'sanitize_email',
 					],
-					'client_id'                   => [ 'type' => 'string' ],
-					'auth_uri'                    => [
-						'type'     => 'string',
+					'client_id' => [ 'type' => 'string' ],
+					'auth_uri' => [
+						'type' => 'string',
 						'sanitize' => 'sanitize_url',
 					],
-					'token_uri'                   => [
-						'type'     => 'string',
+					'token_uri' => [
+						'type' => 'string',
 						'sanitize' => 'sanitize_url',
 					],
 					'auth_provider_x509_cert_url' => [
-						'type'     => 'string',
+						'type' => 'string',
 						'sanitize' => 'sanitize_url',
 					],
-					'client_x509_cert_url'        => [
-						'type'     => 'string',
+					'client_x509_cert_url' => [
+						'type' => 'string',
 						'sanitize' => 'sanitize_url',
 					],
-					'universe_domain'             => [ 'type' => 'string' ],
+					'universe_domain' => [ 'type' => 'string' ],
 				],
 			],
 			'display_name' => [
-				'type'     => 'string',
+				'type' => 'string',
 				'required' => false,
 			],
-			'spreadsheet'  => [
-				'type'       => 'object',
+			'spreadsheet' => [
+				'type' => 'object',
 				'properties' => [
 					'name' => [
-						'type'     => 'string',
+						'type' => 'string',
 						'required' => false, // Spreadsheet name is not required to fetch data.
 					],
-					'id'   => [ 'type' => 'string' ],
+					'id' => [ 'type' => 'string' ],
 				],
 			],
-			'sheet'        => [
-				'type'       => 'object',
+			'sheet' => [
+				'type' => 'object',
 				'properties' => [
 					'name' => [ 'type' => 'string' ],
-					'id'   => [ 'type' => 'integer' ],
+					'id' => [ 'type' => 'integer' ],
 				],
 			],
 		],
@@ -88,34 +88,34 @@ class GoogleSheetsDataSource extends HttpDataSource {
 
 		return [
 			'Authorization' => sprintf( 'Bearer %s', $access_token ),
-			'Content-Type'  => 'application/json',
+			'Content-Type' => 'application/json',
 		];
 	}
 
 	public static function create( array $credentials, string $spreadsheet_id, string $display_name ): self|WP_Error {
 		return parent::from_array([
-			'service'      => REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE,
-			'credentials'  => $credentials,
+			'service' => REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE,
+			'credentials' => $credentials,
 			'display_name' => $display_name,
-			'spreadsheet'  => [
+			'spreadsheet' => [
 				'name' => '',
-				'id'   => $spreadsheet_id,
+				'id' => $spreadsheet_id,
 			],
-			'sheet'        => [
+			'sheet' => [
 				'name' => '',
-				'id'   => 0,
+				'id' => 0,
 			],
-			'slug'         => sanitize_title( $display_name ),
+			'slug' => sanitize_title( $display_name ),
 		]);
 	}
 
 	public function to_ui_display(): array {
 		return [
-			'slug'        => $this->get_slug(),
-			'service'     => REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE,
+			'slug' => $this->get_slug(),
+			'service' => REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE,
 			'spreadsheet' => [ 'name' => $this->config['spreadsheet_id'] ],
-			'sheet'       => [ 'name' => '' ],
-			'uuid'        => $this->config['uuid'] ?? null,
+			'sheet' => [ 'name' => '' ],
+			'uuid' => $this->config['uuid'] ?? null,
 		];
 	}
 }

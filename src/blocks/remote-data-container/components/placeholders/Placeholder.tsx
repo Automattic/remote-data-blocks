@@ -1,5 +1,5 @@
-import { PlaceholderLoop } from '@/blocks/remote-data-container/components/placeholder-loop';
-import { PlaceholderSingle } from '@/blocks/remote-data-container/components/placeholder-single';
+import { PlaceholderLoop } from '@/blocks/remote-data-container/components/placeholders/PlaceholderLoop';
+import { PlaceholderSingle } from '@/blocks/remote-data-container/components/placeholders/PlaceholderSingle';
 
 export interface PlaceholderProps {
 	blockConfig: BlockConfig;

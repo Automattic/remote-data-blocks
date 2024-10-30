@@ -1,7 +1,7 @@
 import { useContext } from '@wordpress/element';
 
 import { REMOTE_DATA_CONTEXT_KEY } from '@/blocks/remote-data-container/config/constants';
-import { LoopIndexContext } from '@/blocks/remote-data-container/context/loop-index-context';
+import { LoopIndexContext } from '@/blocks/remote-data-container/context/LoopIndexContext';
 import { PATTERN_BLOCK_TYPE_POST_META_KEY } from '@/config/constants';
 import { useEditedPostAttribute } from '@/hooks/useEditedPostAttribute';
 import { getBlockConfig } from '@/utils/localized-block-data';

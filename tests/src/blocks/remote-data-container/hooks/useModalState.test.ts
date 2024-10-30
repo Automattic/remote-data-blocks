@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { useModalState } from '@/blocks/remote-data-container/hooks/use-modal-state';
+import { useModalState } from '@/blocks/remote-data-container/hooks/useModalState';
 
 describe( 'useModalState', () => {
 	it( 'should initialize with isOpen as false', () => {

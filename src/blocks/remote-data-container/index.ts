@@ -2,9 +2,10 @@ import { registerBlockType } from '@wordpress/blocks';
 import { addFilter } from '@wordpress/hooks';
 import { registerFormatType } from '@wordpress/rich-text';
 
-import { formatTypeSettings } from '@/blocks/remote-data-container/components/field-shortcode/field-shortcode';
+import { formatTypeSettings } from '@/blocks/remote-data-container/components/field-shortcode';
+import { FieldShortcodeButton } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeButton';
 import { Edit } from '@/blocks/remote-data-container/edit';
-import { withBlockBindingShim } from '@/blocks/remote-data-container/filters/with-block-binding';
+import { withBlockBindingShim } from '@/blocks/remote-data-container/filters/withBlockBinding';
 import { Save } from '@/blocks/remote-data-container/save';
 import { getBlocksConfig } from '@/utils/localized-block-data';
 import './style.scss';
@@ -24,7 +25,10 @@ Object.values( getBlocksConfig() ).forEach( blockConfig => {
 } );
 
 // Register the field shortcode format type.
-registerFormatType( 'remote-data-blocks/field-shortcode', formatTypeSettings );
+registerFormatType( 'remote-data-blocks/field-shortcode', {
+	...formatTypeSettings,
+	edit: FieldShortcodeButton,
+} );
 
 /**
  * Use a filter to wrap the block edit component with our block binding HOC.
@@ -37,7 +41,7 @@ registerFormatType( 'remote-data-blocks/field-shortcode', formatTypeSettings );
  */
 addFilter(
 	'blocks.registerBlockType',
-	'remote-data-blocks/with-block-binding',
+	'remote-data-blocks/withBlockBinding',
 	withBlockBindingShim,
 	5 // Ensure this runs before core filters
 );

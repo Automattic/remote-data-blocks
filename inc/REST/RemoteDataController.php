@@ -24,12 +24,12 @@ class RemoteDataController {
 
 	public static function register_rest_routes(): void {
 		register_rest_route( REMOTE_DATA_BLOCKS__REST_NAMESPACE, '/' . self::$slug, [
-			'methods'             => 'POST',
-			'callback'            => [ __CLASS__, 'execute_query' ],
+			'methods' => 'POST',
+			'callback' => [ __CLASS__, 'execute_query' ],
 			'permission_callback' => [ __CLASS__, 'permission_callback' ],
-			'args'                => [
-				'block_name'  => [
-					'required'          => true,
+			'args' => [
+				'block_name' => [
+					'required' => true,
 					'sanitize_callback' => function ( $value ) {
 						return strval( $value );
 					},
@@ -37,14 +37,14 @@ class RemoteDataController {
 						return null !== ConfigStore::get_configuration( $value );
 					},
 				],
-				'query_key'   => [
-					'required'          => true,
+				'query_key' => [
+					'required' => true,
 					'sanitize_callback' => function ( $value ) {
 						return strval( $value );
 					},
 				],
 				'query_input' => [
-					'required'          => true,
+					'required' => true,
 					'validate_callback' => function ( $value ) {
 						return is_array( $value );
 					},
@@ -54,12 +54,12 @@ class RemoteDataController {
 	}
 
 	public static function execute_query( WP_REST_Request $request ): array|WP_Error {
-		$block_name  = $request->get_param( 'block_name' );
-		$query_key   = $request->get_param( 'query_key' );
+		$block_name = $request->get_param( 'block_name' );
+		$query_key = $request->get_param( 'query_key' );
 		$query_input = $request->get_param( 'query_input' );
 
 		$block_config = ConfigStore::get_configuration( $block_name );
-		$query        = $block_config['queries'][ $query_key ];
+		$query = $block_config['queries'][ $query_key ];
 
 		// The frontend might send more input variables than the query needs or
 		// expects, so only include those defined by the query.
@@ -76,10 +76,10 @@ class RemoteDataController {
 
 		return array_merge(
 			[
-				'block_name'  => $block_name,
+				'block_name' => $block_name,
 				'data_source' => ConfigStore::get_data_source( $block_name ),
-				'result_id'   => wp_generate_uuid4(),
-				'query_key'   => $query_key,
+				'result_id' => wp_generate_uuid4(),
+				'query_key' => $query_key,
 				'query_input' => $query_input,
 			],
 			$query_result
