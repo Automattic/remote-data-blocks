@@ -20,56 +20,56 @@ defined( 'ABSPATH' ) || exit();
  */
 class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterface, ArraySerializableInterface {
 	protected const CONFIG_SCHEMA = [
-		'type'       => 'object',
+		'type' => 'object',
 		'properties' => [
-			'input_schema'  => [
-				'type'  => 'array',
+			'input_schema' => [
+				'type' => 'array',
 				'items' => [
-					'type'       => 'object',
+					'type' => 'object',
 					'properties' => [
-						'type'          => [ 'type' => 'string' ],
-						'name'          => [ 'type' => 'string' ],
+						'type' => [ 'type' => 'string' ],
+						'name' => [ 'type' => 'string' ],
 						'default_value' => [
-							'type'     => 'string',
+							'type' => 'string',
 							'required' => false,
 						],
-						'overrides'     => [
-							'type'     => 'array',
+						'overrides' => [
+							'type' => 'array',
 							'required' => false,
 						],
 					],
 				],
 			],
 			'output_schema' => [
-				'type'       => 'object',
+				'type' => 'object',
 				'properties' => [
-					'root_path'     => [
-						'type'     => 'string',
+					'root_path' => [
+						'type' => 'string',
 						'required' => false,
 					],
 					'is_collection' => [ 'type' => 'boolean' ],
-					'mappings'      => [
-						'type'  => 'array',
+					'mappings' => [
+						'type' => 'array',
 						'items' => [
-							'type'       => 'object',
+							'type' => 'object',
 							'properties' => [
-								'name'     => [ 'type' => 'string' ],
-								'path'     => [
-									'type'     => 'string',
+								'name' => [ 'type' => 'string' ],
+								'path' => [
+									'type' => 'string',
 									'required' => false,
 								],
 								'generate' => [
-									'type'     => 'function',
+									'type' => 'function',
 									'required' => false,
 								],
-								'type'     => [ 'type' => 'string' ],
+								'type' => [ 'type' => 'string' ],
 							],
 						],
 					],
 				],
 			],
-			'query_name'    => [
-				'type'     => 'string',
+			'query_name' => [
+				'type' => 'string',
 				'required' => false,
 			],
 		],
@@ -89,7 +89,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 		protected array $config = [],
 	) {
 		// Provide input and output variables as public properties.
-		$this->input_schema  = $this->get_input_schema();
+		$this->input_schema = $this->get_input_schema();
 		$this->output_schema = $this->get_output_schema();
 
 		// @todo: expand or kill this

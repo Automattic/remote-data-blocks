@@ -39,13 +39,13 @@ class Logger extends AbstractLogger {
 	 * @var array<string, int>
 	 */
 	private array $log_levels = [
-		LogLevel::DEBUG     => 1,
-		LogLevel::INFO      => 2,
-		LogLevel::NOTICE    => 3,
-		LogLevel::WARNING   => 4,
-		LogLevel::ERROR     => 5,
-		LogLevel::CRITICAL  => 6,
-		LogLevel::ALERT     => 7,
+		LogLevel::DEBUG => 1,
+		LogLevel::INFO => 2,
+		LogLevel::NOTICE => 3,
+		LogLevel::WARNING => 4,
+		LogLevel::ERROR => 5,
+		LogLevel::CRITICAL => 6,
+		LogLevel::ALERT => 7,
 		LogLevel::EMERGENCY => 8,
 	];
 
@@ -97,8 +97,8 @@ class Logger extends AbstractLogger {
 		add_filter( 'qm/trace/ignore_class', static function ( array $classes ): array {
 			return array_merge( $classes, [
 				AbstractLogger::class => true,
-				Logger::class         => true,
-				LoggerManager::class  => true,
+				Logger::class => true,
+				LoggerManager::class => true,
 			] );
 		}, 10, 1 );
 	}
@@ -121,7 +121,7 @@ class Logger extends AbstractLogger {
 	 * PSR log implementation.
 	 */
 	public function log( mixed $level, Stringable|string $message, array $context = [] ): void {
-		$level   = strval( $level );
+		$level = strval( $level );
 		$message = strval( $message );
 
 		if ( ! $this->should_log( $level ) ) {

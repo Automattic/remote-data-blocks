@@ -38,20 +38,20 @@ class FieldShortcode {
 		);
 
 		foreach ( $matches as $match ) {
-			$original_tag   = $match[0];
-			$query_data     = json_decode( html_entity_decode( $match['query'] ), true /* associative */ );
+			$original_tag = $match[0];
+			$query_data = json_decode( html_entity_decode( $match['query'] ), true /* associative */ );
 			$fallback_value = $match['fallback_value'] ?? '';
 
 			if ( ! isset( $query_data['remoteData']['blockName'], $query_data['remoteData']['queryInput'], $query_data['selectedField'] ) ) {
 				$status = 'parse-error';
-				$value  = $fallback_value;
+				$value = $fallback_value;
 			} else {
 				$context = [
-					'blockName'  => $query_data['remoteData']['blockName'],
+					'blockName' => $query_data['remoteData']['blockName'],
 					'queryInput' => $query_data['remoteData']['queryInput'],
 				];
-				$field   = $query_data['selectedField'];
-				$type    = $query_data['type'] ?? 'field';
+				$field = $query_data['selectedField'];
+				$type = $query_data['type'] ?? 'field';
 
 				if ( 'meta' === $type ) {
 					$value = self::get_meta_field_value( $context, $field );
@@ -61,7 +61,7 @@ class FieldShortcode {
 
 				if ( is_null( $value ) ) {
 					$status = 'query-error';
-					$value  = $fallback_value;
+					$value = $fallback_value;
 				} else {
 					$status = 'query-success';
 				}

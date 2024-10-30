@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { LoopTemplate } from '@/blocks/remote-data-container/components/loop-template';
+import { LoopTemplate } from '@/blocks/remote-data-container/components/loop-template/LoopTemplate';
 
 describe( 'LoopTemplate', () => {
 	const mockGetInnerBlocks = () => [];

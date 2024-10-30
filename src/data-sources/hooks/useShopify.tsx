@@ -2,7 +2,7 @@ import { useDebounce } from '@wordpress/compose';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { ShopifyApi } from '@/data-sources/shopify/shopify-api';
+import { ShopifyApi } from '@/data-sources/api-clients/shopify';
 import { getConnectionMessage } from '@/data-sources/utils';
 import { useQuery } from '@/hooks/useQuery';
 

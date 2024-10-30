@@ -6,7 +6,7 @@ import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormA
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
-import { useShopifyShopName } from '@/data-sources/shopify/shopify-api-hooks';
+import { useShopifyShopName } from '@/data-sources/hooks/useShopify';
 import { SettingsComponentProps, ShopifyConfig } from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';

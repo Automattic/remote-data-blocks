@@ -21,25 +21,25 @@ class GitHubListFilesQuery extends HttpQueryContext {
 
 	public function get_output_schema(): array {
 		return [
-			'root_path'     => sprintf( '$.tree[?(@.path =~ /\\.%s$/)]', ltrim( $this->file_extension, '.' ) ),
+			'root_path' => sprintf( '$.tree[?(@.path =~ /\\.%s$/)]', ltrim( $this->file_extension, '.' ) ),
 			'is_collection' => true,
-			'mappings'      => [
+			'mappings' => [
 				'file_path' => [
 					'name' => 'File Path',
 					'path' => '$.path',
 					'type' => 'string',
 				],
-				'sha'       => [
+				'sha' => [
 					'name' => 'SHA',
 					'path' => '$.sha',
 					'type' => 'string',
 				],
-				'size'      => [
+				'size' => [
 					'name' => 'Size',
 					'path' => '$.size',
 					'type' => 'number',
 				],
-				'url'       => [
+				'url' => [
 					'name' => 'URL',
 					'path' => '$.url',
 					'type' => 'string',

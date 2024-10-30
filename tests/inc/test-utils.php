@@ -9,7 +9,7 @@
  */
 function get_private_property( string $class_name, string $property_name ): ReflectionProperty {
 	$reflector = new ReflectionClass( $class_name );
-	$property  = $reflector->getProperty( $property_name );
+	$property = $reflector->getProperty( $property_name );
 
 	/**
 	 * @psalm-suppress UnusedMethodCall
@@ -50,7 +50,7 @@ function set_private_property(
  */
 function get_private_method( string $class_name, string $method ): ReflectionMethod {
 	$reflector = new ReflectionClass( $class_name );
-	$method    = $reflector->getMethod( $method );
+	$method = $reflector->getMethod( $method );
 
 	/**
 	 * @psalm-suppress UnusedMethodCall

@@ -15,6 +15,7 @@ function add_filter( string $filter, mixed ...$args ): void {
 
 $GLOBALS['__wordpress_done_actions'] = [];
 function do_action( string $action, mixed ...$args ): void {
+	$GLOBALS['__wordpress_done_actions'][ $action ] = $GLOBALS['__wordpress_done_actions'][ $action ] ?? [];
 	$GLOBALS['__wordpress_done_actions'][ $action ][] = $args;
 }
 
@@ -160,8 +161,8 @@ function wp_is_uuid( $uuid, $version = null ) {
 }
 
 class WP_Error {
-	public $errors             = array();
-	public $error_data         = array();
+	public $errors = array();
+	public $error_data = array();
 	protected $additional_data = array();
 
 	public function __construct( $code = '', $message = '', $data = '' ) {

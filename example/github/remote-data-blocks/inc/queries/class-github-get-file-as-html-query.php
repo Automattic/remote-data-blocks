@@ -11,15 +11,15 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 				'name' => 'File Path',
 				'type' => 'string',
 			],
-			'sha'       => [
+			'sha' => [
 				'name' => 'SHA',
 				'type' => 'string',
 			],
-			'size'      => [
+			'size' => [
 				'name' => 'Size',
 				'type' => 'number',
 			],
-			'url'       => [
+			'url' => [
 				'name' => 'URL',
 				'type' => 'string',
 			],
@@ -29,28 +29,28 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 	public function get_output_schema(): array {
 		return [
 			'is_collection' => false,
-			'mappings'      => [
+			'mappings' => [
 				'file_content' => [
 					'name' => 'File Content',
 					'path' => '$.content',
 					'type' => 'html',
 				],
-				'file_path'    => [
+				'file_path' => [
 					'name' => 'File Path',
 					'path' => '$.path',
 					'type' => 'string',
 				],
-				'sha'          => [
+				'sha' => [
 					'name' => 'SHA',
 					'path' => '$.sha',
 					'type' => 'string',
 				],
-				'size'         => [
+				'size' => [
 					'name' => 'Size',
 					'path' => '$.size',
 					'type' => 'number',
 				],
-				'url'          => [
+				'url' => [
 					'name' => 'URL',
 					'path' => '$.url',
 					'type' => 'string',
@@ -80,11 +80,11 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 
 	public function process_response( string $html_response_data, array $input_variables ): array {
 		return [
-			'content'   => $html_response_data,
+			'content' => $html_response_data,
 			'file_path' => $input_variables['file_path'],
-			'sha'       => $input_variables['sha'],
-			'size'      => $input_variables['size'],
-			'url'       => $input_variables['url'],
+			'sha' => $input_variables['sha'],
+			'size' => $input_variables['size'],
+			'url' => $input_variables['url'],
 		];
 	}
 }

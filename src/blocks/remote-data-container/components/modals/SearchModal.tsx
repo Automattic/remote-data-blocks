@@ -1,7 +1,7 @@
 import { SearchControl } from '@wordpress/components';
 
-import { ItemListModal } from '@/blocks/remote-data-container/components/modals/item-list-modal';
-import { useSearchResults } from '@/blocks/remote-data-container/hooks/use-search-results';
+import { ItemListModal } from '@/blocks/remote-data-container/components/modals/ItemListModal';
+import { useSearchResults } from '@/blocks/remote-data-container/hooks/useSearchResults';
 
 interface SearchModalProps {
 	blockName: string;

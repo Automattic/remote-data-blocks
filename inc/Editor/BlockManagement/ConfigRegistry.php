@@ -34,29 +34,29 @@ class ConfigRegistry {
 		// give it some time to solidify.
 		$config = [
 			'description' => '',
-			'name'        => $block_name,
-			'loop'        => $options['loop'] ?? false,
-			'patterns'    => [],
-			'queries'     => [
+			'name' => $block_name,
+			'loop' => $options['loop'] ?? false,
+			'patterns' => [],
+			'queries' => [
 				'__DISPLAY__' => $display_query,
 			],
-			'selectors'   => [
+			'selectors' => [
 				[
 					'image_url' => $display_query->get_image_url(),
-					'inputs'    => array_map( function ( $slug, $input_var ) {
+					'inputs' => array_map( function ( $slug, $input_var ) {
 						return [
-							'name'     => $input_var['name'] ?? $slug,
+							'name' => $input_var['name'] ?? $slug,
 							'required' => $input_var['required'] ?? true,
-							'slug'     => $slug,
-							'type'     => $input_var['type'] ?? 'string',
+							'slug' => $slug,
+							'type' => $input_var['type'] ?? 'string',
 						];
 					}, array_keys( $display_query->input_schema ), array_values( $display_query->input_schema ) ),
-					'name'      => 'Manual input',
+					'name' => 'Manual input',
 					'query_key' => '__DISPLAY__',
-					'type'      => 'input',
+					'type' => 'input',
 				],
 			],
-			'title'       => $block_title,
+			'title' => $block_title,
 		];
 
 		ConfigStore::set_configuration( $block_name, $config );
@@ -68,27 +68,27 @@ class ConfigRegistry {
 
 	public static function register_block_pattern( string $block_title, string $pattern_title, string $pattern_content, array $pattern_options = [] ): void {
 		$block_name = ConfigStore::get_block_name( $block_title );
-		$config     = ConfigStore::get_configuration( $block_name );
+		$config = ConfigStore::get_configuration( $block_name );
 
 		if ( null === $config ) {
 			return;
 		}
 
 		// Add the block arg to any bindings present in the pattern.
-		$parsed_blocks   = parse_blocks( $pattern_content );
-		$parsed_blocks   = BlockPatterns::add_block_arg_to_bindings( $block_name, $parsed_blocks );
+		$parsed_blocks = parse_blocks( $pattern_content );
+		$parsed_blocks = BlockPatterns::add_block_arg_to_bindings( $block_name, $parsed_blocks );
 		$pattern_content = serialize_blocks( $parsed_blocks );
-		$pattern_name    = 'remote-data-blocks/' . sanitize_title( $pattern_title );
+		$pattern_name = 'remote-data-blocks/' . sanitize_title( $pattern_title );
 
 		// Create the pattern properties, allowing overrides via pattern options.
 		$pattern_properties = array_merge(
 			[
 				'blockTypes' => [ $block_name ],
 				'categories' => [ 'Remote Data' ],
-				'content'    => $pattern_content,
-				'inserter'   => true,
-				'source'     => 'plugin',
-				'title'      => $pattern_title,
+				'content' => $pattern_content,
+				'inserter' => true,
+				'source' => 'plugin',
+				'title' => $pattern_title,
 			],
 			$pattern_options['properties'] ?? []
 		);
@@ -106,7 +106,7 @@ class ConfigRegistry {
 
 	public static function register_page( string $block_title, string $page_slug ): void {
 		$block_name = ConfigStore::get_block_name( $block_title );
-		$config     = ConfigStore::get_configuration( $block_name );
+		$config = ConfigStore::get_configuration( $block_name );
 
 		if ( null === $config ) {
 			return;
@@ -128,17 +128,17 @@ class ConfigRegistry {
 
 			wp_insert_post( [
 				'post_content' => $post_content,
-				'post_name'    => $page_slug,
-				'post_status'  => 'draft',
-				'post_title'   => $block_title,
-				'post_type'    => 'page',
+				'post_name' => $page_slug,
+				'post_status' => 'draft',
+				'post_title' => $block_title,
+				'post_type' => 'page',
 			] );
 		}
 
 		// Add a rewrite rule targeting the provided page slug.
-		$query_var_pattern   = '/([^/]+)';
-		$query_vars          = array_keys( $display_query->input_schema );
-		$rewrite_rule        = sprintf( '^%s%s/?$', $page_slug, str_repeat( $query_var_pattern, count( $query_vars ) ) );
+		$query_var_pattern = '/([^/]+)';
+		$query_vars = array_keys( $display_query->input_schema );
+		$rewrite_rule = sprintf( '^%s%s/?$', $page_slug, str_repeat( $query_var_pattern, count( $query_vars ) ) );
 		$rewrite_rule_target = sprintf( 'index.php?pagename=%s', $page_slug );
 
 		foreach ( $query_vars as $index => $query_var ) {
@@ -151,7 +151,7 @@ class ConfigRegistry {
 			// Add the URL variable override to the display query.
 			$display_query->input_schema[ $query_var ]['overrides'][] = [
 				'target' => $page_slug,
-				'type'   => 'url',
+				'type' => 'url',
 			];
 		}
 
@@ -160,8 +160,8 @@ class ConfigRegistry {
 
 	private static function register_selector( string $block_title, string $type, QueryContextInterface $query ): void {
 		$block_name = ConfigStore::get_block_name( $block_title );
-		$config     = ConfigStore::get_configuration( $block_name );
-		$query_key  = $query::class;
+		$config = ConfigStore::get_configuration( $block_name );
+		$query_key = $query::class;
 
 		if ( null === $config ) {
 			return;
@@ -185,10 +185,10 @@ class ConfigRegistry {
 			$config['selectors'],
 			[
 				'image_url' => $query->get_image_url(),
-				'inputs'    => [],
-				'name'      => $query->get_query_name(),
+				'inputs' => [],
+				'name' => $query->get_query_name(),
 				'query_key' => $query_key,
-				'type'      => $type,
+				'type' => $type,
 			]
 		);
 
@@ -197,8 +197,8 @@ class ConfigRegistry {
 
 	public static function register_query( string $block_title, QueryContextInterface $query ): void {
 		$block_name = ConfigStore::get_block_name( $block_title );
-		$config     = ConfigStore::get_configuration( $block_name );
-		$query_key  = $query::class;
+		$config = ConfigStore::get_configuration( $block_name );
+		$query_key = $query::class;
 
 		if ( null === $config ) {
 			return;

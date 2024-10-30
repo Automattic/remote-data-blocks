@@ -38,9 +38,9 @@ class TracksAnalytics {
 			self::$instance = new $tracks_class(
 				'',
 				[
-					'plugin_version'   => defined( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) ? constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) : '',
-					'is_multisite'     => is_multisite(),
-					'wp_version'       => get_bloginfo( 'version' ),
+					'plugin_version' => defined( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) ? constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) : '',
+					'is_multisite' => is_multisite(),
+					'wp_version' => get_bloginfo( 'version' ),
 					'hosting_provider' => self::$env_config->get_hosting_provider(),
 				]
 			);
@@ -108,7 +108,7 @@ class TracksAnalytics {
 		// Get data source and track usage.
 		$track_props = [
 			'post_status' => $post_status,
-			'post_type'   => $post->post_type,
+			'post_type' => $post->post_type,
 		];
 		foreach ( $matches[1] as $match ) {
 			$data_source = ConfigStore::get_data_source( 'remote-data-blocks/' . $match );
@@ -117,8 +117,8 @@ class TracksAnalytics {
 			}
 
 			// Calculate stats of remote data blocks for tracking.
-			$data_source_prop                              = $data_source . '_data_source_count';
-			$track_props[ $data_source_prop ]              = ( $track_props[ $data_source_prop ] ?? 0 ) + 1;
+			$data_source_prop = $data_source . '_data_source_count';
+			$track_props[ $data_source_prop ] = ( $track_props[ $data_source_prop ] ?? 0 ) + 1;
 			$track_props['remote_data_blocks_total_count'] = ( $track_props['remote_data_blocks_total_count'] ?? 0 ) + 1;
 		}
 
@@ -151,7 +151,7 @@ class TracksAnalytics {
 	}
 
 	public static function reset(): void {
-		self::$instance   = null;
+		self::$instance = null;
 		self::$env_config = null;
 	}
 }

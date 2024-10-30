@@ -42,7 +42,7 @@ abstract class GraphqlMutationContext extends HttpQueryContext {
 		$variables = $this->get_mutation_variables( $input_variables );
 
 		return [
-			'query'     => $this->get_mutation(),
+			'query' => $this->get_mutation(),
 			'variables' => empty( $variables ) ? null : $variables,
 		];
 	}

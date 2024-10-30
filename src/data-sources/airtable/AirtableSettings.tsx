@@ -11,15 +11,15 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
-import {
-	useAirtableApiBases,
-	useAirtableApiTables,
-	useAirtableApiUserId,
-} from '@/data-sources/airtable/airtable-api-hooks';
 import { AirtableFormState } from '@/data-sources/airtable/types';
 import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import { SlugInput } from '@/data-sources/components/SlugInput';
+import {
+	useAirtableApiBases,
+	useAirtableApiTables,
+	useAirtableApiUserId,
+} from '@/data-sources/hooks/useAirtable';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { AirtableConfig, SettingsComponentProps } from '@/data-sources/types';
 import { getConnectionMessage } from '@/data-sources/utils';
