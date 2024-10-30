@@ -1,6 +1,8 @@
 import { PanelBody, SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
+
 interface OverridesPanelProps {
 	blockConfig: BlockConfig;
 	remoteData: RemoteData;
@@ -42,6 +44,12 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 		updateRemoteData( {
 			...remoteData,
 			queryInputOverrides: copyOfQueryInputOverrides,
+		} );
+
+		sendTracksEvent( 'remotedatablocks_remote_data_container_override', {
+			override_type: overrides?.type,
+			override_target: overrides?.target,
+			data_source: remoteData.dataSource,
 		} );
 	}
 
