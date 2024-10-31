@@ -34,21 +34,21 @@ class EnvironmentConfig {
 	}
 
 	public function is_local_env(): bool {
-		$event_base_props = [];
+		$vip_base_props = [];
 
 		if ( function_exists( 'Automattic\VIP\Telemetry\Tracks\get_base_properties_of_track_event' ) ) {
-			$event_base_props = get_base_properties_of_track_event();
+			$vip_base_props = get_base_properties_of_track_event();
 		}
 
-		if ( ! isset( $event_base_props['vipgo_env'] ) ) {
+		if ( ! isset( $vip_base_props['vipgo_env'] ) ) {
 			return false;
 		}
 
-		return 'local' === $event_base_props['vipgo_env'];
+		return 'local' === $vip_base_props['vipgo_env'];
 	}
 
 	public function is_remote_data_blocks_plugin( string|null $plugin_path ): bool {
-		return plugin_basename( __FILE__ ) === $plugin_path;
+		return 'remote-data-blocks/remote-data-blocks.php' === $plugin_path;
 	}
 
 	public function should_track_post_having_remote_data_blocks( int $post_id ): bool {
