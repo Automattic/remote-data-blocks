@@ -118,7 +118,7 @@ class DataSourceController extends WP_REST_Controller {
 		}
 
 		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', array_merge( [
-			'data_source_type' => $data_source_properties['service'],
+			'data_source' => $data_source_properties['service'],
 			'action' => 'added',
 		], $additional_track_props ) );
 
@@ -200,7 +200,7 @@ class DataSourceController extends WP_REST_Controller {
 		}
 
 		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', array_merge( [
-			'data_source_type' => $data_source_properties['service'],
+			'data_source' => $data_source_properties['service'],
 			'action' => 'updated',
 		], $additional_track_props ) );
 
@@ -219,7 +219,7 @@ class DataSourceController extends WP_REST_Controller {
 
 		// Tracks Analytics.
 		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', [
-			'data_source_type' => $data_source_properties['service'],
+			'data_source' => $data_source_properties['service'],
 			'action' => 'deleted',
 		] );
 
