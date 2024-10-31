@@ -7,30 +7,34 @@ defined( 'ABSPATH' ) || exit();
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 
 /**
- * Class to implement Tracks Analytics in the codebase.
+ * Class to implement Tracks Analytics.
  */
 class TracksAnalytics {
 	/**
-	 * The tracks instance (not using Tracks as type because it is not present in the codebase).
+	 * The tracks instance (not using Tracks as type because it is present in MU Plugins codebase).
 	 */
 	private static object|null $instance = null;
 
 	/**
 	 * Environment configuration.
-	 *
 	 */
 	private static ?EnvironmentConfig $env_config = null;
 
+	/**
+	 * Initialize Tracks Analytics based on the environment configuration.
+	 *
+	 * @param EnvironmentConfig $env_config Environment configuration.
+	 */
 	public static function init( EnvironmentConfig $env_config ): void {
 		self::$env_config = $env_config;
 
-		$tracks_class = self::$env_config->get_tracks_lib_class();
-		if ( ! $tracks_class ) {
+		// Do not track on local environment.
+		if ( self::$env_config->is_local_env() ) {
 			return;
 		}
 
-		// Do not track on local environment.
-		if ( self::$env_config->is_local_env() ) {
+		$tracks_class = self::$env_config->get_tracks_lib_class();
+		if ( ! $tracks_class ) {
 			return;
 		}
 
@@ -38,10 +42,10 @@ class TracksAnalytics {
 			self::$instance = new $tracks_class(
 				'',
 				[
-					'plugin_version' => defined( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) ? constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) : '',
-					'is_multisite' => is_multisite(),
-					'wp_version' => get_bloginfo( 'version' ),
 					'hosting_provider' => self::$env_config->get_hosting_provider(),
+					'is_multisite' => is_multisite(),
+					'plugin_version' => defined( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) ? constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) : '',
+					'wp_version' => get_bloginfo( 'version' ),
 				]
 			);
 
@@ -116,9 +120,9 @@ class TracksAnalytics {
 				continue;
 			}
 
-			// Calculate stats of remote data blocks for tracking.
-			$data_source_prop = $data_source . '_data_source_count';
-			$track_props[ $data_source_prop ] = ( $track_props[ $data_source_prop ] ?? 0 ) + 1;
+			// Calculate stats of each remote data source.
+			$key = $data_source . '_data_source_count';
+			$track_props[ $key ] = ( $track_props[ $key ] ?? 0 ) + 1;
 			$track_props['remote_data_blocks_total_count'] = ( $track_props['remote_data_blocks_total_count'] ?? 0 ) + 1;
 		}
 
@@ -126,7 +130,7 @@ class TracksAnalytics {
 	}
 
 	/**
-	 * Track an event.
+	 * Record an event with Tracks.
 	 *
 	 * @param string $event_name The name of the event.
 	 * @param array  $props      The properties to send with the event.
@@ -139,17 +143,24 @@ class TracksAnalytics {
 		}
 
 		self::$instance->record_event( $event_name, $props );
+
 		return true;
 	}
 
+	/**
+	 * Get the instance of Tracks.
+	 */
 	public static function get_instance(): ?object {
 		return self::$instance;
 	}
 
-	public static function get_env_config(): ?object {
+	public static function get_env_config(): ?EnvironmentConfig {
 		return self::$env_config;
 	}
 
+	/**
+	 * Reset class properties.
+	 */
 	public static function reset(): void {
 		self::$instance = null;
 		self::$env_config = null;
