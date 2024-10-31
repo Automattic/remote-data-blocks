@@ -109,18 +109,10 @@ class DataSourceController extends WP_REST_Controller {
 		$data_source_properties = $request->get_json_params();
 		$item = DataSourceCrud::register_new_data_source( $data_source_properties );
 
-		// Tracks Analytics.
-		$additional_track_props = [];
-		if ( 'generic-http' === $data_source_properties['service'] ) {
-			$auth = $data_source_properties['auth'];
-			$additional_track_props['authentication_type'] = $auth['type'] ?? '';
-			$additional_track_props['api_key_location'] = $auth['addTo'] ?? '';
-		}
-
 		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', array_merge( [
 			'data_source' => $data_source_properties['service'],
-			'action' => 'added',
-		], $additional_track_props ) );
+			'action' => 'add',
+		], $this->get_data_source_interaction_track_props( $data_source_properties ) ) );
 
 		return rest_ensure_response( $item );
 	}
@@ -191,18 +183,10 @@ class DataSourceController extends WP_REST_Controller {
 		$data_source_properties = $request->get_json_params();
 		$item = DataSourceCrud::update_item_by_uuid( $request->get_param( 'uuid' ), $data_source_properties );
 
-		// Tracks Analytics.
-		$additional_track_props = [];
-		if ( 'generic-http' === $data_source_properties['service'] ) {
-			$auth = $data_source_properties['auth'];
-			$additional_track_props['authentication_type'] = $auth['type'] ?? '';
-			$additional_track_props['api_key_location'] = $auth['addTo'] ?? '';
-		}
-
 		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', array_merge( [
 			'data_source' => $data_source_properties['service'],
-			'action' => 'updated',
-		], $additional_track_props ) );
+			'action' => 'update',
+		], $this->get_data_source_interaction_track_props( $data_source_properties ) ) );
 
 		return rest_ensure_response( $item );
 	}
@@ -220,7 +204,7 @@ class DataSourceController extends WP_REST_Controller {
 		// Tracks Analytics.
 		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', [
 			'data_source' => $data_source_properties['service'],
-			'action' => 'deleted',
+			'action' => 'delete',
 		] );
 
 		return rest_ensure_response( $result );
@@ -267,5 +251,17 @@ class DataSourceController extends WP_REST_Controller {
 
 	public function item_slug_conflicts_permissions_check() {
 		return current_user_can( 'manage_options' );
+	}
+
+	private function get_data_source_interaction_track_props( $data_source_properties ): array {
+		$props = [];
+
+		if ( 'generic-http' === $data_source_properties['service'] ) {
+			$auth = $data_source_properties['auth'];
+			$props['authentication_type'] = $auth['type'] ?? '';
+			$props['api_key_location'] = $auth['addTo'] ?? '';
+		}
+
+		return $props;
 	}
 }
