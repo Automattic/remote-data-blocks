@@ -39,4 +39,16 @@ class EnvironmentConfigTest extends TestCase {
 
 		$this->assertEquals( true, $obj->is_enabled_via_filter() );
 	}
+
+	public function testIsRemoteDataBlocksPluginReturnsFalse(): void {
+		$obj = new EnvironmentConfig();
+
+		$this->assertEquals( false, $obj->is_remote_data_blocks_plugin( '' ) );
+	}
+
+	public function testIsRemoteDataBlocksPluginReturnsTrue(): void {
+		$obj = new EnvironmentConfig();
+
+		$this->assertEquals( true, $obj->is_remote_data_blocks_plugin( 'remote-data-blocks/remote-data-blocks.php' ) );
+	}
 }

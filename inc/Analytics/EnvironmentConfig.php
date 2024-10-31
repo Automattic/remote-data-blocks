@@ -48,7 +48,7 @@ class EnvironmentConfig {
 	}
 
 	public function is_remote_data_blocks_plugin( string|null $plugin_path ): bool {
-		return plugin_basename( __FILE__ ) === $plugin_path;
+		return 'remote-data-blocks/remote-data-blocks.php' === $plugin_path;
 	}
 
 	public function should_track_post_having_remote_data_blocks( int $post_id ): bool {
