@@ -2,6 +2,7 @@ import { PanelBody, SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
+import { getBlockDataSource } from '@/utils/localized-block-data';
 
 interface OverridesPanelProps {
 	blockConfig: BlockConfig;
@@ -49,7 +50,7 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 		sendTracksEvent( 'remotedatablocks_remote_data_container_override', {
 			override_type: overrides?.type,
 			override_target: overrides?.target,
-			data_source: remoteData.dataSource,
+			data_source: getBlockDataSource( remoteData.blockName ),
 		} );
 	}
 

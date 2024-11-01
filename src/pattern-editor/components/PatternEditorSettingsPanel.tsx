@@ -23,7 +23,7 @@ export function PatternEditorSettingsPanel() {
 	const blocksConfig = getBlocksConfig();
 	const blockType = String( postMeta?.[ PATTERN_BLOCK_TYPE_POST_META_KEY ] ?? '' );
 
-	function updateBlockTypes( blockName: string ) {
+	function updateBlockTypes( blockName: string ): void {
 		updatePostMeta( { ...postMeta, [ PATTERN_BLOCK_TYPE_POST_META_KEY ]: blockName } );
 		sendTracksEvent( 'remotedatablocks_associate_block_type_to_pattern', {
 			data_source: getBlockDataSource( blockName ),

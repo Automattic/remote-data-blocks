@@ -2,6 +2,7 @@ import { CheckboxControl, SelectControl } from '@wordpress/components';
 
 import { TEXT_FIELD_TYPES } from '@/blocks/remote-data-container/config/constants';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
+import { getBlockDataSource } from '@/utils/localized-block-data';
 
 interface BlockBindingFieldControlProps {
 	availableBindings: AvailableBindings;
@@ -36,14 +37,12 @@ interface BlockBindingControlsProps {
 	attributes: RemoteDataInnerBlockAttributes;
 	availableBindings: AvailableBindings;
 	blockName: string;
-	dataSource: string;
 	removeBinding: ( target: string ) => void;
 	updateBinding: ( target: string, args: Omit< RemoteDataBlockBindingArgs, 'block' > ) => void;
 }
 
 export function BlockBindingControls( props: BlockBindingControlsProps ) {
-	const { attributes, availableBindings, blockName, dataSource, removeBinding, updateBinding } =
-		props;
+	const { attributes, availableBindings, blockName, removeBinding, updateBinding } = props;
 	const contentArgs = attributes.metadata?.bindings?.content?.args;
 	const contentField = contentArgs?.field ?? '';
 	const imageAltField = attributes.metadata?.bindings?.alt?.args?.field ?? '';
@@ -57,7 +56,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 
 			sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
 				action: 'remove_binding',
-				data_source: dataSource,
+				data_source: getBlockDataSource( blockName ),
 				block_target_attribute: target,
 			} );
 
@@ -69,7 +68,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 
 		sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
 			action: 'update_binding',
-			data_source: dataSource,
+			data_source: getBlockDataSource( blockName ),
 			remote_data_field: field,
 			block_target_attribute: target,
 		} );
@@ -88,7 +87,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 
 		sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
 			action: 'show_label',
-			data_source: dataSource,
+			data_source: getBlockDataSource( blockName ),
 			value: showLabel,
 		} );
 	}

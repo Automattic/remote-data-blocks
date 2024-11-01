@@ -35,7 +35,7 @@ export function InputModal( props: InputModalProps ) {
 		sendTracksEvent( 'remotedatablocks_add_block', {
 			action: 'select_item',
 			selected_option: 'manual_input',
-			data_source: getBlockDataSource( props.blockName ?? '' ),
+			data_source: getBlockDataSource( props.blockName ),
 		} );
 	}
 

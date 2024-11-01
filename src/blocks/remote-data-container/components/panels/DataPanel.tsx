@@ -8,6 +8,7 @@ import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
+import { getBlockDataSource } from '@/utils/localized-block-data';
 
 interface DataPanelProps {
 	refreshRemoteData: () => void;
@@ -25,7 +26,7 @@ export function DataPanel( props: DataPanelProps ) {
 
 		sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
 			action: 'refresh',
-			data_source: remoteData.dataSource,
+			data_source: getBlockDataSource( remoteData.blockName ),
 		} );
 	}
 
@@ -35,7 +36,7 @@ export function DataPanel( props: DataPanelProps ) {
 
 		sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
 			action: 'reset',
-			data_source: remoteData.dataSource,
+			data_source: getBlockDataSource( remoteData.blockName ),
 		} );
 	}
 

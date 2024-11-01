@@ -16,7 +16,6 @@ interface QueryInputOverride {
 
 interface RemoteData {
 	blockName: string;
-	dataSource: string;
 	isCollection: boolean;
 	metadata: Record< string, RemoteDataResultFields >;
 	queryInput: Record< string, string >;

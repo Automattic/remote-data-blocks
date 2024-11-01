@@ -16,7 +16,6 @@ async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< Re
 
 	return {
 		blockName: body.block_name,
-		dataSource: body.data_source,
 		isCollection: body.is_collection,
 		metadata: body.metadata,
 		queryInput: body.query_input,

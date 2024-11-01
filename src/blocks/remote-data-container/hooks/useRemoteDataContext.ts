@@ -30,7 +30,6 @@ export function useRemoteDataContext( context: Record< string, unknown > ): Remo
 				index,
 				remoteData: {
 					blockName: remoteDataBlockName,
-					dataSource: '',
 					isCollection: blockConfig.loop,
 					metadata: {},
 					queryInput: {},

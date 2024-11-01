@@ -19,14 +19,12 @@ interface BoundBlockEditProps {
 	availableBindings: AvailableBindings;
 	blockName: string;
 	children: JSX.Element;
-	dataSource: string;
 	remoteDataName: string;
 	setAttributes: ( attributes: RemoteDataInnerBlockAttributes ) => void;
 }
 
 function BoundBlockEdit( props: BoundBlockEditProps ) {
-	const { attributes, availableBindings, blockName, dataSource, remoteDataName, setAttributes } =
-		props;
+	const { attributes, availableBindings, blockName, remoteDataName, setAttributes } = props;
 	const existingBindings = attributes.metadata?.bindings ?? {};
 
 	function removeBinding( target: string ) {
@@ -68,7 +66,6 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 						attributes={ attributes }
 						availableBindings={ availableBindings }
 						blockName={ blockName }
-						dataSource={ dataSource }
 						removeBinding={ removeBinding }
 						updateBinding={ updateBinding }
 					/>
@@ -129,7 +126,6 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 				attributes={ mergedAttributes }
 				availableBindings={ availableBindings }
 				blockName={ name }
-				dataSource={ remoteData?.dataSource ?? '' }
 				remoteDataName={ remoteData?.blockName ?? '' }
 				setAttributes={ setAttributes }
 			>
