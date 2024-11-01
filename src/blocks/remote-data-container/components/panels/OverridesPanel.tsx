@@ -46,7 +46,6 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 			...remoteData,
 			queryInputOverrides: copyOfQueryInputOverrides,
 		} );
-
 		sendTracksEvent( 'remotedatablocks_remote_data_container_override', {
 			override_type: overrides?.type,
 			override_target: overrides?.target,

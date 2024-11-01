@@ -79,7 +79,6 @@ export function FieldShortcodeButton( props: WPFormatEditProps ) {
 	function onSelectField( data: FieldSelection, fieldValue: string ) {
 		updateOrInsertField( data, fieldValue );
 		onClose();
-
 		sendTracksEvent( 'remotedatablocks_field_shortcode', {
 			action: data.action,
 			data_source: getBlockDataSource( data.remoteData?.blockName ),
@@ -90,7 +89,6 @@ export function FieldShortcodeButton( props: WPFormatEditProps ) {
 	function resetField( blockName?: string ): void {
 		updateOrInsertField( null, 'Unbound field' );
 		setQueryInput( null );
-
 		sendTracksEvent( 'remotedatablocks_field_shortcode', {
 			action: 'field_reset',
 			data_source: getBlockDataSource( blockName ),
