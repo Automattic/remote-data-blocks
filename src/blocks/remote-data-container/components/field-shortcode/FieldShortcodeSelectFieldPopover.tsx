@@ -47,7 +47,7 @@ export function FieldShortcodeSelectFieldPopover( props: FieldShortcodeSelectFie
 						blockName={ remoteData?.blockName ?? 'Remote Data Block' }
 						fieldType={ type ?? 'field' }
 						onSelectField={ ( data, fieldValue ) =>
-							props.onSelectField( { ...data, action: 'field_updated' }, fieldValue )
+							props.onSelectField( { ...data, action: 'update_field_shortcode' }, fieldValue )
 						}
 						queryInput={ remoteData?.queryInput ?? {} }
 						selectedField={ selectedField }

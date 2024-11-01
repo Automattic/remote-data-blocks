@@ -30,9 +30,9 @@ interface RemoteDataBlockAttributes {
 
 interface FieldSelection extends RemoteDataBlockAttributes {
 	selectedField: string;
-	action: 'field_added' | 'field_updated';
+	action: 'add_field_shortcode' | 'update_field_shortcode';
 	type: 'field' | 'meta';
-	selectionPath: 'select_new_tab' | 'select_existing_tab' | 'select_meta_tab' | 'popover' | 'other';
+	selectionPath: 'select_new_tab' | 'select_existing_tab' | 'select_meta_tab' | 'popover';
 }
 
 interface MetaFieldSelection extends FieldSelection {
@@ -77,7 +77,6 @@ interface RemoteDataApiResult {
 
 interface RemoteDataApiResponseBody {
 	block_name: string;
-	data_source: string;
 	is_collection: boolean;
 	metadata: Record< string, RemoteDataResultFields >;
 	query_input: RemoteDataQueryInput;

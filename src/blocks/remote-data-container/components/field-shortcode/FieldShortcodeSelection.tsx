@@ -22,11 +22,11 @@ export function FieldSelection( props: FieldSelectionProps ) {
 		<>
 			{ Object.entries( props.fields ).map( ( [ fieldName, fieldDetails ], index ) => {
 				const fieldSelection: FieldSelection = {
-					action: 'field_added',
+					action: 'add_field_shortcode',
 					selectedField: fieldName,
 					remoteData: props.remoteData,
 					type: props.fieldType,
-					selectionPath: 'other',
+					selectionPath: 'select_new_tab',
 				};
 
 				return (
