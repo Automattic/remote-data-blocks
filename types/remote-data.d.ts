@@ -30,7 +30,7 @@ interface RemoteDataBlockAttributes {
 
 interface FieldSelection extends RemoteDataBlockAttributes {
 	selectedField: string;
-	action: 'add_field_shortcode' | 'update_field_shortcode';
+	action: 'add_field_shortcode' | 'update_field_shortcode' | 'reset_field_shortcode';
 	type: 'field' | 'meta';
 	selectionPath: 'select_new_tab' | 'select_existing_tab' | 'select_meta_tab' | 'popover';
 }

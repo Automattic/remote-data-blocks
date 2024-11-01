@@ -24,7 +24,7 @@ export function DataPanel( props: DataPanelProps ) {
 	function onRefreshRemoteData(): void {
 		refreshRemoteData();
 		sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
-			action: 'refresh',
+			action: 'refresh_block_data',
 			data_source: getBlockDataSource( remoteData.blockName ),
 		} );
 	}
@@ -33,7 +33,7 @@ export function DataPanel( props: DataPanelProps ) {
 		resetRemoteData();
 		setResetConfirmOpen( false );
 		sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
-			action: 'reset',
+			action: 'reset_block_data',
 			data_source: getBlockDataSource( remoteData.blockName ),
 		} );
 	}

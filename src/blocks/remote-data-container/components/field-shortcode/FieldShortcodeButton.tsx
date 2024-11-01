@@ -90,7 +90,7 @@ export function FieldShortcodeButton( props: WPFormatEditProps ) {
 		updateOrInsertField( null, 'Unbound field' );
 		setQueryInput( null );
 		sendTracksEvent( 'remotedatablocks_field_shortcode', {
-			action: 'field_reset',
+			action: 'reset_field_shortcode',
 			data_source: getBlockDataSource( blockName ),
 		} );
 	}

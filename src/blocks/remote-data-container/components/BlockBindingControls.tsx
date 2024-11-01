@@ -37,12 +37,14 @@ interface BlockBindingControlsProps {
 	attributes: RemoteDataInnerBlockAttributes;
 	availableBindings: AvailableBindings;
 	blockName: string;
+	remoteDataName: string;
 	removeBinding: ( target: string ) => void;
 	updateBinding: ( target: string, args: Omit< RemoteDataBlockBindingArgs, 'block' > ) => void;
 }
 
 export function BlockBindingControls( props: BlockBindingControlsProps ) {
-	const { attributes, availableBindings, blockName, removeBinding, updateBinding } = props;
+	const { attributes, availableBindings, blockName, remoteDataName, removeBinding, updateBinding } =
+		props;
 	const contentArgs = attributes.metadata?.bindings?.content?.args;
 	const contentField = contentArgs?.field ?? '';
 	const imageAltField = attributes.metadata?.bindings?.alt?.args?.field ?? '';
@@ -55,7 +57,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 			removeBinding( target );
 			sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
 				action: 'remove_binding',
-				data_source: getBlockDataSource( blockName ),
+				data_source: getBlockDataSource( remoteDataName ),
 				block_target_attribute: target,
 			} );
 
@@ -66,7 +68,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 		updateBinding( target, { ...args, field } );
 		sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
 			action: 'update_binding',
-			data_source: getBlockDataSource( blockName ),
+			data_source: getBlockDataSource( remoteDataName ),
 			remote_data_field: field,
 			block_target_attribute: target,
 		} );
@@ -84,7 +86,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 		updateBinding( 'content', { ...contentArgs, field: contentField, label } );
 		sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
 			action: 'show_label',
-			data_source: getBlockDataSource( blockName ),
+			data_source: getBlockDataSource( remoteDataName ),
 			value: showLabel,
 		} );
 	}

@@ -66,6 +66,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 						attributes={ attributes }
 						availableBindings={ availableBindings }
 						blockName={ blockName }
+						remoteDataName={ remoteDataName }
 						removeBinding={ removeBinding }
 						updateBinding={ updateBinding }
 					/>
