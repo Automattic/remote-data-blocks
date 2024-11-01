@@ -45,13 +45,12 @@ interface BlocksConfig {
 interface LocalizedBlockData {
 	config: BlocksConfig;
 	rest_url: string;
-	track_base_props?: VipTracksBaseProps;
+	tracks_base_props?: RDBTracksBaseProps;
 }
 
-interface VipTracksBaseProps {
-	vipgo_env: string;
-	vipgo_org: number;
-	is_vip_user: boolean;
-	_ui: string; // User ID
-	_ut: string; // User Type
+/**
+ * Tracks properties that are specific to "Remote Data Blocks" plugin.
+ */
+interface RDBTracksBaseProps {
+	plugin_version: string;
 }

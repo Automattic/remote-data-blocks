@@ -2,6 +2,8 @@ import { recordTracksEvent } from '@automattic/calypso-analytics';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
+import { getTracksBaseProps } from '@/utils/localized-block-data';
+import { VipTracksBaseProps } from 'types/globals';
 
 vi.mock( '@automattic/calypso-analytics', () => ( {
 	recordTracksEvent: vi.fn(),
@@ -16,6 +18,9 @@ describe( 'sendTracksEvent', () => {
 		vipgo_env: 'local',
 		vipgo_org: 1,
 		is_vip_user: false,
+		hosting_provider: 'vip',
+		is_multisite: false,
+		wp_version: '6.6',
 		_ui: '1', // User ID
 		_ut: 'anon', // User Type
 	};
@@ -43,14 +48,15 @@ describe( 'sendTracksEvent', () => {
 		if ( window.VIP_TRACKS_BASE_PROPS ) {
 			window.VIP_TRACKS_BASE_PROPS.vipgo_env = 'production';
 		}
-
-		sendTracksEvent( 'test_event', { customProp: 'customValue' } );
+		vi.mocked( getTracksBaseProps ).mockReturnValue( { plugin_version: '1.0' } );
+		sendTracksEvent( 'test_event', { eventProp: 'eventValue' } );
 
 		expect( recordTracksEvent ).toHaveBeenCalledTimes( 1 );
 		expect( recordTracksEvent ).toHaveBeenCalledWith( 'test_event', {
 			...defaultTrackProps,
+			plugin_version: '1.0',
 			vipgo_env: 'production',
-			customProp: 'customValue',
+			eventProp: 'eventValue',
 		} );
 	} );
 } );

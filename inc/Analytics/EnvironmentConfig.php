@@ -6,19 +6,15 @@ defined( 'ABSPATH' ) || exit();
 
 use Automattic\VIP\Telemetry\Tracks;
 use function Automattic\VIP\Telemetry\Tracks\get_base_properties_of_track_event;
+use function Automattic\VIP\Telemetry\Tracks\is_wpvip_site;
 
 class EnvironmentConfig {
 	public function is_wpvip_site(): bool {
-		return defined( 'WPCOM_IS_VIP_ENV' ) && constant( 'WPCOM_IS_VIP_ENV' ) === true
-			&& defined( 'WPCOM_SANDBOXED' ) && constant( 'WPCOM_SANDBOXED' ) === false;
-	}
-
-	public function get_hosting_provider(): string {
-		if ( $this->is_wpvip_site() ) {
-			return 'wpvip';
+		if ( function_exists( 'Automattic\VIP\Telemetry\Tracks\is_wpvip_site' ) ) {
+			return is_wpvip_site();
 		}
 
-		return 'other';
+		return false;
 	}
 
 	public function is_enabled_via_filter(): bool {

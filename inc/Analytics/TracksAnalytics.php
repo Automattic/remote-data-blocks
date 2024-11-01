@@ -44,12 +44,14 @@ class TracksAnalytics {
 		}
 	}
 
+	/**
+	 * Get the base properties to send with the event.
+	 *
+	 * These properties are only specific to "Remote Data Blocks" while general properties are handled by `Tracks` library.
+	 */
 	public static function get_base_props(): array {
 		return [
-			'hosting_provider' => self::$env_config->get_hosting_provider(),
-			'is_multisite' => is_multisite(),
 			'plugin_version' => defined( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) ? constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) : '',
-			'wp_version' => get_bloginfo( 'version' ),
 		];
 	}
 

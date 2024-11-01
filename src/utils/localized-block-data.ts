@@ -18,6 +18,9 @@ export function getRestUrl(): string {
 	return window.REMOTE_DATA_BLOCKS?.rest_url ?? 'http://127.0.0.1:9999';
 }
 
-export function getTracksBaseProps(): VipTracksBaseProps | undefined {
-	return window.REMOTE_DATA_BLOCKS?.track_base_props;
+/**
+ * Return `Tracks` properties that are specific to "Remote Data Blocks" plugin.
+ */
+export function getTracksBaseProps(): RDBTracksBaseProps | undefined {
+	return window.REMOTE_DATA_BLOCKS?.tracks_base_props;
 }
