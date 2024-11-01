@@ -2,8 +2,6 @@ import { recordTracksEvent } from '@automattic/calypso-analytics';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
-import { getTracksBaseProps } from '@/utils/localized-block-data';
-import { VipTracksBaseProps } from 'types/globals';
 
 vi.mock( '@automattic/calypso-analytics', () => ( {
 	recordTracksEvent: vi.fn(),
@@ -45,7 +43,6 @@ describe( 'sendTracksEvent', () => {
 		if ( window.VIP_TRACKS_BASE_PROPS ) {
 			window.VIP_TRACKS_BASE_PROPS.vipgo_env = 'production';
 		}
-		vi.mocked( getTracksBaseProps ).mockReturnValue( { baseProp: 'baseValue' } );
 
 		sendTracksEvent( 'test_event', { customProp: 'customValue' } );
 
@@ -53,7 +50,6 @@ describe( 'sendTracksEvent', () => {
 		expect( recordTracksEvent ).toHaveBeenCalledWith( 'test_event', {
 			...defaultTrackProps,
 			vipgo_env: 'production',
-			baseProp: 'baseValue',
 			customProp: 'customValue',
 		} );
 	} );

@@ -45,5 +45,13 @@ interface BlocksConfig {
 interface LocalizedBlockData {
 	config: BlocksConfig;
 	rest_url: string;
-	track_base_props?: Record< string, string | boolean >;
+	track_base_props?: VipTracksBaseProps;
+}
+
+interface VipTracksBaseProps {
+	vipgo_env: string;
+	vipgo_org: number;
+	is_vip_user: boolean;
+	_ui: string; // User ID
+	_ut: string; // User Type
 }
