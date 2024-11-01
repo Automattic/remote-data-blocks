@@ -39,18 +39,20 @@ class TracksAnalytics {
 		}
 
 		if ( self::$env_config->is_wpvip_site() || self::$env_config->is_enabled_via_filter() ) {
-			self::$instance = new $tracks_class(
-				'',
-				[
-					'hosting_provider' => self::$env_config->get_hosting_provider(),
-					'is_multisite' => is_multisite(),
-					'plugin_version' => defined( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) ? constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) : '',
-					'wp_version' => get_bloginfo( 'version' ),
-				]
-			);
-
+			self::$instance = new $tracks_class( '', self::get_base_props() );
 			self::setup_tracking_via_hooks();
 		}
+	}
+
+	/**
+	 * Get the base properties to send with the event.
+	 *
+	 * These properties are only specific to "Remote Data Blocks" while general properties are handled by `Tracks` library.
+	 */
+	public static function get_base_props(): array {
+		return [
+			'plugin_version' => defined( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) ? constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) : '',
+		];
 	}
 
 	private static function setup_tracking_via_hooks(): void {
