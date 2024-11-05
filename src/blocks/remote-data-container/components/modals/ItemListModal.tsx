@@ -10,6 +10,7 @@ export interface ItemListModalProps {
 	headerImage?: string;
 	loading: boolean;
 	onOpen?: () => void;
+	onSearch?: ( search: string ) => void;
 	onSelect: ( data: RemoteDataQueryInput ) => void;
 	results?: RemoteData[ 'results' ];
 	title: string;
@@ -37,6 +38,7 @@ export function ItemListModal( props: ItemListModalProps ) {
 				blockName={ props.blockName }
 				loading={ props.loading }
 				noResultsText={ __( 'No items found' ) }
+				onSearch={ props.onSearch }
 				onSelect={ wrappedOnSelect }
 				placeholderText={ __( 'Select an item' ) }
 				results={ props.results }

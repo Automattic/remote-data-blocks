@@ -26,15 +26,6 @@ export function useSearchResults( {
 		void execute( { search_terms: searchTerms } );
 	}
 
-	function onKeyDown( event: React.KeyboardEvent< HTMLInputElement > ): void {
-		if ( event.code !== 'Enter' ) {
-			return;
-		}
-
-		event.preventDefault();
-		onSubmit();
-	}
-
 	useEffect( () => {
 		if ( allowEmptySearchTerms || searchTerms ) {
 			// Debounce the search term input.
@@ -49,8 +40,6 @@ export function useSearchResults( {
 	return {
 		loading,
 		onChange,
-		onKeyDown,
 		results: data?.results,
-		searchTerms,
 	};
 }

@@ -1,6 +1,6 @@
 import { Spinner } from '@wordpress/components';
 import { DataViews, View } from '@wordpress/dataviews';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 import { ItemPreview } from '@/blocks/remote-data-container/components/item-list/ItemPreview';
 import {
@@ -14,6 +14,7 @@ interface ItemListProps {
 	blockName: string;
 	loading: boolean;
 	noResultsText: string;
+	onSearch?: ( search: string ) => void;
 	onSelect: ( data: RemoteDataQueryInput ) => void;
 	placeholderText: string;
 	results?: RemoteData[ 'results' ];
@@ -44,6 +45,12 @@ export function ItemList( props: ItemListProps ) {
 		fields: [ 'id', 'image_url', 'price', 'title' ],
 	} );
 	const { defaultPattern: pattern } = usePatterns( props.blockName );
+
+	useEffect( () => {
+		if ( props.onSearch ) {
+			props.onSearch( view.search ?? '' );
+		}
+	}, [ view.search ] );
 
 	if ( props.loading || ! pattern ) {
 		return <Spinner />;
@@ -149,6 +156,7 @@ export function ItemList( props: ItemListProps ) {
 					setSelection( newSelection );
 				} }
 				defaultLayouts={ defaultLayouts }
+				search={ true }
 				selection={ selection }
 			/>
 		);
