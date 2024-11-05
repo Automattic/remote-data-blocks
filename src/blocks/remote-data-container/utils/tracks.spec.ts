@@ -3,7 +3,6 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
 import { getTracksBaseProps } from '@/utils/localized-block-data';
-import { VipTracksBaseProps } from 'types/globals';
 
 vi.mock( '@automattic/calypso-analytics', () => ( {
 	recordTracksEvent: vi.fn(),
