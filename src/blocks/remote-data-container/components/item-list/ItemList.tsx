@@ -103,21 +103,27 @@ export function ItemList( props: ItemListProps ) {
 	const mappings = blockConfig?.outputSchema?.mappings;
 
 	if ( mappings ) {
-		const fields = Object.keys( mappings )
-			.map( key => {
-				const mapping = mappings[ key ];
+		const fields = Object.entries( mappings )
+			.filter( ( [ _key, mapping ] ) => {
 				if ( ! ( mapping?.name && mapping.type ) ) {
-					return undefined;
+					return false;
 				}
+
+				if ( 'id' === mapping.type ) {
+					return false;
+				}
+
+				return true;
+			} )
+			.map( ( [ key, mapping ] ) => {
 				let renderFn: RenderItemFunction = () => null;
 
 				switch ( mapping.type ) {
 					case 'image_url':
 						renderFn = ( { item } ) => {
-							return <img src={ item.image_url } alt="" style={ { width: '100%' } } />;
+							return <img src={ item.image_url } alt="" style={ { maxHeight: '100px' } } />;
 						};
 						break;
-					case 'id':
 					case 'price':
 					case 'string':
 					default:
