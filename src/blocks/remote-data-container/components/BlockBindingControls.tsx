@@ -85,9 +85,8 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 			: undefined;
 		updateBinding( 'content', { ...contentArgs, field: contentField, label } );
 		sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
-			action: 'show_label',
+			action: showLabel ? 'show_label' : 'hide_label',
 			data_source_type: getBlockDataSourceType( remoteDataName ),
-			value: String( showLabel ),
 		} );
 	}
 
