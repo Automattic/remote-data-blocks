@@ -5,7 +5,7 @@ import { ModalWithButtonTrigger } from '@/blocks/remote-data-container/component
 import { useModalState } from '@/blocks/remote-data-container/hooks/useModalState';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
 import { __ } from '@/utils/i18n';
-import { getBlockDataSource } from '@/utils/localized-block-data';
+import { getBlockDataSourceType } from '@/utils/localized-block-data';
 
 interface InputModalProps {
 	blockName: string;
@@ -34,7 +34,7 @@ export function InputModal( props: InputModalProps ) {
 		sendTracksEvent( 'remotedatablocks_add_block', {
 			action: 'select_item',
 			selected_option: 'manual_input',
-			data_source: getBlockDataSource( props.blockName ),
+			data_source_type: getBlockDataSourceType( props.blockName ),
 		} );
 	}
 

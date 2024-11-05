@@ -117,13 +117,13 @@ class TracksAnalytics {
 			'post_type' => $post->post_type,
 		];
 		foreach ( $matches[1] as $match ) {
-			$data_source = ConfigStore::get_data_source( 'remote-data-blocks/' . $match );
-			if ( ! $data_source ) {
+			$data_source_type = ConfigStore::get_data_source_type( 'remote-data-blocks/' . $match );
+			if ( ! $data_source_type ) {
 				continue;
 			}
 
 			// Calculate stats of each remote data source.
-			$key = $data_source . '_data_source_count';
+			$key = $data_source_type . '_data_source_count';
 			$track_props[ $key ] = ( $track_props[ $key ] ?? 0 ) + 1;
 			$track_props['remote_data_blocks_total_count'] = ( $track_props['remote_data_blocks_total_count'] ?? 0 ) + 1;
 		}

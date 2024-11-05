@@ -6,12 +6,12 @@ export function getBlockConfig( blockName: string ): BlockConfig | undefined {
 	return window.REMOTE_DATA_BLOCKS?.config?.[ blockName ];
 }
 
-export function getBlockDataSource( blockName?: string ): string {
+export function getBlockDataSourceType( blockName?: string ): string {
 	if ( ! blockName ) {
 		return '';
 	}
 
-	return getBlockConfig( blockName )?.dataSource ?? '';
+	return getBlockConfig( blockName )?.dataSourceType ?? '';
 }
 
 export function getBlocksConfig(): BlocksConfig {

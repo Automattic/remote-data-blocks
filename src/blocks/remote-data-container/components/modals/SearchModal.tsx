@@ -3,7 +3,7 @@ import { SearchControl } from '@wordpress/components';
 import { ItemListModal } from '@/blocks/remote-data-container/components/modals/ItemListModal';
 import { useSearchResults } from '@/blocks/remote-data-container/hooks/useSearchResults';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
-import { getBlockDataSource } from '@/utils/localized-block-data';
+import { getBlockDataSourceType } from '@/utils/localized-block-data';
 
 interface SearchModalProps {
 	blockName: string;
@@ -26,7 +26,7 @@ export function SearchModal( props: SearchModalProps ) {
 		sendTracksEvent( 'remotedatablocks_add_block', {
 			action: 'select_item',
 			selected_option: 'search_from_list',
-			data_source: getBlockDataSource( blockName ),
+			data_source_type: getBlockDataSourceType( blockName ),
 		} );
 	}
 

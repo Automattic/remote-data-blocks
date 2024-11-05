@@ -6,7 +6,7 @@ import { PATTERN_BLOCK_TYPE_POST_META_KEY } from '@/config/constants';
 import { useEditedPostAttribute } from '@/hooks/useEditedPostAttribute';
 import { usePostMeta } from '@/hooks/usePostMeta';
 import { __ } from '@/utils/i18n';
-import { getBlockDataSource, getBlocksConfig } from '@/utils/localized-block-data';
+import { getBlockDataSourceType, getBlocksConfig } from '@/utils/localized-block-data';
 
 export function PatternEditorSettingsPanel() {
 	const { postId, postType, isSynced } = useEditedPostAttribute( getEditedPostAttribute => ( {
@@ -26,7 +26,7 @@ export function PatternEditorSettingsPanel() {
 	function updateBlockTypes( blockName: string ): void {
 		updatePostMeta( { ...postMeta, [ PATTERN_BLOCK_TYPE_POST_META_KEY ]: blockName } );
 		sendTracksEvent( 'remotedatablocks_associate_block_type_to_pattern', {
-			data_source: getBlockDataSource( blockName ),
+			data_source_type: getBlockDataSourceType( blockName ),
 			is_pattern_synced: isSynced,
 		} );
 	}

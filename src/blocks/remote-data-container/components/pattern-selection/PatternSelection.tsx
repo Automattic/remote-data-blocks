@@ -6,7 +6,7 @@ import { blockDefault } from '@wordpress/icons';
 
 import { PatternSelectionModal } from '@/blocks/remote-data-container/components/pattern-selection/PatternSelectionModal';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
-import { getBlockDataSource } from '@/utils/localized-block-data';
+import { getBlockDataSourceType } from '@/utils/localized-block-data';
 
 interface PatternSelectionProps {
 	blockName: string;
@@ -24,7 +24,7 @@ export function PatternSelection( props: PatternSelectionProps ) {
 		sendTracksEvent( 'remotedatablocks_add_block', {
 			action: 'select_pattern',
 			selected_option: 'select_from_list',
-			data_source: getBlockDataSource( props.blockName ),
+			data_source_type: getBlockDataSourceType( props.blockName ),
 		} );
 	}
 
@@ -37,7 +37,7 @@ export function PatternSelection( props: PatternSelectionProps ) {
 		sendTracksEvent( 'remotedatablocks_add_block', {
 			action: 'select_pattern',
 			selected_option: 'manual_edit',
-			data_source: getBlockDataSource( props.blockName ),
+			data_source_type: getBlockDataSourceType( props.blockName ),
 		} );
 	}
 

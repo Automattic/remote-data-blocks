@@ -68,7 +68,7 @@ describe( 'InputModal', () => {
 		} );
 		expect( sendTracksEvent ).toHaveBeenCalledWith( 'remotedatablocks_add_block', {
 			action: 'select_item',
-			data_source: '',
+			data_source_type: '',
 			selected_option: 'manual_input',
 		} );
 	} );

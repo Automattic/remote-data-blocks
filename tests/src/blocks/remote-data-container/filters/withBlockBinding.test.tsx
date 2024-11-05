@@ -27,11 +27,11 @@ vi.mock( '@/hooks/useEditedPostAttribute', () => ( {
 describe( 'withBlockBinding', () => {
 	const MockBlockEdit = vi.fn( () => <div data-testid="mock-block-edit" /> );
 	const WrappedComponent = withBlockBinding( MockBlockEdit );
-	const testBlockConfig = {
+	const testBlockConfig: LocalizedBlockData = {
 		config: {
 			'test/block': {
 				availableBindings: { field1: { name: 'Field 1', type: 'string' } },
-				dataSource: 'test-source',
+				dataSourceType: 'test-source',
 				loop: false,
 				name: 'test/block',
 				overrides: {},

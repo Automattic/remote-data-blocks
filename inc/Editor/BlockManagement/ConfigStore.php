@@ -69,11 +69,11 @@ class ConfigStore {
 	}
 
 	/**
-	 * Get data source from block name.
+	 * Get type of data source from block name.
 	 *
 	 * @param string $block_name Name of the block.
 	 */
-	public static function get_data_source( string $block_name ): ?string {
+	public static function get_data_source_type( string $block_name ): ?string {
 		$config = self::get_configuration( $block_name );
 		if ( ! $config ) {
 			return null;
@@ -84,19 +84,19 @@ class ConfigStore {
 			return null;
 		}
 
-		$data_source = null;
+		$data_source_type = null;
 		foreach ( $queries as $query ) {
 			if ( ! $query instanceof HttpQueryContext ) {
 				continue;
 			}
 
-			$data_source = $query->get_data_source()->get_service();
-			if ( $data_source ) {
+			$data_source_type = $query->get_data_source()->get_service();
+			if ( $data_source_type ) {
 				break;
 			}
 		}
 
-		return $data_source;
+		return $data_source_type;
 	}
 
 	/**

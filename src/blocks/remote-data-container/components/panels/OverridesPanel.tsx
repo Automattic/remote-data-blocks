@@ -2,7 +2,7 @@ import { PanelBody, SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
-import { getBlockDataSource } from '@/utils/localized-block-data';
+import { getBlockDataSourceType } from '@/utils/localized-block-data';
 
 interface OverridesPanelProps {
 	blockConfig: BlockConfig;
@@ -47,7 +47,7 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 			queryInputOverrides: copyOfQueryInputOverrides,
 		} );
 		sendTracksEvent( 'remotedatablocks_remote_data_container_override', {
-			data_source: getBlockDataSource( remoteData.blockName ),
+			data_source_type: getBlockDataSourceType( remoteData.blockName ),
 			override_type: overrides?.type,
 			override_target: overrides?.target,
 		} );

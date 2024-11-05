@@ -12,7 +12,7 @@ import { FieldShortcodeSelectFieldPopover } from '@/blocks/remote-data-container
 import { FieldShortcodeSelectTabs } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelectTabs';
 import { FieldShortcodeSelectField } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelection';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
-import { getBlockDataSource } from '@/utils/localized-block-data';
+import { getBlockDataSourceType } from '@/utils/localized-block-data';
 
 function parseDataQuery( dataQuery?: string ): FieldSelection | null {
 	if ( ! dataQuery ) {
@@ -81,7 +81,7 @@ export function FieldShortcodeButton( props: WPFormatEditProps ) {
 		onClose();
 		sendTracksEvent( 'remotedatablocks_field_shortcode', {
 			action: data.action,
-			data_source: getBlockDataSource( data.remoteData?.blockName ),
+			data_source_type: getBlockDataSourceType( data.remoteData?.blockName ),
 			selection_path: data.selectionPath,
 		} );
 	}
@@ -91,7 +91,7 @@ export function FieldShortcodeButton( props: WPFormatEditProps ) {
 		setQueryInput( null );
 		sendTracksEvent( 'remotedatablocks_field_shortcode', {
 			action: 'reset_field_shortcode',
-			data_source: getBlockDataSource( blockName ),
+			data_source_type: getBlockDataSourceType( blockName ),
 		} );
 	}
 

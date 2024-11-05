@@ -2,7 +2,7 @@ import { CheckboxControl, SelectControl } from '@wordpress/components';
 
 import { TEXT_FIELD_TYPES } from '@/blocks/remote-data-container/config/constants';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
-import { getBlockDataSource } from '@/utils/localized-block-data';
+import { getBlockDataSourceType } from '@/utils/localized-block-data';
 
 interface BlockBindingFieldControlProps {
 	availableBindings: AvailableBindings;
@@ -57,7 +57,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 			removeBinding( target );
 			sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
 				action: 'remove_binding',
-				data_source: getBlockDataSource( remoteDataName ),
+				data_source_type: getBlockDataSourceType( remoteDataName ),
 				block_target_attribute: target,
 			} );
 
@@ -68,7 +68,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 		updateBinding( target, { ...args, field } );
 		sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
 			action: 'update_binding',
-			data_source: getBlockDataSource( remoteDataName ),
+			data_source_type: getBlockDataSourceType( remoteDataName ),
 			remote_data_field: field,
 			block_target_attribute: target,
 		} );
@@ -86,7 +86,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 		updateBinding( 'content', { ...contentArgs, field: contentField, label } );
 		sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
 			action: 'show_label',
-			data_source: getBlockDataSource( remoteDataName ),
+			data_source_type: getBlockDataSourceType( remoteDataName ),
 			value: String( showLabel ),
 		} );
 	}
