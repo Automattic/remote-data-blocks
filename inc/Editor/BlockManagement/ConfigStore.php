@@ -69,7 +69,7 @@ class ConfigStore {
 	}
 
 	/**
-	 * Get type of data source from block name.
+	 * Get data source type from block name.
 	 *
 	 * @param string $block_name Name of the block.
 	 */

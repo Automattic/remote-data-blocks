@@ -81,6 +81,19 @@ class TracksAnalyticsTest extends TestCase {
 		$this->assertEquals( [ 'activated_plugin', 'deactivated_plugin', 'save_post' ], array_keys( $GLOBALS['__wordpress_actions'] ) );
 	}
 
+	public function testGetGlobalProperties(): void {
+		/** @var MockObject|EnvironmentConfig */
+		$env_config_mock = $this->getMockBuilder( EnvironmentConfig::class )->onlyMethods( [ 'get_tracks_core_properties' ] )->getMock();
+		$env_config_mock->expects( $this->once() )->method( 'get_tracks_core_properties' )->with()->willReturn( [ 'vipgo_env' => '123' ] );
+
+		TracksAnalytics::init( $env_config_mock );
+
+		$this->assertEquals( [
+			'plugin_version' => '',
+			'vipgo_env' => '123',
+		], TracksAnalytics::get_global_properties() );
+	}
+
 	public function testTrackPluginActivationDoesNotRecordEventIfPluginIsNotRDB(): void {
 		/** @var MockObject|EnvironmentConfig */
 		$env_config_mock = $this->getMockBuilder( EnvironmentConfig::class )->onlyMethods( [ 'is_remote_data_blocks_plugin' ] )->getMock();
