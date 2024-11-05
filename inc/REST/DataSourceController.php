@@ -110,7 +110,7 @@ class DataSourceController extends WP_REST_Controller {
 		$item = DataSourceCrud::register_new_data_source( $data_source_properties );
 
 		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', array_merge( [
-			'data_source' => $data_source_properties['service'],
+			'data_source_type' => $data_source_properties['service'],
 			'action' => 'add',
 		], $this->get_data_source_interaction_track_props( $data_source_properties ) ) );
 
@@ -184,7 +184,7 @@ class DataSourceController extends WP_REST_Controller {
 		$item = DataSourceCrud::update_item_by_uuid( $request->get_param( 'uuid' ), $data_source_properties );
 
 		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', array_merge( [
-			'data_source' => $data_source_properties['service'],
+			'data_source_type' => $data_source_properties['service'],
 			'action' => 'update',
 		], $this->get_data_source_interaction_track_props( $data_source_properties ) ) );
 
@@ -203,7 +203,7 @@ class DataSourceController extends WP_REST_Controller {
 
 		// Tracks Analytics.
 		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', [
-			'data_source' => $data_source_properties['service'],
+			'data_source_type' => $data_source_properties['service'],
 			'action' => 'delete',
 		] );
 
