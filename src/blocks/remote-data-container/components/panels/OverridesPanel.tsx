@@ -47,9 +47,9 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 			queryInputOverrides: copyOfQueryInputOverrides,
 		} );
 		sendTracksEvent( 'remotedatablocks_remote_data_container_override', {
+			data_source: getBlockDataSource( remoteData.blockName ),
 			override_type: overrides?.type,
 			override_target: overrides?.target,
-			data_source: getBlockDataSource( remoteData.blockName ),
 		} );
 	}
 

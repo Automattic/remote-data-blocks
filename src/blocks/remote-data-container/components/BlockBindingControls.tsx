@@ -87,7 +87,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 		sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
 			action: 'show_label',
 			data_source: getBlockDataSource( remoteDataName ),
-			value: showLabel,
+			value: String( showLabel ),
 		} );
 	}
 
