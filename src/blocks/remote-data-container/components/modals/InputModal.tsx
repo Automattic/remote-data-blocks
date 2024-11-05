@@ -28,7 +28,7 @@ export function InputModal( props: InputModalProps ) {
 		setInputState( { ...inputState, [ field ]: value } );
 	}
 
-	function onSaveClick(): void {
+	function onSelectItem(): void {
 		props.onSelect( inputState );
 		close();
 		sendTracksEvent( 'remotedatablocks_add_block', {
@@ -60,7 +60,7 @@ export function InputModal( props: InputModalProps ) {
 						style={ { marginBottom: '8px' } }
 					/>
 				) ) }
-				<Button variant="primary" onClick={ onSaveClick }>
+				<Button variant="primary" onClick={ onSelectItem }>
 					{ __( 'Save' ) }
 				</Button>
 			</form>
