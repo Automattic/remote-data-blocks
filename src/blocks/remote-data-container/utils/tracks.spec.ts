@@ -32,13 +32,13 @@ describe( 'sendTracksEvent', () => {
 	it( 'should not record event if VIP_TRACKS_BASE_PROPS is not defined', () => {
 		window.VIP_TRACKS_BASE_PROPS = undefined;
 
-		sendTracksEvent( 'test_event', { key: 'value' } );
+		sendTracksEvent( 'remotedatablocks_field_shortcode', { action: 'value' } );
 
 		expect( recordTracksEvent ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should not track if vipgo_env is local', () => {
-		sendTracksEvent( 'test_event', { key: 'value' } );
+		sendTracksEvent( 'remotedatablocks_field_shortcode', { action: 'value' } );
 
 		expect( recordTracksEvent ).not.toHaveBeenCalled();
 	} );
@@ -48,14 +48,14 @@ describe( 'sendTracksEvent', () => {
 			window.VIP_TRACKS_BASE_PROPS.vipgo_env = 'production';
 		}
 		vi.mocked( getTracksBaseProps ).mockReturnValue( { plugin_version: '1.0' } );
-		sendTracksEvent( 'test_event', { eventProp: 'eventValue' } );
+		sendTracksEvent( 'remotedatablocks_field_shortcode', { action: 'actionName' } );
 
 		expect( recordTracksEvent ).toHaveBeenCalledTimes( 1 );
-		expect( recordTracksEvent ).toHaveBeenCalledWith( 'test_event', {
+		expect( recordTracksEvent ).toHaveBeenCalledWith( 'remotedatablocks_field_shortcode', {
 			...defaultTrackProps,
 			plugin_version: '1.0',
 			vipgo_env: 'production',
-			eventProp: 'eventValue',
+			action: 'actionName',
 		} );
 	} );
 } );
