@@ -11,14 +11,14 @@ class ConfigStoreTest extends TestCase {
 	public function testGetDataSourceReturnsNullIfConfigIsNotFound(): void {
 		ConfigStore::init();
 
-		$this->assertNull( ConfigStore::get_data_source( 'block_name' ) );
+		$this->assertNull( ConfigStore::get_data_source_type( 'block_name' ) );
 	}
 
 	public function testGetDataSourceReturnsNullIfThereAreNoQueries(): void {
 		ConfigStore::init();
 		ConfigStore::set_configuration( 'block_name', [ 'queries' => [] ] );
 
-		$this->assertNull( ConfigStore::get_data_source( 'block_name' ) );
+		$this->assertNull( ConfigStore::get_data_source_type( 'block_name' ) );
 	}
 
 	public function testGetDataSourceReturnsDataSource(): void {
@@ -27,6 +27,6 @@ class ConfigStoreTest extends TestCase {
 			'queries' => [ new HttpQueryContext( AirtableDataSource::create( 'access_token', 'base_id', [], 'Name' ) ) ],
 		] );
 
-		$this->assertEquals( 'airtable', ConfigStore::get_data_source( 'airtable_remote_blocks' ) );
+		$this->assertEquals( 'airtable', ConfigStore::get_data_source_type( 'airtable_remote_blocks' ) );
 	}
 }
