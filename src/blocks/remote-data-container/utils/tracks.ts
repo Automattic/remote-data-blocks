@@ -1,6 +1,6 @@
 import { recordTracksEvent } from '@automattic/calypso-analytics';
 
-import { getTracksBaseProps } from '@/utils/localized-block-data';
+import { getTracksGlobalProperties } from '@/utils/localized-block-data';
 
 interface TRACKS_EVENTS {
 	remotedatablocks_remote_data_container_actions: {
@@ -35,23 +35,19 @@ interface TRACKS_EVENTS {
  */
 export function sendTracksEvent< K extends keyof TRACKS_EVENTS >(
 	eventName: K,
-	props: TRACKS_EVENTS[ K ]
+	eventProps: TRACKS_EVENTS[ K ]
 ): void {
-	const vipBaseProps = window.VIP_TRACKS_BASE_PROPS;
+	const globalProps = getTracksGlobalProperties();
 
-	// Do not track if the base props are not available i.e. user is not on VIP platform.
-	if ( ! vipBaseProps ) {
+	// Do not track if the props are not available i.e. user is not on VIP platform.
+	if ( ! globalProps ) {
 		return;
 	}
 
 	// Do not track on local environments.
-	if ( vipBaseProps.vipgo_env === 'local' ) {
+	if ( globalProps.vipgo_env === 'local' ) {
 		return;
 	}
 
-	recordTracksEvent( eventName, {
-		...window.VIP_TRACKS_BASE_PROPS,
-		...getTracksBaseProps(),
-		...props,
-	} );
+	recordTracksEvent( eventName, { ...globalProps, ...eventProps } );
 }

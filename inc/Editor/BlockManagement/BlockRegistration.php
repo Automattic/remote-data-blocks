@@ -112,7 +112,7 @@ class BlockRegistration {
 			wp_localize_script( $script_handle, 'REMOTE_DATA_BLOCKS', [
 				'config' => $remote_data_blocks_config,
 				'rest_url' => RemoteDataController::get_url(),
-				'tracks_base_props' => TracksAnalytics::get_base_props(), 
+				'tracks_global_properties' => TracksAnalytics::get_global_properties(), 
 			] );
 		}
 	}

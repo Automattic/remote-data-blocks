@@ -23,8 +23,8 @@ export function getRestUrl(): string {
 }
 
 /**
- * Return `Tracks` properties that are specific to "Remote Data Blocks" plugin.
+ * Return global `Tracks` properties to be sent with every event.
  */
-export function getTracksBaseProps(): RDBTracksBaseProps | undefined {
-	return window.REMOTE_DATA_BLOCKS?.tracks_base_props;
+export function getTracksGlobalProperties(): TracksGlobalProperties | undefined {
+	return window.REMOTE_DATA_BLOCKS?.tracks_global_properties;
 }

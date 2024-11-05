@@ -2,35 +2,42 @@ import { recordTracksEvent } from '@automattic/calypso-analytics';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
-import { getTracksBaseProps } from '@/utils/localized-block-data';
+import { getTracksGlobalProperties } from '@/utils/localized-block-data';
 
 vi.mock( '@automattic/calypso-analytics', () => ( {
 	recordTracksEvent: vi.fn(),
 } ) );
 
 vi.mock( '@/utils/localized-block-data', () => ( {
-	getTracksBaseProps: vi.fn(),
+	getTracksGlobalProperties: vi.fn(),
 } ) );
 
 describe( 'sendTracksEvent', () => {
-	const defaultTrackProps: VipTracksBaseProps = {
+	const defaultTracksGlobalProps: TracksGlobalProperties = {
+		plugin_version: '0.2',
+
+		// "Tracks" library properties.
 		vipgo_env: 'local',
 		vipgo_org: 1,
 		is_vip_user: false,
 		hosting_provider: 'vip',
 		is_multisite: false,
 		wp_version: '6.6',
-		_ui: '1', // User ID
-		_ut: 'anon', // User Type
+		_ui: '1',
+		_ut: 'anon',
 	};
 
 	beforeEach( () => {
-		window.VIP_TRACKS_BASE_PROPS = defaultTrackProps;
+		window.REMOTE_DATA_BLOCKS = {
+			config: {},
+			rest_url: '',
+			tracks_global_properties: defaultTracksGlobalProps,
+		};
 		vi.clearAllMocks();
 	} );
 
-	it( 'should not record event if VIP_TRACKS_BASE_PROPS is not defined', () => {
-		window.VIP_TRACKS_BASE_PROPS = undefined;
+	it( 'should not record event if Tracks global properties is not defined', () => {
+		window.REMOTE_DATA_BLOCKS = { config: {}, rest_url: '', tracks_global_properties: undefined };
 
 		sendTracksEvent( 'remotedatablocks_field_shortcode', { action: 'value' } );
 
@@ -43,17 +50,17 @@ describe( 'sendTracksEvent', () => {
 		expect( recordTracksEvent ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should call recordTracksEvent with the correct event name and merged properties', () => {
-		if ( window.VIP_TRACKS_BASE_PROPS ) {
-			window.VIP_TRACKS_BASE_PROPS.vipgo_env = 'production';
-		}
-		vi.mocked( getTracksBaseProps ).mockReturnValue( { plugin_version: '1.0' } );
+	it( 'should call recordTracksEvent with the correct event name and properties', () => {
+		vi.mocked( getTracksGlobalProperties ).mockReturnValue( {
+			...defaultTracksGlobalProps,
+			vipgo_env: 'production',
+		} );
+
 		sendTracksEvent( 'remotedatablocks_field_shortcode', { action: 'actionName' } );
 
 		expect( recordTracksEvent ).toHaveBeenCalledTimes( 1 );
 		expect( recordTracksEvent ).toHaveBeenCalledWith( 'remotedatablocks_field_shortcode', {
-			...defaultTrackProps,
-			plugin_version: '1.0',
+			...defaultTracksGlobalProps,
 			vipgo_env: 'production',
 			action: 'actionName',
 		} );

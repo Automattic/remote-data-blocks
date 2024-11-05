@@ -45,12 +45,5 @@ interface BlocksConfig {
 interface LocalizedBlockData {
 	config: BlocksConfig;
 	rest_url: string;
-	tracks_base_props?: RDBTracksBaseProps;
-}
-
-/**
- * Tracks properties that are specific to "Remote Data Blocks" plugin.
- */
-interface RDBTracksBaseProps {
-	plugin_version: string;
+	tracks_global_properties?: TracksGlobalProperties;
 }

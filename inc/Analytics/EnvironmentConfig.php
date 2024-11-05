@@ -24,7 +24,7 @@ class EnvironmentConfig {
 
 	public function __construct() {
 		if ( function_exists( 'Automattic\VIP\Telemetry\Tracks\get_tracks_core_properties' ) ) {
-			add_action( 'wp_loaded', function (): void {
+			add_action( 'init', function (): void {
 				$this->tracks_core_props = get_tracks_core_properties();
 			} );
 		}

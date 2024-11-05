@@ -4,6 +4,6 @@ module.exports = {
 	extends: [ 'plugin:@automattic/wpvip/recommended' ],
 	globals: {
 		REMOTE_DATA_BLOCKS: 'readonly',
-		VIP_TRACKS_BASE_PROPS: 'readonly',
+		REMOTE_DATA_BLOCKS_SETTINGS: 'readonly',
 	},
 };
