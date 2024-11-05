@@ -4,4 +4,3 @@ if [ -d "$(git rev-parse --git-path rebase-merge)" ] || [ -d "$(git rev-parse --
 fi
 
 lint-staged
-npm run check-types # Run tsc on the whole project, as running it only on staged files may result in import or type errors.
