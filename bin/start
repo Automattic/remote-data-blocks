@@ -23,7 +23,12 @@ cleanup() {
     echo ""
     echo "✊ Caught SIG signal. Stopping..."
 
-    npm run -s dev:stop
+    printf "Stop WordPress? (y/n) "
+    read -r answer
+    if [ "$answer" != "${answer#[Yy]}" ]; then
+        npm run -s dev:stop
+    fi
+
     exit 0
 }
 
