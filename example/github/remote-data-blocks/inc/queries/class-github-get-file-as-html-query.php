@@ -10,18 +10,12 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 			'file_path' => [
 				'name' => 'File Path',
 				'type' => 'string',
-			],
-			'sha' => [
-				'name' => 'SHA',
-				'type' => 'string',
-			],
-			'size' => [
-				'name' => 'Size',
-				'type' => 'number',
-			],
-			'url' => [
-				'name' => 'URL',
-				'type' => 'string',
+				'overrides' => [
+					[
+						'target' => 'utm_content',
+						'type' => 'query_var',
+					],
+				],
 			],
 		];
 	}
@@ -38,21 +32,6 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 				'file_path' => [
 					'name' => 'File Path',
 					'path' => '$.path',
-					'type' => 'string',
-				],
-				'sha' => [
-					'name' => 'SHA',
-					'path' => '$.sha',
-					'type' => 'string',
-				],
-				'size' => [
-					'name' => 'Size',
-					'path' => '$.size',
-					'type' => 'number',
-				],
-				'url' => [
-					'name' => 'URL',
-					'path' => '$.url',
 					'type' => 'string',
 				],
 			],
@@ -82,9 +61,6 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 		return [
 			'content' => $html_response_data,
 			'file_path' => $input_variables['file_path'],
-			'sha' => $input_variables['sha'],
-			'size' => $input_variables['size'],
-			'url' => $input_variables['url'],
 		];
 	}
 }
