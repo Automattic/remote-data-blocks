@@ -30,6 +30,7 @@ function register_github_file_as_html_block() {
 		],
 	] );
 	register_remote_data_block_pattern( $block_name, 'GitHub File Render', $block_pattern2 );
+	register_remote_data_page( $block_name, 'gh', [ 'allow_nested_paths' => true ] );
 
 	$logger = LoggerManager::instance();
 	$logger->info( sprintf( 'Registered %s block (branch: %s)', $block_name, $branch ) );
