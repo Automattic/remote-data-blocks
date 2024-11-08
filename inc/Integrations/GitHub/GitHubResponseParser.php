@@ -20,9 +20,9 @@ class GitHubResponseParser {
 		// Load the HTML into a DOMDocument
 		$dom = new \DOMDocument();
 
-		// Convert the HTML to UTF-8 if it's not already
-		$html = mb_convert_encoding( $html, 'HTML-ENTITIES', 'UTF-8' );
-
+		// Convert HTML to UTF-8 using htmlspecialchars instead of mb_convert_encoding
+		$html = '<?xml encoding="UTF-8">' . $html;
+		
 		// Suppress errors due to malformed HTML
 		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 		@$dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
