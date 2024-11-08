@@ -4,6 +4,8 @@ namespace RemoteDataBlocks\Example\GitHub;
 
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Integrations\GitHub\GitHubDataSource;
+use RemoteDataBlocks\Integrations\GitHub\GitHubResponseParser;
+
 class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 	public function get_input_schema(): array {
 		return [
@@ -13,7 +15,7 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 				'overrides' => [
 					[
 						'target' => 'utm_content',
-						'type' => 'query_var',
+						'type' => 'url',
 					],
 				],
 			],
@@ -59,7 +61,7 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 
 	public function process_response( string $html_response_data, array $input_variables ): array {
 		return [
-			'content' => $html_response_data,
+			'content' => GitHubResponseParser::update_html_links( $html_response_data ),
 			'file_path' => $input_variables['file_path'],
 		];
 	}
