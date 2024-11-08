@@ -2,6 +2,9 @@
 
 namespace RemoteDataBlocks\Integrations\GitHub;
 
+/**
+ * @psalm-api
+ */
 class GitHubResponseParser {
 	/**
 	 * Updates the relative/absolute links in href attributes.
@@ -21,6 +24,7 @@ class GitHubResponseParser {
 		$html = mb_convert_encoding( $html, 'HTML-ENTITIES', 'UTF-8' );
 
 		// Suppress errors due to malformed HTML
+		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 		@$dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
 
 		// Create an XPath to query href attributes
@@ -37,10 +41,10 @@ class GitHubResponseParser {
 			// Check if the href is non-empty and points to a markdown file 
 			if ( $href && preg_match( '/\.md($|#)/', $href ) ) {
 				// Adjust the path
-				$newHref = self::adjust_path( $href );
+				$new_href = self::adjust_path( $href );
 
 				// Set the new href
-				$node->setAttribute( 'href', $newHref );
+				$node->setAttribute( 'href', $new_href );
 			}
 		}
 
@@ -57,19 +61,19 @@ class GitHubResponseParser {
 	 */
 	private static function adjust_path( string $path ): string {
 		// Parse the URL to separate the path and fragment
-		$parts = parse_url( $path );
+		$parts = wp_parse_url( $path );
 
 		// Extract the path and fragment
-		$originalPath = isset( $parts['path'] ) ? $parts['path'] : '';
+		$original_path = isset( $parts['path'] ) ? $parts['path'] : '';
 		$fragment = isset( $parts['fragment'] ) ? '#' . $parts['fragment'] : '';
 
 		// Remove leading './' or '/' but not '../'
-		$adjustedPath = preg_replace( '#^(\./|/)+#', '', $originalPath );
+		$adjusted_path = preg_replace( '#^(\./|/)+#', '', $original_path );
 
 		// Prepend '../' to go one level up
-		$adjustedPath = '../' . $adjustedPath;
+		$adjusted_path = '../' . $adjusted_path;
 
 		// Reconstruct the path with fragment
-		return $adjustedPath . $fragment;
+		return $adjusted_path . $fragment;
 	}
 }
