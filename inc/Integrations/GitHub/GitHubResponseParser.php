@@ -7,7 +7,7 @@ namespace RemoteDataBlocks\Integrations\GitHub;
  */
 class GitHubResponseParser {
 	/**
-	 * Updates the relative/absolute links in href attributes.
+	 * Updates the relative/absolute markdown links in href attributes.
 	 * This adjusts the links so they work correctly when the file structure changes.
 	 * - All relative paths go one level up.
 	 * - All absolute paths are converted to relative paths one level up.
@@ -16,13 +16,13 @@ class GitHubResponseParser {
 	 * @param string $html The HTML response data.
 	 * @return string The updated HTML response data.
 	 */
-	public static function update_html_links( string $html ): string {
+	public static function update_markdown_links( string $html ): string {
 		// Load the HTML into a DOMDocument
 		$dom = new \DOMDocument();
 
 		// Convert HTML to UTF-8 using htmlspecialchars instead of mb_convert_encoding
 		$html = '<?xml encoding="UTF-8">' . $html;
-		
+
 		// Suppress errors due to malformed HTML
 		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 		@$dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
