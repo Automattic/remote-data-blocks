@@ -1,4 +1,4 @@
-import { registerBlockType } from '@wordpress/blocks';
+import { registerBlockBindingsSource, registerBlockType } from '@wordpress/blocks';
 import { addFilter } from '@wordpress/hooks';
 import { registerFormatType } from '@wordpress/rich-text';
 
@@ -45,3 +45,20 @@ addFilter(
 	withBlockBindingShim,
 	5 // Ensure this runs before core filters
 );
+
+registerBlockBindingsSource( {
+	name: 'remote-data/binding',
+	// label: 'Remote Data Binding',
+	// usesContext: [],
+	// getValues( { select, clientId, context, bindings } ) {
+	// 	console.log( 'getValues', { select, clientId, context, bindings } );
+	// 	return {};
+	// },
+	// setValues( { select, clientId, dispatch, context, bindings } ) {
+	// 	console.log( 'setValues', { select, clientId, dispatch, context, bindings } );
+	// },
+	// canUserEditValue( { select, context, args } ) {
+	// 	console.log( 'canUserEditValue', { select, context, args } );
+	// 	return false;
+	// },
+} );
