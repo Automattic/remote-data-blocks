@@ -5,6 +5,8 @@ import { BlockEditProps as BlockEditPropsOriginal } from '@wordpress/blocks';
  */
 
 declare module '@wordpress/blocks' {
+	function alecgBlocksTest(): void;
+
 	interface BlockEditProps< T extends Record< string, any > > extends BlockEditPropsOriginal< T > {
 		name: string;
 	}

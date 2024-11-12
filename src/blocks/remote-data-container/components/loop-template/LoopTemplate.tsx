@@ -2,8 +2,9 @@ import {
 	BlockEditorStoreSelectors,
 	store as blockEditorStore,
 	useBlockEditContext,
+	alecgBlockEditorTest,
 } from '@wordpress/block-editor';
-import { BlockInstance } from '@wordpress/blocks';
+import { BlockInstance, alecgBlocksTest } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -25,6 +26,10 @@ export function LoopTemplate( props: LoopTemplateProps ) {
 
 	// Hammer approach, forces re-render of the whole loop when user input is detected.
 	const { clientId } = useBlockEditContext();
+
+	alecgBlockEditorTest();
+	alecgBlocksTest();
+
 	useSelect< BlockEditorStoreSelectors, BlockInstance[] >(
 		select => select( blockEditorStore ).getBlocksByClientId( clientId ),
 		[ clientId ]

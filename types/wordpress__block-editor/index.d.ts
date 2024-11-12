@@ -14,6 +14,8 @@ declare module '@wordpress/block-editor' {
 		[ key: string ]: unknown;
 	};
 
+	function alecgBlockEditorTest(): void;
+
 	function __experimentalUseBlockPreview( props: {
 		blocks: BlockInstance[];
 		props: object;
