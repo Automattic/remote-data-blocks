@@ -2,7 +2,7 @@ import { TextControl } from '@wordpress/components';
 import { useDebounce } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { sanitizeDataSourceSlug } from '@/data-sources/utils';
@@ -15,12 +15,14 @@ interface SlugInputProps {
 
 export const SlugInput: React.FC< SlugInputProps > = ( { slug, onChange, uuid } ) => {
 	const { slugConflicts, checkSlugConflict } = useDataSources( false );
+	const [ newSlug, setNewSlug ] = useState( slug );
 
 	// eslint-disable-next-line @typescript-eslint/no-misused-promises
 	const debouncedCheckSlugConflict = useDebounce( checkSlugConflict, 500 );
-	const onSlugChange = ( newSlug: string | undefined ): void => {
+	const onSlugUpdate = () => {
 		const sanitizedSlug = sanitizeDataSourceSlug( newSlug ?? '' );
-		if ( sanitizedSlug !== slug ) {
+		if ( sanitizedSlug !== newSlug ) {
+			setNewSlug( sanitizedSlug );
 			onChange( sanitizedSlug );
 			void debouncedCheckSlugConflict( sanitizedSlug, uuid ?? '' );
 		}
@@ -36,8 +38,9 @@ export const SlugInput: React.FC< SlugInputProps > = ( { slug, onChange, uuid } 
 	return (
 		<TextControl
 			label={ __( 'Slug', 'remote-data-blocks' ) }
-			value={ slug }
-			onChange={ onSlugChange }
+			value={ newSlug }
+			onChange={ setNewSlug }
+			onBlur={ onSlugUpdate }
 			help={ __(
 				slugConflictMessage || 'A unique identifier for this data source.',
 				'remote-data-blocks'
