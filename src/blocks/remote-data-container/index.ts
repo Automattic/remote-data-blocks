@@ -47,10 +47,12 @@ addFilter(
 	5 // Ensure this runs before core filters
 );
 
+// eslint-disable-next-line -- Temporary registerBlockBindingsSource type error workaround for WordPress 6.7
 registerBlockBindingsSource( {
 	name: 'remote-data/binding',
 	label: 'Remote Data Binding',
 	usesContext: [ 'remote-data-blocks/remoteData' ],
+	// eslint-disable-next-line -- Temporary registerBlockBindingsSource type error workaround for WordPress 6.7
 	getValues( { select, clientId, context, bindings }: any ) {
 		return {};
 	},
