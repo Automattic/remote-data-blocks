@@ -2,7 +2,7 @@ import CheckIcon from '@/settings/icons/CheckIcon';
 import ErrorIcon from '@/settings/icons/ErrorIcon';
 
 export const sanitizeDataSourceSlug = ( slug: string ) => {
-	return slug.replace( /[^a-z0-9-]/g, '' ).toLowerCase();
+	return slug.replace( /[^a-z0-9-]/gi, '' ).toLowerCase();
 };
 
 export function getConnectionMessage(
