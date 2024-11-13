@@ -8,7 +8,7 @@
  * Author URI: https://wpvip.com
  * Text Domain: remote-data-blocks
  * Version: 0.2.7
- * Requires at least: 6.6
+ * Requires at least: 6.7
  * Requires PHP: 8.1
  */
 
