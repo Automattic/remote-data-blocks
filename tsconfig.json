@@ -10,6 +10,7 @@
     "noUncheckedIndexedAccess": true,
     "outDir": "./build/",
     "paths": {
+      "@wordpress/blocks": ["./types/wordpress__blocks"],
       "@/*": [ "./src/*" ]
     },
     "resolveJsonModule": true,

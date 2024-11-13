@@ -1,0 +1,56 @@
+{
+    "name": "@types/wordpress__blocks",
+    "version": "12.5.14",
+    "description": "TypeScript definitions for @wordpress/blocks",
+    "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/wordpress__blocks",
+    "license": "MIT",
+    "contributors": [
+        {
+            "name": "Derek Sifford",
+            "githubUsername": "dsifford",
+            "url": "https://github.com/dsifford"
+        },
+        {
+            "name": "Jon Surrell",
+            "githubUsername": "sirreal",
+            "url": "https://github.com/sirreal"
+        },
+        {
+            "name": "Dennis Snell",
+            "githubUsername": "dmsnell",
+            "url": "https://github.com/dmsnell"
+        },
+        {
+            "name": "Tomasz Tunik",
+            "githubUsername": "tomasztunik",
+            "url": "https://github.com/tomasztunik"
+        },
+        {
+            "name": "Lucio Giannotta",
+            "githubUsername": "sunyatasattva",
+            "url": "https://github.com/sunyatasattva"
+        },
+        {
+            "name": "Bas Tolen",
+            "githubUsername": "bastolen",
+            "url": "https://github.com/bastolen"
+        }
+    ],
+    "main": "",
+    "types": "index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+        "directory": "types/wordpress__blocks"
+    },
+    "scripts": {},
+    "dependencies": {
+        "@types/react": "*",
+        "@types/wordpress__shortcode": "*",
+        "@wordpress/components": "^27.2.0",
+        "@wordpress/data": "^9.13.0",
+        "@wordpress/element": "^5.0.0"
+    },
+    "typesPublisherContentHash": "c51d33f0bcb1a68b39ca3cbbbc06afbf57df8deee8eec9a9769f892570403a04",
+    "typeScriptVersion": "4.7"
+}
