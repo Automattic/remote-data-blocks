@@ -11,9 +11,7 @@ function get_query_var( string $var, $default = '' ): mixed {
 	return MockWordPressFunctions::get_query_var( $var, $default );
 }
 
-/**
- * Start of the test namespace.
- */
+// phpcs:disable Universal.Namespaces.OneDeclarationPerFile.MultipleFound
 namespace RemoteDataBlocks\Tests\Editor\DataBinding;
 
 use PHPUnit\Framework\TestCase;
@@ -42,7 +40,7 @@ class BlockBindingsTest extends TestCase {
 				'name' => 'Output Field',
 				'type' => 'string',
 				'path' => '$.output_field',
-			]
+			],
 		],
 	];
 	private const MOCK_OUTPUT_FIELD_NAME = 'output_field';
@@ -53,16 +51,12 @@ class BlockBindingsTest extends TestCase {
 			[
 				'result' => [
 					self::MOCK_OUTPUT_FIELD_NAME => [
-						'value' => self::MOCK_OUTPUT_FIELD_VALUE
+						'value' => self::MOCK_OUTPUT_FIELD_VALUE,
 					],
-				]
-			]
-		]
+				],
+			],
+		],
 	];
-
-	protected function setUp(): void {
-		parent::setUp();
-	}
 
 	protected function tearDown(): void {
 		parent::tearDown();
@@ -77,8 +71,8 @@ class BlockBindingsTest extends TestCase {
 		/**
 		 * Mock the ConfigStore to return null.
 		 */
-		$mockConfigStore = Mockery::namedMock( ConfigStore::class );
-		$mockConfigStore->shouldReceive( 'get_configuration' )
+		$mock_config_store = Mockery::namedMock( ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_configuration' )
 			->once()
 			->with( self::MOCK_BLOCK_NAME )
 			->andReturn( null );
@@ -126,8 +120,8 @@ class BlockBindingsTest extends TestCase {
 		/**
 		 * Mock the ConfigStore to return the block configuration.
 		 */
-		$mockConfigStore = Mockery::namedMock( ConfigStore::class );
-		$mockConfigStore->shouldReceive( 'get_configuration' )
+		$mock_config_store = Mockery::namedMock( ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_configuration' )
 			->once()
 			->with( self::MOCK_BLOCK_NAME )
 			->andReturn( $mock_block_config );
@@ -187,8 +181,8 @@ class BlockBindingsTest extends TestCase {
 			],
 		];
 
-		$mockConfigStore = Mockery::namedMock( ConfigStore::class );
-		$mockConfigStore->shouldReceive( 'get_configuration' )
+		$mock_config_store = Mockery::namedMock( ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_configuration' )
 			->once()
 			->with( self::MOCK_BLOCK_NAME )
 			->andReturn( $mock_block_config );
@@ -242,8 +236,8 @@ class BlockBindingsTest extends TestCase {
 			],
 		];
 
-		$mockConfigStore = Mockery::namedMock( ConfigStore::class );
-		$mockConfigStore->shouldReceive( 'get_configuration' )
+		$mock_config_store = Mockery::namedMock( ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_configuration' )
 			->once()
 			->with( self::MOCK_BLOCK_NAME )
 			->andReturn( $mock_block_config );
@@ -301,8 +295,8 @@ class BlockBindingsTest extends TestCase {
 			],
 		];
 
-		$mockConfigStore = Mockery::namedMock( ConfigStore::class );
-		$mockConfigStore->shouldReceive( 'get_configuration' )
+		$mock_config_store = Mockery::namedMock( ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_configuration' )
 			->once()
 			->with( self::MOCK_BLOCK_NAME )
 			->andReturn( $mock_block_config );
@@ -367,8 +361,8 @@ class BlockBindingsTest extends TestCase {
 			],
 		];
 
-		$mockConfigStore = Mockery::namedMock( ConfigStore::class );
-		$mockConfigStore->shouldReceive( 'get_configuration' )
+		$mock_config_store = Mockery::namedMock( ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_configuration' )
 			->once()
 			->with( self::MOCK_BLOCK_NAME )
 			->andReturn( $mock_block_config );
