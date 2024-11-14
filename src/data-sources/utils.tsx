@@ -1,8 +1,13 @@
 import CheckIcon from '@/settings/icons/CheckIcon';
 import ErrorIcon from '@/settings/icons/ErrorIcon';
 
-export const sanitizeDataSourceSlug = ( slug: string ) => {
-	return slug
+/**
+ * Tranforms a string into a valid data source slug.
+ *
+ * @param input The string to slugify.
+ */
+export const slugify = ( input: string ) => {
+	return input
 		.toString() // Ensure input is a string
 		.toLowerCase() // Convert to lowercase
 		.trim() // Trim leading and trailing spaces
