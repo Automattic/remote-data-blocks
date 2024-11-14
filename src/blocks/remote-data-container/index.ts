@@ -1,4 +1,5 @@
-import { registerBlockType } from '@wordpress/blocks';
+// @ts-expect-error -- Temporary registerBlockBindingsSource type error workaround for WordPress 6.7
+import { registerBlockType, registerBlockBindingsSource } from '@wordpress/blocks';
 import { addFilter } from '@wordpress/hooks';
 import { registerFormatType } from '@wordpress/rich-text';
 
@@ -45,3 +46,14 @@ addFilter(
 	withBlockBindingShim,
 	5 // Ensure this runs before core filters
 );
+
+// eslint-disable-next-line -- Temporary registerBlockBindingsSource type error workaround for WordPress 6.7
+registerBlockBindingsSource( {
+	name: 'remote-data/binding',
+	label: 'Remote Data Binding',
+	usesContext: [ 'remote-data-blocks/remoteData' ],
+	// eslint-disable-next-line -- Temporary registerBlockBindingsSource type error workaround for WordPress 6.7
+	getValues( { select, clientId, context, bindings }: any ) {
+		return {};
+	},
+} );
