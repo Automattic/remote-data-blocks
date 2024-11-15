@@ -49,14 +49,14 @@ export const useDataSources = ( loadOnMount = true ) => {
 		[ setLoadingSlugConflicts, setSlugConflicts, createErrorNotice ]
 	);
 
-	async function updateDataSource( source: DataSourceConfig ) {
+	async function updateDataSource( sourceConfig: DataSourceConfig ) {
 		let result: DataSourceConfig;
 
 		try {
 			result = await apiFetch( {
-				path: `${ REST_BASE_DATA_SOURCES }/${ source.uuid }`,
+				path: `${ REST_BASE_DATA_SOURCES }/${ sourceConfig.uuid }`,
 				method: 'PUT',
-				data: source,
+				data: sourceConfig,
 			} );
 		} catch ( error ) {
 			showSnackbar( 'error', __( 'Failed to update data source.', 'remote-data-blocks' ) );
@@ -65,7 +65,10 @@ export const useDataSources = ( loadOnMount = true ) => {
 
 		showSnackbar(
 			'success',
-			__( sprintf( '"%s" has been successfully updated.', 'remote-data-blocks' ), source.slug )
+			__(
+				sprintf( '"%s" has been successfully updated.', 'remote-data-blocks' ),
+				sourceConfig.slug
+			)
 		);
 		return result;
 	}
@@ -96,6 +99,7 @@ export const useDataSources = ( loadOnMount = true ) => {
 			await apiFetch( {
 				path: `${ REST_BASE_DATA_SOURCES }/${ source.uuid }`,
 				method: 'DELETE',
+				data: source,
 			} );
 		} catch ( error ) {
 			showSnackbar( 'error', __( 'Failed to delete data source.', 'remote-data-blocks' ) );
