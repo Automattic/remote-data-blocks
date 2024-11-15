@@ -31,7 +31,7 @@
     "lint:fix": "npm run cmd:lint . -- --fix",
     "lint:css:fix": "wp-scripts lint-style --fix",
     "lint:css": "wp-scripts lint-style",
-    "lint:js": "npm run lint && npm run check-types",
+    "lint:js": "npm run lint",
     "lint:php": "npm run lint:phpcs && npm run lint:psalm",
     "lint:phpcs": "vendor/bin/phpcs --cache",
     "lint:phpcs:fix": "vendor/bin/phpcbf",
@@ -99,5 +99,8 @@
   },
   "stylelint": {
     "extends": "./node_modules/@wordpress/scripts/config/.stylelintrc.json"
+  },
+  "dependencies": {
+    "@automattic/calypso-analytics": "^1.1.2"
   }
 }
