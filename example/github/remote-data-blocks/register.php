@@ -22,14 +22,8 @@ function register_github_file_as_html_block() {
 	register_remote_data_block( $block_name, $github_get_file_as_html_query );
 	register_remote_data_list_query( $block_name, $github_get_list_files_query );
 
-	$block_pattern1 = file_get_contents( __DIR__ . '/inc/patterns/file-picker.html' );
-	$block_pattern2 = file_get_contents( __DIR__ . '/inc/patterns/file-render.html' );
-	register_remote_data_block_pattern( $block_name, 'GitHub File Picker', $block_pattern1, [
-		'properties' => [
-			'inserter' => false,
-		],
-	] );
-	register_remote_data_block_pattern( $block_name, 'GitHub File Render', $block_pattern2 );
+	$block_pattern = file_get_contents( __DIR__ . '/inc/patterns/file-render.html' );
+	register_remote_data_block_pattern( $block_name, 'GitHub File Render', $block_pattern );
 	register_remote_data_page( $block_name, 'gh', [ 'allow_nested_paths' => true ] );
 
 	$logger = LoggerManager::instance();
