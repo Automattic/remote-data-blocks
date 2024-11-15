@@ -2,11 +2,31 @@
 
 namespace RemoteDataBlocks\Example\GitHub;
 
+use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Integrations\GitHub\GitHubDataSource;
 use RemoteDataBlocks\Integrations\GitHub\GitHubResponseParser;
 
 class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
+	/**
+	 * @inheritDoc
+	 * @param string|null $default_file_extension Optional file extension to append if missing (e.g., '.md')
+	 */
+	public function __construct(
+		private HttpDataSource $data_source,
+		private ?string $default_file_extension = null
+	) {
+		parent::__construct( $data_source );
+	}
+
+	private function ensure_file_extension( string $file_path ): string {
+		if ( ! $this->default_file_extension ) {
+			return $file_path;
+		}
+
+		return str_ends_with( $file_path, $this->default_file_extension ) ? $file_path : $file_path . $this->default_file_extension;
+	}
+
 	public function get_input_schema(): array {
 		return [
 			'file_path' => [
@@ -18,6 +38,9 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 						'type' => 'url',
 					],
 				],
+				'generate' => function ( array $data ): string {
+					return $this->ensure_file_extension( $data['file_path'] );
+				},
 			],
 		];
 	}
