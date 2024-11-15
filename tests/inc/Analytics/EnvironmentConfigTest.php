@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Tests\Analytics;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use RemoteDataBlocks\Analytics\EnvironmentConfig;
 
 class EnvironmentConfigTest extends TestCase {
@@ -30,8 +31,9 @@ class EnvironmentConfigTest extends TestCase {
 	}
 
 	public function testIsWpvipSiteReturnsTrue(): void {
-		$obj = new EnvironmentConfig();
-		set_private_property( EnvironmentConfig::class, $obj, 'tracks_core_props', [ 'hosting_provider' => 'wpvip' ] );
+		/** @var MockObject|EnvironmentConfig */
+		$obj = $this->getMockBuilder( EnvironmentConfig::class )->onlyMethods( [ 'get_tracks_core_properties' ] )->getMock();
+		$obj->expects( $this->once() )->method( 'get_tracks_core_properties' )->with()->willReturn( [ 'hosting_provider' => 'wpvip' ] );
 
 		$this->assertEquals( true, $obj->is_wpvip_site() );
 	}
@@ -43,8 +45,9 @@ class EnvironmentConfigTest extends TestCase {
 	}
 
 	public function testIsLocalEnvReturnsTrue(): void {
-		$obj = new EnvironmentConfig();
-		set_private_property( EnvironmentConfig::class, $obj, 'tracks_core_props', [ 'vipgo_env' => 'local' ] );
+		/** @var MockObject|EnvironmentConfig */
+		$obj = $this->getMockBuilder( EnvironmentConfig::class )->onlyMethods( [ 'get_tracks_core_properties' ] )->getMock();
+		$obj->expects( $this->once() )->method( 'get_tracks_core_properties' )->with()->willReturn( [ 'vip_env' => 'local' ] );
 
 		$this->assertEquals( true, $obj->is_local_env() );
 	}
@@ -62,16 +65,24 @@ class EnvironmentConfigTest extends TestCase {
 	}
 
 	public function testGetTracksCoreProperties(): void {
-		$obj = new EnvironmentConfig();
-		$this->assertEquals( [], $obj->get_tracks_core_properties() );
-
-		set_private_property( EnvironmentConfig::class, $obj, 'tracks_core_props', [
+		/** @var MockObject|EnvironmentConfig */
+		$obj = $this->getMockBuilder( EnvironmentConfig::class )->onlyMethods( [ 'get_tracks_core_properties' ] )->getMock();
+		$obj->expects( $this->once() )->method( 'get_tracks_core_properties' )->with()->willReturn( [
 			'hosting_provider' => 'wpvip',
-			'vipgo_env' => 'local',
+			'vip_env' => 'local',
 		] );
+
 		$this->assertEquals( [
 			'hosting_provider' => 'wpvip',
-			'vipgo_env' => 'local',
+			'vip_env' => 'local',
 		], $obj->get_tracks_core_properties() );
+	}
+
+	public function testRemoteDataBlockProperties(): void {
+		$obj = new EnvironmentConfig();
+
+		$this->assertEquals( [
+			'plugin_version' => '',
+		], $obj->get_remote_data_blocks_properties() );
 	}
 }
