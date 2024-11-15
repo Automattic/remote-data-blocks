@@ -1,10 +1,9 @@
+import { BlockContextProvider } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
 
+import { REMOTE_DATA_CONTEXT_KEY } from '../../config/constants';
 import { ItemPreview } from '@/blocks/remote-data-container/components/item-list/ItemPreview';
-import {
-	cloneBlockWithAttributes,
-	usePatterns,
-} from '@/blocks/remote-data-container/hooks/usePatterns';
+import { usePatterns } from '@/blocks/remote-data-container/hooks/usePatterns';
 import { __ } from '@/utils/i18n';
 
 interface ItemListProps {
@@ -34,17 +33,19 @@ export function ItemList( props: ItemListProps ) {
 	return (
 		<ul>
 			{ props.results.map( ( result, index ) => {
-				const blocks =
-					pattern?.blocks.map( block =>
-						cloneBlockWithAttributes( block, result, props.blockName )
-					) ?? [];
+				const blocks = pattern?.blocks ?? [];
+
+				const context = {
+					[ REMOTE_DATA_CONTEXT_KEY ]: {
+						result,
+						remoteDataBlockName: props.blockName,
+					},
+				};
 
 				return (
-					<ItemPreview
-						key={ index }
-						blocks={ blocks }
-						onSelect={ () => props.onSelect( result ) }
-					/>
+					<BlockContextProvider value={ context } key={ index }>
+						<ItemPreview blocks={ blocks } onSelect={ () => props.onSelect( result ) } />
+					</BlockContextProvider>
 				);
 			} ) }
 		</ul>

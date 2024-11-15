@@ -8,12 +8,7 @@ import { BlockInstance, cloneBlock, createBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
-import {
-	getBoundAttributeEntries,
-	getMismatchedAttributes,
-	hasBlockBinding,
-	isSyncedPattern,
-} from '@/utils/block-binding';
+import { getBoundAttributeEntries, hasBlockBinding, isSyncedPattern } from '@/utils/block-binding';
 import { getBlockConfig } from '@/utils/localized-block-data';
 
 export function cloneBlockWithAttributes(
@@ -21,16 +16,17 @@ export function cloneBlockWithAttributes(
 	attributes: Record< string, string >,
 	remoteDataBlockName: string
 ): BlockInstance {
-	const mismatchedAttributes = getMismatchedAttributes(
-		block.attributes,
-		[ attributes ],
-		remoteDataBlockName
-	);
+	// const mismatchedAttributes = getMismatchedAttributes(
+	// 	block.attributes,
+	// 	[ attributes ],
+	// 	remoteDataBlockName
+	// );
 	const newInnerBlocks = block.innerBlocks?.map( innerBlock =>
 		cloneBlockWithAttributes( innerBlock, attributes, remoteDataBlockName )
 	);
 
-	return cloneBlock( block, mismatchedAttributes, newInnerBlocks );
+	return cloneBlock( block, attributes, newInnerBlocks );
+	// return cloneBlock( block, mismatchedAttributes, newInnerBlocks );
 }
 
 export function usePatterns( remoteDataBlockName: string, rootClientId: string = '' ) {
