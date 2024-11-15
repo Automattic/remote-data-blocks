@@ -23,7 +23,9 @@ function register_github_file_as_html_block() {
 	register_remote_data_list_query( $block_name, $github_get_list_files_query );
 
 	$block_pattern = file_get_contents( __DIR__ . '/inc/patterns/file-render.html' );
-	register_remote_data_block_pattern( $block_name, 'GitHub File Render', $block_pattern );
+	register_remote_data_block_pattern( $block_name, 'GitHub File Render', $block_pattern, [
+		'role' => 'inner_blocks',
+	] );
 	register_remote_data_page( $block_name, 'gh', [ 'allow_nested_paths' => true ] );
 
 	$logger = LoggerManager::instance();
