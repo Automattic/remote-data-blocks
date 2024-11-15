@@ -291,10 +291,10 @@ export const AirtableSettings = ( {
 			if ( selectedTable ) {
 				selectedTable.fields.forEach( field => {
 					const simpleFieldTypes = [
-						'singlelineText',
+						'singleLineText',
 						'multilineText',
 						'email',
-						'phone',
+						'phoneNumber',
 						'url',
 						'number',
 					];
