@@ -84,7 +84,7 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 
 	public function process_response( string $html_response_data, array $input_variables ): array {
 		$content = $html_response_data;
-		if ( $this->default_file_extension === '.md' ) {
+		if ( '.md' === $this->default_file_extension ) {
 			$content = GitHubResponseParser::update_markdown_links( $content );
 		}
 
