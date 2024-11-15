@@ -1,11 +1,17 @@
 <?php declare(strict_types = 1);
 
-function apply_filters( string $_filter, mixed $thing ): mixed {
-	return $thing;
+$GLOBALS['__wordpress_filters'] = [];
+function apply_filters( string $filter, mixed $thing ): mixed {
+	return $GLOBALS['__wordpress_filters'][ $filter ] ?? $thing;
 }
 
-function add_action( string $_action, mixed ...$_args ): void {}
-function add_filter( string $_filter, mixed ...$_args ): void {}
+$GLOBALS['__wordpress_actions'] = [];
+function add_action( string $action, mixed ...$args ): void {
+	$GLOBALS['__wordpress_actions'][ $action ][] = $args;
+}
+function add_filter( string $filter, mixed ...$args ): void {
+	$GLOBALS['__wordpress_filters'][ $filter ][] = $args;
+}
 
 $GLOBALS['__wordpress_done_actions'] = [];
 function do_action( string $action, mixed ...$args ): void {
@@ -18,6 +24,14 @@ function esc_html( string $text ): string {
 }
 
 function register_block_pattern( string $_name, array $_options ): void {
+	// Do nothing
+}
+
+function is_multisite(): void {
+	// Do nothing
+}
+
+function get_bloginfo( $_property ): void {
 	// Do nothing
 }
 

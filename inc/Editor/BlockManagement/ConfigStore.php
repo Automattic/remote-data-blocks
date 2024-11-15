@@ -27,7 +27,6 @@ class ConfigStore {
 	 * Convert a block title to a block name. Mainly this is to reduce the burden
 	 * of configuration and to ensure that block names are unique (since block
 	 * titles must be unique).
-	 *
 	 */
 	public static function get_block_name( string $block_title ): string {
 		return 'remote-data-blocks/' . sanitize_title( $block_title );
@@ -67,6 +66,37 @@ class ConfigStore {
 	 */
 	public static function is_registered_block( string $block_name ): bool {
 		return isset( self::$configurations[ $block_name ] );
+	}
+
+	/**
+	 * Get data source type from block name.
+	 *
+	 * @param string $block_name Name of the block.
+	 */
+	public static function get_data_source_type( string $block_name ): ?string {
+		$config = self::get_configuration( $block_name );
+		if ( ! $config ) {
+			return null;
+		}
+
+		$queries = $config['queries'];
+		if ( count( $queries ) === 0 ) {
+			return null;
+		}
+
+		$data_source_type = null;
+		foreach ( $queries as $query ) {
+			if ( ! $query instanceof HttpQueryContext ) {
+				continue;
+			}
+
+			$data_source_type = $query->get_data_source()->get_service();
+			if ( $data_source_type ) {
+				break;
+			}
+		}
+
+		return $data_source_type;
 	}
 
 	/**

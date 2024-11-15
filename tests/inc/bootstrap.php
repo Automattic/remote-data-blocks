@@ -10,3 +10,4 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../../inc/Integrations/constants.php';
 require_once __DIR__ . '/../../functions.php';
 require_once __DIR__ . '/stubs.php';
+require_once __DIR__ . '/test-utils.php';
