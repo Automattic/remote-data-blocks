@@ -12,7 +12,7 @@ class GitHubResponseParser {
 	 * - All relative paths go one level up.
 	 * - All absolute paths are converted to relative paths one level up.
 	 * - Handles URLs with fragment identifiers (e.g., '#section').
-	 *
+	 * - Removes the '.md' extension from the paths.
 	 * @param string $html The HTML response data.
 	 * @return string The updated HTML response data.
 	 */
@@ -41,7 +41,7 @@ class GitHubResponseParser {
 			// Check if the href is non-empty and points to a markdown file 
 			if ( $href && preg_match( '/\.md($|#)/', $href ) ) {
 				// Adjust the path
-				$new_href = self::adjust_path( $href );
+				$new_href = self::adjust_markdown_file_path( $href );
 
 				// Set the new href
 				$node->setAttribute( 'href', $new_href );
@@ -53,13 +53,13 @@ class GitHubResponseParser {
 	}
 
 	/**
-	 * Adjusts the given path by going one level up.
+	 * Adjusts the given path by going one level up and removes the '.md' extension.
 	 * Preserves fragment identifiers (anchors) in the URL.
 	 *
 	 * @param string $path The original path.
 	 * @return string The adjusted path.
 	 */
-	private static function adjust_path( string $path ): string {
+	private static function adjust_markdown_file_path( string $path ): string {
 		// Parse the URL to separate the path and fragment
 		$parts = wp_parse_url( $path );
 
@@ -72,6 +72,9 @@ class GitHubResponseParser {
 
 		// Prepend '../' to go one level up
 		$adjusted_path = '../' . $adjusted_path;
+
+		// Remove the '.md' extension
+		$adjusted_path = preg_replace( '/\.md$/', '', $adjusted_path );
 
 		// Reconstruct the path with fragment
 		return $adjusted_path . $fragment;
