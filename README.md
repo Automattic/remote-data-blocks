@@ -13,7 +13,7 @@
 ### Requirements
 
 - PHP 8.1+
-- WordPress 6.6+
+- WordPress 6.7+
 
 A [persistent object cache](https://developer.wordpress.org/reference/classes/wp_object_cache/#persistent-cache-plugins) is not strictly required, but it is highly recommended for optimal performance and to help avoid rate limiting from remote data sources. If your WordPress environment does not provide persistent object cache, the plugin will utilize in-memory (per-request) caching.
 
