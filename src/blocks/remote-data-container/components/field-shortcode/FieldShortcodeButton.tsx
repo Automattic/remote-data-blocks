@@ -11,6 +11,8 @@ import {
 import { FieldShortcodeSelectFieldPopover } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelectFieldPopover';
 import { FieldShortcodeSelectTabs } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelectTabs';
 import { FieldShortcodeSelectField } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelection';
+import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
+import { getBlockDataSourceType } from '@/utils/localized-block-data';
 
 function parseDataQuery( dataQuery?: string ): FieldSelection | null {
 	if ( ! dataQuery ) {
@@ -38,6 +40,7 @@ export function FieldShortcodeButton( props: WPFormatEditProps ) {
 
 	function onClick() {
 		setShowUI( ! showUI );
+		sendTracksEvent( 'remotedatablocks_field_shortcode', { action: 'toolbar_icon_clicked' } );
 	}
 
 	function onClose() {
@@ -76,11 +79,20 @@ export function FieldShortcodeButton( props: WPFormatEditProps ) {
 	function onSelectField( data: FieldSelection, fieldValue: string ) {
 		updateOrInsertField( data, fieldValue );
 		onClose();
+		sendTracksEvent( 'remotedatablocks_field_shortcode', {
+			action: data.action,
+			data_source_type: getBlockDataSourceType( data.remoteData?.blockName ),
+			selection_path: data.selectionPath,
+		} );
 	}
 
-	function resetField() {
+	function resetField( blockName?: string ): void {
 		updateOrInsertField( null, 'Unbound field' );
 		setQueryInput( null );
+		sendTracksEvent( 'remotedatablocks_field_shortcode', {
+			action: 'reset_field_shortcode',
+			data_source_type: getBlockDataSourceType( blockName ),
+		} );
 	}
 
 	useEffect( () => {
@@ -118,7 +130,9 @@ export function FieldShortcodeButton( props: WPFormatEditProps ) {
 					{ queryInput && (
 						<FieldShortcodeSelectField
 							blockName={ queryInput.blockName }
-							onSelectField={ onSelectField }
+							onSelectField={ ( data, fieldValue ) =>
+								onSelectField( { ...data, selectionPath: 'select_new_tab' }, fieldValue )
+							}
 							queryInput={ queryInput.queryInput }
 							fieldType="field"
 						/>
@@ -131,7 +145,9 @@ export function FieldShortcodeButton( props: WPFormatEditProps ) {
 					fieldSelection={ fieldSelection }
 					formatTypeSettings={ formatTypeSettings }
 					onClose={ onClose }
-					onSelectField={ onSelectField }
+					onSelectField={ ( data, fieldValue ) =>
+						onSelectField( { ...data, selectionPath: 'popover' }, fieldValue )
+					}
 					resetField={ resetField }
 				/>
 			) }

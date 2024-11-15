@@ -2,10 +2,16 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { InputModal } from '@/blocks/remote-data-container/components/modals/InputModal';
+import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
+
+vi.mock( '@/blocks/remote-data-container/utils/tracks', () => ( {
+	sendTracksEvent: vi.fn(),
+} ) );
 
 describe( 'InputModal', () => {
 	const mockOnSelect = vi.fn();
 	const defaultProps = {
+		blockName: 'test-block',
 		inputs: [
 			{ slug: 'input1', name: 'Input 1', required: true, type: 'text' },
 			{ slug: 'input2', name: 'Input 2', required: false, type: 'text' },
@@ -59,6 +65,11 @@ describe( 'InputModal', () => {
 		expect( mockOnSelect ).toHaveBeenCalledWith( {
 			input1: 'Test Value 1',
 			input2: 'Test Value 2',
+		} );
+		expect( sendTracksEvent ).toHaveBeenCalledWith( 'remotedatablocks_add_block', {
+			action: 'select_item',
+			data_source_type: '',
+			selected_option: 'manual_input',
 		} );
 	} );
 } );

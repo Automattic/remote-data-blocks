@@ -16,6 +16,7 @@ interface InputVariable {
 
 interface BlockConfig {
 	availableBindings: AvailableBindings;
+	dataSourceType: string;
 	loop: boolean;
 	name: string;
 	overrides: Record< string, InputVariableOverrides >;
@@ -44,4 +45,5 @@ interface BlocksConfig {
 interface LocalizedBlockData {
 	config: BlocksConfig;
 	rest_url: string;
+	tracks_global_properties?: TracksGlobalProperties;
 }

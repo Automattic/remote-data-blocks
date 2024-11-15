@@ -4,6 +4,7 @@ namespace RemoteDataBlocks\Editor\BlockManagement;
 
 defined( 'ABSPATH' ) || exit();
 
+use RemoteDataBlocks\Analytics\TracksAnalytics;
 use RemoteDataBlocks\Editor\BlockPatterns\BlockPatterns;
 use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 use RemoteDataBlocks\REST\RemoteDataController;
@@ -77,6 +78,7 @@ class BlockRegistration {
 				'availableBindings' => $available_bindings,
 				'loop' => $config['loop'],
 				'name' => $block_name,
+				'dataSourceType' => ConfigStore::get_data_source_type( $block_name ),
 				'overrides' => $formatted_overrides,
 				'patterns' => $config['patterns'],
 				'selectors' => $config['selectors'],
@@ -110,6 +112,7 @@ class BlockRegistration {
 			wp_localize_script( $script_handle, 'REMOTE_DATA_BLOCKS', [
 				'config' => $remote_data_blocks_config,
 				'rest_url' => RemoteDataController::get_url(),
+				'tracks_global_properties' => TracksAnalytics::get_global_properties(), 
 			] );
 		}
 	}

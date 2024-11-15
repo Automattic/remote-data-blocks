@@ -2,6 +2,8 @@ import { SearchControl } from '@wordpress/components';
 
 import { ItemListModal } from '@/blocks/remote-data-container/components/modals/ItemListModal';
 import { useSearchResults } from '@/blocks/remote-data-container/hooks/useSearchResults';
+import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
+import { getBlockDataSourceType } from '@/utils/localized-block-data';
 
 interface SearchModalProps {
 	blockName: string;
@@ -19,6 +21,15 @@ export function SearchModal( props: SearchModalProps ) {
 		queryKey,
 	} );
 
+	function onSelectItem( data: RemoteDataQueryInput ): void {
+		onSelect( data );
+		sendTracksEvent( 'remotedatablocks_add_block', {
+			action: 'select_item',
+			selected_option: 'search_from_list',
+			data_source_type: getBlockDataSourceType( blockName ),
+		} );
+	}
+
 	return (
 		<ItemListModal
 			blockName={ blockName }
@@ -34,7 +45,7 @@ export function SearchModal( props: SearchModalProps ) {
 			}
 			headerImage={ props.headerImage }
 			loading={ loading }
-			onSelect={ onSelect }
+			onSelect={ onSelectItem }
 			results={ results }
 			title={ title }
 		/>
