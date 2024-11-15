@@ -5,8 +5,11 @@ import { __ } from '@wordpress/i18n';
 import { blockDefault } from '@wordpress/icons';
 
 import { PatternSelectionModal } from '@/blocks/remote-data-container/components/pattern-selection/PatternSelectionModal';
+import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
+import { getBlockDataSourceType } from '@/utils/localized-block-data';
 
 interface PatternSelectionProps {
+	blockName: string;
 	insertPatternBlocks: ( pattern: BlockPattern ) => void;
 	onCancel: () => void;
 	supportedPatterns: BlockPattern[];
@@ -18,10 +21,24 @@ export function PatternSelection( props: PatternSelectionProps ) {
 	function onClickPattern( pattern: BlockPattern ) {
 		props.insertPatternBlocks( pattern );
 		setShowModal( false );
+		sendTracksEvent( 'remotedatablocks_add_block', {
+			action: 'select_pattern',
+			selected_option: 'select_from_list',
+			data_source_type: getBlockDataSourceType( props.blockName ),
+		} );
 	}
 
 	function onClose() {
 		setShowModal( false );
+	}
+
+	function onClickManualEdit(): void {
+		props.onCancel();
+		sendTracksEvent( 'remotedatablocks_add_block', {
+			action: 'select_pattern',
+			selected_option: 'manual_edit',
+			data_source_type: getBlockDataSourceType( props.blockName ),
+		} );
 	}
 
 	if ( showModal ) {
@@ -39,7 +56,7 @@ export function PatternSelection( props: PatternSelectionProps ) {
 			<Button onClick={ () => setShowModal( true ) } variant="primary">
 				{ __( 'Choose a pattern' ) }
 			</Button>
-			<Button onClick={ props.onCancel } variant="secondary">
+			<Button onClick={ onClickManualEdit } variant="secondary">
 				{ __( 'Edit manually' ) }
 			</Button>
 		</Placeholder>
