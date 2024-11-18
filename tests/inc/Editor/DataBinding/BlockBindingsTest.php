@@ -220,7 +220,7 @@ class BlockBindingsTest extends TestCase {
 			'test_input_field' => [
 				'name' => 'Test Input Field',
 				'type' => 'string',
-				'generate' => function ( array $data ): string {
+				'transform' => function ( array $data ): string {
 					return $data['test_input_field'] . ' transformed';
 				},
 			],
@@ -275,7 +275,7 @@ class BlockBindingsTest extends TestCase {
 			'test_input_field' => [
 				'name' => 'Test Input Field',
 				'type' => 'string',
-				'generate' => function ( array $data ): string {
+				'transform' => function ( array $data ): string {
 					return $data['test_input_field'] . ' ' . $data['another_input_field'];
 				},
 			],
@@ -345,7 +345,7 @@ class BlockBindingsTest extends TestCase {
 			'test_input_field' => [
 				'name' => 'Test Input Field',
 				'type' => 'string',
-				'generate' => function ( array $data ): string {
+				'transform' => function ( array $data ): string {
 					return $data['test_input_field'] . ' transformed';
 				},
 			],

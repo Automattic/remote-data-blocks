@@ -153,29 +153,29 @@ class BlockBindings {
 	}
 
 	/**
-	 * Generate the query input for a block binding before executing the query if
-	 * a generate function is provided. This allows the query input to be generated
-	 * from combined input variables or transformed in some way before the query
-	 * is executed. This runs after the query input overrides have been applied.
+	 * Transform the query input for a block binding before executing the query if
+	 * a transform function is provided. This allows the query input to be
+	 * transformed in some way before the query is executed. This runs after the
+	 * query input overrides have been applied.
 	 */
-	private static function transform_query_input_with_generators(
+	private static function transform_query_input(
 		array $query_input,
 		object $query_config
 	): array {
-		$generated_query_input = [];
+		$transformed_query_input = [];
 
 		foreach ( $query_config->input_schema as $query_input_key => $query_input_schema ) {
 			if (
-				isset( $query_input_schema['generate'] ) &&
-				is_callable( $query_input_schema['generate'] )
+				isset( $query_input_schema['transform'] ) &&
+				is_callable( $query_input_schema['transform'] )
 			) {
-				$generated_query_input[ $query_input_key ] = $query_input_schema['generate'](
+				$transformed_query_input[ $query_input_key ] = $query_input_schema['transform'](
 					$query_input
 				);
 			}
 		}
 
-		return array_merge( $query_input, $generated_query_input );
+		return array_merge( $query_input, $transformed_query_input );
 	}
 
 	private static function get_query_input( array $block_context, object $query_config ): array {
@@ -184,7 +184,7 @@ class BlockBindings {
 		$overrides = $block_context['queryInputOverrides'] ?? [];
 
 		$query_input = self::apply_query_input_overrides( $query_input, $overrides, $block_name );
-		$query_input = self::transform_query_input_with_generators( $query_input, $query_config );
+		$query_input = self::transform_query_input( $query_input, $query_config );
 
 		return $query_input;
 	}
