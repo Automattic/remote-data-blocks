@@ -2,14 +2,14 @@ import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { chevronDown } from '@wordpress/icons';
 
-import { SUPPORTED_SERVICES_LABELS } from './constants';
+import { SUPPORTED_SERVICES_LABELS } from '../constants';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import AirtableIcon from '@/settings/icons/AirtableIcon';
 import GoogleSheetsIcon from '@/settings/icons/GoogleSheetsIcon';
 import HttpIcon from '@/settings/icons/HttpIcon';
 import ShopifyIcon from '@/settings/icons/ShopifyIcon';
 
-import './DataSourceList.scss';
+import '../DataSourceList.scss';
 
 export const AddDataSourceDropdown = () => {
 	const { pushState } = useSettingsContext();

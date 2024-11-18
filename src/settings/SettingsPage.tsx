@@ -2,9 +2,9 @@ import { Button, ExternalLink, __experimentalHStack as HStack } from '@wordpress
 import { __ } from '@wordpress/i18n';
 import { chevronLeft } from '@wordpress/icons';
 
-import { AddDataSourceDropdown } from '@/data-sources/AddDataSourceDropdown';
 import DataSourceList from '@/data-sources/DataSourceList';
 import DataSourceSettings from '@/data-sources/DataSourceSettings';
+import { AddDataSourceDropdown } from '@/data-sources/components/AddDataSourceDropdown';
 import Notices from '@/settings/Notices';
 import { SettingsContext, useDataSourceRouter } from '@/settings/hooks/useSettingsNav';
 
