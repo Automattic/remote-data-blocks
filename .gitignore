@@ -12,6 +12,7 @@ coverage
 
 # Build output (only at root)
 /build/
+/artifacts/
 
 # Dependency directories
 node_modules/
