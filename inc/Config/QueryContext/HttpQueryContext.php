@@ -37,7 +37,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 							'type' => 'array',
 							'required' => false,
 						],
-						'generate' => [
+						'transform' => [
 							'type' => 'function',
 							'required' => false,
 						],
