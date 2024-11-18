@@ -1,8 +1,8 @@
 import {
 	Button,
 	ButtonGroup,
+	__experimentalConfirmDialog as ConfirmDialog,
 	Icon,
-	Modal,
 	Placeholder,
 	Spinner,
 	__experimentalText as Text,
@@ -134,42 +134,22 @@ const DataSourceList = () => {
 				</table>
 
 				{ dataSourceToDelete && (
-					<Modal
-						className="confirm-delete-data-source-modal"
-						title={ __( 'Delete Data Source', 'remote-data-blocks' ) }
+					<ConfirmDialog
+						confirmButtonText={ __( 'Confirm', 'remote-data-blocks' ) }
+						onCancel={ () => onCancelDeleteDialog() }
+						onConfirm={ () => void onConfirmDeleteDataSource( dataSourceToDelete ) }
 						size="medium"
-						onRequestClose={ () => {
-							onCancelDeleteDialog();
-						} }
-						isDismissible={ true }
-						focusOnMount
-						shouldCloseOnEsc={ true }
-						shouldCloseOnClickOutside={ true }
+						title={ __( 'Delete Data Source', 'remote-data-blocks' ) }
 					>
-						<p>
-							{ sprintf(
-								__(
-									'Are you sure you want to delete "%s" data source with slug "%s"?',
-									'remote-data-blocks'
-								),
-								getServiceLabel( dataSourceToDelete.service ),
-								dataSourceToDelete.slug
-							) }
-						</p>
-
-						<div className="action-buttons">
-							<Button variant="link" onClick={ onCancelDeleteDialog }>
-								{ __( 'Cancel', 'remote-data-blocks' ) }
-							</Button>
-							<Button
-								variant="primary"
-								isDestructive
-								onClick={ () => void onConfirmDeleteDataSource( dataSourceToDelete ) }
-							>
-								{ __( 'Confirm', 'remote-data-blocks' ) }
-							</Button>
-						</div>
-					</Modal>
+						{ sprintf(
+							__(
+								'Are you sure you want to delete "%s" data source with slug "%s"?',
+								'remote-data-blocks'
+							),
+							getServiceLabel( dataSourceToDelete.service ),
+							dataSourceToDelete.slug
+						) }
+					</ConfirmDialog>
 				) }
 			</div>
 		);
