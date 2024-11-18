@@ -115,3 +115,18 @@ export function hasRemoteDataChanged( one?: RemoteData, two?: RemoteData ): bool
 export function isSyncedPattern( pattern: BlockPattern ): boolean {
 	return Boolean( pattern.id && pattern.syncStatus !== 'unsynced' );
 }
+
+export function getMismatchedAttributesFromBindings(
+	bindings: Record< string, RemoteDataBlockBinding >,
+	results: RemoteData[ 'results' ],
+	remoteDataBlockName: string,
+	index = 0
+): Partial< RemoteDataInnerBlockAttributes > {
+	const boundAttributeEntries = Object.entries( bindings );
+	const mappedAttributes = boundAttributeEntries.map( ( [ target, binding ] ) => [
+		target,
+		getExpectedAttributeValue( results[ index ], binding.args ),
+	] );
+
+	return Object.fromEntries( mappedAttributes ) as Partial< RemoteDataInnerBlockAttributes >;
+}

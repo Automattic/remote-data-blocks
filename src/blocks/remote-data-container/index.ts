@@ -10,9 +10,9 @@ import { Edit } from '@/blocks/remote-data-container/edit';
 import { withBlockBindingShim } from '@/blocks/remote-data-container/filters/withBlockBinding';
 import { Save } from '@/blocks/remote-data-container/save';
 import { BLOCK_BINDING_SOURCE } from '@/config/constants';
+import { getMismatchedAttributesFromBindings } from '@/utils/block-binding';
 import { getBlocksConfig } from '@/utils/localized-block-data';
 import './style.scss';
-import { getClassName } from '@/utils/string';
 
 // Register a unique block definition for each of the context blocks.
 Object.values( getBlocksConfig() ).forEach( blockConfig => {
@@ -55,53 +55,22 @@ registerBlockBindingsSource( {
 	name: BLOCK_BINDING_SOURCE,
 	label: 'Remote Data Binding',
 	usesContext: [ REMOTE_DATA_CONTEXT_KEY ],
-	// eslint-disable-next-line -- Temporary registerBlockBindingsSource type error workaround for WordPress 6.7
-	getValues( { select, clientId, context, bindings }: any ) {
-		if ( context[ REMOTE_DATA_CONTEXT_KEY ] === undefined ) {
+	getValues( {
+		context,
+		bindings,
+	}: {
+		context: Record< string, unknown >;
+		bindings: Record< string, RemoteDataBlockBinding >;
+	} ) {
+		const remoteData = context[ REMOTE_DATA_CONTEXT_KEY ] as RemoteData | undefined;
+
+		if ( remoteData === undefined ) {
 			return {};
 		}
 
-		const {
-			[ REMOTE_DATA_CONTEXT_KEY ]: { result, remoteDataBlockName },
-		} = context;
-
-		const boundAttributes = getBoundAttributeEntries( bindings, remoteDataBlockName );
-
-		const mappedAttributes = boundAttributes.map( ( [ target, binding ] ) => [
-			target,
-			getExpectedAttributeValue( result, binding.args ),
-		] );
-
-		const attributes = Object.fromEntries(
-			mappedAttributes
-		) as Partial< RemoteDataInnerBlockAttributes >;
+		const { results, blockName } = remoteData;
+		const attributes = getMismatchedAttributesFromBindings( bindings, results, blockName );
 
 		return attributes;
 	},
 } );
-
-function getBoundAttributeEntries(
-	bindings: Record< string, RemoteDataBlockBinding > | undefined,
-	remoteDataBlockName: string
-): [ string, RemoteDataBlockBinding ][] {
-	return Object.entries( bindings ?? {} ).filter(
-		( [ _target, binding ] ) => binding.args?.block === remoteDataBlockName
-	);
-}
-
-function getExpectedAttributeValue(
-	result?: Record< string, string >,
-	args?: RemoteDataBlockBindingArgs
-): string | null {
-	if ( ! args?.field || ! result?.[ args.field ] ) {
-		return null;
-	}
-
-	let expectedValue = result[ args.field ];
-	if ( args.label ) {
-		const labelClass = getClassName( 'block-label' );
-		expectedValue = `<span class="${ labelClass }">${ args.label }</span> ${ expectedValue }`;
-	}
-
-	return expectedValue ?? null;
-}

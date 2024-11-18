@@ -1,4 +1,4 @@
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import { BlockContextProvider, InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { BlockEditProps } from '@wordpress/blocks';
 import { Spinner } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
@@ -11,6 +11,7 @@ import { Placeholder } from '@/blocks/remote-data-container/components/placehold
 import {
 	CONTAINER_CLASS_NAME,
 	DISPLAY_QUERY_KEY,
+	REMOTE_DATA_CONTEXT_KEY,
 } from '@/blocks/remote-data-container/config/constants';
 import { usePatterns } from '@/blocks/remote-data-container/hooks/usePatterns';
 import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteData';
@@ -100,17 +101,27 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	}
 
 	if ( showPatternSelection ) {
-		const supportedPatterns = getSupportedPatterns( props.attributes.remoteData?.results[ 0 ] );
+		const supportedPatterns = getSupportedPatterns();
+		const remoteDataResults = props.attributes.remoteData?.results;
 
-		if ( supportedPatterns.length ) {
+		if ( supportedPatterns.length && remoteDataResults ) {
+			const context = {
+				[ REMOTE_DATA_CONTEXT_KEY ]: {
+					results: remoteDataResults,
+					blockName,
+				},
+			};
+
 			return (
 				<div { ...blockProps }>
-					<PatternSelection
-						blockName={ blockName }
-						insertPatternBlocks={ insertPatternBlocks }
-						onCancel={ resetReadyForInsertion }
-						supportedPatterns={ supportedPatterns }
-					/>
+					<BlockContextProvider value={ context }>
+						<PatternSelection
+							blockName={ blockName }
+							insertPatternBlocks={ insertPatternBlocks }
+							onCancel={ resetReadyForInsertion }
+							supportedPatterns={ supportedPatterns }
+						/>
+					</BlockContextProvider>
 				</div>
 			);
 		}

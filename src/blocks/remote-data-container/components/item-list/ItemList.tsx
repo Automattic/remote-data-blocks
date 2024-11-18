@@ -30,15 +30,15 @@ export function ItemList( props: ItemListProps ) {
 		return <p>{ __( props.noResultsText ) }</p>;
 	}
 
+	const blocks = pattern?.blocks ?? [];
+
 	return (
 		<ul>
 			{ props.results.map( ( result, index ) => {
-				const blocks = pattern?.blocks ?? [];
-
 				const context = {
 					[ REMOTE_DATA_CONTEXT_KEY ]: {
-						result,
-						remoteDataBlockName: props.blockName,
+						results: [ result ],
+						blockName: props.blockName,
 					},
 				};
 

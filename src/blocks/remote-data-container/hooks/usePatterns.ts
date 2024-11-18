@@ -11,24 +11,6 @@ import { useState } from '@wordpress/element';
 import { getBoundAttributeEntries, hasBlockBinding, isSyncedPattern } from '@/utils/block-binding';
 import { getBlockConfig } from '@/utils/localized-block-data';
 
-export function cloneBlockWithAttributes(
-	block: BlockInstance,
-	attributes: Record< string, string >,
-	remoteDataBlockName: string
-): BlockInstance {
-	// const mismatchedAttributes = getMismatchedAttributes(
-	// 	block.attributes,
-	// 	[ attributes ],
-	// 	remoteDataBlockName
-	// );
-	const newInnerBlocks = block.innerBlocks?.map( innerBlock =>
-		cloneBlockWithAttributes( innerBlock, attributes, remoteDataBlockName )
-	);
-
-	return cloneBlock( block, attributes, newInnerBlocks );
-	// return cloneBlock( block, mismatchedAttributes, newInnerBlocks );
-}
-
 export function usePatterns( remoteDataBlockName: string, rootClientId: string = '' ) {
 	const { patterns } = getBlockConfig( remoteDataBlockName ) ?? {};
 	const { replaceInnerBlocks } = useDispatch< BlockEditorStoreActions >( blockEditorStore );
@@ -40,7 +22,7 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 	const [ showPatternSelection, setShowPatternSelection ] = useState< boolean >( false );
 
 	// Extract patterns with defined roles.
-	const patternsByBlockTypes = getPatternsByBlockTypes( remoteDataBlockName );
+	const patternsByBlockTypes = getPatternsByBlockTypes( remoteDataBlockName, rootClientId );
 	const defaultPattern = patternsByBlockTypes.find( ( { name } ) => name === patterns?.default );
 	const innerBlocksPattern = patternsByBlockTypes.find(
 		( { name } ) => name === patterns?.inner_blocks
@@ -48,33 +30,17 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 
 	const returnValue = {
 		defaultPattern,
-		getInnerBlocks: (
-			result: Record< string, string >
-		): BlockInstance< RemoteDataInnerBlockAttributes >[] => {
-			return getBlocks< RemoteDataInnerBlockAttributes >( rootClientId ).map( block =>
-				cloneBlockWithAttributes( block, result, remoteDataBlockName )
-			);
+		getInnerBlocks: (): BlockInstance< RemoteDataInnerBlockAttributes >[] => {
+			return getBlocks< RemoteDataInnerBlockAttributes >( rootClientId );
 		},
-		getSupportedPatterns: ( result?: Record< string, string > ): BlockPattern[] => {
+		getSupportedPatterns: (): BlockPattern[] => {
 			const supportedPatterns = __experimentalGetAllowedPatterns( rootClientId ).filter(
 				pattern =>
 					pattern?.blockTypes?.includes( remoteDataBlockName ) ||
 					pattern.blocks.some( block => hasBlockBinding( block, remoteDataBlockName ) )
 			);
 
-			// If no result is provided, return the supported patterns as is.
-			if ( ! result ) {
-				return supportedPatterns;
-			}
-
-			// Clone the pattern blocks and inject the provided result data so that
-			// it can be previewed.
-			return supportedPatterns.map( pattern => ( {
-				...pattern,
-				blocks: pattern.blocks.map( block =>
-					cloneBlockWithAttributes( block, result, remoteDataBlockName )
-				),
-			} ) );
+			return supportedPatterns;
 		},
 		insertPatternBlocks: ( pattern: BlockPattern ): void => {
 			setShowPatternSelection( false );

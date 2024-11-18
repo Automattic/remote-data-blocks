@@ -11,7 +11,7 @@ import {
 	PATTERN_OVERRIDES_BINDING_SOURCE,
 	PATTERN_OVERRIDES_CONTEXT_KEY,
 } from '@/config/constants';
-import { getBoundBlockClassName, getMismatchedAttributes } from '@/utils/block-binding';
+import { getBoundBlockClassName } from '@/utils/block-binding';
 import { getBlockAvailableBindings } from '@/utils/localized-block-data';
 
 interface BoundBlockEditProps {
@@ -110,27 +110,20 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 			binding => binding.source === PATTERN_OVERRIDES_BINDING_SOURCE
 		);
 
-		// If the block has a binding and the attributes do not match their expected
-		// values, update and merge the attributes.
-		const mergedAttributes = {
-			...attributes,
-			...getMismatchedAttributes( attributes, remoteData.results, remoteData.blockName, index ),
-		};
-
 		// If the block is not writable, render it as usual.
 		if ( isInSyncedPattern && ! hasEnabledOverrides ) {
-			return <BlockEdit { ...props } attributes={ mergedAttributes } />;
+			return <BlockEdit { ...props } />;
 		}
 
 		return (
 			<BoundBlockEdit
-				attributes={ mergedAttributes }
+				attributes={ attributes }
 				availableBindings={ availableBindings }
 				blockName={ name }
 				remoteDataName={ remoteData?.blockName ?? '' }
 				setAttributes={ setAttributes }
 			>
-				<BlockEdit { ...props } attributes={ mergedAttributes } />
+				<BlockEdit { ...props } />
 			</BoundBlockEdit>
 		);
 	};
