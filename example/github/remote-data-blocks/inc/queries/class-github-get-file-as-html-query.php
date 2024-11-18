@@ -38,7 +38,7 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 						'type' => 'url',
 					],
 				],
-				'generate' => function ( array $data ): string {
+				'transform' => function ( array $data ): string {
 					return $this->ensure_file_extension( $data['file_path'] );
 				},
 			],
