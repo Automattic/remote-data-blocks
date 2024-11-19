@@ -59,8 +59,6 @@
     "@playwright/test": "^1.49.0",
     "@testing-library/jest-dom": "6.6.3",
     "@testing-library/react": "16.0.1",
-    "@types/jest": "^29.5.14",
-    "@types/jest-environment-puppeteer": "^5.0.6",
     "@types/wordpress__block-editor": "11.5.15",
     "@types/wordpress__editor": "14.3.1",
     "@vitest/coverage-v8": "2.1.2",
