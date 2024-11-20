@@ -108,22 +108,3 @@ span.data-source-slug {
 	}
 }
 
-.confirm-delete-data-source-modal {
-
-	.action-buttons {
-		display: flex;
-		padding-top: 50px;
-		justify-content: end;
-		gap: 12px;
-	}
-
-	button.is-link {
-		padding: 6px 12px;
-		text-decoration: none;
-
-		&:hover {
-			box-shadow: none;
-			text-decoration: underline;
-		}
-	}
-}
