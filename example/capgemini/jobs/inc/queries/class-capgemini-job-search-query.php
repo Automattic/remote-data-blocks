@@ -156,7 +156,7 @@ class CapgeminiJobSearchQuery extends HttpQueryContext {
 		$page = $input_variables['page'];
 		$size = $input_variables['size'];
 
-		$endpoint = $this->get_data_source()->get_endpoint() . '/jobs';
+		$endpoint = $this->get_data_source()->get_endpoint() . '/job-search';
 
 		return add_query_arg(
 			[

@@ -17,7 +17,7 @@ class CapgeminiJobsDataSource extends HttpDataSource {
 	}
 
 	public function get_endpoint(): string {
-		return 'https://www.capgemini.com/gb-en/wp-json/macs/v1';
+		return 'https://cg-job-search-microservices.azurewebsites.net/api';
 	}
 
 	public function get_request_headers(): array {
