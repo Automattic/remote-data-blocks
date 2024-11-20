@@ -31,7 +31,7 @@ const SettingsPage = () => {
 						</HStack>
 					) : (
 						<>
-							<h1>{ __( 'Data', 'remote-data-blocks' ) }</h1>
+							<h1>{ __( 'Data sources', 'remote-data-blocks' ) }</h1>
 							<p>
 								{ __(
 									'Add and manage data sources used for blocks and content across your site. '
