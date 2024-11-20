@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   test:
-    name: E2E against WordPress
+    name: End-to-End Testing against WordPress
     runs-on: ubuntu-24.04
 
     steps:
