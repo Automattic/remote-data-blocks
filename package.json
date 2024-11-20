@@ -22,6 +22,7 @@
     "cmd:lint": "eslint --ext 'js,jsx,ts,tsx' --quiet",
     "dev": "./bin/start",
     "dev:decoupled": "./bin/start decoupled",
+    "dev:build": "./bin/start default build",
     "dev:destroy": "./bin/stop destroy",
     "dev:stop": "./bin/stop",
     "format": "npm run cmd:format -- --write",
