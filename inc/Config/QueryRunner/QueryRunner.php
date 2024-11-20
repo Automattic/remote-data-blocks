@@ -251,6 +251,9 @@ class QueryRunner implements QueryRunnerInterface {
 			case 'html':
 				return $field_value_single;
 
+			case 'json':
+				return wp_json_encode( $field_value_single );
+
 			case 'price':
 				return sprintf( '$%s', number_format( (float) $field_value_single, 2 ) );
 
