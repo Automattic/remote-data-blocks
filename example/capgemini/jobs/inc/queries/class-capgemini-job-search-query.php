@@ -57,11 +57,6 @@ class CapgeminiJobSearchQuery extends HttpQueryContext {
 					'type' => 'id',
 				],
 				'title' => [
-					'name' => 'Ref',
-					'path' => '$.ref',
-					'type' => 'string',
-				],
-				'title' => [
 					'name' => 'Title',
 					'path' => '$.title',
 					'type' => 'string',
@@ -150,12 +145,12 @@ class CapgeminiJobSearchQuery extends HttpQueryContext {
 					'name' => 'Source Reference',
 					'path' => '$.source_ref',
 					'type' => 'string',
-				]
+				],
 			],
 		];
 	}
 
-	public function get_endpoint( $input_variables ): string {
+	public function get_endpoint( array $input_variables ): string {
 		$search = $input_variables['search'];
 		$country = $input_variables['country_code'];
 		$page = $input_variables['page'];
@@ -163,6 +158,14 @@ class CapgeminiJobSearchQuery extends HttpQueryContext {
 
 		$endpoint = $this->get_data_source()->get_endpoint() . '/jobs';
 
-		return add_query_arg( [ 'country' => $country, 'search' => $search, 'page' => $page, 'size' => $size ], $endpoint );
+		return add_query_arg(
+			[
+				'country' => $country,
+				'search' => $search,
+				'page' => $page,
+				'size' => $size,
+			],
+			$endpoint
+		);
 	}
 }
