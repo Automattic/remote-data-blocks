@@ -4,52 +4,18 @@ namespace RemoteDataBlocks\Example\Capgemini\Jobs;
 
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
-class CapgeminiJobSearchQuery extends HttpQueryContext {
+class CapgeminiJobQuery extends HttpQueryContext {
 	public function get_input_schema(): array {
 		return [
-			'search' => [
-				'type' => 'string',
-				'overrides' => [
-					[
-						'type' => 'query_var',
-						'target' => 'search',
-					],
-				],
-			],
-			'country_code' => [
-				'type' => 'string',
-				'overrides' => [
-					[
-						'type' => 'query_var',
-						'target' => 'country_code',
-					],
-				],
-			],
-			'page' => [
-				'type' => 'number',
-				'overrides' => [
-					[
-						'type' => 'query_var',
-						'target' => 'page',
-					],
-				],
-			],
-			'size' => [
-				'type' => 'number',
-				'overrides' => [
-					[
-						'type' => 'query_var',
-						'target' => 'size',
-					],
-				],
+			'id' => [
+				'type' => 'id',
 			],
 		];
 	}
 
 	public function get_output_schema(): array {
 		return [
-			'root_path' => '$.data[*]',
-			'is_collection' => true,
+			'is_collection' => false,
 			'mappings' => [
 				'id' => [
 					'name' => 'Job ID',
@@ -150,22 +116,7 @@ class CapgeminiJobSearchQuery extends HttpQueryContext {
 		];
 	}
 
-	public function get_endpoint( array $input_variables ): string {
-		$search = $input_variables['search'];
-		$country = $input_variables['country_code'];
-		$page = $input_variables['page'];
-		$size = $input_variables['size'];
-
-		$endpoint = $this->get_data_source()->get_endpoint() . '/job-search';
-
-		return add_query_arg(
-			[
-				'country' => $country,
-				'search' => $search,
-				'page' => $page,
-				'size' => $size,
-			],
-			$endpoint
-		);
+	public function get_endpoint( $input_variables ): string {
+		return $this->get_data_source()->get_endpoint() . '/job-details/' . $input_variables['id'];
 	}
 }
