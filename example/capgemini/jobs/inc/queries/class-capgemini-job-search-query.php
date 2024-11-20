@@ -10,30 +10,38 @@ class CapgeminiJobSearchQuery extends HttpQueryContext {
 			'search' => [
 				'type' => 'string',
 				'overrides' => [
-					'type' => 'query_var',
-					'name' => 'search',
-				]
+					[
+						'type' => 'query_var',
+						'name' => 'search',
+					],
+				],
 			],
 			'country_code' => [
 				'type' => 'string',
 				'overrides' => [
-					'type' => 'query_var',
-					'name' => 'country_code',
-				]
+					[
+						'type' => 'query_var',
+						'name' => 'country_code',
+					],
+				],
 			],
 			'page' => [
 				'type' => 'number',
 				'overrides' => [
-					'type' => 'query_var',
-					'name' => 'page',
-				]
+					[
+						'type' => 'query_var',
+						'name' => 'page',
+					],
+				],
 			],
 			'size' => [
 				'type' => 'number',
 				'overrides' => [
-					'type' => 'query_var',
-					'name' => 'size',
-				]
+					[
+						'type' => 'query_var',
+						'name' => 'size',
+					],
+				],
 			],
 		];
 	}
