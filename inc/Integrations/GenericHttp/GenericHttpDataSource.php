@@ -24,7 +24,7 @@ class GenericHttpDataSource extends HttpDataSource {
 				'properties' => [
 					'type' => [
 						'type' => 'string',
-						'enum' => [ 'basic', 'bearer', 'api-key' ],
+						'enum' => [ 'basic', 'bearer', 'api-key', 'none' ],
 					],
 					'value' => [
 						'type' => 'string',
