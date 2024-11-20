@@ -1,7 +1,8 @@
-import { Card, CardBody, CardHeader, TextControl } from '@wordpress/components';
+import { TextControl } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
+import { DataSourceForm } from '../components/DataSourceForm';
 import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import { SlugInput } from '@/data-sources/components/SlugInput';
@@ -81,61 +82,56 @@ export const ShopifySettings = ( {
 	};
 
 	return (
-		<Card className="add-update-data-source-card">
-			<CardHeader>
-				<h2>
-					{ mode === 'add' ? __( 'Add Shopify Data Source' ) : __( 'Edit Shopify Data Source' ) }
-				</h2>
-			</CardHeader>
-			<CardBody>
-				<form>
-					<div className="form-group">
-						<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
-					</div>
+		<DataSourceForm
+			heading={
+				mode === 'add' ? __( 'Add Shopify Data Source' ) : __( 'Edit Shopify Data Source' )
+			}
+		>
+			<div className="form-group">
+				<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
+			</div>
 
-					<div className="form-group">
-						<TextControl
-							type="url"
-							label={ __( 'Store Slug', 'remote-data-blocks' ) }
-							onChange={ storeName => {
-								handleOnChange( 'store_name', storeName ?? '' );
-							} }
-							value={ state.store_name }
-							placeholder="your-shop-name"
-							help={ __( 'Example: https://your-shop-name.myshopify.com', 'remote-data-blocks' ) }
-							autoComplete="off"
-							__next40pxDefaultSize
-						/>
-					</div>
+			<div className="form-group">
+				<TextControl
+					type="url"
+					label={ __( 'Store Slug', 'remote-data-blocks' ) }
+					onChange={ storeName => {
+						handleOnChange( 'store_name', storeName ?? '' );
+					} }
+					value={ state.store_name }
+					placeholder="your-shop-name"
+					help={ __( 'Example: https://your-shop-name.myshopify.com', 'remote-data-blocks' ) }
+					autoComplete="off"
+					__next40pxDefaultSize
+				/>
+			</div>
 
-					<div className="form-group">
-						<PasswordInputControl
-							label={ __( 'Access Token', 'remote-data-blocks' ) }
-							onChange={ onTokenInputChange }
-							value={ state.access_token }
-							help={ connectionMessage }
-						/>
-					</div>
+			<div className="form-group">
+				<PasswordInputControl
+					label={ __( 'Access Token', 'remote-data-blocks' ) }
+					onChange={ onTokenInputChange }
+					value={ state.access_token }
+					help={ connectionMessage }
+				/>
+			</div>
 
-					<div className="form-group">
-						<TextControl
-							label={ __( 'Store Name', 'remote-data-blocks' ) }
-							placeholder={ __( 'Auto-filled on successful connection.', 'remote-data-blocks' ) }
-							value={ shopName ?? '' }
-							onChange={ () => {} }
-							tabIndex={ -1 }
-							readOnly
-							__next40pxDefaultSize
-						/>
-					</div>
+			<div className="form-group">
+				<TextControl
+					label={ __( 'Store Name', 'remote-data-blocks' ) }
+					placeholder={ __( 'Auto-filled on successful connection.', 'remote-data-blocks' ) }
+					value={ shopName ?? '' }
+					onChange={ () => {} }
+					tabIndex={ -1 }
+					readOnly
+					__next40pxDefaultSize
+				/>
+			</div>
 
-					<DataSourceFormActions
-						onSave={ onSaveClick }
-						onCancel={ goToMainScreen }
-						isSaveDisabled={ ! shouldAllowSubmit }
-					/>
-				</form>
-			</CardBody>
-		</Card>
+			<DataSourceFormActions
+				onSave={ onSaveClick }
+				onCancel={ goToMainScreen }
+				isSaveDisabled={ ! shouldAllowSubmit }
+			/>
+		</DataSourceForm>
 	);
 };
