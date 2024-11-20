@@ -1,12 +1,19 @@
 <?php declare(strict_types = 1);
 
-namespace RemoteDataBlocks\Example\CapGemeni\Jobs;
+namespace RemoteDataBlocks\Example\Capgemini\Jobs;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 
-class CapGemeniJobsDataSource extends HttpDataSource {
+class CapgeminiJobsDataSource extends HttpDataSource {
+	public static function create(): self {
+		return parent::from_array( [
+			'service' => 'capgemini-jobs',
+			'slug' => 'capgemini-jobs',
+		] );
+	}
+
 	public function get_display_name(): string {
-		return 'Cap Gemeni Jobs';
+		return 'Capgemini Jobs';
 	}
 
 	public function get_endpoint(): string {

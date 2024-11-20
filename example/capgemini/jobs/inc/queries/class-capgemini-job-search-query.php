@@ -1,10 +1,10 @@
 <?php declare(strict_types = 1);
 
-namespace RemoteDataBlocks\Example\CapGemeni\Jobs;
+namespace RemoteDataBlocks\Example\Capgemini\Jobs;
 
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 
-class CapGemeniJobSearchQuery extends HttpQueryContext {
+class CapgeminiJobSearchQuery extends HttpQueryContext {
 	public function get_input_schema(): array {
 		return [
 			'search' => [
@@ -14,7 +14,7 @@ class CapGemeniJobSearchQuery extends HttpQueryContext {
 					'name' => 'search',
 				]
 			],
-            'country_code' => [
+			'country_code' => [
 				'type' => 'string',
 				'overrides' => [
 					'type' => 'query_var',
@@ -28,7 +28,7 @@ class CapGemeniJobSearchQuery extends HttpQueryContext {
 					'name' => 'page',
 				]
 			],
-            'size' => [
+			'size' => [
 				'type' => 'number',
 				'overrides' => [
 					'type' => 'query_var',
@@ -70,7 +70,7 @@ class CapGemeniJobSearchQuery extends HttpQueryContext {
 				],
 				'apply_job_url' => [
 					'name' => 'Apply URL',
-					'path' => '$.apply_job_url', 
+					'path' => '$.apply_job_url',
 					'type' => 'button_url',
 				],
 				'contract_type' => [
@@ -155,6 +155,6 @@ class CapGemeniJobSearchQuery extends HttpQueryContext {
 
 		$endpoint = $this->get_data_source()->get_endpoint() . '/jobs';
 
-		return add_query_arg( [ 'country' => $country, 'search' => $search, 'page' => $page, 'size' => $size ] );
+		return add_query_arg( [ 'country' => $country, 'search' => $search, 'page' => $page, 'size' => $size ], $endpoint );
 	}
 }
