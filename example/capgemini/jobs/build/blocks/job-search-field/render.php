@@ -3,8 +3,9 @@
 use RemoteDataBlocks\Example\Capgemini\Jobs\InteractivityStore;
 
 $public_store_name = InteractivityStore::get_store_name();
+$initial_state = InteractivityStore::get_initial_state();
 
-wp_interactivity_state( $public_store_name, InteractivityStore::get_initial_state() );
+wp_interactivity_state( $public_store_name, $initial_state );
 
 ?>
 <div
@@ -13,6 +14,6 @@ wp_interactivity_state( $public_store_name, InteractivityStore::get_initial_stat
 >
 	<fieldset>
 		<legend>Search</legend>
-		<input type="text" placeholder="Search" data-wp-on--change="actions.updateSearchTerms" data-wp-on--keydown="actions.updateSearchTerms" />
+		<input type="text" placeholder="Search" data-wp-on--change="actions.updateSearchTerms" data-wp-on--keydown="actions.updateSearchTerms" value="<?php echo esc_attr( $initial_state['searchTerms'] ?? '' ); ?>" />
 	</fieldset>
 </div>
