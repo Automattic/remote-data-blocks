@@ -1,0 +1,23 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "remote-data-blocks/job-search-buttons",
+  "version": "0.1.0",
+  "title": "Capgemini Job Search Buttons",
+  "category": "widgets",
+  "icon": "plus-alt",
+  "description": "Example block scaffolded with Create Block tool.",
+  "example": {},
+  "supports": {
+    "html": false
+  },
+  "textdomain": "capgemini-job-search-buttons",
+  "usesContext": [
+    "remote-data-blocks/remoteData"
+  ],
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "render": "file:./render.php",
+  "style": "file:./style-index.css",
+  "viewScriptModule": "file:./view.js"
+}
