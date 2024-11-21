@@ -71,6 +71,6 @@ function register_remote_data_block_pattern( string $block_name, string $pattern
  * @param string $block_name The block name.
  * @param string $slug       The page slug.
  */
-function register_remote_data_page( string $block_name, string $slug ): void {
-	ConfigRegistry::register_page( $block_name, $slug );
+function register_remote_data_page( string $block_name, string $slug, array $options = [] ): void {
+	ConfigRegistry::register_page( $block_name, $slug, $options );
 }
