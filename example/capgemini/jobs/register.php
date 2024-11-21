@@ -20,7 +20,9 @@ function register_capgemini_job_search_blocks(): void {
 	// Registering ad hoc queries is an unstable, undocumented feature.
 	ConfigRegistry::register_query( $block_name, new CapgeminiJobFiltersQuery( $capgemini_data_source ) );
 
+	register_block_type( __DIR__ . '/build/blocks/job-search-buttons' );
 	register_block_type( __DIR__ . '/build/blocks/job-search-field' );
+	register_block_type( __DIR__ . '/build/blocks/job-search-results' );
 }
 
 add_action( 'init', __NAMESPACE__ . '\\register_capgemini_job_search_blocks' );

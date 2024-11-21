@@ -13,12 +13,13 @@ interface ViewInitialState {
 }
 
 export interface ViewState extends ViewInitialState {
-	blockName?: string;
-	restUrl?: string;
+	blockName: string;
+	restUrl: string;
 }
 
 interface ViewStore {
 	actions: {
+		search: () => Promise< void >;
 		updateSearchTerms: ( evt: React.ChangeEvent< HTMLInputElement > ) => void;
 	};
 	state: ViewState;
@@ -31,6 +32,28 @@ const initialState: ViewInitialState = {
 
 const { state } = store< ViewStore >( PUBLIC_STORE_NAME, {
 	actions: {
+		search: async (): Promise< void > => {
+			const response = await window.fetch( state.restUrl, {
+				body: JSON.stringify( {
+					block_name: state.blockName,
+					query_key: '__DISPLAY__',
+					query_input: {
+						search: state.searchTerms,
+					},
+				} ),
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				method: 'POST',
+			} );
+			const { body } = ( await response.json() ) as RemoteDataApiResponse;
+
+			state.jobs =
+				body?.results.map( result => ( {
+					id: result.result?.id?.value ?? 'id',
+					title: result.result?.title?.value ?? 'title',
+				} ) ) ?? [];
+		},
 		updateSearchTerms: ( evt: React.ChangeEvent< HTMLInputElement > ) => {
 			// TODO: Debounce
 			state.searchTerms = evt.target?.value;
