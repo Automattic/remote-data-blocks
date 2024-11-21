@@ -6,38 +6,38 @@
 		padding: 0;
 	}
 
-	#remote-data-blocks-settings-wrapper {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		padding: 24px 20px;
+	#wpwrap {
+		background: rgb(255, 255, 255);
 	}
 
-	#remote-data-blocks-settings {
-		width: 100%;
-		max-width: 1400px;
+	.components-external-link__contents {
+		text-decoration: none;
 	}
 
-	.page-title {
-		display: flex;
-		align-items: center;
+	.rdb-settings-page_header {
+		display: grid;
+		padding: 24px 48px;
+		border-bottom: 1px solid var(--Alias-border-border-secondary, #ebebeb);
+	}
 
-		h1 {
-			font-weight: 500;
-			line-height: 32px;
-			margin: 0;
-		}
+	.rdb-settings-page_header-return {
+		justify-content: flex-start;
+	}
 
-		p {
-			margin: 5px 0 0 6px;
-		}
+	h1 {
+		margin-bottom: 0;
+	}
+
+	.rdb-settings-page_add-data-source-dropdown {
+		grid-area: 1 / 2 / span 1 / span 1;
+		justify-self: end;
 	}
 
 	.page-content {
-		margin-top: 24px;
 
 		> *:not(:first-child) {
 			margin-top: 18px;
 		}
 	}
 }
+

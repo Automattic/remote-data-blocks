@@ -20,7 +20,7 @@ declare module '@wordpress/notices' {
 		__unstableHTML?: boolean;
 	}
 
-	export interface WPNotice {
+	interface WPNotice {
 		id: string;
 		status: string;
 		content: string;
@@ -46,13 +46,13 @@ declare module '@wordpress/notices' {
 		id: string;
 	}
 
-	export interface NoticeStoreActions {
+	interface NoticeStoreActions {
 		createSuccessNotice: ( content: string, options?: CreateNoticeOptions ) => CreateNoticeReturn;
 		createErrorNotice: ( content: string, options?: CreateNoticeOptions ) => CreateNoticeReturn;
 		removeNotice: ( id: string, context?: string ) => RemoveNoticeReturn;
 	}
 
-	export interface NoticeStoreSelectors {
+	interface NoticeStoreSelectors {
 		getNotices: ( state: object = {}, context?: string ) => WPNotice[];
 	}
 }
