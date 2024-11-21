@@ -1,8 +1,9 @@
-import { Card, CardHeader, CardBody, TextareaControl, SelectControl } from '@wordpress/components';
+import { TextareaControl, SelectControl } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
+import { DataSourceForm } from '../components/DataSourceForm';
 import { getConnectionMessage } from '../utils';
 import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import { SlugInput } from '@/data-sources/components/SlugInput';
@@ -261,64 +262,59 @@ export const GoogleSheetsSettings = ( {
 	}, [ state.spreadsheet, sheets ] );
 
 	return (
-		<Card className="add-update-data-source-card">
-			<CardHeader>
-				<h2>
-					{ mode === 'add'
-						? __( 'Add Google Sheets Data Source' )
-						: __( 'Edit Google Sheets Data Source' ) }
-				</h2>
-			</CardHeader>
-			<CardBody>
-				<form>
-					<div className="form-group">
-						<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
-					</div>
+		<DataSourceForm
+			heading={
+				mode === 'add'
+					? __( 'Add Google Sheets Data Source' )
+					: __( 'Edit Google Sheets Data Source' )
+			}
+		>
+			<div className="form-group">
+				<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
+			</div>
 
-					<div className="form-group">
-						<TextareaControl
-							label={ __( 'Credentials', 'remote-data-blocks' ) }
-							value={ state.credentials }
-							onChange={ onCredentialsChange }
-							help={ credentialsHelpText }
-							rows={ 14 }
-							className="code-input"
-						/>
-					</div>
+			<div className="form-group">
+				<TextareaControl
+					label={ __( 'Credentials', 'remote-data-blocks' ) }
+					value={ state.credentials }
+					onChange={ onCredentialsChange }
+					help={ credentialsHelpText }
+					rows={ 14 }
+					className="code-input"
+				/>
+			</div>
 
-					<div className="form-group">
-						<SelectControl
-							id="spreadsheet"
-							label={ __( 'Spreadsheet', 'remote-data-blocks' ) }
-							value={ state.spreadsheet?.id ?? '' }
-							onChange={ onSelectChange }
-							options={ spreadsheetOptions }
-							help={ spreadsheetHelpText }
-							disabled={ fetchingToken || ! spreadsheets?.length }
-							__next40pxDefaultSize
-						/>
-					</div>
+			<div className="form-group">
+				<SelectControl
+					id="spreadsheet"
+					label={ __( 'Spreadsheet', 'remote-data-blocks' ) }
+					value={ state.spreadsheet?.id ?? '' }
+					onChange={ onSelectChange }
+					options={ spreadsheetOptions }
+					help={ spreadsheetHelpText }
+					disabled={ fetchingToken || ! spreadsheets?.length }
+					__next40pxDefaultSize
+				/>
+			</div>
 
-					<div className="form-group">
-						<SelectControl
-							id="sheet"
-							label={ __( 'Sheet', 'remote-data-blocks' ) }
-							value={ state.sheet?.id ?? '' }
-							onChange={ onSelectChange }
-							options={ sheetOptions }
-							help={ sheetHelpText }
-							disabled={ fetchingToken || ! sheets?.length }
-							__next40pxDefaultSize
-						/>
-					</div>
+			<div className="form-group">
+				<SelectControl
+					id="sheet"
+					label={ __( 'Sheet', 'remote-data-blocks' ) }
+					value={ state.sheet?.id ?? '' }
+					onChange={ onSelectChange }
+					options={ sheetOptions }
+					help={ sheetHelpText }
+					disabled={ fetchingToken || ! sheets?.length }
+					__next40pxDefaultSize
+				/>
+			</div>
 
-					<DataSourceFormActions
-						onSave={ onSaveClick }
-						onCancel={ goToMainScreen }
-						isSaveDisabled={ ! shouldAllowSubmit }
-					/>
-				</form>
-			</CardBody>
-		</Card>
+			<DataSourceFormActions
+				onSave={ onSaveClick }
+				onCancel={ goToMainScreen }
+				isSaveDisabled={ ! shouldAllowSubmit }
+			/>
+		</DataSourceForm>
 	);
 };
