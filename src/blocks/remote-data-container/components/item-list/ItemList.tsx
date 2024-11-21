@@ -57,10 +57,29 @@ export function ItemList( props: ItemListProps ) {
 	);
 
 	const fields = tableFields.map( field => {
+		const isImageField =
+			field.toLowerCase().includes( 'url' ) ||
+			field.toLowerCase().includes( 'image' ) ||
+			props.results?.some(
+				item => typeof item[ field ] === 'string' && item[ field ].startsWith( 'data:image/' )
+			);
 		return {
 			id: field,
 			label: field,
 			enableGlobalSearch: true,
+			render: isImageField
+				? ( { item }: { item: Record< string, unknown > } ) => {
+						return (
+							<img
+								// temporary until we pull in more data
+								alt=""
+								src={ item[ field ] as string }
+								style={ { maxWidth: '250px' } }
+							/>
+						);
+				  }
+				: undefined,
+			enableSorting: ! isImageField,
 		};
 	} );
 
