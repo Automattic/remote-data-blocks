@@ -22,6 +22,7 @@ function register_capgemini_job_search_blocks(): void {
 
 	register_block_type( __DIR__ . '/build/blocks/job-search-buttons' );
 	register_block_type( __DIR__ . '/build/blocks/job-search-field' );
+	register_block_type( __DIR__ . '/build/blocks/job-search-filters' );
 	register_block_type( __DIR__ . '/build/blocks/job-search-results' );
 }
 

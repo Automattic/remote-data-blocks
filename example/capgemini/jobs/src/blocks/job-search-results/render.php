@@ -19,5 +19,5 @@ wp_interactivity_state( $public_store_name, $initial_state );
 		<?php foreach ( $initial_state['jobs'] ?? [] as $job ) : ?>
 		<li data-wp-each-child><?php echo esc_html( $job['title'] ); ?></li>
 		<?php endforeach; ?>
-</ul>
+	</ul>
 </div>
