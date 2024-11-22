@@ -83,13 +83,14 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 
 	public function process_response( string $html_response_data, array $input_variables ): array {
 		$content = $html_response_data;
+		$file_path = $input_variables['file_path'];
 		if ( '.md' === $this->default_file_extension ) {
-			$content = $this->update_markdown_links( $content, $input_variables['file_path'] );
+			$content = $this->update_markdown_links( $content, $file_path );
 		}
 
 		return [
 			'content' => $content,
-			'file_path' => $input_variables['file_path'],
+			'file_path' => $file_path,
 		];
 	}
 
