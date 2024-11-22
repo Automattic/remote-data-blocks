@@ -21,7 +21,7 @@ export const SlugInput: React.FC< SlugInputProps > = ( { slug, onChange, uuid } 
 	const debouncedCheckSlugConflict = useDebounce( checkSlugConflict, 500 );
 	const onSlugUpdate = () => {
 		const sanitizedSlug = slugify( newSlug ?? '' );
-		if ( sanitizedSlug !== newSlug ) {
+		if ( sanitizedSlug !== slug ) {
 			setNewSlug( sanitizedSlug );
 			onChange( sanitizedSlug );
 			void debouncedCheckSlugConflict( sanitizedSlug, uuid ?? '' );

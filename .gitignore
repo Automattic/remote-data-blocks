@@ -13,6 +13,10 @@ coverage
 # Build output (only at root)
 /build/
 
+# Testing
+/artifacts/
+/test-results/
+
 # Dependency directories
 node_modules/
 

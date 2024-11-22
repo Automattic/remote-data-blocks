@@ -5,12 +5,17 @@ import { REMOTE_DATA_CONTEXT_KEY } from '@/blocks/remote-data-container/config/c
 import { withBlockBinding } from '@/blocks/remote-data-container/filters/withBlockBinding';
 import { BLOCK_BINDING_SOURCE, PATTERN_OVERRIDES_CONTEXT_KEY } from '@/config/constants';
 
+vi.mock( '@/blocks/remote-data-container/utils/tracks', () => ( {
+	sendTracksEvent: vi.fn(),
+} ) );
+
 // Minimal mocking for WordPress dependencies
 vi.mock( '@wordpress/block-editor', () => ( {
 	InspectorControls: ( { children }: { children: React.ReactNode } ) => (
 		<div data-testid="inspector-controls">{ children }</div>
 	),
 } ) );
+
 vi.mock( '@wordpress/components', () => ( {
 	PanelBody: ( { children, title }: { children: React.ReactNode; title: string } ) => (
 		<div data-testid="panel-body" title={ title }>
@@ -18,6 +23,7 @@ vi.mock( '@wordpress/components', () => ( {
 		</div>
 	),
 } ) );
+
 vi.mock( '@/hooks/useEditedPostAttribute', () => ( {
 	useEditedPostAttribute: () => ( {
 		postType: '',

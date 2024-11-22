@@ -32,7 +32,7 @@ export const GOOGLE_SHEETS_API_SCOPES = [
 /**
  * REST API Source Constants
  */
-export const AUTH_TYPES = [ 'bearer', 'basic', 'api-key' ] as const;
+export const AUTH_TYPES = [ 'bearer', 'basic', 'api-key', 'none' ] as const;
 export const API_KEY_ADD_TO = [ 'queryparams', 'header' ] as const;
 
 /**
@@ -44,6 +44,7 @@ export const HTTP_SOURCE_AUTH_TYPE_SELECT_OPTIONS: SelectOption<
 	{ label: __( 'Bearer', 'remote-data-blocks' ), value: 'bearer' },
 	{ label: __( 'Basic', 'remote-data-blocks' ), value: 'basic' },
 	{ label: __( 'API Key', 'remote-data-blocks' ), value: 'api-key' },
+	{ label: __( 'None', 'remote-data-blocks' ), value: 'none' },
 ];
 export const HTTP_SOURCE_ADD_TO_SELECT_OPTIONS: SelectOption<
 	( typeof API_KEY_ADD_TO )[ number ]

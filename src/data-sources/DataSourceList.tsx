@@ -1,30 +1,20 @@
 import {
 	Button,
 	ButtonGroup,
-	Card,
-	CardBody,
-	CardHeader,
-	Dropdown,
+	__experimentalConfirmDialog as ConfirmDialog,
 	Icon,
-	MenuGroup,
-	MenuItem,
-	Modal,
 	Placeholder,
 	Spinner,
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { chevronDown, edit, info, trash } from '@wordpress/icons';
+import { edit, info, trash } from '@wordpress/icons';
 
 import { SUPPORTED_SERVICES, SUPPORTED_SERVICES_LABELS } from './constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
-import AirtableIcon from '@/settings/icons/AirtableIcon';
-import GoogleSheetsIcon from '@/settings/icons/GoogleSheetsIcon';
-import HttpIcon from '@/settings/icons/HttpIcon';
-import ShopifyIcon from '@/settings/icons/ShopifyIcon';
 
 import './DataSourceList.scss';
 
@@ -72,74 +62,12 @@ const DataSourceList = () => {
 		) );
 	};
 
-	const AddDataSourceDropdown = () => {
-		function onAddDataSource( dataSource: string ) {
-			const newUrl = new URL( window.location.href );
-			newUrl.searchParams.set( 'addDataSource', dataSource );
-			pushState( newUrl );
-		}
-
-		return (
-			<Dropdown
-				className="add-data-source-dropdown"
-				contentClassName="add-data-source-dropdown-content"
-				focusOnMount={ false }
-				popoverProps={ { placement: 'bottom-end' } }
-				renderToggle={ ( { isOpen, onToggle } ) => (
-					<Button
-						className="add-data-source-btn"
-						variant="primary"
-						onClick={ onToggle }
-						aria-expanded={ isOpen }
-					>
-						Add <Icon icon={ chevronDown } size={ 18 } />
-					</Button>
-				) }
-				renderContent={ () => (
-					<MenuGroup>
-						{ [
-							{
-								icon: AirtableIcon,
-								label: SUPPORTED_SERVICES_LABELS.airtable,
-								value: 'airtable',
-							},
-							{
-								icon: GoogleSheetsIcon,
-								label: SUPPORTED_SERVICES_LABELS[ 'google-sheets' ],
-								value: 'google-sheets',
-							},
-							{
-								icon: ShopifyIcon,
-								label: SUPPORTED_SERVICES_LABELS.shopify,
-								value: 'shopify',
-							},
-							{
-								icon: HttpIcon,
-								label: SUPPORTED_SERVICES_LABELS[ 'generic-http' ],
-								value: 'generic-http',
-							},
-						].map( ( { icon, label, value } ) => (
-							<MenuItem
-								key={ value }
-								icon={ icon }
-								iconPosition="left"
-								onClick={ () => onAddDataSource( value ) }
-							>
-								{ label }
-							</MenuItem>
-						) ) }
-					</MenuGroup>
-				) }
-			/>
-		);
-	};
-
 	const getServiceLabel = ( service: ( typeof SUPPORTED_SERVICES )[ number ] ) => {
 		// eslint-disable-next-line security/detect-object-injection
 		return SUPPORTED_SERVICES_LABELS[ service ];
 	};
 
-	const CardBodyContent = (): JSX.Element => {
+	const DataSourceTable = (): JSX.Element => {
 		if ( loadingDataSources ) {
 			return (
 				<div className="card-loader">
@@ -206,58 +134,28 @@ const DataSourceList = () => {
 				</table>
 
 				{ dataSourceToDelete && (
-					<Modal
-						className="confirm-delete-data-source-modal"
-						title={ __( 'Delete Data Source', 'remote-data-blocks' ) }
+					<ConfirmDialog
+						confirmButtonText={ __( 'Confirm', 'remote-data-blocks' ) }
+						onCancel={ () => onCancelDeleteDialog() }
+						onConfirm={ () => void onConfirmDeleteDataSource( dataSourceToDelete ) }
 						size="medium"
-						onRequestClose={ () => {
-							onCancelDeleteDialog();
-						} }
-						isDismissible={ true }
-						focusOnMount
-						shouldCloseOnEsc={ true }
-						shouldCloseOnClickOutside={ true }
+						title={ __( 'Delete Data Source', 'remote-data-blocks' ) }
 					>
-						<p>
-							{ sprintf(
-								__(
-									'Are you sure you want to delete "%s" data source with slug "%s"?',
-									'remote-data-blocks'
-								),
-								getServiceLabel( dataSourceToDelete.service ),
-								dataSourceToDelete.slug
-							) }
-						</p>
-
-						<div className="action-buttons">
-							<Button variant="link" onClick={ onCancelDeleteDialog }>
-								{ __( 'Cancel', 'remote-data-blocks' ) }
-							</Button>
-							<Button
-								variant="primary"
-								isDestructive
-								onClick={ () => void onConfirmDeleteDataSource( dataSourceToDelete ) }
-							>
-								{ __( 'Confirm', 'remote-data-blocks' ) }
-							</Button>
-						</div>
-					</Modal>
+						{ sprintf(
+							__(
+								'Are you sure you want to delete "%s" data source with slug "%s"?',
+								'remote-data-blocks'
+							),
+							getServiceLabel( dataSourceToDelete.service ),
+							dataSourceToDelete.slug
+						) }
+					</ConfirmDialog>
 				) }
 			</div>
 		);
 	};
 
-	return (
-		<Card className="data-source-list-card">
-			<CardHeader>
-				<h2>{ __( 'Data Sources', 'remote-data-blocks' ) }</h2>
-				<AddDataSourceDropdown />
-			</CardHeader>
-			<CardBody>
-				<CardBodyContent />
-			</CardBody>
-		</Card>
-	);
+	return <DataSourceTable />;
 };
 
 export default DataSourceList;
