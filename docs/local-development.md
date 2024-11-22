@@ -21,6 +21,20 @@ This will spin up a WordPress environment and a Valkey (Redis) instance for obje
 
 Stop the development environment with `Ctrl+C` and resume it by running the same command. You can also manually stop the environment with `npm run stop`. Stopping the environment stops the WordPress containers but preserves their state.
 
+### Testing
+
+Run unit tests:
+
+```sh
+npm run test
+```
+
+For e2e tests, ensure the development environment is running, then execute:
+
+```sh
+npm run test:e2e
+```
+
 ### Logs
 
 Watch logs from the WordPress container:
