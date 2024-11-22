@@ -63,7 +63,9 @@ class RemoteDataController {
 
 		// The frontend might send more input variables than the query needs or
 		// expects, so only include those defined by the query.
-		$query_input = array_intersect_key( $query_input, $query->input_schema );
+		//
+		// TEMPORARILY DISABLED to allow for dynamic input variables.
+		// $query_input = array_intersect_key( $query_input, $query->input_schema );
 
 		$query_runner = $query->get_query_runner();
 		$query_result = $query_runner->execute( $query_input );
