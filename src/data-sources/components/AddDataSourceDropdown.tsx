@@ -52,6 +52,11 @@ export const AddDataSourceDropdown = () => {
 						},
 						{
 							icon: HttpIcon,
+							label: SUPPORTED_SERVICES_LABELS[ 'salesforce-b2c' ],
+							value: 'salesforce-b2c',
+						},
+						{
+							icon: HttpIcon,
 							label: SUPPORTED_SERVICES_LABELS[ 'generic-http' ],
 							value: 'generic-http',
 						},
