@@ -14,12 +14,16 @@ export interface HttpBasicAuth extends BaseHttpAuth {
 	type: 'basic';
 }
 
-export type HttpAuth = HttpBearerAuth | HttpBasicAuth | HttpApiKeyAuth;
+export type HttpAuth = HttpBearerAuth | HttpBasicAuth | HttpApiKeyAuth | HttpNoAuth;
 
 export interface HttpApiKeyAuth extends BaseHttpAuth {
 	type: 'api-key';
 	key: string;
 	addTo: ( typeof API_KEY_ADD_TO )[ number ];
+}
+
+export interface HttpNoAuth extends BaseHttpAuth {
+	type: 'none';
 }
 
 export type HttpAuthFormState = {

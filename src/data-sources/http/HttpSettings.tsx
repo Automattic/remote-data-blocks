@@ -1,7 +1,8 @@
-import { Card, CardBody, CardHeader, TextControl } from '@wordpress/components';
+import { TextControl } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
+import { DataSourceForm } from '../components/DataSourceForm';
 import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import { HttpAuthSettingsInput } from '@/data-sources/components/HttpAuthSettingsInput';
 import { SlugInput } from '@/data-sources/components/SlugInput';
@@ -79,6 +80,10 @@ export const HttpSettings = ( {
 			}
 		}
 
+		if ( state.authType === 'none' ) {
+			return state.slug && state.url;
+		}
+
 		return state.slug && state.url && state.authType && state.authValue;
 	}, [ state.slug, state.url, state.authType, state.authValue, state.authKey, state.authAddTo ] );
 
@@ -120,38 +125,33 @@ export const HttpSettings = ( {
 	};
 
 	return (
-		<Card className="add-update-data-source-card">
-			<CardHeader>
-				<h2>{ mode === 'add' ? __( 'Add HTTP Data Source' ) : __( 'Edit HTTP Data Source' ) }</h2>
-			</CardHeader>
-			<CardBody>
-				<form>
-					<div className="form-group">
-						<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
-					</div>
+		<DataSourceForm
+			heading={ mode === 'add' ? __( 'Add HTTP Data Source' ) : __( 'Edit HTTP Data Source' ) }
+		>
+			<div className="form-group">
+				<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
+			</div>
 
-					<div className="form-group">
-						<TextControl
-							type="url"
-							id="url"
-							label={ __( 'URL', 'remote-data-blocks' ) }
-							value={ state.url }
-							onChange={ value => handleOnChange( 'url', value ) }
-							autoComplete="off"
-							__next40pxDefaultSize
-							help={ __( 'The URL for the HTTP endpoint.', 'remote-data-blocks' ) }
-						/>
-					</div>
+			<div className="form-group">
+				<TextControl
+					type="url"
+					id="url"
+					label={ __( 'URL', 'remote-data-blocks' ) }
+					value={ state.url }
+					onChange={ value => handleOnChange( 'url', value ) }
+					autoComplete="off"
+					__next40pxDefaultSize
+					help={ __( 'The URL for the HTTP endpoint.', 'remote-data-blocks' ) }
+				/>
+			</div>
 
-					<HttpAuthSettingsInput auth={ getAuthState() } onChange={ handleOnChange } />
+			<HttpAuthSettingsInput auth={ getAuthState() } onChange={ handleOnChange } />
 
-					<DataSourceFormActions
-						onSave={ onSaveClick }
-						onCancel={ goToMainScreen }
-						isSaveDisabled={ ! shouldAllowSubmit }
-					/>
-				</form>
-			</CardBody>
-		</Card>
+			<DataSourceFormActions
+				onSave={ onSaveClick }
+				onCancel={ goToMainScreen }
+				isSaveDisabled={ ! shouldAllowSubmit }
+			/>
+		</DataSourceForm>
 	);
 };

@@ -104,9 +104,20 @@ class ConfigRegistry {
 		}
 	}
 
-	public static function register_page( string $block_title, string $page_slug ): void {
+	/**
+	 * Registers a page query with optional configuration.
+	 *
+	 * @param string       $block_title   The block title.
+	 * @param string       $page_slug     The page slug.
+	 * @param array {
+	 *     allow_nested_paths?: bool
+	 * }                   $options       Optional. Configuration options for the rewrite rule.
+	 */
+	public static function register_page( string $block_title, string $page_slug, array $options = [] ): void {
+		
 		$block_name = ConfigStore::get_block_name( $block_title );
 		$config = ConfigStore::get_configuration( $block_name );
+		$allow_nested_paths = $options['allow_nested_paths'] ?? false;
 
 		if ( null === $config ) {
 			return;
@@ -136,8 +147,18 @@ class ConfigRegistry {
 		}
 
 		// Add a rewrite rule targeting the provided page slug.
-		$query_var_pattern = '/([^/]+)';
 		$query_vars = array_keys( $display_query->input_schema );
+		
+		$query_var_pattern = '/([^/]+)';
+
+		/**
+		 * If nested paths are allowed and there is only one query variable,
+		 * allow slashes in the query variable value.
+		 */
+		if ( $allow_nested_paths && 1 === count( $query_vars ) ) {
+			$query_var_pattern = '/(.+)';
+		}
+		
 		$rewrite_rule = sprintf( '^%s%s/?$', $page_slug, str_repeat( $query_var_pattern, count( $query_vars ) ) );
 		$rewrite_rule_target = sprintf( 'index.php?pagename=%s', $page_slug );
 
