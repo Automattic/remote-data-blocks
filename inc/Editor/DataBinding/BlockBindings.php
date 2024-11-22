@@ -155,17 +155,18 @@ class BlockBindings {
 	public static function execute_query( array $block_context, string $operation_name ): array|null {
 		$block_name = $block_context['blockName'];
 		$query_input = $block_context['queryInput'];
+		$query_key = $block_context['queryKey'] ?? '__DISPLAY__';
 		$overrides = $block_context['queryInputOverrides'] ?? [];
-		$block_config = ConfigStore::get_configuration( $block_name );
 
-		if ( null === $block_config ) {
+		$block_config = ConfigStore::get_configuration( $block_name );
+		$query_config = $block_config['queries'][ $query_key ] ?? null;
+
+		if ( null === $block_config || null === $query_config ) {
 			return null;
 		}
 
 		try {
-			$query_config = $block_config['queries']['__DISPLAY__'];
 			$query_input = self::apply_query_input_overrides( $query_input, $overrides, $block_name );
-
 			$query_runner = $query_config->get_query_runner();
 			$query_results = $query_runner->execute( $query_input );
 
