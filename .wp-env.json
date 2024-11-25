@@ -5,7 +5,8 @@
     "WP_DEVELOPMENT_MODE": "plugin",
     "WP_ENVIRONMENT_TYPE": "development",
     "WP_REDIS_DISABLE_BANNERS": true,
-    "WP_REDIS_HOST": "host.docker.internal"
+    "WP_REDIS_HOST": "host.docker.internal",
+		"AUTOSAVE_INTERVAL": false
   },
   "mappings": {
     ".htaccess": "./bin/conf/htaccess"

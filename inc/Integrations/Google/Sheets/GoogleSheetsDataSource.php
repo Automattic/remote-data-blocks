@@ -12,7 +12,7 @@ class GoogleSheetsDataSource extends HttpDataSource {
 
 	protected const SERVICE_SCHEMA = [
 		'type' => 'object',
-		'properties' => [       
+		'properties' => [
 			'credentials' => [
 				'type' => 'object',
 				'properties' => [

@@ -16,7 +16,8 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es6",
-    "typeRoots": [ "./types", "./node_modules/@types" ]
+    "typeRoots": [ "./types", "./node_modules/@types" ],
+    "sourceMap": true
   },
   "include": [ "./types/*.d.ts", "./example/**/*", "./src/**/*", "./tests/**/*" ]
 }

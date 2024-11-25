@@ -125,7 +125,7 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 			}
 			$href = $node->getAttribute( 'href' );
 
-			// Check if the href is non-empty and points to a markdown file 
+			// Check if the href is non-empty and points to a markdown file
 			if ( $href && preg_match( '/\.md($|#)/', $href ) ) {
 				// Adjust the path
 				$new_href = $this->adjust_markdown_file_path( $href );

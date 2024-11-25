@@ -35,18 +35,17 @@ class SalesforceB2CDataSource extends HttpDataSource {
 	}
 
 	public function get_endpoint(): string {
-		return sprintf( 'https://%s.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/%s/oauth2/login', $this->config['shortcode'], $this->config['organization_id'] );
+		return sprintf( 'https://%s.api.commercecloud.salesforce.com', $this->config['shortcode'] );
 	}
 
 	public function get_request_headers(): array {
 		return [
 			'Content-Type' => 'application/json',
-			'X-Shopify-Storefront-Access-Token' => $this->config['access_token'],
 		];
 	}
 
 	public function get_image_url(): string {
-		return plugins_url( './assets/shopify_logo_black.png', __FILE__ );
+		return plugins_url( './assets/salesforce_commerce_cloud_logo.png', __FILE__ );
 	}
 
 	public static function create( string $shortcode, string $organization_id, string $client_id, string $client_secret ): self {
