@@ -45,7 +45,7 @@ export function sendTracksEvent< K extends keyof TRACKS_EVENTS >(
 	}
 
 	// Do not track on local environments.
-	if ( globalProps.vipgo_env === 'local' ) {
+	if ( globalProps.vip_env === 'local' ) {
 		return;
 	}
 
