@@ -28,7 +28,7 @@ add_filter( 'wpcomvip_log_to_query_monitor', '__return_false' );
 Filter whether to register the included example API block ("Conference Event") (default: `true`).
 
 ```php
-add_filter( 'remote_data_blocks_register_example_block', '__return false' );
+add_filter( 'remote_data_blocks_register_example_block', '__return_false' );
 ```
 
 ### remote_data_blocks_allowed_url_schemes
