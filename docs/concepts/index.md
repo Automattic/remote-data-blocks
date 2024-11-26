@@ -10,9 +10,7 @@ Remote Data Blocks allows you to integrate remote data into posts, pages, patter
 
 A **remote data block** is a custom block that fetches and displays data from a specific remote source. Each remote data block has a unique name and provides a specific kind of data.
 
-For example, you might have a remote data block named "Shopify Product" that fetches a product from your Shopify store and displays the product's name, description, price, and image. Or, you might have a remote data block named "Conference event" that displays rows from an Airtable and displays the event's name, location, and type. It might look something like this:
-
-[image tk]
+For example, you might have a remote data block named "Shopify Product" that fetches a product from your Shopify store and displays the product's name, description, price, and image. Or, you might have a remote data block named "Conference event" that displays rows from an Airtable and displays the event's name, location, and type.
 
 Remote data blocks are **container blocks** that contain other blocks and provide remote data to them. You retain full control over the layout, design, and content. You can leverage patterns to enable consistent styling and workflows, and you can customize the block's appearance using the block editor or `theme.json`.
 
