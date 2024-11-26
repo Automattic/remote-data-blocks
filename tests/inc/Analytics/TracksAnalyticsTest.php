@@ -2,8 +2,6 @@
 
 namespace RemoteDataBlocks\Tests\Analytics;
 
-use Mockery;
-use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use RemoteDataBlocks\Analytics\TracksAnalytics;
@@ -29,7 +27,6 @@ class TracksAnalyticsTest extends TestCase {
 	}
 
 	public function tearDown(): void {
-		Mockery::close();
 		TracksAnalytics::reset();
 	}
 
@@ -46,8 +43,6 @@ class TracksAnalyticsTest extends TestCase {
 		$env_config_mock->method( 'is_local_env' )->with()->willReturn( true );
 		$env_config_mock->method( 'is_enabled_via_filter' )->with()->willReturn( true );
 
-		/** @var TracksAnalytics|MockInterface */
-		Mockery::mock( TracksAnalytics::class )->makePartial();
 		TracksAnalytics::init( $env_config_mock );
 
 		$this->assertEquals( null, TracksAnalytics::get_instance() );
@@ -55,12 +50,11 @@ class TracksAnalyticsTest extends TestCase {
 
 	public function testInitDoesSetTracksIfTrackingIsEnabledViaFilter(): void {
 		/** @var MockObject|EnvironmentConfig */
-		$env_config_mock = $this->getMockBuilder( EnvironmentConfig::class )->onlyMethods( [ 'is_enabled_via_filter', 'get_tracks_lib_class' ] )->getMock();
+		$env_config_mock = $this->getMockBuilder( EnvironmentConfig::class )->onlyMethods( [ 'is_enabled_via_filter', 'get_tracks_lib_class', 'get_remote_data_blocks_properties' ] )->getMock();
 		$env_config_mock->method( 'is_enabled_via_filter' )->with()->willReturn( true );
 		$env_config_mock->method( 'get_tracks_lib_class' )->with()->willReturn( MockTracks::class );
+		$env_config_mock->expects( $this->once() )->method( 'get_remote_data_blocks_properties' )->with();
 
-		/** @var TracksAnalytics|MockInterface */
-		Mockery::mock( TracksAnalytics::class )->makePartial();
 		TracksAnalytics::init( $env_config_mock );
 
 		$this->assertInstanceOf( MockTracks::class, TracksAnalytics::get_instance() );
@@ -69,12 +63,11 @@ class TracksAnalyticsTest extends TestCase {
 
 	public function testInitDoesSetTracksIfTrackingIsEnabledOnVipSite(): void {
 		/** @var MockObject|EnvironmentConfig */
-		$env_config_mock = $this->getMockBuilder( EnvironmentConfig::class )->onlyMethods( [ 'is_wpvip_site', 'get_tracks_lib_class' ] )->getMock();
+		$env_config_mock = $this->getMockBuilder( EnvironmentConfig::class )->onlyMethods( [ 'is_wpvip_site', 'get_tracks_lib_class', 'get_remote_data_blocks_properties' ] )->getMock();
 		$env_config_mock->method( 'is_wpvip_site' )->with()->willReturn( true );
 		$env_config_mock->method( 'get_tracks_lib_class' )->with()->willReturn( MockTracks::class );
+		$env_config_mock->expects( $this->once() )->method( 'get_remote_data_blocks_properties' )->with();
 
-		/** @var TracksAnalytics|MockInterface */
-		Mockery::mock( TracksAnalytics::class )->makePartial();
 		TracksAnalytics::init( $env_config_mock );
 
 		$this->assertInstanceOf( MockTracks::class, TracksAnalytics::get_instance() );
@@ -84,13 +77,13 @@ class TracksAnalyticsTest extends TestCase {
 	public function testGetGlobalProperties(): void {
 		/** @var MockObject|EnvironmentConfig */
 		$env_config_mock = $this->getMockBuilder( EnvironmentConfig::class )->onlyMethods( [ 'get_tracks_core_properties' ] )->getMock();
-		$env_config_mock->expects( $this->once() )->method( 'get_tracks_core_properties' )->with()->willReturn( [ 'vipgo_env' => '123' ] );
+		$env_config_mock->expects( $this->exactly( 2 ) )->method( 'get_tracks_core_properties' )->with()->willReturn( [ 'vip_env' => '123' ] );
 
 		TracksAnalytics::init( $env_config_mock );
 
 		$this->assertEquals( [
 			'plugin_version' => '',
-			'vipgo_env' => '123',
+			'vip_env' => '123',
 		], TracksAnalytics::get_global_properties() );
 	}
 

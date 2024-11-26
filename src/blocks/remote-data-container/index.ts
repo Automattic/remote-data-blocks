@@ -5,6 +5,7 @@ import { registerFormatType } from '@wordpress/rich-text';
 import { formatTypeSettings } from '@/blocks/remote-data-container/components/field-shortcode';
 import { FieldShortcodeButton } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeButton';
 import { Edit } from '@/blocks/remote-data-container/edit';
+import { addUsesContext } from '@/blocks/remote-data-container/filters/addUsesContext';
 import { withBlockBindingShim } from '@/blocks/remote-data-container/filters/withBlockBinding';
 import { Save } from '@/blocks/remote-data-container/save';
 import { registerBlockBindingsSource } from '@/types/expected-errors/registerBlockBindingsSource';
@@ -46,6 +47,11 @@ addFilter(
 	withBlockBindingShim,
 	5 // Ensure this runs before core filters
 );
+
+/**
+ * Use a filter to inject usesContext to core block settings.
+ */
+addFilter( 'blocks.registerBlockType', 'remote-data-blocks/addUsesContext', addUsesContext, 10 );
 
 registerBlockBindingsSource( {
 	name: 'remote-data/binding',

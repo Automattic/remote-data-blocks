@@ -95,7 +95,11 @@ start_redis() {
 }
 
 start_wordpress() {
-    FLAGS="${WP_ENV_FLAGS---xdebug}"
+    # Enable Xdebug when starting the server in "start" mode.
+    FLAGS=""
+    if [ "$SCRIPT_MODE" = "start" ]; then
+        FLAGS="${WP_ENV_FLAGS---xdebug}"
+    fi
 
     echo "🔼 Starting WordPress..."
     WP_ENV_PORT="$PORT" npx wp-env start "$FLAGS"
