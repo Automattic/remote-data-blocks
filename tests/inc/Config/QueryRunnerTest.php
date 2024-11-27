@@ -7,7 +7,6 @@ use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
-use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 use RemoteDataBlocks\HttpClient\HttpClient;
 use RemoteDataBlocks\Tests\Mocks\MockDataSource;
 use RemoteDataBlocks\Tests\Mocks\MockValidator;
