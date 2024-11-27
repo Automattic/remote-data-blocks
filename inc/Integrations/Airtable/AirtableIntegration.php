@@ -7,6 +7,10 @@ use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 
 class AirtableIntegration {
 	public static function init(): void {
+		add_action( 'init', [ __CLASS__, 'register_blocks' ] );
+	}
+
+	public static function register_blocks(): void {
 		$data_sources = DataSourceCrud::get_data_sources( REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE );
 
 		foreach ( $data_sources as $config ) {
@@ -29,7 +33,7 @@ class AirtableIntegration {
 
 		register_remote_data_block( $block_name, $query );
 		register_remote_data_list_query( $block_name, $list_query );
-		
+
 		LoggerManager::instance()->info( 'Registered Airtable block', [ 'block_name' => $block_name ] );
 	}
 }
