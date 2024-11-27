@@ -6,6 +6,7 @@ use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Tests\Mocks\MockDataSource;
 use RemoteDataBlocks\Tests\Mocks\MockValidator;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
+use WP_Error;
 
 class MockQueryContext extends HttpQueryContext {
 	public function __construct(
@@ -20,7 +21,7 @@ class MockQueryContext extends HttpQueryContext {
 		);
 	}
 
-	public function get_query_runner(): QueryRunnerInterface {
-		return $this->mock_qr;
+	public function execute( array $input_variables ): array|WP_Error {
+		return $this->mock_qr->execute( $input_variables );
 	}
 }

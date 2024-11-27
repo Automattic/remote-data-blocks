@@ -200,9 +200,7 @@ class BlockBindings {
 		try {
 			$query_config = $block_config['queries']['__DISPLAY__'];
 			$query_input = self::get_query_input( $block_context, $query_config );
-
-			$query_runner = $query_config->get_query_runner();
-			$query_results = $query_runner->execute( $query_input );
+			$query_results = $query_config->execute( $query_input );
 
 			if ( is_wp_error( $query_results ) ) {
 				self::log_error( 'Error executing query for block binding: ' . $query_results->get_error_message(), $block_name, $operation_name );

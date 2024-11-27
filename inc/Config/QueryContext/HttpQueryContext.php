@@ -6,9 +6,9 @@ use RemoteDataBlocks\Config\ArraySerializableInterface;
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Config\DataSource\HttpDataSourceInterface;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
-use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 use RemoteDataBlocks\Validation\Validator;
 use RemoteDataBlocks\Validation\ValidatorInterface;
+use WP_Error;
 
 defined( 'ABSPATH' ) || exit();
 
@@ -98,6 +98,15 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 
 		// @todo: expand or kill this
 		$this->config = $config;
+	}
+
+	/**
+	 * Override this method to provide a custom execution implementation.
+	 */
+	public function execute( array $input_variables ): array|WP_Error {
+		$query_runner = new QueryRunner( $this );
+		
+		return $query_runner->execute( $input_variables );
 	}
 
 	/**
@@ -198,13 +207,6 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 */
 	public function get_query_name(): string {
 		return 'Query';
-	}
-
-	/**
-	 * Override this method to specify a custom query runner for this query.
-	 */
-	public function get_query_runner(): QueryRunnerInterface {
-		return new QueryRunner( $this );
 	}
 
 	/**
