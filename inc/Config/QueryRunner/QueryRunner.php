@@ -174,7 +174,7 @@ class QueryRunner implements QueryRunnerInterface {
 			],
 			'total_count' => [
 				'name' => 'Total count',
-				'type' => 'number',
+				'type' => 'integer',
 				'value' => count( $query_results ),
 			],
 		];

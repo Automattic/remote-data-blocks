@@ -2,127 +2,188 @@
 
 namespace RemoteDataBlocks\Validation;
 
+use RemoteDataBlocks\Validation\Types;
 use WP_Error;
+use function is_email;
 
 /**
  * Validator class.
  */
-class Validator implements ValidatorInterface {
-	/**
-	 * The validation schema.
-	 *
-	 * @var array<string, mixed>
-	 */
-	private array $schema;
+final class Validator implements ValidatorInterface {
+	public function __construct( private array $schema ) {}
 
 	/**
 	 * @inheritDoc
-	 */
-	public function __construct( array $schema ) {
-		$this->schema = $schema;
-	}
-
-	/**
-	 * @inheritDoc
-	 * 
-	 * @param array<string, mixed> $data The data to validate.
 	 */
 	public function validate( array $data ): bool|WP_Error {
-		return $this->validate_schema( $this->schema, $data );
-	}
+		$base_validation = $this->check_type( $this->schema, $data );
 
-	/**
-	 * Validates the schema.
-	 *
-	 * @param array<string, mixed> $schema The schema to validate against.
-	 * @param mixed $data The data to validate.
-	 * @return bool|WP_Error Returns true if the data is valid, otherwise a WP_Error.
-	 */
-	private function validate_schema( array $schema, mixed $data ): bool|WP_Error {
-		if ( isset( $schema['required'] ) && false === $schema['required'] && ! isset( $data ) ) {
-			return true;
-		}
-
-		if ( isset( $schema['type'] ) && ! $this->check_type( $data, $schema['type'] ) ) {
-			// translators: %1$s is the expected PHP data type, %2$s is the actual PHP data type.
-			return new WP_Error( 'invalid_type', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), $schema['type'], gettype( $data ) ), [ 'status' => 400 ] );
-		}
-
-		if ( isset( $schema['pattern'] ) && is_string( $data ) && ! preg_match( $schema['pattern'], $data ) ) {
-			// translators: %1$s is the expected regex pattern, %2$s is the actual value.
-			return new WP_Error( 'invalid_format', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), $schema['pattern'], $data ), [ 'status' => 400 ] );
-		}
-
-		if ( isset( $schema['enum'] ) && ! in_array( $data, $schema['enum'] ) ) {
-			// translators: %1$s is the expected value, %2$s is the actual value.
-			return new WP_Error( 'invalid_value', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), implode( ', ', $schema['enum'] ), $data ), [ 'status' => 400 ] );
-		}
-
-		if ( isset( $schema['const'] ) && $data !== $schema['const'] ) {
-			// translators: %1$s is the expected value, %2$s is the actual value.
-			return new WP_Error( 'invalid_value', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), $schema['const'], $data ), [ 'status' => 400 ] );
-		}
-
-		if ( isset( $schema['callback'] ) && is_callable( $schema['callback'] ) ) {
-			if ( false === call_user_func( $schema['callback'], $data ) ) {
-				// translators: %1$s is the callback name, %2$s is the value given to the callback.
-				return new WP_Error( 'invalid_value', sprintf( __( 'Validate callback %1$s failed with value %2$s.', 'remote-data-blocks' ), $schema['callback'], $data ), [ 'status' => 400 ] );
-			}
-		}
-
-		if ( isset( $schema['properties'] ) && is_array( $schema['properties'] ) ) {
-			foreach ( $schema['properties'] as $field => $field_schema ) {
-				if ( isset( $field_schema['required'] ) && false === $field_schema['required'] && ! isset( $data[ $field ] ) ) {
-					continue;
-				}
-
-				if ( ! isset( $data[ $field ] ) ) {
-					// translators: %1$s is the missing field name.
-					return new WP_Error( 'missing_field', sprintf( __( 'Missing field %1$s.', 'remote-data-blocks' ), $field ), [ 'status' => 400 ] );
-				}
-				
-				$result = $this->validate_schema( $field_schema, $data[ $field ] );
-				if ( is_wp_error( $result ) ) {
-					return $result;
-				}
-			}
-		}
-
-		if ( isset( $schema['items'] ) ) {
-			if ( ! is_array( $data ) ) {
-				// translators: %1$s is the expected PHP data type, %2$s is the actual PHP data type.
-				return new WP_Error( 'invalid_array', sprintf( __( 'Expected %1$s, got %2$s.', 'remote-data-blocks' ), 'array', gettype( $data ) ), [ 'status' => 400 ] );
-			}
-
-			foreach ( $data as $item ) {
-				$result = $this->validate_schema( $schema['items'], $item );
-				if ( is_wp_error( $result ) ) {
-					return $result;
-				}
-			}
+		if ( is_wp_error( $base_validation ) ) {
+			return $base_validation;
 		}
 
 		return true;
 	}
 
-	private function check_type( mixed $value, string $expected_type ): bool {
-		switch ( $expected_type ) {
-			case 'array':
-				return is_array( $value );
+	/**
+	 * Validate a value recursively against a schema.
+	 *
+	 * @param array<string, mixed> $type The schema to validate against.
+	 * @param mixed $value The value to validate.
+	 * @return bool|WP_Error Returns true if the data is valid, otherwise a WP_Error.
+	 */
+	private function check_type( array $type, mixed $value = null ): bool|WP_Error {
+		if ( Types::is_nullable( $type ) && is_null( $value ) ) {
+			return true;
+		}
+
+		if ( Types::is_primitive( $type ) ) {
+			$type_name = Types::get_type_name( $type );
+			if ( $this->check_primitive_type( $type_name, $value ) ) {
+				return true;
+			}
+
+			return $this->create_error( sprintf( 'Value must be a %s', $type_name ), $value );
+		}
+
+		return $this->check_non_primitive_type( $type, $value );
+	}
+
+	private function check_non_primitive_type( array $type, mixed $value ): bool|WP_Error {
+		switch ( Types::get_type_name( $type ) ) {
+			case 'const':
+				return Types::get_type_args( $type ) === $value;
+
+			case 'enum':
+				return in_array( $value, Types::get_type_args( $type ), true );
+
+			case 'instance_of':
+				return is_a( $value, Types::get_type_args( $type ) );
+
+			case 'list_of':
+				if ( ! is_array( $value ) || ! array_is_list( $value ) ) {
+					return $this->create_error( 'Value must be an array', $value );
+				}
+
+				$member_type = Types::get_type_args( $type );
+				return array_reduce( $value, function ( bool $carry, mixed $item ) use ( $member_type ): bool {
+					return $carry && $this->check_type( $member_type, $item );
+				}, true );
+
+			case 'one_of':
+				foreach ( Types::get_type_args( $type ) as $member_type ) {
+					if ( $this->check_type( $member_type, $value ) ) {
+						return true;
+					}
+				}
+
+				return $this->create_error( 'Value must be one of the specified types.', $value );
+
 			case 'object':
-				return is_object( $value ) || ( is_array( $value ) && ! array_is_list( $value ) );
-			case 'string':
-				return is_string( $value );
-			case 'integer':
-				return is_int( $value );
-			case 'boolean':
-				return is_bool( $value );
-			case 'null':
-				return is_null( $value );
-			case 'function':
-				return is_callable( $value );
+				if ( ! $this->check_iterable_object( $value ) ) {
+					return $this->create_error( 'Value must be an object or associative array', $value );
+				}
+
+				foreach ( Types::get_type_args( $type ) as $key => $value_type ) {
+					if ( ! $this->check_type( $value_type, $this->get_object_key( $value, $key ) ) ) {
+						return $this->create_error( 'Object must have valid field', $value_type );
+					}
+				}
+
+				return true;
+
+			case 'record':
+				if ( ! $this->check_iterable_object( $value ) ) {
+					return $this->create_error( 'Value must be an object or associative array', $value );
+				}
+
+				$type_args = Types::get_type_args( $type );
+				$key_type = $type_args[0];
+				$value_type = $type_args[1];
+
+				foreach ( $value as $key => $record_value ) {
+					if ( ! $this->check_type( $key_type, $key ) ) {
+						return $this->create_error( 'Record must have valid key', $key );
+					}
+
+					if ( ! $this->check_type( $value_type, $record_value ) ) {
+						return $this->create_error( 'Record must have valid value', $record_value );
+					}
+				}
+
+				return true;
+
+			case 'ref':
+				return $this->check_type( Types::load_ref_type( $type ), $value );
+
+			case 'string_matching':
+				$regex = Types::get_type_args( $type );
+				return $this->check_primitive_type( 'string', $value ) && $this->check_primitive_type( 'string', $regex ) && preg_match( $regex, $value );
+
 			default:
 				return false;
 		}
+	}
+
+	private function check_primitive_type( string $type_name, mixed $value ): bool {
+		switch ( $type_name ) {
+			case 'boolean':
+				return is_bool( $value );
+			case 'callable':
+				return is_callable( $value );
+			case 'integer':
+				return is_int( $value );
+			case 'null':
+				return is_null( $value );
+			case 'number':
+				return is_numeric( $value );
+			case 'string':
+				return is_string( $value );
+
+			case 'base64_string':
+				return is_string( $value ) && base64_encode( base64_decode( $value ) ) === $value;
+
+			case 'email_address':
+				return is_email( $value );
+
+			case 'html':
+			case 'id':
+			case 'image_alt':
+				return is_string( $value );
+
+			case 'json_path':
+				return is_string( $value ) && str_starts_with( $value, '$' );
+
+			case 'price':
+				return is_string( $value ) || is_numeric( $value );
+
+			case 'image_url':
+			case 'url':
+				return filter_var( $value, FILTER_VALIDATE_URL );
+
+			case 'uuid':
+				return wp_is_uuid( $value );
+
+			default:
+				return false;
+		}
+	}
+
+	/*
+	 * While an "object" in name, we expect this type to be implemented as an
+	 * associative array since this is typically how humans represent objects in
+	 * literal PHP code.
+	 */
+	private function check_iterable_object( mixed $value ): bool {
+		return is_object( $value ) || ( is_array( $value ) && ! array_is_list( $value ) );
+	}
+
+	private function create_error( string $message, mixed $value, int $status = 400 ): WP_Error {
+		$message = sprintf( '%s: %o', esc_html( $message ), $value );
+		return new WP_Error( 'invalid_type', $message, [ 'status' => $status ] );
+	}
+
+	private function get_object_key( mixed $data, string $key ): mixed {
+		return is_array( $data ) && array_key_exists( $key, $data ) ? $data[ $key ] : null;
 	}
 }

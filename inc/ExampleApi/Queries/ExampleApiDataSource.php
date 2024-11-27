@@ -7,6 +7,8 @@ use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 /**
  * This is a placeholder DataSource used only to represent the data source in the
  * settings UI. The actual data loading is implemented by ExampleApiQueryRunner.
+ *
+ * TODO delete
  */
 class ExampleApiDataSource extends HttpDataSource {
 	public function get_display_name(): string {

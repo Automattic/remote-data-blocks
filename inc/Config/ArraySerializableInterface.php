@@ -2,6 +2,8 @@
 
 namespace RemoteDataBlocks\Config;
 
+use RemoteDataBlocks\Validation\ValidatorInterface;
+
 interface ArraySerializableInterface {
 	/**
 	 * Creates an instance of the class from an array representation.
@@ -14,7 +16,7 @@ interface ArraySerializableInterface {
 	 *                                   data needed to create an instance of the class.
 	 * @return mixed Returns a new instance of the implementing class.
 	 */
-	public static function from_array( array $data ): mixed;
+	public static function from_array( array $data, ?ValidatorInterface $validator ): mixed;
 
 	/**
 	 * Converts the current object to an array representation.

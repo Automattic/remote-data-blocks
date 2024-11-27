@@ -10,7 +10,6 @@ namespace RemoteDataBlocks\Sanitization;
 interface SanitizerInterface {
 	/**
 	 * Constructor.
-	 * 
 	 */
 	public function __construct( array $schema );
 
@@ -18,7 +17,7 @@ interface SanitizerInterface {
 	 * Sanitize data according to a schema.
 	 *
 	 *
-	 * @return array The sanitized data.
+	 * @return mixed The sanitized data.
 	 */
-	public function sanitize( array $data ): array;
+	public function sanitize( mixed $data ): mixed;
 }

@@ -2,9 +2,8 @@
 
 namespace RemoteDataBlocks\ExampleApi;
 
-use RemoteDataBlocks\ExampleApi\Queries\ExampleApiDataSource;
-use RemoteDataBlocks\ExampleApi\Queries\ExampleApiGetRecordQuery;
-use RemoteDataBlocks\ExampleApi\Queries\ExampleApiGetTableQuery;
+use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use RemoteDataBlocks\ExampleApi\Queries\ExampleApiQuery;
 use function register_remote_data_block;
 use function register_remote_data_list_query;
 
@@ -30,13 +29,79 @@ class ExampleApi {
 			return;
 		}
 
-		$data_source = ExampleApiDataSource::from_array( [
+		$data_source = HttpDataSource::from_array( [
+			'display_name' => 'Example API',
 			'slug' => 'example-api',
 			'service' => 'example_api',
 		] );
-		
-		$get_record_query = new ExampleApiGetRecordQuery( $data_source );
-		$get_table_query = new ExampleApiGetTableQuery( $data_source );
+
+		$get_record_query = ExampleApiQuery::from_array( [
+			'data_source' => $data_source,
+			'input_schema' => [
+				'record_id' => [
+					'name' => 'Record ID',
+					'type' => 'id',
+				],
+			],
+			'output_schema' => [
+				'type' => [
+					'id' => [
+						'name' => 'Record ID',
+						'path' => '$.id',
+						'type' => 'id',
+					],
+					'title' => [
+						'name' => 'Title',
+						'path' => '$.fields.Activity',
+						'type' => 'string',
+					],
+					'location' => [
+						'name' => 'Location',
+						'path' => '$.fields.Location',
+						'type' => 'string',
+					],
+					'event_type' => [
+						'name' => 'Event type',
+						'path' => '$.fields.Type',
+						'type' => 'string',
+					],
+				],
+			],
+			'query_name' => 'Get event',
+		] );
+
+		$get_table_query = ExampleApiQuery::from_array( [
+			'data_source' => $data_source,
+			'input_schema' => [],
+			'output_schema' => [
+				'is_collection' => true,
+				'path' => '$.records[*]',
+				'type' => [
+					'record_id' => [
+						'name' => 'Record ID',
+						'path' => '$.id',
+						'type' => 'id',
+					],
+					'title' => [
+						'name' => 'Title',
+						'path' => '$.fields.Activity',
+						'type' => 'string',
+					],
+					'location' => [
+						'name' => 'Location',
+						'path' => '$.fields.Location',
+						'type' => 'string',
+					],
+					'event_type' => [
+						'name' => 'Event type',
+						'path' => '$.fields.Type',
+						'type' => 'string',
+					],
+				],
+			],
+			'query_key' => 'example_api_list_events',
+			'query_name' => 'List events',
+		] );
 
 		register_remote_data_block( self::$block_name, $get_record_query );
 		register_remote_data_list_query( self::$block_name, $get_table_query );
