@@ -9,7 +9,6 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
-import { SlugInput } from '../components/SlugInput';
 import { AirtableFormState } from '@/data-sources/airtable/types';
 import { DataSourceForm } from '@/data-sources/components/DataSourceForm';
 import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
@@ -33,7 +32,6 @@ const initialState: AirtableFormState = {
 	display_name: '',
 	table: null,
 	table_fields: new Set< string >(),
-	slug: '',
 };
 
 const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState => {
@@ -46,7 +44,6 @@ const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState
 		display_name: config.display_name,
 		table: null,
 		table_fields: new Set< string >(),
-		slug: config.slug,
 	};
 
 	if ( Array.isArray( config.tables ) ) {
@@ -84,8 +81,7 @@ export const AirtableSettings = ( {
 	config,
 }: SettingsComponentProps< AirtableConfig > ) => {
 	const { goToMainScreen } = useSettingsContext();
-	const { updateDataSource, addDataSource, slugConflicts, loadingSlugConflicts } =
-		useDataSources( false );
+	const { updateDataSource, addDataSource } = useDataSources( false );
 
 	const { state, handleOnChange } = useForm< AirtableFormState >( {
 		initialValues: getInitialStateFromConfig( config ),
@@ -131,7 +127,6 @@ export const AirtableSettings = ( {
 					} ) ),
 				},
 			],
-			slug: state.slug,
 		};
 
 		if ( mode === 'add' ) {
@@ -164,13 +159,6 @@ export const AirtableSettings = ( {
 		}
 	};
 
-	/**
-	 * Handle updating the uuid. Only accepts alphanumeric characters and dashes.
-	 * @param slug The uuid to update.
-	 */
-	const onSlugChange = ( slug: string | undefined ) => {
-		handleOnChange( 'slug', slug ?? '' );
-	};
 	const onUUIDChange = ( uuid: string | undefined ) => {
 		setNewUUID( uuid ?? null );
 		handleOnChange( 'uuid', uuid ?? '' );
@@ -202,16 +190,8 @@ export const AirtableSettings = ( {
 	}, [ fetchingUserId, userId, userIdError ] );
 
 	const shouldAllowSubmit = useMemo( () => {
-		return (
-			bases !== null &&
-			tables !== null &&
-			Boolean( state.base ) &&
-			Boolean( state.table ) &&
-			Boolean( state.slug ) &&
-			! loadingSlugConflicts &&
-			! slugConflicts
-		);
-	}, [ bases, tables, state.base, state.table, state.slug, loadingSlugConflicts, slugConflicts ] );
+		return bases !== null && tables !== null && Boolean( state.base ) && Boolean( state.table );
+	}, [ bases, tables, state.base, state.table ] );
 
 	const basesHelpText = useMemo( () => {
 		if ( userId ) {
@@ -327,9 +307,6 @@ export const AirtableSettings = ( {
 				mode === 'add' ? __( 'Add Airtable Data Source' ) : __( 'Edit Airtable Data Source' )
 			}
 		>
-			<div className="form-group">
-				<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
-			</div>
 			{ mode === 'edit' && (
 				<div className="form-group">
 					<InputControl

@@ -10,7 +10,6 @@ interface BaseDataSourceConfig {
 	uuid: string;
 	newUUID?: string;
 	service: DataSourceType;
-	slug: string;
 }
 
 export interface DataSourceQueryMappingValue {

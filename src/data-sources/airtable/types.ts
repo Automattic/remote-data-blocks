@@ -21,7 +21,6 @@ export type AirtableFormState = {
 	display_name: string;
 	table: StringIdName | null;
 	table_fields: Set< string >;
-	slug: string;
 };
 
 export interface AirtableTable {
