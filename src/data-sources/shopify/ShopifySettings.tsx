@@ -15,6 +15,7 @@ import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 export type ShopifyFormState = Omit< ShopifyConfig, 'service' | 'uuid' >;
 
 const initialState: ShopifyFormState = {
+	display_name: '',
 	store_name: '',
 	access_token: '',
 	slug: '',
@@ -25,6 +26,7 @@ const getInitialStateFromConfig = ( config?: ShopifyConfig ): ShopifyFormState =
 		return initialState;
 	}
 	return {
+		display_name: config.display_name,
 		store_name: config.store_name,
 		access_token: config.access_token,
 		slug: config.slug,
@@ -54,6 +56,7 @@ export const ShopifySettings = ( {
 
 	const onSaveClick = async () => {
 		const shopifyConfig: ShopifyConfig = {
+			display_name: state.display_name,
 			uuid: uuidFromProps ?? '',
 			service: 'shopify',
 			store_name: state.store_name,
@@ -83,6 +86,7 @@ export const ShopifySettings = ( {
 
 	return (
 		<DataSourceForm
+			handleOnChange={ handleOnChange }
 			heading={
 				mode === 'add' ? __( 'Add Shopify Data Source' ) : __( 'Edit Shopify Data Source' )
 			}

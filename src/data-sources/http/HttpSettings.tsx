@@ -13,6 +13,7 @@ import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
 const initialState: HttpFormState = {
+	display_name: '',
 	slug: '',
 	url: '',
 	authType: 'bearer',
@@ -27,6 +28,7 @@ const getInitialStateFromConfig = ( config?: HttpConfig ): HttpFormState => {
 	}
 
 	const initialStateFromConfig: HttpFormState = {
+		display_name: config.display_name,
 		slug: config.slug,
 		url: config.url,
 		authType: config.auth.type,
@@ -109,6 +111,7 @@ export const HttpSettings = ( {
 		}
 
 		const httpConfig: HttpConfig = {
+			display_name: state.display_name,
 			uuid: uuidFromProps ?? '',
 			service: 'generic-http',
 			slug: state.slug,
@@ -126,6 +129,7 @@ export const HttpSettings = ( {
 
 	return (
 		<DataSourceForm
+			handleOnChange={ handleOnChange }
 			heading={ mode === 'add' ? __( 'Add HTTP Data Source' ) : __( 'Edit HTTP Data Source' ) }
 		>
 			<div className="form-group">

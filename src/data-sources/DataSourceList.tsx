@@ -92,7 +92,7 @@ const DataSourceList = () => {
 				<table className="table data-source-list">
 					<thead className="table-header">
 						<tr>
-							<th>{ __( 'Slug', 'remote-data-blocks' ) }</th>
+							<th>{ __( 'Name', 'remote-data-blocks' ) }</th>
 							<th>{ __( 'Data Source', 'remote-data-blocks' ) }</th>
 							<th>{ __( 'Meta', 'remote-data-blocks' ) }</th>
 							<th className="data-source-actions">{ __( 'Actions', 'remote-data-blocks' ) }</th>
@@ -102,11 +102,12 @@ const DataSourceList = () => {
 						{ dataSources
 							.sort( ( a, b ) => a.slug.localeCompare( b.slug ) )
 							.map( source => {
-								const { uuid, slug, service } = source;
+								const { display_name: displayName, uuid, slug, service } = source;
+
 								return (
 									<tr key={ slug } className="table-row">
 										<td>
-											<Text className="data-source-slug">{ slug }</Text>
+											<Text className="data-source-display_name">{ displayName }</Text>
 										</td>
 										<td>
 											<Text>{ getServiceLabel( service ) }</Text>

@@ -25,6 +25,7 @@ import { SelectOption } from '@/types/input';
 const initialState: AirtableFormState = {
 	access_token: '',
 	base: null,
+	display_name: '',
 	table: null,
 	table_fields: new Set< string >(),
 	slug: '',
@@ -37,6 +38,7 @@ const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState
 	const initialStateFromConfig: AirtableFormState = {
 		access_token: config.access_token,
 		base: config.base,
+		display_name: config.display_name,
 		table: null,
 		table_fields: new Set< string >(),
 		slug: config.slug,
@@ -110,6 +112,7 @@ export const AirtableSettings = ( {
 			service: 'airtable',
 			access_token: state.access_token,
 			base: state.base,
+			display_name: state.display_name,
 			tables: [
 				{
 					id: state.table.id,
@@ -307,6 +310,7 @@ export const AirtableSettings = ( {
 
 	return (
 		<DataSourceForm
+			handleOnChange={ handleOnChange }
 			heading={
 				mode === 'add' ? __( 'Add Airtable Data Source' ) : __( 'Edit Airtable Data Source' )
 			}

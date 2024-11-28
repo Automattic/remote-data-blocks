@@ -18,6 +18,7 @@ export interface AirtableBaseSchema {
 export type AirtableFormState = {
 	access_token: string;
 	base: StringIdName | null;
+	display_name: string;
 	table: StringIdName | null;
 	table_fields: Set< string >;
 	slug: string;

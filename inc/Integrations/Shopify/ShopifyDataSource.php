@@ -25,6 +25,10 @@ class ShopifyDataSource extends HttpDataSource {
 			],
 			'access_token' => [ 'type' => 'string' ],
 			'store_name' => [ 'type' => 'string' ],
+            'display_name' => [
+				'type' => 'string',
+				'required' => false,
+			],
 		],
 	];
 
@@ -47,8 +51,9 @@ class ShopifyDataSource extends HttpDataSource {
 		return plugins_url( './assets/shopify_logo_black.png', __FILE__ );
 	}
 
-	public static function create( string $access_token, string $store_name ): self {
+	public static function create( string $access_token, string $store_name, ?string $display_name = null ): self {
 		return parent::from_array([
+            'display_name' => $display_name ?? 'Shopify (' . $store_name . ')',
 			'service' => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
 			'access_token' => $access_token,
 			'store_name' => $store_name,
@@ -58,6 +63,7 @@ class ShopifyDataSource extends HttpDataSource {
 
 	public function to_ui_display(): array {
 		return [
+            'display_name' => $this->get_display_name(),
 			'slug' => $this->get_slug(),
 			'service' => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
 			'store_name' => $this->config['store_name'],

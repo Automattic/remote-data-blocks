@@ -23,6 +23,7 @@ import { GoogleServiceAccountKey } from '@/types/google';
 import { SelectOption } from '@/types/input';
 
 const initialState: GoogleSheetsFormState = {
+	display_name: '',
 	slug: '',
 	spreadsheet: null,
 	sheet: null,
@@ -35,6 +36,7 @@ const getInitialStateFromConfig = ( config?: GoogleSheetsConfig ): GoogleSheetsF
 	}
 
 	return {
+		display_name: config.display_name,
 		slug: config.slug,
 		spreadsheet: config.spreadsheet,
 		sheet: config.sheet
@@ -116,6 +118,7 @@ export const GoogleSheetsSettings = ( {
 		}
 
 		const data: GoogleSheetsConfig = {
+			display_name: state.display_name,
 			uuid: uuidFromProps ?? '',
 			service: 'google-sheets',
 			slug: state.slug,
@@ -263,6 +266,7 @@ export const GoogleSheetsSettings = ( {
 
 	return (
 		<DataSourceForm
+			handleOnChange={ handleOnChange }
 			heading={
 				mode === 'add'
 					? __( 'Add Google Sheets Data Source' )

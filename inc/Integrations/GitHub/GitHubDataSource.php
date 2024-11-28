@@ -62,6 +62,7 @@ class GitHubDataSource extends HttpDataSource {
 	
 	public static function create( string $repo_owner, string $repo_name, string $ref ): self {
 		return parent::from_array([
+            'display_name' => sprintf( 'GitHub: %s/%s (%s)', $repo_owner, $repo_name, $ref ),
 			'service' => REMOTE_DATA_BLOCKS_GITHUB_SERVICE,
 			'repo_owner' => $repo_owner,
 			'repo_name' => $repo_name,
