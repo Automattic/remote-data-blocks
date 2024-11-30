@@ -18,14 +18,14 @@
 		display: grid;
 		padding: 24px 48px;
 		border-bottom: 1px solid var(--Alias-border-border-secondary, #ebebeb);
+
+		p {
+			margin-bottom: 0;
+		}
 	}
 
 	.rdb-settings-page_header-return {
 		justify-content: flex-start;
-	}
-
-	h1 {
-		margin-bottom: 0;
 	}
 
 	.rdb-settings-page_add-data-source-dropdown {
@@ -67,10 +67,7 @@
 	}
 
 	.page-content {
-
-		> *:not(:first-child) {
-			margin-top: 18px;
-		}
+		margin-top: 8px;
 	}
 }
 
