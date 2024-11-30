@@ -1,15 +1,8 @@
-import {
-	Button,
-	ButtonGroup,
-	__experimentalConfirmDialog as ConfirmDialog,
-	Icon,
-	Placeholder,
-	Spinner,
-	__experimentalText as Text,
-} from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { __experimentalConfirmDialog as ConfirmDialog, Placeholder } from '@wordpress/components';
+import { DataViews, filterSortAndPaginate, View } from '@wordpress/dataviews';
+import { useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { edit, info, trash } from '@wordpress/icons';
+import { info } from '@wordpress/icons';
 
 import { SUPPORTED_SERVICES, SUPPORTED_SERVICES_LABELS } from './constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
@@ -22,6 +15,16 @@ const DataSourceList = () => {
 	const { dataSources, loadingDataSources, deleteDataSource, fetchDataSources } = useDataSources();
 	const [ dataSourceToDelete, setDataSourceToDelete ] = useState< DataSourceConfig | null >( null );
 	const { pushState } = useSettingsContext();
+
+	const [ view, setView ] = useState< View >( {
+		type: 'table',
+		perPage: 10,
+		page: 1,
+		search: '',
+		fields: [ 'slug', 'service', 'meta' ],
+		filters: [],
+		layout: {},
+	} );
 
 	const onCancelDeleteDialog = () => {
 		setDataSourceToDelete( null );
@@ -67,95 +70,113 @@ const DataSourceList = () => {
 		return SUPPORTED_SERVICES_LABELS[ service ];
 	};
 
-	const DataSourceTable = (): JSX.Element => {
-		if ( loadingDataSources ) {
-			return (
-				<div className="card-loader">
-					<Spinner />
-					<p> { __( 'Loading data sources...', 'remote-data-blocks' ) } </p>
-				</div>
-			);
-		}
+	const fields = useMemo(
+		() => [
+			{ id: 'slug', label: __( 'Slug', 'remote-data-blocks' ), enableGlobalSearch: true },
+			{
+				id: 'service',
+				label: __( 'Data Source', 'remote-data-blocks' ),
+				enableGlobalSearch: true,
+			},
+			{
+				id: 'meta',
+				label: __( 'Meta', 'remote-data-blocks' ),
+				enableGlobalSearch: true,
+				render: ( { item }: { item: DataSourceConfig } ) => renderDataSourceMeta( item ),
+			},
+		],
+		[]
+	);
 
-		if ( dataSources.length === 0 ) {
-			return (
-				<Placeholder
-					icon={ info }
-					label={ __( 'No data source found.', 'remote-data-blocks' ) }
-					instructions={ __( 'Use “Add” button to add data source.', 'remote-data-blocks' ) }
-				/>
-			);
-		}
+	// filter, sort and paginate data
+	const { data: shownData, paginationInfo } = useMemo( () => {
+		return filterSortAndPaginate( dataSources, view, fields );
+	}, [ dataSources, fields, view ] );
 
-		return (
-			<div className="data-source-list-wrapper">
-				<table className="table data-source-list">
-					<thead className="table-header">
-						<tr>
-							<th>{ __( 'Slug', 'remote-data-blocks' ) }</th>
-							<th>{ __( 'Data Source', 'remote-data-blocks' ) }</th>
-							<th>{ __( 'Meta', 'remote-data-blocks' ) }</th>
-							<th className="data-source-actions">{ __( 'Actions', 'remote-data-blocks' ) }</th>
-						</tr>
-					</thead>
-					<tbody className="table-body">
-						{ dataSources
-							.sort( ( a, b ) => a.slug.localeCompare( b.slug ) )
-							.map( source => {
-								const { uuid, slug, service } = source;
-								return (
-									<tr key={ slug } className="table-row">
-										<td>
-											<Text className="data-source-slug">{ slug }</Text>
-										</td>
-										<td>
-											<Text>{ getServiceLabel( service ) }</Text>
-										</td>
-										<td> { renderDataSourceMeta( source ) } </td>
-										<td className="data-source-actions">
-											{ uuid && (
-												<ButtonGroup className="data-source-actions">
-													<Button variant="secondary" onClick={ () => onEditDataSource( uuid ) }>
-														<Icon icon={ edit } />
-													</Button>
-													<Button
-														variant="secondary"
-														onClick={ () => onDeleteDataSource( source ) }
-													>
-														<Icon icon={ trash } />
-													</Button>
-												</ButtonGroup>
-											) }
-										</td>
-									</tr>
-								);
-							} ) }
-					</tbody>
-				</table>
-
-				{ dataSourceToDelete && (
-					<ConfirmDialog
-						confirmButtonText={ __( 'Confirm', 'remote-data-blocks' ) }
-						onCancel={ () => onCancelDeleteDialog() }
-						onConfirm={ () => void onConfirmDeleteDataSource( dataSourceToDelete ) }
-						size="medium"
-						title={ __( 'Delete Data Source', 'remote-data-blocks' ) }
-					>
-						{ sprintf(
-							__(
-								'Are you sure you want to delete "%s" data source with slug "%s"?',
-								'remote-data-blocks'
-							),
-							getServiceLabel( dataSourceToDelete.service ),
-							dataSourceToDelete.slug
-						) }
-					</ConfirmDialog>
-				) }
-			</div>
-		);
+	const defaultLayouts = {
+		table: {
+			layout: {
+				primaryField: 'id',
+			},
+		},
 	};
 
-	return <DataSourceTable />;
+	const actions = [
+		{
+			id: 'edit',
+			label: __( 'Edit', 'remote-data-blocks' ),
+			icon: 'edit',
+			isPrimary: true,
+			callback: ( [ item ]: DataSourceConfig[] ) => {
+				if ( item ) {
+					onEditDataSource( item.uuid );
+				}
+			},
+			isEligible: ( item: DataSourceConfig ) => {
+				// @ts-expect-error some examples have a service of 'unknown'
+				return item ? item.service !== 'unknown' : false;
+			},
+		},
+		{
+			id: 'delete',
+			label: __( 'Delete', 'remote-data-blocks' ),
+			icon: 'trash',
+			isDestructive: true,
+			callback: ( [ item ]: DataSourceConfig[] ) => {
+				if ( item ) {
+					onDeleteDataSource( item );
+				}
+			},
+			isEligible: ( item: DataSourceConfig ) => {
+				// @ts-expect-error some examples have a service of 'unknown'
+				return item ? item.service !== 'unknown' : false;
+			},
+		},
+	];
+
+	if ( dataSources.length === 0 ) {
+		return (
+			<Placeholder
+				icon={ info }
+				label={ __( 'No data source found.', 'remote-data-blocks' ) }
+				instructions={ __( 'Use “Add” button to add data source.', 'remote-data-blocks' ) }
+			/>
+		);
+	}
+
+	return (
+		<>
+			<DataViews
+				actions={ actions }
+				data={ shownData }
+				fields={ fields }
+				view={ view }
+				onChangeView={ setView }
+				paginationInfo={ paginationInfo }
+				defaultLayouts={ defaultLayouts }
+				getItemId={ ( item: DataSourceConfig ) => item.uuid }
+				isLoading={ loadingDataSources }
+			/>
+			{ dataSourceToDelete && (
+				<ConfirmDialog
+					confirmButtonText={ __( 'Confirm', 'remote-data-blocks' ) }
+					onCancel={ () => onCancelDeleteDialog() }
+					onConfirm={ () => void onConfirmDeleteDataSource( dataSourceToDelete ) }
+					size="medium"
+					title={ __( 'Delete Data Source', 'remote-data-blocks' ) }
+				>
+					{ sprintf(
+						__(
+							'Are you sure you want to delete "%s" data source with slug "%s"?',
+							'remote-data-blocks'
+						),
+						getServiceLabel( dataSourceToDelete.service ),
+						dataSourceToDelete.slug
+					) }
+				</ConfirmDialog>
+			) }
+		</>
+	);
 };
 
 export default DataSourceList;
