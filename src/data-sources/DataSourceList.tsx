@@ -119,8 +119,7 @@ const DataSourceList = () => {
 				}
 			},
 			isEligible: ( item: DataSourceConfig ) => {
-				// @ts-expect-error some examples have a service of 'unknown'
-				return item ? item.service !== 'unknown' : false;
+				return item ? SUPPORTED_SERVICES.includes( item.service ) : false;
 			},
 		},
 		{
@@ -134,8 +133,7 @@ const DataSourceList = () => {
 				}
 			},
 			isEligible: ( item: DataSourceConfig ) => {
-				// @ts-expect-error some examples have a service of 'unknown'
-				return item ? item.service !== 'unknown' : false;
+				return item ? SUPPORTED_SERVICES.includes( item.service ) : false;
 			},
 		},
 	];
