@@ -1,4 +1,7 @@
 @import url( ./../styles/components/components.scss );
+// include dataviews and components styles in settings
+@import "@wordpress/dataviews/build-style/style";
+@import "@wordpress/components/build-style/style";
 
 .settings_page_remote-data-blocks-settings {
 
@@ -39,5 +42,37 @@
 			margin-top: 18px;
 		}
 	}
+
+	.data-source-meta {
+		padding: 6px;
+		margin-right: 5px;
+		border-radius: 4px;
+		background-color: #eee;
+		color: #757575;
+	}
+
+	.components-placeholder {
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+		box-shadow: none;
+		min-height: 250px;
+		border-radius: 8px;
+	}
+
+	.components-placeholder__label {
+		flex-direction: column;
+
+		svg {
+			width: 40px;
+			height: 40px;
+			margin-bottom: 12px;
+		}
+	}
+
+	.components-placeholder__instructions {
+		color: #757575;
+	}
+
 }
 

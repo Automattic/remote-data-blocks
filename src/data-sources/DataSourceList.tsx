@@ -1,4 +1,5 @@
 import { __experimentalConfirmDialog as ConfirmDialog, Placeholder } from '@wordpress/components';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { DataViews, filterSortAndPaginate, View } from '@wordpress/dataviews';
 import { useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -8,8 +9,6 @@ import { SUPPORTED_SERVICES, SUPPORTED_SERVICES_LABELS } from './constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
-
-import './DataSourceList.scss';
 
 const DataSourceList = () => {
 	const { dataSources, loadingDataSources, deleteDataSource, fetchDataSources } = useDataSources();

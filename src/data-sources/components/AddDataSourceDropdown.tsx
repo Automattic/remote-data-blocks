@@ -9,8 +9,6 @@ import GoogleSheetsIcon from '@/settings/icons/GoogleSheetsIcon';
 import HttpIcon from '@/settings/icons/HttpIcon';
 import ShopifyIcon from '@/settings/icons/ShopifyIcon';
 
-import '../DataSourceList.scss';
-
 export const AddDataSourceDropdown = () => {
 	const { pushState } = useSettingsContext();
 

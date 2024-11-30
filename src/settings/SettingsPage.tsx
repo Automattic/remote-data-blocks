@@ -8,8 +8,6 @@ import { AddDataSourceDropdown } from '@/data-sources/components/AddDataSourceDr
 import Notices from '@/settings/Notices';
 import { SettingsContext, useDataSourceRouter } from '@/settings/hooks/useSettingsNav';
 
-import './SettingsPage.scss';
-
 const SettingsPage = () => {
 	const settingsContext = useDataSourceRouter();
 
