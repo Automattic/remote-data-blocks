@@ -45,8 +45,8 @@ export const useDataSources = ( loadOnMount = true ) => {
 
 		showSnackbar(
 			'success',
-			__(
-				sprintf( '"%s" has been successfully updated.', 'remote-data-blocks' ),
+			sprintf(
+				__( '"%s" has been successfully updated.', 'remote-data-blocks' ),
 				sourceConfig.display_name
 			)
 		);
@@ -69,8 +69,8 @@ export const useDataSources = ( loadOnMount = true ) => {
 
 		showSnackbar(
 			'success',
-			__(
-				sprintf( '"%s" has been successfully added.', 'remote-data-blocks' ),
+			sprintf(
+				__( '"%s" has been successfully added.', 'remote-data-blocks' ),
 				source.display_name
 			)
 		);
@@ -91,8 +91,8 @@ export const useDataSources = ( loadOnMount = true ) => {
 
 		showSnackbar(
 			'success',
-			__(
-				sprintf( '"%s" has been successfully deleted.', 'remote-data-blocks' ),
+			sprintf(
+				__( '"%s" has been successfully deleted.', 'remote-data-blocks' ),
 				source.display_name
 			)
 		);
