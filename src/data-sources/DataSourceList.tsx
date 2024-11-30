@@ -76,6 +76,10 @@ const DataSourceList = () => {
 				id: 'service',
 				label: __( 'Data Source', 'remote-data-blocks' ),
 				enableGlobalSearch: true,
+				elements: SUPPORTED_SERVICES.map( service => ( {
+					value: service,
+					label: getServiceLabel( service ),
+				} ) ),
 			},
 			{
 				id: 'meta',
