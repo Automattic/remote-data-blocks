@@ -80,6 +80,9 @@ const DataSourceList = () => {
 					value: service,
 					label: getServiceLabel( service ),
 				} ) ),
+				render: ( { item }: { item: DataSourceConfig } ) =>
+					// @ts-expect-error some examples have a service of 'unknown'
+					item.service !== 'unknown' ? item.service : null,
 			},
 			{
 				id: 'meta',
