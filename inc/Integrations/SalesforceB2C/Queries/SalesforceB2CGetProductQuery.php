@@ -70,14 +70,24 @@ class SalesforceB2CGetProductQuery extends HttpQueryContext {
 			$data_source_config['client_secret']
 		);
 
-		return [
-			'Authorization' => sprintf( 'Bearer %s', $access_token ),
+		$headers = [
 			'Content-Type' => 'application/json',
 		];
+
+		if ( is_wp_error( $access_token ) ) {
+			// alecg todo: Surface error in get_request_headers() parent call
+			return $headers;
+		}
+
+		$headers['Authorization'] = sprintf( 'Bearer %s', $access_token );
+		return $headers;
 	}
 
 	public function get_endpoint( array $input_variables ): string {
-		return sprintf( '%s/products/%s', $this->get_data_source()->get_endpoint(), $input_variables['product_id'] );
+		$data_source_endpoint = $this->get_data_source()->get_endpoint();
+		$data_source_config = $this->get_data_source()->to_array();
+
+		return sprintf( '%s/product/shopper-products/v1/organizations/%s/products/%s?siteId=RefArchGlobal', $data_source_endpoint, $data_source_config['organization_id'], $input_variables['product_id'] );
 	}
 
 	public function get_query_name(): string {

@@ -25,7 +25,7 @@ class SalesforceB2CAuth {
 		string $client_id,
 		string $client_secret
 	): WP_Error|string {
-		$client_auth_url = sprintf( '%s/shopper/auth/v1/organizations/%s/oauth2/login', $endpoint, $organization_id );
+		$client_auth_url = sprintf( '%s/shopper/auth/v1/organizations/%s/oauth2/token', $endpoint, $organization_id );
 		$client_credentials = base64_encode( sprintf( '%s:%s', $client_id, $client_secret ) );
 
 		$client_auth_response = wp_remote_post( $client_auth_url, [
@@ -34,7 +34,7 @@ class SalesforceB2CAuth {
 				'channel_id' => 'RefArch',
 			],
 			'headers' => [
-				'Content-Type' => 'application/x-www-form-urlencoded;charset=UTF-8',
+				'Content-Type' => 'application/x-www-form-urlencoded',
 				'Authorization' => 'Basic ' . $client_credentials,
 			],
 		]);
@@ -66,30 +66,6 @@ class SalesforceB2CAuth {
 		$refresh_token_expires_in = $response_data['refresh_token_expires_in'];
 
 		return $access_token;
-
-		// $cache_key = 'google_auth_token_' . $service_account_key->client_email;
-		// if ( ! $no_cache ) {
-		//  $cached_token = wp_cache_get( $cache_key, 'oauth-tokens' );
-		//  if ( false !== $cached_token ) {
-		//      return $cached_token;
-		//  }
-		// }
-
-		// $jwt = self::generate_jwt( $service_account_key, $scope );
-		// $token_uri = $service_account_key->token_uri;
-
-		// $token = self::get_token_using_jwt( $jwt, $token_uri );
-
-		// if ( ! is_wp_error( $token ) ) {
-		//  wp_cache_set(
-		//      $cache_key,
-		//      $token,
-		//      'oauth-tokens',
-		//      3000, // 50 minutes
-		//  );
-		// }
-
-		// return $token;
 	}
 
 	/**
