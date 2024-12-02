@@ -37,8 +37,12 @@ export const DataSourceForm = ( {
 	};
 
 	const onDisplayNameChange = ( displayNameInput: string | undefined ) => {
-		setDisplayName( displayNameInput ?? '' );
-		handleOnChange( 'display_name', displayNameInput ?? '' );
+		const sanitizedDisplayName = displayNameInput
+			?.toString()
+			.trim()
+			.replace( /[^a-zA-Z0-9-_ ]/g, '' );
+		setDisplayName( sanitizedDisplayName ?? '' );
+		handleOnChange( 'display_name', sanitizedDisplayName ?? '' );
 	};
 
 	return (
