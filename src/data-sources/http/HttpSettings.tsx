@@ -80,6 +80,10 @@ export const HttpSettings = ( {
 			}
 		}
 
+		if ( state.authType === 'none' ) {
+			return state.slug && state.url;
+		}
+
 		return state.slug && state.url && state.authType && state.authValue;
 	}, [ state.slug, state.url, state.authType, state.authValue, state.authKey, state.authAddTo ] );
 

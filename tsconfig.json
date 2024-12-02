@@ -19,5 +19,5 @@
     "typeRoots": [ "./types", "./node_modules/@types" ],
     "sourceMap": true
   },
-  "include": [ "./types/*.d.ts", "./example/**/*", "./src/**/*", "./tests/**/*" ]
+  "include": [ "./types/*.d.ts", "./example/**/*", "./src/**/*", "./tests/**/*", "*.config.ts" ]
 }

@@ -74,19 +74,21 @@ export const HttpAuthSettingsInput: React.FC< HttpAuthSettingsInputProps > = ( {
 				</>
 			) }
 
-			<div className="form-group">
-				<PasswordInputControl
-					id="authValue"
-					label={ __( 'Authentication Value', 'remote-data-blocks' ) }
-					value={ auth.authValue }
-					onChange={ value => onChange( 'authValue', value ) }
-					__next40pxDefaultSize
-					help={ __(
-						'The authentication value to use for the HTTP endpoint. When using Basic Auth, this is "username:password" string.',
-						'remote-data-blocks'
-					) }
-				/>
-			</div>
+			{ auth.authType !== 'none' && (
+				<div className="form-group">
+					<PasswordInputControl
+						id="authValue"
+						label={ __( 'Authentication Value', 'remote-data-blocks' ) }
+						value={ auth.authValue }
+						onChange={ value => onChange( 'authValue', value ) }
+						__next40pxDefaultSize
+						help={ __(
+							'The authentication value to use for the HTTP endpoint. When using Basic Auth, this is "username:password" string.',
+							'remote-data-blocks'
+						) }
+					/>
+				</div>
+			) }
 		</>
 	);
 };

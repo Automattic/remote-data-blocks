@@ -13,23 +13,6 @@ use function Automattic\VIP\Telemetry\Tracks\get_tracks_core_properties;
  * This class abstracts WordPress-specific functions for easy mocking.
  */
 class EnvironmentConfig {
-	/**
-	 * Tracks analytics core properties.
-	 * 
-	 * This is set by the Tracks library available in MU Plugins.
-	 *
-	 * @var array<string, mixed>
-	 */
-	private array $tracks_core_props = [];
-
-	public function __construct() {
-		if ( function_exists( 'Automattic\VIP\Telemetry\Tracks\get_tracks_core_properties' ) ) {
-			add_action( 'init', function (): void {
-				/** @psalm-suppress UndefinedFunction */
-				$this->tracks_core_props = get_tracks_core_properties();
-			} );
-		}
-	}
 
 	public function is_enabled_via_filter(): bool {
 		return apply_filters( 'remote_data_blocks_enable_tracks_analytics', false ) ?? false;
@@ -44,19 +27,21 @@ class EnvironmentConfig {
 	}
 
 	public function is_wpvip_site(): bool {
-		if ( ! isset( $this->tracks_core_props['hosting_provider'] ) ) {
+		$core_props = $this->get_tracks_core_properties();
+		if ( ! isset( $core_props['hosting_provider'] ) ) {
 			return false;
 		}
 
-		return 'wpvip' === $this->tracks_core_props['hosting_provider'];
+		return 'wpvip' === $core_props['hosting_provider'];
 	}
 
 	public function is_local_env(): bool {
-		if ( ! isset( $this->tracks_core_props['vipgo_env'] ) ) {
+		$core_props = $this->get_tracks_core_properties();
+		if ( ! isset( $core_props['vip_env'] ) ) {
 			return false;
 		}
 
-		return 'local' === $this->tracks_core_props['vipgo_env'];
+		return 'local' === $core_props['vip_env'];
 	}
 
 	public function is_remote_data_blocks_plugin( string|null $plugin_path ): bool {
@@ -76,6 +61,19 @@ class EnvironmentConfig {
 	 * Get the core properties to be sent with each event.
 	 */
 	public function get_tracks_core_properties(): array {
-		return $this->tracks_core_props;
+		if ( function_exists( 'Automattic\VIP\Telemetry\Tracks\get_tracks_core_properties' ) ) {
+			return get_tracks_core_properties();
+		}
+
+		return [];
+	}
+
+	/**
+	 * Get `Tracks` properties which are specific to "Remote Data Blocks". These properties are sent with each event.
+	 */
+	public function get_remote_data_blocks_properties(): array {
+		return [
+			'plugin_version' => defined( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) ? constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) : '',
+		];
 	}
 }

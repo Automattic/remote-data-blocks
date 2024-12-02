@@ -39,7 +39,8 @@ class TracksAnalytics {
 		}
 
 		if ( self::$env_config->is_wpvip_site() || self::$env_config->is_enabled_via_filter() ) {
-			self::$instance = new $tracks_class( '', self::get_global_properties() );
+			// We don't need to pass core properties here as they are already set by Tracks library.
+			self::$instance = new $tracks_class( '', self::$env_config->get_remote_data_blocks_properties() );
 			self::setup_tracking_via_hooks();
 		}
 	}
@@ -48,11 +49,7 @@ class TracksAnalytics {
 	 * Get `Tracks` global properties to be sent with each event.
 	 */
 	public static function get_global_properties(): array {
-		$rdb_specific_props = [
-			'plugin_version' => defined( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) ? constant( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) : '',
-		];
-
-		return array_merge( $rdb_specific_props, self::$env_config->get_tracks_core_properties() );
+		return array_merge( self::$env_config->get_remote_data_blocks_properties(), self::$env_config->get_tracks_core_properties() );
 	}
 
 	private static function setup_tracking_via_hooks(): void {

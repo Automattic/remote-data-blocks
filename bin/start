@@ -1,8 +1,9 @@
 #!/bin/sh
 
-set -e
+set -e # Exit immediately if any command exits with a non-zero status.
 
 APP_MODE="$1" # "decoupled" or empty
+SCRIPT_MODE=${2:-start} # "build" or "start". Default is "start".
 
 # Set WordPress port and home URL.
 PORT="${WP_ENV_PORT-8888}"
@@ -15,9 +16,6 @@ if [ "$APP_MODE" = "decoupled" ]; then
 
     WP_HOME="${WP_ENV_HOME_URL-http://localhost:3000}"
 fi
-
-FLAGS="${WP_ENV_FLAGS---xdebug}"
-WP_ADMIN="http://localhost:$PORT/wp-admin/"
 
 cleanup() {
     echo ""
@@ -97,11 +95,19 @@ start_redis() {
 }
 
 start_wordpress() {
+    # Enable Xdebug when starting the server in "start" mode.
+    FLAGS=""
+    if [ "$SCRIPT_MODE" = "start" ]; then
+        FLAGS="${WP_ENV_FLAGS---xdebug}"
+    fi
+
     echo "🔼 Starting WordPress..."
     WP_ENV_PORT="$PORT" npx wp-env start "$FLAGS"
 }
 
 open_browser() {
+    WP_ADMIN="http://localhost:$PORT/wp-admin/"
+
     echo ""
     echo "> 🌐 $WP_ADMIN"
     echo "> 🔑 Username: admin"
@@ -128,8 +134,15 @@ trap 'cleanup' INT TERM
 start_redis
 start_wordpress
 configure_wordpress
-open_browser
 
-# Start hot-reloading wp-scripts start
-echo "🔼 Starting wp-scripts build process..."
-npm start
+if [ "$SCRIPT_MODE" = "build" ]; then
+    echo "🔼 Starting build process..."
+    npm run build
+    echo "🔼 Build completed."
+elif [ "$SCRIPT_MODE" = "start" ]; then
+    open_browser
+
+    # Start hot-reloading wp-scripts start
+    echo "🔼 Starting build process for development..."
+    npm start
+fi

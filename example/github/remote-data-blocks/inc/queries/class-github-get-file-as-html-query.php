@@ -83,13 +83,14 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 
 	public function process_response( string $html_response_data, array $input_variables ): array {
 		$content = $html_response_data;
+		$file_path = $input_variables['file_path'];
 		if ( '.md' === $this->default_file_extension ) {
-			$content = $this->update_markdown_links( $content );
+			$content = $this->update_markdown_links( $content, $file_path );
 		}
 
 		return [
 			'content' => $content,
-			'file_path' => $input_variables['file_path'],
+			'file_path' => $file_path,
 		];
 	}
 
@@ -101,9 +102,10 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 	 * - Handles URLs with fragment identifiers (e.g., '#section').
 	 * - Removes the '.md' extension from the paths.
 	 * @param string $html The HTML response data.
+	 * @param string $current_file_path The current file's path.
 	 * @return string The updated HTML response data.
 	 */
-	private function update_markdown_links( string $html ): string {
+	private function update_markdown_links( string $html, string $current_file_path = '' ): string {
 		// Load the HTML into a DOMDocument
 		$dom = new \DOMDocument();
 
@@ -125,10 +127,13 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 			}
 			$href = $node->getAttribute( 'href' );
 
-			// Check if the href is non-empty and points to a markdown file
-			if ( $href && preg_match( '/\.md($|#)/', $href ) ) {
+			// Check if the href is non-empty, points to a markdown file, and is a local path
+			if ( $href &&
+				preg_match( '/\.md($|#)/', $href ) &&
+				! preg_match( '/^(https?:)?\/\//', $href )
+			) {
 				// Adjust the path
-				$new_href = $this->adjust_markdown_file_path( $href );
+				$new_href = $this->adjust_markdown_file_path( $href, $current_file_path );
 
 				// Set the new href
 				$node->setAttribute( 'href', $new_href );
@@ -140,13 +145,17 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 	}
 
 	/**
-	 * Adjusts the given path by going one level up and removes the '.md' extension.
+	 * Adjusts the markdown file path by resolving relative paths to absolute paths.
 	 * Preserves fragment identifiers (anchors) in the URL.
 	 *
 	 * @param string $path The original path.
+	 * @param string $current_file_path The current file's path.
 	 * @return string The adjusted path.
 	 */
-	private function adjust_markdown_file_path( string $path ): string {
+	private function adjust_markdown_file_path( string $path, string $current_file_path = '' ): string {
+		global $post;
+		$page_slug = $post->post_name;
+
 		// Parse the URL to separate the path and fragment
 		$parts = wp_parse_url( $path );
 
@@ -154,16 +163,37 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 		$original_path = isset( $parts['path'] ) ? $parts['path'] : '';
 		$fragment = isset( $parts['fragment'] ) ? '#' . $parts['fragment'] : '';
 
-		// Remove leading './' or '/' but not '../'
-		$adjusted_path = preg_replace( '#^(\./|/)+#', '', $original_path );
+		// Get the directory of the current file
+		$current_dir = dirname( $current_file_path );
 
-		// Prepend '../' to go one level up
-		$adjusted_path = '../' . $adjusted_path;
+		// Resolve the absolute path based on the current directory
+		if ( str_starts_with( $original_path, '/' ) ) {
+			// Already an absolute path from root, just remove leading slash
+			$absolute_path = ltrim( $original_path, '/' );
+		} else {
+			// Use realpath to resolve relative paths
+			$temp_path = $current_dir . '/' . $original_path;
+			$parts = explode( '/', $temp_path );
+			$absolute_parts = [];
 
-		// Remove the '.md' extension
-		$adjusted_path = preg_replace( '/\.md$/', '', $adjusted_path );
+			foreach ( $parts as $part ) {
+				if ( '.' === $part || '' === $part ) {
+					continue;
+				}
+				if ( '..' === $part ) {
+					array_pop( $absolute_parts );
+				} else {
+					$absolute_parts[] = $part;
+				}
+			}
 
-		// Reconstruct the path with fragment
-		return $adjusted_path . $fragment;
+			$absolute_path = implode( '/', $absolute_parts );
+		}
+
+		// Remove the .md extension
+		$absolute_path = preg_replace( '/\.md$/', '', $absolute_path );
+
+		// Ensure the path starts with a forward slash and includes the page slug
+		return '/' . $page_slug . '/' . $absolute_path . $fragment;
 	}
 }
