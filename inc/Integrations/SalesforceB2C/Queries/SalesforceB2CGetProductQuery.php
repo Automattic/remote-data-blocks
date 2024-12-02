@@ -75,7 +75,6 @@ class SalesforceB2CGetProductQuery extends HttpQueryContext {
 		];
 
 		if ( is_wp_error( $access_token ) ) {
-			// alecg todo: Surface error in get_request_headers() parent call
 			return $headers;
 		}
 

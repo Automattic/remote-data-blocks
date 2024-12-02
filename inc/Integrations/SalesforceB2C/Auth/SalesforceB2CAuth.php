@@ -149,9 +149,6 @@ class SalesforceB2CAuth {
 		// Expires 10 seconds early as a buffer for request time and drift
 		$access_token_expires_in = $expires_in - 10;
 
-		// Debug
-		$access_token_expires_in = 30;
-
 		$access_token_data = [
 			'token' => $access_token,
 			'expires_at' => time() + $access_token_expires_in,
@@ -198,9 +195,6 @@ class SalesforceB2CAuth {
 	private static function save_refresh_token( string $refresh_token, int $expires_in, string $organization_id, string $client_id ): void {
 		// Expires 10 seconds early as a buffer for request time and drift
 		$refresh_token_expires_in = $expires_in - 10;
-
-		// Debug
-		$refresh_token_expires_in = 120;
 
 		$refresh_token_data = [
 			'token' => $refresh_token,
