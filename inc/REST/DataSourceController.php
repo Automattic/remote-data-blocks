@@ -127,20 +127,20 @@ class DataSourceController extends WP_REST_Controller {
 		 * single source of truth for data source configurations
 		 */
 		$data_sources = array_values(array_reduce(
-            array_merge( $code_configured_data_sources, $ui_configured_data_sources ),
-            function ( $acc, $item ) {
-                // Check if item with the same UUID already exists
-                if ( isset( $acc[ $item['uuid'] ] ) ) {        
-                    // Merge the properties of the existing item with the new one
-                    $acc[ $item['uuid'] ] = array_merge( $acc[ $item['uuid'] ], $item );
-                } else {
-                    // Otherwise, add the new item
-                    $acc[ $item['uuid'] ] = $item;
-                }
-                return $acc;
-            },
-            []
-        ));
+			array_merge( $code_configured_data_sources, $ui_configured_data_sources ),
+			function ( $acc, $item ) {
+				// Check if item with the same UUID already exists
+				if ( isset( $acc[ $item['uuid'] ] ) ) {
+					// Merge the properties of the existing item with the new one
+					$acc[ $item['uuid'] ] = array_merge( $acc[ $item['uuid'] ], $item );
+				} else {
+					// Otherwise, add the new item
+					$acc[ $item['uuid'] ] = $item;
+				}
+				return $acc;
+			},
+			[]
+		));
 
 		// Tracks Analytics. Only once per day to reduce noise.
 		$track_transient_key = 'remotedatablocks_view_data_sources_tracked';
@@ -166,66 +166,66 @@ class DataSourceController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
    public function update_item( $request ) {
-    $current_uuid = $request->get_param( 'uuid' );
-    $data_source_properties = $request->get_json_params();
+	$current_uuid = $request->get_param( 'uuid' );
+	$data_source_properties = $request->get_json_params();
 
-    // Extract new UUID if provided
-    $new_uuid = $data_source_properties['newUUID'] ?? null;
+	// Extract new UUID if provided
+	$new_uuid = $data_source_properties['newUUID'] ?? null;
 
-    // Retrieve the current data sources and the item by its current UUID
-    $data_sources = DataSourceCrud::get_data_sources();
-    $item = DataSourceCrud::get_item_by_uuid( $data_sources, $current_uuid );
+	// Retrieve the current data sources and the item by its current UUID
+	$data_sources = DataSourceCrud::get_data_sources();
+	$item = DataSourceCrud::get_item_by_uuid( $data_sources, $current_uuid );
 
-    // Handle item not found
-    if ( ! $item ) {
-        return new WP_Error(
-            'data_source_not_found',
-            __( 'Data source not found.', 'remote-data-blocks' ),
-            [ 'status' => 404 ]
-        );
-    }
+	// Handle item not found
+	if ( ! $item ) {
+		return new WP_Error(
+			'data_source_not_found',
+			__( 'Data source not found.', 'remote-data-blocks' ),
+			[ 'status' => 404 ]
+		);
+	}
 
-    // Handle new UUID conflicts
-    if ( $new_uuid && $new_uuid !== $current_uuid ) {
-        // Ensure no conflict with existing UUID
-        if ( DataSourceCrud::get_item_by_uuid( $data_sources, $new_uuid ) ) {
-            return new WP_Error(
-                'uuid_conflict',
-                __( 'The new UUID already exists.', 'remote-data-blocks' ),
-                [ 'status' => 409 ]
-            );
-        }
+	// Handle new UUID conflicts
+	if ( $new_uuid && $new_uuid !== $current_uuid ) {
+		// Ensure no conflict with existing UUID
+		if ( DataSourceCrud::get_item_by_uuid( $data_sources, $new_uuid ) ) {
+			return new WP_Error(
+				'uuid_conflict',
+				__( 'The new UUID already exists.', 'remote-data-blocks' ),
+				[ 'status' => 409 ]
+			);
+		}
 
-        // Set the new UUID in the properties
-        $data_source_properties['uuid'] = $new_uuid;
-    }
+		// Set the new UUID in the properties
+		$data_source_properties['uuid'] = $new_uuid;
+	}
 
-    // Merge the updated properties with the existing item
-    $updated_item = array_merge( $item, $data_source_properties );
+	// Merge the updated properties with the existing item
+	$updated_item = array_merge( $item, $data_source_properties );
 
-    // Pass the original UUID when updating the item to avoid duplication
-    $result = DataSourceCrud::update_item_by_uuid( $current_uuid, $updated_item, $current_uuid );
+	// Pass the original UUID when updating the item to avoid duplication
+	$result = DataSourceCrud::update_item_by_uuid( $current_uuid, $updated_item, $current_uuid );
 
-    if ( is_wp_error( $result ) ) {
-        return $result; // Return WP_Error if update fails
-    }
+	if ( is_wp_error( $result ) ) {
+		return $result; // Return WP_Error if update fails
+	}
 
-    // Log the update action
-    TracksAnalytics::record_event(
-        'remotedatablocks_data_source_interaction',
-        array_merge(
-            [
-                'data_source_type' => $data_source_properties['service'],
-                'action' => 'update',
-            ],
-            $this->get_data_source_interaction_track_props( $data_source_properties )
-        )
-    );
+	// Log the update action
+	TracksAnalytics::record_event(
+		'remotedatablocks_data_source_interaction',
+		array_merge(
+			[
+				'data_source_type' => $data_source_properties['service'],
+				'action' => 'update',
+			],
+			$this->get_data_source_interaction_track_props( $data_source_properties )
+		)
+	);
 
-    return rest_ensure_response( $result );
+	return rest_ensure_response( $result );
 }
 
-    
+	
 
 
 	/**

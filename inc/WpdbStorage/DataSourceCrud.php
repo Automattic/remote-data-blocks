@@ -61,43 +61,43 @@ class DataSourceCrud {
 	}
 
 	public static function update_item_by_uuid( string $uuid, array $new_item ): HttpDataSourceInterface|WP_Error {
-        $data_sources = self::get_data_sources();
-        $item = self::get_item_by_uuid($data_sources, $uuid);
-        
-        if (!$item) {
-            return new WP_Error('data_source_not_found', __('Data source not found.', 'remote-data-blocks'), ['status' => 404]);
-        }
-    
-        // Check if new UUID is provided
-        $new_uuid = $new_item['uuid'] ?? null;
-        if ($new_uuid && $new_uuid !== $uuid) {
-            // Ensure the new UUID doesn't already exist
-            if (self::get_item_by_uuid($data_sources, $new_uuid)) {
-                return new WP_Error('uuid_conflict', __('The new UUID already exists.', 'remote-data-blocks'), ['status' => 409]);
-            }
-    
-            // Remove the old item from data source array if UUID is being updated
-            unset($data_sources[$uuid]);
-        }
-    
-        // Merge new item properties
-        $merged_item = array_merge($item, $new_item);
-    
-        // Resolve and save the updated item
-        $resolved_data_source = self::resolve_data_source($merged_item);
-        if (is_wp_error($resolved_data_source)) {
-            return $resolved_data_source;  // If resolving fails, return error
-        }
-    
-        // Save the updated item
-        $result = self::save_data_source($resolved_data_source, $data_sources, $uuid);  // Passing old UUID to remove it if changed
-        if (!$result) {
-            return new WP_Error('failed_to_update_data_source', __('Failed to update data source.', 'remote-data-blocks'));
-        }
-    
-        return $resolved_data_source;
-    }
-    
+		$data_sources = self::get_data_sources();
+		$item = self::get_item_by_uuid($data_sources, $uuid);
+		
+		if (!$item) {
+			return new WP_Error('data_source_not_found', __('Data source not found.', 'remote-data-blocks'), ['status' => 404]);
+		}
+	
+		// Check if new UUID is provided
+		$new_uuid = $new_item['uuid'] ?? null;
+		if ($new_uuid && $new_uuid !== $uuid) {
+			// Ensure the new UUID doesn't already exist
+			if (self::get_item_by_uuid($data_sources, $new_uuid)) {
+				return new WP_Error('uuid_conflict', __('The new UUID already exists.', 'remote-data-blocks'), ['status' => 409]);
+			}
+	
+			// Remove the old item from data source array if UUID is being updated
+			unset($data_sources[$uuid]);
+		}
+	
+		// Merge new item properties
+		$merged_item = array_merge($item, $new_item);
+	
+		// Resolve and save the updated item
+		$resolved_data_source = self::resolve_data_source($merged_item);
+		if (is_wp_error($resolved_data_source)) {
+			return $resolved_data_source;  // If resolving fails, return error
+		}
+	
+		// Save the updated item
+		$result = self::save_data_source($resolved_data_source, $data_sources, $uuid);  // Passing old UUID to remove it if changed
+		if (!$result) {
+			return new WP_Error('failed_to_update_data_source', __('Failed to update data source.', 'remote-data-blocks'));
+		}
+	
+		return $resolved_data_source;
+	}
+	
 
 	public static function delete_item_by_uuid( string $uuid ): WP_Error|bool {
 		$data_sources = self::get_data_sources();
@@ -109,7 +109,7 @@ class DataSourceCrud {
 		return true;
 	}
 
-    public static function get_by_uuid( string $uuid ): array|false {
+	public static function get_by_uuid( string $uuid ): array|false {
 		$data_sources = self::get_data_sources();
 		foreach ( $data_sources as $source ) {
 			if ( $source['uuid'] === $uuid ) {

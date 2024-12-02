@@ -126,7 +126,7 @@ class DataSourceCrudTest extends TestCase {
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'service_schema_version' => 1,
 			'uuid' => wp_generate_uuid4(),
-            'newUUID' => '2ced7a88-5a61-4e66-840e-26baefdfdfd5',
+			'newUUID' => '2ced7a88-5a61-4e66-840e-26baefdfdfd5',
 			'access_token' => 'token1',
 			'base' => [
 				'id' => 'base_id1',

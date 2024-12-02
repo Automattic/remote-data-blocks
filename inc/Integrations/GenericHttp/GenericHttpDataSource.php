@@ -66,7 +66,7 @@ class GenericHttpDataSource extends HttpDataSource {
 	
 	public static function create( string $url, string $auth, string $display_name ): self {
 		return parent::from_array([
-            'display_name' => $display_name,
+			'display_name' => $display_name,
 			'service' => REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE,
 			'url' => $url,
 			'auth' => $auth,
@@ -75,7 +75,7 @@ class GenericHttpDataSource extends HttpDataSource {
 
 	public function to_ui_display(): array {
 		return [
-            'display_name' => $this->get_display_name(),
+			'display_name' => $this->get_display_name(),
 			'service' => REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE,
 			'url' => $this->config['url'],
 			'auth_type' => $this->config['auth']['type'],
