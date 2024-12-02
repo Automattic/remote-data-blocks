@@ -207,7 +207,7 @@ class SalesforceB2CAuth {
 			$refresh_token_cache_key,
 			$refresh_token_data,
 			'oauth-tokens',
-			// phpcs:ignore WordPressVIPMinimum.Performance.LowExpiryCacheTime.CacheTimeUndetermined -- 'expires_in' defaults to 30 minutes for access tokens.
+			// phpcs:ignore WordPressVIPMinimum.Performance.LowExpiryCacheTime.CacheTimeUndetermined -- 'expires_in' defaults to 30 days for refresh tokens.
 			$refresh_token_expires_in,
 		);
 	}
