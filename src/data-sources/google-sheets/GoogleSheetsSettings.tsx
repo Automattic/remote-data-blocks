@@ -107,6 +107,8 @@ export const GoogleSheetsSettings = ( {
 		state.spreadsheet?.id ?? ''
 	);
 
+	const [ newUUID, setNewUUID ] = useState< string | null >( uuidFromProps ?? null );
+
 	const onSaveClick = async () => {
 		if ( ! state.spreadsheet || ! state.sheet || ! state.credentials ) {
 			// TODO: Error handling
@@ -116,6 +118,7 @@ export const GoogleSheetsSettings = ( {
 		const data: GoogleSheetsConfig = {
 			display_name: state.display_name,
 			uuid: uuidFromProps ?? '',
+			newUUID: newUUID ?? '',
 			service: 'google-sheets',
 
 			spreadsheet: state.spreadsheet,
@@ -248,12 +251,17 @@ export const GoogleSheetsSettings = ( {
 
 	return (
 		<DataSourceForm
+			displayName={ state.display_name }
 			handleOnChange={ handleOnChange }
 			heading={
 				mode === 'add'
 					? __( 'Add Google Sheets Data Source' )
 					: __( 'Edit Google Sheets Data Source' )
 			}
+			mode={ mode }
+			newUUID={ newUUID }
+			setNewUUID={ setNewUUID }
+			uuidFromProps={ uuidFromProps }
 		>
 			<div className="form-group">
 				<TextareaControl

@@ -1,5 +1,5 @@
 import { TextControl } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { DataSourceForm } from '../components/DataSourceForm';
@@ -55,6 +55,8 @@ export const HttpSettings = ( {
 
 	const { addDataSource, updateDataSource } = useDataSources( false );
 
+	const [ newUUID, setNewUUID ] = useState< string | null >( uuidFromProps ?? null );
+
 	const getAuthState = (): HttpAuthFormState => {
 		return {
 			authType: state.authType,
@@ -102,6 +104,7 @@ export const HttpSettings = ( {
 		const httpConfig: HttpConfig = {
 			display_name: state.display_name,
 			uuid: uuidFromProps ?? '',
+			newUUID: newUUID ?? '',
 			service: 'generic-http',
 			url: state.url,
 			auth,
@@ -117,8 +120,13 @@ export const HttpSettings = ( {
 
 	return (
 		<DataSourceForm
+			displayName={ state.display_name }
 			handleOnChange={ handleOnChange }
 			heading={ mode === 'add' ? __( 'Add HTTP Data Source' ) : __( 'Edit HTTP Data Source' ) }
+			mode={ mode }
+			newUUID={ newUUID }
+			setNewUUID={ setNewUUID }
+			uuidFromProps={ uuidFromProps }
 		>
 			<div className="form-group">
 				<TextControl

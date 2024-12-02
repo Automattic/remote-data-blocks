@@ -1,5 +1,5 @@
 import { TextControl } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { DataSourceForm } from '../components/DataSourceForm';
@@ -47,6 +47,8 @@ export const ShopifySettings = ( {
 		state.access_token
 	);
 
+	const [ newUUID, setNewUUID ] = useState< string | null >( uuidFromProps ?? null );
+
 	const shouldAllowSubmit = useMemo( () => {
 		return state.store_name && state.access_token;
 	}, [ state.store_name, state.access_token ] );
@@ -55,6 +57,7 @@ export const ShopifySettings = ( {
 		const shopifyConfig: ShopifyConfig = {
 			display_name: state.display_name,
 			uuid: uuidFromProps ?? '',
+			newUUID: newUUID ?? '',
 			service: 'shopify',
 			store_name: state.store_name,
 			access_token: state.access_token,
@@ -74,10 +77,15 @@ export const ShopifySettings = ( {
 
 	return (
 		<DataSourceForm
+			displayName={ state.display_name }
 			handleOnChange={ handleOnChange }
 			heading={
 				mode === 'add' ? __( 'Add Shopify Data Source' ) : __( 'Edit Shopify Data Source' )
 			}
+			mode={ mode }
+			newUUID={ newUUID }
+			setNewUUID={ setNewUUID }
+			uuidFromProps={ uuidFromProps }
 		>
 			<div className="form-group">
 				<TextControl
