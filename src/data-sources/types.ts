@@ -8,6 +8,7 @@ export type DataSourceType = ( typeof SUPPORTED_SERVICES )[ number ];
 interface BaseDataSourceConfig {
 	display_name: string;
 	uuid: string;
+	newUUID?: string;
 	service: DataSourceType;
 	slug: string;
 }

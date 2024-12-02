@@ -92,27 +92,44 @@ class DataSourceCrud {
 		return $data_sources[ $uuid ] ?? false;
 	}
 
-	public static function update_item_by_uuid( string $uuid, array $new_item, ?ArraySerializableInterface $data_source = null ): HttpDataSourceInterface|WP_Error {
-		$data_sources = self::get_data_sources();
-		$item = self::get_item_by_uuid( $data_sources, $uuid );
-		if ( ! $item ) {
-			return new WP_Error( 'data_source_not_found', __( 'Data source not found.', 'remote-data-blocks' ), [ 'status' => 404 ] );
-		}
-
-		$data_source = $data_source ?? self::resolve_data_source( array_merge( $item, $new_item ) );
-
-		if ( is_wp_error( $data_source ) ) {
-			return $data_source;
-		}
-
-		$result = self::save_data_source( $data_source, $data_sources );
-		
-		if ( true !== $result ) {
-			return new WP_Error( 'failed_to_update_data_source', __( 'Failed to update data source.', 'remote-data-blocks' ) );
-		}
-		
-		return $data_source;
-	}
+	public static function update_item_by_uuid( string $uuid, array $new_item ): HttpDataSourceInterface|WP_Error {
+        $data_sources = self::get_data_sources();
+        $item = self::get_item_by_uuid($data_sources, $uuid);
+        
+        if (!$item) {
+            return new WP_Error('data_source_not_found', __('Data source not found.', 'remote-data-blocks'), ['status' => 404]);
+        }
+    
+        // Check if new UUID is provided
+        $new_uuid = $new_item['uuid'] ?? null;
+        if ($new_uuid && $new_uuid !== $uuid) {
+            // Ensure the new UUID doesn't already exist
+            if (self::get_item_by_uuid($data_sources, $new_uuid)) {
+                return new WP_Error('uuid_conflict', __('The new UUID already exists.', 'remote-data-blocks'), ['status' => 409]);
+            }
+    
+            // Remove the old item from data source array if UUID is being updated
+            unset($data_sources[$uuid]);
+        }
+    
+        // Merge new item properties
+        $merged_item = array_merge($item, $new_item);
+    
+        // Resolve and save the updated item
+        $resolved_data_source = self::resolve_data_source($merged_item);
+        if (is_wp_error($resolved_data_source)) {
+            return $resolved_data_source;  // If resolving fails, return error
+        }
+    
+        // Save the updated item
+        $result = self::save_data_source($resolved_data_source, $data_sources, $uuid);  // Passing old UUID to remove it if changed
+        if (!$result) {
+            return new WP_Error('failed_to_update_data_source', __('Failed to update data source.', 'remote-data-blocks'));
+        }
+    
+        return $resolved_data_source;
+    }
+    
 
 	public static function delete_item_by_uuid( string $uuid ): WP_Error|bool {
 		$data_sources = self::get_data_sources();
@@ -124,29 +141,17 @@ class DataSourceCrud {
 		return true;
 	}
 
-	/**
-	 * Get a data source by its slug.
-	 * 
-	 * The easiest way to think of the slug relative to data sources is it
-	 * provides a developer-friendly "contract" for the data source. The developer
-	 * can define the slug pre-emptively in their code and then customers can add it
-	 * when configuring specific data sources later.
-	 * 
-	 * This function naively returns the first data source it finds. In theory, that
-	 * should be the only one as we check for slug conflicts at present. In the future,
-	 * it's be good to holistically improve how those interactions work
-	 */
-	public static function get_by_slug( string $slug ): array|false {
+    public static function get_by_uuid( string $uuid ): array|false {
 		$data_sources = self::get_data_sources();
 		foreach ( $data_sources as $source ) {
-			if ( $source['slug'] === $slug ) {
+			if ( $source['uuid'] === $uuid ) {
 				return $source;
 			}
 		}
 		return false;
 	}
 
-	private static function save_data_source( ArraySerializableInterface $data_source, array $data_source_configs ): bool {
+	private static function save_data_source( ArraySerializableInterface $data_source, array $data_source_configs, ?string $original_uuid = null ): bool {
 		$config = $data_source->to_array();
 		
 		if ( ! isset( $config['__metadata'] ) ) {
@@ -154,15 +159,22 @@ class DataSourceCrud {
 		}
 
 		$now = gmdate( 'Y-m-d H:i:s' );
-		
-		if ( ! isset( $config['__metadata']['created_at'] ) ) {
+		$config['__metadata']['updated_at'] = $now;
+	
+		if (!isset($config['__metadata']['created_at'])) {
 			$config['__metadata']['created_at'] = $now;
 		}
-
-		$config['__metadata']['updated_at'] = $now;
-		$data_source_configs[ $config['uuid'] ] = $config;
-
-		return update_option( self::CONFIG_OPTION_NAME, $data_source_configs );
+	
+		// If the UUID has changed, remove the old entry based on the original UUID
+		if ($original_uuid && $original_uuid !== $config['uuid']) {
+			unset($data_source_configs[$original_uuid]);  // Remove old item if UUID is changing
+		}
+	
+		// Add or update the data source with the new UUID
+		$data_source_configs[$config['uuid']] = $config;
+	
+		// Save updated configuration
+		return update_option(self::CONFIG_OPTION_NAME, $data_source_configs);
 	}
 
 	private static function resolve_data_source( array $config ): HttpDataSourceInterface|WP_Error {

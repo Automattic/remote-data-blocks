@@ -117,7 +117,10 @@ class ConfigStore {
 				$data_source = $query->get_data_source();
 
 				if ( $data_source instanceof UiDisplayableInterface ) {
-					$data_sources[ $data_source->to_array()['slug'] ] = $data_source->to_ui_display();
+                    $data_source_array = $data_source->to_array();
+                    if (isset($data_source_array['uuid'])) {
+                        $data_sources[$data_source_array['uuid']] = $data_source->to_ui_display();
+                    }
 				}
 			}
 		}

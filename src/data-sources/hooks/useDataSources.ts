@@ -53,10 +53,15 @@ export const useDataSources = ( loadOnMount = true ) => {
 		let result: DataSourceConfig;
 
 		try {
+			const data = { ...sourceConfig };
+			if ( sourceConfig.newUUID && sourceConfig.newUUID !== sourceConfig.uuid ) {
+				data.newUUID = sourceConfig.newUUID;
+			}
+
 			result = await apiFetch( {
 				path: `${ REST_BASE_DATA_SOURCES }/${ sourceConfig.uuid }`,
 				method: 'PUT',
-				data: sourceConfig,
+				data,
 			} );
 		} catch ( error ) {
 			showSnackbar( 'error', __( 'Failed to update data source.', 'remote-data-blocks' ) );

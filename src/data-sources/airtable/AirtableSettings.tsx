@@ -1,14 +1,19 @@
-import { BaseControl, CheckboxControl, SelectControl } from '@wordpress/components';
+import {
+	BaseControl,
+	CheckboxControl,
+	SelectControl,
+	__experimentalInputControl as InputControl,
+} from '@wordpress/components';
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
+import { SlugInput } from '../components/SlugInput';
 import { AirtableFormState } from '@/data-sources/airtable/types';
 import { DataSourceForm } from '@/data-sources/components/DataSourceForm';
 import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
-import { SlugInput } from '@/data-sources/components/SlugInput';
 import {
 	useAirtableApiBases,
 	useAirtableApiTables,
@@ -101,6 +106,8 @@ export const AirtableSettings = ( {
 		state.base?.id ?? ''
 	);
 
+	const [ newUUID, setNewUUID ] = useState< string | null >( uuidFromProps ?? null );
+
 	const onSaveClick = async () => {
 		if ( ! state.base || ! state.table ) {
 			// TODO: Error handling
@@ -109,6 +116,7 @@ export const AirtableSettings = ( {
 
 		const airtableConfig: AirtableConfig = {
 			uuid: uuidFromProps ?? '',
+			newUUID: newUUID ?? '',
 			service: 'airtable',
 			access_token: state.access_token,
 			base: state.base,
@@ -157,11 +165,15 @@ export const AirtableSettings = ( {
 	};
 
 	/**
-	 * Handle the slug change. Only accepts valid slugs which only contain alphanumeric characters and dashes.
-	 * @param slug The slug to set.
+	 * Handle updating the uuid. Only accepts alphanumeric characters and dashes.
+	 * @param slug The uuid to update.
 	 */
 	const onSlugChange = ( slug: string | undefined ) => {
 		handleOnChange( 'slug', slug ?? '' );
+	};
+	const onUUIDChange = ( uuid: string | undefined ) => {
+		setNewUUID( uuid ?? null );
+		handleOnChange( 'uuid', uuid ?? '' );
 	};
 
 	const connectionMessage = useMemo( () => {
@@ -318,6 +330,15 @@ export const AirtableSettings = ( {
 			<div className="form-group">
 				<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
 			</div>
+			{ mode === 'edit' && (
+				<div className="form-group">
+					<InputControl
+						value={ newUUID ?? '' }
+						onChange={ onUUIDChange }
+						placeholder={ uuidFromProps }
+					/>
+				</div>
+			) }
 
 			<div className="form-group">
 				<PasswordInputControl

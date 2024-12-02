@@ -90,7 +90,6 @@ class AirtableDataSource extends HttpDataSource {
 
 	public function to_ui_display(): array {
 		return [
-			'slug' => $this->get_slug(),
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'base' => [
 				'id' => $this->config['base']['id'],

@@ -57,14 +57,12 @@ class ShopifyDataSource extends HttpDataSource {
 			'service' => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
 			'access_token' => $access_token,
 			'store_name' => $store_name,
-			'slug' => $store_name,
 		]);
 	}
 
 	public function to_ui_display(): array {
 		return [
             'display_name' => $this->get_display_name(),
-			'slug' => $this->get_slug(),
 			'service' => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
 			'store_name' => $this->config['store_name'],
 			'uuid' => $this->config['uuid'] ?? null,

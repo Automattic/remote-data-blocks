@@ -105,14 +105,12 @@ class GoogleSheetsDataSource extends HttpDataSource {
 				'name' => '',
 				'id' => 0,
 			],
-			'slug' => sanitize_title( $display_name ),
 		]);
 	}
 
 	public function to_ui_display(): array {
 		return [
             'display_name' => $this->get_display_name(),
-			'slug' => $this->get_slug(),
 			'service' => REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE,
 			'spreadsheet' => [ 'name' => $this->config['spreadsheet_id'] ],
 			'sheet' => [ 'name' => '' ],
