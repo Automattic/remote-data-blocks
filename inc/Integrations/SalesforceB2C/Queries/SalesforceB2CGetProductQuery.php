@@ -63,7 +63,7 @@ class SalesforceB2CGetProductQuery extends HttpQueryContext {
 		$data_source_config = $this->get_data_source()->to_array();
 		$data_source_endpoint = $this->get_data_source()->get_endpoint();
 
-		$access_token = SalesforceB2CAuth::generate_token_from_client_credentials(
+		$access_token = SalesforceB2CAuth::generate_token(
 			$data_source_endpoint,
 			$data_source_config['organization_id'],
 			$data_source_config['client_id'],

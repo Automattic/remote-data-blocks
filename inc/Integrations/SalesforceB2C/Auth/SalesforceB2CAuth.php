@@ -19,11 +19,38 @@ class SalesforceB2CAuth {
 	 * @param string $client_secret The client secret.
 	 * @return WP_Error|string The token or an error.
 	 */
-	public static function generate_token_from_client_credentials(
+	public static function generate_token(
 		string $endpoint,
 		string $organization_id,
 		string $client_id,
 		string $client_secret
+	): WP_Error|string {
+		$saved_access_token = self::get_saved_access_token( $organization_id, $client_id );
+
+		if ( null !== $saved_access_token ) {
+			return $saved_access_token;
+		}
+
+		$saved_refresh_token = self::get_saved_refresh_token( $organization_id, $client_id );
+		if ( null !== $saved_refresh_token ) {
+			$access_token = self::get_token_using_refresh_token( $saved_refresh_token, $client_id, $client_secret, $endpoint, $organization_id );
+		}
+
+		if ( null !== $access_token ) {
+			return $access_token;
+		}
+
+		$access_token = self::get_token_using_client_credentials( $client_id, $client_secret, $endpoint, $organization_id );
+		return $access_token;
+	}
+
+	// Access token request using top-level credentials
+
+	public static function get_token_using_client_credentials(
+		string $client_id,
+		string $client_secret,
+		string $endpoint,
+		string $organization_id,
 	): WP_Error|string {
 		$client_auth_url = sprintf( '%s/shopper/auth/v1/organizations/%s/oauth2/token', $endpoint, $organization_id );
 		$client_credentials = base64_encode( sprintf( '%s:%s', $client_id, $client_secret ) );
@@ -46,7 +73,6 @@ class SalesforceB2CAuth {
 			);
 		}
 
-
 		$response_code = wp_remote_retrieve_response_code( $client_auth_response );
 		$response_body = wp_remote_retrieve_body( $client_auth_response );
 		$response_data = json_decode( $response_body, true );
@@ -60,140 +86,160 @@ class SalesforceB2CAuth {
 		}
 
 		$access_token = $response_data['access_token'];
-		$expires_in = $response_data['expires_in'];
+		$access_token_expires_in = $response_data['expires_in'];
+		self::save_access_token( $access_token, $access_token_expires_in, $organization_id, $client_id );
 
 		$refresh_token = $response_data['refresh_token'];
 		$refresh_token_expires_in = $response_data['refresh_token_expires_in'];
+		self::save_refresh_token( $refresh_token, $refresh_token_expires_in, $organization_id, $client_id );
 
 		return $access_token;
 	}
 
-	/**
-	 * Get an access token using a JWT.
-	 *
-	 * @param string $jwt The JWT.
-	 * @param string $token_uri The token URI.
-	 * @return WP_Error|string The access token or an error.
-	 */
-	private static function get_token_using_jwt( string $jwt, string $token_uri ): WP_Error|string {
-		$response = wp_remote_post(
-			$token_uri,
-			[
-				'body' => [
-					'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-					'assertion' => $jwt,
-				],
-			]
-		);
+	// Access token request using refresh token
 
-		if ( is_wp_error( $response ) ) {
-			return new WP_Error(
-				'google_auth_error',
-				__( 'Failed to retrieve access token', 'remote-data-blocks' )
-			);
+	public static function get_token_using_refresh_token(
+		string $refresh_token,
+		string $client_id,
+		string $client_secret,
+		string $endpoint,
+		string $organization_id,
+	): ?string {
+		$client_auth_url = sprintf( '%s/shopper/auth/v1/organizations/%s/oauth2/token', $endpoint, $organization_id );
+
+		// Even though we're using a refresh token, authentication is still required to receive a new secret
+		$client_credentials = base64_encode( sprintf( '%s:%s', $client_id, $client_secret ) );
+
+		$client_auth_response = wp_remote_post( $client_auth_url, [
+			'body' => [
+				'grant_type' => 'refresh_token',
+				'refresh_token' => $refresh_token,
+				'channel_id' => 'RefArch',
+			],
+			'headers' => [
+				'Content-Type' => 'application/x-www-form-urlencoded',
+				'Authorization' => 'Basic ' . $client_credentials,
+			],
+		]);
+
+		if ( is_wp_error( $client_auth_response ) ) {
+			return null;
 		}
 
-		$response_body = wp_remote_retrieve_body( $response );
+		$response_code = wp_remote_retrieve_response_code( $client_auth_response );
+		$response_body = wp_remote_retrieve_body( $client_auth_response );
 		$response_data = json_decode( $response_body, true );
 
-		if ( ! isset( $response_data['access_token'] ) ) {
-			return new WP_Error(
-				'google_auth_error',
-				__( 'Invalid response from Google Auth', 'remote-data-blocks' )
-			);
+		if ( 400 === $response_code ) {
+			return null;
 		}
 
-		return $response_data['access_token'];
+		$access_token = $response_data['access_token'];
+		$access_token_expires_in = $response_data['expires_in'];
+		self::save_access_token( $access_token, $access_token_expires_in, $organization_id, $client_id );
+
+		// No need to save the refresh token, as it stays the same until we perform a top-level authentication
+
+		return $access_token;
 	}
 
-	/**
-	 * Generate a JWT.
-	 *
-	 * @param GoogleServiceAccountKey $service_account_key The service account key.
-	 * @param string $scope The scope.
-	 * @return string The JWT.
-	 */
-	private static function generate_jwt(
-		GoogleServiceAccountKey $service_account_key,
-		string $scope
-	): string {
-		$header = self::generate_jwt_header();
-		$payload = self::generate_jwt_payload(
-			$service_account_key->client_email,
-			$service_account_key->token_uri,
-			$scope
-		);
+	// Access token cache management
 
-		$base64_url_header = base64_encode( wp_json_encode( $header ) );
-		$base64_url_payload = base64_encode( wp_json_encode( $payload ) );
+	private static function save_access_token( string $access_token, int $expires_in, string $organization_id, string $client_id ): void {
+		// Expires 10 seconds early as a buffer for request time and drift
+		$access_token_expires_in = $expires_in - 10;
 
-		$signature = self::generate_jwt_signature(
-			$base64_url_header,
-			$base64_url_payload,
-			$service_account_key->private_key
-		);
-		$base64_url_signature = base64_encode( $signature );
+		// Debug
+		$access_token_expires_in = 30;
 
-		return $base64_url_header . '.' . $base64_url_payload . '.' . $base64_url_signature;
-	}
-
-	/**
-	 * Generate a JWT signature.
-	 *
-	 * @param string $base64_url_header The base64 URL encoded header.
-	 * @param string $base64_url_payload The base64 URL encoded payload.
-	 * @param string $private_key The private key.
-	 * @return string The JWT signature.
-	 */
-	private static function generate_jwt_signature(
-		string $base64_url_header,
-		string $base64_url_payload,
-		string $private_key
-	): string {
-		$signature_input = $base64_url_header . '.' . $base64_url_payload;
-
-		openssl_sign( $signature_input, $signature, $private_key, 'sha256' );
-		return $signature;
-	}
-
-	/**
-	 * Generate a JWT header.
-	 *
-	 * @return array The JWT header.
-	 */
-	private static function generate_jwt_header(): array {
-		$header = [
-			'alg' => 'RS256',
-			'typ' => 'JWT',
+		$access_token_data = [
+			'token' => $access_token,
+			'expires_at' => time() + $access_token_expires_in,
 		];
 
-		return $header;
+		$access_token_cache_key = self::get_access_token_key( $organization_id, $client_id );
+
+		wp_cache_set(
+			$access_token_cache_key,
+			$access_token_data,
+			'oauth-tokens',
+			// phpcs:ignore WordPressVIPMinimum.Performance.LowExpiryCacheTime.CacheTimeUndetermined -- 'expires_in' defaults to 30 minutes for access tokens.
+			$access_token_expires_in,
+		);
 	}
 
-	/**
-	 * Generate a JWT payload.
-	 *
-	 * @param string $client_email The client email.
-	 * @param string $token_uri The token URI.
-	 * @param string $scope The scope.
-	 * @return array The JWT payload.
-	 */
-	private static function generate_jwt_payload(
-		string $client_email,
-		string $token_uri,
-		string $scope
-	): array {
-		$now = time();
-		$expiry = $now + self::TOKEN_EXPIRY_SECONDS;
+	private static function get_saved_access_token( string $organization_id, string $client_id ): ?string {
+		$access_token_cache_key = self::get_access_token_key( $organization_id, $client_id );
 
-		$payload = [
-			'iss' => $client_email,
-			'scope' => $scope,
-			'aud' => $token_uri,
-			'exp' => $expiry,
-			'iat' => $now,
+		$saved_access_token = wp_cache_get( $access_token_cache_key, 'oauth-tokens' );
+
+		if ( false === $saved_access_token ) {
+			return null;
+		}
+
+		$access_token = $saved_access_token['token'];
+		$expires_at = $saved_access_token['expires_at'];
+
+		// Ensure the token is still valid
+		if ( time() >= $expires_at ) {
+			return null;
+		}
+
+		return $access_token;
+	}
+
+	private static function get_access_token_key( string $organization_id, string $client_id ): string {
+		$cache_key_suffix = hash( 'sha256', sprintf( '%s-%s', $organization_id, $client_id ) );
+		return sprintf( 'salesforce_b2c_access_token_%s', $cache_key_suffix );
+	}
+
+	// Refresh token cache management
+
+	private static function save_refresh_token( string $refresh_token, int $expires_in, string $organization_id, string $client_id ): void {
+		// Expires 10 seconds early as a buffer for request time and drift
+		$refresh_token_expires_in = $expires_in - 10;
+
+		// Debug
+		$refresh_token_expires_in = 120;
+
+		$refresh_token_data = [
+			'token' => $refresh_token,
+			'expires_at' => time() + $refresh_token_expires_in,
 		];
 
-		return $payload;
+		$refresh_token_cache_key = self::get_refresh_token_key( $organization_id, $client_id );
+
+		wp_cache_set(
+			$refresh_token_cache_key,
+			$refresh_token_data,
+			'oauth-tokens',
+			// phpcs:ignore WordPressVIPMinimum.Performance.LowExpiryCacheTime.CacheTimeUndetermined -- 'expires_in' defaults to 30 minutes for access tokens.
+			$refresh_token_expires_in,
+		);
+	}
+
+	private static function get_saved_refresh_token( string $organization_id, string $client_id ): ?string {
+		$refresh_token_cache_key = self::get_refresh_token_key( $organization_id, $client_id );
+
+		$saved_refresh_token = wp_cache_get( $refresh_token_cache_key, 'oauth-tokens' );
+
+		if ( false === $saved_refresh_token ) {
+			return null;
+		}
+
+		$refresh_token = $saved_refresh_token['token'];
+		$expires_at = $saved_refresh_token['expires_at'];
+
+		// Ensure the token is still valid
+		if ( time() >= $expires_at ) {
+			return null;
+		}
+
+		return $refresh_token;
+	}
+
+	private static function get_refresh_token_key( string $organization_id, string $client_id ): string {
+		$cache_key_suffix = hash( 'sha256', sprintf( '%s-%s', $organization_id, $client_id ) );
+		return sprintf( 'salesforce_b2c_refresh_token_%s', $cache_key_suffix );
 	}
 }
