@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Integrations\SalesforceB2C\Queries;
 
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
+use RemoteDataBlocks\Integrations\SalesforceB2C\Auth\SalesforceB2CAuth;
 
 class SalesforceB2CSearchProductsQuery extends HttpQueryContext {
 	public function get_input_schema(): array {
@@ -15,57 +16,67 @@ class SalesforceB2CSearchProductsQuery extends HttpQueryContext {
 
 	public function get_output_schema(): array {
 		return [
-			'root_path' => '$.data.products.edges[*]',
+			'root_path' => '$.hits[*]',
 			'is_collection' => true,
 			'mappings' => [
-				'id' => [
+				'product_id' => [
 					'name' => 'Product ID',
-					'path' => '$.node.id',
+					'path' => '$.productId',
 					'type' => 'id',
 				],
-				'title' => [
-					'name' => 'Product title',
-					'path' => '$.node.title',
+				'name' => [
+					'name' => 'Product name',
+					'path' => '$.productName',
 					'type' => 'string',
 				],
 				'price' => [
 					'name' => 'Item price',
-					'path' => '$.node.priceRange.maxVariantPrice.amount',
+					'path' => '$.price',
 					'type' => 'price',
 				],
 				'image_url' => [
 					'name' => 'Item image URL',
-					'path' => '$.node.images.edges[0].node.originalSrc',
+					'path' => '$.image.link',
 					'type' => 'image_url',
 				],
 			],
 		];
 	}
 
-	public function get_query(): string {
-		return 'query SearchProducts($search_terms: String!) {
-			products(first: 10, query: $search_terms, sortKey: BEST_SELLING) {
-				edges {
-					node {
-						id
-						title
-						descriptionHtml
-						priceRange {
-							maxVariantPrice {
-								amount
-							}
-						}
-						images(first: 1) {
-							edges {
-								node {
-									originalSrc
-								}
-							}
-						}
-					}
-				}
-			}
-		}';
+	public function get_endpoint( array $input_variables ): string {
+		$data_source_endpoint = $this->get_data_source()->get_endpoint();
+		$data_source_config = $this->get_data_source()->to_array();
+
+		return sprintf(
+			'%s/search/shopper-search/v1/organizations/%s/product-search?siteId=RefArchGlobal&q=%s',
+			$data_source_endpoint,
+			$data_source_config['organization_id'],
+			urlencode( $input_variables['search_terms'] )
+		);
+	}
+
+	public function get_request_headers( array $input_variables ): array {
+		$data_source_config = $this->get_data_source()->to_array();
+		$data_source_endpoint = $this->get_data_source()->get_endpoint();
+
+		$access_token = SalesforceB2CAuth::generate_token(
+			$data_source_endpoint,
+			$data_source_config['organization_id'],
+			$data_source_config['client_id'],
+			$data_source_config['client_secret']
+		);
+
+		$headers = [
+			'Content-Type' => 'application/json',
+		];
+
+		if ( is_wp_error( $access_token ) ) {
+			// alecg todo: Surface error in get_request_headers() parent call
+			return $headers;
+		}
+
+		$headers['Authorization'] = sprintf( 'Bearer %s', $access_token );
+		return $headers;
 	}
 
 	public function get_query_name(): string {
