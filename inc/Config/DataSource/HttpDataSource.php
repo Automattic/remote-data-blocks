@@ -60,17 +60,7 @@ abstract class HttpDataSource implements DataSourceInterface, HttpDataSourceInte
 		return $schema;
 	}
 
-	public static function from_slug( string $uuid ): DataSourceInterface|WP_Error {
-		$config = DataSourceCrud::get_by_uuid( $uuid );
-
-		if ( ! $config ) {
-			return new WP_Error( 'data_source_not_found', __( 'Data source not found.', 'remote-data-blocks' ), [ 'status' => 404 ] );
-		}
-
-		return static::from_array( $config );
-	}
-
-    public static function from_uuid( string $uuid ): DataSourceInterface|WP_Error {
+	public static function from_uuid( string $uuid ): DataSourceInterface|WP_Error {
 		$config = DataSourceCrud::get_by_uuid( $uuid );
 
 		if ( ! $config ) {
@@ -115,7 +105,7 @@ abstract class HttpDataSource implements DataSourceInterface, HttpDataSourceInte
 		// TODO: Implement remove from children and implement here in standardized way
 		return [
 			'display_name' => $this->get_display_name(),
-			'slug' => $this->get_slug(),
+			'uuid' => $this->get_uuid(),
 			'service' => static::SERVICE_NAME,
 		];
 	}

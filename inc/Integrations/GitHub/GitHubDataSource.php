@@ -67,7 +67,6 @@ class GitHubDataSource extends HttpDataSource {
 			'repo_owner' => $repo_owner,
 			'repo_name' => $repo_name,
 			'ref' => $ref,
-			'slug' => sanitize_title( sprintf( '%s/%s/%s', $repo_owner, $repo_name, $ref ) ),
 		]);
 	}
 }

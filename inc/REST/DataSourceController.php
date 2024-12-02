@@ -87,16 +87,6 @@ class DataSourceController extends WP_REST_Controller {
 			]
 		);
 
-		// item_slug_conflicts
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/slug-conflicts',
-			[
-				'methods' => 'POST',
-				'callback' => [ $this, 'item_slug_conflicts' ],
-				'permission_callback' => [ $this, 'item_slug_conflicts_permissions_check' ],
-			]
-		);
 	}
 
 	/**
@@ -257,22 +247,6 @@ class DataSourceController extends WP_REST_Controller {
 		return rest_ensure_response( $result );
 	}
 
-	public function item_slug_conflicts( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		$slug = $request->get_param( 'slug' );
-
-		if ( empty( $slug ) ) {
-			return new \WP_Error(
-				'missing_slug',
-				__( 'Missing slug parameter.', 'remote-data-blocks' ),
-				array( 'status' => 400 )
-			);
-		}
-		$validation_status = DataSourceCrud::validate_slug( $slug );
-		$result = [
-			'exists' => true !== $validation_status,
-		];
-		return rest_ensure_response( $result );
-	}
 
 	// These all require manage_options for now, but we can adjust as needed
 

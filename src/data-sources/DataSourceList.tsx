@@ -100,12 +100,12 @@ const DataSourceList = () => {
 					</thead>
 					<tbody className="table-body">
 						{ dataSources
-							.sort( ( a, b ) => a.slug.localeCompare( b.slug ) )
+							.sort( ( a, b ) => a.display_name.localeCompare( b.display_name ) )
 							.map( source => {
-								const { display_name: displayName, uuid, slug, service } = source;
+								const { display_name: displayName, uuid, service } = source;
 
 								return (
-									<tr key={ slug } className="table-row">
+									<tr key={ uuid } className="table-row">
 										<td>
 											<Text className="data-source-display_name">{ displayName }</Text>
 										</td>
@@ -114,7 +114,7 @@ const DataSourceList = () => {
 										</td>
 										<td> { renderDataSourceMeta( source ) } </td>
 										<td className="data-source-actions">
-											{ uuid && (
+											{ uuid && SUPPORTED_SERVICES.includes( service ) && (
 												<ButtonGroup className="data-source-actions">
 													<Button variant="secondary" onClick={ () => onEditDataSource( uuid ) }>
 														<Icon icon={ edit } />
@@ -143,12 +143,9 @@ const DataSourceList = () => {
 						title={ __( 'Delete Data Source', 'remote-data-blocks' ) }
 					>
 						{ sprintf(
-							__(
-								'Are you sure you want to delete "%s" data source with slug "%s"?',
-								'remote-data-blocks'
-							),
+							__( 'Are you sure you want to delete %s data source "%s"?', 'remote-data-blocks' ),
 							getServiceLabel( dataSourceToDelete.service ),
-							dataSourceToDelete.slug
+							dataSourceToDelete.display_name
 						) }
 					</ConfirmDialog>
 				) }

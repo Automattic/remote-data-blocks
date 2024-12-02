@@ -33,7 +33,7 @@ class ShopifyDataSource extends HttpDataSource {
 	];
 
 	public function get_display_name(): string {
-		return 'Shopify (' . $this->config['slug'] . ')';
+		return 'Shopify (' . $this->config['display_name'] . ')';
 	}
 
 	public function get_endpoint(): string {

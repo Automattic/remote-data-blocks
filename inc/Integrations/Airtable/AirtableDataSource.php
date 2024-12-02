@@ -63,7 +63,7 @@ class AirtableDataSource extends HttpDataSource {
 	];
 
 	public function get_display_name(): string {
-		return sprintf( 'Airtable (%s)', $this->config['display_name'] ?? $this->config['slug'] ?? $this->config['base']['name'] );
+		return sprintf( 'Airtable (%s)', $this->config['display_name'] ?? $this->config['base']['name'] );
 	}
 
 	public function get_endpoint(): string {
@@ -84,7 +84,6 @@ class AirtableDataSource extends HttpDataSource {
 			'base' => [ 'id' => $base_id ],
 			'tables' => $tables,
 			'display_name' => $display_name,
-			'slug' => $display_name ? sanitize_title( $display_name ) : sanitize_title( 'Airtable ' . $base_id ),
 		]);
 	}
 

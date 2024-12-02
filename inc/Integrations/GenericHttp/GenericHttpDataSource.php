@@ -51,7 +51,7 @@ class GenericHttpDataSource extends HttpDataSource {
 	];
 
 	public function get_display_name(): string {
-		return 'HTTP Connection (' . $this->config['slug'] . ')';
+		return 'HTTP Connection (' . $this->config['display_name'] . ')';
 	}
 
 	public function get_endpoint(): string {
@@ -70,14 +70,12 @@ class GenericHttpDataSource extends HttpDataSource {
 			'service' => REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE,
 			'url' => $url,
 			'auth' => $auth,
-			'slug' => sanitize_title( $display_name ),
 		]);
 	}
 
 	public function to_ui_display(): array {
 		return [
             'display_name' => $this->get_display_name(),
-			'slug' => $this->get_slug(),
 			'service' => REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE,
 			'url' => $this->config['url'],
 			'auth_type' => $this->config['auth']['type'],

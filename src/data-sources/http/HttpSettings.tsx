@@ -5,7 +5,6 @@ import { __ } from '@wordpress/i18n';
 import { DataSourceForm } from '../components/DataSourceForm';
 import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import { HttpAuthSettingsInput } from '@/data-sources/components/HttpAuthSettingsInput';
-import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { HttpAuth, HttpAuthFormState, HttpFormState } from '@/data-sources/http/types';
 import { HttpConfig, SettingsComponentProps } from '@/data-sources/types';
@@ -14,7 +13,6 @@ import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
 const initialState: HttpFormState = {
 	display_name: '',
-	slug: '',
 	url: '',
 	authType: 'bearer',
 	authValue: '',
@@ -29,7 +27,6 @@ const getInitialStateFromConfig = ( config?: HttpConfig ): HttpFormState => {
 
 	const initialStateFromConfig: HttpFormState = {
 		display_name: config.display_name,
-		slug: config.slug,
 		url: config.url,
 		authType: config.auth.type,
 		authValue: config.auth.value,
@@ -67,14 +64,6 @@ export const HttpSettings = ( {
 		};
 	};
 
-	/**
-	 * Handle the slug change. Only accepts valid slugs which only contain alphanumeric characters and dashes.
-	 * @param slug The slug to set.
-	 */
-	const onSlugChange = ( slug: string | undefined ) => {
-		handleOnChange( 'slug', slug ?? '' );
-	};
-
 	const shouldAllowSubmit = useMemo( () => {
 		if ( state.authType === 'api-key' ) {
 			if ( ! state.authKey || ! state.authAddTo ) {
@@ -83,11 +72,11 @@ export const HttpSettings = ( {
 		}
 
 		if ( state.authType === 'none' ) {
-			return state.slug && state.url;
+			return state.url;
 		}
 
-		return state.slug && state.url && state.authType && state.authValue;
-	}, [ state.slug, state.url, state.authType, state.authValue, state.authKey, state.authAddTo ] );
+		return state.url && state.authType && state.authValue;
+	}, [ state.url, state.authType, state.authValue, state.authKey, state.authAddTo ] );
 
 	const onSaveClick = async () => {
 		if ( ! shouldAllowSubmit ) {
@@ -114,7 +103,6 @@ export const HttpSettings = ( {
 			display_name: state.display_name,
 			uuid: uuidFromProps ?? '',
 			service: 'generic-http',
-			slug: state.slug,
 			url: state.url,
 			auth,
 		};
@@ -132,10 +120,6 @@ export const HttpSettings = ( {
 			handleOnChange={ handleOnChange }
 			heading={ mode === 'add' ? __( 'Add HTTP Data Source' ) : __( 'Edit HTTP Data Source' ) }
 		>
-			<div className="form-group">
-				<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
-			</div>
-
 			<div className="form-group">
 				<TextControl
 					type="url"
