@@ -1,9 +1,4 @@
-import {
-	BaseControl,
-	CheckboxControl,
-	SelectControl,
-	__experimentalInputControl as InputControl,
-} from '@wordpress/components';
+import { BaseControl, CheckboxControl, SelectControl } from '@wordpress/components';
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -159,11 +154,6 @@ export const AirtableSettings = ( {
 		}
 	};
 
-	const onUUIDChange = ( uuid: string | undefined ) => {
-		setNewUUID( uuid ?? null );
-		handleOnChange( 'uuid', uuid ?? '' );
-	};
-
 	const connectionMessage = useMemo( () => {
 		if ( fetchingUserId ) {
 			return __( 'Validating connection...', 'remote-data-blocks' );
@@ -302,21 +292,16 @@ export const AirtableSettings = ( {
 
 	return (
 		<DataSourceForm
+			displayName={ state.display_name }
 			handleOnChange={ handleOnChange }
 			heading={
 				mode === 'add' ? __( 'Add Airtable Data Source' ) : __( 'Edit Airtable Data Source' )
 			}
+			mode={ mode }
+			newUUID={ newUUID }
+			setNewUUID={ setNewUUID }
+			uuidFromProps={ uuidFromProps }
 		>
-			{ mode === 'edit' && (
-				<div className="form-group">
-					<InputControl
-						value={ newUUID ?? '' }
-						onChange={ onUUIDChange }
-						placeholder={ uuidFromProps }
-					/>
-				</div>
-			) }
-
 			<div className="form-group">
 				<PasswordInputControl
 					label={ __( 'Access Token', 'remote-data-blocks' ) }
