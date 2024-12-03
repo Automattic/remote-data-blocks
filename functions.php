@@ -9,6 +9,7 @@
 
 use RemoteDataBlocks\Config\QueryContext\QueryContextInterface;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
+use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 
 /**
  * Register a remote data block.
@@ -73,4 +74,9 @@ function register_remote_data_block_pattern( string $block_name, string $pattern
  */
 function register_remote_data_page( string $block_name, string $slug, array $options = [] ): void {
 	ConfigRegistry::register_page( $block_name, $slug, $options );
+}
+
+function execute_remote_data_block_query( WP_Block $block ): array|null {
+	$block_context = $block->context[ BlockBindings::$context_name ];
+	return BlockBindings::execute_query( $block_context, 'execute_remote_data_block_query' );
 }
