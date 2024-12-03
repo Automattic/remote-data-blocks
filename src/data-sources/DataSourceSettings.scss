@@ -1,20 +1,26 @@
+.rdb-settings-page_add-edit {
 
+	@media screen and (min-width: 782px) {
+		height: calc(100vh - 132px);
+		display: grid;
+	}
+
+}
 
 .rdb-settings-page_data-source-form-footer {
-	width: 100%;
+	align-self: end;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: var(--Alias-page-tiny, 16px) 48px;
+	padding: 16px;
 	gap: 12px;
 	border-top: 1px solid var(--Gutenberg-Gray-100, #f0f0f0);
 	background: var(--Gutenberg-White, #fff);
 
-	.rdb-settings-page_data-source-form_header {
-		display: flex;
-		align-items: center;
-		gap: 12px;
+	@media screen and (min-width: 782px) {
+		padding: 16px 0;
 	}
+
 
 	button {
 		display: flex;
@@ -27,7 +33,14 @@
 }
 
 .rdb-settings-page_data-source-form-wrapper {
-	padding: 56px 48px 0 48px;
+	padding: 24px;
+	overflow: hidden;
+
+	@media screen and (min-width: 782px) {
+		display: grid;
+		grid-template-columns: 0.5fr 1fr 0.5fr;
+		padding: 56px 48px 0 48px;
+	}
 
 
 	.rdb-settings_form-steps {
@@ -69,6 +82,8 @@
 
 
 	.rdb-settings-page_data-source-form {
+
+		overflow-y: auto;
 
 		.rdb-settings_form-header {
 			margin-bottom: 40px;

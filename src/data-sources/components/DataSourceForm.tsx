@@ -81,17 +81,29 @@ const DataSourceForm = ( { children, icon, mode, onSave, source }: DataSourceFor
 				{ mode === 'add' && (
 					<>
 						{ currentStep === 1 && (
-							<Button onClick={ () => console.log( 'Go to main screen' ) } variant="secondary">
+							<Button
+								onClick={ () => console.log( 'Go to main screen' ) }
+								variant="secondary"
+								__next40pxDefaultSize
+							>
 								Cancel
 							</Button>
 						) }
 						{ currentStep > 1 && (
-							<Button onClick={ () => setCurrentStep( currentStep - 1 ) } variant="secondary">
+							<Button
+								onClick={ () => setCurrentStep( currentStep - 1 ) }
+								variant="secondary"
+								__next40pxDefaultSize
+							>
 								Go back
 							</Button>
 						) }
 						{ currentStep < steps.length && (
-							<Button onClick={ () => setCurrentStep( currentStep + 1 ) } variant="primary">
+							<Button
+								onClick={ () => setCurrentStep( currentStep + 1 ) }
+								variant="primary"
+								__next40pxDefaultSize
+							>
 								Continue
 							</Button>
 						) }

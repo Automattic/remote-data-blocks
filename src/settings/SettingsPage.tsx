@@ -13,11 +13,13 @@ import './SettingsPage.scss';
 const SettingsPage = () => {
 	const settingsContext = useDataSourceRouter();
 
+	const addOrEditScreen = [ 'addDataSource', 'editDataSource' ].includes( settingsContext.screen );
+
 	return (
 		<div className="rdb-settings-page">
 			<SettingsContext.Provider value={ settingsContext }>
 				<div className="rdb-settings-page_header">
-					{ [ 'addDataSource', 'editDataSource' ].includes( settingsContext.screen ) ? (
+					{ addOrEditScreen ? (
 						<HStack className="rdb-settings-page_header-return">
 							<Button icon={ chevronLeft } onClick={ () => settingsContext.goToMainScreen() } />
 							<h2>
@@ -44,14 +46,14 @@ const SettingsPage = () => {
 						</>
 					) }
 				</div>
-				<div className="page-content">
+				<div
+					className={ `rdb-settings-page_content ${
+						addOrEditScreen ? 'rdb-settings-page_add-edit' : 'rdb-settings-page_sources'
+					}` }
+				>
 					<Notices />
 
-					{ [ 'addDataSource', 'editDataSource' ].includes( settingsContext.screen ) ? (
-						<DataSourceSettings />
-					) : (
-						<DataSourceList />
-					) }
+					{ addOrEditScreen ? <DataSourceSettings /> : <DataSourceList /> }
 				</div>
 			</SettingsContext.Provider>
 		</div>
