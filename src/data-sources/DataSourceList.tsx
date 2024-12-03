@@ -143,7 +143,10 @@ const DataSourceList = () => {
 			<Placeholder
 				icon={ info }
 				label={ __( 'No data source found.', 'remote-data-blocks' ) }
-				instructions={ __( 'Use “Add” button to add data source.', 'remote-data-blocks' ) }
+				instructions={ __(
+					'Use the “Connect New” button to add a data source.',
+					'remote-data-blocks'
+				) }
 			/>
 		);
 	}
