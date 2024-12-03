@@ -1,36 +1,3 @@
-.data-source-list-card {
-
-	.add-data-source-btn {
-		border-radius: 4px;
-		padding-right: 8px;
-
-		svg {
-			margin-left: 4px;
-		}
-	}
-}
-
-.settings_page_remote-data-blocks-settings {
-
-	.add-data-source-dropdown-content {
-		top: -7px !important;
-	}
-
-	.components-menu-item__button {
-
-		&:hover {
-
-			.components-menu-items__item-icon path {
-				fill: var(--wp-admin-theme-color, #68696f);
-			}
-		}
-	}
-
-	.components-menu-items__item-icon {
-		margin-right: 8px;
-	}
-}
-
 .data-source-list-wrapper {
 	overflow: auto;
 }

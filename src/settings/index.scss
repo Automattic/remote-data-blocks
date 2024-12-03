@@ -1,7 +1,7 @@
-@import url( ./../styles/components/components.scss );
-
+/* Admin settings */
 .settings_page_remote-data-blocks-settings {
 
+	/* WP default style overrides */
 	#wpcontent {
 		padding: 0;
 	}
@@ -18,29 +18,33 @@
 		display: none;
 	}
 
-	.components-external-link__contents {
-		text-decoration: none;
+	/* Snackbar notice */
+	.components-snackbar-list {
+		position: fixed;
+		bottom: 30px;
+		left: 160px;
+		width: calc(100% - 160px);
 	}
 
-	.rdb-settings-page_header {
-		display: grid;
-		padding: 24px 48px;
-		border-bottom: 1px solid var(--Alias-border-border-secondary, #ebebeb);
-
-		p {
-			margin-bottom: 0;
-		}
+	&.folded .components-snackbar-list {
+		left: 36px;
+		width: calc(100% - 36px);
 	}
 
-	.rdb-settings-page_header-return {
-		justify-content: flex-start;
+	.components-snackbar {
+		position: relative;
+		left: 50%;
+		transform: translateX(-50%);
 	}
 
-	.rdb-settings-page_add-data-source-dropdown {
-		grid-area: 1 / 2 / span 1 / span 1;
-		justify-self: end;
+	.components-snackbar__icon {
+		font-size: 15px;
+		top: -3px;
+		left: 0;
 	}
 
+
+	/* Add new source menu */
 	.components-menu-group {
 
 		div {
@@ -74,8 +78,56 @@
 		}
 	}
 
-	.page-content {
-		margin-top: 8px;
+	.rdb-settings-page {
+
+		/* No sources found placeholder */
+		.components-placeholder {
+			align-items: center;
+			justify-content: center;
+			gap: 6px;
+			box-shadow: none;
+			min-height: 250px;
+			border-radius: 8px;
+		}
+
+		.components-placeholder__label {
+			flex-direction: column;
+
+			svg {
+				width: 40px;
+				height: 40px;
+				margin-bottom: 12px;
+			}
+		}
+
+		.components-placeholder__instructions {
+			color: #757575;
+		}
+
+		/* Header */
+		.rdb-settings-page_header {
+			display: grid;
+			padding: 24px 48px;
+			border-bottom: 1px solid var(--Alias-border-border-secondary, #ebebeb);
+
+			.rdb-settings-page_header-return {
+				justify-content: flex-start;
+			}
+
+			p {
+				margin-bottom: 0;
+			}
+
+			.components-external-link__contents {
+				text-decoration: none;
+			}
+
+			.rdb-settings-page_add-data-source-dropdown {
+				grid-area: 1 / 2 / span 1 / span 1;
+				justify-self: end;
+			}
+		}
 	}
+
 }
 
