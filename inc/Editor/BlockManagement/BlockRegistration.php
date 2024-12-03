@@ -35,9 +35,9 @@ class BlockRegistration {
 		$remote_data_blocks_config = [];
 		$scripts_to_localize = [];
 
-		foreach ( ConfigStore::get_block_names() as $block_name ) {
+		foreach ( ConfigStore::get_block_configurations() as $config ) {
+			$block_name = $config['name'];
 			$block_path = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-container';
-			$config = ConfigStore::get_configuration( $block_name );
 
 			$input_vars_with_overrides = array_filter( $config['queries']['__DISPLAY__']->get_input_schema(), function ( $input_var ) {
 				return isset( $input_var['overrides'] );
@@ -113,7 +113,7 @@ class BlockRegistration {
 			wp_localize_script( $script_handle, 'REMOTE_DATA_BLOCKS', [
 				'config' => $remote_data_blocks_config,
 				'rest_url' => RemoteDataController::get_url(),
-				'tracks_global_properties' => TracksAnalytics::get_global_properties(), 
+				'tracks_global_properties' => TracksAnalytics::get_global_properties(),
 			] );
 		}
 	}

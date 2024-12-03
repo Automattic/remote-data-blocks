@@ -58,7 +58,7 @@ class ConfigRegistry {
 			'title' => $block_title,
 		];
 
-		ConfigStore::set_configuration( $block_name, $config );
+		ConfigStore::set_block_configuration( $block_name, $config );
 	}
 
 	public static function register_loop_block( string $block_title, QueryContextInterface $display_query ): void {
@@ -67,7 +67,7 @@ class ConfigRegistry {
 
 	public static function register_block_pattern( string $block_title, string $pattern_title, string $pattern_content, array $pattern_options = [] ): void {
 		$block_name = ConfigStore::get_block_name( $block_title );
-		$config = ConfigStore::get_configuration( $block_name );
+		$config = ConfigStore::get_block_configuration( $block_name );
 
 		if ( null === $config ) {
 			return;
@@ -99,7 +99,7 @@ class ConfigRegistry {
 		$recognized_roles = [ 'inner_blocks' ];
 		if ( isset( $pattern_options['role'] ) && in_array( $pattern_options['role'], $recognized_roles, true ) ) {
 			$config['patterns'][ $pattern_options['role'] ] = $pattern_name;
-			ConfigStore::set_configuration( $block_name, $config );
+			ConfigStore::set_block_configuration( $block_name, $config );
 		}
 	}
 
@@ -115,7 +115,7 @@ class ConfigRegistry {
 	public static function register_page( string $block_title, string $page_slug, array $options = [] ): void {
 
 		$block_name = ConfigStore::get_block_name( $block_title );
-		$config = ConfigStore::get_configuration( $block_name );
+		$config = ConfigStore::get_block_configuration( $block_name );
 		$allow_nested_paths = $options['allow_nested_paths'] ?? false;
 
 		if ( null === $config ) {
@@ -180,7 +180,7 @@ class ConfigRegistry {
 
 	private static function register_selector( string $block_title, string $type, QueryContextInterface $query ): void {
 		$block_name = ConfigStore::get_block_name( $block_title );
-		$config = ConfigStore::get_configuration( $block_name );
+		$config = ConfigStore::get_block_configuration( $block_name );
 		$query_key = $query->get_query_key();
 
 		if ( null === $config ) {
@@ -198,11 +198,11 @@ class ConfigRegistry {
 			}
 		}
 
-		self::register_query( $block_name, $query );
+		self::register_query( $block_title, $query );
 
 		// Add the selector to the configuration. Fetch config again since it was
 		// updated in register_query.
-		$config = ConfigStore::get_configuration( $block_name );
+		$config = ConfigStore::get_block_configuration( $block_name );
 		array_unshift(
 			$config['selectors'],
 			[
@@ -214,13 +214,13 @@ class ConfigRegistry {
 			]
 		);
 
-		ConfigStore::set_configuration( $block_name, $config );
+		ConfigStore::set_block_configuration( $block_name, $config );
 	}
 
 	public static function register_query( string $block_title, QueryContextInterface $query ): void {
 		$block_name = ConfigStore::get_block_name( $block_title );
-		$config = ConfigStore::get_configuration( $block_name );
-		$query_key = $query::class;
+		$config = ConfigStore::get_block_configuration( $block_name );
+		$query_key = $query->get_query_key();
 
 		if ( null === $config ) {
 			return;
@@ -232,7 +232,7 @@ class ConfigRegistry {
 		}
 
 		$config['queries'][ $query_key ] = $query;
-		ConfigStore::set_configuration( $block_name, $config );
+		ConfigStore::set_block_configuration( $block_name, $config );
 	}
 
 	public static function register_list_query( string $block_title, QueryContextInterface $query ): void {

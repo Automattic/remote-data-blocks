@@ -7,6 +7,7 @@ defined( 'ABSPATH' ) || exit();
 use RemoteDataBlocks\Logging\LoggerManager;
 use Psr\Log\LoggerInterface;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
+use RemoteDataBlocks\Config\QueryContext\QueryContextInterface;
 use RemoteDataBlocks\Config\UiDisplayableInterface;
 
 use function sanitize_title;
@@ -15,11 +16,16 @@ class ConfigStore {
 	/**
 	 * @var array<string, array<string, mixed>>
 	 */
-	private static array $configurations;
+	private static array $blocks = [];
+
+	/**
+	 * @var array<string, QueryContextInterface>
+	 */
+	private static array $queries = [];
+
 	private static LoggerInterface $logger;
 
 	public static function init( ?LoggerInterface $logger = null ): void {
-		self::$configurations = [];
 		self::$logger = $logger ?? LoggerManager::instance();
 	}
 
@@ -33,39 +39,37 @@ class ConfigStore {
 	}
 
 	/**
-	 * Get all registered block names.
-	 *
-	 * @return string[]
+	 * Get the configuration for a block.
 	 */
-	public static function get_block_names(): array {
-		return array_keys( self::$configurations );
+	public static function get_block_configurations(): array {
+		return self::$blocks;
 	}
 
 	/**
 	 * Get the configuration for a block.
 	 */
-	public static function get_configuration( string $block_name ): ?array {
+	public static function get_block_configuration( string $block_name ): ?array {
 		if ( ! self::is_registered_block( $block_name ) ) {
 			self::$logger->error( sprintf( 'Block %s has not been registered', $block_name ) );
 			return null;
 		}
 
-		return self::$configurations[ $block_name ];
+		return self::$blocks[ $block_name ];
 	}
 
 	/**
 	 * Set or update the configuration for a block.
 	 */
-	public static function set_configuration( string $block_name, array $config ): void {
+	public static function set_block_configuration( string $block_name, array $config ): void {
 		// @TODO: Validate config shape.
-		self::$configurations[ $block_name ] = $config;
+		self::$blocks[ $block_name ] = $config;
 	}
 
 	/**
 	 * Check if a block is registered.
 	 */
 	public static function is_registered_block( string $block_name ): bool {
-		return isset( self::$configurations[ $block_name ] );
+		return isset( self::$blocks[ $block_name ] );
 	}
 
 	/**
@@ -74,7 +78,7 @@ class ConfigStore {
 	 * @param string $block_name Name of the block.
 	 */
 	public static function get_data_source_type( string $block_name ): ?string {
-		$config = self::get_configuration( $block_name );
+		$config = self::get_block_configuration( $block_name );
 		if ( ! $config ) {
 			return null;
 		}
@@ -108,7 +112,7 @@ class ConfigStore {
 	public static function get_data_sources_displayable(): array {
 		$data_sources = [];
 
-		foreach ( self::$configurations as $config ) {
+		foreach ( self::$blocks as $config ) {
 			foreach ( $config['queries'] as $query ) {
 				if ( ! $query instanceof HttpQueryContext ) {
 					continue;

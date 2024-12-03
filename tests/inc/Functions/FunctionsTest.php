@@ -77,7 +77,7 @@ class FunctionsTest extends TestCase {
 		register_remote_data_list_query( 'List Block', $list_query );
 
 		$block_name = 'remote-data-blocks/list-block';
-		$config = ConfigStore::get_configuration( $block_name );
+		$config = ConfigStore::get_block_configuration( $block_name );
 		$this->assertSame( 'list', $config['selectors'][0]['type'] );
 	}
 
@@ -93,18 +93,8 @@ class FunctionsTest extends TestCase {
 		register_remote_data_search_query( 'Search Block', $search_query );
 
 		$block_name = 'remote-data-blocks/search-block';
-		$config = ConfigStore::get_configuration( $block_name );
+		$config = ConfigStore::get_block_configuration( $block_name );
 		$this->assertSame( 'search', $config['selectors'][0]['type'] );
-	}
-
-	public function testGetBlockNames() {
-		register_remote_data_block( 'Block One', new HttpQueryContext( $this->mock_data_source ) );
-		register_remote_data_block( 'Block Two', new HttpQueryContext( $this->mock_data_source ) );
-
-		$block_names = ConfigStore::get_block_names();
-		$this->assertCount( 2, $block_names );
-		$this->assertContains( 'remote-data-blocks/block-one', $block_names );
-		$this->assertContains( 'remote-data-blocks/block-two', $block_names );
 	}
 
 	public function testIsRegisteredBlockReturnsTrueForRegisteredBlock() {
@@ -117,7 +107,7 @@ class FunctionsTest extends TestCase {
 	}
 
 	public function testGetConfigurationForNonexistentBlock() {
-		$this->assertNull( ConfigStore::get_configuration( 'nonexistent' ) );
+		$this->assertNull( ConfigStore::get_block_configuration( 'nonexistent' ) );
 		$this->assertTrue( $this->mock_logger->hasLoggedLevel( LogLevel::ERROR ) );
 		$error_logs = $this->mock_logger->getLogsByLevel( LogLevel::ERROR );
 		$this->assertStringContainsString( 'not been registered', $error_logs[0]['message'] );

@@ -164,7 +164,7 @@ class BlockBindings {
 
 	public static function execute_query( array $block_context, string $operation_name ): array|null {
 		$block_name = $block_context['blockName'];
-		$block_config = ConfigStore::get_configuration( $block_name );
+		$block_config = ConfigStore::get_block_configuration( $block_name );
 
 		if ( null === $block_config ) {
 			return null;
