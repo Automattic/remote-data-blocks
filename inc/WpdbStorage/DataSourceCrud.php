@@ -65,7 +65,7 @@ class DataSourceCrud {
 		$item = self::get_item_by_uuid( $data_sources, $uuid );
 		
 		if ( ! $item ) {
-			return new WP_Error('data_source_not_found', __('Data source not found.', 'remote-data-blocks'), ['status' => 404]);
+			return new WP_Error( 'data_source_not_found', __( 'Data source not found.', 'remote-data-blocks' ), [ 'status' => 404 ] );
 		}
 	
 		// Check if new UUID is provided
@@ -77,14 +77,14 @@ class DataSourceCrud {
 			}
 	
 			// Remove the old item from data source array if UUID is being updated
-			unset($data_sources[$uuid]);
+			unset( $data_sources[ $uuid ] );
 		}
 	
 		// Merge new item properties
 		$merged_item = array_merge( $item, $new_item );
 	
 		// Resolve and save the updated item
-		$resolved_data_source = self::resolve_data_source($merged_item);
+		$resolved_data_source = self::resolve_data_source( $merged_item );
 		if ( is_wp_error( $resolved_data_source ) ) {
 			return $resolved_data_source;  // If resolving fails, return error
 		}
@@ -139,10 +139,10 @@ class DataSourceCrud {
 		}
 	
 		// Add or update the data source with the new UUID
-		$data_source_configs[$config['uuid']] = $config;
+		$data_source_configs[ $config['uuid'] ] = $config;
 	
 		// Save updated configuration
-		return update_option(self::CONFIG_OPTION_NAME, $data_source_configs);
+		return update_option( self::CONFIG_OPTION_NAME, $data_source_configs );
 	}
 
 	private static function resolve_data_source( array $config ): HttpDataSourceInterface|WP_Error {
