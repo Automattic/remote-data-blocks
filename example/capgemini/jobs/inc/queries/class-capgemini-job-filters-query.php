@@ -38,6 +38,6 @@ class CapgeminiJobFiltersQuery extends HttpQueryContext {
 	public function get_endpoint( array $input_variables ): string {
 		$endpoint = $this->get_data_source()->get_endpoint() . '/job-filters';
 
-		return add_query_arg( $input_variables, $endpoint );
+		return add_query_arg( array_merge( $input_variables, [ 'country_code' => 'gb-en' ] ), $endpoint );
 	}
 }

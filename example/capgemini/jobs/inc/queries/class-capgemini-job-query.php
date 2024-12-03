@@ -15,6 +15,7 @@ class CapgeminiJobQuery extends HttpQueryContext {
 
 	public function get_output_schema(): array {
 		return [
+			'root_path' => '$.data',
 			'is_collection' => false,
 			'mappings' => [
 				'id' => [
@@ -29,7 +30,9 @@ class CapgeminiJobQuery extends HttpQueryContext {
 				],
 				'description' => [
 					'name' => 'Description',
-					'path' => '$.description',
+                    'generate' => function ( $data ) {
+						return html_entity_decode( $data['description'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+					},
 					'type' => 'string',
 				],
 				'location' => [

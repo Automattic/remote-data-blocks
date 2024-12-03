@@ -1,22 +1,22 @@
-import { store } from '@wordpress/interactivity';
+import { getContext, store } from '@wordpress/interactivity';
 
 import { PUBLIC_STORE_NAME } from '../config/constants';
-
-interface GenericEvent {
-	key?: string;
-	target: {
-		value?: string;
-	};
-	type: string;
-}
 
 interface Job {
 	id: string;
 	title: string;
 }
 
+interface Filter {
+	type: string;
+	items: { value: string; count: number }[];
+}
+
 interface ViewInitialState {
 	jobs: Job[];
+	filters: Filter[];
+	selectedFilters: { filter: string; value: string }[];
+	isFilterSelected: () => boolean;
 	searchTerms: string;
 }
 
@@ -28,7 +28,10 @@ export interface ViewState extends ViewInitialState {
 interface ViewStore {
 	actions: {
 		search: () => Promise< void >;
+		clearFilter: ( filter: string ) => void;
+		clearAllFilters: () => void;
 		updateSearchTerms: ( evt: React.ChangeEvent< HTMLInputElement > ) => void;
+		toggleFilter: () => void;
 	};
 	state: ViewState;
 }
@@ -42,6 +45,10 @@ const { actions, state } = store< ViewStore >( PUBLIC_STORE_NAME, {
 					query_key: '__DISPLAY__',
 					query_input: {
 						search: state.searchTerms,
+						...state.selectedFilters.reduce( ( acc, filter ) => {
+							acc[ filter.filter ] = filter.value;
+							return acc;
+						}, {} as Record< string, string > ),
 					},
 				} ),
 				headers: {
@@ -57,16 +64,37 @@ const { actions, state } = store< ViewStore >( PUBLIC_STORE_NAME, {
 					title: result.result?.title?.value ?? 'title',
 				} ) ) ?? [];
 		},
-		updateSearchTerms: ( evt: GenericEvent ) => {
+		updateSearchTerms: event => {
 			// TODO: Debounce
-			state.searchTerms = evt.target?.value ?? '';
+			state.searchTerms = event.target.value;
 
-			if ( evt.type === 'keydown' && evt.key === 'Enter' ) {
-				void actions.search();
+			// if ( evt.type === 'keydown' && 'key' in evt && evt.key === 'Enter' ) {
+			// 	void actions.search();
+			// }
+		},
+		clearFilter: ( filter: string ) => {
+			state.selectedFilters = state.selectedFilters.filter( _filter => _filter.filter !== filter );
+		},
+		clearAllFilters: () => {
+			state.selectedFilters = [];
+		},
+		toggleFilter: ( event: { target: HTMLInputElement } ) => {
+			const context: { item: { value: string } } = getContext();
+
+			if ( event.target.checked ) {
+				state.selectedFilters.push( {
+					filter: event.target.name,
+					value: context.item.value,
+				} );
+			} else {
+				state.selectedFilters = state.selectedFilters.filter(
+					_filter => _filter.filter !== event.target.name || _filter.value !== context.item.value
+				);
 			}
 		},
-	},
+	} as ViewStore[ 'actions' ],
 	state: {
+		selectedFilters: [],
 		// We rely on the initial state supplied by wp_interactivity_state() in
 		// render.php, which is merged with the default initial state here.
 	},
