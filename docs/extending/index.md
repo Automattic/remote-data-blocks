@@ -33,7 +33,7 @@ Once you've defined your custom classes, you can [register a remote data block](
 ### Additional customization
 
 - [Block patterns](block-patterns.md)
-- [Hooks (actions and filters](hooks.md)
+- [Hooks (actions and filters)](hooks.md)
 
 ## Workflows
 

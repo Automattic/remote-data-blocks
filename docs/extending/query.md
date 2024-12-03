@@ -67,7 +67,15 @@ The `get_input_schema` method defines the input data expected by the query. The 
 - `overrides` (optional): An array of possible [overrides](overrides.md) for the input variable. Each override is an associative array with the following keys:
   - `type`: The type of the override. Supported values are `query_var` and `url`.
   - `target`: The targeted entity for the override (e.g., the query or URL variable that contains the overridde).
-- `type` (required): The type of the input variable. Supported types are `string`, `number`, and `boolean`.
+- `type` (required): The type of the input variable. Supported types are:
+  - `base64`
+  - `boolean`
+  - `button_url`
+  - `image_alt`
+  - `image_url`
+  - `number`
+  - `price`
+  - `string`
 
 #### Example
 

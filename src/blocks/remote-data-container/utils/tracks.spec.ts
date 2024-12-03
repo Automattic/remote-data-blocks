@@ -17,8 +17,8 @@ describe( 'sendTracksEvent', () => {
 		plugin_version: '0.2',
 
 		// "Tracks" library properties.
-		vipgo_env: 'local',
-		vipgo_org: 1,
+		vip_env: 'local',
+		vip_org: 1,
 		is_vip_user: false,
 		hosting_provider: 'vip',
 		is_multisite: false,
@@ -44,7 +44,7 @@ describe( 'sendTracksEvent', () => {
 		expect( recordTracksEvent ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should not track if vipgo_env is local', () => {
+	it( 'should not track if vip_env is local', () => {
 		sendTracksEvent( 'remotedatablocks_field_shortcode', { action: 'value' } );
 
 		expect( recordTracksEvent ).not.toHaveBeenCalled();
@@ -53,7 +53,7 @@ describe( 'sendTracksEvent', () => {
 	it( 'should call recordTracksEvent with the correct event name and properties', () => {
 		vi.mocked( getTracksGlobalProperties ).mockReturnValue( {
 			...defaultTracksGlobalProps,
-			vipgo_env: 'production',
+			vip_env: 'production',
 		} );
 
 		sendTracksEvent( 'remotedatablocks_field_shortcode', { action: 'actionName' } );
@@ -61,7 +61,7 @@ describe( 'sendTracksEvent', () => {
 		expect( recordTracksEvent ).toHaveBeenCalledTimes( 1 );
 		expect( recordTracksEvent ).toHaveBeenCalledWith( 'remotedatablocks_field_shortcode', {
 			...defaultTracksGlobalProps,
-			vipgo_env: 'production',
+			vip_env: 'production',
 			action: 'actionName',
 		} );
 	} );
