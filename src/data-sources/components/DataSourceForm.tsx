@@ -15,8 +15,10 @@ import { DataSourceFormActions } from './DataSourceFormActions';
 
 interface DataSourceFormProps {
 	children: React.ReactNode;
+	icon: IconType;
 	mode: 'add' | 'edit';
 	onSave: () => Promise< void >;
+	source: string;
 }
 
 interface DataSourceFormSetupProps {
@@ -45,7 +47,7 @@ const DataSourceFormStep = ( {
 	</>
 );
 
-const DataSourceForm = ( { children, mode, onSave }: DataSourceFormProps ) => {
+const DataSourceForm = ( { children, icon, mode, onSave, source }: DataSourceFormProps ) => {
 	const [ currentStep, setCurrentStep ] = useState( 1 );
 
 	const steps = Children.toArray( children );
@@ -67,7 +69,7 @@ const DataSourceForm = ( { children, mode, onSave }: DataSourceFormProps ) => {
 
 	return (
 		<>
-			<div className="rdb-settings-page_data-source-form-wrapper">
+			<div className={ `rdb-settings-page_data-source-${ mode }-form` }>
 				{ mode === 'add' && (
 					<>
 						<nav className="rdb-settings_form-steps" aria-label="Setup form steps">

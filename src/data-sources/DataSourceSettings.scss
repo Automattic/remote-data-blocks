@@ -53,7 +53,15 @@
 	}
 }
 
-.rdb-settings-page_data-source-form-wrapper {
+.rdb-settings-page_data-source-edit-form {
+	padding: 24px;
+
+	@media screen and (min-width: 782px) {
+		padding: 32px 48px 0 48px;
+	}
+}
+
+.rdb-settings-page_data-source-add-form {
 	padding: 24px;
 	overflow: hidden;
 
@@ -97,68 +105,68 @@
 			}
 		}
 	}
+}
 
 
-	.rdb-settings-page_data-source-form {
-		overflow-y: auto;
+.rdb-settings-page_data-source-form {
+	overflow-y: auto;
 
-		@media screen and (min-width: 782px) {
-			width: 500px;
-			justify-self: center;
+	@media screen and (min-width: 782px) {
+		width: 500px;
+		justify-self: center;
+	}
+
+	.rdb-settings_form-header {
+		color: var(--Gutenberg-Gray-900, #1e1e1e);
+		font-size: 24px;
+		font-weight: 500;
+		line-height: var(--m, 24px);
+	}
+
+	.rdb-settings_form-fields {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.code-input {
+
+		textarea {
+			font-family: monospace;
 		}
+	}
 
-		.rdb-settings_form-header {
-			color: var(--Gutenberg-Gray-900, #1e1e1e);
-			font-size: 24px;
-			font-weight: 500;
-			line-height: var(--m, 24px);
-		}
+	.form-actions {
+		margin-top: 32px;
+		display: flex;
+		gap: 12px;
+	}
 
-		.rdb-settings_form-fields {
+	button {
+		min-width: 80px;
+		justify-content: center;
+	}
+
+	.components-base-control__help {
+		margin-bottom: 1em;
+
+		.status-icon {
 			display: flex;
-			flex-direction: column;
-			gap: 12px;
+			margin-right: 3px;
 		}
 
-		.code-input {
-
-			textarea {
-				font-family: monospace;
-			}
-		}
-
-		.form-actions {
-			margin-top: 32px;
+		.status-message {
 			display: flex;
-			gap: 12px;
+			align-items: center;
+			height: 18px;
 		}
 
-		button {
-			min-width: 80px;
-			justify-content: center;
+		.is-success {
+			color: #144722;
 		}
 
-		.components-base-control__help {
-			margin-bottom: 1em;
-
-			.status-icon {
-				display: flex;
-				margin-right: 3px;
-			}
-
-			.status-message {
-				display: flex;
-				align-items: center;
-				height: 18px;
-			}
-
-			.is-success {
-				color: #144722;
-			}
-
-			.is-error {
-				color: #681f1b;
-			}
+		.is-error {
+			color: #681f1b;
 		}
 	}
 }
