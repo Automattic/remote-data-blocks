@@ -41,7 +41,7 @@ class DataSourceCrud {
 		$data_sources = self::get_config();
 
 		if ( $service ) {
-			return array_values( array_filter($data_sources, function ( $config ) use ( $service ) {
+			return array_values( array_filter( $data_sources, function ( $config ) use ( $service ) {
 				return $config['service'] === $service;
 			} ) );
 		}
@@ -81,18 +81,18 @@ class DataSourceCrud {
 		}
 	
 		// Merge new item properties
-		$merged_item = array_merge($item, $new_item);
+		$merged_item = array_merge( $item, $new_item );
 	
 		// Resolve and save the updated item
 		$resolved_data_source = self::resolve_data_source($merged_item);
-		if (is_wp_error($resolved_data_source)) {
+		if ( is_wp_error( $resolved_data_source ) ) {
 			return $resolved_data_source;  // If resolving fails, return error
 		}
 	
 		// Save the updated item
-		$result = self::save_data_source($resolved_data_source, $data_sources, $uuid);  // Passing old UUID to remove it if changed
-		if (!$result) {
-			return new WP_Error('failed_to_update_data_source', __('Failed to update data source.', 'remote-data-blocks'));
+		$result = self::save_data_source( $resolved_data_source, $data_sources, $uuid );  // Passing old UUID to remove it if changed
+		if ( !$result ) {
+			return new WP_Error( 'failed_to_update_data_source', __( 'Failed to update data source.', 'remote-data-blocks' ) );
 		}
 	
 		return $resolved_data_source;
@@ -129,13 +129,13 @@ class DataSourceCrud {
 		$now = gmdate( 'Y-m-d H:i:s' );
 		$config['__metadata']['updated_at'] = $now;
 	
-		if (!isset($config['__metadata']['created_at'])) {
+		if ( ! isset( $config['__metadata']['created_at'] ) ) {
 			$config['__metadata']['created_at'] = $now;
 		}
 	
 		// If the UUID has changed, remove the old entry based on the original UUID
-		if ($original_uuid && $original_uuid !== $config['uuid']) {
-			unset($data_source_configs[$original_uuid]);  // Remove old item if UUID is changing
+		if ( $original_uuid && $original_uuid !== $config['uuid'] ) {
+			unset( $data_source_configs[ $original_uuid ] );  // Remove old item if UUID is changing
 		}
 	
 		// Add or update the data source with the new UUID
