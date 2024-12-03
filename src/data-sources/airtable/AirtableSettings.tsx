@@ -202,8 +202,8 @@ export const AirtableSettings = ( {
 	}, [ fetchingUserId, userId, userIdError ] );
 
 	const shouldAllowContinue = useMemo( () => {
-		return userId !== null && Boolean( state.slug ) && ! loadingSlugConflicts && ! slugConflicts;
-	}, [ loadingSlugConflicts, slugConflicts, state.slug, userId ] );
+		return userId !== null;
+	}, [ userId ] );
 
 	const shouldAllowSubmit = useMemo( () => {
 		return bases !== null && tables !== null && Boolean( state.base ) && Boolean( state.table );
