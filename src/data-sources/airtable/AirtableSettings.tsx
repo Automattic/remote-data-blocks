@@ -1,4 +1,4 @@
-import { BaseControl, CheckboxControl, SelectControl } from '@wordpress/components';
+import { BaseControl, CheckboxControl, SelectControl, Spinner } from '@wordpress/components';
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -335,7 +335,7 @@ export const AirtableSettings = ( {
 						/>
 					</div>
 
-					{ state.table && availableTableFields.length && (
+					{ state.table && availableTableFields.length ? (
 						<div className="form-group">
 							<BaseControl
 								label={ __( 'Table Fields', 'remote-data-blocks' ) }
@@ -361,6 +361,8 @@ export const AirtableSettings = ( {
 								) ) }
 							</BaseControl>
 						</div>
+					) : (
+						state.table && <Spinner />
 					) }
 				</DataSourceForm.Scope>
 			</DataSourceForm>
