@@ -62,18 +62,18 @@ class DataSourceCrud {
 
 	public static function update_item_by_uuid( string $uuid, array $new_item ): HttpDataSourceInterface|WP_Error {
 		$data_sources = self::get_data_sources();
-		$item = self::get_item_by_uuid($data_sources, $uuid);
+		$item = self::get_item_by_uuid( $data_sources, $uuid );
 		
-		if (!$item) {
+		if ( ! $item ) {
 			return new WP_Error('data_source_not_found', __('Data source not found.', 'remote-data-blocks'), ['status' => 404]);
 		}
 	
 		// Check if new UUID is provided
 		$new_uuid = $new_item['uuid'] ?? null;
-		if ($new_uuid && $new_uuid !== $uuid) {
+		if ( $new_uuid && $new_uuid !== $uuid ) {
 			// Ensure the new UUID doesn't already exist
-			if (self::get_item_by_uuid($data_sources, $new_uuid)) {
-				return new WP_Error('uuid_conflict', __('The new UUID already exists.', 'remote-data-blocks'), ['status' => 409]);
+			if ( self::get_item_by_uuid( $data_sources, $new_uuid ) ) {
+				return new WP_Error( 'uuid_conflict', __( 'The new UUID already exists.', 'remote-data-blocks' ), [ 'status' => 409 ] );
 			}
 	
 			// Remove the old item from data source array if UUID is being updated

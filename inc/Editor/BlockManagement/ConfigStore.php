@@ -118,8 +118,8 @@ class ConfigStore {
 
 				if ( $data_source instanceof UiDisplayableInterface ) {
 					$data_source_array = $data_source->to_array();
-					if (isset($data_source_array['uuid'])) {
-						$data_sources[$data_source_array['uuid']] = $data_source->to_ui_display();
+					if ( isset( $data_source_array['uuid'] ) ) {
+						$data_sources[ $data_source_array['uuid'] ] = $data_source->to_ui_display();
 					}
 				}
 			}
