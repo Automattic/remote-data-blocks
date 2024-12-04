@@ -53,7 +53,11 @@ export const DataSourceForm = ( {
 					<DropdownMenu
 						controls={ [
 							{
-								title: __( editUUID ? 'Hide UUID' : 'Edit UUID' ),
+								title: __(
+									editUUID
+										? __( 'Hide UUID', 'remote-data-blocks' )
+										: __( 'Edit UUID', 'remote-data-blocks' )
+								),
 								onClick: () => setEditUUID( ! editUUID ),
 							},
 						] }

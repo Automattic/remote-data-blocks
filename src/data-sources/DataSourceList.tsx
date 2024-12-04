@@ -100,7 +100,7 @@ const DataSourceList = () => {
 					</thead>
 					<tbody className="table-body">
 						{ dataSources
-							.sort( ( a, b ) => a.display_name.localeCompare( b.display_name ) )
+							.sort( ( a, b ) => ( a.display_name ?? '' ).localeCompare( b.display_name ?? '' ) )
 							.map( source => {
 								const { display_name: displayName, uuid, service } = source;
 
