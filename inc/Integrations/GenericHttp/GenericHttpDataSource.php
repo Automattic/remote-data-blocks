@@ -47,6 +47,10 @@ class GenericHttpDataSource extends HttpDataSource {
 				'callback' => '\RemoteDataBlocks\Validation\is_url',
 				'sanitize' => 'sanitize_url',
 			],
+			'display_name' => [
+				'type' => 'string',
+				'required' => false,
+			],
 		],
 	];
 

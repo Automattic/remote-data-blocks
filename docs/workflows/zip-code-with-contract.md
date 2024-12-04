@@ -4,7 +4,7 @@ This page will walk you through building [Zippopotam.us](https://zippopotam.us/)
 
 ## The contract
 
-Developers can code a "slug" to define a "contract" between the remote data block integration they build and the admins managing the Remote Data Blocks settings in WordPress.
+Developers can code a version 4 UUID to define a "contract" between the remote data block integration they build and the admins managing the Remote Data Blocks settings in WordPress.
 
 ## Define a query
 
@@ -73,7 +73,7 @@ use RemoteDataBlocks\Logging\LoggerManager;
 require_once __DIR__ . '/inc/queries/class-get-zip-code-query.php';
 
 function register_zipcode_block() {
-	$zipcode_data_source = GenericHttpDataSource::from_slug( 'zip-code' );
+	$zipcode_data_source = GenericHttpDataSource::from_uuid( '0d8f9e74-5244-49b4-981b-e5374107aa5c' );
 
 	if ( ! $zipcode_data_source instanceof GenericHttpDataSource ) {
 		LoggerManager::instance()->debug( 'Zip Code data source not found' );
@@ -88,7 +88,7 @@ add_action( 'init', __NAMESPACE__ . '\\register_zipcode_block' );
 
 ```
 
-Note the `zip-code` slug in the `GenericHttpDataSource::from_slug` call. That's the "contract" in our implementation.
+Note the `0d8f9e74-5244-49b4-981b-e5374107aa5c` UUID in the `GenericHttpDataSource::from_uuid` call. That's the "contract" in our implementation.
 
 We're done!
 
@@ -97,12 +97,14 @@ We're done!
 An admin can seperately set up the data source via the following steps:
 
 1. Go to the Remote Data Blocks settings page in your WordPress admin area.
-2. Click on "Add Data Source".
-3. Choose "Generic HTTP" as the data source type.
+2. Click on the "Add" menu button.
+3. Choose "HTTP" from the dropdown menu as the data source type.
 4. Fill in the following details:
    - Name: Zip Code API
-   - Slug: zip-code
    - Endpoint: https://api.zippopotam.us/us/
 5. Save the data source.
+6. Click on the edit icon for the newly saved data source. 
+7. Click on the settings icon next to "Edit HTTP Data Source".
+8. Update the UUID to match the one defined in the code or vice versa. 
 
-The slug _must_ match the slug defined by the developer in the previous section when creating the data source.
+The UUID _must_ match the UUID defined by the developer in the previous section when creating the data source.
