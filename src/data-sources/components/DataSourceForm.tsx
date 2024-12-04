@@ -49,16 +49,18 @@ export const DataSourceForm = ( {
 		<form className="rdb-settings-page_data-source-form">
 			<div className="rdb-settings-page_data-source-form_header">
 				<Heading size={ 24 }>{ heading }</Heading>
-				<DropdownMenu
-					controls={ [
-						{
-							title: __( editUUID ? 'Hide UUID' : 'Edit UUID' ),
-							onClick: () => setEditUUID( ! editUUID ),
-						},
-					] }
-					icon={ cog }
-					label={ __( 'Additional Settings' ) }
-				/>
+				{ mode === 'edit' && (
+					<DropdownMenu
+						controls={ [
+							{
+								title: __( editUUID ? 'Hide UUID' : 'Edit UUID' ),
+								onClick: () => setEditUUID( ! editUUID ),
+							},
+						] }
+						icon={ cog }
+						label={ __( 'Additional Settings' ) }
+					/>
+				) }
 			</div>
 			{ mode === 'edit' && editUUID && (
 				<div className="form-group">
