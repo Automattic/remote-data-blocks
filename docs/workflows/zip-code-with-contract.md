@@ -103,8 +103,8 @@ An admin can seperately set up the data source via the following steps:
    - Name: Zip Code API
    - Endpoint: https://api.zippopotam.us/us/
 5. Save the data source.
-6. Click on the edit icon for the newly saved data source. 
+6. Click on the edit icon for the newly saved data source.
 7. Click on the settings icon next to "Edit HTTP Data Source".
-8. Update the UUID to match the one defined in the code or vice versa. 
+8. Update the UUID to match the one defined in the code or vice versa.
 
 The UUID _must_ match the UUID defined by the developer in the previous section when creating the data source.
