@@ -117,7 +117,7 @@ class DataSourceController extends WP_REST_Controller {
 		$ui_configured_data_sources = DataSourceCrud::get_data_sources_list();
 
 		/**
-		 * Quick and dirty de-duplication of data sources by slug.
+		 * Quick and dirty de-duplication of data sources by uuid.
 		 *
 		 * UI configured data sources take precedence over code configured ones
 		 * here due to the ordering of the two arrays passed to array_reduce.
@@ -263,10 +263,6 @@ class DataSourceController extends WP_REST_Controller {
 	}
 
 	public function delete_item_permissions_check( $request ) {
-		return current_user_can( 'manage_options' );
-	}
-
-	public function item_slug_conflicts_permissions_check() {
 		return current_user_can( 'manage_options' );
 	}
 
