@@ -55,7 +55,7 @@ const DataSourceFormStep = ( {
 
 const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 	const [ currentStep, setCurrentStep ] = useState( 1 );
-	const { screen } = useSettingsContext();
+	const { goToMainScreen, screen } = useSettingsContext();
 
 	const steps = Children.toArray( children );
 	const singleStep = steps.length === 1 || screen === 'editDataSource';
@@ -124,7 +124,7 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 						<>
 							{ currentStep === 1 && (
 								<Button
-									onClick={ () => console.log( 'Go to main screen' ) }
+									onClick={ () => goToMainScreen() }
 									variant="secondary"
 									__next40pxDefaultSize
 								>
