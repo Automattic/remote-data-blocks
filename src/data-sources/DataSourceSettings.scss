@@ -4,23 +4,45 @@
 		height: calc(100vh - 132px);
 		display: grid;
 	}
-
 }
 
 .rdb-settings-page_data-source-form-footer {
 	align-self: end;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 16px;
-	gap: 12px;
-	border-top: 1px solid var(--Gutenberg-Gray-100, #f0f0f0);
-	background: var(--Gutenberg-White, #fff);
 
-	@media screen and (min-width: 782px) {
-		padding: 16px 0;
+	.rdb-settings-page_data-source-form-setup-info {
+		display: flex;
+		justify-content: center;
+		margin-bottom: 4px;
+		padding: 16px;
+
+		svg {
+			fill: var(--Gutenberg-Alert-Green, #4ab866);
+			flex-shrink: 0;
+		}
+
+		p {
+			color: var(--Gutenberg-Gray-700, #757575);
+			font-size: var(--s, 12px);
+			line-height: var(--xs, 16px);
+			margin-top: 4px;
+			max-width: 500px;
+		}
 	}
 
+	.rdb-settings-page_data-source-form-setup-actions {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 16px;
+		gap: 12px;
+		border-top: 1px solid var(--Gutenberg-Gray-100, #f0f0f0);
+		background: var(--Gutenberg-White, #fff);
+
+		@media screen and (min-width: 782px) {
+			padding: 16px 0;
+		}
+
+	}
 
 	button {
 		display: flex;
@@ -29,7 +51,6 @@
 		justify-content: center;
 		align-items: center;
 	}
-
 }
 
 .rdb-settings-page_data-source-form-wrapper {
@@ -41,7 +62,6 @@
 		grid-template-columns: 0.5fr 1fr 0.5fr;
 		padding: 56px 48px 0 48px;
 	}
-
 
 	.rdb-settings_form-steps {
 
@@ -65,9 +85,7 @@
 					border-radius: 50%;
 					display: inline-grid;
 					place-items: center;
-
 				}
-
 
 				&.current-step::before {
 					background: var(--Gutenberg-Blueberry, #3858e9);
@@ -82,19 +100,27 @@
 
 
 	.rdb-settings-page_data-source-form {
-
 		overflow-y: auto;
 
+		@media screen and (min-width: 782px) {
+			width: 500px;
+			justify-self: center;
+		}
+
 		.rdb-settings_form-header {
-			margin-bottom: 40px;
+			color: var(--Gutenberg-Gray-900, #1e1e1e);
+			font-size: 24px;
+			font-weight: 500;
+			line-height: var(--m, 24px);
 		}
 
-		.form-group {
-			width: 100%;
-			max-width: 680px;
+		.rdb-settings_form-fields {
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
 		}
 
-		.form-group .code-input {
+		.code-input {
 
 			textarea {
 				font-family: monospace;

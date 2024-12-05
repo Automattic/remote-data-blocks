@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n';
 
 import { SUPPORTED_SERVICES_LABELS } from '../constants';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
-import AirtableIcon from '@/settings/icons/AirtableIcon';
+import { AirtableIcon } from '@/settings/icons/AirtableIcon';
 import GoogleSheetsIcon from '@/settings/icons/GoogleSheetsIcon';
 import HttpIcon from '@/settings/icons/HttpIcon';
 import ShopifyIcon from '@/settings/icons/ShopifyIcon';

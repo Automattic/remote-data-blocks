@@ -18,6 +18,12 @@
 		display: none;
 	}
 
+	/* External Links */
+	.components-external-link__contents,
+	.components-base-control__help a {
+		text-decoration: none;
+	}
+
 	/* Snackbar notice */
 	.components-snackbar-list {
 		position: fixed;
@@ -118,9 +124,6 @@
 				margin-bottom: 0;
 			}
 
-			.components-external-link__contents {
-				text-decoration: none;
-			}
 
 			.rdb-settings-page_add-data-source-dropdown {
 				grid-area: 1 / 2 / span 1 / span 1;
