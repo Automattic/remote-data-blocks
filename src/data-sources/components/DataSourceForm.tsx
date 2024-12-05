@@ -1,30 +1,33 @@
 import {
 	Button,
 	DropdownMenu,
+	ExternalLink,
+	Icon,
+	IconType,
+	VisuallyHidden,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
 import { Children, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { cog } from '@wordpress/icons';
+import { cog, lockSmall } from '@wordpress/icons';
 
 import { DataSourceFormActions } from './DataSourceFormActions';
 
 interface DataSourceFormProps {
 	children: React.ReactNode;
-	icon: React.ReactNode;
 	mode: 'add' | 'edit';
 	onSave: () => Promise< void >;
-	source: string;
 }
 
 interface DataSourceFormSetupProps {
 	children: React.ReactNode;
 	displayName: string;
 	handleOnChange: ( key: string, value: string ) => void;
-	heading: string | React.ReactNode;
+	icon: IconType;
 	mode: 'add' | 'edit';
 	newUUID: string | null;
 	setNewUUID: ( uuid: string | null ) => void;
+	source: string;
 	uuidFromProps?: string;
 }
 
@@ -35,13 +38,13 @@ const DataSourceFormStep = ( {
 	children: React.ReactNode;
 	heading: React.ReactNode;
 } ) => (
-	<fieldset>
+	<>
 		<h2 className="rdb-settings_form-header">{ heading }</h2>
-		{ children }
-	</fieldset>
+		<fieldset className="rdb-settings_form-fields">{ children }</fieldset>
+	</>
 );
 
-const DataSourceForm = ( { children, icon, mode, onSave, source }: DataSourceFormProps ) => {
+const DataSourceForm = ( { children, mode, onSave }: DataSourceFormProps ) => {
 	const [ currentStep, setCurrentStep ] = useState( 1 );
 
 	const steps = Children.toArray( children );
@@ -78,55 +81,70 @@ const DataSourceForm = ( { children, icon, mode, onSave, source }: DataSourceFor
 			</div>
 
 			<div className="rdb-settings-page_data-source-form-footer">
-				{ mode === 'add' && (
-					<>
-						{ currentStep === 1 && (
-							<Button
-								onClick={ () => console.log( 'Go to main screen' ) }
-								variant="secondary"
-								__next40pxDefaultSize
-							>
-								Cancel
-							</Button>
-						) }
-						{ currentStep > 1 && (
-							<Button
-								onClick={ () => setCurrentStep( currentStep - 1 ) }
-								variant="secondary"
-								__next40pxDefaultSize
-							>
-								Go back
-							</Button>
-						) }
-						{ currentStep < steps.length && (
-							<Button
-								onClick={ () => setCurrentStep( currentStep + 1 ) }
-								variant="primary"
-								__next40pxDefaultSize
-							>
-								Continue
-							</Button>
-						) }
-						{ currentStep === steps.length && (
-							<DataSourceFormActions
-								onSave={ onSave }
-								onCancel={ function (): void {
-									throw new Error( 'Function not implemented.' );
-								} }
-								isSaveDisabled={ false }
-							/>
-						) }
-					</>
+				{ mode === 'add' && currentStep === 1 && (
+					<div className="rdb-settings-page_data-source-form-setup-info">
+						<Icon icon={ lockSmall } />
+						<p>
+							{ __(
+								'Connecting to an external source will not store the data. We issue queries to the database, but all your data stays with the provider. '
+							) }
+							<ExternalLink href="https://remotedatablocks.com/">
+								{ __( 'Learn more', 'remote-data-blocks' ) }
+							</ExternalLink>
+						</p>
+					</div>
 				) }
-				{ mode === 'edit' && (
-					<DataSourceFormActions
-						onSave={ onSave }
-						onCancel={ function (): void {
-							throw new Error( 'Function not implemented.' );
-						} }
-						isSaveDisabled={ false }
-					/>
-				) }
+				<div className="rdb-settings-page_data-source-form-setup-actions">
+					{ mode === 'add' && (
+						<>
+							{ currentStep === 1 && (
+								<Button
+									onClick={ () => console.log( 'Go to main screen' ) }
+									variant="secondary"
+									__next40pxDefaultSize
+								>
+									Cancel
+								</Button>
+							) }
+							{ currentStep > 1 && (
+								<Button
+									onClick={ () => setCurrentStep( currentStep - 1 ) }
+									variant="secondary"
+									__next40pxDefaultSize
+								>
+									Go back
+								</Button>
+							) }
+							{ currentStep < steps.length && (
+								<Button
+									onClick={ () => setCurrentStep( currentStep + 1 ) }
+									variant="primary"
+									__next40pxDefaultSize
+								>
+									Continue
+								</Button>
+							) }
+							{ currentStep === steps.length && (
+								<DataSourceFormActions
+									onSave={ onSave }
+									onCancel={ function (): void {
+										throw new Error( 'Function not implemented.' );
+									} }
+									isSaveDisabled={ false }
+								/>
+							) }
+						</>
+					) }
+					{ mode === 'edit' && (
+						<DataSourceFormActions
+							onSave={ onSave }
+							onCancel={ function (): void {
+								throw new Error( 'Function not implemented.' );
+							} }
+							isSaveDisabled={ false }
+						/>
+					) }
+				</div>
 			</div>
 		</>
 	);
@@ -136,16 +154,13 @@ const DataSourceFormSetup = ( {
 	children,
 	displayName: initialDisplayName,
 	handleOnChange,
+	icon,
 	mode,
 	newUUID,
 	setNewUUID,
+	source,
 	uuidFromProps,
-<<<<<<< HEAD
-	...formProps
-}: DataSourceFormProps ) => {
-=======
 }: DataSourceFormSetupProps ) => {
->>>>>>> 62aaf42 (Add steps to setup flow)
 	const [ displayName, setDisplayName ] = useState( initialDisplayName );
 	const [ editUUID, setEditUUID ] = useState( false );
 
@@ -164,16 +179,18 @@ const DataSourceFormSetup = ( {
 	};
 
 	return (
-<<<<<<< HEAD
-		<form className="rdb-settings-page_data-source-form" { ...formProps }>
-			<div className="rdb-settings-page_data-source-form_header">
-				<Heading size={ 24 }>{ heading }</Heading>
-				{ mode === 'edit' && (
-=======
-		<DataSourceFormStep heading="Setup">
+		<DataSourceFormStep
+			heading={
+				<>
+					{ __( 'Connect with ', 'remote-data-blocks' ) }
+
+					<Icon icon={ icon } style={ { width: '113.81px', height: '25px', marginLeft: '4px' } } />
+					<VisuallyHidden>{ __( source, 'remote-data-blocks' ) }</VisuallyHidden>
+				</>
+			}
+		>
 			{ mode === 'edit' && (
 				<>
->>>>>>> 62aaf42 (Add steps to setup flow)
 					<DropdownMenu
 						controls={ [
 							{

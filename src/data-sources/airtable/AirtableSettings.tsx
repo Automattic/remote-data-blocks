@@ -23,7 +23,7 @@ import {
 import { getConnectionMessage } from '@/data-sources/utils';
 import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
-import AirtableIcon from '@/settings/icons/AirtableIcon';
+import { AirtableIconWithText } from '@/settings/icons/AirtableIcon';
 import { StringIdName } from '@/types/common';
 import { SelectOption } from '@/types/input';
 
@@ -194,11 +194,9 @@ export const AirtableSettings = ( {
 		}
 		return (
 			<span>
-				{ __( 'Provide access token to connect your Airtable', 'remote-data-blocks' ) } (
 				<a href="https://support.airtable.com/docs/creating-personal-access-tokens" target="_label">
-					{ __( 'guide', 'remote-data-blocks' ) }
+					{ __( 'How do I get my token?', 'remote-data-blocks' ) }
 				</a>
-				).
 			</span>
 		);
 	}, [ fetchingUserId, userId, userIdError ] );
@@ -305,17 +303,19 @@ export const AirtableSettings = ( {
 
 	return (
 		<>
-			<DataSourceForm icon={ AirtableIcon } mode={ mode } onSave={ onSaveClick } source="Airtable">
+			<DataSourceForm mode={ mode } onSave={ onSaveClick }>
 				<DataSourceForm.Setup
 					displayName={ state.display_name }
 					handleOnChange={ handleOnChange }
 					heading={
 						mode === 'add' ? __( 'Add Airtable Data Source' ) : __( 'Edit Airtable Data Source' )
 					}
+					icon={ AirtableIconWithText }
 					mode={ mode }
 					newUUID={ newUUID }
 					setNewUUID={ setNewUUID }
 					uuidFromProps={ uuidFromProps }
+					source="Airtable"
 				>
 					<PasswordInputControl
 						label={ __( 'Access Token', 'remote-data-blocks' ) }
