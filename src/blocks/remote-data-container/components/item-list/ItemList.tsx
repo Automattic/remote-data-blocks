@@ -1,6 +1,5 @@
 import { useInstanceId } from '@wordpress/compose';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { DataViews, filterSortAndPaginate, View } from '@wordpress/dataviews';
+import { DataViews, filterSortAndPaginate, View } from '@wordpress/dataviews/wp';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 
 import { usePatterns } from '@/blocks/remote-data-container/hooks/usePatterns';
