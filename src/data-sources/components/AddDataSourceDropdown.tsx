@@ -6,7 +6,7 @@ import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import { AirtableIcon } from '@/settings/icons/AirtableIcon';
 import GoogleSheetsIcon from '@/settings/icons/GoogleSheetsIcon';
 import HttpIcon from '@/settings/icons/HttpIcon';
-import ShopifyIcon from '@/settings/icons/ShopifyIcon';
+import { ShopifyIcon } from '@/settings/icons/ShopifyIcon';
 
 import '../DataSourceList.scss';
 
