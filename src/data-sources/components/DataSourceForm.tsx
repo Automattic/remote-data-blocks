@@ -80,6 +80,8 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 			<div
 				className={ `rdb-settings-page_data-source-${
 					singleStep ? 'single-step' : 'multi-step'
+				}-form rdb-settings-page_data-source-${
+					screen === 'addDataSource' ? 'add' : 'edit'
 				}-form` }
 			>
 				{ ! singleStep && (
