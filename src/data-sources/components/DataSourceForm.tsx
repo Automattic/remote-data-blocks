@@ -6,19 +6,18 @@ import {
 	IconType,
 	VisuallyHidden,
 	__experimentalInputControl as InputControl,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
 import { Children, isValidElement, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { cog, lockSmall } from '@wordpress/icons';
 
 import { DataSourceFormActions } from './DataSourceFormActions';
+import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
 interface DataSourceFormProps {
 	children: React.ReactNode;
-	icon: IconType;
-	mode: 'add' | 'edit';
 	onSave: () => Promise< void >;
-	source: string;
 }
 
 interface DataSourceFormSetupProps {
@@ -26,29 +25,32 @@ interface DataSourceFormSetupProps {
 	canProceed: boolean;
 	displayName: string;
 	handleOnChange: ( key: string, value: string ) => void;
-	icon: IconType;
-	mode: 'add' | 'edit';
+	headingIcon: IconType;
+	inputIcon: IconType;
 	newUUID: string | null;
 	setNewUUID: ( uuid: string | null ) => void;
-	source: string;
 	uuidFromProps?: string;
 }
 
 const DataSourceFormStep = ( {
 	children,
 	heading,
+	subheading,
 }: {
 	children: React.ReactNode;
 	heading: React.ReactNode;
+	subheading?: React.ReactNode;
 } ) => (
 	<>
-		<h2 className="rdb-settings_form-header">{ heading }</h2>
+		<h2 className="rdb-settings_form-heading">{ heading }</h2>
+		<h3 className="rdb-settings_form-subheading">{ subheading }</h3>
 		<fieldset className="rdb-settings_form-fields">{ children }</fieldset>
 	</>
 );
 
-const DataSourceForm = ( { children, icon, mode, onSave, source }: DataSourceFormProps ) => {
+const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 	const [ currentStep, setCurrentStep ] = useState( 1 );
+	const { screen } = useSettingsContext();
 
 	const steps = Children.toArray( children );
 
@@ -69,8 +71,12 @@ const DataSourceForm = ( { children, icon, mode, onSave, source }: DataSourceFor
 
 	return (
 		<>
-			<div className={ `rdb-settings-page_data-source-${ mode }-form` }>
-				{ mode === 'add' && (
+			<div
+				className={ `rdb-settings-page_data-source-${
+					screen === 'addDataSource' ? 'add' : 'edit'
+				}-form` }
+			>
+				{ screen === 'addDataSource' && (
 					<>
 						<nav className="rdb-settings_form-steps" aria-label="Setup form steps">
 							<ol>
@@ -88,16 +94,15 @@ const DataSourceForm = ( { children, icon, mode, onSave, source }: DataSourceFor
 								} ) }
 							</ol>
 						</nav>
-						<form className="rdb-settings-page_data-source-form">{ steps[ currentStep - 1 ] }</form>
 					</>
 				) }
-				{ mode === 'edit' && (
-					<form className="rdb-settings-page_data-source-form">{ steps.map( step => step ) }</form>
-				) }
+				<form className="rdb-settings-page_data-source-form">
+					{ screen === 'editDataSource' ? steps.map( step => step ) : steps[ currentStep - 1 ] }
+				</form>
 			</div>
 
 			<div className="rdb-settings-page_data-source-form-footer">
-				{ mode === 'add' && currentStep === 1 && (
+				{ screen === 'addDataSource' && currentStep === 1 && (
 					<div className="rdb-settings-page_data-source-form-setup-info">
 						<Icon icon={ lockSmall } />
 						<p>
@@ -111,7 +116,7 @@ const DataSourceForm = ( { children, icon, mode, onSave, source }: DataSourceFor
 					</div>
 				) }
 				<div className="rdb-settings-page_data-source-form-setup-actions">
-					{ mode === 'add' && (
+					{ screen === 'addDataSource' && (
 						<>
 							{ currentStep === 1 && (
 								<Button
@@ -152,7 +157,7 @@ const DataSourceForm = ( { children, icon, mode, onSave, source }: DataSourceFor
 							) }
 						</>
 					) }
-					{ mode === 'edit' && (
+					{ screen === 'editDataSource' && (
 						<>
 							<Button
 								onClick={ () => console.log( 'Go to main screen' ) }
@@ -180,15 +185,16 @@ const DataSourceFormSetup = ( {
 	children,
 	displayName: initialDisplayName,
 	handleOnChange,
-	icon,
-	mode,
+	headingIcon,
+	inputIcon,
 	newUUID,
 	setNewUUID,
-	source,
 	uuidFromProps,
 }: DataSourceFormSetupProps ) => {
 	const [ displayName, setDisplayName ] = useState( initialDisplayName );
 	const [ editUUID, setEditUUID ] = useState( false );
+
+	const { screen, service } = useSettingsContext();
 
 	const onUUIDChange = ( uuid: string | undefined ) => {
 		setNewUUID( uuid ?? null );
@@ -207,15 +213,21 @@ const DataSourceFormSetup = ( {
 	return (
 		<DataSourceFormStep
 			heading={
-				<>
-					{ __( 'Connect with ', 'remote-data-blocks' ) }
-
-					<Icon icon={ icon } style={ { width: '113.81px', height: '25px', marginLeft: '4px' } } />
-					<VisuallyHidden>{ __( source, 'remote-data-blocks' ) }</VisuallyHidden>
-				</>
+				screen === 'addDataSource' && service ? (
+					<span style={ { marginBottom: '48px' } }>
+						{ __( 'Connect with ', 'remote-data-blocks' ) }
+						<Icon
+							icon={ headingIcon }
+							style={ { width: '113.81px', height: '25px', marginLeft: '4px' } }
+						/>
+						<VisuallyHidden>{ __( service, 'remote-data-blocks' ) }</VisuallyHidden>
+					</span>
+				) : (
+					<>{ __( 'Setup' ) }</>
+				)
 			}
 		>
-			{ mode === 'edit' && (
+			{ screen === 'editDataSource' && (
 				<>
 					<DropdownMenu
 						controls={ [
@@ -231,7 +243,7 @@ const DataSourceFormSetup = ( {
 						icon={ cog }
 						label={ __( 'Additional Settings' ) }
 					/>
-					{ mode === 'edit' && editUUID && (
+					{ screen === 'editDataSource' && editUUID && (
 						<InputControl
 							label={ __( 'UUID', 'remote-data-blocks' ) }
 							value={ newUUID ?? '' }
@@ -249,6 +261,13 @@ const DataSourceFormSetup = ( {
 					label={ __( 'Data Source Name' ) }
 					onChange={ onDisplayNameChange }
 					value={ displayName }
+					prefix={
+						screen === 'editDataSource' ? (
+							<InputControlPrefixWrapper style={ { paddingRight: '4px' } }>
+								<Icon icon={ inputIcon } />
+							</InputControlPrefixWrapper>
+						) : null
+					}
 					__next40pxDefaultSize
 				/>
 			</div>
@@ -259,10 +278,24 @@ const DataSourceFormSetup = ( {
 
 const DataSourceFormScope = ( {
 	children,
+	...props
 }: {
-	canProceed: boolean;
 	children: React.ReactNode;
-} ) => <DataSourceFormStep heading="Scope">{ children }</DataSourceFormStep>;
+	canProceed: boolean;
+} ) => {
+	const { service } = useSettingsContext();
+	return (
+		<DataSourceFormStep
+			heading="Scope"
+			subheading={ __(
+				`Choose what data should be pulled from ${ service ?? 'your data source' } to your site.`
+			) }
+			{ ...props }
+		>
+			{ children }
+		</DataSourceFormStep>
+	);
+};
 
 DataSourceForm.Setup = DataSourceFormSetup;
 DataSourceForm.Scope = DataSourceFormScope;

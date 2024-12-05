@@ -17,7 +17,7 @@ import { AirtableConfig, SettingsComponentProps } from '@/data-sources/types';
 import { getConnectionMessage } from '@/data-sources/utils';
 import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
-import { AirtableIconWithText } from '@/settings/icons/AirtableIcon';
+import { AirtableIcon, AirtableIconWithText } from '@/settings/icons/AirtableIcon';
 import { StringIdName } from '@/types/common';
 import { SelectOption } from '@/types/input';
 
@@ -294,19 +294,15 @@ export const AirtableSettings = ( {
 
 	return (
 		<>
-			<DataSourceForm mode={ mode } onSave={ onSaveClick }>
+			<DataSourceForm onSave={ onSaveClick }>
 				<DataSourceForm.Setup
 					displayName={ state.display_name }
 					handleOnChange={ handleOnChange }
-					heading={
-						mode === 'add' ? __( 'Add Airtable Data Source' ) : __( 'Edit Airtable Data Source' )
-					}
-					icon={ AirtableIconWithText }
-					mode={ mode }
+					headingIcon={ AirtableIconWithText }
+					inputIcon={ AirtableIcon }
 					newUUID={ newUUID }
 					setNewUUID={ setNewUUID }
 					uuidFromProps={ uuidFromProps }
-					source="Airtable"
 					canProceed={ shouldAllowContinue }
 				>
 					<PasswordInputControl
