@@ -1,10 +1,14 @@
-.rdb-settings-page_data-source-form {
 
+
+.rdb-settings-page_data-source-form-footer {
+	width: 100%;
 	display: flex;
-	flex-direction: column;
 	align-items: center;
+	justify-content: center;
+	padding: var(--Alias-page-tiny, 16px) 48px;
 	gap: 12px;
-	padding: 24px 48px;
+	border-top: 1px solid var(--Gutenberg-Gray-100, #f0f0f0);
+	background: var(--Gutenberg-White, #fff);
 
 	.rdb-settings-page_data-source-form_header {
 		display: flex;
@@ -12,49 +16,109 @@
 		gap: 12px;
 	}
 
-	.form-group {
-		width: 100%;
-		max-width: 680px;
-	}
-
-	.form-group .code-input {
-
-		textarea {
-			font-family: monospace;
-		}
-	}
-
-	.form-actions {
-		margin-top: 32px;
-		display: flex;
-		gap: 12px;
-	}
-
 	button {
-		min-width: 80px;
+		display: flex;
+		width: 244px;
+		padding: var(--grid-unit-10, 8px);
 		justify-content: center;
+		align-items: center;
 	}
 
-	.components-base-control__help {
-		margin-bottom: 1em;
+}
 
-		.status-icon {
+.rdb-settings-page_data-source-form-wrapper {
+	padding: 56px 48px 0 48px;
+
+
+	.rdb-settings_form-steps {
+
+		ol {
+			list-style: none;
+			counter-reset: steps;
+
+			li {
+				counter-increment: steps;
+				color: var(--Gutenberg-Gray-700, #757575);
+				font-weight: 600;
+				margin-bottom: 24px;
+
+				&::before {
+					content: counter(steps);
+					margin-right: 0.5rem;
+					background: var(--Gutenberg-Gray-200, #e0e0e0);
+					color: var(--Gutenberg-White, #fff);
+					width: 24px;
+					height: 24px;
+					border-radius: 50%;
+					display: inline-grid;
+					place-items: center;
+
+				}
+
+
+				&.current-step::before {
+					background: var(--Gutenberg-Blueberry, #3858e9);
+				}
+
+				&.current-step {
+					color: var(--Gutenberg-Gray-900, #1e1e1e);
+				}
+			}
+		}
+	}
+
+
+	.rdb-settings-page_data-source-form {
+
+		.rdb-settings_form-header {
+			margin-bottom: 40px;
+		}
+
+		.form-group {
+			width: 100%;
+			max-width: 680px;
+		}
+
+		.form-group .code-input {
+
+			textarea {
+				font-family: monospace;
+			}
+		}
+
+		.form-actions {
+			margin-top: 32px;
 			display: flex;
-			margin-right: 3px;
+			gap: 12px;
 		}
 
-		.status-message {
-			display: flex;
-			align-items: center;
-			height: 18px;
+		button {
+			min-width: 80px;
+			justify-content: center;
 		}
 
-		.is-success {
-			color: #144722;
-		}
+		.components-base-control__help {
+			margin-bottom: 1em;
 
-		.is-error {
-			color: #681f1b;
+			.status-icon {
+				display: flex;
+				margin-right: 3px;
+			}
+
+			.status-message {
+				display: flex;
+				align-items: center;
+				height: 18px;
+			}
+
+			.is-success {
+				color: #144722;
+			}
+
+			.is-error {
+				color: #681f1b;
+			}
 		}
 	}
 }
+
