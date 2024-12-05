@@ -57,6 +57,7 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 	const { screen } = useSettingsContext();
 
 	const steps = Children.toArray( children );
+	const singleStep = steps.length === 1 || screen === 'editDataSource';
 
 	const stepHeadings = [ 'Setup', 'Scope' ];
 
@@ -77,31 +78,29 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 		<>
 			<div
 				className={ `rdb-settings-page_data-source-${
-					screen === 'addDataSource' ? 'add' : 'edit'
+					singleStep ? 'single-step' : 'multi-step'
 				}-form` }
 			>
-				{ screen === 'addDataSource' && (
-					<>
-						<nav className="rdb-settings_form-steps" aria-label="Setup form steps">
-							<ol>
-								{ stepHeadings.map( ( label, index ) => {
-									const stepNumber = index + 1;
-									return (
-										<li
-											key={ stepNumber }
-											aria-current={ currentStep === stepNumber ? 'step' : undefined }
-											className={ currentStep === stepNumber ? 'current-step' : '' }
-										>
-											{ label }
-										</li>
-									);
-								} ) }
-							</ol>
-						</nav>
-					</>
+				{ ! singleStep && (
+					<nav className="rdb-settings_form-steps" aria-label="Setup form steps">
+						<ol>
+							{ stepHeadings.map( ( label, index ) => {
+								const stepNumber = index + 1;
+								return (
+									<li
+										key={ stepNumber }
+										aria-current={ currentStep === stepNumber ? 'step' : undefined }
+										className={ currentStep === stepNumber ? 'current-step' : '' }
+									>
+										{ label }
+									</li>
+								);
+							} ) }
+						</ol>
+					</nav>
 				) }
 				<form className="rdb-settings-page_data-source-form">
-					{ screen === 'editDataSource' ? steps.map( step => step ) : steps[ currentStep - 1 ] }
+					{ singleStep ? steps.map( step => step ) : steps[ currentStep - 1 ] }
 				</form>
 			</div>
 
