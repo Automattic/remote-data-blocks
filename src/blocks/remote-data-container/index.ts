@@ -1,4 +1,4 @@
-import { registerBlockType } from '@wordpress/blocks';
+import { registerBlockBindingsSource, registerBlockType } from '@wordpress/blocks';
 import { addFilter } from '@wordpress/hooks';
 import { registerFormatType } from '@wordpress/rich-text';
 
@@ -8,7 +8,6 @@ import { Edit } from '@/blocks/remote-data-container/edit';
 import { addUsesContext } from '@/blocks/remote-data-container/filters/addUsesContext';
 import { withBlockBindingShim } from '@/blocks/remote-data-container/filters/withBlockBinding';
 import { Save } from '@/blocks/remote-data-container/save';
-import { registerBlockBindingsSource } from '@/types/expected-errors/registerBlockBindingsSource';
 import { getBlocksConfig } from '@/utils/localized-block-data';
 import './style.scss';
 
