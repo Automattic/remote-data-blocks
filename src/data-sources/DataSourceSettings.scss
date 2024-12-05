@@ -59,9 +59,8 @@
 	.rdb-settings_form-heading {
 		color: var(--Gutenberg-Gray-900, #1e1e1e);
 		font-size: 16px;
-		font-style: normal;
 		font-weight: 500;
-		line-height: 24px; /* 150% */
+		line-height: 24px;
 		margin-bottom: 0;
 	}
 
@@ -70,73 +69,6 @@
 	}
 }
 
-.rdb-settings_form-subheading {
-	color: var(--Alias-text-text-tertiary, #505050);
-	font-size: var(--s, 12px);
-	font-style: normal;
-	font-weight: var(--Regular, 400);
-	line-height: var(--xs, 16px); /* 133.333% */
-	margin: 4px 0 16px;
-}
-
-.rdb-settings-page_data-source-multi-step-form {
-	padding: 24px;
-	overflow: hidden;
-
-	.rdb-settings_form-heading {
-		color: var(--Gutenberg-Gray-900, #1e1e1e);
-		font-size: 24px;
-		font-weight: 500;
-		line-height: var(--m, 24px);
-		margin-bottom: 12px;
-	}
-
-	.rdb-settings_form-fields {
-		margin-top: 40px;
-	}
-
-
-	@media screen and (min-width: 782px) {
-		display: grid;
-		grid-template-columns: 0.5fr 1fr 0.5fr;
-		padding: 56px 48px 0 48px;
-	}
-
-	.rdb-settings_form-steps {
-
-		ol {
-			list-style: none;
-			counter-reset: steps;
-
-			li {
-				counter-increment: steps;
-				color: var(--Gutenberg-Gray-700, #757575);
-				font-weight: 600;
-				margin-bottom: 24px;
-
-				&::before {
-					content: counter(steps);
-					margin-right: 0.5rem;
-					background: var(--Gutenberg-Gray-200, #e0e0e0);
-					color: var(--Gutenberg-White, #fff);
-					width: 24px;
-					height: 24px;
-					border-radius: 50%;
-					display: inline-grid;
-					place-items: center;
-				}
-
-				&.current-step::before {
-					background: var(--Gutenberg-Blueberry, #3858e9);
-				}
-
-				&.current-step {
-					color: var(--Gutenberg-Gray-900, #1e1e1e);
-				}
-			}
-		}
-	}
-}
 
 .rdb-settings-page_data-source-form {
 	overflow-y: auto;
@@ -151,6 +83,7 @@
 		flex-direction: column;
 		gap: 12px;
 	}
+
 
 	.code-input {
 
@@ -194,3 +127,77 @@
 	}
 }
 
+
+.rdb-settings-page_data-source-multi-step-form,
+.rdb-settings-page_data-source-single-step-form.rdb-settings-page_data-source-add-form {
+
+	.rdb-settings_form-heading {
+		color: var(--Gutenberg-Gray-900, #1e1e1e);
+		font-size: 24px;
+		font-weight: 500;
+		line-height: 24px;
+		margin-bottom: 12px;
+	}
+
+	.rdb-settings_form-fields {
+		margin-top: 40px;
+	}
+
+}
+
+
+.rdb-settings_form-subheading {
+	color: var(--Alias-text-text-tertiary, #505050);
+	font-size: var(--s, 12px);
+	font-style: normal;
+	font-weight: var(--Regular, 400);
+	line-height: var(--xs, 16px); /* 133.333% */
+	margin: 4px 0 16px;
+}
+
+.rdb-settings-page_data-source-multi-step-form {
+	padding: 24px;
+	overflow: hidden;
+
+
+	@media screen and (min-width: 782px) {
+		display: grid;
+		grid-template-columns: 0.5fr 1fr 0.5fr;
+		padding: 56px 48px 0 48px;
+	}
+
+	.rdb-settings_form-steps {
+
+		ol {
+			list-style: none;
+			counter-reset: steps;
+
+			li {
+				counter-increment: steps;
+				color: var(--Gutenberg-Gray-700, #757575);
+				font-weight: 600;
+				margin-bottom: 24px;
+
+				&::before {
+					content: counter(steps);
+					margin-right: 0.5rem;
+					background: var(--Gutenberg-Gray-200, #e0e0e0);
+					color: var(--Gutenberg-White, #fff);
+					width: 24px;
+					height: 24px;
+					border-radius: 50%;
+					display: inline-grid;
+					place-items: center;
+				}
+
+				&.current-step::before {
+					background: var(--Gutenberg-Blueberry, #3858e9);
+				}
+
+				&.current-step {
+					color: var(--Gutenberg-Gray-900, #1e1e1e);
+				}
+			}
+		}
+	}
+}
