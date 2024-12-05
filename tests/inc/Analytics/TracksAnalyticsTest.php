@@ -208,7 +208,6 @@ class TracksAnalyticsTest extends TestCase {
 		ConfigStore::set_configuration( 'remote-data-blocks/conference-event', [
 			'queries' => [
 				new HttpQueryContext( ExampleApiDataSource::from_array( [
-					'slug' => 'example-api',
 					'service' => 'example_api',
 				] ) ),
 			],

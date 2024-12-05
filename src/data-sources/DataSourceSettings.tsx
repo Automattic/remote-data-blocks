@@ -15,6 +15,7 @@ interface DataSourceEditSettings {
 
 const DataSourceEditSettings = ( { uuid }: DataSourceEditSettings ) => {
 	const { dataSources, loadingDataSources } = useDataSources();
+
 	if ( loadingDataSources ) {
 		return <>{ __( 'Loading data source...', 'remote-data-blocks' ) }</>;
 	}
