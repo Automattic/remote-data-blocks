@@ -29,6 +29,7 @@ interface DataSourceFormSetupProps {
 		icon: IconType;
 		width: string;
 		height: string;
+		verticalAlign?: string;
 	};
 	inputIcon: IconType;
 	newUUID: string | null;
@@ -198,7 +199,7 @@ const DataSourceFormSetup = ( {
 	const [ editUUID, setEditUUID ] = useState( false );
 
 	const { screen, service } = useSettingsContext();
-	const { icon, height, width } = headingIcon;
+	const { icon, height, width, verticalAlign } = headingIcon;
 
 	const onUUIDChange = ( uuid: string | undefined ) => {
 		setNewUUID( uuid ?? null );
@@ -222,7 +223,12 @@ const DataSourceFormSetup = ( {
 						{ __( 'Connect with ', 'remote-data-blocks' ) }
 						<Icon
 							icon={ icon }
-							style={ { width, height, marginLeft: '4px', verticalAlign: 'text-bottom' } }
+							style={ {
+								width,
+								height,
+								marginLeft: '4px',
+								verticalAlign: verticalAlign ?? 'text-bottom',
+							} }
 						/>
 						<VisuallyHidden>{ __( service, 'remote-data-blocks' ) }</VisuallyHidden>
 					</span>
