@@ -6,7 +6,6 @@ import { ChangeEvent } from 'react';
 
 import { AirtableFormState } from '@/data-sources/airtable/types';
 import { DataSourceForm } from '@/data-sources/components/DataSourceForm';
-import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import {
 	useAirtableApiBases,
@@ -18,6 +17,7 @@ import { AirtableConfig, SettingsComponentProps } from '@/data-sources/types';
 import { getConnectionMessage } from '@/data-sources/utils';
 import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
+import AirtableIcon from '@/settings/icons/AirtableIcon';
 import { StringIdName } from '@/types/common';
 import { SelectOption } from '@/types/input';
 
@@ -291,85 +291,79 @@ export const AirtableSettings = ( {
 	}, [ state.table, tables ] );
 
 	return (
-		<DataSourceForm
-			displayName={ state.display_name }
-			handleOnChange={ handleOnChange }
-			heading={
-				mode === 'add' ? __( 'Add Airtable Data Source' ) : __( 'Edit Airtable Data Source' )
-			}
-			mode={ mode }
-			newUUID={ newUUID }
-			setNewUUID={ setNewUUID }
-			uuidFromProps={ uuidFromProps }
-		>
-			<div className="form-group">
-				<PasswordInputControl
-					label={ __( 'Access Token', 'remote-data-blocks' ) }
-					onChange={ onTokenInputChange }
-					value={ state.access_token }
-					help={ connectionMessage }
-				/>
-			</div>
+		<>
+			<DataSourceForm icon={ AirtableIcon } mode={ mode } onSave={ onSaveClick } source="Airtable">
+				<DataSourceForm.Setup
+					displayName={ state.display_name }
+					handleOnChange={ handleOnChange }
+					heading={
+						mode === 'add' ? __( 'Add Airtable Data Source' ) : __( 'Edit Airtable Data Source' )
+					}
+					mode={ mode }
+					newUUID={ newUUID }
+					setNewUUID={ setNewUUID }
+					uuidFromProps={ uuidFromProps }
+				>
+					<PasswordInputControl
+						label={ __( 'Access Token', 'remote-data-blocks' ) }
+						onChange={ onTokenInputChange }
+						value={ state.access_token }
+						help={ connectionMessage }
+					/>
+				</DataSourceForm.Setup>
+				<DataSourceForm.Scope>
+					<div className="form-group">
+						<SelectControl
+							id="base"
+							label={ __( 'Base', 'remote-data-blocks' ) }
+							value={ state.base?.id ?? '' }
+							onChange={ onSelectChange }
+							options={ baseOptions }
+							help={ basesHelpText }
+							disabled={ fetchingBases || ! bases?.length }
+							__next40pxDefaultSize
+						/>
+						<SelectControl
+							id="table"
+							label={ __( 'Table', 'remote-data-blocks' ) }
+							value={ state.table?.id ?? '' }
+							onChange={ onSelectChange }
+							options={ tableOptions }
+							help={ tablesHelpText }
+							disabled={ fetchingTables || ! tables?.length }
+							__next40pxDefaultSize
+						/>
+					</div>
 
-			<div className="form-group">
-				<SelectControl
-					id="base"
-					label={ __( 'Base', 'remote-data-blocks' ) }
-					value={ state.base?.id ?? '' }
-					onChange={ onSelectChange }
-					options={ baseOptions }
-					help={ basesHelpText }
-					disabled={ fetchingBases || ! bases?.length }
-					__next40pxDefaultSize
-				/>
-			</div>
-
-			<div className="form-group">
-				<SelectControl
-					id="table"
-					label={ __( 'Table', 'remote-data-blocks' ) }
-					value={ state.table?.id ?? '' }
-					onChange={ onSelectChange }
-					options={ tableOptions }
-					help={ tablesHelpText }
-					disabled={ fetchingTables || ! tables?.length }
-					__next40pxDefaultSize
-				/>
-			</div>
-
-			{ state.table && availableTableFields.length && (
-				<div className="form-group">
-					<BaseControl
-						label={ __( 'Table Fields', 'remote-data-blocks' ) }
-						help={ __(
-							'Select the fields to be used in the remote data block.',
-							'remote-data-blocks'
-						) }
-					>
-						{ availableTableFields.map( field => (
-							<CheckboxControl
-								key={ field }
-								label={ field }
-								checked={ state.table_fields.has( field ) }
-								onChange={ checked =>
-									handleOnChange(
-										'table_fields',
-										checked
-											? new Set( [ ...state.table_fields, field ] )
-											: new Set( [ ...state.table_fields ].filter( fld => fld !== field ) )
-									)
-								}
-							/>
-						) ) }
-					</BaseControl>
-				</div>
-			) }
-
-			<DataSourceFormActions
-				onSave={ onSaveClick }
-				onCancel={ goToMainScreen }
-				isSaveDisabled={ ! shouldAllowSubmit }
-			/>
-		</DataSourceForm>
+					{ state.table && availableTableFields.length && (
+						<div className="form-group">
+							<BaseControl
+								label={ __( 'Table Fields', 'remote-data-blocks' ) }
+								help={ __(
+									'Select the fields to be used in the remote data block.',
+									'remote-data-blocks'
+								) }
+							>
+								{ availableTableFields.map( field => (
+									<CheckboxControl
+										key={ field }
+										label={ field }
+										checked={ state.table_fields.has( field ) }
+										onChange={ checked =>
+											handleOnChange(
+												'table_fields',
+												checked
+													? new Set( [ ...state.table_fields, field ] )
+													: new Set( [ ...state.table_fields ].filter( fld => fld !== field ) )
+											)
+										}
+									/>
+								) ) }
+							</BaseControl>
+						</div>
+					) }
+				</DataSourceForm.Scope>
+			</DataSourceForm>
+		</>
 	);
 };

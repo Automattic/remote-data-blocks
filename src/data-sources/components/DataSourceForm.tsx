@@ -1,13 +1,23 @@
 import {
+	Button,
 	DropdownMenu,
-	__experimentalHeading as Heading,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { Children, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { cog } from '@wordpress/icons';
 
-type DataSourceFormProps = React.FormHTMLAttributes< HTMLFormElement > & {
+import { DataSourceFormActions } from './DataSourceFormActions';
+
+interface DataSourceFormProps {
+	children: React.ReactNode;
+	icon: React.ReactNode;
+	mode: 'add' | 'edit';
+	onSave: () => Promise< void >;
+	source: string;
+}
+
+interface DataSourceFormSetupProps {
 	children: React.ReactNode;
 	displayName: string;
 	handleOnChange: ( key: string, value: string ) => void;
@@ -16,18 +26,109 @@ type DataSourceFormProps = React.FormHTMLAttributes< HTMLFormElement > & {
 	newUUID: string | null;
 	setNewUUID: ( uuid: string | null ) => void;
 	uuidFromProps?: string;
+}
+
+const DataSourceFormStep = ( {
+	children,
+	heading,
+}: {
+	children: React.ReactNode;
+	heading: React.ReactNode;
+} ) => (
+	<fieldset>
+		<h2 className="rdb-settings_form-header">{ heading }</h2>
+		{ children }
+	</fieldset>
+);
+
+const DataSourceForm = ( { children, icon, mode, onSave, source }: DataSourceFormProps ) => {
+	const [ currentStep, setCurrentStep ] = useState( 1 );
+
+	const steps = Children.toArray( children );
+
+	const stepHeadings = [ 'Setup', 'Scope' ];
+
+	return (
+		<>
+			<div className="rdb-settings-page_data-source-form-wrapper">
+				{ mode === 'add' && (
+					<>
+						<nav className="rdb-settings_form-steps" aria-label="Setup form steps">
+							<ol>
+								{ stepHeadings.map( ( label, index ) => {
+									const stepNumber = index + 1;
+									return (
+										<li
+											key={ stepNumber }
+											aria-current={ currentStep === stepNumber ? 'step' : undefined }
+											className={ currentStep === stepNumber ? 'current-step' : '' }
+										>
+											{ label }
+										</li>
+									);
+								} ) }
+							</ol>
+						</nav>
+						<form className="rdb-settings-page_data-source-form">{ steps[ currentStep - 1 ] }</form>
+					</>
+				) }
+				{ mode === 'edit' && (
+					<form className="rdb-settings-page_data-source-form">{ steps.map( step => step ) }</form>
+				) }
+			</div>
+
+			<div className="rdb-settings-page_data-source-form-footer">
+				{ mode === 'add' && (
+					<>
+						{ currentStep === 1 && (
+							<Button onClick={ () => console.log( 'Go to main screen' ) } variant="secondary">
+								Cancel
+							</Button>
+						) }
+						{ currentStep > 1 && (
+							<Button onClick={ () => setCurrentStep( currentStep - 1 ) } variant="secondary">
+								Go back
+							</Button>
+						) }
+						{ currentStep < steps.length && (
+							<Button onClick={ () => setCurrentStep( currentStep + 1 ) } variant="primary">
+								Continue
+							</Button>
+						) }
+						{ currentStep === steps.length && (
+							<DataSourceFormActions
+								onSave={ onSave }
+								onCancel={ function (): void {
+									throw new Error( 'Function not implemented.' );
+								} }
+								isSaveDisabled={ false }
+							/>
+						) }
+					</>
+				) }
+				{ mode === 'edit' && (
+					<DataSourceFormActions
+						onSave={ onSave }
+						onCancel={ function (): void {
+							throw new Error( 'Function not implemented.' );
+						} }
+						isSaveDisabled={ false }
+					/>
+				) }
+			</div>
+		</>
+	);
 };
 
-export const DataSourceForm = ( {
+const DataSourceFormSetup = ( {
 	children,
 	displayName: initialDisplayName,
 	handleOnChange,
-	heading,
 	mode,
 	newUUID,
 	setNewUUID,
 	uuidFromProps,
-}: DataSourceFormProps ) => {
+}: DataSourceFormSetupProps ) => {
 	const [ displayName, setDisplayName ] = useState( initialDisplayName );
 	const [ editUUID, setEditUUID ] = useState( false );
 
@@ -46,10 +147,9 @@ export const DataSourceForm = ( {
 	};
 
 	return (
-		<form className="rdb-settings-page_data-source-form">
-			<div className="rdb-settings-page_data-source-form_header">
-				<Heading size={ 24 }>{ heading }</Heading>
-				{ mode === 'edit' && (
+		<DataSourceFormStep heading="Setup">
+			{ mode === 'edit' && (
+				<>
 					<DropdownMenu
 						controls={ [
 							{
@@ -64,19 +164,17 @@ export const DataSourceForm = ( {
 						icon={ cog }
 						label={ __( 'Additional Settings' ) }
 					/>
-				) }
-			</div>
-			{ mode === 'edit' && editUUID && (
-				<div className="form-group">
-					<InputControl
-						label={ __( 'UUID', 'remote-data-blocks' ) }
-						value={ newUUID ?? '' }
-						onChange={ onUUIDChange }
-						placeholder={ uuidFromProps }
-						__next40pxDefaultSize
-						help={ __( 'Unique identifier for this data source.', 'remote-data-blocks' ) }
-					/>
-				</div>
+					{ mode === 'edit' && editUUID && (
+						<InputControl
+							label={ __( 'UUID', 'remote-data-blocks' ) }
+							value={ newUUID ?? '' }
+							onChange={ onUUIDChange }
+							placeholder={ uuidFromProps }
+							__next40pxDefaultSize
+							help={ __( 'Unique identifier for this data source.', 'remote-data-blocks' ) }
+						/>
+					) }
+				</>
 			) }
 			<div className="form-group">
 				<InputControl
@@ -87,8 +185,16 @@ export const DataSourceForm = ( {
 					__next40pxDefaultSize
 				/>
 			</div>
-
 			{ children }
-		</form>
+		</DataSourceFormStep>
 	);
 };
+
+const DataSourceFormScope = ( { children }: { children: React.ReactNode } ) => (
+	<DataSourceFormStep heading="Scope">{ children }</DataSourceFormStep>
+);
+
+DataSourceForm.Setup = DataSourceFormSetup;
+DataSourceForm.Scope = DataSourceFormScope;
+
+export { DataSourceForm };
