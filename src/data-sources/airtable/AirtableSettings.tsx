@@ -201,6 +201,10 @@ export const AirtableSettings = ( {
 		);
 	}, [ fetchingUserId, userId, userIdError ] );
 
+	const shouldAllowContinue = useMemo( () => {
+		return userId !== null && Boolean( state.slug ) && ! loadingSlugConflicts && ! slugConflicts;
+	}, [ loadingSlugConflicts, slugConflicts, state.slug, userId ] );
+
 	const shouldAllowSubmit = useMemo( () => {
 		return bases !== null && tables !== null && Boolean( state.base ) && Boolean( state.table );
 	}, [ bases, tables, state.base, state.table ] );
@@ -316,6 +320,7 @@ export const AirtableSettings = ( {
 					setNewUUID={ setNewUUID }
 					uuidFromProps={ uuidFromProps }
 					source="Airtable"
+					canProceed={ shouldAllowContinue }
 				>
 					<PasswordInputControl
 						label={ __( 'Access Token', 'remote-data-blocks' ) }
@@ -324,7 +329,7 @@ export const AirtableSettings = ( {
 						help={ connectionMessage }
 					/>
 				</DataSourceForm.Setup>
-				<DataSourceForm.Scope>
+				<DataSourceForm.Scope canProceed={ shouldAllowSubmit }>
 					<div className="form-group">
 						<SelectControl
 							id="base"
