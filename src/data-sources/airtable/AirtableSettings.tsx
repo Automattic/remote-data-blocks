@@ -1,4 +1,10 @@
-import { BaseControl, CheckboxControl, SelectControl, Spinner } from '@wordpress/components';
+import {
+	BaseControl,
+	CheckboxControl,
+	SelectControl,
+	Spinner,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -326,38 +332,39 @@ export const AirtableSettings = ( {
 					/>
 				</DataSourceForm.Setup>
 				<DataSourceForm.Scope canProceed={ shouldAllowSubmit }>
-					<div className="form-group">
-						<SelectControl
-							id="base"
-							label={ __( 'Base', 'remote-data-blocks' ) }
-							value={ state.base?.id ?? '' }
-							onChange={ onSelectChange }
-							options={ baseOptions }
-							help={ basesHelpText }
-							disabled={ fetchingBases || ! bases?.length }
-							__next40pxDefaultSize
-						/>
-						<SelectControl
-							id="table"
-							label={ __( 'Table', 'remote-data-blocks' ) }
-							value={ state.table?.id ?? '' }
-							onChange={ onSelectChange }
-							options={ tableOptions }
-							help={ tablesHelpText }
-							disabled={ fetchingTables || ! tables?.length }
-							__next40pxDefaultSize
-						/>
-					</div>
+					<SelectControl
+						id="base"
+						label={ __( 'Base', 'remote-data-blocks' ) }
+						value={ state.base?.id ?? '' }
+						onChange={ onSelectChange }
+						options={ baseOptions }
+						help={ basesHelpText }
+						disabled={ fetchingBases || ! bases?.length }
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+					/>
+					<SelectControl
+						id="table"
+						label={ __( 'Table', 'remote-data-blocks' ) }
+						value={ state.table?.id ?? '' }
+						onChange={ onSelectChange }
+						options={ tableOptions }
+						help={ tablesHelpText }
+						disabled={ fetchingTables || ! tables?.length }
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+					/>
 
 					{ state.table && availableTableFields.length ? (
-						<div className="form-group">
-							<BaseControl
-								label={ __( 'Table Fields', 'remote-data-blocks' ) }
-								help={ __(
-									'Select the fields to be used in the remote data block.',
-									'remote-data-blocks'
-								) }
-							>
+						<BaseControl
+							label={ __( 'Table Fields', 'remote-data-blocks' ) }
+							help={ __(
+								'Select the fields to be used in the remote data block.',
+								'remote-data-blocks'
+							) }
+							__nextHasNoMarginBottom
+						>
+							<VStack>
 								{ availableTableFields.map( field => (
 									<CheckboxControl
 										key={ field }
@@ -371,10 +378,11 @@ export const AirtableSettings = ( {
 													: new Set( [ ...state.table_fields ].filter( fld => fld !== field ) )
 											)
 										}
+										__nextHasNoMarginBottom
 									/>
 								) ) }
-							</BaseControl>
-						</div>
+							</VStack>
+						</BaseControl>
 					) : (
 						state.table && <Spinner />
 					) }

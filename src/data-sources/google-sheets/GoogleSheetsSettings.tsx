@@ -271,8 +271,9 @@ export const GoogleSheetsSettings = ( {
 					value={ state.credentials }
 					onChange={ onCredentialsChange }
 					help={ credentialsHelpText }
-					rows={ 14 }
+					rows={ 10 }
 					className="code-input"
+					__nextHasNoMarginBottom
 				/>
 			</DataSourceForm.Setup>
 			<DataSourceForm.Scope canProceed={ Boolean( shouldAllowSubmit ) }>
@@ -285,6 +286,7 @@ export const GoogleSheetsSettings = ( {
 					help={ spreadsheetHelpText }
 					disabled={ fetchingToken || ! spreadsheets?.length }
 					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				/>
 
 				<SelectControl
