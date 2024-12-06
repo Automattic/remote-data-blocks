@@ -4,7 +4,9 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
+import { SUPPORTED_AIRTABLE_TYPES } from '@/data-sources/airtable/constants';
 import { AirtableFormState } from '@/data-sources/airtable/types';
+import { getAirtableOutputQueryMappingValue } from '@/data-sources/airtable/utils';
 import { DataSourceForm } from '@/data-sources/components/DataSourceForm';
 import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
@@ -15,7 +17,11 @@ import {
 	useAirtableApiUserId,
 } from '@/data-sources/hooks/useAirtable';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
-import { AirtableConfig, SettingsComponentProps } from '@/data-sources/types';
+import {
+	AirtableConfig,
+	AirtableOutputQueryMappingValue,
+	SettingsComponentProps,
+} from '@/data-sources/types';
 import { getConnectionMessage } from '@/data-sources/utils';
 import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
@@ -105,6 +111,11 @@ export const AirtableSettings = ( {
 			return;
 		}
 
+		const selectedTable = tables?.find( table => table.id === state.table?.id );
+		if ( ! selectedTable ) {
+			return;
+		}
+
 		const airtableConfig: AirtableConfig = {
 			uuid: uuidFromProps ?? '',
 			service: 'airtable',
@@ -114,11 +125,18 @@ export const AirtableSettings = ( {
 				{
 					id: state.table.id,
 					name: state.table.name,
-					output_query_mappings: Array.from( state.table_fields ).map( key => ( {
-						key,
-						name: key,
-						type: key.endsWith( '.url' ) ? 'image_url' : 'string',
-					} ) ),
+					output_query_mappings: Array.from( state.table_fields )
+						.map( key => {
+							const field = selectedTable.fields.find( tableField => tableField.name === key );
+							if ( field ) {
+								return getAirtableOutputQueryMappingValue( field );
+							}
+							/**
+							 * Remove any fields which are not from this table or not supported.
+							 */
+							return null;
+						} )
+						.filter( Boolean ) as AirtableOutputQueryMappingValue[],
 				},
 			],
 			slug: state.slug,
@@ -149,6 +167,11 @@ export const AirtableSettings = ( {
 			} else if ( id === 'table' ) {
 				const selectedTable = tables?.find( table => table.id === value );
 				newValue = { id: value, name: selectedTable?.name ?? '' };
+
+				if ( value !== state.table?.id ) {
+					// Reset the selected fields when the table changes.
+					handleOnChange( 'table_fields', new Set< string >() );
+				}
 			}
 			handleOnChange( id, newValue );
 		}
@@ -285,19 +308,8 @@ export const AirtableSettings = ( {
 
 			if ( selectedTable ) {
 				selectedTable.fields.forEach( field => {
-					const simpleFieldTypes = [
-						'singleLineText',
-						'multilineText',
-						'email',
-						'phoneNumber',
-						'url',
-						'number',
-					];
-
-					if ( simpleFieldTypes.includes( field.type ) ) {
+					if ( SUPPORTED_AIRTABLE_TYPES.includes( field.type ) ) {
 						newAvailableTableFields.push( field.name );
-					} else if ( field.type === 'multipleAttachments' ) {
-						newAvailableTableFields.push( `${ field.name }[0].url` );
 					}
 				} );
 			}
