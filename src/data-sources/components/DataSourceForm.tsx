@@ -117,13 +117,7 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 				{ screen === 'editDataSource' && (
 					<>
 						{ createPortal(
-							<DataSourceFormActions
-								onSave={ onSave }
-								onCancel={ function (): void {
-									throw new Error( 'Function not implemented.' );
-								} }
-								isSaveDisabled={ false }
-							/>,
+							<DataSourceFormActions onSave={ onSave } isSaveDisabled={ false } />,
 							document.getElementById( 'rdb-settings-page-form-save-button' ) ||
 								document.createElement( 'div' )
 						) }
@@ -178,9 +172,6 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 							{ currentStep === steps.length && (
 								<DataSourceFormActions
 									onSave={ onSave }
-									onCancel={ function (): void {
-										throw new Error( 'Function not implemented.' );
-									} }
 									isSaveDisabled={ ! canProceedToNextStep() }
 								/>
 							) }
