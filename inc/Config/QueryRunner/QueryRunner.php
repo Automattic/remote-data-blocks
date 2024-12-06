@@ -254,6 +254,9 @@ class QueryRunner implements QueryRunnerInterface {
 			case 'price':
 				return sprintf( '$%s', number_format( (float) $field_value_single, 2 ) );
 
+			case 'string_array':
+				return implode( ', ', $field_value );
+
 			case 'string':
 				return wp_strip_all_tags( $field_value_single );
 		}
