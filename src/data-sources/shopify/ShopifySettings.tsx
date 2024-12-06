@@ -76,12 +76,12 @@ export const ShopifySettings = ( {
 	};
 
 	return (
-		<DataSourceForm mode={ mode } onSave={ onSaveClick } source="Shopify">
+		<DataSourceForm onSave={ onSaveClick }>
 			<DataSourceForm.Setup
 				canProceed={ Boolean( shouldAllowSubmit ) }
 				displayName={ state.display_name }
 				handleOnChange={ handleOnChange }
-				headingIcon={ { icon: ShopifyIconWithText, width: '102px', height: '32px' } }
+				heading={ { icon: ShopifyIconWithText, width: '102px', height: '32px' } }
 				inputIcon={ ShopifyIcon }
 				newUUID={ newUUID }
 				setNewUUID={ setNewUUID }
