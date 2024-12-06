@@ -19,6 +19,10 @@ import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
 import './DataSourceList.scss';
+import { AirtableIcon } from '@/settings/icons/AirtableIcon';
+import { GoogleSheetsIcon } from '@/settings/icons/GoogleSheetsIcon';
+import HttpIcon from '@/settings/icons/HttpIcon';
+import { ShopifyIcon } from '@/settings/icons/ShopifyIcon';
 
 const DataSourceList = () => {
 	const { createSuccessNotice, createErrorNotice } =
@@ -85,6 +89,20 @@ const DataSourceList = () => {
 				break;
 		}
 	}
+	const getServiceIcon = ( service: ( typeof SUPPORTED_SERVICES )[ number ] ) => {
+		switch ( service ) {
+			case 'airtable':
+				return AirtableIcon;
+			case 'shopify':
+				return ShopifyIcon;
+			case 'google-sheets':
+				return GoogleSheetsIcon;
+			case 'generic-http':
+				return HttpIcon;
+			default:
+				return null;
+		}
+	};
 
 	const DataSourceTable = (): JSX.Element => {
 		if ( loadingDataSources ) {
@@ -114,8 +132,8 @@ const DataSourceList = () => {
 				<table className="table data-source-list">
 					<thead className="table-header">
 						<tr>
-							<th>{ __( 'Name', 'remote-data-blocks' ) }</th>
-							<th>{ __( 'Data Source', 'remote-data-blocks' ) }</th>
+							<th>{ __( 'Source', 'remote-data-blocks' ) }</th>
+							<th>{ __( 'Service', 'remote-data-blocks' ) }</th>
 							<th>{ __( 'Meta', 'remote-data-blocks' ) }</th>
 							<th className="data-source-actions">{ __( 'Actions', 'remote-data-blocks' ) }</th>
 						</tr>
@@ -129,6 +147,10 @@ const DataSourceList = () => {
 								return (
 									<tr key={ uuid } className="table-row">
 										<td>
+											<Icon
+												icon={ getServiceIcon( service ) }
+												style={ { marginRight: '16px', verticalAlign: 'text-bottom' } }
+											/>
 											<Text className="data-source-display_name">{ displayName }</Text>
 										</td>
 										<td>
