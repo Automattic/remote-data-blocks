@@ -35,6 +35,7 @@ export interface AirtableOutputQueryMappingValue {
 	name?: string;
 	path?: string;
 	type?: string;
+	prefix?: string;
 }
 
 export interface AirtableTableConfig extends StringIdName {

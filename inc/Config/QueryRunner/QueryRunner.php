@@ -241,7 +241,10 @@ class QueryRunner implements QueryRunnerInterface {
 	 * @param string       $field_type    The field type.
 	 * @return string The field value.
 	 */
-	protected function get_field_value( array|string $field_value, string $default_value = '', string $field_type = 'string' ): string {
+	protected function get_field_value( array|string $field_value, array $mapping ): string {
+		$default_value = $mapping['default_value'] ?? '';
+		$field_type = $mapping['type'];
+
 		$field_value_single = is_array( $field_value ) && count( $field_value ) > 1 ? $field_value : ( $field_value[0] ?? $default_value );
 
 		switch ( $field_type ) {
@@ -251,8 +254,9 @@ class QueryRunner implements QueryRunnerInterface {
 			case 'html':
 				return $field_value_single;
 
-			case 'price':
-				return sprintf( '$%s', number_format( (float) $field_value_single, 2 ) );
+			case 'currency':
+				$currency_symbol = $mapping['prefix'] ?? '$';
+				return sprintf( '%s%s', $currency_symbol, number_format( (float) $field_value_single, 2 ) );
 
 			case 'string_array':
 				return implode( ', ', $field_value );
@@ -307,7 +311,7 @@ class QueryRunner implements QueryRunnerInterface {
 
 					// JSONPath always returns values in an array, even if there's only one value.
 					// Because we're mostly interested in single values for field mapping, unwrap the array if it's only one item.
-					$field_value_single = self::get_field_value( $field_value, $mapping['default_value'] ?? '', $mapping['type'] );
+					$field_value_single = self::get_field_value( $field_value, $mapping );
 				}
 
 				return array_merge( $mapping, [

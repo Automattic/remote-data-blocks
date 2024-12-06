@@ -74,8 +74,9 @@ The `get_input_schema` method defines the input data expected by the query. The 
   - `image_alt`
   - `image_url`
   - `number`
-  - `price`
+  - `currency`
   - `string`
+  - `string_array`
 
 #### Example
 
