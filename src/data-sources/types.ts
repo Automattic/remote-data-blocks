@@ -44,12 +44,6 @@ export interface AirtableConfig extends BaseDataSourceConfig {
 	tables: AirtableTableConfig[];
 }
 
-export interface ShopifyConfig extends BaseDataSourceConfig {
-	service: 'shopify';
-	access_token: string;
-	store_name: string;
-}
-
 export interface GoogleSheetsConfig extends BaseDataSourceConfig {
 	service: 'google-sheets';
 	credentials: GoogleServiceAccountKey;
@@ -63,7 +57,26 @@ export interface HttpConfig extends BaseDataSourceConfig {
 	auth: HttpAuth;
 }
 
-export type DataSourceConfig = AirtableConfig | ShopifyConfig | GoogleSheetsConfig | HttpConfig;
+export interface SalesforceB2CConfig extends BaseDataSourceConfig {
+	service: 'salesforce-b2c';
+	shortcode: string;
+	organization_id: string;
+	client_id: string;
+	client_secret: string;
+}
+
+export interface ShopifyConfig extends BaseDataSourceConfig {
+	service: 'shopify';
+	access_token: string;
+	store_name: string;
+}
+
+export type DataSourceConfig =
+	| AirtableConfig
+	| GoogleSheetsConfig
+	| HttpConfig
+	| SalesforceB2CConfig
+	| ShopifyConfig;
 
 export type SettingsComponentProps< T extends BaseDataSourceConfig > = {
 	mode: 'add' | 'edit';
