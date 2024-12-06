@@ -8,7 +8,7 @@ import {
 	__experimentalInputControl as InputControl,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
-import { Children, isValidElement, useState } from '@wordpress/element';
+import { Children, createPortal, isValidElement, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { cog, lockSmall } from '@wordpress/icons';
 
@@ -114,24 +114,38 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 				<form className="rdb-settings-page_data-source-form">
 					{ singleStep ? steps.map( step => step ) : steps[ currentStep - 1 ] }
 				</form>
-			</div>
-
-			<div className="rdb-settings-page_data-source-form-footer">
-				{ screen === 'addDataSource' && currentStep === 1 && (
-					<div className="rdb-settings-page_data-source-form-setup-info">
-						<Icon icon={ lockSmall } />
-						<p>
-							{ __(
-								'Connecting to an external source will not store the data. We issue queries to the database, but all your data stays with the provider. '
-							) }
-							<ExternalLink href="https://remotedatablocks.com/">
-								{ __( 'Learn more', 'remote-data-blocks' ) }
-							</ExternalLink>
-						</p>
-					</div>
+				{ screen === 'editDataSource' && (
+					<>
+						{ createPortal(
+							<DataSourceFormActions
+								onSave={ onSave }
+								onCancel={ function (): void {
+									throw new Error( 'Function not implemented.' );
+								} }
+								isSaveDisabled={ false }
+							/>,
+							document.getElementById( 'rdb-settings-page-form-save-button' ) ||
+								document.createElement( 'div' )
+						) }
+					</>
 				) }
-				<div className="rdb-settings-page_data-source-form-setup-actions">
-					{ screen === 'addDataSource' && (
+			</div>
+			{ screen === 'addDataSource' && (
+				<div className="rdb-settings-page_data-source-form-footer">
+					{ currentStep === 1 && (
+						<div className="rdb-settings-page_data-source-form-setup-info">
+							<Icon icon={ lockSmall } />
+							<p>
+								{ __(
+									'Connecting to an external source will not store the data. We issue queries to the database, but all your data stays with the provider. '
+								) }
+								<ExternalLink href="https://remotedatablocks.com/">
+									{ __( 'Learn more', 'remote-data-blocks' ) }
+								</ExternalLink>
+							</p>
+						</div>
+					) }
+					<div className="rdb-settings-page_data-source-form-setup-actions">
 						<>
 							{ currentStep === 1 && (
 								<Button
@@ -171,27 +185,9 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 								/>
 							) }
 						</>
-					) }
-					{ screen === 'editDataSource' && (
-						<>
-							<Button
-								onClick={ () => console.log( 'Go to main screen' ) }
-								variant="secondary"
-								__next40pxDefaultSize
-							>
-								Cancel
-							</Button>
-							<DataSourceFormActions
-								onSave={ onSave }
-								onCancel={ function (): void {
-									throw new Error( 'Function not implemented.' );
-								} }
-								isSaveDisabled={ false }
-							/>
-						</>
-					) }
+					</div>
 				</div>
-			</div>
+			) }
 		</>
 	);
 };
@@ -256,21 +252,26 @@ const DataSourceFormSetup = ( {
 		>
 			{ screen === 'editDataSource' && (
 				<>
-					<DropdownMenu
-						controls={ [
-							{
-								title: __(
-									editUUID
-										? __( 'Hide UUID', 'remote-data-blocks' )
-										: __( 'Edit UUID', 'remote-data-blocks' )
-								),
-								onClick: () => setEditUUID( ! editUUID ),
-							},
-						] }
-						icon={ cog }
-						label={ __( 'Additional Settings' ) }
-					/>
-					{ screen === 'editDataSource' && editUUID && (
+					{ createPortal(
+						<DropdownMenu
+							controls={ [
+								{
+									title: __(
+										editUUID
+											? __( 'Hide UUID', 'remote-data-blocks' )
+											: __( 'Edit UUID', 'remote-data-blocks' )
+									),
+									onClick: () => setEditUUID( ! editUUID ),
+								},
+							] }
+							icon={ cog }
+							label={ __( 'Additional Settings' ) }
+						/>,
+						document.getElementById( 'rdb-settings-page-form-settings' ) ||
+							document.createElement( 'div' )
+					) }
+
+					{ editUUID && (
 						<InputControl
 							label={ __( 'UUID', 'remote-data-blocks' ) }
 							value={ newUUID ?? '' }

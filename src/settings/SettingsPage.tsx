@@ -18,16 +18,22 @@ const SettingsPage = () => {
 			<SettingsContext.Provider value={ settingsContext }>
 				<div className="rdb-settings-page_header">
 					{ addOrEditScreen ? (
-						<HStack className="rdb-settings-page_header-return">
+						<HStack justify="flex-start">
 							<Button icon={ chevronLeft } onClick={ () => settingsContext.goToMainScreen() } />
-							<h2>
-								{ __(
-									`${
-										[ 'addDataSource' ].includes( settingsContext.screen ) ? 'New ' : 'Edit'
-									} Data Source`,
-									'remote-data-blocks'
-								) }
-							</h2>
+							<HStack>
+								<h2>
+									{ __(
+										`${
+											[ 'addDataSource' ].includes( settingsContext.screen ) ? 'New ' : 'Edit'
+										} Data Source`,
+										'remote-data-blocks'
+									) }
+								</h2>
+								<HStack expanded={ false } justify="flex-end" spacing={ 3 }>
+									<div id="rdb-settings-page-form-save-button" />
+									<div id="rdb-settings-page-form-settings" />
+								</HStack>
+							</HStack>
 						</HStack>
 					) : (
 						<>
