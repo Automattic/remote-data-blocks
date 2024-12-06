@@ -29,6 +29,10 @@ body {
 		text-decoration: none;
 	}
 
+	.components-base-control__help {
+		margin-bottom: 0;
+	}
+
 	/* Snackbar notice */
 	.components-snackbar-list {
 		position: fixed;

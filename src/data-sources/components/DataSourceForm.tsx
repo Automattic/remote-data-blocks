@@ -249,6 +249,11 @@ const DataSourceFormSetup = ( {
 					<>{ __( 'Setup' ) }</>
 				)
 			}
+			subheading={
+				screen === 'editDataSource'
+					? __( 'Manage the source’s visibility and connection details.', 'remote-data-blocks' )
+					: undefined
+			}
 		>
 			{ screen === 'editDataSource' && (
 				<>
@@ -283,22 +288,22 @@ const DataSourceFormSetup = ( {
 					) }
 				</>
 			) }
-			<div className="form-group">
-				<InputControl
-					help={ __( 'Only visible to you and other site managers.', 'remote-data-blocks' ) }
-					label={ __( 'Data Source Name' ) }
-					onChange={ onDisplayNameChange }
-					value={ displayName }
-					prefix={
-						screen === 'editDataSource' ? (
-							<InputControlPrefixWrapper style={ { paddingRight: '4px' } }>
-								<Icon icon={ inputIcon } />
-							</InputControlPrefixWrapper>
-						) : null
-					}
-					__next40pxDefaultSize
-				/>
-			</div>
+
+			<InputControl
+				help={ __( 'Only visible to you and other site managers.', 'remote-data-blocks' ) }
+				label={ __( 'Data Source Name' ) }
+				onChange={ onDisplayNameChange }
+				value={ displayName }
+				prefix={
+					screen === 'editDataSource' ? (
+						<InputControlPrefixWrapper style={ { paddingRight: '4px' } }>
+							<Icon icon={ inputIcon } style={ { verticalAlign: 'text-bottom' } } />
+						</InputControlPrefixWrapper>
+					) : null
+				}
+				__next40pxDefaultSize
+			/>
+
 			{ children }
 		</DataSourceFormStep>
 	);

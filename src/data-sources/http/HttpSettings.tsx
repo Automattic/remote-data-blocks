@@ -139,6 +139,7 @@ export const HttpSettings = ( {
 					autoComplete="off"
 					__next40pxDefaultSize
 					help={ __( 'The URL for the HTTP endpoint.', 'remote-data-blocks' ) }
+					__nextHasNoMarginBottom
 				/>
 
 				<HttpAuthSettingsInput auth={ getAuthState() } onChange={ handleOnChange } />

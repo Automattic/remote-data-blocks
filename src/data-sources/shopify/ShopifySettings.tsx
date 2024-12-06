@@ -98,6 +98,7 @@ export const ShopifySettings = ( {
 					help={ __( 'Example: https://your-shop-name.myshopify.com', 'remote-data-blocks' ) }
 					autoComplete="off"
 					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				/>
 				<PasswordInputControl
 					label={ __( 'Access Token', 'remote-data-blocks' ) }
@@ -113,6 +114,7 @@ export const ShopifySettings = ( {
 					tabIndex={ -1 }
 					readOnly
 					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				/>
 			</DataSourceForm.Setup>
 		</DataSourceForm>
