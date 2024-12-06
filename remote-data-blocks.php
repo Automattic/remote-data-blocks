@@ -44,9 +44,9 @@ ExampleApi\ExampleApi::init();
 PluginSettings\PluginSettings::init();
 
 // Integrations
-Integrations\Airtable\AirtableIntegration::init();
-Integrations\Shopify\ShopifyIntegration::init();
-Integrations\VipBlockDataApi\VipBlockDataApi::init();
+/* Integrations\Airtable\AirtableIntegration::init(); */
+/* Integrations\Shopify\ShopifyIntegration::init(); */
+/* Integrations\VipBlockDataApi\VipBlockDataApi::init(); */
 
 // REST endpoints
 REST\RemoteDataController::init();
