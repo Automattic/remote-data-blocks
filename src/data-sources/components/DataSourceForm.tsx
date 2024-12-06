@@ -7,7 +7,7 @@ import {
 	VisuallyHidden,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
-import { Children, useState } from '@wordpress/element';
+import { Children, isValidElement, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { cog, lockSmall } from '@wordpress/icons';
 
@@ -21,6 +21,7 @@ interface DataSourceFormProps {
 
 interface DataSourceFormSetupProps {
 	children: React.ReactNode;
+	canProceed: boolean;
 	displayName: string;
 	handleOnChange: ( key: string, value: string ) => void;
 	icon: IconType;
@@ -50,6 +51,19 @@ const DataSourceForm = ( { children, mode, onSave }: DataSourceFormProps ) => {
 	const steps = Children.toArray( children );
 
 	const stepHeadings = [ 'Setup', 'Scope' ];
+
+	const canProceedToNextStep = (): boolean => {
+		const step = steps[ currentStep - 1 ];
+		return isValidElement< { canProceed?: boolean } >( step )
+			? Boolean( step.props?.canProceed )
+			: false;
+	};
+
+	const handleNextStep = () => {
+		if ( canProceedToNextStep() ) {
+			setCurrentStep( currentStep + 1 );
+		}
+	};
 
 	return (
 		<>
@@ -117,9 +131,10 @@ const DataSourceForm = ( { children, mode, onSave }: DataSourceFormProps ) => {
 							) }
 							{ currentStep < steps.length && (
 								<Button
-									onClick={ () => setCurrentStep( currentStep + 1 ) }
+									onClick={ handleNextStep }
 									variant="primary"
 									__next40pxDefaultSize
+									disabled={ ! canProceedToNextStep() }
 								>
 									Continue
 								</Button>
@@ -130,19 +145,28 @@ const DataSourceForm = ( { children, mode, onSave }: DataSourceFormProps ) => {
 									onCancel={ function (): void {
 										throw new Error( 'Function not implemented.' );
 									} }
-									isSaveDisabled={ false }
+									isSaveDisabled={ ! canProceedToNextStep() }
 								/>
 							) }
 						</>
 					) }
 					{ mode === 'edit' && (
-						<DataSourceFormActions
-							onSave={ onSave }
-							onCancel={ function (): void {
-								throw new Error( 'Function not implemented.' );
-							} }
-							isSaveDisabled={ false }
-						/>
+						<>
+							<Button
+								onClick={ () => console.log( 'Go to main screen' ) }
+								variant="secondary"
+								__next40pxDefaultSize
+							>
+								Cancel
+							</Button>
+							<DataSourceFormActions
+								onSave={ onSave }
+								onCancel={ function (): void {
+									throw new Error( 'Function not implemented.' );
+								} }
+								isSaveDisabled={ false }
+							/>
+						</>
 					) }
 				</div>
 			</div>
@@ -231,9 +255,12 @@ const DataSourceFormSetup = ( {
 	);
 };
 
-const DataSourceFormScope = ( { children }: { children: React.ReactNode } ) => (
-	<DataSourceFormStep heading="Scope">{ children }</DataSourceFormStep>
-);
+const DataSourceFormScope = ( {
+	children,
+}: {
+	canProceed: boolean;
+	children: React.ReactNode;
+} ) => <DataSourceFormStep heading="Scope">{ children }</DataSourceFormStep>;
 
 DataSourceForm.Setup = DataSourceFormSetup;
 DataSourceForm.Scope = DataSourceFormScope;
