@@ -51,7 +51,7 @@ const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState
 				name: table.name,
 			};
 			initialStateFromConfig.table_fields = new Set(
-				table.output_query_mappings.map( ( { name } ) => name )
+				table.output_query_mappings.map( ( { key } ) => key )
 			);
 		}
 	}
@@ -114,9 +114,10 @@ export const AirtableSettings = ( {
 				{
 					id: state.table.id,
 					name: state.table.name,
-					output_query_mappings: Array.from( state.table_fields ).map( name => ( {
-						name,
-						type: name.endsWith( '.url' ) ? 'image_url' : 'string',
+					output_query_mappings: Array.from( state.table_fields ).map( key => ( {
+						key,
+						name: key,
+						type: key.endsWith( '.url' ) ? 'image_url' : 'string',
 					} ) ),
 				},
 			],
