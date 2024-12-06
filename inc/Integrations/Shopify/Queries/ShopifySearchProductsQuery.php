@@ -31,7 +31,7 @@ class ShopifySearchProductsQuery extends GraphqlQueryContext {
 				'price' => [
 					'name' => 'Item price',
 					'path' => '$.node.priceRange.maxVariantPrice.amount',
-					'type' => 'price',
+					'type' => 'currency',
 				],
 				'image_url' => [
 					'name' => 'Item image URL',

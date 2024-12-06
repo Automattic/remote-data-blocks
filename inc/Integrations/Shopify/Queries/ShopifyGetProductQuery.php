@@ -47,7 +47,7 @@ class ShopifyGetProductQuery extends GraphqlQueryContext {
 				'price' => [
 					'name' => 'Item price',
 					'path' => '$.data.product.priceRange.maxVariantPrice.amount',
-					'type' => 'price',
+					'type' => 'currency',
 				],
 				'variant_id' => [
 					'name' => 'Variant ID',
