@@ -3,9 +3,14 @@
 namespace RemoteDataBlocks\ExampleApi\Queries;
 
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
-use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
+use WP_Error;
 
 class ExampleApiGetTableQuery extends HttpQueryContext {
+	public function execute( array $input_variables ): array|WP_Error {
+		$query_runner = new ExampleApiQueryRunner( $this );
+		return $query_runner->execute( $input_variables );
+	}
+
 	public function get_output_schema(): array {
 		return [
 			'root_path' => '$.records[*]',
@@ -37,9 +42,5 @@ class ExampleApiGetTableQuery extends HttpQueryContext {
 
 	public function get_query_name(): string {
 		return 'List events';
-	}
-
-	public function get_query_runner(): QueryRunnerInterface {
-		return new ExampleApiQueryRunner( $this );
 	}
 }

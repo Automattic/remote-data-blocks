@@ -65,8 +65,7 @@ class RemoteDataController {
 		// expects, so only include those defined by the query.
 		$query_input = array_intersect_key( $query_input, $query->input_schema );
 
-		$query_runner = $query->get_query_runner();
-		$query_result = $query_runner->execute( $query_input );
+		$query_result = $query->execute( $query_input );
 
 		if ( is_wp_error( $query_result ) ) {
 			$logger = LoggerManager::instance();

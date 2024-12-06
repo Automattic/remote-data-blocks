@@ -179,9 +179,9 @@ Override this method to define a request body for this query. The return value w
 
 Override this method to specify a name that represents the query in UI.
 
-### get_query_runner(): QueryRunnerInterface
+### execute(): array|WP_Error
 
-Override this method to specify a custom [query runner](query-runner.md) for this query. The default query runner works well with most HTTP-powered APIs.
+Override this method to specify a custom execution implementation. By default, we execute this query with our [query runner](query-runner.md), which works well with most HTTP-powered APIs.
 
 ### process_response( string $raw_response_data, array $input_variables ): string|array|object|null
 
