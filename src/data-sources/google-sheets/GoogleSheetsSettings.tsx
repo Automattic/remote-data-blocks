@@ -250,12 +250,12 @@ export const GoogleSheetsSettings = ( {
 	}, [ state.spreadsheet, sheets ] );
 
 	return (
-		<DataSourceForm mode={ mode } onSave={ onSaveClick } source="Google Sheets">
+		<DataSourceForm onSave={ onSaveClick }>
 			<DataSourceForm.Setup
 				canProceed={ Boolean( token ) }
 				displayName={ state.display_name }
 				handleOnChange={ handleOnChange }
-				headingIcon={ {
+				heading={ {
 					icon: GoogleSheetsIconWithText,
 					width: '191px',
 					height: '32px',

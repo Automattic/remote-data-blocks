@@ -3,13 +3,13 @@ import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { DataSourceForm } from '../components/DataSourceForm';
-import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import { HttpAuthSettingsInput } from '@/data-sources/components/HttpAuthSettingsInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { HttpAuth, HttpAuthFormState, HttpFormState } from '@/data-sources/http/types';
 import { HttpConfig, SettingsComponentProps } from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
+import HttpIcon from '@/settings/icons/HttpIcon';
 
 const initialState: HttpFormState = {
 	display_name: '',
@@ -119,16 +119,17 @@ export const HttpSettings = ( {
 	};
 
 	return (
-		<DataSourceForm
-			displayName={ state.display_name }
-			handleOnChange={ handleOnChange }
-			heading={ mode === 'add' ? __( 'Add HTTP Data Source' ) : __( 'Edit HTTP Data Source' ) }
-			mode={ mode }
-			newUUID={ newUUID }
-			setNewUUID={ setNewUUID }
-			uuidFromProps={ uuidFromProps }
-		>
-			<div className="form-group">
+		<DataSourceForm onSave={ onSaveClick }>
+			<DataSourceForm.Setup
+				canProceed={ Boolean( shouldAllowSubmit ) }
+				displayName={ state.display_name }
+				handleOnChange={ handleOnChange }
+				heading={ { label: __( 'Connect HTTP Data Source', 'remote-data-blocks' ) } }
+				inputIcon={ HttpIcon }
+				newUUID={ newUUID }
+				setNewUUID={ setNewUUID }
+				uuidFromProps={ uuidFromProps }
+			>
 				<TextControl
 					type="url"
 					id="url"
@@ -139,15 +140,9 @@ export const HttpSettings = ( {
 					__next40pxDefaultSize
 					help={ __( 'The URL for the HTTP endpoint.', 'remote-data-blocks' ) }
 				/>
-			</div>
 
-			<HttpAuthSettingsInput auth={ getAuthState() } onChange={ handleOnChange } />
-
-			<DataSourceFormActions
-				onSave={ onSaveClick }
-				onCancel={ goToMainScreen }
-				isSaveDisabled={ ! shouldAllowSubmit }
-			/>
+				<HttpAuthSettingsInput auth={ getAuthState() } onChange={ handleOnChange } />
+			</DataSourceForm.Setup>
 		</DataSourceForm>
 	);
 };

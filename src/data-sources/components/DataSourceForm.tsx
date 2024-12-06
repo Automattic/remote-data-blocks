@@ -25,12 +25,21 @@ interface DataSourceFormSetupProps {
 	canProceed: boolean;
 	displayName: string;
 	handleOnChange: ( key: string, value: string ) => void;
-	headingIcon: {
-		icon: IconType;
-		width: string;
-		height: string;
-		verticalAlign?: string;
-	};
+	heading:
+		| {
+				label: string;
+				icon?: never;
+				width?: never;
+				height?: never;
+				verticalAlign?: never;
+		  }
+		| {
+				label?: never;
+				icon: IconType;
+				width: string;
+				height: string;
+				verticalAlign?: string;
+		  };
 	inputIcon: IconType;
 	newUUID: string | null;
 	setNewUUID: ( uuid: string | null ) => void;
@@ -191,7 +200,7 @@ const DataSourceFormSetup = ( {
 	children,
 	displayName: initialDisplayName,
 	handleOnChange,
-	headingIcon,
+	heading,
 	inputIcon,
 	newUUID,
 	setNewUUID,
@@ -201,7 +210,7 @@ const DataSourceFormSetup = ( {
 	const [ editUUID, setEditUUID ] = useState( false );
 
 	const { screen, service } = useSettingsContext();
-	const { icon, height, width, verticalAlign } = headingIcon;
+	const { icon, height, label, width, verticalAlign } = heading;
 
 	const onUUIDChange = ( uuid: string | undefined ) => {
 		setNewUUID( uuid ?? null );
@@ -222,17 +231,23 @@ const DataSourceFormSetup = ( {
 			heading={
 				screen === 'addDataSource' && service ? (
 					<span style={ { marginBottom: '48px' } }>
-						{ __( 'Connect with ', 'remote-data-blocks' ) }
-						<Icon
-							icon={ icon }
-							style={ {
-								width,
-								height,
-								marginLeft: '4px',
-								verticalAlign: verticalAlign ?? 'text-bottom',
-							} }
-						/>
-						<VisuallyHidden>{ __( service, 'remote-data-blocks' ) }</VisuallyHidden>
+						{ label ? (
+							__( label, 'remote-data-blocks' )
+						) : (
+							<>
+								{ __( 'Connect with ', 'remote-data-blocks' ) }
+								<Icon
+									icon={ icon }
+									style={ {
+										width,
+										height,
+										marginLeft: '4px',
+										verticalAlign: verticalAlign ?? 'text-bottom',
+									} }
+								/>
+								<VisuallyHidden>{ __( service, 'remote-data-blocks' ) }</VisuallyHidden>
+							</>
+						) }
 					</span>
 				) : (
 					<>{ __( 'Setup' ) }</>
