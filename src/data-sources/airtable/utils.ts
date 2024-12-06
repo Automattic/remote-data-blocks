@@ -1,4 +1,8 @@
-import { STRING_TYPES, NUMBER_TYPES } from '@/data-sources/airtable/constants';
+import {
+	AIRTABLE_STRING_TYPES,
+	AIRTABLE_NUMBER_TYPES,
+	AIRTABLE_USER_TYPES,
+} from '@/data-sources/airtable/constants';
 import { AirtableField } from '@/data-sources/airtable/types';
 import { AirtableOutputQueryMappingValue } from '@/data-sources/types';
 
@@ -11,12 +15,16 @@ export const getAirtableOutputQueryMappingValue = (
 		key: field.name,
 	};
 
-	if ( STRING_TYPES.has( field.type ) ) {
+	if ( AIRTABLE_STRING_TYPES.has( field.type ) ) {
 		return { ...baseField, type: 'string' };
 	}
 
-	if ( NUMBER_TYPES.has( field.type ) ) {
+	if ( AIRTABLE_NUMBER_TYPES.has( field.type ) ) {
 		return { ...baseField, type: 'number' };
+	}
+
+	if ( AIRTABLE_USER_TYPES.has( field.type ) ) {
+		return { ...baseField, path: `$.fields["${ field.name }"].name`, type: 'string' };
 	}
 
 	switch ( field.type ) {
@@ -25,30 +33,44 @@ export const getAirtableOutputQueryMappingValue = (
 			return { ...baseField, type: 'button_url' };
 
 		case 'currency':
-			return { ...baseField, type: 'price' };
+			return {
+				...baseField,
+				type: 'currency',
+				prefix: field.options?.symbol,
+			};
 
 		case 'checkbox':
 			return { ...baseField, type: 'boolean' };
 
+		case 'multipleSelects':
+			return {
+				...baseField,
+				path: `$.fields["${ field.name }"][*]`,
+				type: 'string_array',
+			};
+
+		case 'multipleRecordLinks':
+			return {
+				...baseField,
+				path: `$.fields["${ field.name }"][*].id`,
+				type: 'string_array',
+			};
+
 		case 'multipleAttachments':
 			return {
+				...baseField,
 				path: `$.fields["${ field.name }"][0].url`,
-				name: `${ field.name } URL`,
-				key: `${ field.name }_url`,
 				type: 'image_url',
 			};
 
-		case 'singleCollaborator':
 		case 'multipleCollaborator':
 			return {
-				path: `$.fields["${ field.name }"].name`,
-				name: `${ field.name } Name`,
-				key: `${ field.name }_name`,
-				type: 'string',
+				...baseField,
+				path: `$.fields["${ field.name }"][*].name`,
+				type: 'string_array',
 			};
 
 		case 'formula':
-		case 'rollup':
 		case 'lookup':
 			if ( field.options?.result?.type ) {
 				return getAirtableOutputQueryMappingValue( {

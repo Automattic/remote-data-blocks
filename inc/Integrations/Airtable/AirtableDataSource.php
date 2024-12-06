@@ -54,6 +54,10 @@ class AirtableDataSource extends HttpDataSource {
 										'type' => 'string',
 										'required' => false,
 									],
+									'prefix' => [
+										'type' => 'string',
+										'required' => false,
+									],
 								],
 							],
 						],
@@ -132,6 +136,10 @@ class AirtableDataSource extends HttpDataSource {
 				'path' => $mapping['path'] ?? '$.fields["' . $mapping_key . '"]',
 				'type' => $mapping['type'] ?? 'string',
 			];
+
+			if ( $mapping['type'] === 'currency' && isset( $mapping['prefix'] ) ) {
+				$output_schema['mappings'][ $mapping_key ]['prefix'] = $mapping['prefix'];
+			}
 		}
 
 		return AirtableGetItemQuery::from_array([
