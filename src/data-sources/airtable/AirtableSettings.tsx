@@ -356,14 +356,18 @@ export const AirtableSettings = ( {
 					/>
 
 					{ state.table && availableTableFields.length ? (
-						<BaseControl
-							label={ __( 'Table Fields', 'remote-data-blocks' ) }
-							help={ __(
-								'Select the fields to be used in the remote data block.',
-								'remote-data-blocks'
-							) }
-							__nextHasNoMarginBottom
-						>
+						<>
+							<BaseControl
+								help={ __(
+									'Select the fields to be used in the remote data block.',
+									'remote-data-blocks'
+								) }
+								__nextHasNoMarginBottom
+							>
+								<BaseControl.VisualLabel>
+									{ __( 'Table Fields', 'remote-data-blocks' ) }
+								</BaseControl.VisualLabel>
+							</BaseControl>
 							<VStack>
 								{ availableTableFields.map( field => (
 									<CheckboxControl
@@ -382,7 +386,7 @@ export const AirtableSettings = ( {
 									/>
 								) ) }
 							</VStack>
-						</BaseControl>
+						</>
 					) : (
 						state.table && <Spinner />
 					) }
