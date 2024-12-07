@@ -12,4 +12,5 @@ interface HttpQueryContextInterface extends QueryContextInterface {
 	public function get_request_method(): string;
 	public function get_request_headers( array $input_variables ): array;
 	public function get_request_body( array $input_variables ): array|null;
+	public function preprocess_response( array $response_data, array $input_variables ): array;
 }

@@ -2,12 +2,14 @@
 
 namespace RemoteDataBlocks\Config\QueryRunner;
 
+use RemoteDataBlocks\Config\QueryContext\HttpQueryContextInterface;
 use WP_Error;
 
 interface QueryRunnerInterface {
 	/**
 	 * Execute the query and return processed results.
 	 *
+	 * @param HttpQueryContextInterface $query The query to execute.
 	 * @param array<string, mixed> $input_variables The input variables for the current request.
 	 * @return WP_Error|array{
 	 *   is_collection: bool,
@@ -25,5 +27,5 @@ interface QueryRunnerInterface {
 	 *   }>,
 	 * }
 	 */
-	public function execute( array $input_variables ): array|\WP_Error;
+	public function execute( HttpQueryContextInterface $query, array $input_variables ): array|WP_Error;
 }
