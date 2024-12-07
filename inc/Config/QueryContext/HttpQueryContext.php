@@ -22,9 +22,9 @@ class HttpQueryContext extends ArraySerializable implements HttpQueryContextInte
 	 * Override this method to provide a custom execution implementation.
 	 */
 	public function execute( array $input_variables ): array|WP_Error {
-		$query_runner = new QueryRunner( $this );
+		$query_runner = $this->config['query_runner'] ?? new QueryRunner();
 
-		return $query_runner->execute( $input_variables );
+		return $query_runner->execute( $this, $input_variables );
 	}
 
 	/**
@@ -126,5 +126,17 @@ class HttpQueryContext extends ArraySerializable implements HttpQueryContextInte
 	 */
 	protected static function get_config_schema(): array {
 		return ConfigSchemas::get_http_query_config_schema();
+	}
+
+	/**
+	 * Override this method to preprocess the response data before it is passed to
+	 * the response parser.
+	 *
+	 * @param array $response_data The raw deserialized response data.
+	 * @param array $input_variables The input variables for this query.
+	 * @return array Preprocessed response data.
+	 */
+	public function preprocess_response( array $response_data, array $input_variables ): array {
+		return $this->get_or_call_from_config( 'preprocess_response', $response_data, $input_variables ) ?? $response_data;
 	}
 }

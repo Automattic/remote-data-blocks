@@ -3,7 +3,9 @@
 namespace RemoteDataBlocks\ExampleApi;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
-use RemoteDataBlocks\ExampleApi\Queries\ExampleApiQuery;
+use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
+use RemoteDataBlocks\ExampleApi\Queries\ExampleApiQueryRunner;
+
 use function register_remote_data_block;
 use function register_remote_data_list_query;
 
@@ -31,11 +33,12 @@ class ExampleApi {
 
 		$data_source = HttpDataSource::from_array( [
 			'display_name' => 'Example API',
+			'endpoint' => 'https://example.com/api/v1', // dummy URL
 			'slug' => 'example-api',
 			'service' => 'example_api',
 		] );
 
-		$get_record_query = ExampleApiQuery::from_array( [
+		$get_record_query = HttpQueryContext::from_array( [
 			'data_source' => $data_source,
 			'input_schema' => [
 				'record_id' => [
@@ -68,9 +71,10 @@ class ExampleApi {
 				],
 			],
 			'query_name' => 'Get event',
+			'query_runner' => new ExampleApiQueryRunner(),
 		] );
 
-		$get_table_query = ExampleApiQuery::from_array( [
+		$get_table_query = HttpQueryContext::from_array( [
 			'data_source' => $data_source,
 			'input_schema' => [],
 			'output_schema' => [
@@ -101,6 +105,7 @@ class ExampleApi {
 			],
 			'query_key' => 'example_api_list_events',
 			'query_name' => 'List events',
+			'query_runner' => new ExampleApiQueryRunner(),
 		] );
 
 		register_remote_data_block( self::$block_name, $get_record_query );
