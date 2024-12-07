@@ -202,60 +202,6 @@ class BlockBindingsTest extends TestCase {
 	/**
 	 * @runInSeparateProcess
 	 */
-	public function test_execute_query_with_query_input_transformations(): void {
-		/**
-		 * Mock the QueryRunner to return a result.
-		 */
-		$mock_qr = new MockQueryRunner();
-		$mock_qr->addResult( 'output_field', 'Test Output Value' );
-
-		$block_context = [
-			'blockName' => self::MOCK_BLOCK_NAME,
-			'queryInput' => [
-				'test_input_field' => 'test_value',
-			],
-		];
-
-		$input_schema = [
-			'test_input_field' => [
-				'name' => 'Test Input Field',
-				'type' => 'string',
-				'transform' => function ( array $data ): string {
-					return $data['test_input_field'] . ' transformed';
-				},
-			],
-		];
-
-		$mock_block_config = [
-			'queries' => [
-				'__DISPLAY__' => new MockQueryContext(
-					$mock_qr,
-					$input_schema,
-					self::MOCK_OUTPUT_SCHEMA,
-				),
-			],
-		];
-
-		$mock_config_store = Mockery::namedMock( ConfigStore::class );
-		$mock_config_store->shouldReceive( 'get_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
-
-		$query_results = BlockBindings::execute_query( $block_context, self::MOCK_OPERATION_NAME );
-		$this->assertSame( $query_results, self::MOCK_OUTPUT_QUERY_RESULTS );
-
-		/**
-		 * Assert that the query runner received the correct input after transformations were applied.
-		 */
-		$this->assertSame( $mock_qr->getLastExecuteCallInput(), [
-			'test_input_field' => 'test_value transformed',
-		] );
-	}
-
-	/**
-	 * @runInSeparateProcess
-	 */
 	public function test_execute_query_with_query_input_transformed_with_multiple_inputs(): void {
 		/**
 		 * Mock the QueryRunner to return a result.
