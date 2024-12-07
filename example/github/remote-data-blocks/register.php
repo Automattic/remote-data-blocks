@@ -2,22 +2,119 @@
 
 namespace RemoteDataBlocks\Example\GitHub;
 
+use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Integrations\GitHub\GitHubDataSource;
 use RemoteDataBlocks\Logging\LoggerManager;
 
-require_once __DIR__ . '/inc/queries/class-github-get-file-as-html-query.php';
-require_once __DIR__ . '/inc/queries/class-github-list-files-query.php';
+require_once __DIR__ . '/github-query-runner.php';
 
-function register_github_file_as_html_block() {
-	$repo_owner = 'Automattic';
-	$repo_name = 'remote-data-blocks';
-	$branch = 'trunk';
+function register_github_file_as_html_block(): void {
+	$service_config = [
+		'repo_owner' => 'Automattic',
+		'repo_name' => 'remote-data-blocks',
+		'branch' => 'trunk',
+	];
 
-	$block_name = sprintf( 'GitHub File As HTML (%s/%s)', $repo_owner, $repo_name );
+	$block_name = sprintf( 'GitHub File As HTML (%s/%s)', $service_config['repo_owner'], $service_config['repo_name'] );
+	$file_extension = '.md';
 
-	$github_data_source = GitHubDataSource::create( $repo_owner, $repo_name, $branch );
-	$github_get_file_as_html_query = new GitHubGetFileAsHtmlQuery( $github_data_source, '.md' );
-	$github_get_list_files_query = new GitHubListFilesQuery( $github_data_source, '.md' );
+	$github_data_source = GitHubDataSource::create(
+		$service_config,
+		[
+			'request_headers' => [
+				'Accept' => 'application/vnd.github.html+json',
+			],
+		],
+	);
+
+	$github_get_file_as_html_query = HttpQueryContext::from_array( [
+		'data_source' => $github_data_source,
+		'endpoint' => function ( array $input_variables ) use ( $service_config ): string {
+			return sprintf(
+				'https://api.github.com/repos/%s/%s/contents/%s?ref=%s',
+				$service_config['repo_owner'],
+				$service_config['repo_name'],
+				$input_variables['file_path'],
+				$service_config['branch']
+			);
+		},
+		'input_schema' => [
+			'file_path' => [
+				'name' => 'File Path',
+				'type' => 'string',
+				'overrides' => [
+					[
+						'target' => 'utm_content',
+						'type' => 'url',
+					],
+				],
+			],
+		],
+		'output_schema' => [
+			'is_collection' => false,
+			'type' => [
+				'file_content' => [
+					'name' => 'File Content',
+					'path' => '$.content',
+					'type' => 'html',
+				],
+				'file_path' => [
+					'name' => 'File Path',
+					'path' => '$.path',
+					'type' => 'string',
+				],
+			],
+		],
+		'query_name' => 'Get file as HTML',
+		'query_runner' => new GitHubQueryRunner( $file_extension ),
+	] );
+
+	$github_get_list_files_query = HttpQueryContext::from_array( [
+		'data_source' => $github_data_source,
+		'endpoint' => function ( array $input_variables ) use ( $service_config ): string {
+			return sprintf(
+				'https://api.github.com/repos/%s/%s/contents/%s?ref=%s',
+				$service_config['repo_owner'],
+				$service_config['repo_name'],
+				$input_variables['file_path'],
+				$service_config['branch']
+			);
+		},
+		'input_schema' => [
+			'file_extension' => [
+				'name' => 'File Extension',
+				'type' => 'string',
+			],
+		],
+		'output_schema' => [
+			'is_collection' => true,
+			'path' => sprintf( '$.tree[?(@.path =~ /\\.%s$/)]', ltrim( $file_extension, '.' ) ),
+			'type' => [
+				'file_path' => [
+					'name' => 'File Path',
+					'path' => '$.path',
+					'type' => 'string',
+				],
+				'sha' => [
+					'name' => 'SHA',
+					'path' => '$.sha',
+					'type' => 'string',
+				],
+				'size' => [
+					'name' => 'Size',
+					'path' => '$.size',
+					'type' => 'integer',
+				],
+				'url' => [
+					'name' => 'URL',
+					'path' => '$.url',
+					'type' => 'string',
+				],
+			],
+		],
+		'query_name' => 'List files',
+		'query_runner' => new GitHubQueryRunner( $file_extension ),
+	] );
 
 	register_remote_data_block( $block_name, $github_get_file_as_html_query );
 	register_remote_data_list_query( $block_name, $github_get_list_files_query );

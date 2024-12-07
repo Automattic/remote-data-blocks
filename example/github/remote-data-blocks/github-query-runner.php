@@ -2,20 +2,32 @@
 
 namespace RemoteDataBlocks\Example\GitHub;
 
-use RemoteDataBlocks\Config\DataSource\HttpDataSource;
-use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
-use RemoteDataBlocks\Integrations\GitHub\GitHubDataSource;
+use RemoteDataBlocks\Config\QueryContext\HttpQueryContextInterface;
+use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
+use WP_Error;
 
-class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
+defined( 'ABSPATH' ) || exit();
+
+/**
+ * Custom query runner that process custom processing for GitHub API responses
+ * that return HTML / Markdown instead of JSON. This also provides custom
+ * processing to adjust embedded links.
+ *
+ * Data fetching and caching is still delegated to the parent QueryRunner class.
+ */
+class GitHubQueryRunner extends QueryRunner {
 	/**
 	 * @inheritDoc
 	 * @param string|null $default_file_extension Optional file extension to append if missing (e.g., '.md')
 	 */
-	public function __construct(
-		private HttpDataSource $data_source,
-		private ?string $default_file_extension = null
-	) {
-		parent::__construct( $data_source );
+	public function __construct( private ?string $default_file_extension = null ) {
+		parent::__construct();
+	}
+
+	public function execute( HttpQueryContextInterface $query, array $input_variables ): array|WP_Error {
+		$input_variables['file_path'] = $this->ensure_file_extension( $input_variables['file_path'] );
+
+		return parent::execute( $query, $input_variables );
 	}
 
 	private function ensure_file_extension( string $file_path ): string {
@@ -26,72 +38,21 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 		return str_ends_with( $file_path, $this->default_file_extension ) ? $file_path : $file_path . $this->default_file_extension;
 	}
 
-	public function get_input_schema(): array {
-		return [
-			'file_path' => [
-				'name' => 'File Path',
-				'type' => 'string',
-				'overrides' => [
-					[
-						'target' => 'utm_content',
-						'type' => 'url',
-					],
-				],
-				'transform' => function ( array $data ): string {
-					return $this->ensure_file_extension( $data['file_path'] );
-				},
-			],
-		];
-	}
-
-	public function get_output_schema(): array {
-		return [
-			'is_collection' => false,
-			'mappings' => [
-				'file_content' => [
-					'name' => 'File Content',
-					'path' => '$.content',
-					'type' => 'html',
-				],
-				'file_path' => [
-					'name' => 'File Path',
-					'path' => '$.path',
-					'type' => 'string',
-				],
-			],
-		];
-	}
-
-	public function get_endpoint( array $input_variables ): string {
-		/** @var GitHubDataSource $data_source */
-		$data_source = $this->get_data_source();
-
-		return sprintf(
-			'https://api.github.com/repos/%s/%s/contents/%s?ref=%s',
-			$data_source->get_repo_owner(),
-			$data_source->get_repo_name(),
-			$input_variables['file_path'],
-			$data_source->get_ref()
-		);
-	}
-
-	public function get_request_headers( array $input_variables ): array {
-		return [
-			'Accept' => 'application/vnd.github.html+json',
-		];
-	}
-
-	public function process_response( string $html_response_data, array $input_variables ): array {
-		$content = $html_response_data;
-		$file_path = $input_variables['file_path'];
-		if ( '.md' === $this->default_file_extension ) {
-			$content = $this->update_markdown_links( $content, $file_path );
-		}
+	protected function deserialize_response( string $html_response ): array {
+		$content = $html_response;
 
 		return [
 			'content' => $content,
-			'file_path' => $file_path,
 		];
+	}
+
+	protected function preprocess_response( array $response, array $input_variables ): array {
+		$file_path = $input_variables['file_path'];
+		if ( '.md' === $this->default_file_extension ) {
+			$response['content'] = $this->update_markdown_links( $response['content'], $file_path );
+		}
+
+		return array_merge( $response, [ 'file_path' => $file_path ] );
 	}
 
 	/**
