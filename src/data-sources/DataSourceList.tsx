@@ -1,6 +1,5 @@
 import { __experimentalConfirmDialog as ConfirmDialog, Placeholder } from '@wordpress/components';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { DataViews, filterSortAndPaginate, View } from '@wordpress/dataviews';
+import { DataViews, filterSortAndPaginate, View } from '@wordpress/dataviews/wp';
 import { useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { info } from '@wordpress/icons';
