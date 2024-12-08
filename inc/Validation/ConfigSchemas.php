@@ -76,8 +76,8 @@ final class ConfigSchemas {
 					Types::record( Types::string(), Types::string() ),
 				)
 			),
-			'service' => Types::string(),
-			'service_schema_version' => Types::integer(),
+			'service' => Types::nullable( Types::string() ),
+			'service_schema_version' => Types::nullable( Types::integer() ),
 			'slug' => Types::string_matching( '/^[a-z0-9-]+$/' ),
 			'uuid' => Types::nullable( Types::uuid() ),
 		] );

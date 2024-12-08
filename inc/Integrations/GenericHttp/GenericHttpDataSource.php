@@ -4,53 +4,57 @@ namespace RemoteDataBlocks\Integrations\GenericHttp;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Validation\Types;
+use RemoteDataBlocks\Validation\Validator;
+use WP_Error;
 
 class GenericHttpDataSource extends HttpDataSource {
 	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE;
 	protected const SERVICE_SCHEMA_VERSION = 1;
 
-	protected const SERVICE_SCHEMA = Types::object( [
-		'service' => Types::const( REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE ),
-		'service_schema_version' => Types::const( self::SERVICE_SCHEMA_VERSION ),
-		'auth' => Types::object( [
-			'type' => Types::enum( 'basic', 'bearer', 'api-key', 'none' ),
-			'value' => Types::string( /* TODO sanitize: false? */ ),
-			'key' => Types::nullable( Types::string( /* TODO sanitize: false? */ ) ),
-			'add_to' => Types::nullable( Types::enum( 'header', 'query' ) ),
-		] ),
-		'url' => Types::url(),
-	] );
+	public static function create( array $service_config, array $config_overrides = [] ): self|WP_Error {
+		$validator = new Validator( self::get_service_config_schema() );
+		$validated = $validator->validate( $service_config );
 
-	public function get_display_name(): string {
-		return 'HTTP Connection (' . $this->config['slug'] . ')';
+		if ( is_wp_error( $validated ) ) {
+			return $validated;
+		}
+
+		return self::from_array(
+			array_merge(
+				[
+					'display_name' => sprintf( 'HTTP Connection (%s)', $service_config['slug'] ),
+					'endpoint' => $service_config['url'],
+					'service' => REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE,
+					'service_config' => $service_config,
+					'slug' => $service_config['slug'],
+				],
+				$config_overrides
+			)
+		);
 	}
 
-	public function get_endpoint(): string {
-		return $this->config['url'];
-	}
-
-	public function get_request_headers(): array {
-		return [
-			'Accept' => 'application/json',
-		];
-	}
-
-	public static function create( string $url, string $auth, string $display_name ): self {
-		return parent::from_array([
-			'service' => REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE,
-			'url' => $url,
-			'auth' => $auth,
-			'slug' => sanitize_title( $display_name ),
-		]);
+	private static function get_service_config_schema(): array {
+		return Types::object( [
+			'auth' => Types::nullable(
+				Types::object( [
+					'add_to' => Types::nullable( Types::enum( 'header', 'query' ) ),
+					'key' => Types::nullable( Types::unsanitizable( Types::string() ) ),
+					'type' => Types::enum( 'basic', 'bearer', 'api-key', 'none' ),
+					'value' => Types::unsanitizable( Types::string() ),
+				] )
+			),
+			'slug' => Types::string(),
+			'url' => Types::url(),
+		] );
 	}
 
 	public function to_ui_display(): array {
-		return [
-			'slug' => $this->get_slug(),
-			'service' => REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE,
-			'url' => $this->config['url'],
-			'auth_type' => $this->config['auth']['type'],
-			'uuid' => $this->config['uuid'] ?? null,
-		];
+		return array_merge(
+			parent::to_ui_display(),
+			[
+				'auth_type' => $this->config['service_config']['auth']['type'] ?? null,
+				'url' => $this->get_endpoint(),
+			]
+		);
 	}
 }
