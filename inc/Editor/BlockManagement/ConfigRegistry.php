@@ -114,11 +114,11 @@ class ConfigRegistry {
 			}
 		}
 
-		foreach ( $user_config['patterns'] as $pattern ) {
+		foreach ( $user_config['patterns'] ?? [] as $pattern ) {
 			$parsed_blocks = parse_blocks( $pattern['html'] );
 			$parsed_blocks = BlockPatterns::add_block_arg_to_bindings( $block_name, $parsed_blocks );
 			$pattern_content = serialize_blocks( $parsed_blocks );
-			
+
 			$pattern_name = self::register_block_pattern( $block_name, $pattern['title'], $pattern_content );
 
 			// If the pattern role is specified and recognized, add it to the block configuration.
