@@ -34,7 +34,7 @@ class Sanitizer implements SanitizerInterface {
 		}
 
 		if ( Types::is_primitive( $type ) ) {
-			return $this->sanitize_primitive_type( Types::get_type_name( $type ), $value );
+			return self::sanitize_primitive_type( Types::get_type_name( $type ), $value );
 		}
 
 		return $this->sanitize_non_primitive_type( $type, $value );
@@ -98,7 +98,7 @@ class Sanitizer implements SanitizerInterface {
 		}
 	}
 
-	private function sanitize_primitive_type( string $type_name, mixed $value ): mixed {
+	public static function sanitize_primitive_type( string $type_name, mixed $value ): mixed {
 		// Not all types support sanitization. We sanitize what we can.
 		switch ( $type_name ) {
 			case 'boolean':
@@ -113,14 +113,18 @@ class Sanitizer implements SanitizerInterface {
 			case 'string':
 				return sanitize_text_field( strval( $value ) );
 
-			case 'base64_string':
 			case 'html':
 			case 'id':
 			case 'image_alt':
 			case 'json_path':
-			case 'price':
 			case 'uuid':
 				return strval( $value );
+
+			case 'base64_string':
+				return base64_decode( $value );
+
+			case 'price':
+				return sprintf( '$%s', number_format( (float) $value, 2 ) );
 
 			case 'email_address':
 				return sanitize_email( $value );
