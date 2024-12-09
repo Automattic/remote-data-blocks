@@ -140,7 +140,7 @@ final class ConfigSchemas {
 					'name' => Types::nullable( Types::string() ),
 					'path' => Types::nullable( Types::json_path() ),
 					'type' => Types::one_of(
-						Types::enum( 'base64_string', 'boolean', 'image_alt', 'image_url', 'integer', 'price', 'string' ),
+						Types::enum( 'base64_string', 'boolean', 'id', 'image_alt', 'image_url', 'integer', 'price', 'string' ),
 						Types::record( Types::string(), Types::use_ref( 'FIELD_SCHEMA' ) ), // Nested schema!
 					),
 				] ),

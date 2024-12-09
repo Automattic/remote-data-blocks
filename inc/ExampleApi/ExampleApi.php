@@ -69,6 +69,7 @@ class ExampleApi {
 					],
 				],
 			],
+			'query_key' => 'example_api_get_event',
 			'query_name' => 'Get event',
 			'query_runner' => new ExampleApiQueryRunner(),
 		] );
