@@ -5,6 +5,7 @@ import { chevronDown } from '@wordpress/icons';
 import { SUPPORTED_SERVICES_LABELS } from '../constants';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import AirtableIcon from '@/settings/icons/AirtableIcon';
+import SalesforceCommerceB2CIcon from '@/settings/icons/SalesforceCommerceB2CIcon';
 import GoogleSheetsIcon from '@/settings/icons/GoogleSheetsIcon';
 import HttpIcon from '@/settings/icons/HttpIcon';
 import ShopifyIcon from '@/settings/icons/ShopifyIcon';
@@ -51,7 +52,7 @@ export const AddDataSourceDropdown = () => {
 							value: 'shopify',
 						},
 						{
-							icon: HttpIcon,
+							icon: SalesforceCommerceB2CIcon,
 							label: SUPPORTED_SERVICES_LABELS[ 'salesforce-b2c' ],
 							value: 'salesforce-b2c',
 						},
