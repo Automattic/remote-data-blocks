@@ -15,7 +15,7 @@ function register_github_file_as_html_block() {
 
 	$block_name = sprintf( 'GitHub File As HTML (%s/%s)', $repo_owner, $repo_name );
 
-	$github_data_source = GitHubDataSource::create( $repo_owner, $repo_name, $branch );
+	$github_data_source = GitHubDataSource::create( $repo_owner, $repo_name, $branch, '37fb2ac2-2399-4095-94d4-d58037d66c61' );
 	$github_get_file_as_html_query = new GitHubGetFileAsHtmlQuery( $github_data_source, '.md' );
 	$github_get_list_files_query = new GitHubListFilesQuery( $github_data_source, '.md' );
 

@@ -8,7 +8,7 @@ require_once __DIR__ . '/inc/queries/class-art-institute-search-query.php';
 
 function register_aic_block() {
 	$aic_data_source = ArtInstituteOfChicagoDataSource::from_array( [
-		'slug' => 'art-institute-of-chicago',
+		'uuid' => '7c979e0d-67ca-44f8-a835-3c6fbf0f01d0',
 		'service' => 'art-institute-of-chicago',
 	] );
 
