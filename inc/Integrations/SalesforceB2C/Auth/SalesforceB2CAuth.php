@@ -10,6 +10,7 @@ use WP_Error;
  * This class is used to authenticate with Salesforce B2C using a client ID and secret.
  */
 class SalesforceB2CAuth {
+
 	/**
 	 * Generate a token from a client ID and secret, or use an existing token if available.
 	 *
@@ -55,7 +56,7 @@ class SalesforceB2CAuth {
 		$client_auth_url = sprintf( '%s/shopper/auth/v1/organizations/%s/oauth2/token', $endpoint, $organization_id );
 		$client_credentials = base64_encode( sprintf( '%s:%s', $client_id, $client_secret ) );
 
-		$client_auth_response = wp_remote_post( $client_auth_url, [
+		$client_auth_response = wp_remote_post($client_auth_url, [
 			'body' => [
 				'grant_type' => 'client_credentials',
 				'channel_id' => 'RefArch',
@@ -110,7 +111,7 @@ class SalesforceB2CAuth {
 		// Even though we're using a refresh token, authentication is still required to receive a new secret
 		$client_credentials = base64_encode( sprintf( '%s:%s', $client_id, $client_secret ) );
 
-		$client_auth_response = wp_remote_post( $client_auth_url, [
+		$client_auth_response = wp_remote_post($client_auth_url, [
 			'body' => [
 				'grant_type' => 'refresh_token',
 				'refresh_token' => $refresh_token,
@@ -201,7 +202,7 @@ class SalesforceB2CAuth {
 			'expires_at' => time() + $refresh_token_expires_in,
 		];
 
-		$refresh_token_cache_key = self::get_refresh_token_key( $organization_id, $client_id );
+		$refresh_token_cache_key = self::get_refresh_token_cache_key( $organization_id, $client_id );
 
 		wp_cache_set(
 			$refresh_token_cache_key,
@@ -213,7 +214,7 @@ class SalesforceB2CAuth {
 	}
 
 	private static function get_saved_refresh_token( string $organization_id, string $client_id ): ?string {
-		$refresh_token_cache_key = self::get_refresh_token_key( $organization_id, $client_id );
+		$refresh_token_cache_key = self::get_refresh_token_cache_key( $organization_id, $client_id );
 
 		$saved_refresh_token = wp_cache_get( $refresh_token_cache_key, 'oauth-tokens' );
 
@@ -232,7 +233,7 @@ class SalesforceB2CAuth {
 		return $refresh_token;
 	}
 
-	private static function get_refresh_token_key( string $organization_id, string $client_id ): string {
+	private static function get_refresh_token_cache_key( string $organization_id, string $client_id ): string {
 		$cache_key_suffix = hash( 'sha256', sprintf( '%s-%s', $organization_id, $client_id ) );
 		return sprintf( 'salesforce_b2c_refresh_token_%s', $cache_key_suffix );
 	}
