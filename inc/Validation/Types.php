@@ -18,7 +18,7 @@ final class Types {
 	private const NULLABLE_PROP = '@nullable';
 	private const PRIMITIVE_PROP = '@primitive';
 	private const REF_PROP = '@ref';
-	private const SANITIZABLE_PROP = '@unsanitizable';
+	private const SANITIZE_PROP = '@sanitize';
 	private const SERIALIZABLE_PROP = '@serializable';
 	private const TYPE_PROP = '@type';
 
@@ -102,13 +102,17 @@ final class Types {
 
 	/**
 	 * Data is sanitized by default according to its type (e.g., data with a string
-	 * type is passed through `sanitize_text_field`. This transformation is used
-	 * to exempt a type from sanitization.
+	 * type is passed through `sanitize_text_field`). This transformation is used
+	 * to exempt a primitive type from sanitization.
 	 */
-	public static function unsanitizable( array $type ): array {
+	public static function skip_sanitize( array $type ): array {
 		self::check_type( $type );
 
-		return array_merge( $type, [ self::SANITIZABLE_PROP => false ] );
+		if ( ! self::is_primitive( $type ) ) {
+			throw new \InvalidArgumentException( 'Sanitization can only be skipped for primitive types.' );
+		}
+
+		return array_merge( $type, [ self::SANITIZE_PROP => false ] );
 	}
 
 
@@ -270,7 +274,7 @@ final class Types {
 	public static function is_sanitizable( array $type ): bool {
 		self::check_type( $type );
 
-		return $type[ self::SANITIZABLE_PROP ] ?? true;
+		return $type[ self::SANITIZE_PROP ] ?? true;
 	}
 
 	public static function is_serializable( array $type ): bool {

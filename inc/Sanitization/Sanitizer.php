@@ -52,7 +52,7 @@ class Sanitizer implements SanitizerInterface {
 				}
 
 				$member_type = Types::get_type_args( $type );
-				return array_map( function ( mixed $item ) use ( $member_type ): bool {
+				return array_map( function ( mixed $item ) use ( $member_type ): mixed {
 					return $this->sanitize_type( $member_type, $item );
 				}, $value );
 
