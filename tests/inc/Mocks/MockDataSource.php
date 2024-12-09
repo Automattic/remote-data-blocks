@@ -3,10 +3,11 @@
 namespace RemoteDataBlocks\Tests\Mocks;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use RemoteDataBlocks\Tests\Mocks\MockValidator;
 
 class MockDataSource extends HttpDataSource {
-	private $endpoint = 'https://example.com/api';
-	private $headers = [ 'Content-Type' => 'application/json' ];
+	private string $endpoint = 'https://example.com/api';
+	private array $headers = [ 'Content-Type' => 'application/json' ];
 
 	public const MOCK_CONFIG = [
 		'uuid' => 'e3458c42-4cf4-4214-aaf6-3628e33ed07a',
@@ -23,6 +24,10 @@ class MockDataSource extends HttpDataSource {
 			],
 		],
 	];
+
+	public static function create(): static {
+		return self::from_array( self::MOCK_CONFIG, new MockValidator() );
+	}
 
 	public function get_display_name(): string {
 		return 'Mock Data Source';
