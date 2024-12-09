@@ -39,13 +39,17 @@ final class Types {
 		return self::generate_primitive_type( 'null' );
 	}
 
+	public static function number(): array {
+		return self::generate_primitive_type( 'number' );
+	}
+
 	public static function string(): array {
 		return self::generate_primitive_type( 'string' );
 	}
 
 
 	public static function base64_string(): array {
-		return self::generate_primitive_type( 'base64' );
+		return self::generate_primitive_type( 'base64_string' );
 	}
 
 	public static function email_address(): array {

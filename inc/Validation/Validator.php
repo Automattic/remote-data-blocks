@@ -15,7 +15,7 @@ final class Validator implements ValidatorInterface {
 	/**
 	 * @inheritDoc
 	 */
-	public function validate( array $data ): bool|WP_Error {
+	public function validate( mixed $data ): bool|WP_Error {
 		$base_validation = $this->check_type( $this->schema, $data );
 
 		if ( is_wp_error( $base_validation ) ) {
@@ -49,44 +49,80 @@ final class Validator implements ValidatorInterface {
 		return $this->check_non_primitive_type( $type, $value );
 	}
 
-	private function check_non_primitive_type( array $type, mixed $value ): bool|WP_Error {
+	/**
+	 * Validate a non-primitive value against a schema. This method returns true
+	 * or a WP_Error object. Never check the return value for truthiness; either
+	 * return the value directly or check it with is_wp_error().
+	 *
+	 * @param array<string, mixed> $type The schema type to validate against.
+	 * @param mixed $value The value to validate.
+	 * @return bool|WP_Error Returns true if the data is valid, otherwise a WP_Error.
+	 */
+	private function check_non_primitive_type( array $type, mixed $value ): true|WP_Error {
 		switch ( Types::get_type_name( $type ) ) {
+			case 'callable':
+				if ( is_callable( $value ) ) {
+					return true;
+				}
+
+				return $this->create_error( 'Value must be callable', $value );
+
 			case 'const':
-				return Types::get_type_args( $type ) === $value;
+				if ( Types::get_type_args( $type ) === $value ) {
+					return true;
+				}
+
+				return $this->create_error( 'Value must be the constant', $value );
 
 			case 'enum':
-				return in_array( $value, Types::get_type_args( $type ), true );
+				if ( in_array( $value, Types::get_type_args( $type ), true ) ) {
+					return true;
+				}
+
+				return $this->create_error( 'Value must be one of the enumerated values', $value );
 
 			case 'instance_of':
-				return is_a( $value, Types::get_type_args( $type ) );
+				if ( is_a( $value, Types::get_type_args( $type ) ) ) {
+					return true;
+				}
+
+				return $this->create_error( 'Value must be an instance of the specified class', $value );
 
 			case 'list_of':
 				if ( ! is_array( $value ) || ! array_is_list( $value ) ) {
-					return $this->create_error( 'Value must be an array', $value );
+					return $this->create_error( 'Value must be a non-associative array', $value );
 				}
 
 				$member_type = Types::get_type_args( $type );
-				return array_reduce( $value, function ( bool $carry, mixed $item ) use ( $member_type ): bool {
-					return $carry && $this->check_type( $member_type, $item );
-				}, true );
+
+				foreach ( $value as $item ) {
+					$validated = $this->check_type( $member_type, $item );
+					if ( is_wp_error( $validated ) ) {
+						return $this->create_error( 'Value must be a list of the specified type', $item, $validated );
+					}
+				}
+
+				return true;
 
 			case 'one_of':
 				foreach ( Types::get_type_args( $type ) as $member_type ) {
-					if ( $this->check_type( $member_type, $value ) ) {
+					if ( true === $this->check_type( $member_type, $value ) ) {
 						return true;
 					}
 				}
 
-				return $this->create_error( 'Value must be one of the specified types.', $value );
+				return $this->create_error( 'Value must be one of the specified types', $value );
 
 			case 'object':
 				if ( ! $this->check_iterable_object( $value ) ) {
-					return $this->create_error( 'Value must be an object or associative array', $value );
+					return $this->create_error( 'Value must be an associative array', $value );
 				}
 
-				foreach ( Types::get_type_args( $type ) as $key => $value_type ) {
-					if ( ! $this->check_type( $value_type, $this->get_object_key( $value, $key ) ) ) {
-						return $this->create_error( 'Object must have valid field', $value_type );
+				foreach ( Types::get_type_args( $type ) as $key => $property_type ) {
+					$property_value = $this->get_object_key( $value, $key );
+					$validated = $this->check_type( $property_type, $property_value );
+					if ( is_wp_error( $validated ) ) {
+						return $this->create_error( 'Object must have valid property', $key, $validated );
 					}
 				}
 
@@ -94,7 +130,7 @@ final class Validator implements ValidatorInterface {
 
 			case 'record':
 				if ( ! $this->check_iterable_object( $value ) ) {
-					return $this->create_error( 'Value must be an object or associative array', $value );
+					return $this->create_error( 'Value must be an associative array', $value );
 				}
 
 				$type_args = Types::get_type_args( $type );
@@ -102,11 +138,13 @@ final class Validator implements ValidatorInterface {
 				$value_type = $type_args[1];
 
 				foreach ( $value as $key => $record_value ) {
-					if ( ! $this->check_type( $key_type, $key ) ) {
+					$validated = $this->check_type( $key_type, $key );
+					if ( is_wp_error( $validated ) ) {
 						return $this->create_error( 'Record must have valid key', $key );
 					}
 
-					if ( ! $this->check_type( $value_type, $record_value ) ) {
+					$validated = $this->check_type( $value_type, $record_value );
+					if ( is_wp_error( $validated ) ) {
 						return $this->create_error( 'Record must have valid value', $record_value );
 					}
 				}
@@ -118,10 +156,15 @@ final class Validator implements ValidatorInterface {
 
 			case 'string_matching':
 				$regex = Types::get_type_args( $type );
-				return $this->check_primitive_type( 'string', $value ) && $this->check_primitive_type( 'string', $regex ) && preg_match( $regex, $value );
+
+				if ( $this->check_primitive_type( 'string', $value ) && $this->check_primitive_type( 'string', $regex ) && preg_match( $regex, $value ) ) {
+					return true;
+				}
+
+				return $this->create_error( 'Value must match the specified regex', $value );
 
 			default:
-				return false;
+				return $this->create_error( 'Unknown type', Types::get_type_name( $type ) );
 		}
 	}
 
@@ -129,8 +172,6 @@ final class Validator implements ValidatorInterface {
 		switch ( $type_name ) {
 			case 'boolean':
 				return is_bool( $value );
-			case 'callable':
-				return is_callable( $value );
 			case 'integer':
 				return is_int( $value );
 			case 'null':
@@ -159,7 +200,7 @@ final class Validator implements ValidatorInterface {
 
 			case 'image_url':
 			case 'url':
-				return filter_var( $value, FILTER_VALIDATE_URL );
+				return false !== filter_var( $value, FILTER_VALIDATE_URL );
 
 			case 'uuid':
 				return wp_is_uuid( $value );
@@ -178,9 +219,10 @@ final class Validator implements ValidatorInterface {
 		return is_object( $value ) || ( is_array( $value ) && ! array_is_list( $value ) );
 	}
 
-	private function create_error( string $message, mixed $value, int $status = 400 ): WP_Error {
-		$message = sprintf( '%s: %o', esc_html( $message ), $value );
-		return new WP_Error( 'invalid_type', $message, [ 'status' => $status ] );
+	private function create_error( string $message, mixed $value, ?WP_Error $child_error = null ): WP_Error {
+		$serialized_value = is_string( $value ) ? $value : wp_json_encode( $value );
+		$message = sprintf( '%s: %s', esc_html( $message ), $serialized_value );
+		return new WP_Error( 'invalid_type', $message, [ 'child' => $child_error ] );
 	}
 
 	private function get_object_key( mixed $data, string $key ): mixed {
