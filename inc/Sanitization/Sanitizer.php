@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Sanitization;
 
 use RemoteDataBlocks\Validation\Types;
+use RemoteDataBlocks\Validation\Validator;
 
 /**
  * Sanitizer class.
@@ -57,7 +58,7 @@ class Sanitizer implements SanitizerInterface {
 				}, $value );
 
 			case 'object':
-				if ( ! $this->check_iterable_object( $value ) ) {
+				if ( ! Validator::check_iterable_object( $value ) ) {
 					return [];
 				}
 
@@ -69,7 +70,7 @@ class Sanitizer implements SanitizerInterface {
 				return $sanitized_object;
 
 			case 'record':
-				if ( ! $this->check_iterable_object( $value ) ) {
+				if ( ! Validator::check_iterable_object( $value ) ) {
 					return [];
 				}
 
@@ -136,15 +137,6 @@ class Sanitizer implements SanitizerInterface {
 			default:
 				return $value;
 		}
-	}
-
-	/*
-	 * While an "object" in name, we expect this type to be implemented as an
-	 * associative array since this is typically how humans represent objects in
-	 * literal PHP code.
-	 */
-	private function check_iterable_object( mixed $value ): bool {
-		return is_object( $value ) || ( is_array( $value ) && ! array_is_list( $value ) );
 	}
 
 	private function get_object_key( mixed $data, string $key ): mixed {

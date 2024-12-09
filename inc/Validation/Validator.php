@@ -124,7 +124,7 @@ final class Validator implements ValidatorInterface {
 				return $this->create_error( 'Value must be one of the specified types', $value );
 
 			case 'object':
-				if ( ! $this->check_iterable_object( $value ) ) {
+				if ( ! self::check_iterable_object( $value ) ) {
 					return $this->create_error( 'Value must be an associative array', $value );
 				}
 
@@ -139,7 +139,7 @@ final class Validator implements ValidatorInterface {
 				return true;
 
 			case 'record':
-				if ( ! $this->check_iterable_object( $value ) ) {
+				if ( ! self::check_iterable_object( $value ) ) {
 					return $this->create_error( 'Value must be an associative array', $value );
 				}
 
@@ -225,8 +225,8 @@ final class Validator implements ValidatorInterface {
 	 * associative array since this is typically how humans represent objects in
 	 * literal PHP code.
 	 */
-	private function check_iterable_object( mixed $value ): bool {
-		return is_object( $value ) || ( is_array( $value ) && ! array_is_list( $value ) );
+	public static function check_iterable_object( mixed $value ): bool {
+		return is_object( $value ) || ( is_array( $value ) && ! array_is_list( $value ) && ! empty( $value ) );
 	}
 
 	private function create_error( string $message, mixed $value, ?WP_Error $child_error = null ): WP_Error {
