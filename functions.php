@@ -14,8 +14,8 @@ use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
  *
  * @param array<string, mixed> $block_config The block configuration.
  */
-function register_remote_data_block( array $block_config ): void {
-	ConfigRegistry::register_block( $block_config );
+function register_remote_data_block( array $block_config ): true|WP_Error {
+	return ConfigRegistry::register_block( $block_config );
 }
 
 /**
@@ -24,6 +24,6 @@ function register_remote_data_block( array $block_config ): void {
  * @param string $block_name The block name.
  * @param string $slug       The page slug.
  */
-function register_remote_data_page( string $block_name, string $slug, array $options = [] ): void {
-	ConfigRegistry::register_page( $block_name, $slug, $options );
+function register_remote_data_page( string $block_name, string $slug, array $options = [] ): true|WP_Error {
+	return ConfigRegistry::register_page( $block_name, $slug, $options );
 }

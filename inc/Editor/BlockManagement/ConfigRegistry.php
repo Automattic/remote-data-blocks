@@ -25,9 +25,9 @@ class ConfigRegistry {
 		ConfigStore::init( self::$logger );
 	}
 
-	public static function register_block( array $user_config = [] ): bool|WP_Error {
+	public static function register_block( array $user_config = [] ): true|WP_Error {
 		$schema = ConfigSchemas::get_remote_data_block_config_schema();
-		$validator = new Validator( $schema );
+		$validator = new Validator( $schema, static::class );
 		$validated = $validator->validate( $user_config );
 
 		if ( is_wp_error( $validated ) ) {
