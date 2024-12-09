@@ -4,10 +4,12 @@ namespace RemoteDataBlocks\Editor\BlockManagement;
 
 defined( 'ABSPATH' ) || exit();
 
-use RemoteDataBlocks\Config\QueryContext\QueryContextInterface;
 use RemoteDataBlocks\Logging\LoggerManager;
 use Psr\Log\LoggerInterface;
 use RemoteDataBlocks\Editor\BlockPatterns\BlockPatterns;
+use RemoteDataBlocks\Validation\ConfigSchemas;
+use RemoteDataBlocks\Validation\Validator;
+use WP_Error;
 
 use function get_page_by_path;
 use function parse_blocks;
@@ -23,18 +25,31 @@ class ConfigRegistry {
 		ConfigStore::init( self::$logger );
 	}
 
-	public static function register_block( string $block_title, QueryContextInterface $display_query, array $options = [] ): void {
-		$block_name = ConfigStore::get_block_name( $block_title );
-		if ( ConfigStore::is_registered_block( $block_name ) ) {
-			self::$logger->error( sprintf( 'Block %s has already been registered', $block_name ) );
-			return;
+	public static function register_block( array $user_config = [] ): bool|WP_Error {
+		$schema = ConfigSchemas::get_remote_data_block_config_schema();
+		$validator = new Validator( $schema );
+		$validated = $validator->validate( $user_config );
+
+		if ( is_wp_error( $validated ) ) {
+			return $validated;
 		}
 
+		$block_title = $user_config['title'];
+		$block_name = ConfigStore::get_block_name( $block_title );
+		if ( ConfigStore::is_registered_block( $block_name ) ) {
+			$error_message = sprintf( 'Block %s has already been registered', $block_name );
+			self::$logger->error( $error_message );
+			return new WP_Error( 'block_already_registered', $error_message );
+		}
+
+		$display_query = $user_config['queries']['display'];
 		$input_schema = $display_query->get_input_schema();
+		$output_schema = $display_query->get_output_schema();
+
 		$config = [
 			'description' => '',
 			'name' => $block_name,
-			'loop' => $options['loop'] ?? false,
+			'loop' => $output_schema['is_collection'] ?? false,
 			'patterns' => [],
 			'queries' => [
 				'__DISPLAY__' => $display_query,
@@ -58,49 +73,84 @@ class ConfigRegistry {
 			'title' => $block_title,
 		];
 
-		ConfigStore::set_block_configuration( $block_name, $config );
-	}
+		// Register "selectors" which allow the user to use a query to assist in
+		// selecting data for display by the block.
+		foreach ( [ 'list', 'search' ] as $from_query_type ) {
+			if ( isset( $user_config['queries'][ $from_query_type ] ) ) {
+				$to_query = $display_query;
+				$from_query = $user_config['queries'][ $from_query_type ];
+				$from_query_key = $from_query->get_query_key();
 
-	public static function register_loop_block( string $block_title, QueryContextInterface $display_query ): void {
-		self::register_block( $block_title, $display_query, [ 'loop' => true ] );
-	}
+				$config['queries'][ $from_query_key ] = $from_query;
 
-	public static function register_block_pattern( string $block_title, string $pattern_title, string $pattern_content, array $pattern_options = [] ): void {
-		$block_name = ConfigStore::get_block_name( $block_title );
-		$config = ConfigStore::get_block_configuration( $block_name );
+				$input_schema = $from_query->get_input_schema();
+				$output_schema = $from_query->get_output_schema();
 
-		if ( null === $config ) {
-			return;
+				foreach ( array_keys( $to_query->get_input_schema() ) as $to ) {
+					if ( ! isset( $output_schema['type'][ $to ] ) ) {
+						$error_message = sprintf( 'Cannot map key "%s" from query "%s"', esc_html( $to ), $from_query_key );
+						self::$logger->error( $error_message );
+						return new WP_Error( 'invalid_query_mapping', $error_message );
+					}
+				}
+
+				if ( 'search' === $from_query_type && ! isset( $input_schema['search_terms'] ) ) {
+					$error_message = sprintf( 'A search query must have a "search_terms" input variable: %s', $from_query_key );
+					self::$logger->error( $error_message );
+					return new WP_Error( 'invalid_query_mapping', $error_message );
+				}
+
+				// Add the selector to the configuration.
+				array_unshift(
+					$config['selectors'],
+					[
+						'image_url' => $from_query->get_image_url(),
+						'inputs' => [],
+						'name' => $from_query->get_query_name(),
+						'query_key' => $from_query_key,
+						'type' => $from_query_type,
+					]
+				);
+			}
 		}
 
+		foreach ( $user_config['patterns'] as $pattern ) {
+			$parsed_blocks = parse_blocks( $pattern['html'] );
+			$parsed_blocks = BlockPatterns::add_block_arg_to_bindings( $block_name, $parsed_blocks );
+			$pattern_content = serialize_blocks( $parsed_blocks );
+			
+			$pattern_name = self::register_block_pattern( $block_name, $pattern['title'], $pattern_content );
+
+			// If the pattern role is specified and recognized, add it to the block configuration.
+			$recognized_roles = [ 'inner_blocks' ];
+			if ( isset( $pattern['role'] ) && in_array( $pattern['role'], $recognized_roles, true ) ) {
+				$config['patterns'][ $pattern['role'] ] = $pattern_name;
+			}
+		}
+
+		ConfigStore::set_block_configuration( $block_name, $config );
+
+		return true;
+	}
+
+	private static function register_block_pattern( string $block_name, string $pattern_title, string $pattern_content ): string {
 		// Add the block arg to any bindings present in the pattern.
-		$parsed_blocks = parse_blocks( $pattern_content );
-		$parsed_blocks = BlockPatterns::add_block_arg_to_bindings( $block_name, $parsed_blocks );
-		$pattern_content = serialize_blocks( $parsed_blocks );
 		$pattern_name = 'remote-data-blocks/' . sanitize_title( $pattern_title );
 
 		// Create the pattern properties, allowing overrides via pattern options.
-		$pattern_properties = array_merge(
-			[
-				'blockTypes' => [ $block_name ],
-				'categories' => [ 'Remote Data' ],
-				'content' => $pattern_content,
-				'inserter' => true,
-				'source' => 'plugin',
-				'title' => $pattern_title,
-			],
-			$pattern_options['properties'] ?? []
-		);
+		$pattern_properties = [
+			'blockTypes' => [ $block_name ],
+			'categories' => [ 'Remote Data' ],
+			'content' => $pattern_content,
+			'inserter' => true,
+			'source' => 'plugin',
+			'title' => $pattern_title,
+		];
 
 		// Register the pattern.
 		register_block_pattern( $pattern_name, $pattern_properties );
 
-		// If the pattern role is specified and recognized, add it to the block configuration.
-		$recognized_roles = [ 'inner_blocks' ];
-		if ( isset( $pattern_options['role'] ) && in_array( $pattern_options['role'], $recognized_roles, true ) ) {
-			$config['patterns'][ $pattern_options['role'] ] = $pattern_name;
-			ConfigStore::set_block_configuration( $block_name, $config );
-		}
+		return $pattern_name;
 	}
 
 	/**
@@ -176,75 +226,5 @@ class ConfigRegistry {
 		}
 
 		add_rewrite_rule( $rewrite_rule, $rewrite_rule_target, 'top' );
-	}
-
-	private static function register_selector( string $block_title, string $type, QueryContextInterface $query ): void {
-		$block_name = ConfigStore::get_block_name( $block_title );
-		$config = ConfigStore::get_block_configuration( $block_name );
-		$query_key = $query->get_query_key();
-
-		if ( null === $config ) {
-			return;
-		}
-
-		// Verify mappings.
-		// TODO: Nested schema?
-		$to_query = $config['queries']['__DISPLAY__'];
-		$output_schema = $query->get_output_schema();
-		foreach ( array_keys( $to_query->get_input_schema() ) as $to ) {
-			if ( ! isset( $output_schema['type'][ $to ] ) ) {
-				self::$logger->error( sprintf( 'Cannot map key "%s" from query "%s"', esc_html( $to ), $query_key ) );
-				return;
-			}
-		}
-
-		self::register_query( $block_title, $query );
-
-		// Add the selector to the configuration. Fetch config again since it was
-		// updated in register_query.
-		$config = ConfigStore::get_block_configuration( $block_name );
-		array_unshift(
-			$config['selectors'],
-			[
-				'image_url' => $query->get_image_url(),
-				'inputs' => [],
-				'name' => $query->get_query_name(),
-				'query_key' => $query_key,
-				'type' => $type,
-			]
-		);
-
-		ConfigStore::set_block_configuration( $block_name, $config );
-	}
-
-	public static function register_query( string $block_title, QueryContextInterface $query ): void {
-		$block_name = ConfigStore::get_block_name( $block_title );
-		$config = ConfigStore::get_block_configuration( $block_name );
-		$query_key = $query->get_query_key();
-
-		if ( null === $config ) {
-			return;
-		}
-
-		if ( isset( $config['queries'][ $query_key ] ) ) {
-			self::$logger->error( sprintf( 'Query %s has already been registered', $query_key ) );
-			return;
-		}
-
-		$config['queries'][ $query_key ] = $query;
-		ConfigStore::set_block_configuration( $block_name, $config );
-	}
-
-	public static function register_list_query( string $block_title, QueryContextInterface $query ): void {
-		self::register_selector( $block_title, 'list', $query );
-	}
-
-	public static function register_search_query( string $block_title, QueryContextInterface $query ): void {
-		if ( ! isset( $query->input_schema['search_terms'] ) ) {
-			self::$logger->error( sprintf( 'A search query must have a "search_terms" input variable: %s', $query::class ) );
-			return;
-		}
-
-		self::register_selector( $block_title, 'search', $query );
 	}
 }

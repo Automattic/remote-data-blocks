@@ -7,10 +7,9 @@ use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\ExampleApi\Queries\ExampleApiQueryRunner;
 
 use function register_remote_data_block;
-use function register_remote_data_list_query;
 
 class ExampleApi {
-	private static string $block_name = 'Conference Event';
+	private static string $block_title = 'Conference Event';
 
 	public static function init(): void {
 		add_action( 'init', [ __CLASS__, 'register_remote_data_block' ] );
@@ -108,7 +107,12 @@ class ExampleApi {
 			'query_runner' => new ExampleApiQueryRunner(),
 		] );
 
-		register_remote_data_block( self::$block_name, $get_record_query );
-		register_remote_data_list_query( self::$block_name, $get_table_query );
+		register_remote_data_block( [
+			'title' => self::$block_title,
+			'queries' => [
+				'display' => $get_record_query,
+				'list' => $get_table_query,
+			],
+		] );
 	}
 }

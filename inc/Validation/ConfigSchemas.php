@@ -4,12 +4,23 @@ namespace RemoteDataBlocks\Validation;
 
 use RemoteDataBlocks\Validation\Types;
 use RemoteDataBlocks\Config\DataSource\HttpDataSourceInterface;
+use RemoteDataBlocks\Config\QueryContext\QueryContextInterface;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 
 /**
  * ConfigSchemas class.
  */
 final class ConfigSchemas {
+	public static function get_remote_data_block_config_schema(): array {
+		static $schema = null;
+
+		if ( null === $schema ) {
+			$schema = self::generate_remote_data_block_config_schema();
+		}
+
+		return $schema;
+	}
+
 	public static function get_graphql_query_config_schema(): array {
 		static $schema = null;
 
@@ -38,6 +49,25 @@ final class ConfigSchemas {
 		}
 
 		return $schema;
+	}
+
+	private static function generate_remote_data_block_config_schema(): array {
+		return Types::object( [
+			'queries' => Types::object( [
+				'display' => Types::instance_of( QueryContextInterface::class ),
+				'list' => Types::nullable( Types::instance_of( QueryContextInterface::class ) ),
+				'search' => Types::nullable( Types::instance_of( QueryContextInterface::class ) ),
+			] ),
+			'patterns' => Types::nullable( Types::record(
+				Types::string(),
+				Types::object( [
+					'html' => Types::html(),
+					'role' => Types::nullable( Types::enum( 'inner_blocks' ) ),
+					'title' => Types::string(),
+				] )
+			) ),
+			'title' => Types::string(),
+		] );
 	}
 
 	private static function generate_graphql_query_config_schema(): array {
