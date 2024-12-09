@@ -4,80 +4,27 @@ namespace RemoteDataBlocks\Tests\Config;
 
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use RemoteDataBlocks\Config\DataSource\HttpDataSource;
-use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
-use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 use RemoteDataBlocks\HttpClient\HttpClient;
 use RemoteDataBlocks\Tests\Mocks\MockDataSource;
-use RemoteDataBlocks\Tests\Mocks\MockValidator;
+use RemoteDataBlocks\Tests\Mocks\MockQueryContext;
 use WP_Error;
 
 class QueryRunnerTest extends TestCase {
 	private MockDataSource $http_data_source;
-	private HttpQueryContext $query_context;
+	private MockQueryContext $query_context;
 	private HttpClient $http_client;
 
 	protected function setUp(): void {
 		parent::setUp();
 
 		$this->http_client = $this->createMock( HttpClient::class );
-		$this->http_data_source = MockDataSource::from_array( MockDataSource::MOCK_CONFIG, new MockValidator() );
+		$this->http_data_source = MockDataSource::create();
 
-		$this->query_context = new class($this->http_data_source, $this->http_client) extends HttpQueryContext {
-			private string $request_method = 'GET';
-			private array $request_body = [ 'query' => 'test' ];
-			private mixed $response_data = null;
-
-			public function __construct( private HttpDataSource $http_data_source, private HttpClient $http_client ) {
-				parent::__construct( $http_data_source );
-			}
-
-			public function execute( array $input_variables ): array|WP_Error {
-				$query_runner = new QueryRunner( $this, $this->http_client );
-				return $query_runner->execute( $input_variables );
-			}
-
-			public function get_endpoint( array $input_variables = [] ): string {
-				return $this->http_data_source->get_endpoint();
-			}
-
-			public function get_image_url(): ?string {
-				return null;
-			}
-
-			public function get_request_method(): string {
-				return $this->request_method;
-			}
-
-			public function get_request_body( array $input_variables ): array|null {
-				return $this->request_body;
-			}
-
-			public function get_query_name(): string {
-				return 'Query';
-			}
-
-			public function process_response( string $raw_response_data, array $input_variables ): string|array|object|null {
-				if ( null !== $this->response_data ) {
-					return $this->response_data;
-				}
-
-				return $raw_response_data;
-			}
-
-			public function set_request_method( string $method ): void {
-				$this->request_method = $method;
-			}
-
-			public function set_request_body( array $body ): void {
-				$this->request_body = $body;
-			}
-
-			public function set_response_data( string|array|object|null $data ): void {
-				$this->response_data = $data;
-			}
-		};
+		$this->query_context = MockQueryContext::create( [
+			'data_source' => $this->http_data_source,
+			'query_runner' => new QueryRunner( $this->http_client ),
+		] );
 	}
 
 	public static function provideValidEndpoints(): array {
@@ -192,8 +139,8 @@ class QueryRunnerTest extends TestCase {
 
 		$this->http_client->method( 'request' )->willThrowException( new \Exception( 'HTTP Client Error' ) );
 
-		$query_runner = new QueryRunner( $this->query_context, $this->http_client );
-		$result = $query_runner->execute( $input_variables );
+		$query_runner = new QueryRunner( $this->http_client );
+		$result = $query_runner->execute( $this->query_context, $input_variables );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
 		$this->assertSame( 'remote-data-blocks-unexpected-exception', $result->get_error_code() );
@@ -205,8 +152,8 @@ class QueryRunnerTest extends TestCase {
 		$response = new \GuzzleHttp\Psr7\Response( 400, [], 'Bad Request' );
 		$this->http_client->method( 'request' )->willReturn( $response );
 
-		$query_runner = new QueryRunner( $this->query_context, $this->http_client );
-		$result = $query_runner->execute( $input_variables );
+		$query_runner = new QueryRunner( $this->http_client );
+		$result = $query_runner->execute( $this->query_context, $input_variables );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
 		$this->assertSame( 'remote-data-blocks-bad-status-code', $result->get_error_code() );
@@ -222,16 +169,16 @@ class QueryRunnerTest extends TestCase {
 
 		$this->http_client->method( 'request' )->willReturn( $response );
 
-		$this->query_context->output_schema = [
+		$this->query_context->set_output_schema( [
 			'is_collection' => false,
-			'mappings' => [
+			'type' => [
 				'test' => [
 					'name' => 'Test Field',
 					'path' => '$.test',
 					'type' => 'string',
 				],
 			],
-		];
+		] );
 
 		$result = $this->query_context->execute( $input_variables );
 
@@ -267,16 +214,16 @@ class QueryRunnerTest extends TestCase {
 		$this->http_client->method( 'request' )->willReturn( $response );
 
 		$this->query_context->set_response_data( '{"test":"overridden in process_response as JSON string"}' );
-		$this->query_context->output_schema = [
+		$this->query_context->set_output_schema( [
 			'is_collection' => false,
-			'mappings' => [
+			'type' => [
 				'test' => [
 					'name' => 'Test Field',
 					'path' => '$.test',
 					'type' => 'string',
 				],
 			],
-		];
+		] );
 
 		$result = $this->query_context->execute( [] );
 
@@ -312,16 +259,16 @@ class QueryRunnerTest extends TestCase {
 		$this->http_client->method( 'request' )->willReturn( $response );
 
 		$this->query_context->set_response_data( [ 'test' => 'overridden in process_response as array' ] );
-		$this->query_context->output_schema = [
+		$this->query_context->set_output_schema( [
 			'is_collection' => false,
-			'mappings' => [
+			'type' => [
 				'test' => [
 					'name' => 'Test Field',
 					'path' => '$.test',
 					'type' => 'string',
 				],
 			],
-		];
+		] );
 
 		$result = $this->query_context->execute( [] );
 
@@ -360,16 +307,16 @@ class QueryRunnerTest extends TestCase {
 		$response_data->test = 'overridden in process_response as object';
 
 		$this->query_context->set_response_data( $response_data );
-		$this->query_context->output_schema = [
+		$this->query_context->set_output_schema( [
 			'is_collection' => false,
-			'mappings' => [
+			'type' => [
 				'test' => [
 					'name' => 'Test Field',
 					'path' => '$.test',
 					'type' => 'string',
 				],
 			],
-		];
+		] );
 
 		$result = $this->query_context->execute( [] );
 
