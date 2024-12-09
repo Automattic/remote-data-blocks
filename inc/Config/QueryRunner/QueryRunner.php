@@ -199,11 +199,6 @@ class QueryRunner implements QueryRunnerInterface {
 			return $raw_response_data;
 		}
 
-		// Loose validation of the raw response data.
-		if ( ! isset( $raw_response_data['metadata'], $raw_response_data['response_data'] ) || ! is_array( $raw_response_data['metadata'] ) ) {
-			return new WP_Error( 'Invalid raw response data' );
-		}
-
 		// Preprocess the response data.
 		$response_data = $this->preprocess_response( $query, $raw_response_data['response_data'], $input_variables );
 
@@ -214,13 +209,15 @@ class QueryRunner implements QueryRunnerInterface {
 		// The parser always returns an array, even if it's a single item. This
 		// ensures a consistent response shape. The requestor is expected to inspect
 		// is_collection and unwrap if necessary.
-		$results = QueryResponseParser::parse( $response_data, $schema );
+		$parser = new QueryResponseParser();
+		$results = $parser->parse( $response_data, $schema );
+		$results = $is_collection ? $results : [ $results ];
 		$metadata = $this->get_response_metadata( $query, $raw_response_data['metadata'], $results );
 
 		return [
 			'is_collection' => $is_collection,
 			'metadata' => $metadata,
-			'results' => $is_collection ? $results : [ $results ],
+			'results' => $results,
 		];
 	}
 
@@ -232,7 +229,7 @@ class QueryRunner implements QueryRunnerInterface {
 	 * @param string $response_data The raw response data.
 	 * @return array The deserialized response data as associative array.
 	 */
-	protected function deserialize_response( string $raw_response_data ): array {
+	protected function deserialize_response( string $raw_response_data ): mixed {
 		return json_decode( $raw_response_data, true );
 	}
 
@@ -242,7 +239,7 @@ class QueryRunner implements QueryRunnerInterface {
 	 * @param array $response_data The raw response data.
 	 * @return array Preprocessed response. The deserialized response data or (re-)serialized JSON.
 	 */
-	protected function preprocess_response( HttpQueryContextInterface $query, array $response_data, array $input_variables ): array {
+	protected function preprocess_response( HttpQueryContextInterface $query, mixed $response_data, array $input_variables ): mixed {
 		return $query->preprocess_response( $response_data, $input_variables );
 	}
 }

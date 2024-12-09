@@ -132,11 +132,11 @@ class HttpQueryContext extends ArraySerializable implements HttpQueryContextInte
 	 * Override this method to preprocess the response data before it is passed to
 	 * the response parser.
 	 *
-	 * @param array $response_data The raw deserialized response data.
+	 * @param mixed $response_data The raw deserialized response data.
 	 * @param array $input_variables The input variables for this query.
-	 * @return array Preprocessed response data.
+	 * @return mixed Preprocessed response data.
 	 */
-	public function preprocess_response( array $response_data, array $input_variables ): array {
+	public function preprocess_response( mixed $response_data, array $input_variables ): mixed {
 		return $this->get_or_call_from_config( 'preprocess_response', $response_data, $input_variables ) ?? $response_data;
 	}
 }
