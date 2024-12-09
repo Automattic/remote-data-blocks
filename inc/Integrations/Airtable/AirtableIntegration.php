@@ -18,7 +18,6 @@ class AirtableIntegration {
 		/** @var AirtableDataSource $airtable_data_source */
 		$airtable_data_source = AirtableDataSource::from_array( $config );
 
-		$block_name = $airtable_data_source->get_display_name();
 		$query = $airtable_data_source->___temp_get_query();
 		$list_query = $airtable_data_source->___temp_get_list_query();
 
@@ -27,8 +26,13 @@ class AirtableIntegration {
 			return;
 		}
 
-		register_remote_data_block( $block_name, $query );
-		register_remote_data_list_query( $block_name, $list_query );
+		register_remote_data_block( [
+			'title' => $airtable_data_source->get_display_name(),
+			'queries' => [
+				'display' => $query,
+				'list' => $list_query,
+			],
+		] );
 		
 		LoggerManager::instance()->info( 'Registered Airtable block', [ 'block_name' => $block_name ] );
 	}

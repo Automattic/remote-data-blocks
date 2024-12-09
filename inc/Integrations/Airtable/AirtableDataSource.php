@@ -78,7 +78,7 @@ class AirtableDataSource extends HttpDataSource {
 		);
 	}
 
-	public function ___temp_get_query(): AirtableGetItemQuery|\WP_Error {
+	public function ___temp_get_query(): HttpQueryContext|WP_Error {
 		$input_schema = [
 			'record_id' => [
 				'name' => 'Record ID',
@@ -116,7 +116,7 @@ class AirtableDataSource extends HttpDataSource {
 		] );
 	}
 
-	public function ___temp_get_list_query(): AirtableListItemsQuery|\WP_Error {
+	public function ___temp_get_list_query(): HttpQueryContext|WP_Error {
 		$output_schema = [
 			'is_collection' => true,
 			'path' => '$.records[*]',
