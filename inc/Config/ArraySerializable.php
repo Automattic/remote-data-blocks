@@ -31,7 +31,7 @@ abstract class ArraySerializable implements ArraySerializableInterface {
 	final public static function from_array( array $config, ?ValidatorInterface $validator = null ): static|WP_Error {
 		$schema = static::get_config_schema();
 
-		$validator = $validator ?? new Validator( $schema );
+		$validator = $validator ?? new Validator( $schema, static::class );
 		$validated = $validator->validate( $config );
 
 		if ( is_wp_error( $validated ) ) {

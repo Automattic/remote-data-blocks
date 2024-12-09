@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Validation;
 
 use RemoteDataBlocks\Validation\Types;
+use RemoteDataBlocks\Logging\LoggerManager;
 use WP_Error;
 use function is_email;
 
@@ -10,16 +11,25 @@ use function is_email;
  * Validator class.
  */
 final class Validator implements ValidatorInterface {
-	public function __construct( private array $schema ) {}
+	public function __construct( private array $schema, private string $description = 'Validator' ) {}
 
 	/**
 	 * @inheritDoc
 	 */
 	public function validate( mixed $data ): bool|WP_Error {
-		$base_validation = $this->check_type( $this->schema, $data );
+		$validation = $this->check_type( $this->schema, $data );
 
-		if ( is_wp_error( $base_validation ) ) {
-			return $base_validation;
+		if ( is_wp_error( $validation ) ) {
+			$error_message = sprintf( '[%s] %s', $this->description, $validation->get_error_message() );
+
+			$child_error = $validation->get_error_data()['child'] ?? null;
+			while ( is_wp_error( $child_error ) ) {
+				$error_message .= sprintf( '; %s', $child_error->get_error_message() );
+				$child_error = $child_error->get_error_data()['child'] ?? null;
+			}
+
+			LoggerManager::instance()->error( $error_message );
+			return $validation;
 		}
 
 		return true;
