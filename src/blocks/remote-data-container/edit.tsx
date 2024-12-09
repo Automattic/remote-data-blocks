@@ -41,22 +41,34 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	const [ initialLoad, setInitialLoad ] = useState< boolean >( true );
 
 	function fetchRemoteData( input: RemoteDataQueryInput, insertBlocks = true ) {
-		execute( input, true )
-			.then( remoteData => {
-				if ( remoteData ) {
-					updateRemoteData(
-						{
-							queryInputOverrides: props.attributes.remoteData?.queryInputOverrides,
-							...remoteData,
-						},
-						insertBlocks
-					);
-				}
-			} )
-			.catch( () => {} )
-			.finally( () => {
-				setInitialLoad( false );
-			} );
+		console.log( { input } );
+		updateRemoteData(
+			{
+				blockName,
+				queryInput: { id: input.id ? input.id : '' },
+				isCollection: false,
+				metadata: {},
+				resultId: '',
+				results: [],
+			},
+			insertBlocks
+		);
+		setInitialLoad( false );
+		// queryInputOverrides: props.attributes.remoteData?.queryInputOverrides as any,
+		// execute( input, true )
+		// 	.then( remoteData => {
+		// 		if ( remoteData ) {
+		// 			updateRemoteData(
+		// 				{
+		// 					queryInputOverrides: props.attributes.remoteData?.queryInputOverrides,
+		// 					...remoteData,
+		// 				},
+		// 				insertBlocks
+		// 			);
+		// 		}
+		// 	} )
+		// 	.catch( () => {} )
+		// 	.finally( () => setInitialLoad( false ) );
 	}
 
 	// Update the remote data in the block attributes, which is passed via context
@@ -100,7 +112,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	}
 
 	if ( showPatternSelection ) {
-		const supportedPatterns = getSupportedPatterns( props.attributes.remoteData?.results[ 0 ] );
+		const supportedPatterns = getSupportedPatterns( props.attributes.remoteData?.results?.[ 0 ] );
 
 		if ( supportedPatterns.length ) {
 			return (
@@ -140,6 +152,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 								width: '50px',
 							} }
 						/>
+						<p>Loading remote data</p>
 					</div>
 				) }
 				<InnerBlocks

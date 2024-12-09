@@ -3,7 +3,9 @@ import { useState } from '@wordpress/element';
 
 import { REMOTE_DATA_REST_API_URL } from '@/blocks/remote-data-container/config/constants';
 
-async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< RemoteData | null > {
+export async function fetchRemoteData(
+	requestData: RemoteDataApiRequest
+): Promise< RemoteData | null > {
 	const { body } = await apiFetch< RemoteDataApiResponse >( {
 		url: REMOTE_DATA_REST_API_URL,
 		method: 'POST',
