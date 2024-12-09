@@ -2,6 +2,7 @@
 
 namespace RemoteDataBlocks\Tests\Mocks;
 
+use RemoteDataBlocks\Config\QueryContext\HttpQueryContextInterface;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 
 class MockQueryRunner implements QueryRunnerInterface {
@@ -26,7 +27,7 @@ class MockQueryRunner implements QueryRunnerInterface {
 		] );
 	}
 
-	public function execute( array $input_variables ): array|\WP_Error {
+	public function execute( HttpQueryContextInterface $query, array $input_variables ): array|\WP_Error {
 		array_push( $this->execute_call_inputs, $input_variables );
 		return array_shift( $this->query_results );
 	}

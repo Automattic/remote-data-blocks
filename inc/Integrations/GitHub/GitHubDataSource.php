@@ -7,7 +7,7 @@ use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 class GitHubDataSource extends HttpDataSource {
 	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_GITHUB_SERVICE;
 	protected const SERVICE_SCHEMA_VERSION = 1;
-	
+
 	protected const SERVICE_SCHEMA = [
 		'type' => 'object',
 		'properties' => [
@@ -55,11 +55,11 @@ class GitHubDataSource extends HttpDataSource {
 	public function get_repo_name(): string {
 		return $this->config['repo_name'];
 	}
-	
+
 	public function get_ref(): string {
 		return $this->config['ref'];
 	}
-	
+
 	public static function create( string $repo_owner, string $repo_name, string $ref ): self {
 		return parent::from_array([
 			'service' => REMOTE_DATA_BLOCKS_GITHUB_SERVICE,

@@ -2,6 +2,7 @@
 
 namespace RemoteDataBlocks\ExampleApi\Queries;
 
+use RemoteDataBlocks\Config\QueryContext\HttpQueryContextInterface;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\ExampleApi\Data\ExampleApiData;
 use WP_Error;
@@ -18,7 +19,7 @@ defined( 'ABSPATH' ) || exit();
  *
  */
 class ExampleApiQueryRunner extends QueryRunner {
-	protected function get_raw_response_data( array $input_variables ): array|WP_Error {
+	protected function get_raw_response_data( HttpQueryContextInterface $query, array $input_variables ): array|WP_Error {
 		if ( isset( $input_variables['record_id'] ) ) {
 			return [
 				'metadata' => [],

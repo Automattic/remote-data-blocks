@@ -4,6 +4,7 @@ namespace RemoteDataBlocks\Integrations\Google\Sheets;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
+use RemoteDataBlocks\Validation\Types;
 use WP_Error;
 
 class GoogleSheetsDataSource extends HttpDataSource {

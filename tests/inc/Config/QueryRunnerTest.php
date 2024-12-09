@@ -33,6 +33,11 @@ class QueryRunnerTest extends TestCase {
 				parent::__construct( $http_data_source );
 			}
 
+			public function execute( array $input_variables ): array|WP_Error {
+				$query_runner = new QueryRunner( $this, $this->http_client );
+				return $query_runner->execute( $input_variables );
+			}
+
 			public function get_endpoint( array $input_variables = [] ): string {
 				return $this->http_data_source->get_endpoint();
 			}
@@ -51,10 +56,6 @@ class QueryRunnerTest extends TestCase {
 
 			public function get_query_name(): string {
 				return 'Query';
-			}
-
-			public function get_query_runner(): QueryRunnerInterface {
-				return new QueryRunner( $this, $this->http_client );
 			}
 
 			public function process_response( string $raw_response_data, array $input_variables ): string|array|object|null {
@@ -124,8 +125,7 @@ class QueryRunnerTest extends TestCase {
 		$this->http_data_source->set_endpoint( $endpoint );
 		$this->http_client->method( 'request' )->willReturn( $response );
 
-		$query_runner = $this->query_context->get_query_runner();
-		$result = $query_runner->execute( $input_variables );
+		$result = $this->query_context->execute( $input_variables );
 
 		$this->assertIsArray( $result );
 		$this->assertArrayHasKey( 'is_collection', $result );
@@ -181,8 +181,7 @@ class QueryRunnerTest extends TestCase {
 
 		$this->http_data_source->set_endpoint( $endpoint );
 
-		$query_runner = $this->query_context->get_query_runner();
-		$result = $query_runner->execute( $input_variables );
+		$result = $this->query_context->execute( $input_variables );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
 		$this->assertSame( $expected_error_code, $result->get_error_code() );
@@ -234,8 +233,7 @@ class QueryRunnerTest extends TestCase {
 			],
 		];
 
-		$query_runner = $this->query_context->get_query_runner();
-		$result = $query_runner->execute( $input_variables );
+		$result = $this->query_context->execute( $input_variables );
 
 		$this->assertIsArray( $result );
 		$this->assertArrayHasKey( 'is_collection', $result );
@@ -280,8 +278,7 @@ class QueryRunnerTest extends TestCase {
 			],
 		];
 
-		$query_runner = $this->query_context->get_query_runner();
-		$result = $query_runner->execute( [] );
+		$result = $this->query_context->execute( [] );
 
 		$this->assertIsArray( $result );
 		$this->assertArrayHasKey( 'is_collection', $result );
@@ -326,8 +323,7 @@ class QueryRunnerTest extends TestCase {
 			],
 		];
 
-		$query_runner = $this->query_context->get_query_runner();
-		$result = $query_runner->execute( [] );
+		$result = $this->query_context->execute( [] );
 
 		$this->assertIsArray( $result );
 		$this->assertArrayHasKey( 'is_collection', $result );
@@ -375,8 +371,7 @@ class QueryRunnerTest extends TestCase {
 			],
 		];
 
-		$query_runner = $this->query_context->get_query_runner();
-		$result = $query_runner->execute( [] );
+		$result = $this->query_context->execute( [] );
 
 		$this->assertIsArray( $result );
 		$this->assertArrayHasKey( 'is_collection', $result );

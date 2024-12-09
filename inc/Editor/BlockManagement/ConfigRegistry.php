@@ -30,8 +30,7 @@ class ConfigRegistry {
 			return;
 		}
 
-		// This becomes our target shape for a static config approach, but let's
-		// give it some time to solidify.
+		$input_schema = $display_query->get_input_schema();
 		$config = [
 			'description' => '',
 			'name' => $block_name,
@@ -50,7 +49,7 @@ class ConfigRegistry {
 							'slug' => $slug,
 							'type' => $input_var['type'] ?? 'string',
 						];
-					}, array_keys( $display_query->input_schema ), array_values( $display_query->input_schema ) ),
+					}, array_keys( $input_schema ), array_values( $input_schema ) ),
 					'name' => 'Manual input',
 					'query_key' => '__DISPLAY__',
 					'type' => 'input',
@@ -114,7 +113,7 @@ class ConfigRegistry {
 	 * }                   $options       Optional. Configuration options for the rewrite rule.
 	 */
 	public static function register_page( string $block_title, string $page_slug, array $options = [] ): void {
-		
+
 		$block_name = ConfigStore::get_block_name( $block_title );
 		$config = ConfigStore::get_configuration( $block_name );
 		$allow_nested_paths = $options['allow_nested_paths'] ?? false;
@@ -148,7 +147,7 @@ class ConfigRegistry {
 
 		// Add a rewrite rule targeting the provided page slug.
 		$query_vars = array_keys( $display_query->input_schema );
-		
+
 		$query_var_pattern = '/([^/]+)';
 
 		/**
@@ -158,7 +157,7 @@ class ConfigRegistry {
 		if ( $allow_nested_paths && 1 === count( $query_vars ) ) {
 			$query_var_pattern = '/(.+)';
 		}
-		
+
 		$rewrite_rule = sprintf( '^%s%s/?$', $page_slug, str_repeat( $query_var_pattern, count( $query_vars ) ) );
 		$rewrite_rule_target = sprintf( 'index.php?pagename=%s', $page_slug );
 
@@ -182,22 +181,24 @@ class ConfigRegistry {
 	private static function register_selector( string $block_title, string $type, QueryContextInterface $query ): void {
 		$block_name = ConfigStore::get_block_name( $block_title );
 		$config = ConfigStore::get_configuration( $block_name );
-		$query_key = $query::class;
+		$query_key = $query->get_query_key();
 
 		if ( null === $config ) {
 			return;
 		}
 
 		// Verify mappings.
+		// TODO: Nested schema?
 		$to_query = $config['queries']['__DISPLAY__'];
-		foreach ( array_keys( $to_query->input_schema ) as $to ) {
-			if ( ! isset( $query->output_schema['mappings'][ $to ] ) ) {
+		$output_schema = $query->get_output_schema();
+		foreach ( array_keys( $to_query->get_input_schema() ) as $to ) {
+			if ( ! isset( $output_schema['type'][ $to ] ) ) {
 				self::$logger->error( sprintf( 'Cannot map key "%s" from query "%s"', esc_html( $to ), $query_key ) );
 				return;
 			}
 		}
 
-		self::register_query( $block_title, $query );
+		self::register_query( $block_name, $query );
 
 		// Add the selector to the configuration. Fetch config again since it was
 		// updated in register_query.

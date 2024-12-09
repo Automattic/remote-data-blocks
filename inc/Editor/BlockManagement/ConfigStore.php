@@ -90,7 +90,7 @@ class ConfigStore {
 				continue;
 			}
 
-			$data_source_type = $query->get_data_source()->get_service();
+			$data_source_type = $query->get_data_source()->get_service_name();
 			if ( $data_source_type ) {
 				break;
 			}
