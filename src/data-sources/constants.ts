@@ -4,18 +4,20 @@ import { SelectOption } from '@/types/input';
 
 export const SUPPORTED_SERVICES = [
 	'airtable',
-	'shopify',
-	'google-sheets',
-	'generic-http',
 	'example-api',
+	'generic-http',
+	'google-sheets',
+	'salesforce-b2c',
+	'shopify',
 ] as const;
 export const SUPPORTED_SERVICES_LABELS: Record< ( typeof SUPPORTED_SERVICES )[ number ], string > =
 	{
 		airtable: __( 'Airtable', 'remote-data-blocks' ),
-		shopify: __( 'Shopify', 'remote-data-blocks' ),
-		'google-sheets': __( 'Google Sheets', 'remote-data-blocks' ),
-		'generic-http': __( 'HTTP', 'remote-data-blocks' ),
 		'example-api': __( 'Conference Events Example API', 'remote-data-blocks' ),
+		'generic-http': __( 'HTTP', 'remote-data-blocks' ),
+		'google-sheets': __( 'Google Sheets', 'remote-data-blocks' ),
+		'salesforce-b2c': __( 'Salesforce Commerce B2C', 'remote-data-blocks' ),
+		shopify: __( 'Shopify', 'remote-data-blocks' ),
 	} as const;
 export const OPTIONS_PAGE_SLUG = 'remote-data-blocks-settings';
 export const REST_BASE = '/remote-data-blocks/v1';
