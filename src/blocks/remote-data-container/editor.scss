@@ -2,6 +2,8 @@
  * The following styles get applied inside the editor only.
  */
 
+@import url(@wordpress/dataviews/build-style/style.css);
+
 .remote-data-blocks-loading-overlay {
 	align-items: center;
 	background-color: rgba(255, 255, 255, 0.25);
