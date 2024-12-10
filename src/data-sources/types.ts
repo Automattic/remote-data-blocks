@@ -12,9 +12,10 @@ interface BaseDataSourceConfig {
 }
 
 export interface DataSourceQueryMappingValue {
+	key: string;
 	name: string;
 	path: string;
-	type: 'id' | 'string';
+	type: string;
 }
 
 export type DataSourceQueryMapping = Record< string, DataSourceQueryMappingValue >;
@@ -30,7 +31,11 @@ export interface DataSourceQuery {
  * - `type` is always string for now.
  */
 export interface AirtableOutputQueryMappingValue {
-	name: string;
+	key: string;
+	name?: string;
+	path?: string;
+	type?: string;
+	prefix?: string;
 }
 
 export interface AirtableTableConfig extends StringIdName {
