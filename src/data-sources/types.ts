@@ -13,9 +13,10 @@ interface BaseDataSourceConfig {
 }
 
 export interface DataSourceQueryMappingValue {
+	key: string;
 	name: string;
 	path: string;
-	type: 'id' | 'string';
+	type: string;
 }
 
 export type DataSourceQueryMapping = Record< string, DataSourceQueryMappingValue >;
@@ -31,7 +32,11 @@ export interface DataSourceQuery {
  * - `type` is always string for now.
  */
 export interface AirtableOutputQueryMappingValue {
-	name: string;
+	key: string;
+	name?: string;
+	path?: string;
+	type?: string;
+	prefix?: string;
 }
 
 export interface AirtableTableConfig extends StringIdName {
@@ -43,12 +48,6 @@ export interface AirtableConfig extends BaseDataSourceConfig {
 	access_token: string;
 	base: StringIdName;
 	tables: AirtableTableConfig[];
-}
-
-export interface ShopifyConfig extends BaseDataSourceConfig {
-	service: 'shopify';
-	access_token: string;
-	store_name: string;
 }
 
 export interface GoogleSheetsConfig extends BaseDataSourceConfig {
@@ -64,7 +63,26 @@ export interface HttpConfig extends BaseDataSourceConfig {
 	auth: HttpAuth;
 }
 
-export type DataSourceConfig = AirtableConfig | ShopifyConfig | GoogleSheetsConfig | HttpConfig;
+export interface SalesforceB2CConfig extends BaseDataSourceConfig {
+	service: 'salesforce-b2c';
+	shortcode: string;
+	organization_id: string;
+	client_id: string;
+	client_secret: string;
+}
+
+export interface ShopifyConfig extends BaseDataSourceConfig {
+	service: 'shopify';
+	access_token: string;
+	store_name: string;
+}
+
+export type DataSourceConfig =
+	| AirtableConfig
+	| GoogleSheetsConfig
+	| HttpConfig
+	| SalesforceB2CConfig
+	| ShopifyConfig;
 
 export type SettingsComponentProps< T extends BaseDataSourceConfig > = {
 	mode: 'add' | 'edit';

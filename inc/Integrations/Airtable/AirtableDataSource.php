@@ -44,8 +44,20 @@ class AirtableDataSource extends HttpDataSource {
 							'items' => [
 								'type' => 'object',
 								'properties' => [
-									'name' => [ 'type' => 'string' ],
+									'key' => [ 'type' => 'string' ],
+									'name' => [
+										'type' => 'string',
+										'required' => false,
+									],
 									'type' => [
+										'type' => 'string',
+										'required' => false,
+									],
+									'path' => [
+										'type' => 'string',
+										'required' => false,
+									],
+									'prefix' => [
 										'type' => 'string',
 										'required' => false,
 									],
@@ -120,11 +132,16 @@ class AirtableDataSource extends HttpDataSource {
 		];
 
 		foreach ( $this->config['tables'][0]['output_query_mappings'] as $mapping ) {
-			$output_schema['mappings'][ ucfirst( $mapping['name'] ) ] = [
-				'name' => $mapping['name'],
-				'path' => '$.fields.' . $mapping['name'],
+			$mapping_key = $mapping['key'];
+			$output_schema['mappings'][ $mapping_key ] = [
+				'name' => $mapping['name'] ?? $mapping_key,
+				'path' => $mapping['path'] ?? '$.fields["' . $mapping_key . '"]',
 				'type' => $mapping['type'] ?? 'string',
 			];
+
+			if ( 'currency' === $mapping['type'] && isset( $mapping['prefix'] ) ) {
+				$output_schema['mappings'][ $mapping_key ]['prefix'] = $mapping['prefix'];
+			}
 		}
 
 		return AirtableGetItemQuery::from_array([
