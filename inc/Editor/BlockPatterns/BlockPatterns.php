@@ -108,7 +108,6 @@ class BlockPatterns {
 					];
 					break;
 
-				case 'string_array':
 				case 'base64':
 				case 'currency':
 					$bindings['paragraphs'][] = [

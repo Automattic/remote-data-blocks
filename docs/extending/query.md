@@ -76,7 +76,6 @@ The `get_input_schema` method defines the input data expected by the query. The 
   - `number`
   - `currency`
   - `string`
-  - `string_array`
 
 #### Example
 

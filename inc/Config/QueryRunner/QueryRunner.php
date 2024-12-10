@@ -258,10 +258,14 @@ class QueryRunner implements QueryRunnerInterface {
 				$currency_symbol = $mapping['prefix'] ?? '$';
 				return sprintf( '%s%s', $currency_symbol, number_format( (float) $field_value_single, 2 ) );
 
-			case 'string_array':
-				return implode( ', ', $field_value );
-
 			case 'string':
+				if ( is_array( $field_value_single ) ) {
+					// Ensure all elements are strings and filter out non-string values
+					$string_values = array_filter( $field_value_single, '\is_string' );
+					if ( ! empty( $string_values ) ) {
+						return wp_strip_all_tags( implode( ', ', $string_values ) );
+					}
+				}
 				return wp_strip_all_tags( $field_value_single );
 		}
 

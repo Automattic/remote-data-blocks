@@ -46,14 +46,14 @@ export const getAirtableOutputQueryMappingValue = (
 			return {
 				...baseField,
 				path: `$.fields["${ field.name }"][*]`,
-				type: 'string_array',
+				type: 'string',
 			};
 
 		case 'multipleRecordLinks':
 			return {
 				...baseField,
 				path: `$.fields["${ field.name }"][*].id`,
-				type: 'string_array',
+				type: 'string',
 			};
 
 		case 'multipleAttachments':
@@ -67,7 +67,7 @@ export const getAirtableOutputQueryMappingValue = (
 			return {
 				...baseField,
 				path: `$.fields["${ field.name }"][*].name`,
-				type: 'string_array',
+				type: 'string',
 			};
 
 		case 'formula':
