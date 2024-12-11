@@ -360,7 +360,7 @@ final class Types {
 		}
 
 		$merged_properties = array_reduce( $types, function ( array $carry, array $type ): array {
-			return array_merge( $carry, $type['properties'] );
+			return array_merge( $carry, self::get_type_args( $type ) );
 		}, [] );
 
 		return self::object( $merged_properties );
