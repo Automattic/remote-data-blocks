@@ -2,94 +2,141 @@
 
 namespace RemoteDataBlocks\Sanitization;
 
+use RemoteDataBlocks\Validation\Types;
+use RemoteDataBlocks\Validation\Validator;
+
 /**
  * Sanitizer class.
  */
 class Sanitizer implements SanitizerInterface {
 	/**
-	 * The sanitization schema.
-	 *
-	 * @var array<string, mixed>
-	 */
-	private array $schema;
-
-	/**
 	 * @inheritDoc
 	 */
-	public function __construct( array $schema ) {
-		$this->schema = $schema;
+	public function __construct( private array $schema ) {}
+
+	public function sanitize( mixed $data ): mixed {
+		return $this->sanitize_type( $this->schema, $data );
 	}
 
 	/**
-	 * @inheritDoc
+	 * Sanitize a value recursively against a schema.
+	 *
+	 * @param array<string, mixed> $type The schema to sanitize against.
+	 * @param mixed $value The value to sanitize.
+	 * @return mixed Sanitized value.
 	 */
-	public function sanitize( array $data ): array {
-		if ( ! isset( $this->schema['type'] ) || 'object' !== $this->schema['type'] || ! isset( $this->schema['properties'] ) ) {
-			return [];
+	private function sanitize_type( array $type, mixed $value = null ): mixed {
+		if ( ! Types::is_sanitizable( $type ) ) {
+			return $value;
 		}
 
-		return $this->sanitize_config( $data, $this->schema['properties'] );
+		if ( Types::is_nullable( $type ) && empty( $value ) ) {
+			return null;
+		}
+
+		if ( Types::is_primitive( $type ) ) {
+			return self::sanitize_primitive_type( Types::get_type_name( $type ), $value );
+		}
+
+		return $this->sanitize_non_primitive_type( $type, $value );
 	}
 
-	/**
-	 * Sanitize the config, recursively if necessary, according to the schema.
-	 *
-	 * @param array $config The config to sanitize.
-	 * @param array $schema The schema to use for sanitization.
-	 * @return array The sanitized config.
-	 */
-	private function sanitize_config( array $config, array $schema ): array {
-		$sanitized = [];
+	private function sanitize_non_primitive_type( array $type, mixed $value ): mixed {
+		// Not all types support sanitization. We sanitize what we can.
+		switch ( Types::get_type_name( $type ) ) {
+			case 'const':
+				return Types::get_type_args( $type );
 
-		foreach ( $schema as $key => $field_schema ) {
-			if ( ! isset( $config[ $key ] ) ) {
-				continue;
-			}
+			case 'list_of':
+				if ( ! is_array( $value ) || ! array_is_list( $value ) ) {
+					return [];
+				}
 
-			$value = $config[ $key ];
+				$member_type = Types::get_type_args( $type );
+				return array_map( function ( mixed $item ) use ( $member_type ): mixed {
+					return $this->sanitize_type( $member_type, $item );
+				}, $value );
 
-			if ( isset( $field_schema['sanitize'] ) && false === $field_schema['sanitize'] ) {
-				$sanitized[ $key ] = $value;
-				continue;
-			}
+			case 'object':
+				if ( ! Validator::check_iterable_object( $value ) ) {
+					return [];
+				}
 
-			if ( isset( $field_schema['sanitize'] ) ) {
-				$sanitized[ $key ] = call_user_func( $field_schema['sanitize'], $value );
-				continue;
-			}
+				$sanitized_object = [];
+				foreach ( Types::get_type_args( $type ) as $key => $value_type ) {
+					$sanitized_object[ $key ] = $this->sanitize_type( $value_type, $this->get_object_key( $value, $key ) );
+				}
 
-			switch ( $field_schema['type'] ) {
-				case 'string':
-					$sanitized[ $key ] = sanitize_text_field( $value );
-					break;
-				case 'integer':
-					$sanitized[ $key ] = intval( $value );
-					break;
-				case 'boolean':
-					$sanitized[ $key ] = (bool) $value;
-					break;
-				case 'array':
-					if ( is_array( $value ) ) {
-						if ( isset( $field_schema['items'] ) ) {
-							$sanitized[ $key ] = array_map(function ( $item ) use ( $field_schema ) {
-								if ( is_array( $item ) && isset( $field_schema['items']['properties'] ) ) {
-									return $this->sanitize_config( $item, $field_schema['items']['properties'] );
-								}
-								return $this->sanitize_config( $item, $field_schema['items'] );
-							}, $value);
-						} else {
-							$sanitized[ $key ] = array_map( 'sanitize_text_field', $value );
-						}
-					}
-					break;
-				case 'object':
-					if ( is_array( $value ) && isset( $field_schema['properties'] ) ) {
-						$sanitized[ $key ] = $this->sanitize_config( $value, $field_schema['properties'] );
-					}
-					break;
-			}
+				return $sanitized_object;
+
+			case 'record':
+				if ( ! Validator::check_iterable_object( $value ) ) {
+					return [];
+				}
+
+				$type_args = Types::get_type_args( $type );
+				$key_type = $type_args[0];
+				$value_type = $type_args[1];
+
+				foreach ( $value as $key => $record_value ) {
+					$sanitized_key = $this->sanitize_type( $key_type, $key );
+					$sanitized_record_value = $this->sanitize_type( $value_type, $record_value );
+					$value[ $sanitized_key ] = $sanitized_record_value;
+				}
+
+				return $value;
+
+			case 'string_matching':
+				$regex = Types::get_type_args( $type );
+				if ( preg_match( $regex, strval( $value ) ) ) {
+					return $value;
+				}
+
+				return null;
+
+			default:
+				return $value;
 		}
+	}
 
-		return $sanitized;
+	public static function sanitize_primitive_type( string $type_name, mixed $value ): mixed {
+		// Not all types support sanitization. We sanitize what we can.
+		switch ( $type_name ) {
+			case 'boolean':
+				return (bool) $value;
+
+			case 'integer':
+				return intval( $value );
+
+			case 'null':
+				return null;
+
+			case 'string':
+				return sanitize_text_field( strval( $value ) );
+
+			case 'button_text':
+			case 'html':
+			case 'id':
+			case 'image_alt':
+			case 'json_path':
+			case 'markdown':
+			case 'uuid':
+				return strval( $value );
+
+			case 'email_address':
+				return sanitize_email( $value );
+
+			case 'button_url':
+			case 'image_url':
+			case 'url':
+				return sanitize_url( $value );
+
+			default:
+				return $value;
+		}
+	}
+
+	private function get_object_key( mixed $data, string $key ): mixed {
+		return is_array( $data ) && array_key_exists( $key, $data ) ? $data[ $key ] : null;
 	}
 }
