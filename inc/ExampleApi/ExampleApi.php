@@ -2,14 +2,13 @@
 
 namespace RemoteDataBlocks\ExampleApi;
 
-use RemoteDataBlocks\ExampleApi\Queries\ExampleApiDataSource;
-use RemoteDataBlocks\ExampleApi\Queries\ExampleApiGetRecordQuery;
-use RemoteDataBlocks\ExampleApi\Queries\ExampleApiGetTableQuery;
+use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use RemoteDataBlocks\Config\Query\HttpQuery;
+use RemoteDataBlocks\ExampleApi\Queries\ExampleApiQueryRunner;
 use function register_remote_data_block;
-use function register_remote_data_list_query;
 
 class ExampleApi {
-	private static string $block_name = 'Conference Event';
+	private static string $block_title = 'Conference Event';
 
 	public static function init(): void {
 		add_action( 'init', [ __CLASS__, 'register_remote_data_block' ] );
@@ -30,15 +29,87 @@ class ExampleApi {
 			return;
 		}
 
-		$data_source = ExampleApiDataSource::from_array( [
-			'uuid' => 'bf4bc2b4-c06a-40d2-80f2-a682d81d63f5',
-			'service' => 'example_api',
+		$data_source = HttpDataSource::from_array( [
+			'service_config' => [
+				'__version' => 1,
+				'display_name' => 'Example API',
+				'endpoint' => 'https://example.com/api/v1', // dummy URL
+			],
 		] );
-		
-		$get_record_query = new ExampleApiGetRecordQuery( $data_source );
-		$get_table_query = new ExampleApiGetTableQuery( $data_source );
 
-		register_remote_data_block( self::$block_name, $get_record_query );
-		register_remote_data_list_query( self::$block_name, $get_table_query );
+		$get_record_query = HttpQuery::from_array( [
+			'data_source' => $data_source,
+			'input_schema' => [
+				'record_id' => [
+					'name' => 'Record ID',
+					'type' => 'id',
+				],
+			],
+			'output_schema' => [
+				'type' => [
+					'id' => [
+						'name' => 'Record ID',
+						'path' => '$.id',
+						'type' => 'id',
+					],
+					'title' => [
+						'name' => 'Title',
+						'path' => '$.fields.Activity',
+						'type' => 'string',
+					],
+					'location' => [
+						'name' => 'Location',
+						'path' => '$.fields.Location',
+						'type' => 'string',
+					],
+					'event_type' => [
+						'name' => 'Event type',
+						'path' => '$.fields.Type',
+						'type' => 'string',
+					],
+				],
+			],
+			'query_runner' => new ExampleApiQueryRunner(),
+		] );
+
+		$get_table_query = HttpQuery::from_array( [
+			'data_source' => $data_source,
+			'input_schema' => [],
+			'output_schema' => [
+				'is_collection' => true,
+				'path' => '$.records[*]',
+				'type' => [
+					'record_id' => [
+						'name' => 'Record ID',
+						'path' => '$.id',
+						'type' => 'id',
+					],
+					'title' => [
+						'name' => 'Title',
+						'path' => '$.fields.Activity',
+						'type' => 'string',
+					],
+					'location' => [
+						'name' => 'Location',
+						'path' => '$.fields.Location',
+						'type' => 'string',
+					],
+					'event_type' => [
+						'name' => 'Event type',
+						'path' => '$.fields.Type',
+						'type' => 'string',
+					],
+				],
+			],
+			'query_runner' => new ExampleApiQueryRunner(),
+		] );
+
+		register_remote_data_block( [
+			'title' => self::$block_title,
+			'queries' => [
+				'display' => $get_record_query,
+				'list' => $get_table_query,
+			],
+		] );
 	}
 }
