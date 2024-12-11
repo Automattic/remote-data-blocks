@@ -7,16 +7,16 @@ import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { cog } from '@wordpress/icons';
 
-type DataSourceFormProps = React.FormHTMLAttributes< HTMLFormElement > & {
-	children: React.ReactNode;
-	displayName: string;
-	handleOnChange: ( key: string, value: string ) => void;
-	heading: string | React.ReactNode;
-	mode: 'add' | 'edit';
-	newUUID: string | null;
-	setNewUUID: ( uuid: string | null ) => void;
-	uuidFromProps?: string;
-};
+type DataSourceFormProps = React.FormHTMLAttributes< HTMLFormElement > &
+	React.PropsWithChildren< {
+		displayName: string;
+		handleOnChange: ( key: string, value: string ) => void;
+		heading: string | React.ReactNode;
+		mode: 'add' | 'edit';
+		newUUID: string | null;
+		setNewUUID: ( uuid: string | null ) => void;
+		uuidFromProps?: string;
+	} >;
 
 export const DataSourceForm = ( {
 	children,
@@ -27,6 +27,7 @@ export const DataSourceForm = ( {
 	newUUID,
 	setNewUUID,
 	uuidFromProps,
+	...formProps
 }: DataSourceFormProps ) => {
 	const [ displayName, setDisplayName ] = useState( initialDisplayName );
 	const [ editUUID, setEditUUID ] = useState( false );
@@ -46,7 +47,7 @@ export const DataSourceForm = ( {
 	};
 
 	return (
-		<form className="rdb-settings-page_data-source-form">
+		<form className="rdb-settings-page_data-source-form" { ...formProps }>
 			<div className="rdb-settings-page_data-source-form_header">
 				<Heading size={ 24 }>{ heading }</Heading>
 				{ mode === 'edit' && (
