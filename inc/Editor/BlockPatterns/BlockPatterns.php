@@ -93,7 +93,13 @@ class BlockPatterns {
 		foreach ( $display_query->output_schema['mappings'] as $field => $var ) {
 			$name = isset( $var['name'] ) ? $var['name'] : $field;
 
+			// The types handled here should align with the constants defined in
+			// src/blocks/remote-data-container/config/constants.ts
 			switch ( $var['type'] ) {
+				case 'email_address':
+				case 'integer':
+				case 'markdown':
+				case 'number':
 				case 'string':
 					// Attempt to autodetect headings.
 					$normalized_name = trim( strtolower( $name ) );
@@ -103,14 +109,6 @@ class BlockPatterns {
 						break;
 					}
 
-					$bindings['paragraphs'][] = [
-						'content' => [ $field, $name ],
-					];
-					break;
-
-				case 'markdown':
-				case 'base64':
-				case 'currency':
 					$bindings['paragraphs'][] = [
 						'content' => [ $field, $name ],
 					];
