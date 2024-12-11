@@ -51,6 +51,28 @@ class SanitizerTest extends TestCase {
 		$this->assertSame( true, $result['is_active'] );
 	}
 
+	public function test_sanitize_any() {
+		$schema = Types::object( [
+			'one' => Types::any(),
+			'two' => Types::any(),
+			'three' => Types::any(),
+			'four' => Types::any(),
+			'five' => Types::any(),
+		] );
+		$data = [
+			'one' => 'string',
+			'two' => 123,
+			'three' => true,
+			'four' => [ 'array' ],
+			'five' => null,
+		];
+
+		$sanitizer = new Sanitizer( $schema );
+		$result = $sanitizer->sanitize( $data );
+
+		$this->assertSame( $data, $result );
+	}
+
 	public function test_sanitize_array() {
 		$schema = [
 			'type' => 'object',
