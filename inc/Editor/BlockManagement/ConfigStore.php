@@ -8,7 +8,7 @@ use RemoteDataBlocks\Config\Query\QueryInterface;
 use RemoteDataBlocks\Logging\LoggerManager;
 use Psr\Log\LoggerInterface;
 
-use function sanitize_title;
+use function sanitize_title_with_dashes;
 
 class ConfigStore {
 	/**
@@ -29,7 +29,7 @@ class ConfigStore {
 	 * titles must be unique).
 	 */
 	public static function get_block_name( string $block_title ): string {
-		return 'remote-data-blocks/' . sanitize_title( $block_title );
+		return 'remote-data-blocks/' . sanitize_title_with_dashes( $block_title );
 	}
 
 	/**
@@ -101,7 +101,7 @@ class ConfigStore {
 	 * Return an unprivileged representation of the data sources that can be
 	 * displayed in settings screens.
 	 *
-	 * @return DataSourceInterface[]
+	 * @return array<array<string, string>> Data source properties for UI display.
 	 */
 	public static function get_data_sources_as_array(): array {
 		$data_sources = [];
@@ -109,7 +109,7 @@ class ConfigStore {
 		foreach ( self::$blocks as $config ) {
 			foreach ( $config['queries'] as $query ) {
 				$data_source = $query->get_data_source();
-				$data_sources[] = $data_source->to_ui_display();
+				$data_sources[] = $data_source->to_array();
 			}
 		}
 
