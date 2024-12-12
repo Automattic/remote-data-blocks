@@ -88,7 +88,7 @@ class DataSourceCrud {
 		if ( is_wp_error( $resolved_data_source ) ) {
 			return $resolved_data_source;  // If resolving fails, return error
 		}
-	
+
 		// Save the updated item
 		$result = self::save_data_source( $resolved_data_source, $data_sources, $uuid );  // Passing old UUID to remove it if changed
 		if ( !$result ) {

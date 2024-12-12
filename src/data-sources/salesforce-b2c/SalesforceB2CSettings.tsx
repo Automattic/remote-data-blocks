@@ -55,6 +55,7 @@ export const SalesforceB2CSettings = ( {
 	const onSaveClick = async () => {
 		const salesforceConfig: SalesforceB2CConfig = {
 			uuid: uuidFromProps ?? '',
+			newUUID: newUUID ?? '',
 			display_name: state.display_name,
 			service: 'salesforce-b2c',
 			shortcode: state.shortcode,

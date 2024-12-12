@@ -69,7 +69,7 @@ class AirtableDataSource extends HttpDataSource {
 			],
 			'display_name' => [
 				'type' => 'string',
-				'required' => false,
+				'required' => true,
 			],
 		],
 	];
