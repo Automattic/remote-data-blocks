@@ -6,6 +6,11 @@
 	gap: 12px;
 	padding: 24px 48px;
 
+	.rdb-settings-page_data-source-form_header {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
 
 	.form-group {
 		width: 100%;

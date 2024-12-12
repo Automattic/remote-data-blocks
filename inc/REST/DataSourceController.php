@@ -86,17 +86,6 @@ class DataSourceController extends WP_REST_Controller {
 				'permission_callback' => [ $this, 'delete_item_permissions_check' ],
 			]
 		);
-
-		// item_slug_conflicts
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/slug-conflicts',
-			[
-				'methods' => 'POST',
-				'callback' => [ $this, 'item_slug_conflicts' ],
-				'permission_callback' => [ $this, 'item_slug_conflicts_permissions_check' ],
-			]
-		);
 	}
 
 	/**
@@ -128,7 +117,7 @@ class DataSourceController extends WP_REST_Controller {
 		$ui_configured_data_sources = DataSourceCrud::get_data_sources_list();
 
 		/**
-		 * Quick and dirty de-duplication of data sources by slug.
+		 * Quick and dirty de-duplication of data sources by uuid.
 		 *
 		 * UI configured data sources take precedence over code configured ones
 		 * here due to the ordering of the two arrays passed to array_reduce.
@@ -139,7 +128,14 @@ class DataSourceController extends WP_REST_Controller {
 		$data_sources = array_values(array_reduce(
 			array_merge( $code_configured_data_sources, $ui_configured_data_sources ),
 			function ( $acc, $item ) {
-				$acc[ $item['slug'] ] = $item;
+				// Check if item with the same UUID already exists
+				if ( isset( $acc[ $item['uuid'] ] ) ) {
+					// Merge the properties of the existing item with the new one
+					$acc[ $item['uuid'] ] = array_merge( $acc[ $item['uuid'] ], $item );
+				} else {
+					// Otherwise, add the new item
+					$acc[ $item['uuid'] ] = $item;
+				}
 				return $acc;
 			},
 			[]
@@ -168,27 +164,64 @@ class DataSourceController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function get_item( $request ) {
-		$response = DataSourceCrud::get_item_by_uuid( DataSourceCrud::get_data_sources(), $request->get_param( 'uuid' ) );
-		return rest_ensure_response( $response );
-	}
-
-	/**
-	 * Updates a single item.
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
-	 */
 	public function update_item( $request ) {
+		$current_uuid = $request->get_param( 'uuid' );
 		$data_source_properties = $request->get_json_params();
-		$item = DataSourceCrud::update_item_by_uuid( $request->get_param( 'uuid' ), $data_source_properties );
 
-		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', array_merge( [
-			'data_source_type' => $data_source_properties['service'],
-			'action' => 'update',
-		], $this->get_data_source_interaction_track_props( $data_source_properties ) ) );
+		// Extract new UUID if provided
+		$new_uuid = $data_source_properties['newUUID'] ?? null;
 
-		return rest_ensure_response( $item );
+		// Retrieve the current data sources and the item by its current UUID
+		$data_sources = DataSourceCrud::get_data_sources();
+		$item = DataSourceCrud::get_item_by_uuid( $data_sources, $current_uuid );
+
+		// Handle item not found
+		if ( ! $item ) {
+			return new WP_Error(
+				'data_source_not_found',
+				__( 'Data source not found.', 'remote-data-blocks' ),
+				[ 'status' => 404 ]
+			);
+		}
+
+		// Handle new UUID conflicts
+		if ( $new_uuid && $new_uuid !== $current_uuid ) {
+			// Ensure no conflict with existing UUID
+			if ( DataSourceCrud::get_item_by_uuid( $data_sources, $new_uuid ) ) {
+				return new WP_Error(
+					'uuid_conflict',
+					__( 'The new UUID already exists.', 'remote-data-blocks' ),
+					[ 'status' => 409 ]
+				);
+			}
+		}
+
+		// Set the new UUID in the properties
+		$data_source_properties['uuid'] = $new_uuid;
+
+		// Merge the updated properties with the existing item
+		$updated_item = array_merge( $item, $data_source_properties );
+
+		// Pass the original UUID when updating the item to avoid duplication
+		$result = DataSourceCrud::update_item_by_uuid( $current_uuid, $updated_item, $current_uuid );
+
+		if ( is_wp_error( $result ) ) {
+			return $result; // Return WP_Error if update fails
+		}
+
+		// Log the update action
+		TracksAnalytics::record_event(
+			'remotedatablocks_data_source_interaction',
+			array_merge(
+				[
+					'data_source_type' => $data_source_properties['service'],
+					'action' => 'update',
+				],
+				$this->get_data_source_interaction_track_props( $data_source_properties )
+			)
+		);
+
+		return rest_ensure_response( $result );
 	}
 
 	/**
@@ -210,22 +243,6 @@ class DataSourceController extends WP_REST_Controller {
 		return rest_ensure_response( $result );
 	}
 
-	public function item_slug_conflicts( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		$slug = $request->get_param( 'slug' );
-
-		if ( empty( $slug ) ) {
-			return new \WP_Error(
-				'missing_slug',
-				__( 'Missing slug parameter.', 'remote-data-blocks' ),
-				array( 'status' => 400 )
-			);
-		}
-		$validation_status = DataSourceCrud::validate_slug( $slug );
-		$result = [
-			'exists' => true !== $validation_status,
-		];
-		return rest_ensure_response( $result );
-	}
 
 	// These all require manage_options for now, but we can adjust as needed
 
@@ -246,10 +263,6 @@ class DataSourceController extends WP_REST_Controller {
 	}
 
 	public function delete_item_permissions_check( $request ) {
-		return current_user_can( 'manage_options' );
-	}
-
-	public function item_slug_conflicts_permissions_check() {
 		return current_user_can( 'manage_options' );
 	}
 

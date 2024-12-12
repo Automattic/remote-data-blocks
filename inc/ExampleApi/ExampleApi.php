@@ -31,7 +31,7 @@ class ExampleApi {
 		}
 
 		$data_source = ExampleApiDataSource::from_array( [
-			'slug' => 'example-api',
+			'uuid' => 'bf4bc2b4-c06a-40d2-80f2-a682d81d63f5',
 			'service' => 'example_api',
 		] );
 		

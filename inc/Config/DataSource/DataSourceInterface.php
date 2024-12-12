@@ -22,10 +22,6 @@ interface DataSourceInterface {
 			],
 			'service' => [ 'type' => 'string' ],
 			'service_schema_version' => [ 'type' => 'integer' ],
-			'slug' => [
-				'type' => 'string',
-				'pattern' => '/^[a-z0-9-]+$/',
-			],
 			'uuid' => [
 				'type' => 'string',
 				'callback' => 'wp_is_uuid',

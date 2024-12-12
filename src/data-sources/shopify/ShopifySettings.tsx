@@ -1,11 +1,10 @@
 import { TextControl } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { DataSourceForm } from '../components/DataSourceForm';
 import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
-import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { useShopifyShopName } from '@/data-sources/hooks/useShopify';
 import { SettingsComponentProps, ShopifyConfig } from '@/data-sources/types';
@@ -15,9 +14,9 @@ import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 export type ShopifyFormState = Omit< ShopifyConfig, 'service' | 'uuid' >;
 
 const initialState: ShopifyFormState = {
+	display_name: '',
 	store_name: '',
 	access_token: '',
-	slug: '',
 };
 
 const getInitialStateFromConfig = ( config?: ShopifyConfig ): ShopifyFormState => {
@@ -25,9 +24,9 @@ const getInitialStateFromConfig = ( config?: ShopifyConfig ): ShopifyFormState =
 		return initialState;
 	}
 	return {
+		display_name: config.display_name,
 		store_name: config.store_name,
 		access_token: config.access_token,
-		slug: config.slug,
 	};
 };
 
@@ -48,17 +47,20 @@ export const ShopifySettings = ( {
 		state.access_token
 	);
 
+	const [ newUUID, setNewUUID ] = useState< string | null >( uuidFromProps ?? null );
+
 	const shouldAllowSubmit = useMemo( () => {
-		return state.slug && state.store_name && state.access_token;
-	}, [ state.slug, state.store_name, state.access_token ] );
+		return state.store_name && state.access_token;
+	}, [ state.store_name, state.access_token ] );
 
 	const onSaveClick = async () => {
 		const shopifyConfig: ShopifyConfig = {
+			display_name: state.display_name,
 			uuid: uuidFromProps ?? '',
+			newUUID: newUUID ?? '',
 			service: 'shopify',
 			store_name: state.store_name,
 			access_token: state.access_token,
-			slug: state.slug,
 		};
 
 		if ( mode === 'add' ) {
@@ -73,24 +75,18 @@ export const ShopifySettings = ( {
 		handleOnChange( 'access_token', token ?? '' );
 	};
 
-	/**
-	 * Handle the slug change. Only accepts valid slugs which only contain alphanumeric characters and dashes.
-	 * @param slug The slug to set.
-	 */
-	const onSlugChange = ( slug: string | undefined ) => {
-		handleOnChange( 'slug', slug ?? '' );
-	};
-
 	return (
 		<DataSourceForm
+			displayName={ state.display_name }
+			handleOnChange={ handleOnChange }
 			heading={
 				mode === 'add' ? __( 'Add Shopify Data Source' ) : __( 'Edit Shopify Data Source' )
 			}
+			mode={ mode }
+			newUUID={ newUUID }
+			setNewUUID={ setNewUUID }
+			uuidFromProps={ uuidFromProps }
 		>
-			<div className="form-group">
-				<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
-			</div>
-
 			<div className="form-group">
 				<TextControl
 					type="url"

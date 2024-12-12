@@ -10,7 +10,6 @@ import { getAirtableOutputQueryMappingValue } from '@/data-sources/airtable/util
 import { DataSourceForm } from '@/data-sources/components/DataSourceForm';
 import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
-import { SlugInput } from '@/data-sources/components/SlugInput';
 import {
 	useAirtableApiBases,
 	useAirtableApiTables,
@@ -31,9 +30,9 @@ import { SelectOption } from '@/types/input';
 const initialState: AirtableFormState = {
 	access_token: '',
 	base: null,
+	display_name: '',
 	table: null,
 	table_fields: new Set< string >(),
-	slug: '',
 };
 
 const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState => {
@@ -43,9 +42,9 @@ const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState
 	const initialStateFromConfig: AirtableFormState = {
 		access_token: config.access_token,
 		base: config.base,
+		display_name: config.display_name,
 		table: null,
 		table_fields: new Set< string >(),
-		slug: config.slug,
 	};
 
 	if ( Array.isArray( config.tables ) ) {
@@ -83,8 +82,7 @@ export const AirtableSettings = ( {
 	config,
 }: SettingsComponentProps< AirtableConfig > ) => {
 	const { goToMainScreen } = useSettingsContext();
-	const { updateDataSource, addDataSource, slugConflicts, loadingSlugConflicts } =
-		useDataSources( false );
+	const { updateDataSource, addDataSource } = useDataSources( false );
 
 	const { state, handleOnChange } = useForm< AirtableFormState >( {
 		initialValues: getInitialStateFromConfig( config ),
@@ -105,6 +103,8 @@ export const AirtableSettings = ( {
 		state.base?.id ?? ''
 	);
 
+	const [ newUUID, setNewUUID ] = useState< string | null >( uuidFromProps ?? null );
+
 	const onSaveClick = async () => {
 		if ( ! state.base || ! state.table ) {
 			// TODO: Error handling
@@ -118,9 +118,11 @@ export const AirtableSettings = ( {
 
 		const airtableConfig: AirtableConfig = {
 			uuid: uuidFromProps ?? '',
+			newUUID: newUUID ?? '',
 			service: 'airtable',
 			access_token: state.access_token,
 			base: state.base,
+			display_name: state.display_name,
 			tables: [
 				{
 					id: state.table.id,
@@ -139,7 +141,6 @@ export const AirtableSettings = ( {
 						.filter( Boolean ) as AirtableOutputQueryMappingValue[],
 				},
 			],
-			slug: state.slug,
 		};
 
 		if ( mode === 'add' ) {
@@ -177,14 +178,6 @@ export const AirtableSettings = ( {
 		}
 	};
 
-	/**
-	 * Handle the slug change. Only accepts valid slugs which only contain alphanumeric characters and dashes.
-	 * @param slug The slug to set.
-	 */
-	const onSlugChange = ( slug: string | undefined ) => {
-		handleOnChange( 'slug', slug ?? '' );
-	};
-
 	const connectionMessage = useMemo( () => {
 		if ( fetchingUserId ) {
 			return __( 'Validating connection...', 'remote-data-blocks' );
@@ -211,16 +204,8 @@ export const AirtableSettings = ( {
 	}, [ fetchingUserId, userId, userIdError ] );
 
 	const shouldAllowSubmit = useMemo( () => {
-		return (
-			bases !== null &&
-			tables !== null &&
-			Boolean( state.base ) &&
-			Boolean( state.table ) &&
-			Boolean( state.slug ) &&
-			! loadingSlugConflicts &&
-			! slugConflicts
-		);
-	}, [ bases, tables, state.base, state.table, state.slug, loadingSlugConflicts, slugConflicts ] );
+		return bases !== null && tables !== null && Boolean( state.base ) && Boolean( state.table );
+	}, [ bases, tables, state.base, state.table ] );
 
 	const basesHelpText = useMemo( () => {
 		if ( userId ) {
@@ -320,14 +305,16 @@ export const AirtableSettings = ( {
 
 	return (
 		<DataSourceForm
+			displayName={ state.display_name }
+			handleOnChange={ handleOnChange }
 			heading={
 				mode === 'add' ? __( 'Add Airtable Data Source' ) : __( 'Edit Airtable Data Source' )
 			}
+			mode={ mode }
+			newUUID={ newUUID }
+			setNewUUID={ setNewUUID }
+			uuidFromProps={ uuidFromProps }
 		>
-			<div className="form-group">
-				<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
-			</div>
-
 			<div className="form-group">
 				<PasswordInputControl
 					label={ __( 'Access Token', 'remote-data-blocks' ) }

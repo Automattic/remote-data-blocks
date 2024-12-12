@@ -8,7 +8,7 @@ use RemoteDataBlocks\Logging\LoggerManager;
 require_once __DIR__ . '/inc/queries/class-get-zip-code-query.php';
 
 function register_zipcode_block() {
-	$zipcode_data_source = GenericHttpDataSource::from_slug( 'zip-code' );
+	$zipcode_data_source = GenericHttpDataSource::from_uuid( '0d8f9e74-5244-49b4-981b-e5374107aa5c' );
 
 	if ( ! $zipcode_data_source instanceof GenericHttpDataSource ) {
 		LoggerManager::instance()->debug( 'Zip Code data source not found' );

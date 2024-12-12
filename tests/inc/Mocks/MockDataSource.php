@@ -11,7 +11,6 @@ class MockDataSource extends HttpDataSource {
 	public const MOCK_CONFIG = [
 		'uuid' => 'e3458c42-4cf4-4214-aaf6-3628e33ed07a',
 		'service' => 'mock',
-		'slug' => 'mock-thingy-1',
 		'api_key' => '1234567890',
 	];
 
