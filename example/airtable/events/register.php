@@ -3,22 +3,39 @@
 namespace RemoteDataBlocks\Example\Airtable\Events;
 
 use RemoteDataBlocks\Integrations\Airtable\AirtableDataSource;
+use RemoteDataBlocks\Integrations\Airtable\AirtableIntegration;
 
-require_once __DIR__ . '/inc/queries/class-airtable-get-event-query.php';
-require_once __DIR__ . '/inc/queries/class-airtable-list-events-query.php';
-
-function register_airtable_events_block() {
-	$block_name = 'Conference Event';
+function register_airtable_events_block(): void {
 	$access_token = \RemoteDataBlocks\Example\get_access_token( 'airtable_events' );
 
-	$airtable_data_source = AirtableDataSource::create( $access_token, 'appVQ2PAl95wQSo9S', [], 'Conference Events' );
-	$airtable_get_event_query = new AirtableGetEventQuery( $airtable_data_source );
-	$airtable_list_events_query = new AirtableListEventsQuery( $airtable_data_source );
+	if ( empty( $access_token ) ) {
+		return;
+	}
 
-	register_remote_data_block( $block_name, $airtable_get_event_query );
-	register_remote_data_list_query( $block_name, $airtable_list_events_query );
-	register_remote_data_loop_block( 'Conference Event List', $airtable_list_events_query );
-	register_remote_data_page( $block_name, 'conference-event' );
+	$airtable_data_source = AirtableDataSource::from_array( [
+		'service_config' => [
+			'__version' => 1,
+			'access_token' => $access_token,
+			'base' => [
+				'id' => 'appVQ2PAl95wQSo9S',
+				'name' => 'Conference Events',
+			],
+			'display_name' => 'Conference Events',
+			'tables' => [], // AirtableDataSource does not formally provide queries.
+		],
+	] );
+
+	$block_options = [
+		'pages' => [
+			[
+				'slug' => 'conference-event',
+				'title' => 'Conference Events',
+			],
+		],
+	];
+
+	AirtableIntegration::register_block_for_airtable_data_source( $airtable_data_source, $block_options );
+	AirtableIntegration::register_loop_block_for_airtable_data_source( $airtable_data_source, $block_options );
 }
 
 add_action( 'init', __NAMESPACE__ . '\\register_airtable_events_block' );
