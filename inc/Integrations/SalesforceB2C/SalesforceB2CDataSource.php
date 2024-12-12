@@ -27,7 +27,10 @@ class SalesforceB2CDataSource extends HttpDataSource {
 			'organization_id' => [ 'type' => 'string' ],
 			'client_id' => [ 'type' => 'string' ],
 			'client_secret' => [ 'type' => 'string' ],
-			'display_name' => [ 'type' => 'string', 'required' => true ],
+			'display_name' => [
+				'type' => 'string',
+				'required' => true,
+			],
 		],
 	];
 
@@ -56,7 +59,7 @@ class SalesforceB2CDataSource extends HttpDataSource {
 			'organization_id' => $organization_id,
 			'client_id' => $client_id,
 			'client_secret' => $client_secret,
-			'display_name' => $display_name
+			'display_name' => $display_name,
 		]);
 	}
 
