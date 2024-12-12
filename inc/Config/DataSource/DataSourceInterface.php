@@ -2,6 +2,8 @@
 
 namespace RemoteDataBlocks\Config\DataSource;
 
+use RemoteDataBlocks\Config\ArraySerializableInterface;
+
 /**
  * DataSourceInterface
  *
@@ -12,26 +14,9 @@ namespace RemoteDataBlocks\Config\DataSource;
  * If you are a WPVIP customer, data sources are automatically provided by VIP.
  * Only implement this interface if you have additional custom data sources.
  */
-interface DataSourceInterface {
-	public const BASE_SCHEMA = [
-		'type' => 'object',
-		'properties' => [
-			'__metadata' => [
-				'type' => 'object',
-				'required' => false,
-			],
-			'service' => [ 'type' => 'string' ],
-			'service_schema_version' => [ 'type' => 'integer' ],
-			'uuid' => [
-				'type' => 'string',
-				'callback' => 'wp_is_uuid',
-				'required' => false,
-			],
-		],
-	];
-
+interface DataSourceInterface extends ArraySerializableInterface {
 	/**
-	 * Get a human-readable name for this data source.
+	 * Get a unique human-readable name for this data source.
 	 *
 	 * This method should return a display name for the data source that can be
 	 * used in user interfaces or for identification purposes.
@@ -41,19 +26,17 @@ interface DataSourceInterface {
 	public function get_display_name(): string;
 
 	/**
-	 * Get the schema for the data source's configuration.
-	 *
-	 * This method should return an array that defines the schema for the data source's configuration.
-	 *
-	 * @return array The schema for the data source's configuration.
-	 */
-	public static function get_config_schema(): array;
-
-	/**
 	 * An optional image URL that can represent the data source in the block editor
 	 * (e.g., in modals or in the block inspector).
 	 *
 	 * @return string|null The image URL or null if not set.
 	 */
 	public function get_image_url(): ?string;
+
+	/**
+	 * Get a name for the underlying service for this data source
+	 *
+	 * @return string|null The service name of the data source.
+	 */
+	public function get_service_name(): ?string;
 }
