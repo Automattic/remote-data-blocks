@@ -4,12 +4,24 @@ namespace RemoteDataBlocks\Validation;
 
 use RemoteDataBlocks\Validation\Types;
 use RemoteDataBlocks\Config\DataSource\HttpDataSourceInterface;
+use RemoteDataBlocks\Config\Query\QueryInterface;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 
 /**
  * ConfigSchemas class.
  */
 final class ConfigSchemas {
+	public static function get_remote_data_block_config_schema(): array {
+		static $schema = null;
+
+		if ( null === $schema ) {
+			$schema = self::generate_remote_data_block_config_schema();
+		}
+
+		return $schema;
+	}
+
 	public static function get_graphql_query_config_schema(): array {
 		static $schema = null;
 
@@ -48,6 +60,47 @@ final class ConfigSchemas {
 		}
 
 		return $schema;
+	}
+
+	private static function generate_remote_data_block_config_schema(): array {
+		return Types::object( [
+			'queries' => Types::object( [
+				ConfigRegistry::DISPLAY_QUERY_KEY => Types::instance_of( QueryInterface::class ),
+				ConfigRegistry::LIST_QUERY_KEY => Types::nullable( Types::instance_of( QueryInterface::class ) ),
+				ConfigRegistry::SEARCH_QUERY_KEY => Types::nullable( Types::instance_of( QueryInterface::class ) ),
+			] ),
+			'query_input_overrides' => Types::nullable(
+				Types::list_of(
+					Types::object( [
+						'query' => Types::enum( ConfigRegistry::DISPLAY_QUERY_KEY ), // only display query for now
+						'source' => Types::string(), // e.g., the name of the query var
+						'source_type' => Types::enum( 'page', 'query_var' ),
+						'target' => Types::string(), // e.g., input variable name
+						'target_type' => Types::const( 'input_var' ),
+					] ),
+				)
+			),
+			'loop' => Types::nullable( Types::boolean() ),
+			'pages' => Types::nullable(
+				Types::list_of(
+					Types::object( [
+						'allow_nested_paths' => Types::nullable( Types::boolean() ),
+						'slug' => Types::string(),
+						'title' => Types::nullable( Types::string() ),
+					] )
+				)
+			),
+			'patterns' => Types::nullable(
+				Types::list_of(
+					Types::object( [
+						'html' => Types::html(),
+						'role' => Types::nullable( Types::enum( 'inner_blocks' ) ),
+						'title' => Types::string(),
+					] )
+				)
+			),
+			'title' => Types::string(),
+		] );
 	}
 
 	private static function generate_graphql_query_config_schema(): array {
