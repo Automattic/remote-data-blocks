@@ -2,6 +2,8 @@
 
 namespace RemoteDataBlocks\Config;
 
+use RemoteDataBlocks\Validation\ValidatorInterface;
+
 interface ArraySerializableInterface {
 	/**
 	 * Creates an instance of the class from an array representation.
@@ -10,11 +12,10 @@ interface ArraySerializableInterface {
 	 * using data provided in an array format. It's particularly useful for
 	 * deserialization or when creating objects from structured data (e.g., JSON).
 	 *
-	 * @param array<string, mixed> $data An associative array containing the configuration or
-	 *                                   data needed to create an instance of the class.
+	 * @param array<string, mixed> $config An associative array containing the configuration or data needed to create an instance of the class.
 	 * @return mixed Returns a new instance of the implementing class.
 	 */
-	public static function from_array( array $data ): mixed;
+	public static function from_array( array $config, ?ValidatorInterface $validator ): mixed;
 
 	/**
 	 * Converts the current object to an array representation.
