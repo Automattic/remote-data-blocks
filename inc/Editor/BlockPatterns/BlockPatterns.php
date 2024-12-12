@@ -4,7 +4,7 @@ namespace RemoteDataBlocks\Editor\BlockPatterns;
 
 defined( 'ABSPATH' ) || exit();
 
-use RemoteDataBlocks\Config\QueryContext\QueryContextInterface;
+use RemoteDataBlocks\Config\Query\QueryInterface;
 use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 
 use function register_block_pattern;
@@ -67,12 +67,12 @@ class BlockPatterns {
 	 * Register a default block pattern for a remote data block that can be used
 	 * even when no other patterns are available (e.g., in the item list view).
 	 *
-	 * @param string                 $block_name     The block name.
-	 * @param string                 $block_title    The block title.
-	 * @param QueryContextInterface  $display_query  The display query.
+	 * @param string $block_name The block name.
+	 * @param string $block_title The block title.
+	 * @param QueryInterface $display_query The display query.
 	 * @return string The registered pattern name.
 	 */
-	public static function register_default_block_pattern( string $block_name, string $block_title, QueryContextInterface $display_query ): string {
+	public static function register_default_block_pattern( string $block_name, string $block_title, QueryInterface $display_query ): string {
 		self::load_templates();
 
 		// Loop through output variables and generate a pattern. Each text field will
@@ -90,7 +90,9 @@ class BlockPatterns {
 			'paragraphs' => [],
 		];
 
-		foreach ( $display_query->output_schema['mappings'] as $field => $var ) {
+		$output_schema = $display_query->get_output_schema();
+
+		foreach ( $output_schema['type'] as $field => $var ) {
 			$name = isset( $var['name'] ) ? $var['name'] : $field;
 
 			// The types handled here should align with the constants defined in
