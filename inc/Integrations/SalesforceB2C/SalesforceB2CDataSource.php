@@ -49,14 +49,13 @@ class SalesforceB2CDataSource extends HttpDataSource {
 		return plugins_url( './assets/salesforce_commerce_cloud_logo.png', __FILE__ );
 	}
 
-	public static function create( string $uuid, string $display_name, string $shortcode, string $organization_id, string $client_id, string $client_secret ): self {
+	public static function create( string $shortcode, string $organization_id, string $client_id, string $client_secret, ?string $display_name = null ): self {
 		return parent::from_array([
 			'service' => REMOTE_DATA_BLOCKS_SALESFORCE_B2C_SERVICE,
 			'shortcode' => $shortcode,
 			'organization_id' => $organization_id,
 			'client_id' => $client_id,
 			'client_secret' => $client_secret,
-			'uuid' => $uuid,
 			'display_name' => $display_name
 		]);
 	}

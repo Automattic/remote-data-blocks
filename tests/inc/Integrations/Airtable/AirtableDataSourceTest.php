@@ -35,6 +35,7 @@ class AirtableDataSourceTest extends TestCase {
 				'name' => 'Test Base Name',
 			],
 			'tables' => [],
+			'display_name' => 'Test Base Name',
 		]);
 
 		$this->assertSame(
