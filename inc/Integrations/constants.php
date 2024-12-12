@@ -21,7 +21,7 @@ define( 'REMOTE_DATA_BLOCKS__SERVICES', [
 
 const REMOTE_DATA_BLOCKS__DATA_SOURCE_CLASSMAP = [
 	REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE => \RemoteDataBlocks\Integrations\Airtable\AirtableDataSource::class,
-	REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE => \RemoteDataBlocks\Integrations\GenericHttp\GenericHttpDataSource::class,
+	REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE => \RemoteDataBlocks\Config\DataSource\HttpDataSource::class,
 	REMOTE_DATA_BLOCKS_GITHUB_SERVICE => \RemoteDataBlocks\Integrations\GitHub\GitHubDataSource::class,
 	REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE => \RemoteDataBlocks\Integrations\Google\Sheets\GoogleSheetsDataSource::class,
 	REMOTE_DATA_BLOCKS_SALESFORCE_B2C_SERVICE => \RemoteDataBlocks\Integrations\SalesforceB2C\SalesforceB2CDataSource::class,
