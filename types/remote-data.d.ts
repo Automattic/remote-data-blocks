@@ -71,7 +71,6 @@ interface RemoteDataApiRequest {
 }
 
 interface RemoteDataApiResult {
-	output: Record< string, string >;
 	result: Record< string, RemoteDataResultFields >;
 }
 
