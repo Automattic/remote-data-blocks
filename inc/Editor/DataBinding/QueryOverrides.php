@@ -16,11 +16,9 @@ class QueryOverrides {
 	 */
 	public static function add_query_vars( array $vars ): array {
 		$query_vars = [];
-	
-		// Find all of the query variable overrides defined in display queries.
-		foreach ( ConfigStore::get_block_names() as $block_name ) {
-			$config = ConfigStore::get_configuration( $block_name );
 
+		// Find all of the query variable overrides defined in display queries.
+		foreach ( ConfigStore::get_block_configurations() as $config ) {
 			if ( ! isset( $config['queries']['__DISPLAY__']->input_schema ) ) {
 				continue;
 			}
