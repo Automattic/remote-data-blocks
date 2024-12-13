@@ -1,12 +1,6 @@
 type RemoteDataBinding = Pick< RemoteDataResultFields, 'name' | 'type' >;
 type AvailableBindings = Record< string, RemoteDataBinding >;
 
-interface InputVariableOverrides {
-	name: string;
-	overrides: QueryInputOverride[];
-	type: string;
-}
-
 interface InputVariable {
 	name: string;
 	required: boolean;
@@ -19,7 +13,7 @@ interface BlockConfig {
 	dataSourceType: string;
 	loop: boolean;
 	name: string;
-	overrides: Record< string, InputVariableOverrides >;
+	overrides: Record< string, QueryInputOverride[] >;
 	patterns: {
 		default: string;
 		inner_blocks?: string;

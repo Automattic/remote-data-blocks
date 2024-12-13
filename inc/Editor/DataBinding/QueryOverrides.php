@@ -12,31 +12,17 @@ class QueryOverrides {
 	}
 
 	/**
-	 * Register the query vars indicated as potential overrides in display queries.
+	 * Register the query vars indicated as potential overrides in configured blocks.
 	 */
 	public static function add_query_vars( array $vars ): array {
 		$query_vars = [];
 
-		// Find all of the query variable overrides defined in display queries.
 		foreach ( ConfigStore::get_block_configurations() as $config ) {
-			if ( ! isset( $config['queries']['__DISPLAY__']->input_schema ) ) {
-				continue;
-			}
-
-			foreach ( $config['queries']['__DISPLAY__']->input_schema as $key => $input_var ) {
-				if ( ! isset( $input_var['overrides'] ) ) {
-					continue;
-				}
-
-				foreach ( $input_var['overrides'] as $override ) {
-					switch ( $override['type'] ?? '' ) {
-						case 'query_var':
-							$query_vars[] = $override['target'];
-							break;
-						case 'url':
-							$query_vars[] = $key;
-							break;
-					}
+			foreach ( $config['query_input_overrides'] as $override ) {
+				switch ( $override['source_type'] ?? '' ) {
+					case 'query_var':
+						$query_vars[] = $override['source'];
+						break;
 				}
 			}
 		}

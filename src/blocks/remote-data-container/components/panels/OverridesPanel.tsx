@@ -24,16 +24,18 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 			return -1;
 		}
 
-		const overrides = availableOverrides[ key ]?.overrides;
+		const overrides = availableOverrides[ key ];
 		if ( ! overrides ) {
 			return -1;
 		}
 
-		return overrides.findIndex( o => o.type === override.type && o.target === override.target );
+		return overrides.findIndex(
+			o => o.sourceType === override.sourceType && o.source === override.source
+		);
 	}
 
 	function updateOverrides( inputVar: string, index: number ) {
-		const overrides = availableOverrides[ inputVar ]?.overrides[ index ];
+		const overrides = availableOverrides[ inputVar ]?.[ index ];
 		const copyOfQueryInputOverrides = { ...remoteData.queryInputOverrides };
 
 		if ( ! overrides || index === -1 ) {
@@ -48,8 +50,8 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 		} );
 		sendTracksEvent( 'remotedatablocks_remote_data_container_override', {
 			data_source_type: getBlockDataSourceType( remoteData.blockName ),
-			override_type: overrides?.type,
-			override_target: overrides?.target,
+			override_type: overrides?.sourceType,
+			override_target: overrides?.source,
 		} );
 	}
 
@@ -64,10 +66,10 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 			{ Object.entries( availableOverrides ).map( ( [ key, value ] ) => (
 				<SelectControl
 					key={ key }
-					label={ value.name }
+					label={ key }
 					options={ [
 						{ label: 'Choose an override', value: '-1' },
-						...value.overrides.map( ( override, index ) => ( {
+						...value.map( ( override, index ) => ( {
 							label: override.display,
 							value: index.toString(),
 						} ) ),
