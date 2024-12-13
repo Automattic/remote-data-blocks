@@ -25,11 +25,15 @@ export const AddDataSourceDropdown = () => {
 			className="rdb-settings-page_add-data-source-dropdown"
 			icon={ null }
 			label={ __( 'Connect new data source', 'remote-data-blocks' ) }
+			popoverProps={ {
+				offset: 8,
+			} }
 			text={ __( 'Connect New', 'remote-data-blocks' ) }
 			toggleProps={ {
 				className: 'rdb-settings-page_add-data-source-btn',
 				variant: 'primary',
 				showTooltip: false,
+				__next40pxDefaultSize: true,
 			} }
 			children={ ( { onClose } ) => (
 				<MenuGroup>
@@ -60,18 +64,19 @@ export const AddDataSourceDropdown = () => {
 							value: 'generic-http',
 						},
 					].map( ( { icon, label, value } ) => (
-						<MenuItem
-							className={ `rdb-settings-page_add-data-source-btn-${ value }` }
-							key={ value }
-							icon={ icon }
-							iconPosition="left"
-							onClick={ () => {
-								onAddDataSource( value );
-								onClose();
-							} }
-						>
-							{ label }
-						</MenuItem>
+						<div key={ value } className="rdb-settings-page_add-data-source-btn-wrapper">
+							<MenuItem
+								className={ `rdb-settings-page_add-data-source-btn-${ value }` }
+								icon={ icon }
+								iconPosition="left"
+								onClick={ () => {
+									onAddDataSource( value );
+									onClose();
+								} }
+							>
+								{ label }
+							</MenuItem>
+						</div>
 					) ) }
 				</MenuGroup>
 			) }

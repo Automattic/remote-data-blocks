@@ -91,15 +91,18 @@ body {
 			padding: 24px 48px;
 			border-bottom: 1px solid var(--Alias-border-border-secondary, #ebebeb);
 
-
 			p {
 				margin-bottom: 0;
 			}
 
-
 			.rdb-settings-page_add-data-source-dropdown {
 				grid-area: 1 / 2 / span 1 / span 1;
 				justify-self: end;
+				align-self: center;
+
+				.rdb-settings-page_add-data-source-btn.is-opened {
+					background: #1d35b4;
+				}
 			}
 		}
 	}
@@ -107,18 +110,23 @@ body {
 	/* Add new source menu */
 	.components-menu-group {
 
-		div {
-			display: flex;
+		> div {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
 			width: 368px;
-			align-items: flex-start;
-			align-content: flex-start;
+			align-items: start;
+			align-content: start;
 			gap: 8px;
 			padding: 8px 8px 16px 8px;
-			flex-wrap: wrap;
+
+			.rdb-settings-page_add-data-source-btn-wrapper {
+				height: 100%;
+			}
 
 			.components-button.has-icon.has-text {
 				display: flex;
 				width: 112px;
+				height: 101px;
 				padding: var(--Spacing-Spacing-Base, 16px);
 				flex-direction: column;
 				align-items: center;
@@ -130,16 +138,33 @@ body {
 
 				}
 
+				svg {
+					width: 40px;
+					height: 40px;
+					padding: 4px;
+				}
+
 				.components-menu-item__item {
 					min-width: unset;
 					margin-right: unset;
-					text-wrap: auto;
 					text-align: center;
 				}
 			}
 
-			.rdb-settings-page_add-data-source-btn-salesforce-b2c svg {
-				width: 50px;
+			.components-button.has-icon.has-text.rdb-settings-page_add-data-source-btn-generic-http svg {
+				padding: 8px;
+			}
+
+			.components-button.has-icon.has-text.rdb-settings-page_add-data-source-btn-salesforce-b2c {
+
+				svg {
+					padding: 0;
+				}
+
+				span.components-menu-item__item {
+					text-wrap: auto;
+					min-width: 112px;
+				}
 			}
 		}
 	}
