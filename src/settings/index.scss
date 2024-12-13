@@ -25,7 +25,8 @@ body {
 
 	/* External Links */
 	.components-external-link__contents,
-	.components-base-control__help a {
+	.components-base-control__help a,
+	.components-button.is-link {
 		text-decoration: none;
 	}
 
