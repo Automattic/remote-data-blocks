@@ -32,6 +32,9 @@ export const getAirtableOutputQueryMappingValue = (
 		case 'button':
 			return { ...baseField, type: 'button_url' };
 
+		case 'richText':
+			return { ...baseField, type: 'markdown' };
+
 		case 'currency':
 			return {
 				...baseField,
