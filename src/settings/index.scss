@@ -89,7 +89,13 @@ body {
 				.components-menu-item__item {
 					min-width: unset;
 					margin-right: unset;
+					text-wrap: auto;
+					text-align: center;
 				}
+			}
+
+			.rdb-settings-page_add-data-source-btn-salesforce-b2c svg {
+				width: 50px;
 			}
 		}
 	}

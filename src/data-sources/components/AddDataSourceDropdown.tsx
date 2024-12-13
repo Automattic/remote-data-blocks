@@ -61,6 +61,7 @@ export const AddDataSourceDropdown = () => {
 						},
 					].map( ( { icon, label, value } ) => (
 						<MenuItem
+							className={ `rdb-settings-page_add-data-source-btn-${ value }` }
 							key={ value }
 							icon={ icon }
 							iconPosition="left"
