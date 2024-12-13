@@ -18,13 +18,13 @@ export function getConnectionMessage(
 	};
 
 	return (
-		<div className={ status ? `status-message is-${ status }` : '' }>
+		<span className={ status ? `status-message is-${ status }` : '' }>
 			{ status && (
 				<span className="status-icon">
 					<StatusIcon />
 				</span>
 			) }
 			{ message }
-		</div>
+		</span>
 	);
 }

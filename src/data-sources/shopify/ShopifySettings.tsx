@@ -3,13 +3,13 @@ import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { DataSourceForm } from '../components/DataSourceForm';
-import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { useShopifyShopName } from '@/data-sources/hooks/useShopify';
 import { SettingsComponentProps, ShopifyConfig } from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
+import { ShopifyIcon, ShopifyIconWithText } from '@/settings/icons/ShopifyIcon';
 
 export type ShopifyFormState = Omit< ShopifyConfig, 'service' | 'uuid' >;
 
@@ -76,18 +76,17 @@ export const ShopifySettings = ( {
 	};
 
 	return (
-		<DataSourceForm
-			displayName={ state.display_name }
-			handleOnChange={ handleOnChange }
-			heading={
-				mode === 'add' ? __( 'Add Shopify Data Source' ) : __( 'Edit Shopify Data Source' )
-			}
-			mode={ mode }
-			newUUID={ newUUID }
-			setNewUUID={ setNewUUID }
-			uuidFromProps={ uuidFromProps }
-		>
-			<div className="form-group">
+		<DataSourceForm onSave={ onSaveClick }>
+			<DataSourceForm.Setup
+				canProceed={ Boolean( shouldAllowSubmit ) }
+				displayName={ state.display_name }
+				handleOnChange={ handleOnChange }
+				heading={ { icon: ShopifyIconWithText, width: '102px', height: '32px' } }
+				inputIcon={ ShopifyIcon }
+				newUUID={ newUUID }
+				setNewUUID={ setNewUUID }
+				uuidFromProps={ uuidFromProps }
+			>
 				<TextControl
 					type="url"
 					label={ __( 'Store Slug', 'remote-data-blocks' ) }
@@ -99,19 +98,14 @@ export const ShopifySettings = ( {
 					help={ __( 'Example: https://your-shop-name.myshopify.com', 'remote-data-blocks' ) }
 					autoComplete="off"
 					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				/>
-			</div>
-
-			<div className="form-group">
 				<PasswordInputControl
 					label={ __( 'Access Token', 'remote-data-blocks' ) }
 					onChange={ onTokenInputChange }
 					value={ state.access_token }
 					help={ connectionMessage }
 				/>
-			</div>
-
-			<div className="form-group">
 				<TextControl
 					label={ __( 'Store Name', 'remote-data-blocks' ) }
 					placeholder={ __( 'Auto-filled on successful connection.', 'remote-data-blocks' ) }
@@ -120,14 +114,9 @@ export const ShopifySettings = ( {
 					tabIndex={ -1 }
 					readOnly
 					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				/>
-			</div>
-
-			<DataSourceFormActions
-				onSave={ onSaveClick }
-				onCancel={ goToMainScreen }
-				isSaveDisabled={ ! shouldAllowSubmit }
-			/>
+			</DataSourceForm.Setup>
 		</DataSourceForm>
 	);
 };

@@ -5,7 +5,6 @@ import { ChangeEvent } from 'react';
 
 import { DataSourceForm } from '../components/DataSourceForm';
 import { getConnectionMessage } from '../utils';
-import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import { GOOGLE_SHEETS_API_SCOPES } from '@/data-sources/constants';
 import { GoogleSheetsFormState } from '@/data-sources/google-sheets/types';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
@@ -17,6 +16,7 @@ import { useGoogleAuth } from '@/data-sources/hooks/useGoogleAuth';
 import { GoogleSheetsConfig, SettingsComponentProps } from '@/data-sources/types';
 import { useForm, ValidationRules } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
+import { GoogleSheetsIcon, GoogleSheetsIconWithText } from '@/settings/icons/GoogleSheetsIcon';
 import { StringIdName } from '@/types/common';
 import { GoogleServiceAccountKey } from '@/types/google';
 import { SelectOption } from '@/types/input';
@@ -250,31 +250,33 @@ export const GoogleSheetsSettings = ( {
 	}, [ state.spreadsheet, sheets ] );
 
 	return (
-		<DataSourceForm
-			displayName={ state.display_name }
-			handleOnChange={ handleOnChange }
-			heading={
-				mode === 'add'
-					? __( 'Add Google Sheets Data Source' )
-					: __( 'Edit Google Sheets Data Source' )
-			}
-			mode={ mode }
-			newUUID={ newUUID }
-			setNewUUID={ setNewUUID }
-			uuidFromProps={ uuidFromProps }
-		>
-			<div className="form-group">
+		<DataSourceForm onSave={ onSaveClick }>
+			<DataSourceForm.Setup
+				canProceed={ Boolean( token ) }
+				displayName={ state.display_name }
+				handleOnChange={ handleOnChange }
+				heading={ {
+					icon: GoogleSheetsIconWithText,
+					width: '191px',
+					height: '32px',
+					verticalAlign: 'text-top',
+				} }
+				inputIcon={ GoogleSheetsIcon }
+				newUUID={ newUUID }
+				setNewUUID={ setNewUUID }
+				uuidFromProps={ uuidFromProps }
+			>
 				<TextareaControl
 					label={ __( 'Credentials', 'remote-data-blocks' ) }
 					value={ state.credentials }
 					onChange={ onCredentialsChange }
 					help={ credentialsHelpText }
-					rows={ 14 }
+					rows={ 10 }
 					className="code-input"
+					__nextHasNoMarginBottom
 				/>
-			</div>
-
-			<div className="form-group">
+			</DataSourceForm.Setup>
+			<DataSourceForm.Scope canProceed={ Boolean( shouldAllowSubmit ) }>
 				<SelectControl
 					id="spreadsheet"
 					label={ __( 'Spreadsheet', 'remote-data-blocks' ) }
@@ -284,10 +286,9 @@ export const GoogleSheetsSettings = ( {
 					help={ spreadsheetHelpText }
 					disabled={ fetchingToken || ! spreadsheets?.length }
 					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				/>
-			</div>
 
-			<div className="form-group">
 				<SelectControl
 					id="sheet"
 					label={ __( 'Sheet', 'remote-data-blocks' ) }
@@ -298,13 +299,7 @@ export const GoogleSheetsSettings = ( {
 					disabled={ fetchingToken || ! sheets?.length }
 					__next40pxDefaultSize
 				/>
-			</div>
-
-			<DataSourceFormActions
-				onSave={ onSaveClick }
-				onCancel={ goToMainScreen }
-				isSaveDisabled={ ! shouldAllowSubmit }
-			/>
+			</DataSourceForm.Scope>
 		</DataSourceForm>
 	);
 };

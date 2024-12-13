@@ -3,12 +3,12 @@ import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { DataSourceForm } from '../components/DataSourceForm';
-import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { SettingsComponentProps, SalesforceB2CConfig } from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
+import SalesforceCommerceB2CIcon from '@/settings/icons/SalesforceCommerceB2CIcon';
 
 export type SalesforceB2CFormState = Omit< SalesforceB2CConfig, 'service' | 'uuid' >;
 
@@ -74,20 +74,22 @@ export const SalesforceB2CSettings = ( {
 	};
 
 	return (
-		<DataSourceForm
-			displayName={ state.display_name }
-			handleOnChange={ handleOnChange }
-			mode={ mode }
-			newUUID={ newUUID }
-			setNewUUID={ setNewUUID }
-			uuidFromProps={ uuidFromProps }
-			heading={
-				mode === 'add'
-					? __( 'Add Salesforce B2C Data Source' )
-					: __( 'Edit Salesforce B2C Data Source' )
-			}
-		>
-			<div className="form-group">
+		<DataSourceForm onSave={ onSaveClick }>
+			<DataSourceForm.Setup
+				canProceed={ Boolean( shouldAllowSubmit ) }
+				displayName={ state.display_name }
+				handleOnChange={ handleOnChange }
+				heading={ {
+					icon: SalesforceCommerceB2CIcon,
+					width: '100px',
+					height: '75px',
+					verticalAlign: 'middle',
+				} }
+				inputIcon={ SalesforceCommerceB2CIcon }
+				newUUID={ newUUID }
+				setNewUUID={ setNewUUID }
+				uuidFromProps={ uuidFromProps }
+			>
 				<TextControl
 					type="text"
 					label={ __( 'Merchant shortCode', 'remote-data-blocks' ) }
@@ -99,9 +101,7 @@ export const SalesforceB2CSettings = ( {
 					autoComplete="off"
 					__next40pxDefaultSize
 				/>
-			</div>
 
-			<div className="form-group">
 				<TextControl
 					type="text"
 					label={ __( 'Organization ID', 'remote-data-blocks' ) }
@@ -113,9 +113,7 @@ export const SalesforceB2CSettings = ( {
 					autoComplete="off"
 					__next40pxDefaultSize
 				/>
-			</div>
 
-			<div className="form-group">
 				<TextControl
 					type="text"
 					label={ __( 'Client ID', 'remote-data-blocks' ) }
@@ -127,9 +125,7 @@ export const SalesforceB2CSettings = ( {
 					autoComplete="off"
 					__next40pxDefaultSize
 				/>
-			</div>
 
-			<div className="form-group">
 				<PasswordInputControl
 					label={ __( 'Client Secret', 'remote-data-blocks' ) }
 					onChange={ shortCode => {
@@ -137,13 +133,7 @@ export const SalesforceB2CSettings = ( {
 					} }
 					value={ state.client_secret }
 				/>
-			</div>
-
-			<DataSourceFormActions
-				onSave={ onSaveClick }
-				onCancel={ goToMainScreen }
-				isSaveDisabled={ ! shouldAllowSubmit }
-			/>
+			</DataSourceForm.Setup>
 		</DataSourceForm>
 	);
 };

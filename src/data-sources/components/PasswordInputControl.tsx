@@ -1,7 +1,7 @@
 import { Button, __experimentalInputControl as InputControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { lock, seen, unseen } from '@wordpress/icons';
+import { seen, unseen } from '@wordpress/icons';
 import { ComponentPropsWithoutRef } from 'react';
 
 type PasswordInputControlProps = ComponentPropsWithoutRef< typeof InputControl >;
@@ -13,7 +13,6 @@ const PasswordInputControl = ( { ...props }: PasswordInputControlProps ) => {
 		<InputControl
 			className="password-input-control"
 			type={ visible ? 'text' : 'password' }
-			prefix={ <Button icon={ lock } tabIndex={ -1 } /> }
 			suffix={
 				<Button
 					icon={ visible ? unseen : seen }
