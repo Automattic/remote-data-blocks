@@ -10,14 +10,13 @@ import {
 import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { copy, edit, info, trash } from '@wordpress/icons';
+import { chevronRightSmall, copy, edit, info, trash } from '@wordpress/icons';
 import { store as noticesStore, NoticeStoreActions, WPNotice } from '@wordpress/notices';
 
 import { SUPPORTED_SERVICES, SUPPORTED_SERVICES_LABELS } from './constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
-
 import './DataSourceList.scss';
 import { AirtableIcon } from '@/settings/icons/AirtableIcon';
 import { GoogleSheetsIcon } from '@/settings/icons/GoogleSheetsIcon';
@@ -53,19 +52,36 @@ const DataSourceList = () => {
 		const tags = [];
 		switch ( source.service ) {
 			case 'airtable':
-				tags.push( source.base.name ?? source.base.id );
+				tags.push( {
+					key: 'base',
+					primaryValue: source.base?.name,
+					secondaryValue: source.tables?.[ 0 ]?.name,
+				} );
 				break;
 			case 'shopify':
-				tags.push( source.store_name );
+				tags.push( { key: 'store', primaryValue: source.store_name } );
 				break;
 			case 'google-sheets':
-				tags.push( source.spreadsheet.name );
+				tags.push( {
+					key: 'spreadsheet',
+					primaryValue: source.spreadsheet.name,
+					secondaryValue: source.sheet.name,
+				} );
 				break;
 		}
 
 		return tags.filter( Boolean ).map( tag => (
-			<span key={ tag } className="data-source-meta">
-				{ tag }
+			<span key={ tag.key } className="data-source-meta">
+				{ tag.primaryValue }
+				{ tag.secondaryValue && (
+					<>
+						<Icon
+							icon={ chevronRightSmall }
+							style={ { fill: '#949494', verticalAlign: 'middle' } }
+						/>
+						{ tag.secondaryValue }
+					</>
+				) }
 			</span>
 		) );
 	};
