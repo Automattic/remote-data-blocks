@@ -25,6 +25,9 @@ export const AddDataSourceDropdown = () => {
 			className="rdb-settings-page_add-data-source-dropdown"
 			icon={ null }
 			label={ __( 'Connect new data source', 'remote-data-blocks' ) }
+			popoverProps={ {
+				offset: 8,
+			} }
 			text={ __( 'Connect New', 'remote-data-blocks' ) }
 			toggleProps={ {
 				className: 'rdb-settings-page_add-data-source-btn',
