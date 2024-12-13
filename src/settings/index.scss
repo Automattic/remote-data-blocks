@@ -147,7 +147,15 @@ body {
 				}
 			}
 
+			.components-button.has-icon.has-text.rdb-settings-page_add-data-source-btn-generic-http svg {
+				padding: 8px;
+			}
+
 			.components-button.has-icon.has-text.rdb-settings-page_add-data-source-btn-salesforce-b2c {
+
+				svg {
+					padding: 0;
+				}
 
 				span.components-menu-item__item {
 					text-wrap: auto;
