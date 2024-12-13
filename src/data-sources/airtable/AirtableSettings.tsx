@@ -1,10 +1,4 @@
-import {
-	BaseControl,
-	CheckboxControl,
-	SelectControl,
-	Spinner,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { FormTokenField, SelectControl, Spinner } from '@wordpress/components';
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -356,37 +350,32 @@ export const AirtableSettings = ( {
 					/>
 
 					{ state.table && availableTableFields.length ? (
-						<>
-							<BaseControl
-								help={ __(
-									'Select the fields to be used in the remote data block.',
-									'remote-data-blocks'
-								) }
-								__nextHasNoMarginBottom
-							>
-								<BaseControl.VisualLabel>
-									{ __( 'Table Fields', 'remote-data-blocks' ) }
-								</BaseControl.VisualLabel>
-							</BaseControl>
-							<VStack>
-								{ availableTableFields.map( field => (
-									<CheckboxControl
-										key={ field }
-										label={ field }
-										checked={ state.table_fields.has( field ) }
-										onChange={ checked =>
-											handleOnChange(
-												'table_fields',
-												checked
-													? new Set( [ ...state.table_fields, field ] )
-													: new Set( [ ...state.table_fields ].filter( fld => fld !== field ) )
-											)
-										}
-										__nextHasNoMarginBottom
-									/>
-								) ) }
-							</VStack>
-						</>
+						<FormTokenField
+							label={ __( 'Fields', 'remote-data-blocks' ) }
+							onChange={ selection => {
+								if ( selection.includes( 'Select All' ) ) {
+									handleOnChange( 'table_fields', new Set( availableTableFields ) );
+								} else if ( selection.includes( 'Deselect All' ) ) {
+									handleOnChange( 'table_fields', new Set() );
+								} else {
+									handleOnChange(
+										'table_fields',
+										new Set(
+											selection.filter( item => item !== 'Select All' && item !== 'Deselect All' )
+										)
+									);
+								}
+							} }
+							suggestions={ [
+								...( state.table_fields.size === availableTableFields.length
+									? [ 'Deselect All' ]
+									: [ 'Select All' ] ),
+								...availableTableFields,
+							] }
+							value={ Array.from( state.table_fields ) }
+							__nextHasNoMarginBottom
+							__experimentalExpandOnFocus
+						/>
 					) : (
 						state.table && <Spinner />
 					) }
