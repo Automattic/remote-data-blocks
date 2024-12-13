@@ -111,8 +111,8 @@ body {
 			display: grid;
 			grid-template-columns: repeat(3, 1fr);
 			width: 368px;
-			align-items: flex-start;
-			align-content: flex-start;
+			align-items: start;
+			align-content: start;
 			gap: 8px;
 			padding: 8px 8px 16px 8px;
 
@@ -130,7 +130,7 @@ body {
 				gap: 12px;
 				align-self: stretch;
 				justify-self: stretch;
-				justify-content: center;
+				justify-content: start;
 
 				&:hover {
 					color: unset;
