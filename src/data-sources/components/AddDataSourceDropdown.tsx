@@ -33,6 +33,7 @@ export const AddDataSourceDropdown = () => {
 				className: 'rdb-settings-page_add-data-source-btn',
 				variant: 'primary',
 				showTooltip: false,
+				__next40pxDefaultSize: true,
 			} }
 			children={ ( { onClose } ) => (
 				<MenuGroup>
