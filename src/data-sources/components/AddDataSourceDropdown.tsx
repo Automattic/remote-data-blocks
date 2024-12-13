@@ -60,18 +60,19 @@ export const AddDataSourceDropdown = () => {
 							value: 'generic-http',
 						},
 					].map( ( { icon, label, value } ) => (
-						<MenuItem
-							className={ `rdb-settings-page_add-data-source-btn-${ value }` }
-							key={ value }
-							icon={ icon }
-							iconPosition="left"
-							onClick={ () => {
-								onAddDataSource( value );
-								onClose();
-							} }
-						>
-							{ label }
-						</MenuItem>
+						<div key={ value } className="rdb-settings-page_add-data-source-btn-wrapper">
+							<MenuItem
+								className={ `rdb-settings-page_add-data-source-btn-${ value }` }
+								icon={ icon }
+								iconPosition="left"
+								onClick={ () => {
+									onAddDataSource( value );
+									onClose();
+								} }
+							>
+								{ label }
+							</MenuItem>
+						</div>
 					) ) }
 				</MenuGroup>
 			) }
