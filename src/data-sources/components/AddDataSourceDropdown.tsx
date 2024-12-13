@@ -7,7 +7,7 @@ import { AirtableIcon } from '@/settings/icons/AirtableIcon';
 import GoogleSheetsIcon from '@/settings/icons/GoogleSheetsIcon';
 import HttpIcon from '@/settings/icons/HttpIcon';
 import SalesforceCommerceB2CIcon from '@/settings/icons/SalesforceCommerceB2CIcon';
-import ShopifyIcon from '@/settings/icons/ShopifyIcon';
+import { ShopifyIcon } from '@/settings/icons/ShopifyIcon';
 
 import '../DataSourceList.scss';
 

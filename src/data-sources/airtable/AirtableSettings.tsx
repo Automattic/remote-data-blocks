@@ -307,11 +307,11 @@ export const AirtableSettings = ( {
 
 	return (
 		<>
-			<DataSourceForm onSave={ onSaveClick }>
+			<DataSourceForm onSave={ onSaveClick } source="Airtable">
 				<DataSourceForm.Setup
 					displayName={ state.display_name }
 					handleOnChange={ handleOnChange }
-					headingIcon={ AirtableIconWithText }
+					headingIcon={ { icon: AirtableIconWithText, width: '113.81px', height: '25px' } }
 					inputIcon={ AirtableIcon }
 					newUUID={ newUUID }
 					setNewUUID={ setNewUUID }
