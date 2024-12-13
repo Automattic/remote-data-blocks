@@ -120,14 +120,13 @@ body {
 			}
 
 			.components-button.has-icon.has-text {
-				height: 100%;
 				display: flex;
 				width: 112px;
+				height: 101px;
 				padding: var(--Spacing-Spacing-Base, 16px);
 				flex-direction: column;
 				align-items: center;
 				gap: 12px;
-				justify-content: start;
 
 				&:hover {
 					color: unset;
@@ -135,16 +134,25 @@ body {
 
 				}
 
+				svg {
+					width: 40px;
+					height: 40px;
+					padding: 4px;
+				}
+
 				.components-menu-item__item {
 					min-width: unset;
 					margin-right: unset;
-					text-wrap: auto;
 					text-align: center;
 				}
 			}
 
-			.rdb-settings-page_add-data-source-btn-salesforce-b2c svg {
-				width: 50px;
+			.components-button.has-icon.has-text.rdb-settings-page_add-data-source-btn-salesforce-b2c {
+
+				span.components-menu-item__item {
+					text-wrap: auto;
+					min-width: 112px;
+				}
 			}
 		}
 	}
