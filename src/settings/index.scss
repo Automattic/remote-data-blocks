@@ -109,7 +109,7 @@ body {
 
 		> div {
 			display: grid;
-			grid-template-columns: repeat( 3, 1fr );
+			grid-template-columns: repeat(3, 1fr);
 			width: 368px;
 			align-items: flex-start;
 			align-content: flex-start;
@@ -121,7 +121,7 @@ body {
 			}
 
 			.components-button.has-icon.has-text {
-				height:100%;
+				height: 100%;
 				display: flex;
 				width: 112px;
 				padding: var(--Spacing-Spacing-Base, 16px);
