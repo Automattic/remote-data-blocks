@@ -1,23 +1,22 @@
 import { TextControl } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { DataSourceForm } from '../components/DataSourceForm';
-import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
-import { SlugInput } from '@/data-sources/components/SlugInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { useShopifyShopName } from '@/data-sources/hooks/useShopify';
 import { SettingsComponentProps, ShopifyConfig } from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
+import { ShopifyIcon, ShopifyIconWithText } from '@/settings/icons/ShopifyIcon';
 
 export type ShopifyFormState = Omit< ShopifyConfig, 'service' | 'uuid' >;
 
 const initialState: ShopifyFormState = {
+	display_name: '',
 	store_name: '',
 	access_token: '',
-	slug: '',
 };
 
 const getInitialStateFromConfig = ( config?: ShopifyConfig ): ShopifyFormState => {
@@ -25,9 +24,9 @@ const getInitialStateFromConfig = ( config?: ShopifyConfig ): ShopifyFormState =
 		return initialState;
 	}
 	return {
+		display_name: config.display_name,
 		store_name: config.store_name,
 		access_token: config.access_token,
-		slug: config.slug,
 	};
 };
 
@@ -48,17 +47,20 @@ export const ShopifySettings = ( {
 		state.access_token
 	);
 
+	const [ newUUID, setNewUUID ] = useState< string | null >( uuidFromProps ?? null );
+
 	const shouldAllowSubmit = useMemo( () => {
-		return state.slug && state.store_name && state.access_token;
-	}, [ state.slug, state.store_name, state.access_token ] );
+		return state.store_name && state.access_token;
+	}, [ state.store_name, state.access_token ] );
 
 	const onSaveClick = async () => {
 		const shopifyConfig: ShopifyConfig = {
+			display_name: state.display_name,
 			uuid: uuidFromProps ?? '',
+			newUUID: newUUID ?? '',
 			service: 'shopify',
 			store_name: state.store_name,
 			access_token: state.access_token,
-			slug: state.slug,
 		};
 
 		if ( mode === 'add' ) {
@@ -73,25 +75,18 @@ export const ShopifySettings = ( {
 		handleOnChange( 'access_token', token ?? '' );
 	};
 
-	/**
-	 * Handle the slug change. Only accepts valid slugs which only contain alphanumeric characters and dashes.
-	 * @param slug The slug to set.
-	 */
-	const onSlugChange = ( slug: string | undefined ) => {
-		handleOnChange( 'slug', slug ?? '' );
-	};
-
 	return (
-		<DataSourceForm
-			heading={
-				mode === 'add' ? __( 'Add Shopify Data Source' ) : __( 'Edit Shopify Data Source' )
-			}
-		>
-			<div className="form-group">
-				<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
-			</div>
-
-			<div className="form-group">
+		<DataSourceForm onSave={ onSaveClick }>
+			<DataSourceForm.Setup
+				canProceed={ Boolean( shouldAllowSubmit ) }
+				displayName={ state.display_name }
+				handleOnChange={ handleOnChange }
+				heading={ { icon: ShopifyIconWithText, width: '102px', height: '32px' } }
+				inputIcon={ ShopifyIcon }
+				newUUID={ newUUID }
+				setNewUUID={ setNewUUID }
+				uuidFromProps={ uuidFromProps }
+			>
 				<TextControl
 					type="url"
 					label={ __( 'Store Slug', 'remote-data-blocks' ) }
@@ -103,19 +98,14 @@ export const ShopifySettings = ( {
 					help={ __( 'Example: https://your-shop-name.myshopify.com', 'remote-data-blocks' ) }
 					autoComplete="off"
 					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				/>
-			</div>
-
-			<div className="form-group">
 				<PasswordInputControl
 					label={ __( 'Access Token', 'remote-data-blocks' ) }
 					onChange={ onTokenInputChange }
 					value={ state.access_token }
 					help={ connectionMessage }
 				/>
-			</div>
-
-			<div className="form-group">
 				<TextControl
 					label={ __( 'Store Name', 'remote-data-blocks' ) }
 					placeholder={ __( 'Auto-filled on successful connection.', 'remote-data-blocks' ) }
@@ -124,14 +114,9 @@ export const ShopifySettings = ( {
 					tabIndex={ -1 }
 					readOnly
 					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				/>
-			</div>
-
-			<DataSourceFormActions
-				onSave={ onSaveClick }
-				onCancel={ goToMainScreen }
-				isSaveDisabled={ ! shouldAllowSubmit }
-			/>
+			</DataSourceForm.Setup>
 		</DataSourceForm>
 	);
 };

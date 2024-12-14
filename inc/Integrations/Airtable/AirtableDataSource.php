@@ -44,8 +44,20 @@ class AirtableDataSource extends HttpDataSource {
 							'items' => [
 								'type' => 'object',
 								'properties' => [
-									'name' => [ 'type' => 'string' ],
+									'key' => [ 'type' => 'string' ],
+									'name' => [
+										'type' => 'string',
+										'required' => false,
+									],
 									'type' => [
+										'type' => 'string',
+										'required' => false,
+									],
+									'path' => [
+										'type' => 'string',
+										'required' => false,
+									],
+									'prefix' => [
 										'type' => 'string',
 										'required' => false,
 									],
@@ -57,13 +69,13 @@ class AirtableDataSource extends HttpDataSource {
 			],
 			'display_name' => [
 				'type' => 'string',
-				'required' => false,
+				'required' => true,
 			],
 		],
 	];
 
 	public function get_display_name(): string {
-		return sprintf( 'Airtable (%s)', $this->config['display_name'] ?? $this->config['slug'] ?? $this->config['base']['name'] );
+		return sprintf( 'Airtable (%s)', $this->config['display_name'] ?? $this->config['base']['name'] );
 	}
 
 	public function get_endpoint(): string {
@@ -84,13 +96,11 @@ class AirtableDataSource extends HttpDataSource {
 			'base' => [ 'id' => $base_id ],
 			'tables' => $tables,
 			'display_name' => $display_name,
-			'slug' => $display_name ? sanitize_title( $display_name ) : sanitize_title( 'Airtable ' . $base_id ),
 		]);
 	}
 
 	public function to_ui_display(): array {
 		return [
-			'slug' => $this->get_slug(),
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'base' => [
 				'id' => $this->config['base']['id'],
@@ -98,6 +108,7 @@ class AirtableDataSource extends HttpDataSource {
 			],
 			'tables' => $this->config['tables'] ?? [],
 			'uuid' => $this->config['uuid'] ?? null,
+			'display_name' => $this->config['display_name'] ?? null,
 		];
 	}
 
@@ -121,11 +132,16 @@ class AirtableDataSource extends HttpDataSource {
 		];
 
 		foreach ( $this->config['tables'][0]['output_query_mappings'] as $mapping ) {
-			$output_schema['mappings'][ ucfirst( $mapping['name'] ) ] = [
-				'name' => $mapping['name'],
-				'path' => '$.fields.' . $mapping['name'],
+			$mapping_key = $mapping['key'];
+			$output_schema['mappings'][ $mapping_key ] = [
+				'name' => $mapping['name'] ?? $mapping_key,
+				'path' => $mapping['path'] ?? '$.fields["' . $mapping_key . '"]',
 				'type' => $mapping['type'] ?? 'string',
 			];
+
+			if ( 'currency' === $mapping['type'] && isset( $mapping['prefix'] ) ) {
+				$output_schema['mappings'][ $mapping_key ]['prefix'] = $mapping['prefix'];
+			}
 		}
 
 		return AirtableGetItemQuery::from_array([

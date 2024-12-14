@@ -101,7 +101,6 @@ class ValidatorTest extends TestCase {
 				'id' => 'table_id',
 				'name' => 'Table Name',
 			],
-			'slug' => 'valid-slug',
 		];
 
 		$validator = new Validator( self::AIRTABLE_SCHEMA );
@@ -112,7 +111,6 @@ class ValidatorTest extends TestCase {
 		$invalid_source = [
 			'uuid' => '123e4567-e89b-12d3-a456-426614174000',
 			'service' => 'airtable',
-			'slug' => 'valid-slug',
 		];
 
 		$validator = new Validator( self::AIRTABLE_SCHEMA );
@@ -125,7 +123,6 @@ class ValidatorTest extends TestCase {
 			'access_token' => 'valid_token',
 			'service' => 'shopify',
 			'store_name' => 'mystore.myshopify.com',
-			'slug' => 'valid-slug',
 		];
 	
 		$validator = new Validator( self::SHOPIFY_SCHEMA );
@@ -136,7 +133,6 @@ class ValidatorTest extends TestCase {
 		$invalid_source = [
 			'uuid' => '123e4567-e89b-12d3-a456-426614174000',
 			'service' => 'shopify',
-			'slug' => 'valid-slug',
 		];
 
 		$validator = new Validator( self::SHOPIFY_SCHEMA );
@@ -170,7 +166,6 @@ class ValidatorTest extends TestCase {
 				'id' => 0,
 				'name' => 'Sheet Name',
 			],
-			'slug' => 'valid-slug',
 		];
 
 		$validator = new Validator( self::GOOGLE_SHEETS_SCHEMA );
@@ -184,7 +179,6 @@ class ValidatorTest extends TestCase {
 			'credentials' => [
 				'type' => 'service_account',
 			],
-			'slug' => 'valid-slug',
 		];
 
 		$validator = new Validator( self::GOOGLE_SHEETS_SCHEMA );
@@ -209,7 +203,6 @@ class ValidatorTest extends TestCase {
 				'boolean_field' => true,
 				'enum_field' => 'option2',
 			],
-			'slug' => 'valid-nested-slug',
 		];
 
 		$schema = [
@@ -243,7 +236,6 @@ class ValidatorTest extends TestCase {
 						],
 					],
 				],
-				'slug' => [ 'type' => 'string' ],
 			],
 		];
 
@@ -265,7 +257,6 @@ class ValidatorTest extends TestCase {
 				],
 				'boolean_field' => 'not_a_boolean', // This should be a boolean
 			],
-			'slug' => 'valid-nested-slug',
 		];
 
 		$schema = [
@@ -295,7 +286,6 @@ class ValidatorTest extends TestCase {
 						'boolean_field' => [ 'type' => 'boolean' ],
 					],
 				],
-				'slug' => [ 'type' => 'string' ],
 			],
 		];
 

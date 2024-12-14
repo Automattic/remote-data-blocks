@@ -7,18 +7,25 @@ import {
 	Spinner,
 	__experimentalText as Text,
 } from '@wordpress/components';
+import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { edit, info, trash } from '@wordpress/icons';
+import { chevronRightSmall, copy, edit, info, trash } from '@wordpress/icons';
+import { store as noticesStore, NoticeStoreActions, WPNotice } from '@wordpress/notices';
 
 import { SUPPORTED_SERVICES, SUPPORTED_SERVICES_LABELS } from './constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
-
 import './DataSourceList.scss';
+import { AirtableIcon } from '@/settings/icons/AirtableIcon';
+import { GoogleSheetsIcon } from '@/settings/icons/GoogleSheetsIcon';
+import HttpIcon from '@/settings/icons/HttpIcon';
+import { ShopifyIcon } from '@/settings/icons/ShopifyIcon';
 
 const DataSourceList = () => {
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch< NoticeStoreActions >( noticesStore );
 	const { dataSources, loadingDataSources, deleteDataSource, fetchDataSources } = useDataSources();
 	const [ dataSourceToDelete, setDataSourceToDelete ] = useState< DataSourceConfig | null >( null );
 	const { pushState } = useSettingsContext();
@@ -45,19 +52,36 @@ const DataSourceList = () => {
 		const tags = [];
 		switch ( source.service ) {
 			case 'airtable':
-				tags.push( source.base.name ?? source.base.id );
+				tags.push( {
+					key: 'base',
+					primaryValue: source.base?.name,
+					secondaryValue: source.tables?.[ 0 ]?.name,
+				} );
 				break;
 			case 'shopify':
-				tags.push( source.store_name );
+				tags.push( { key: 'store', primaryValue: source.store_name } );
 				break;
 			case 'google-sheets':
-				tags.push( source.spreadsheet.name );
+				tags.push( {
+					key: 'spreadsheet',
+					primaryValue: source.spreadsheet.name,
+					secondaryValue: source.sheet.name,
+				} );
 				break;
 		}
 
 		return tags.filter( Boolean ).map( tag => (
-			<span key={ tag } className="data-source-meta">
-				{ tag }
+			<span key={ tag.key } className="data-source-meta">
+				{ tag.primaryValue }
+				{ tag.secondaryValue && (
+					<>
+						<Icon
+							icon={ chevronRightSmall }
+							style={ { fill: '#949494', verticalAlign: 'middle' } }
+						/>
+						{ tag.secondaryValue }
+					</>
+				) }
 			</span>
 		) );
 	};
@@ -65,6 +89,35 @@ const DataSourceList = () => {
 	const getServiceLabel = ( service: ( typeof SUPPORTED_SERVICES )[ number ] ) => {
 		// eslint-disable-next-line security/detect-object-injection
 		return SUPPORTED_SERVICES_LABELS[ service ];
+	};
+
+	function showSnackbar( type: 'success' | 'error', message: string ): void {
+		const SNACKBAR_OPTIONS: Partial< WPNotice > = {
+			isDismissible: true,
+		};
+
+		switch ( type ) {
+			case 'success':
+				createSuccessNotice( message, { ...SNACKBAR_OPTIONS, icon: '✅' } );
+				break;
+			case 'error':
+				createErrorNotice( message, { ...SNACKBAR_OPTIONS, icon: '❌' } );
+				break;
+		}
+	}
+	const getServiceIcon = ( service: ( typeof SUPPORTED_SERVICES )[ number ] ) => {
+		switch ( service ) {
+			case 'airtable':
+				return AirtableIcon;
+			case 'shopify':
+				return ShopifyIcon;
+			case 'google-sheets':
+				return GoogleSheetsIcon;
+			case 'generic-http':
+				return HttpIcon;
+			default:
+				return null;
+		}
 	};
 
 	const DataSourceTable = (): JSX.Element => {
@@ -82,7 +135,10 @@ const DataSourceList = () => {
 				<Placeholder
 					icon={ info }
 					label={ __( 'No data source found.', 'remote-data-blocks' ) }
-					instructions={ __( 'Use “Add” button to add data source.', 'remote-data-blocks' ) }
+					instructions={ __(
+						'Use the “Connect New” button to add a data source.',
+						'remote-data-blocks'
+					) }
 				/>
 			);
 		}
@@ -92,29 +148,60 @@ const DataSourceList = () => {
 				<table className="table data-source-list">
 					<thead className="table-header">
 						<tr>
-							<th>{ __( 'Slug', 'remote-data-blocks' ) }</th>
-							<th>{ __( 'Data Source', 'remote-data-blocks' ) }</th>
+							<th>{ __( 'Source', 'remote-data-blocks' ) }</th>
+							<th>{ __( 'Service', 'remote-data-blocks' ) }</th>
 							<th>{ __( 'Meta', 'remote-data-blocks' ) }</th>
 							<th className="data-source-actions">{ __( 'Actions', 'remote-data-blocks' ) }</th>
 						</tr>
 					</thead>
 					<tbody className="table-body">
 						{ dataSources
-							.sort( ( a, b ) => a.slug.localeCompare( b.slug ) )
+							.sort( ( a, b ) => ( a.display_name ?? '' ).localeCompare( b.display_name ?? '' ) )
 							.map( source => {
-								const { uuid, slug, service } = source;
+								const { display_name: displayName, uuid, service } = source;
+
 								return (
-									<tr key={ slug } className="table-row">
+									<tr key={ uuid } className="table-row">
 										<td>
-											<Text className="data-source-slug">{ slug }</Text>
+											<Icon
+												icon={ getServiceIcon( service ) }
+												style={ { marginRight: '16px', verticalAlign: 'text-bottom' } }
+											/>
+											<Text className="data-source-display_name">{ displayName }</Text>
 										</td>
 										<td>
 											<Text>{ getServiceLabel( service ) }</Text>
 										</td>
 										<td> { renderDataSourceMeta( source ) } </td>
 										<td className="data-source-actions">
-											{ uuid && (
+											{ uuid && SUPPORTED_SERVICES.includes( service ) && (
 												<ButtonGroup className="data-source-actions">
+													<Button
+														variant="secondary"
+														onClick={ () => {
+															if ( uuid ) {
+																navigator.clipboard
+																	.writeText( uuid )
+																	.then( () => {
+																		showSnackbar(
+																			'success',
+																			__(
+																				'Copied data source UUID to the clipboard.',
+																				'remote-data-blocks'
+																			)
+																		);
+																	} )
+																	.catch( () =>
+																		showSnackbar(
+																			'error',
+																			__( 'Failed to copy to clipboard.', 'remote-data-blocks' )
+																		)
+																	);
+															}
+														} }
+													>
+														<Icon icon={ copy } />
+													</Button>
 													<Button variant="secondary" onClick={ () => onEditDataSource( uuid ) }>
 														<Icon icon={ edit } />
 													</Button>
@@ -142,12 +229,9 @@ const DataSourceList = () => {
 						title={ __( 'Delete Data Source', 'remote-data-blocks' ) }
 					>
 						{ sprintf(
-							__(
-								'Are you sure you want to delete "%s" data source with slug "%s"?',
-								'remote-data-blocks'
-							),
+							__( 'Are you sure you want to delete %s data source "%s"?', 'remote-data-blocks' ),
 							getServiceLabel( dataSourceToDelete.service ),
-							dataSourceToDelete.slug
+							dataSourceToDelete.display_name
 						) }
 					</ConfirmDialog>
 				) }
