@@ -1,3 +1,6 @@
+// include dataview styles in settings
+@import "@wordpress/dataviews/build-style/style";
+
 .data-source-list-wrapper {
 	overflow: auto;
 }
