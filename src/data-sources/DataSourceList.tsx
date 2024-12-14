@@ -163,11 +163,13 @@ const DataSourceList = () => {
 								return (
 									<tr key={ uuid } className="table-row">
 										<td>
-											<Icon
-												icon={ getServiceIcon( service ) }
-												style={ { marginRight: '16px', verticalAlign: 'text-bottom' } }
-											/>
-											<Text className="data-source-display_name">{ displayName }</Text>
+											<div className="rdb-data-source-name-and-icon">
+												<Icon
+													icon={ getServiceIcon( service ) }
+													style={ { marginRight: '16px', verticalAlign: 'text-bottom' } }
+												/>
+												<Text className="data-source-display_name">{ displayName }</Text>
+											</div>
 										</td>
 										<td>
 											<Text>{ getServiceLabel( service ) }</Text>
