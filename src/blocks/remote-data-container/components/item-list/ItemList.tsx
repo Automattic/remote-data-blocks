@@ -47,12 +47,7 @@ export function ItemList( props: ItemListProps ) {
 
 	// get fields from results data to use as columns
 	const tableFields = useMemo(
-		() =>
-			Array.from(
-				new Set(
-					results?.flatMap( Object.keys ).filter( key => ! /(^|_)(id)$/i.test( key ) ) // Filters out keys containing 'id' or similar patterns
-				)
-			),
+		() => Array.from( new Set( results?.flatMap( Object.keys ) ) ),
 
 		[ results ]
 	);
@@ -74,7 +69,9 @@ export function ItemList( props: ItemListProps ) {
 		perPage: 10,
 		page: 1,
 		search: '',
-		fields: tableFields.filter( field => field !== mediaField && field !== titleField ),
+		fields: tableFields.filter(
+			field => field !== mediaField && field !== titleField && ! /(^|_)(id)$/i.test( field )
+		),
 		filters: [],
 		layout: {},
 		titleField,
