@@ -8,25 +8,14 @@ import { __ } from '@/utils/i18n';
 interface ItemListProps {
 	blockName: string;
 	loading: boolean;
-	noResultsText: string;
 	onSelect: ( data: RemoteDataQueryInput ) => void;
-	placeholderText: string;
 	results?: RemoteData[ 'results' ];
 	searchTerms: string;
 	setSearchTerms: ( newValue: string ) => void;
 }
 
 export function ItemList( props: ItemListProps ) {
-	const {
-		blockName,
-		loading,
-		noResultsText,
-		onSelect,
-		placeholderText,
-		results,
-		searchTerms,
-		setSearchTerms,
-	} = props;
+	const { blockName, loading, onSelect, results, searchTerms, setSearchTerms } = props;
 	const { defaultPattern: pattern } = usePatterns( blockName );
 
 	const instanceId = useInstanceId( ItemList, blockName );
@@ -46,11 +35,7 @@ export function ItemList( props: ItemListProps ) {
 	}, [ results ] );
 
 	// get fields from results data to use as columns
-	const tableFields = useMemo(
-		() => Array.from( new Set( results?.flatMap( Object.keys ) ) ),
-
-		[ results ]
-	);
+	const tableFields = useMemo( () => Array.from( new Set( results?.flatMap( Object.keys ) ) ), [] );
 
 	// generic search for title
 	const titleField =
@@ -98,12 +83,22 @@ export function ItemList( props: ItemListProps ) {
 			} ) ),
 			render:
 				field === mediaField
-					? ( { item }: { item: Record< string, unknown > } ) => {
+					? ( { item }: { item: Record< string, string > } ) => {
 							return (
 								<img
-									// temporary until we pull in more data
-									alt=""
-									src={ item[ field ] as string }
+									alt={
+										Object.prototype.hasOwnProperty.call( item, titleField )
+											? item[ titleField ]
+											: ''
+									}
+									src={
+										typeof item[ field ] === 'string' &&
+										/^(https?|data:image\/)/.test( item[ field ] ) &&
+										( item[ field ].startsWith( 'http' ) ||
+											item[ field ].startsWith( 'data:image/' ) )
+											? item[ field ]
+											: ''
+									}
 								/>
 							);
 					  }
@@ -132,20 +127,12 @@ export function ItemList( props: ItemListProps ) {
 		return filterSortAndPaginate( data ?? [], view, fields );
 	}, [ data, view ] );
 
-	if ( ! results ) {
-		return <p>{ __( placeholderText ) }</p>;
-	}
-
-	if ( results.length === 0 ) {
-		return <p>{ __( noResultsText ) }</p>;
-	}
-
 	const actions = [
 		{
 			id: 'select',
 			label: __( 'Select item' ),
-			callback: ( items: unknown[] ) => {
-				( items as RemoteData[ 'results' ] ).map( item => onSelect( item ) );
+			callback: ( items: RemoteData[ 'results' ] ) => {
+				items.map( item => onSelect( item ) );
 			},
 		},
 	];
