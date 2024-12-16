@@ -86,6 +86,10 @@ class GoogleSheetsDataSource extends HttpDataSource {
 			GoogleAuth::GOOGLE_SHEETS_SCOPES
 		);
 
+		if ( is_wp_error( $access_token ) ) {
+			return $access_token;
+		}
+
 		return [
 			'Authorization' => sprintf( 'Bearer %s', $access_token ),
 			'Content-Type' => 'application/json',
