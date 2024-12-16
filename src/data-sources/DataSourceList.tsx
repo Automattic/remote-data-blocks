@@ -49,23 +49,23 @@ const DataSourceList = () => {
 	};
 
 	const renderDataSourceMeta = ( source: DataSourceConfig ) => {
-		const tags = [];
+		const tags: { key: string; primaryValue: string; secondaryValue?: string }[] = [];
 		switch ( source.service ) {
 			case 'airtable':
 				tags.push( {
 					key: 'base',
-					primaryValue: source.base?.name,
-					secondaryValue: source.tables?.[ 0 ]?.name,
+					primaryValue: source.service_config.base?.name,
+					secondaryValue: source.service_config.tables?.[ 0 ]?.name,
 				} );
 				break;
 			case 'shopify':
-				tags.push( { key: 'store', primaryValue: source.store_name } );
+				tags.push( { key: 'store', primaryValue: source.service_config.store_name } );
 				break;
 			case 'google-sheets':
 				tags.push( {
 					key: 'spreadsheet',
-					primaryValue: source.spreadsheet.name,
-					secondaryValue: source.sheet.name,
+					primaryValue: source.service_config.spreadsheet.name ?? 'Google Sheet',
+					secondaryValue: source.service_config.sheet.name,
 				} );
 				break;
 		}
@@ -156,9 +156,17 @@ const DataSourceList = () => {
 					</thead>
 					<tbody className="table-body">
 						{ dataSources
-							.sort( ( a, b ) => ( a.display_name ?? '' ).localeCompare( b.display_name ?? '' ) )
+							.sort( ( a, b ) =>
+								( a.service_config.display_name ?? '' ).localeCompare(
+									b.service_config.display_name ?? ''
+								)
+							)
 							.map( source => {
-								const { display_name: displayName, uuid, service } = source;
+								const {
+									service_config: { display_name: displayName } = {},
+									uuid,
+									service,
+								} = source;
 
 								return (
 									<tr key={ uuid } className="table-row">
@@ -233,7 +241,7 @@ const DataSourceList = () => {
 						{ sprintf(
 							__( 'Are you sure you want to delete %s data source "%s"?', 'remote-data-blocks' ),
 							getServiceLabel( dataSourceToDelete.service ),
-							dataSourceToDelete.display_name
+							dataSourceToDelete.service_config.display_name
 						) }
 					</ConfirmDialog>
 				) }
