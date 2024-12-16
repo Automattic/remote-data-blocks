@@ -56,10 +56,26 @@ export function ItemList( props: ItemListProps ) {
 	);
 
 	const fields = tableFields.map( field => {
+		// merge duplicate fields for filters
+		const mergedDuplicateFields = Array.from(
+			new Set(
+				props.results
+					?.map( result => result[ field ] )
+					.filter( value => value !== '' && value !== undefined )
+			)
+		);
+
 		return {
 			id: field,
 			label: field,
 			enableGlobalSearch: true,
+			elements: mergedDuplicateFields.map( value => ( {
+				label: value,
+				value,
+			} ) ),
+			filterBy: {
+				operators: [ 'isAny', 'isNone', 'isAll', 'isNotAll' ],
+			},
 		};
 	} );
 
