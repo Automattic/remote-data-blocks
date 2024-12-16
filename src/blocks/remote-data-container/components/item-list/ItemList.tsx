@@ -1,9 +1,9 @@
 import { useInstanceId } from '@wordpress/compose';
 import { DataViews, filterSortAndPaginate, Operator, View } from '@wordpress/dataviews/wp';
 import { useEffect, useMemo, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 import { usePatterns } from '@/blocks/remote-data-container/hooks/usePatterns';
-import { __ } from '@/utils/i18n';
 
 interface ItemListProps {
 	blockName: string;
@@ -113,7 +113,6 @@ export function ItemList( props: ItemListProps ) {
 	const defaultLayouts = {
 		table: {},
 		grid: {},
-		list: {},
 	};
 
 	useEffect( () => {
@@ -129,8 +128,10 @@ export function ItemList( props: ItemListProps ) {
 
 	const actions = [
 		{
-			id: 'select',
-			label: __( 'Select item' ),
+			id: 'choose',
+			icon: <>{ __( 'Choose' ) }</>,
+			isPrimary: true,
+			label: '',
 			callback: ( items: RemoteData[ 'results' ] ) => {
 				items.map( item => onSelect( item ) );
 			},
@@ -141,13 +142,15 @@ export function ItemList( props: ItemListProps ) {
 		<DataViews
 			actions={ actions }
 			data={ filteredData }
+			defaultLayouts={ defaultLayouts }
 			fields={ fields }
-			view={ view }
+			getItemId={ ( item: { id?: string } ) => item.id || '' }
+			isLoading={ loading || ! pattern }
+			isItemClickable={ () => true }
+			onClickItem={ item => onSelect( item ) }
 			onChangeView={ setView }
 			paginationInfo={ paginationInfo }
-			defaultLayouts={ defaultLayouts }
-			isLoading={ loading || ! pattern }
-			getItemId={ ( item: { id?: string } ) => item.id || '' }
+			view={ view }
 		/>
 	);
 }

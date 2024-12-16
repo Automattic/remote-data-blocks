@@ -81,3 +81,36 @@ remote-data-blocks-inline-field {
 	background-color: #f0f0f0;
 	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
+
+.dataviews-view-table tbody .dataviews-view-table__cell-content-wrapper {
+	max-width: 250px;
+	text-wrap: auto;
+}
+
+.dataviews-view-table__row .dataviews-view-table__actions-column .components-button.is-compact.has-icon:not(.has-text) {
+	opacity: 0;
+	display: inline-flex;
+	align-items: center;
+	background: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+	color: var(--wp-components-color-accent-inverted, #fff);
+	height: 32px;
+	padding: 6px 12px;
+	border-radius: 2px;
+	width: auto;
+}
+
+.dataviews-view-table__row:hover .dataviews-view-table__actions-column .components-button.is-compact.has-icon:not(.has-text),
+.dataviews-view-table__row:focus-within .dataviews-view-table__actions-column .components-button.is-compact.has-icon:not(.has-text) {
+	opacity: 1;
+
+}
+
+.dataviews-view-table tbody td {
+	vertical-align: middle;
+}
+
+.dataviews-view-table tr td:last-child,
+.dataviews-view-table tr th:last-child {
+	padding-left: 48px;
+}
+
