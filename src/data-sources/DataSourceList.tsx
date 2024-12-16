@@ -4,8 +4,14 @@ import {
 	Placeholder,
 } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
-import { DataViews, filterSortAndPaginate, type View } from '@wordpress/dataviews/wp';
-import { useMemo, useState } from '@wordpress/element';
+import {
+	Action,
+	DataViews,
+	Field,
+	filterSortAndPaginate,
+	type View,
+} from '@wordpress/dataviews/wp';
+import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronRightSmall, info } from '@wordpress/icons';
 import { store as noticesStore, NoticeStoreActions, WPNotice } from '@wordpress/notices';
@@ -50,23 +56,23 @@ const DataSourceList = () => {
 	};
 
 	const renderDataSourceMeta = ( source: DataSourceConfig ) => {
-		const tags = [];
+		const tags: { key: string; primaryValue: string; secondaryValue?: string }[] = [];
 		switch ( source.service ) {
 			case 'airtable':
 				tags.push( {
 					key: 'base',
-					primaryValue: source.base?.name,
-					secondaryValue: source.tables?.[ 0 ]?.name,
+					primaryValue: source.service_config.base?.name,
+					secondaryValue: source.service_config.tables?.[ 0 ]?.name,
 				} );
 				break;
 			case 'shopify':
-				tags.push( { key: 'store', primaryValue: source.store_name } );
+				tags.push( { key: 'store', primaryValue: source.service_config.store_name } );
 				break;
 			case 'google-sheets':
 				tags.push( {
 					key: 'spreadsheet',
-					primaryValue: source.spreadsheet.name,
-					secondaryValue: source.sheet.name,
+					primaryValue: source.service_config.spreadsheet.name ?? 'Google Sheet',
+					secondaryValue: source.service_config.sheet.name,
 				} );
 				break;
 		}
@@ -89,7 +95,7 @@ const DataSourceList = () => {
 
 	const getServiceLabel = ( service: ( typeof SUPPORTED_SERVICES )[ number ] ) => {
 		// eslint-disable-next-line security/detect-object-injection
-		return SUPPORTED_SERVICES_LABELS[ service ];
+		return SUPPORTED_SERVICES_LABELS[ service ] ?? 'HTTP';
 	};
 
 	function showSnackbar( type: 'success' | 'error', message: string ): void {
@@ -106,7 +112,10 @@ const DataSourceList = () => {
 				break;
 		}
 	}
-	const getServiceIcon = ( service: ( typeof SUPPORTED_SERVICES )[ number ] ) => {
+
+	const getServiceIcon = (
+		service: ( typeof SUPPORTED_SERVICES )[ number ]
+	): React.ReactElement => {
 		switch ( service ) {
 			case 'airtable':
 				return AirtableIcon;
@@ -114,10 +123,8 @@ const DataSourceList = () => {
 				return ShopifyIcon;
 			case 'google-sheets':
 				return GoogleSheetsIcon;
-			case 'generic-http':
-				return HttpIcon;
 			default:
-				return null;
+				return HttpIcon;
 		}
 	};
 
@@ -131,75 +138,69 @@ const DataSourceList = () => {
 		layout: {},
 	} );
 
-	const fields = useMemo(
-		() => [
-			{
-				id: 'display_name',
-				label: __( 'Source', 'remote-data-blocks' ),
-				enableGlobalSearch: true,
-				render: ( { item }: { item: DataSourceConfig } ) => {
-					const serviceIcon = getServiceIcon( item.service );
-					return (
-						<>
-							{ serviceIcon && (
-								<Icon
-									icon={ serviceIcon }
-									style={ { marginRight: '16px', verticalAlign: 'text-bottom' } }
-								/>
-							) }
-							{ item.display_name }
-						</>
-					);
-				},
+	const fields: Field< DataSourceConfig >[] = [
+		{
+			id: 'display_name',
+			label: __( 'Source', 'remote-data-blocks' ),
+			enableGlobalSearch: true,
+			render: ( { item }: { item: DataSourceConfig } ) => {
+				return (
+					<>
+						<Icon
+							icon={ getServiceIcon( item.service ) }
+							style={ { marginRight: '16px', verticalAlign: 'text-bottom' } }
+						/>
+						{ item.service_config.display_name }
+					</>
+				);
 			},
-			{
-				id: 'service',
-				label: __( 'Service', 'remote-data-blocks' ),
-				enableGlobalSearch: true,
-				elements: SUPPORTED_SERVICES.map( service => ( {
-					value: service,
-					label: getServiceLabel( service ),
-				} ) ),
-			},
-			{
-				id: 'meta',
-				label: __( 'Meta', 'remote-data-blocks' ),
-				enableGlobalSearch: true,
-				render: ( { item }: { item: DataSourceConfig } ) => renderDataSourceMeta( item ),
-			},
-		],
-		[]
-	);
+		},
+		{
+			id: 'service',
+			label: __( 'Service', 'remote-data-blocks' ),
+			enableGlobalSearch: true,
+			elements: SUPPORTED_SERVICES.map( service => ( {
+				value: service,
+				label: getServiceLabel( service ),
+			} ) ),
+		},
+		{
+			id: 'meta',
+			label: __( 'Meta', 'remote-data-blocks' ),
+			enableGlobalSearch: true,
+			render: ( { item }: { item: DataSourceConfig } ) => renderDataSourceMeta( item ),
+		},
+	];
 
 	// filter, sort and paginate data
-	const { data: shownData, paginationInfo } = useMemo( () => {
-		return filterSortAndPaginate( dataSources, view, fields );
-	}, [ dataSources, fields, view ] );
+	const { data: shownData, paginationInfo } = filterSortAndPaginate( dataSources, view, fields );
 
 	const defaultLayouts = {
 		table: {},
 	};
 
-	const actions = [
+	const actions: Action< DataSourceConfig >[] = [
 		{
 			id: 'edit',
 			label: __( 'Edit', 'remote-data-blocks' ),
 			icon: 'edit',
 			isPrimary: true,
+			isEligible: ( item: DataSourceConfig ) => {
+				return Boolean( item?.uuid );
+			},
 			callback: ( [ item ]: DataSourceConfig[] ) => {
-				if ( item ) {
+				if ( item?.uuid ) {
 					onEditDataSource( item.uuid );
 				}
-			},
-			isEligible: ( item: DataSourceConfig ) => {
-				return item ? SUPPORTED_SERVICES.includes( item.service ) : false;
 			},
 		},
 		{
 			id: 'copy',
 			label: __( 'Copy UUID', 'remote-data-blocks' ),
 			icon: 'copy',
-			isPrimary: true,
+			isEligible: ( item: DataSourceConfig ) => {
+				return Boolean( item?.uuid );
+			},
 			callback: ( [ item ]: DataSourceConfig[] ) => {
 				if ( item && item.uuid ) {
 					navigator.clipboard
@@ -221,6 +222,9 @@ const DataSourceList = () => {
 			label: __( 'Delete', 'remote-data-blocks' ),
 			icon: 'trash',
 			isDestructive: true,
+			isEligible: ( item: DataSourceConfig ) => {
+				return Boolean( item?.uuid );
+			},
 			callback: ( items: DataSourceConfig[] ) => {
 				if ( items.length === 1 ) {
 					if ( items[ 0 ] ) {
@@ -229,9 +233,6 @@ const DataSourceList = () => {
 				} else if ( items.length > 1 ) {
 					onDeleteDataSource( items );
 				}
-			},
-			isEligible: ( item: DataSourceConfig ) => {
-				return item ? SUPPORTED_SERVICES.includes( item.service ) : false;
 			},
 			supportsBulk: true,
 		},
@@ -260,7 +261,7 @@ const DataSourceList = () => {
 				onChangeView={ setView }
 				paginationInfo={ paginationInfo }
 				defaultLayouts={ defaultLayouts }
-				getItemId={ ( item: DataSourceConfig ) => item.uuid }
+				getItemId={ ( item: DataSourceConfig ) => item.uuid ?? 'not-persisted' }
 				isLoading={ loadingDataSources }
 			/>
 			{ dataSourceToDelete && (
@@ -279,7 +280,7 @@ const DataSourceList = () => {
 						: sprintf(
 								__( 'Are you sure you want to delete %s data source "%s"?', 'remote-data-blocks' ),
 								getServiceLabel( dataSourceToDelete.service ),
-								dataSourceToDelete.display_name
+								dataSourceToDelete.service_config.display_name
 						  ) }
 				</ConfirmDialog>
 			) }

@@ -7,10 +7,10 @@ import {
 	HTTP_SOURCE_AUTH_TYPE_SELECT_OPTIONS,
 	HTTP_SOURCE_ADD_TO_SELECT_OPTIONS,
 } from '@/data-sources/constants';
-import { HttpAuthFormState } from '@/data-sources/http/types';
+import { HttpConfig } from '@/data-sources/types';
 
 interface HttpAuthSettingsInputProps {
-	auth: HttpAuthFormState;
+	auth: HttpConfig[ 'service_config' ][ 'auth' ];
 	onChange: ( id: string, value: unknown ) => void;
 }
 
@@ -33,19 +33,19 @@ export const HttpAuthSettingsInput: React.FC< HttpAuthSettingsInputProps > = ( {
 			<SelectControl
 				id="authType"
 				label={ __( 'Authentication Type', 'remote-data-blocks' ) }
-				value={ auth.authType }
+				value={ auth?.type }
 				onChange={ onSelectChange }
 				options={ HTTP_SOURCE_AUTH_TYPE_SELECT_OPTIONS }
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 			/>
 
-			{ auth.authType === 'api-key' && (
+			{ auth?.type === 'api-key' && (
 				<>
 					<SelectControl
 						id="authAddTo"
 						label={ __( 'Add API Key to', 'remote-data-blocks' ) }
-						value={ auth.authAddTo }
+						value={ auth?.add_to }
 						onChange={ onSelectChange }
 						options={ HTTP_SOURCE_ADD_TO_SELECT_OPTIONS }
 						__next40pxDefaultSize
@@ -59,7 +59,7 @@ export const HttpAuthSettingsInput: React.FC< HttpAuthSettingsInputProps > = ( {
 					<TextControl
 						id="authKey"
 						label={ __( 'Authentication Key Name', 'remote-data-blocks' ) }
-						value={ auth.authKey }
+						value={ auth?.key }
 						onChange={ value => onChange( 'authKey', value ) }
 						help={ __(
 							'The name of the header or query parameter to add the API key to.',
@@ -70,11 +70,11 @@ export const HttpAuthSettingsInput: React.FC< HttpAuthSettingsInputProps > = ( {
 					/>
 				</>
 			) }
-			{ auth.authType !== 'none' && (
+			{ auth?.type !== 'none' && (
 				<PasswordInputControl
 					id="authValue"
 					label={ __( 'Authentication Value', 'remote-data-blocks' ) }
-					value={ auth.authValue }
+					value={ auth?.value }
 					onChange={ value => onChange( 'authValue', value ) }
 					__next40pxDefaultSize
 					help={ __(
