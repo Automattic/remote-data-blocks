@@ -45,16 +45,6 @@ export function ItemList( props: ItemListProps ) {
 		) as RemoteData[ 'results' ];
 	}, [ results ] );
 
-	const [ view, setView ] = useState< View >( {
-		type: 'table' as const,
-		perPage: 10,
-		page: 1,
-		search: '',
-		fields: [],
-		filters: [],
-		layout: {},
-	} );
-
 	// get fields from results data to use as columns
 	const tableFields = useMemo(
 		() =>
@@ -67,10 +57,29 @@ export function ItemList( props: ItemListProps ) {
 		[ results ]
 	);
 
+	// generic search for title
+	const titleField =
+		tableFields.find(
+			field => field.toLowerCase().includes( 'title' ) || field.toLowerCase().includes( 'name' )
+		) || '';
+
+	// generic search for media
 	const mediaField =
 		tableFields.find(
 			field => field.toLowerCase().includes( 'url' ) || field.toLowerCase().includes( 'image' )
 		) || '';
+
+	const [ view, setView ] = useState< View >( {
+		type: 'table' as const,
+		perPage: 10,
+		page: 1,
+		search: '',
+		fields: tableFields.filter( field => field !== mediaField && field !== titleField ),
+		filters: [],
+		layout: {},
+		titleField,
+		mediaField,
+	} );
 
 	const fields = tableFields.map( field => {
 		// merge duplicate fields for filters
@@ -110,25 +119,10 @@ export function ItemList( props: ItemListProps ) {
 	} );
 
 	const defaultLayouts = {
-		table: {
-			showMedia: false,
-		},
-		grid: {
-			mediaField,
-		},
-		list: {
-			mediaField,
-		},
+		table: {},
+		grid: {},
+		list: {},
 	};
-
-	useEffect( () => {
-		if ( tableFields.length > 0 ) {
-			setView( prevView => ( {
-				...prevView,
-				fields: tableFields.filter( field => field !== mediaField ),
-			} ) );
-		}
-	}, [ tableFields ] );
 
 	useEffect( () => {
 		if ( view.search !== searchTerms ) {
