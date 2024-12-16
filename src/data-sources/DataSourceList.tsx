@@ -24,14 +24,17 @@ const DataSourceList = () => {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch< NoticeStoreActions >( noticesStore );
 	const { dataSources, loadingDataSources, deleteDataSource, fetchDataSources } = useDataSources();
-	const [ dataSourceToDelete, setDataSourceToDelete ] = useState< DataSourceConfig | null >( null );
+	const [ dataSourceToDelete, setDataSourceToDelete ] = useState<
+		DataSourceConfig | DataSourceConfig[] | null
+	>( null );
 	const { pushState } = useSettingsContext();
 
 	const onCancelDeleteDialog = () => {
 		setDataSourceToDelete( null );
 	};
 
-	const onDeleteDataSource = ( source: DataSourceConfig ) => setDataSourceToDelete( source );
+	const onDeleteDataSource = ( source: DataSourceConfig | DataSourceConfig[] ) =>
+		setDataSourceToDelete( source );
 
 	const onEditDataSource = ( uuidToEdit: string ) => {
 		const newUrl = new URL( window.location.href );
@@ -39,8 +42,9 @@ const DataSourceList = () => {
 		pushState( newUrl );
 	};
 
-	const onConfirmDeleteDataSource = async ( source: DataSourceConfig ) => {
-		await deleteDataSource( source ).catch( () => null );
+	const onConfirmDeleteDataSource = async ( source: DataSourceConfig | DataSourceConfig[] ) => {
+		const sources = Array.isArray( source ) ? source : [ source ];
+		await Promise.all( sources.map( src => deleteDataSource( src ).catch( () => null ) ) );
 		setDataSourceToDelete( null );
 		await fetchDataSources().catch( () => null );
 	};
@@ -217,14 +221,19 @@ const DataSourceList = () => {
 			label: __( 'Delete', 'remote-data-blocks' ),
 			icon: 'trash',
 			isDestructive: true,
-			callback: ( [ item ]: DataSourceConfig[] ) => {
-				if ( item ) {
-					onDeleteDataSource( item );
+			callback: ( items: DataSourceConfig[] ) => {
+				if ( items.length === 1 ) {
+					if ( items[ 0 ] ) {
+						onDeleteDataSource( items[ 0 ] );
+					}
+				} else if ( items.length > 1 ) {
+					onDeleteDataSource( items );
 				}
 			},
 			isEligible: ( item: DataSourceConfig ) => {
 				return item ? SUPPORTED_SERVICES.includes( item.service ) : false;
 			},
+			supportsBulk: true,
 		},
 	];
 
@@ -262,11 +271,16 @@ const DataSourceList = () => {
 					size="medium"
 					title={ __( 'Delete Data Source', 'remote-data-blocks' ) }
 				>
-					{ sprintf(
-						__( 'Are you sure you want to delete %s data source "%s"?', 'remote-data-blocks' ),
-						getServiceLabel( dataSourceToDelete.service ),
-						dataSourceToDelete.display_name
-					) }
+					{ Array.isArray( dataSourceToDelete )
+						? __(
+								'Are you sure you want to delete the selected data sources?',
+								'remote-data-blocks'
+						  )
+						: sprintf(
+								__( 'Are you sure you want to delete %s data source "%s"?', 'remote-data-blocks' ),
+								getServiceLabel( dataSourceToDelete.service ),
+								dataSourceToDelete.display_name
+						  ) }
 				</ConfirmDialog>
 			) }
 		</>
