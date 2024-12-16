@@ -6,16 +6,12 @@ import {
 	VisuallyHidden,
 	__experimentalInputControl as InputControl,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
-	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
-import { Children, createPortal, isValidElement, useEffect, useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { Children, createPortal, isValidElement, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { lockSmall } from '@wordpress/icons';
 
 import { DataSourceFormActions } from './DataSourceFormActions';
-import { useDataSources } from '../hooks/useDataSources';
-import { ModalWithButtonTrigger } from '@/blocks/remote-data-container/components/modals/BaseModal';
-import { useModalState } from '@/blocks/remote-data-container/hooks/useModalState';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
 interface DataSourceFormProps {
@@ -44,8 +40,8 @@ interface DataSourceFormSetupProps {
 				verticalAlign?: string;
 		  };
 	inputIcon: IconType;
-	newUUID: string | null;
-	setNewUUID: ( uuid: string | null ) => void;
+	newUUID?: string | null;
+	setNewUUID?: ( uuid: string | null ) => void;
 	uuidFromProps?: string;
 }
 
@@ -69,8 +65,6 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 	const [ currentStep, setCurrentStep ] = useState( 1 );
 	const { goToMainScreen, screen } = useSettingsContext();
 
-	const { checkDisplayNameConflict } = useDataSources();
-
 	const steps = Children.toArray( children );
 	const singleStep = steps.length === 1 || screen === 'editDataSource';
 
@@ -81,14 +75,6 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 		if (
 			isValidElement< { canProceed?: boolean; displayName: string; uuidFromProps: string } >( step )
 		) {
-			const { displayName, uuidFromProps } = step.props;
-
-			if ( currentStep === 1 ) {
-				return (
-					Boolean( step.props?.canProceed ) &&
-					checkDisplayNameConflict( displayName, uuidFromProps )
-				);
-			}
 			return Boolean( step.props?.canProceed );
 		}
 		return false;
@@ -204,18 +190,12 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 
 const DataSourceFormSetup = ( {
 	children,
-	canProceed,
 	displayName: initialDisplayName,
 	handleOnChange,
 	heading,
 	inputIcon,
-	newUUID,
-	setNewUUID,
-	uuidFromProps,
 }: DataSourceFormSetupProps ) => {
-	const { close, isOpen, open } = useModalState();
 	const { screen, service } = useSettingsContext();
-	const { checkDisplayNameConflict } = useDataSources();
 
 	const [ displayName, setDisplayName ] = useState( initialDisplayName );
 	const [ errors, setErrors ] = useState< Record< string, string > >( {} );
@@ -232,38 +212,15 @@ const DataSourceFormSetup = ( {
 		handleOnChange( 'display_name', sanitizedDisplayName ?? '' );
 	};
 
-	const isValidUUIDv4 = ( uuid: string ) => {
-		const uuidv4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-		return uuidv4Regex.test( uuid );
-	};
-
 	const validateDisplayName = () => {
-		const hasConflict = ! checkDisplayNameConflict( displayName, uuidFromProps ?? '' );
-
 		if ( ! displayName.trim() ) {
 			setErrors( {
 				displayName: __( 'Please provide a name for your data source.', 'remote-data-blocks' ),
-			} );
-		} else if ( hasConflict ) {
-			setErrors( {
-				displayName: sprintf(
-					__(
-						'Data source "%s" already exists. Please choose another name.',
-						'remote-data-blocks'
-					),
-					displayName
-				),
 			} );
 		} else {
 			setErrors( {} );
 		}
 	};
-
-	useEffect( () => {
-		if ( canProceed ) {
-			validateDisplayName();
-		}
-	}, [ canProceed, displayName ] );
 
 	return (
 		<DataSourceFormStep
@@ -306,81 +263,11 @@ const DataSourceFormSetup = ( {
 					errors.displayName ? 'has-error' : ''
 				}   ` }
 				help={
-					<>
-						<span>
-							{ errors.displayName
-								? errors.displayName
-								: __( 'Only visible to you and other site managers. ', 'remote-data-blocks' ) }
-						</span>
-						{ screen === 'editDataSource' && ! errors.displayName && (
-							<ModalWithButtonTrigger
-								buttonText={ __( 'Edit identifier', 'remote-data-blocks' ) }
-								isOpen={ isOpen }
-								onClose={ close }
-								onOpen={ open }
-								title={ __( 'Edit identifier', 'remote-data-blocks' ) }
-								buttonVariant="link"
-								size="medium"
-							>
-								<form
-									onSubmit={ event => {
-										event.preventDefault();
-										if ( newUUID && isValidUUIDv4( newUUID ) ) {
-											isValidUUIDv4( newUUID );
-											handleOnChange( 'uuid', newUUID ?? '' );
-											setErrors( {} );
-											close();
-										} else {
-											setErrors( {
-												uuid: __(
-													'Please use valid UUIDv4 formatting to save changes.',
-													'remote-data-blocks'
-												),
-											} );
-										}
-									} }
-								>
-									<InputControl
-										className={ `rdb-settings-page_data-source-form-input ${
-											errors.uuid ? 'has-error' : ''
-										}   ` }
-										label={ __( 'UUID', 'remote-data-blocks' ) }
-										value={ newUUID ?? '' }
-										onChange={ ( uuid?: string ) => setNewUUID( uuid ?? null ) }
-										placeholcomponents-base-control__helpder={ uuidFromProps }
-										__next40pxDefaultSize
-										help={
-											<span>
-												{ errors.uuid
-													? errors.uuid
-													: __(
-															'Unique identifier allows you to reference this data source in code.',
-															'remote-data-blocks'
-													  ) }
-											</span>
-										}
-									/>
-									<Spacer marginBottom={ 8 } />
-									<div className="rdb-settings-page_data-source-form-uuid-actions">
-										<Button
-											onClick={ () => {
-												setNewUUID( uuidFromProps ?? null );
-												setErrors( {} );
-												close();
-											} }
-											variant="tertiary"
-											__next40pxDefaultSize
-										>
-											Cancel
-										</Button>
-										<Button type="submit" variant="primary">
-											Save
-										</Button>
-									</div>
-								</form>
-							</ModalWithButtonTrigger>
-						) }
-					</>
+					<span>
+						{ errors.displayName
+							? errors.displayName
+							: __( 'Only visible to you and other site managers. ', 'remote-data-blocks' ) }
+					</span>
 				}
 				label={ __( 'Data Source Name' ) }
 				onChange={ onDisplayNameChange }

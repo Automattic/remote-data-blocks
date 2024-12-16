@@ -1,140 +1,87 @@
 import { TextControl } from '@wordpress/components';
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { DataSourceForm } from '../components/DataSourceForm';
 import { HttpAuthSettingsInput } from '@/data-sources/components/HttpAuthSettingsInput';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
-import { HttpAuth, HttpAuthFormState, HttpFormState } from '@/data-sources/http/types';
-import { HttpConfig, SettingsComponentProps } from '@/data-sources/types';
+import { HttpAuth } from '@/data-sources/http/types';
+import { HttpConfig, HttpServiceConfig, SettingsComponentProps } from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
-import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import HttpIcon from '@/settings/icons/HttpIcon';
 
-const initialState: HttpFormState = {
-	display_name: '',
-	url: '',
-	authType: 'bearer',
-	authValue: '',
-	authKey: '',
-	authAddTo: 'header',
-};
+const SERVICE_CONFIG_VERSION = 1;
 
-const getInitialStateFromConfig = ( config?: HttpConfig ): HttpFormState => {
-	if ( ! config ) {
-		return initialState;
-	}
-
-	const initialStateFromConfig: HttpFormState = {
-		display_name: config.display_name,
-		url: config.url,
-		authType: config.auth.type,
-		authValue: config.auth.value,
-		authKey: '',
-		authAddTo: 'header',
-	};
-
-	if ( config.auth.type === 'api-key' ) {
-		initialStateFromConfig.authKey = config.auth.key;
-		initialStateFromConfig.authAddTo = config.auth.addTo;
-	}
-
-	return initialStateFromConfig;
-};
-
-export const HttpSettings = ( {
-	mode,
-	uuid: uuidFromProps,
-	config,
-}: SettingsComponentProps< HttpConfig > ) => {
-	const { goToMainScreen } = useSettingsContext();
-
-	const { state, handleOnChange } = useForm< HttpFormState >( {
-		initialValues: getInitialStateFromConfig( config ),
+export const HttpSettings = ( { mode, uuid, config }: SettingsComponentProps< HttpConfig > ) => {
+	const { state, handleOnChange, validState } = useForm< HttpServiceConfig >( {
+		initialValues: config?.service_config ?? { __version: SERVICE_CONFIG_VERSION },
 	} );
 
-	const { addDataSource, updateDataSource } = useDataSources( false );
+	const { onSave } = useDataSources< HttpConfig >( false );
 
-	const [ newUUID, setNewUUID ] = useState< string | null >( uuidFromProps ?? null );
-
-	const getAuthState = (): HttpAuthFormState => {
-		return {
-			authType: state.authType,
-			authValue: state.authValue,
-			authKey: state.authKey,
-			authAddTo: state.authAddTo,
-		};
+	const getAuthState = (): HttpServiceConfig[ 'auth' ] => {
+		return state.auth;
 	};
 
 	const shouldAllowSubmit = useMemo( () => {
-		if ( state.authType === 'api-key' ) {
-			if ( ! state.authKey || ! state.authAddTo ) {
-				return false;
-			}
+		if ( state.auth?.type === 'api-key' ) {
+			return ! state.auth.key || ! state.auth.add_to;
 		}
 
-		if ( state.authType === 'none' ) {
+		if ( state.auth?.type === 'none' ) {
 			return state.url;
 		}
 
-		return state.url && state.authType && state.authValue;
-	}, [ state.url, state.authType, state.authValue, state.authKey, state.authAddTo ] );
+		return state.url && state.auth?.type && state.auth?.value;
+	}, [ state.url, state.auth ] );
 
 	const onSaveClick = async () => {
-		if ( ! shouldAllowSubmit ) {
+		if ( ! validState || ! shouldAllowSubmit ) {
 			return;
 		}
 
 		let auth: HttpAuth;
 
-		if ( state.authType === 'api-key' ) {
+		if ( state.auth?.type === 'api-key' ) {
 			auth = {
 				type: 'api-key',
-				value: state.authValue,
-				key: state.authKey,
-				addTo: state.authAddTo,
+				value: state.auth?.value,
+				key: state.auth?.key,
+				add_to: state.auth?.add_to,
 			};
 		} else {
 			auth = {
-				type: state.authType,
-				value: state.authValue,
+				type: state.auth?.type ?? 'none',
+				value: state.auth?.value ?? '',
 			};
 		}
 
 		const httpConfig: HttpConfig = {
-			display_name: state.display_name,
-			uuid: uuidFromProps ?? '',
-			newUUID: newUUID ?? '',
 			service: 'generic-http',
-			url: state.url,
-			auth,
+			service_config: {
+				...validState,
+				auth,
+			},
+			uuid: uuid ?? null,
 		};
 
-		if ( mode === 'add' ) {
-			await addDataSource( httpConfig );
-		} else {
-			await updateDataSource( httpConfig );
-		}
-		goToMainScreen();
+		return onSave( httpConfig, mode );
 	};
 
 	return (
 		<DataSourceForm onSave={ onSaveClick }>
 			<DataSourceForm.Setup
 				canProceed={ Boolean( shouldAllowSubmit ) }
-				displayName={ state.display_name }
+				displayName={ state.display_name ?? '' }
 				handleOnChange={ handleOnChange }
 				heading={ { label: __( 'Connect HTTP Data Source', 'remote-data-blocks' ) } }
 				inputIcon={ HttpIcon }
-				newUUID={ newUUID }
-				setNewUUID={ setNewUUID }
-				uuidFromProps={ uuidFromProps }
 			>
 				<TextControl
 					type="url"
 					id="url"
 					label={ __( 'URL', 'remote-data-blocks' ) }
-					value={ state.url }
+					value={ state.url ?? '' }
 					onChange={ value => handleOnChange( 'url', value ) }
 					autoComplete="off"
 					__next40pxDefaultSize
