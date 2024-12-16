@@ -1,4 +1,4 @@
-import { BaseControl, CheckboxControl, SelectControl } from '@wordpress/components';
+import { FormTokenField, SelectControl, Spinner } from '@wordpress/components';
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -8,7 +8,6 @@ import { SUPPORTED_AIRTABLE_TYPES } from '@/data-sources/airtable/constants';
 import { AirtableFormState } from '@/data-sources/airtable/types';
 import { getAirtableOutputQueryMappingValue } from '@/data-sources/airtable/utils';
 import { DataSourceForm } from '@/data-sources/components/DataSourceForm';
-import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import {
 	useAirtableApiBases,
@@ -24,6 +23,7 @@ import {
 import { getConnectionMessage } from '@/data-sources/utils';
 import { useForm } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
+import { AirtableIcon, AirtableIconWithText } from '@/settings/icons/AirtableIcon';
 import { StringIdName } from '@/types/common';
 import { SelectOption } from '@/types/input';
 
@@ -194,14 +194,16 @@ export const AirtableSettings = ( {
 		}
 		return (
 			<span>
-				{ __( 'Provide access token to connect your Airtable', 'remote-data-blocks' ) } (
 				<a href="https://support.airtable.com/docs/creating-personal-access-tokens" target="_label">
-					{ __( 'guide', 'remote-data-blocks' ) }
+					{ __( 'How do I get my token?', 'remote-data-blocks' ) }
 				</a>
-				).
 			</span>
 		);
 	}, [ fetchingUserId, userId, userIdError ] );
+
+	const shouldAllowContinue = useMemo( () => {
+		return userId !== null;
+	}, [ userId ] );
 
 	const shouldAllowSubmit = useMemo( () => {
 		return bases !== null && tables !== null && Boolean( state.base ) && Boolean( state.table );
@@ -304,85 +306,81 @@ export const AirtableSettings = ( {
 	}, [ state.table, tables ] );
 
 	return (
-		<DataSourceForm
-			displayName={ state.display_name }
-			handleOnChange={ handleOnChange }
-			heading={
-				mode === 'add' ? __( 'Add Airtable Data Source' ) : __( 'Edit Airtable Data Source' )
-			}
-			mode={ mode }
-			newUUID={ newUUID }
-			setNewUUID={ setNewUUID }
-			uuidFromProps={ uuidFromProps }
-		>
-			<div className="form-group">
-				<PasswordInputControl
-					label={ __( 'Access Token', 'remote-data-blocks' ) }
-					onChange={ onTokenInputChange }
-					value={ state.access_token }
-					help={ connectionMessage }
-				/>
-			</div>
+		<>
+			<DataSourceForm onSave={ onSaveClick }>
+				<DataSourceForm.Setup
+					displayName={ state.display_name }
+					handleOnChange={ handleOnChange }
+					heading={ { icon: AirtableIconWithText, width: '113.81px', height: '25px' } }
+					inputIcon={ AirtableIcon }
+					newUUID={ newUUID }
+					setNewUUID={ setNewUUID }
+					uuidFromProps={ uuidFromProps }
+					canProceed={ shouldAllowContinue }
+				>
+					<PasswordInputControl
+						label={ __( 'Access Token', 'remote-data-blocks' ) }
+						onChange={ onTokenInputChange }
+						value={ state.access_token }
+						help={ connectionMessage }
+					/>
+				</DataSourceForm.Setup>
+				<DataSourceForm.Scope canProceed={ shouldAllowSubmit }>
+					<SelectControl
+						id="base"
+						label={ __( 'Base', 'remote-data-blocks' ) }
+						value={ state.base?.id ?? '' }
+						onChange={ onSelectChange }
+						options={ baseOptions }
+						help={ basesHelpText }
+						disabled={ fetchingBases || ! bases?.length }
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+					/>
+					<SelectControl
+						id="table"
+						label={ __( 'Table', 'remote-data-blocks' ) }
+						value={ state.table?.id ?? '' }
+						onChange={ onSelectChange }
+						options={ tableOptions }
+						help={ tablesHelpText }
+						disabled={ fetchingTables || ! tables?.length }
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+					/>
 
-			<div className="form-group">
-				<SelectControl
-					id="base"
-					label={ __( 'Base', 'remote-data-blocks' ) }
-					value={ state.base?.id ?? '' }
-					onChange={ onSelectChange }
-					options={ baseOptions }
-					help={ basesHelpText }
-					disabled={ fetchingBases || ! bases?.length }
-					__next40pxDefaultSize
-				/>
-			</div>
-
-			<div className="form-group">
-				<SelectControl
-					id="table"
-					label={ __( 'Table', 'remote-data-blocks' ) }
-					value={ state.table?.id ?? '' }
-					onChange={ onSelectChange }
-					options={ tableOptions }
-					help={ tablesHelpText }
-					disabled={ fetchingTables || ! tables?.length }
-					__next40pxDefaultSize
-				/>
-			</div>
-
-			{ state.table && availableTableFields.length && (
-				<div className="form-group">
-					<BaseControl
-						label={ __( 'Table Fields', 'remote-data-blocks' ) }
-						help={ __(
-							'Select the fields to be used in the remote data block.',
-							'remote-data-blocks'
-						) }
-					>
-						{ availableTableFields.map( field => (
-							<CheckboxControl
-								key={ field }
-								label={ field }
-								checked={ state.table_fields.has( field ) }
-								onChange={ checked =>
+					{ state.table && availableTableFields.length ? (
+						<FormTokenField
+							label={ __( 'Fields', 'remote-data-blocks' ) }
+							onChange={ selection => {
+								if ( selection.includes( 'Select All' ) ) {
+									handleOnChange( 'table_fields', new Set( availableTableFields ) );
+								} else if ( selection.includes( 'Deselect All' ) ) {
+									handleOnChange( 'table_fields', new Set() );
+								} else {
 									handleOnChange(
 										'table_fields',
-										checked
-											? new Set( [ ...state.table_fields, field ] )
-											: new Set( [ ...state.table_fields ].filter( fld => fld !== field ) )
-									)
+										new Set(
+											selection.filter( item => item !== 'Select All' && item !== 'Deselect All' )
+										)
+									);
 								}
-							/>
-						) ) }
-					</BaseControl>
-				</div>
-			) }
-
-			<DataSourceFormActions
-				onSave={ onSaveClick }
-				onCancel={ goToMainScreen }
-				isSaveDisabled={ ! shouldAllowSubmit }
-			/>
-		</DataSourceForm>
+							} }
+							suggestions={ [
+								...( state.table_fields.size === availableTableFields.length
+									? [ 'Deselect All' ]
+									: [ 'Select All' ] ),
+								...availableTableFields,
+							] }
+							value={ Array.from( state.table_fields ) }
+							__nextHasNoMarginBottom
+							__experimentalExpandOnFocus
+						/>
+					) : (
+						state.table && <Spinner />
+					) }
+				</DataSourceForm.Scope>
+			</DataSourceForm>
+		</>
 	);
 };

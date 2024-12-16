@@ -1,23 +1,91 @@
-.rdb-settings-page_data-source-form {
+.rdb-settings-page_add-edit {
 
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 12px;
-	padding: 24px 48px;
+	@media screen and (min-width: 782px) {
+		height: calc(100vh - 132px);
+		display: grid;
+	}
+}
 
-	.rdb-settings-page_data-source-form_header {
+.rdb-settings-page_data-source-form-footer {
+	align-self: end;
+
+	.rdb-settings-page_data-source-form-setup-info {
+		display: flex;
+		justify-content: center;
+		margin-bottom: 4px;
+		padding: 16px;
+
+		svg {
+			fill: var(--Gutenberg-Alert-Green, #4ab866);
+			flex-shrink: 0;
+		}
+
+		p {
+			color: var(--Gutenberg-Gray-700, #757575);
+			font-size: var(--s, 12px);
+			line-height: var(--xs, 16px);
+			margin-top: 4px;
+			max-width: 500px;
+		}
+	}
+
+	.rdb-settings-page_data-source-form-setup-actions {
 		display: flex;
 		align-items: center;
+		justify-content: center;
+		padding: 16px;
 		gap: 12px;
+		border-top: 1px solid var(--Gutenberg-Gray-100, #f0f0f0);
+		background: var(--Gutenberg-White, #fff);
+
+		@media screen and (min-width: 782px) {
+			padding: 16px 0;
+		}
+
 	}
 
-	.form-group {
-		width: 100%;
-		max-width: 680px;
+	button {
+		display: flex;
+		width: 244px;
+		padding: var(--grid-unit-10, 8px);
+		justify-content: center;
+		align-items: center;
+	}
+}
+
+.rdb-settings-page_data-source-single-step-form {
+	padding: 24px;
+
+	.rdb-settings_form-heading {
+		color: var(--Gutenberg-Gray-900, #1e1e1e);
+		font-size: 16px;
+		font-weight: 500;
+		line-height: 24px;
+		margin-bottom: 0;
 	}
 
-	.form-group .code-input {
+	@media screen and (min-width: 782px) {
+		padding: 32px 48px 40px 48px;
+	}
+}
+
+
+.rdb-settings-page_data-source-form {
+	overflow-y: auto;
+	padding: 0 16px 40px;
+
+	@media screen and (min-width: 782px) {
+		width: 500px;
+		justify-self: center;
+	}
+
+	.rdb-settings_form-fields {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.code-input {
 
 		textarea {
 			font-family: monospace;
@@ -55,6 +123,100 @@
 
 		.is-error {
 			color: #681f1b;
+		}
+	}
+}
+
+.rdb-settings-page_data-source-form-uuid-actions {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 12px;
+}
+
+.rdb-settings-page_data-source-form-uuid-error {
+	color: var(--Gutenberg-Alert-Red, #d94f4f);
+	font-size: var(--s, 12px);
+	line-height: var(--xs, 16px);
+	margin-top: 4px;
+}
+
+.rdb-settings-page_data-source-form-uuid-input .components-input-control__input:focus,
+.rdb-settings-page_data-source-form-uuid-input .components-input-control__container .components-input-control__backdrop:focus {
+	border-color: var(--wp-components-color-accent, var(--Gutenberg-Alert-Red, #d94f4f)) !important;
+	box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--Gutenberg-Alert-Red, #d94f4f)) !important;
+}
+
+.rdb-settings-page_data-source-multi-step-form,
+.rdb-settings-page_data-source-single-step-form.rdb-settings-page_data-source-add-form {
+
+	.rdb-settings_form-heading {
+		color: var(--Gutenberg-Gray-900, #1e1e1e);
+		font-size: 24px;
+		font-weight: 500;
+		line-height: 24px;
+		margin-bottom: 12px;
+	}
+
+	.rdb-settings_form-fields {
+		margin-top: 40px;
+	}
+
+}
+
+
+.rdb-settings_form-subheading {
+	color: var(--Alias-text-text-tertiary, #505050);
+	font-size: var(--s, 12px);
+	font-style: normal;
+	font-weight: var(--Regular, 400);
+	line-height: var(--xs, 16px); /* 133.333% */
+	margin: 4px 0 16px;
+}
+
+.rdb-settings-page_data-source-multi-step-form {
+	padding: 24px;
+	overflow: hidden;
+
+
+	@media screen and (min-width: 782px) {
+		display: grid;
+		grid-template-columns: 0.5fr 1fr 0.5fr;
+		padding: 56px 48px 0 48px;
+	}
+
+	.rdb-settings_form-steps {
+
+		ol {
+			list-style: none;
+			counter-reset: steps;
+
+			li {
+				counter-increment: steps;
+				color: var(--Gutenberg-Gray-700, #757575);
+				font-weight: 600;
+				margin-bottom: 24px;
+
+				&::before {
+					content: counter(steps);
+					margin-right: 0.5rem;
+					background: var(--Gutenberg-Gray-200, #e0e0e0);
+					color: var(--Gutenberg-White, #fff);
+					width: 24px;
+					height: 24px;
+					border-radius: 50%;
+					display: inline-grid;
+					place-items: center;
+				}
+
+				&.current-step::before {
+					background: var(--Gutenberg-Blueberry, #3858e9);
+				}
+
+				&.current-step {
+					color: var(--Gutenberg-Gray-900, #1e1e1e);
+				}
+			}
 		}
 	}
 }
