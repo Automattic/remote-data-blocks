@@ -137,6 +137,7 @@ registerBlockBindingsSource( {
 			// const data = select( gravatarStore ).getGravatarData( id );
 			newValues[ attributeName ] = 'TEST'; // data?.[ key || field ];
 		}
-		return newValues;
+		console.log(remoteDataContext?.results?.[0])
+		return remoteDataContext?.results?.[0];
 	},
 } );

@@ -112,25 +112,25 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 
 		// If the block has a binding and the attributes do not match their expected
 		// values, update and merge the attributes.
-		const mergedAttributes = {
-			...attributes,
-			...getMismatchedAttributes( attributes, remoteData.results, remoteData.blockName, index ),
-		};
+		// const mergedAttributes = {
+		// 	...attributes,
+		// 	...getMismatchedAttributes( attributes, remoteData.results, remoteData.blockName, index ),
+		// };
 
 		// If the block is not writable, render it as usual.
 		if ( isInSyncedPattern && ! hasEnabledOverrides ) {
-			return <BlockEdit { ...props } attributes={ mergedAttributes } />;
+			return <BlockEdit { ...props } attributes={ attributes } />;
 		}
 
 		return (
 			<BoundBlockEdit
-				attributes={ mergedAttributes }
+				attributes={ attributes }
 				availableBindings={ availableBindings }
 				blockName={ name }
 				remoteDataName={ remoteData?.blockName ?? '' }
 				setAttributes={ setAttributes }
 			>
-				<BlockEdit { ...props } attributes={ mergedAttributes } />
+				<BlockEdit { ...props } attributes={ attributes } />
 			</BoundBlockEdit>
 		);
 	};
