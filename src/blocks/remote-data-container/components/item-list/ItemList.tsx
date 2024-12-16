@@ -1,5 +1,5 @@
 import { useInstanceId } from '@wordpress/compose';
-import { DataViews, filterSortAndPaginate, View } from '@wordpress/dataviews/wp';
+import { DataViews, filterSortAndPaginate, Operator, View } from '@wordpress/dataviews/wp';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 
 import { usePatterns } from '@/blocks/remote-data-container/hooks/usePatterns';
@@ -34,7 +34,7 @@ export function ItemList( props: ItemListProps ) {
 	}, [ props.results ] );
 
 	const [ view, setView ] = useState< View >( {
-		type: 'table',
+		type: 'table' as const,
 		perPage: 10,
 		page: 1,
 		search: '',
@@ -55,6 +55,11 @@ export function ItemList( props: ItemListProps ) {
 		[ props.results ]
 	);
 
+	const mediaField =
+		tableFields.find(
+			field => field.toLowerCase().includes( 'url' ) || field.toLowerCase().includes( 'image' )
+		) || '';
+
 	const fields = tableFields.map( field => {
 		// merge duplicate fields for filters
 		const mergedDuplicateFields = Array.from(
@@ -67,31 +72,39 @@ export function ItemList( props: ItemListProps ) {
 
 		return {
 			id: field,
-			label: field,
+			label: field ?? '',
 			enableGlobalSearch: true,
 			elements: mergedDuplicateFields.map( value => ( {
-				label: value,
-				value,
+				label: value ?? '',
+				value: value ?? '',
 			} ) ),
+			render:
+				field === mediaField
+					? ( { item }: { item: Record< string, unknown > } ) => {
+							return (
+								<img
+									// temporary until we pull in more data
+									alt=""
+									src={ item[ field ] as string }
+								/>
+							);
+					  }
+					: undefined,
+			enableSorting: field !== mediaField,
 			filterBy: {
-				operators: [ 'isAny', 'isNone', 'isAll', 'isNotAll' ],
+				operators: [ 'isAny', 'isNone', 'isAll', 'isNotAll' ] as Operator[],
 			},
 		};
 	} );
-
-	const mediaField =
-		tableFields.find(
-			field => field.toLowerCase().includes( 'url' ) || field.toLowerCase().includes( 'image' )
-		) || '';
 
 	const defaultLayouts = {
 		table: {
 			showMedia: false,
 		},
-		list: {
+		grid: {
 			mediaField,
 		},
-		grid: {
+		list: {
 			mediaField,
 		},
 	};
@@ -100,8 +113,7 @@ export function ItemList( props: ItemListProps ) {
 		if ( tableFields.length > 0 ) {
 			setView( prevView => ( {
 				...prevView,
-
-				fields: tableFields,
+				fields: tableFields.filter( field => field !== mediaField ),
 			} ) );
 		}
 	}, [ tableFields ] );
