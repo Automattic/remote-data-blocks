@@ -33,9 +33,6 @@ class MockDataSource extends HttpDataSource {
 		return $this->endpoint;
 	}
 
-	/**
-	 * @inheritDoc
-	 */
 	public function get_request_headers(): array|WP_Error {
 		return $this->headers;
 	}

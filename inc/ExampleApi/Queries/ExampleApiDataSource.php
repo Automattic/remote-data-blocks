@@ -22,9 +22,6 @@ class ExampleApiDataSource extends HttpDataSource {
 		return '';
 	}
 
-	/**
-	 * @inheritDoc
-	 */
 	public function get_request_headers(): array|WP_Error {
 		return [];
 	}
