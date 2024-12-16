@@ -137,6 +137,7 @@ final class ConfigSchemas {
 				Types::object( [
 					// @see Note above about default value type.
 					'default_value' => Types::nullable( Types::any() ),
+					'format' => Types::nullable( Types::callable() ),
 					'generate' => Types::nullable( Types::callable() ),
 					'is_collection' => Types::nullable( Types::boolean() ),
 					'name' => Types::nullable( Types::string() ),
