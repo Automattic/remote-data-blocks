@@ -80,7 +80,7 @@ class GoogleSheetsDataSource extends HttpDataSource {
 		return sprintf( 'https://sheets.googleapis.com/v4/spreadsheets/%s', $this->config['spreadsheet']['id'] );
 	}
 
-	public function get_request_headers(): array {
+	public function get_request_headers(): array|WP_Error {
 		$access_token = GoogleAuth::generate_token_from_service_account_key(
 			$this->config['credentials'],
 			GoogleAuth::GOOGLE_SHEETS_SCOPES

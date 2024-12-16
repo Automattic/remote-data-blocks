@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Example\ArtInstituteOfChicago;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use WP_Error;
 
 class ArtInstituteOfChicagoDataSource extends HttpDataSource {
 	public function get_display_name(): string {
@@ -13,7 +14,7 @@ class ArtInstituteOfChicagoDataSource extends HttpDataSource {
 		return 'https://api.artic.edu/api/v1/artworks';
 	}
 
-	public function get_request_headers(): array {
+	public function get_request_headers(): array|WP_Error {
 		return [
 			'Content-Type' => 'application/json',
 		];

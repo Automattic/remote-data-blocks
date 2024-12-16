@@ -9,6 +9,7 @@ use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 use RemoteDataBlocks\Validation\Validator;
 use RemoteDataBlocks\Validation\ValidatorInterface;
+use WP_Error;
 
 defined( 'ABSPATH' ) || exit();
 
@@ -175,7 +176,7 @@ class HttpQueryContext implements QueryContextInterface, HttpQueryContextInterfa
 	 *
 	 * @param array $input_variables The input variables for this query.
 	 */
-	public function get_request_headers( array $input_variables ): array {
+	public function get_request_headers( array $input_variables ): array|WP_Error {
 		return $this->get_data_source()->get_request_headers();
 	}
 

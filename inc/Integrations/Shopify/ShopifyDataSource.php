@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Integrations\Shopify;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use WP_Error;
 
 use function plugins_url;
 
@@ -36,7 +37,7 @@ class ShopifyDataSource extends HttpDataSource {
 		return 'https://' . $this->config['store_name'] . '.myshopify.com/api/2024-04/graphql.json';
 	}
 
-	public function get_request_headers(): array {
+	public function get_request_headers(): array|WP_Error {
 		return [
 			'Content-Type' => 'application/json',
 			'X-Shopify-Storefront-Access-Token' => $this->config['access_token'],

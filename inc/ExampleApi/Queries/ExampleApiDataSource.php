@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\ExampleApi\Queries;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use WP_Error;
 
 /**
  * This is a placeholder DataSource used only to represent the data source in the
@@ -24,7 +25,7 @@ class ExampleApiDataSource extends HttpDataSource {
 	/**
 	 * @inheritDoc
 	 */
-	public function get_request_headers(): array {
+	public function get_request_headers(): array|WP_Error {
 		return [];
 	}
 }

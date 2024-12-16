@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Tests\Mocks;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use WP_Error;
 
 class MockDataSource extends HttpDataSource {
 	private $endpoint = 'https://example.com/api';
@@ -35,7 +36,7 @@ class MockDataSource extends HttpDataSource {
 	/**
 	 * @inheritDoc
 	 */
-	public function get_request_headers(): array {
+	public function get_request_headers(): array|WP_Error {
 		return $this->headers;
 	}
 

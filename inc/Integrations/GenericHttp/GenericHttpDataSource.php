@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Integrations\GenericHttp;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use WP_Error;
 
 class GenericHttpDataSource extends HttpDataSource {
 	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE;
@@ -58,7 +59,7 @@ class GenericHttpDataSource extends HttpDataSource {
 		return $this->config['url'];
 	}
 
-	public function get_request_headers(): array {
+	public function get_request_headers(): array|WP_Error {
 		return [
 			'Accept' => 'application/json',
 		];
