@@ -21,7 +21,7 @@ export function BaseModal( props: BaseModalProps ) {
 						<img
 							alt={ props.title }
 							src={ props.headerImage }
-							style={ { height: '90%', marginRight: '2em', objectFit: 'contain' } }
+							style={ { marginRight: '2em', objectFit: 'contain' } }
 						/>
 					) }
 					{ props.headerActions }

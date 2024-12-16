@@ -12,16 +12,28 @@ interface ItemListProps {
 	onSelect: ( data: RemoteDataQueryInput ) => void;
 	placeholderText: string;
 	results?: RemoteData[ 'results' ];
+	searchTerms: string;
+	setSearchTerms: ( newValue: string ) => void;
 }
 
 export function ItemList( props: ItemListProps ) {
-	const { defaultPattern: pattern } = usePatterns( props.blockName );
+	const {
+		blockName,
+		loading,
+		noResultsText,
+		onSelect,
+		placeholderText,
+		results,
+		searchTerms,
+		setSearchTerms,
+	} = props;
+	const { defaultPattern: pattern } = usePatterns( blockName );
 
-	const instanceId = useInstanceId( ItemList, props.blockName );
+	const instanceId = useInstanceId( ItemList, blockName );
 
 	// ensure each result has an 'id' key
 	const data = useMemo( () => {
-		return ( props.results ?? [] ).map( ( item: Record< string, unknown > ) =>
+		return ( results ?? [] ).map( ( item: Record< string, unknown > ) =>
 			item.id
 				? item
 				: {
@@ -31,7 +43,7 @@ export function ItemList( props: ItemListProps ) {
 							: instanceId,
 				  }
 		) as RemoteData[ 'results' ];
-	}, [ props.results ] );
+	}, [ results ] );
 
 	const [ view, setView ] = useState< View >( {
 		type: 'table' as const,
@@ -48,11 +60,11 @@ export function ItemList( props: ItemListProps ) {
 		() =>
 			Array.from(
 				new Set(
-					props.results?.flatMap( Object.keys ).filter( key => ! /(^|_)(id)$/i.test( key ) ) // Filters out keys containing 'id' or similar patterns
+					results?.flatMap( Object.keys ).filter( key => ! /(^|_)(id)$/i.test( key ) ) // Filters out keys containing 'id' or similar patterns
 				)
 			),
 
-		[ props.results ]
+		[ results ]
 	);
 
 	const mediaField =
@@ -64,7 +76,7 @@ export function ItemList( props: ItemListProps ) {
 		// merge duplicate fields for filters
 		const mergedDuplicateFields = Array.from(
 			new Set(
-				props.results
+				results
 					?.map( result => result[ field ] )
 					.filter( value => value !== '' && value !== undefined )
 			)
@@ -118,17 +130,23 @@ export function ItemList( props: ItemListProps ) {
 		}
 	}, [ tableFields ] );
 
-	// filter, sort and paginate data
-	const { data: results, paginationInfo } = useMemo( () => {
-		return filterSortAndPaginate( data ?? [], view, fields );
-	}, [ view ] );
+	useEffect( () => {
+		if ( view.search !== searchTerms ) {
+			setSearchTerms( view.search ?? '' );
+		}
+	}, [ view, searchTerms ] );
 
-	if ( ! props.results ) {
-		return <p>{ __( props.placeholderText ) }</p>;
+	// filter, sort and paginate data
+	const { data: filteredData, paginationInfo } = useMemo( () => {
+		return filterSortAndPaginate( data ?? [], view, fields );
+	}, [ data, view ] );
+
+	if ( ! results ) {
+		return <p>{ __( placeholderText ) }</p>;
 	}
 
-	if ( props.results.length === 0 ) {
-		return <p>{ __( props.noResultsText ) }</p>;
+	if ( results.length === 0 ) {
+		return <p>{ __( noResultsText ) }</p>;
 	}
 
 	const actions = [
@@ -136,7 +154,7 @@ export function ItemList( props: ItemListProps ) {
 			id: 'select',
 			label: __( 'Select item' ),
 			callback: ( items: unknown[] ) => {
-				( items as RemoteData[ 'results' ] ).map( item => props.onSelect( item ) );
+				( items as RemoteData[ 'results' ] ).map( item => onSelect( item ) );
 			},
 		},
 	];
@@ -144,13 +162,13 @@ export function ItemList( props: ItemListProps ) {
 	return (
 		<DataViews
 			actions={ actions }
-			data={ results }
+			data={ filteredData }
 			fields={ fields }
 			view={ view }
 			onChangeView={ setView }
 			paginationInfo={ paginationInfo }
 			defaultLayouts={ defaultLayouts }
-			isLoading={ props.loading || ! pattern }
+			isLoading={ loading || ! pattern }
 			getItemId={ ( item: { id?: string } ) => item.id || '' }
 		/>
 	);
