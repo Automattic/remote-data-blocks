@@ -4,6 +4,7 @@ namespace RemoteDataBlocks\Integrations\SalesforceB2C\Queries;
 
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\Integrations\SalesforceB2C\Auth\SalesforceB2CAuth;
+use WP_Error;
 
 class SalesforceB2CSearchProductsQuery extends HttpQueryContext {
 	public function get_input_schema(): array {
@@ -55,7 +56,7 @@ class SalesforceB2CSearchProductsQuery extends HttpQueryContext {
 		);
 	}
 
-	public function get_request_headers( array $input_variables ): array {
+	public function get_request_headers( array $input_variables ): array|WP_Error {
 		$data_source_config = $this->get_data_source()->to_array();
 		$data_source_endpoint = $this->get_data_source()->get_endpoint();
 
@@ -66,16 +67,14 @@ class SalesforceB2CSearchProductsQuery extends HttpQueryContext {
 			$data_source_config['client_secret']
 		);
 
-		$headers = [
-			'Content-Type' => 'application/json',
-		];
-
 		if ( is_wp_error( $access_token ) ) {
-			return $headers;
+			return $access_token;
 		}
 
-		$headers['Authorization'] = sprintf( 'Bearer %s', $access_token );
-		return $headers;
+		return [
+			'Content-Type' => 'application/json',
+			'Authorization' => sprintf( 'Bearer %s', $access_token ),
+		];
 	}
 
 	public function get_query_name(): string {

@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Integrations\SalesforceB2C;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use WP_Error;
 
 use function plugins_url;
 
@@ -42,7 +43,7 @@ class SalesforceB2CDataSource extends HttpDataSource {
 		return sprintf( 'https://%s.api.commercecloud.salesforce.com', $this->config['shortcode'] );
 	}
 
-	public function get_request_headers(): array {
+	public function get_request_headers(): array|WP_Error {
 		return [
 			'Content-Type' => 'application/json',
 		];
