@@ -11,6 +11,9 @@ use function get_locale;
 final class FieldFormatter {
 	/**
 	 * Format a number as a currency.
+	 *
+	 * @psalm-suppress UnusedPsalmSuppress
+	 * @psalm-suppress UndefinedClass
 	 */
 	public static function format_currency( mixed $value, string $iso_4127_currency_code = 'USD', ?string $locale = null ): string {
 		$format = numfmt_create( $locale ?? get_locale(), NumberFormatter::CURRENCY );
