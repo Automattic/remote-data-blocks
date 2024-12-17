@@ -28,7 +28,7 @@ export function BaseModal( props: BaseModalProps ) {
 				</>
 			}
 			onRequestClose={ props.onClose }
-			size={ props.size ?? 'large' }
+			size={ props.size ?? 'fill' }
 			title={ props.title }
 		>
 			{ props.children }

@@ -27,10 +27,7 @@ abstract class HttpDataSource implements DataSourceInterface, HttpDataSourceInte
 
 	abstract public function get_endpoint(): string;
 
-	/**
-	 * @inheritDoc
-	 */
-	abstract public function get_request_headers(): array;
+	abstract public function get_request_headers(): array|WP_Error;
 
 	public function get_image_url(): ?string {
 		return null;

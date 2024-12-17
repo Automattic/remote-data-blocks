@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Integrations\GitHub;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use WP_Error;
 
 class GitHubDataSource extends HttpDataSource {
 	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_GITHUB_SERVICE;
@@ -42,7 +43,7 @@ class GitHubDataSource extends HttpDataSource {
 		);
 	}
 
-	public function get_request_headers(): array {
+	public function get_request_headers(): array|WP_Error {
 		return [
 			'Accept' => 'application/vnd.github+json',
 		];

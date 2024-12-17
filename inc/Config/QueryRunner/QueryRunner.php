@@ -39,6 +39,11 @@ class QueryRunner implements QueryRunnerInterface {
 	 */
 	protected function get_request_details( array $input_variables ): array|WP_Error {
 		$headers = $this->query_context->get_request_headers( $input_variables );
+
+		if ( is_wp_error( $headers ) ) {
+			return $headers;
+		}
+
 		$method = $this->query_context->get_request_method();
 		$body = $this->query_context->get_request_body( $input_variables );
 		$endpoint = $this->query_context->get_endpoint( $input_variables );
