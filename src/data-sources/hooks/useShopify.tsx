@@ -43,7 +43,7 @@ export const useShopifyShopName = ( store: string, token: string ): ShopifyConne
 				getConnectionMessage(
 					'error',
 					__(
-						'Connection failed. Please verify store slug and access token.',
+						'Connection failed. Please verify store name and access token.',
 						'remote-data-blocks'
 					)
 				)
@@ -60,11 +60,9 @@ export const useShopifyShopName = ( store: string, token: string ): ShopifyConne
 	if ( ! connectionMessage ) {
 		setConnectionMessage(
 			<span>
-				{ __( 'Provide access token to connect your Shopify store', 'remote-data-blocks' ) } (
 				<a href="https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens/generate-app-access-tokens-admin">
-					{ __( 'guide', 'remote-data-blocks' ) }
+					{ __( 'How do I get my token?', 'remote-data-blocks' ) }
 				</a>
-				).
 			</span>
 		);
 	}

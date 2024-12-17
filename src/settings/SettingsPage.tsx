@@ -8,26 +8,32 @@ import { AddDataSourceDropdown } from '@/data-sources/components/AddDataSourceDr
 import Notices from '@/settings/Notices';
 import { SettingsContext, useDataSourceRouter } from '@/settings/hooks/useSettingsNav';
 
-import './SettingsPage.scss';
-
 const SettingsPage = () => {
 	const settingsContext = useDataSourceRouter();
+
+	const addOrEditScreen = [ 'addDataSource', 'editDataSource' ].includes( settingsContext.screen );
 
 	return (
 		<div className="rdb-settings-page">
 			<SettingsContext.Provider value={ settingsContext }>
 				<div className="rdb-settings-page_header">
-					{ [ 'addDataSource', 'editDataSource' ].includes( settingsContext.screen ) ? (
-						<HStack className="rdb-settings-page_header-return">
+					{ addOrEditScreen ? (
+						<HStack justify="flex-start">
 							<Button icon={ chevronLeft } onClick={ () => settingsContext.goToMainScreen() } />
-							<h2>
-								{ __(
-									`${
-										[ 'addDataSource' ].includes( settingsContext.screen ) ? 'New ' : 'Edit'
-									} Data Source`,
-									'remote-data-blocks'
-								) }
-							</h2>
+							<HStack>
+								<h2>
+									{ __(
+										`${
+											[ 'addDataSource' ].includes( settingsContext.screen ) ? 'New ' : 'Edit'
+										} Data Source`,
+										'remote-data-blocks'
+									) }
+								</h2>
+								<HStack expanded={ false } justify="flex-end" spacing={ 3 }>
+									<div id="rdb-settings-page-form-save-button" />
+									<div id="rdb-settings-page-form-settings" />
+								</HStack>
+							</HStack>
 						</HStack>
 					) : (
 						<>
@@ -44,14 +50,14 @@ const SettingsPage = () => {
 						</>
 					) }
 				</div>
-				<div className="page-content">
+				<div
+					className={ `rdb-settings-page_content ${
+						addOrEditScreen ? 'rdb-settings-page_add-edit' : 'rdb-settings-page_sources'
+					}` }
+				>
 					<Notices />
 
-					{ [ 'addDataSource', 'editDataSource' ].includes( settingsContext.screen ) ? (
-						<DataSourceSettings />
-					) : (
-						<DataSourceList />
-					) }
+					{ addOrEditScreen ? <DataSourceSettings /> : <DataSourceList /> }
 				</div>
 			</SettingsContext.Provider>
 		</div>

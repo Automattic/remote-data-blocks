@@ -26,11 +26,15 @@ class ShopifyDataSource extends HttpDataSource {
 			],
 			'access_token' => [ 'type' => 'string' ],
 			'store_name' => [ 'type' => 'string' ],
+			'display_name' => [
+				'type' => 'string',
+				'required' => false,
+			],
 		],
 	];
 
 	public function get_display_name(): string {
-		return 'Shopify (' . $this->config['slug'] . ')';
+		return 'Shopify (' . $this->config['display_name'] . ')';
 	}
 
 	public function get_endpoint(): string {
@@ -48,18 +52,18 @@ class ShopifyDataSource extends HttpDataSource {
 		return plugins_url( './assets/shopify_logo_black.png', __FILE__ );
 	}
 
-	public static function create( string $access_token, string $store_name ): self {
+	public static function create( string $access_token, string $store_name, ?string $display_name = null ): self {
 		return parent::from_array([
+			'display_name' => $display_name ?? 'Shopify (' . $store_name . ')',
 			'service' => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
 			'access_token' => $access_token,
 			'store_name' => $store_name,
-			'slug' => $store_name,
 		]);
 	}
 
 	public function to_ui_display(): array {
 		return [
-			'slug' => $this->get_slug(),
+			'display_name' => $this->get_display_name(),
 			'service' => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
 			'store_name' => $this->config['store_name'],
 			'uuid' => $this->config['uuid'] ?? null,
