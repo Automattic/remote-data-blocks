@@ -18,9 +18,9 @@ export interface AirtableBaseSchema {
 export type AirtableFormState = {
 	access_token: string;
 	base: StringIdName | null;
+	display_name: string;
 	table: StringIdName | null;
 	table_fields: Set< string >;
-	slug: string;
 };
 
 export interface AirtableTable {
@@ -34,13 +34,35 @@ export interface AirtableTable {
 	syncStatus: 'complete' | 'pending';
 }
 
-interface AirtableField {
+/**
+ * Represents an Airtable field configuration.
+ * @see https://airtable.com/developers/web/api/model/table-model#fields
+ */
+export interface AirtableField {
 	id: string;
 	name: string;
 	type: string;
 	description: string | null;
 	options?: {
-		[ key: string ]: unknown;
+		choices?: Array< {
+			id: string;
+			name: string;
+			color?: string;
+		} >;
+		precision?: number;
+		symbol?: string;
+		format?: string;
+		foreignTableId?: string;
+		relationship?: 'many' | 'one';
+		symmetricColumnId?: string;
+		result?: {
+			type: string;
+			options?: {
+				precision?: number;
+				symbol?: string;
+				format?: string;
+			};
+		};
 	};
 }
 

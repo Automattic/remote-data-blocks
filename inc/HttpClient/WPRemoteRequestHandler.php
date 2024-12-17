@@ -30,6 +30,7 @@ class WPRemoteRequestHandler {
 		try {
 			// Convert Guzzle request to arguments for wp_remote_request.
 			$url = (string) $request->getUri();
+			$headers = [];
 
 			// If we are running on WordPress Playground, use the provided CORS proxy.
 			if ( defined( 'USE_PLAYGROUND_CORS_PROXY' ) && true === USE_PLAYGROUND_CORS_PROXY ) {
@@ -40,11 +41,12 @@ class WPRemoteRequestHandler {
 					->withQuery( $url );
 				$request = $request->withUri( $new_uri );
 				$url = (string) $new_uri;
+				$headers['X-Cors-Proxy-Allowed-Request-Headers'] = 'Authorization';
 			}
 
 			$args = [
 				'body' => (string) $request->getBody(), // Stream has been read, let __toString() rewind and read it.
-				'headers' => [],
+				'headers' => $headers,
 				'httpversion' => $options['httpversion'] ?? self::DEFAULT_HTTP_VERSION,
 				'method' => $request->getMethod(),
 				'timeout' => $options['timeout'] ?? self::DEFAULT_TIMEOUT,
