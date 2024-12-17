@@ -90,7 +90,7 @@
     "fork-ts-checker-webpack-plugin": "9.0.2",
     "happy-dom": "15.11.7",
     "husky": "9.1.7",
-    "lint-staged": "15.2.10",
+    "lint-staged": "15.2.11",
     "prettier": "npm:wp-prettier@2.8.5",
     "react": "18.3.1",
     "stylelint": "16.11.0",
