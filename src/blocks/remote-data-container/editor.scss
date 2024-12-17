@@ -114,3 +114,14 @@ remote-data-blocks-inline-field {
 	padding-left: 48px;
 }
 
+.rdb-editor_data-views-modal .components-modal__content {
+	padding: 0;
+
+	> :nth-child(2) {
+		height: 100%;
+	}
+
+	.dataviews-view-table {
+		padding: 4px 32px 32px;
+	}
+}

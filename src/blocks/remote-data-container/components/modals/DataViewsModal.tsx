@@ -38,6 +38,7 @@ export function DataViewsModal( props: DataViewsModalProps ) {
 	return (
 		<ModalWithButtonTrigger
 			buttonText={ __( 'Choose' ) }
+			className="rdb-editor_data-views-modal"
 			isOpen={ isOpen }
 			onClose={ close }
 			onOpen={ open }
@@ -46,9 +47,7 @@ export function DataViewsModal( props: DataViewsModalProps ) {
 			<ItemList
 				blockName={ props.blockName }
 				loading={ loading }
-				noResultsText={ __( 'No items found' ) }
 				onSelect={ onSelectItem }
-				placeholderText={ __( 'Select an item' ) }
 				results={ results }
 				searchTerms={ searchTerms }
 				setSearchTerms={ setSearchTerms }

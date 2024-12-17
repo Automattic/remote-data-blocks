@@ -51,7 +51,7 @@ export function ItemList( props: ItemListProps ) {
 
 	const [ view, setView ] = useState< View >( {
 		type: 'table' as const,
-		perPage: 10,
+		perPage: 8,
 		page: 1,
 		search: '',
 		fields: tableFields.filter(
