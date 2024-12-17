@@ -11,10 +11,14 @@ class SanitizerTest extends TestCase {
 		$schema = Types::object( [
 			'name' => Types::string(),
 		] );
-		$data = [ 'name' => ' John Doe ' ];
 
 		$sanitizer = new Sanitizer( $schema );
-		$result = $sanitizer->sanitize( $data );
+		$result = $sanitizer->sanitize( [ 'name' => ' John Doe ' ] );
+
+		$this->assertSame( 'John Doe', $result['name'] );
+
+		// Takes the first element of the array.
+		$result = $sanitizer->sanitize( [ 'name' => [ [ 'John Doe' ], 'Jane Doe', 33 ] ] );
 
 		$this->assertSame( 'John Doe', $result['name'] );
 	}
