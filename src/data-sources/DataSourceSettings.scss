@@ -71,7 +71,6 @@
 
 
 .rdb-settings-page_data-source-form {
-	overflow-y: auto;
 	padding: 0 16px 40px;
 
 	@media screen and (min-width: 782px) {
@@ -176,8 +175,6 @@
 
 .rdb-settings-page_data-source-multi-step-form {
 	padding: 24px;
-	overflow: hidden;
-
 
 	@media screen and (min-width: 782px) {
 		display: grid;
