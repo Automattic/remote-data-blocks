@@ -75,6 +75,17 @@ export const ShopifySettings = ( {
 		handleOnChange( 'access_token', token ?? '' );
 	};
 
+	const onShopNameChange = ( shopNameInput: string | undefined ) => {
+		if ( ! shopNameInput ) {
+			handleOnChange( 'store_name', '' );
+			return;
+		}
+		const urlPattern = /^https?:\/\/([^\.]+)\.myshopify\.com$/;
+		const match = shopNameInput.match( urlPattern );
+		const extractedShopName = match ? match[ 1 ] : shopNameInput;
+		handleOnChange( 'store_name', extractedShopName );
+	};
+
 	return (
 		<DataSourceForm onSave={ onSaveClick }>
 			<DataSourceForm.Setup
@@ -89,13 +100,17 @@ export const ShopifySettings = ( {
 			>
 				<TextControl
 					type="url"
-					label={ __( 'Store Slug', 'remote-data-blocks' ) }
-					onChange={ storeName => {
-						handleOnChange( 'store_name', storeName ?? '' );
-					} }
+					label={ __( 'myshopify.com domain name', 'remote-data-blocks' ) }
+					onChange={ onShopNameChange }
 					value={ state.store_name }
 					placeholder="your-shop-name"
-					help={ __( 'Example: https://your-shop-name.myshopify.com', 'remote-data-blocks' ) }
+					help={
+						<>
+							{ __( 'Example: https://' ) }
+							<strong>{ __( 'your-shop-name' ) }</strong>
+							{ __( '.myshopify.com' ) }
+						</>
+					}
 					autoComplete="off"
 					__next40pxDefaultSize
 					__nextHasNoMarginBottom
