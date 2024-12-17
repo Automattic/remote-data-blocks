@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Integrations\Airtable;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use WP_Error;
 
 class AirtableDataSource extends HttpDataSource {
 	protected const SERVICE_SCHEMA_VERSION = 1;
@@ -82,7 +83,7 @@ class AirtableDataSource extends HttpDataSource {
 		return 'https://api.airtable.com/v0/' . $this->config['base']['id'];
 	}
 
-	public function get_request_headers(): array {
+	public function get_request_headers(): array|WP_Error {
 		return [
 			'Authorization' => sprintf( 'Bearer %s', $this->config['access_token'] ),
 			'Content-Type' => 'application/json',
