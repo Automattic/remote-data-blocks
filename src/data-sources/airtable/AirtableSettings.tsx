@@ -373,6 +373,11 @@ export const AirtableSettings = ( {
 								...availableTableFields,
 							] }
 							value={ Array.from( state.table_fields ) }
+							__experimentalValidateInput={ input =>
+								availableTableFields.includes( input ) ||
+								input === 'Select All' ||
+								input === 'Deselect All'
+							}
 							__nextHasNoMarginBottom
 							__experimentalExpandOnFocus
 						/>
