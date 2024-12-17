@@ -100,6 +100,11 @@ class Sanitizer implements SanitizerInterface {
 	}
 
 	public static function sanitize_primitive_type( string $type_name, mixed $value ): mixed {
+		// If the value is an array, just take the first element.
+		if ( is_array( $value ) ) {
+			return self::sanitize_primitive_type( $type_name, $value[0] ?? null );
+		}
+
 		// Not all types support sanitization. We sanitize what we can.
 		switch ( $type_name ) {
 			case 'boolean':
@@ -129,7 +134,7 @@ class Sanitizer implements SanitizerInterface {
 			case 'button_url':
 			case 'image_url':
 			case 'url':
-				return sanitize_url( $value );
+				return sanitize_url( strval( $value ) );
 
 			default:
 				return $value;
