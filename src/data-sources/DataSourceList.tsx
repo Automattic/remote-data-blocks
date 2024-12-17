@@ -88,7 +88,7 @@ const DataSourceList = () => {
 
 	const getServiceLabel = ( service: ( typeof SUPPORTED_SERVICES )[ number ] ) => {
 		// eslint-disable-next-line security/detect-object-injection
-		return SUPPORTED_SERVICES_LABELS[ service ];
+		return SUPPORTED_SERVICES_LABELS[ service ] ?? 'HTTP';
 	};
 
 	function showSnackbar( type: 'success' | 'error', message: string ): void {
@@ -113,10 +113,8 @@ const DataSourceList = () => {
 				return ShopifyIcon;
 			case 'google-sheets':
 				return GoogleSheetsIcon;
-			case 'generic-http':
-				return HttpIcon;
 			default:
-				return null;
+				return HttpIcon;
 		}
 	};
 
