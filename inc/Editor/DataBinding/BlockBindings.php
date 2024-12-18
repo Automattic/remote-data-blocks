@@ -251,7 +251,8 @@ class BlockBindings {
 			return $fallback_content;
 		}
 
-		$result = $block_context['results'][0] ?? null;
+		$result_index = $source_args['index'] ?? 0;
+		$result = $block_context['results'][ $result_index ] ?? null;
 
 		if ( isset( $result[ $source_field ] ) ) {
 			$fallback_content = $result[ $source_field ];
@@ -304,9 +305,16 @@ class BlockBindings {
 		$loop_template_content = $block->parsed_block['innerContent'];
 		$query_results = self::execute_query( $block_context, 'loop' );
 
-		if ( ! isset( $query_results['results'] ) ) {
+		if ( isset( $query_results['results'] ) ) {
+			$results = $query_results['results'];
+		} else {
 			self::log_error( 'Cannot load results for data loop', $block->name, 'loop' );
-			return $content;
+
+			if ( isset( $block_context['results'] ) ) {
+				$results = $block_context['results'];
+			} else {
+				return $content;
+			}
 		}
 
 		$block->parsed_block['innerBlocks'] = [];
@@ -315,7 +323,7 @@ class BlockBindings {
 		// Loop through the query results and make a copy of the template for each
 		// result, updating the bindings with the result index. This will be used
 		// by the binding source to render the correct result.
-		foreach ( array_keys( $query_results['results'] ) as $index ) {
+		foreach ( array_keys( $results ) as $index ) {
 
 			// Loop over the inner blocks of the template and update the bindings to
 			// include the current index.
