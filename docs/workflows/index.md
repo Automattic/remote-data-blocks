@@ -4,6 +4,7 @@
 
 ## Code-based workflows
 
-- [Create an Airtable integration with code](airtable-with-code.md)
-- [Create a Google Sheets integration with code](google-sheets-with-code.md)
-- [Create a Zip Code integration with code contract](zip-code-with-contract.md)
+- [Create an Airtable integration](airtable.md)
+- [Create a Google Sheets integration](google-sheets.md)
+- [Create a REST API integration](rest-api.md)
+- [Create a REST API integration with code](rest-api-with-code.md)
