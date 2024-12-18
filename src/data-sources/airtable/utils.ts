@@ -28,7 +28,6 @@ export const getAirtableOutputQueryMappingValue = (
 	}
 
 	switch ( field.type ) {
-		case 'url':
 		case 'button':
 			return { ...baseField, type: 'button_url' };
 

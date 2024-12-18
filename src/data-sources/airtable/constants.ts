@@ -14,6 +14,7 @@ export const AIRTABLE_STRING_TYPES = Object.freeze(
 		'multipleRecordLinks',
 		'rollup',
 		'externalSyncSource',
+		'url',
 	] )
 );
 
@@ -42,6 +43,7 @@ export const SUPPORTED_AIRTABLE_TYPES = Object.freeze( [
 	'multipleRecordLinks',
 	'rollup',
 	'externalSyncSource',
+	'url',
 	// Number types
 	'number',
 	'autoNumber',
@@ -55,7 +57,6 @@ export const SUPPORTED_AIRTABLE_TYPES = Object.freeze( [
 	'singleCollaborator',
 	// Other types
 	'multipleCollaborator',
-	'url',
 	'button',
 	'currency',
 	'checkbox',
