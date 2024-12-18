@@ -1,9 +1,10 @@
-import { FormTokenField, SelectControl, Spinner } from '@wordpress/components';
+import { SelectControl, Spinner } from '@wordpress/components';
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
+import { CustomFormFieldToken } from '../components/CustomFormFieldToken';
 import { SUPPORTED_AIRTABLE_TYPES } from '@/data-sources/airtable/constants';
 import { AirtableFormState } from '@/data-sources/airtable/types';
 import { getAirtableOutputQueryMappingValue } from '@/data-sources/airtable/utils';
@@ -240,8 +241,8 @@ export const AirtableSettings = ( {
 
 					if ( selectedTable ) {
 						return sprintf(
-							__( 'Fields: %s', 'remote-data-blocks' ),
-							selectedTable.fields.map( field => field.name ).join( ', ' )
+							__( '%s fields found', 'remote-data-blocks' ),
+							selectedTable.fields.length
 						);
 					}
 				}
@@ -350,7 +351,7 @@ export const AirtableSettings = ( {
 					/>
 
 					{ state.table && availableTableFields.length ? (
-						<FormTokenField
+						<CustomFormFieldToken
 							label={ __( 'Fields', 'remote-data-blocks' ) }
 							onChange={ selection => {
 								if ( selection.includes( 'Select All' ) ) {
@@ -373,8 +374,14 @@ export const AirtableSettings = ( {
 								...availableTableFields,
 							] }
 							value={ Array.from( state.table_fields ) }
+							__experimentalValidateInput={ input =>
+								availableTableFields.includes( input ) ||
+								input === 'Select All' ||
+								input === 'Deselect All'
+							}
 							__nextHasNoMarginBottom
 							__experimentalExpandOnFocus
+							__next40pxDefaultSize
 						/>
 					) : (
 						state.table && <Spinner />
