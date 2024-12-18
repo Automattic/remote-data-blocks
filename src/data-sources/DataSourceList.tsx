@@ -165,9 +165,10 @@ const DataSourceList = () => {
 									uuid,
 									service,
 								} = source;
+								const key = `${ service }-${ uuid }-${ displayName }`;
 
 								return (
-									<tr key={ uuid } className="table-row">
+									<tr key={ key } className="table-row">
 										<td>
 											<div className="rdb-data-source-name-and-icon">
 												<Icon

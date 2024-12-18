@@ -1,7 +1,8 @@
-import { AUTH_TYPES, API_KEY_ADD_TO } from '@/data-sources/constants';
+export type HttpAuthTypes = 'bearer' | 'basic' | 'api-key' | 'none';
+export type HttpApiKeyDestination = 'header' | 'queryparams';
 
 export interface BaseHttpAuth {
-	type: ( typeof AUTH_TYPES )[ number ];
+	type: HttpAuthTypes;
 	value: string;
 }
 
@@ -18,7 +19,7 @@ export type HttpAuth = HttpBearerAuth | HttpBasicAuth | HttpApiKeyAuth | HttpNoA
 export interface HttpApiKeyAuth extends BaseHttpAuth {
 	type: 'api-key';
 	key: string;
-	add_to: ( typeof API_KEY_ADD_TO )[ number ];
+	add_to: HttpApiKeyDestination;
 }
 
 export interface HttpNoAuth extends BaseHttpAuth {

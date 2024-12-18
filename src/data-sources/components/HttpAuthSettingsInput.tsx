@@ -31,9 +31,9 @@ export const HttpAuthSettingsInput: React.FC< HttpAuthSettingsInputProps > = ( {
 	return (
 		<>
 			<SelectControl
-				id="authType"
+				id="type"
 				label={ __( 'Authentication Type', 'remote-data-blocks' ) }
-				value={ auth?.type }
+				value={ auth?.type ?? 'none' }
 				onChange={ onSelectChange }
 				options={ HTTP_SOURCE_AUTH_TYPE_SELECT_OPTIONS }
 				__next40pxDefaultSize
@@ -43,9 +43,9 @@ export const HttpAuthSettingsInput: React.FC< HttpAuthSettingsInputProps > = ( {
 			{ auth?.type === 'api-key' && (
 				<>
 					<SelectControl
-						id="authAddTo"
+						id="add_to"
 						label={ __( 'Add API Key to', 'remote-data-blocks' ) }
-						value={ auth?.add_to }
+						value={ auth.add_to ?? 'header' }
 						onChange={ onSelectChange }
 						options={ HTTP_SOURCE_ADD_TO_SELECT_OPTIONS }
 						__next40pxDefaultSize
@@ -57,10 +57,10 @@ export const HttpAuthSettingsInput: React.FC< HttpAuthSettingsInputProps > = ( {
 					/>
 
 					<TextControl
-						id="authKey"
+						id="key"
 						label={ __( 'Authentication Key Name', 'remote-data-blocks' ) }
-						value={ auth?.key }
-						onChange={ value => onChange( 'authKey', value ) }
+						value={ auth.key ?? '' }
+						onChange={ value => onChange( 'key', value ) }
 						help={ __(
 							'The name of the header or query parameter to add the API key to.',
 							'remote-data-blocks'
@@ -72,10 +72,10 @@ export const HttpAuthSettingsInput: React.FC< HttpAuthSettingsInputProps > = ( {
 			) }
 			{ auth?.type !== 'none' && (
 				<PasswordInputControl
-					id="authValue"
+					id="value"
 					label={ __( 'Authentication Value', 'remote-data-blocks' ) }
-					value={ auth?.value }
-					onChange={ value => onChange( 'authValue', value ) }
+					value={ auth?.value ?? '' }
+					onChange={ value => onChange( 'value', value ) }
 					__next40pxDefaultSize
 					help={ __(
 						'The authentication value to use for the HTTP endpoint. When using Basic Auth, this is "username:password" string.',
