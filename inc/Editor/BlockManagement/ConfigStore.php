@@ -77,24 +77,12 @@ class ConfigStore {
 			return null;
 		}
 
-		$queries = $config['queries'];
-		if ( count( $queries ) === 0 ) {
+		$query = $config['queries'][ ConfigRegistry::DISPLAY_QUERY_KEY ] ?? null;
+		if ( ! ( $query instanceof QueryInterface ) ) {
 			return null;
 		}
 
-		$data_source_type = null;
-		foreach ( $queries as $query ) {
-			if ( ! $query instanceof QueryInterface ) {
-				continue;
-			}
-
-			$data_source_type = $query->get_data_source()->get_service_name();
-			if ( $data_source_type ) {
-				break;
-			}
-		}
-
-		return $data_source_type;
+		return $query->get_data_source()->get_service_name();
 	}
 
 	/**
