@@ -216,7 +216,7 @@ class BlockBindings {
 		}
 	}
 
-	public static function get_value( array $source_args, WP_Block|array $block ): string {
+	public static function get_value( array $source_args, WP_Block|array $block ): ?string {
 		// We may be passed a block instance (by core block bindings) or a block
 		// array (by our hooks into the Block Data API).
 		if ( $block instanceof WP_Block ) {
@@ -246,7 +246,8 @@ class BlockBindings {
 	}
 
 	private static function get_block_fallback_content( array $source_args, array $block_context, array $block_attributes ): string {
-		$fallback_content = '';
+		// Returning null from get_value() cancels the binding and allows the default saved content to show.
+		$fallback_content = null;
 
 		$source_field = $source_args['field'] ?? null;
 		if ( null === $source_field ) {
@@ -261,7 +262,7 @@ class BlockBindings {
 		}
 
 		if ( '' === $fallback_content ) {
-			$fallback_content = $block_attributes['content'] ?? '';
+			$fallback_content = $block_attributes['content'] ?? null;
 		}
 
 		return $fallback_content;
