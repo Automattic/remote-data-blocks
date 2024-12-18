@@ -63,8 +63,8 @@ export interface GoogleSheetsServiceConfig extends BaseServiceConfig {
 }
 
 export interface HttpServiceConfig extends BaseServiceConfig {
-	url: string;
 	auth?: HttpAuth;
+	endpoint: string;
 }
 
 export interface SalesforceB2CServiceConfig extends BaseServiceConfig {
