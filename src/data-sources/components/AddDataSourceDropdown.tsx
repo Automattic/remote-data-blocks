@@ -1,13 +1,13 @@
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { chevronDown } from '@wordpress/icons';
 
 import { SUPPORTED_SERVICES_LABELS } from '../constants';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
-import AirtableIcon from '@/settings/icons/AirtableIcon';
-import GoogleSheetsIcon from '@/settings/icons/GoogleSheetsIcon';
+import { AirtableIcon } from '@/settings/icons/AirtableIcon';
+import { GoogleSheetsIcon } from '@/settings/icons/GoogleSheetsIcon';
 import HttpIcon from '@/settings/icons/HttpIcon';
-import ShopifyIcon from '@/settings/icons/ShopifyIcon';
+import SalesforceCommerceB2CIcon from '@/settings/icons/SalesforceCommerceB2CIcon';
+import { ShopifyIcon } from '@/settings/icons/ShopifyIcon';
 
 import '../DataSourceList.scss';
 
@@ -23,14 +23,17 @@ export const AddDataSourceDropdown = () => {
 	return (
 		<DropdownMenu
 			className="rdb-settings-page_add-data-source-dropdown"
-			icon={ chevronDown }
-			label={ __( 'Add source', 'remote-data-blocks' ) }
-			text={ __( 'Add', 'remote-data-blocks' ) }
+			icon={ null }
+			label={ __( 'Connect new data source', 'remote-data-blocks' ) }
+			popoverProps={ {
+				offset: 8,
+			} }
+			text={ __( 'Connect New', 'remote-data-blocks' ) }
 			toggleProps={ {
 				className: 'rdb-settings-page_add-data-source-btn',
 				variant: 'primary',
 				showTooltip: false,
-				style: { flexDirection: 'row-reverse', paddingLeft: '12px', paddingRight: '8px' },
+				__next40pxDefaultSize: true,
 			} }
 			children={ ( { onClose } ) => (
 				<MenuGroup>
@@ -51,22 +54,29 @@ export const AddDataSourceDropdown = () => {
 							value: 'shopify',
 						},
 						{
+							icon: SalesforceCommerceB2CIcon,
+							label: SUPPORTED_SERVICES_LABELS[ 'salesforce-b2c' ],
+							value: 'salesforce-b2c',
+						},
+						{
 							icon: HttpIcon,
 							label: SUPPORTED_SERVICES_LABELS[ 'generic-http' ],
 							value: 'generic-http',
 						},
 					].map( ( { icon, label, value } ) => (
-						<MenuItem
-							key={ value }
-							icon={ icon }
-							iconPosition="left"
-							onClick={ () => {
-								onAddDataSource( value );
-								onClose();
-							} }
-						>
-							{ label }
-						</MenuItem>
+						<div key={ value } className="rdb-settings-page_add-data-source-btn-wrapper">
+							<MenuItem
+								className={ `rdb-settings-page_add-data-source-btn-${ value }` }
+								icon={ icon }
+								iconPosition="left"
+								onClick={ () => {
+									onAddDataSource( value );
+									onClose();
+								} }
+							>
+								{ label }
+							</MenuItem>
+						</div>
 					) ) }
 				</MenuGroup>
 			) }

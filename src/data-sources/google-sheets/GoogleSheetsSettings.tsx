@@ -5,8 +5,6 @@ import { ChangeEvent } from 'react';
 
 import { DataSourceForm } from '../components/DataSourceForm';
 import { getConnectionMessage } from '../utils';
-import { DataSourceFormActions } from '@/data-sources/components/DataSourceFormActions';
-import { SlugInput } from '@/data-sources/components/SlugInput';
 import { GOOGLE_SHEETS_API_SCOPES } from '@/data-sources/constants';
 import { GoogleSheetsFormState } from '@/data-sources/google-sheets/types';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
@@ -18,12 +16,13 @@ import { useGoogleAuth } from '@/data-sources/hooks/useGoogleAuth';
 import { GoogleSheetsConfig, SettingsComponentProps } from '@/data-sources/types';
 import { useForm, ValidationRules } from '@/hooks/useForm';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
+import { GoogleSheetsIcon, GoogleSheetsIconWithText } from '@/settings/icons/GoogleSheetsIcon';
 import { StringIdName } from '@/types/common';
 import { GoogleServiceAccountKey } from '@/types/google';
 import { SelectOption } from '@/types/input';
 
 const initialState: GoogleSheetsFormState = {
-	slug: '',
+	display_name: '',
 	spreadsheet: null,
 	sheet: null,
 	credentials: '',
@@ -35,7 +34,7 @@ const getInitialStateFromConfig = ( config?: GoogleSheetsConfig ): GoogleSheetsF
 	}
 
 	return {
-		slug: config.slug,
+		display_name: config.display_name,
 		spreadsheet: config.spreadsheet,
 		sheet: config.sheet
 			? {
@@ -77,8 +76,7 @@ export const GoogleSheetsSettings = ( {
 	config,
 }: SettingsComponentProps< GoogleSheetsConfig > ) => {
 	const { goToMainScreen } = useSettingsContext();
-	const { updateDataSource, addDataSource, slugConflicts, loadingSlugConflicts } =
-		useDataSources( false );
+	const { updateDataSource, addDataSource } = useDataSources( false );
 
 	const { state, errors, handleOnChange } = useForm< GoogleSheetsFormState >( {
 		initialValues: getInitialStateFromConfig( config ),
@@ -109,6 +107,8 @@ export const GoogleSheetsSettings = ( {
 		state.spreadsheet?.id ?? ''
 	);
 
+	const [ newUUID, setNewUUID ] = useState< string | null >( uuidFromProps ?? null );
+
 	const onSaveClick = async () => {
 		if ( ! state.spreadsheet || ! state.sheet || ! state.credentials ) {
 			// TODO: Error handling
@@ -116,9 +116,11 @@ export const GoogleSheetsSettings = ( {
 		}
 
 		const data: GoogleSheetsConfig = {
+			display_name: state.display_name,
 			uuid: uuidFromProps ?? '',
+			newUUID: newUUID ?? '',
 			service: 'google-sheets',
-			slug: state.slug,
+
 			spreadsheet: state.spreadsheet,
 			sheet: {
 				id: parseInt( state.sheet.id, 10 ),
@@ -159,14 +161,6 @@ export const GoogleSheetsSettings = ( {
 		}
 	};
 
-	/**
-	 * Handle the slug change. Only accepts valid slugs which only contain alphanumeric characters and dashes.
-	 * @param slug The slug to set.
-	 */
-	const onSlugChange = ( slug: string | undefined ) => {
-		handleOnChange( 'slug', slug ?? '' );
-	};
-
 	const credentialsHelpText = useMemo( () => {
 		if ( fetchingToken ) {
 			return __( 'Checking credentials...', 'remote-data-blocks' );
@@ -193,14 +187,8 @@ export const GoogleSheetsSettings = ( {
 	}, [ fetchingToken, token, tokenError, errors.credentials ] );
 
 	const shouldAllowSubmit = useMemo( () => {
-		return (
-			state.spreadsheet &&
-			state.sheet &&
-			state.credentials &&
-			! loadingSlugConflicts &&
-			! slugConflicts
-		);
-	}, [ state.spreadsheet, state.sheet, state.credentials, loadingSlugConflicts, slugConflicts ] );
+		return state.spreadsheet && state.sheet && state.credentials;
+	}, [ state.spreadsheet, state.sheet, state.credentials ] );
 
 	const spreadsheetHelpText = useMemo( () => {
 		if ( token ) {
@@ -262,29 +250,33 @@ export const GoogleSheetsSettings = ( {
 	}, [ state.spreadsheet, sheets ] );
 
 	return (
-		<DataSourceForm
-			heading={
-				mode === 'add'
-					? __( 'Add Google Sheets Data Source' )
-					: __( 'Edit Google Sheets Data Source' )
-			}
-		>
-			<div className="form-group">
-				<SlugInput slug={ state.slug } onChange={ onSlugChange } uuid={ uuidFromProps } />
-			</div>
-
-			<div className="form-group">
+		<DataSourceForm onSave={ onSaveClick }>
+			<DataSourceForm.Setup
+				canProceed={ Boolean( token ) }
+				displayName={ state.display_name }
+				handleOnChange={ handleOnChange }
+				heading={ {
+					icon: GoogleSheetsIconWithText,
+					width: '191px',
+					height: '32px',
+					verticalAlign: 'text-top',
+				} }
+				inputIcon={ GoogleSheetsIcon }
+				newUUID={ newUUID }
+				setNewUUID={ setNewUUID }
+				uuidFromProps={ uuidFromProps }
+			>
 				<TextareaControl
 					label={ __( 'Credentials', 'remote-data-blocks' ) }
 					value={ state.credentials }
 					onChange={ onCredentialsChange }
 					help={ credentialsHelpText }
-					rows={ 14 }
+					rows={ 10 }
 					className="code-input"
+					__nextHasNoMarginBottom
 				/>
-			</div>
-
-			<div className="form-group">
+			</DataSourceForm.Setup>
+			<DataSourceForm.Scope canProceed={ Boolean( shouldAllowSubmit ) }>
 				<SelectControl
 					id="spreadsheet"
 					label={ __( 'Spreadsheet', 'remote-data-blocks' ) }
@@ -294,10 +286,9 @@ export const GoogleSheetsSettings = ( {
 					help={ spreadsheetHelpText }
 					disabled={ fetchingToken || ! spreadsheets?.length }
 					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				/>
-			</div>
 
-			<div className="form-group">
 				<SelectControl
 					id="sheet"
 					label={ __( 'Sheet', 'remote-data-blocks' ) }
@@ -308,13 +299,7 @@ export const GoogleSheetsSettings = ( {
 					disabled={ fetchingToken || ! sheets?.length }
 					__next40pxDefaultSize
 				/>
-			</div>
-
-			<DataSourceFormActions
-				onSave={ onSaveClick }
-				onCancel={ goToMainScreen }
-				isSaveDisabled={ ! shouldAllowSubmit }
-			/>
+			</DataSourceForm.Scope>
 		</DataSourceForm>
 	);
 };

@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Integrations\GitHub;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use WP_Error;
 
 class GitHubDataSource extends HttpDataSource {
 	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_GITHUB_SERVICE;
@@ -42,7 +43,7 @@ class GitHubDataSource extends HttpDataSource {
 		);
 	}
 
-	public function get_request_headers(): array {
+	public function get_request_headers(): array|WP_Error {
 		return [
 			'Accept' => 'application/vnd.github+json',
 		];
@@ -60,13 +61,14 @@ class GitHubDataSource extends HttpDataSource {
 		return $this->config['ref'];
 	}
 	
-	public static function create( string $repo_owner, string $repo_name, string $ref ): self {
+	public static function create( string $repo_owner, string $repo_name, string $ref, string $uuid ): self {
 		return parent::from_array([
+			'display_name' => sprintf( 'GitHub: %s/%s (%s)', $repo_owner, $repo_name, $ref ),
 			'service' => REMOTE_DATA_BLOCKS_GITHUB_SERVICE,
 			'repo_owner' => $repo_owner,
 			'repo_name' => $repo_name,
 			'ref' => $ref,
-			'slug' => sanitize_title( sprintf( '%s/%s/%s', $repo_owner, $repo_name, $ref ) ),
+			'uuid' => $uuid,
 		]);
 	}
 }

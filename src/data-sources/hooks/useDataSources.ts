@@ -1,6 +1,6 @@
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch } from '@wordpress/data';
-import { useEffect, useState, useCallback } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore, NoticeStoreActions, WPNotice } from '@wordpress/notices';
 
@@ -12,8 +12,6 @@ export const useDataSources = ( loadOnMount = true ) => {
 	const [ dataSources, setDataSources ] = useState< DataSourceConfig[] >( [] );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch< NoticeStoreActions >( noticesStore );
-	const [ slugConflicts, setSlugConflicts ] = useState< boolean >( false );
-	const [ loadingSlugConflicts, setLoadingSlugConflicts ] = useState< boolean >( false );
 
 	async function fetchDataSources() {
 		setLoadingDataSources( true );
@@ -26,37 +24,19 @@ export const useDataSources = ( loadOnMount = true ) => {
 		setLoadingDataSources( false );
 	}
 
-	const checkSlugConflict = useCallback(
-		async ( slug: string, uuid: string = '' ) => {
-			if ( slug === '' ) {
-				showSnackbar( 'error', __( 'Slug should not be empty.', 'remote-data-blocks' ) );
-				return;
-			}
-
-			setLoadingSlugConflicts( true );
-			try {
-				const conflict = await apiFetch< { exists: boolean } >( {
-					path: `${ REST_BASE_DATA_SOURCES }/slug-conflicts`,
-					method: 'POST',
-					data: { slug, uuid },
-				} );
-				setSlugConflicts( conflict?.exists ?? false );
-			} catch ( error ) {
-				createErrorNotice( __( 'Failed to check slug availability.', 'remote-data-blocks' ) );
-			}
-			setLoadingSlugConflicts( false );
-		},
-		[ setLoadingSlugConflicts, setSlugConflicts, createErrorNotice ]
-	);
-
 	async function updateDataSource( sourceConfig: DataSourceConfig ) {
 		let result: DataSourceConfig;
 
 		try {
+			const data = { ...sourceConfig };
+			if ( sourceConfig.newUUID && sourceConfig.newUUID !== sourceConfig.uuid ) {
+				data.newUUID = sourceConfig.newUUID;
+			}
+
 			result = await apiFetch( {
 				path: `${ REST_BASE_DATA_SOURCES }/${ sourceConfig.uuid }`,
 				method: 'PUT',
-				data: sourceConfig,
+				data,
 			} );
 		} catch ( error ) {
 			showSnackbar( 'error', __( 'Failed to update data source.', 'remote-data-blocks' ) );
@@ -65,9 +45,9 @@ export const useDataSources = ( loadOnMount = true ) => {
 
 		showSnackbar(
 			'success',
-			__(
-				sprintf( '"%s" has been successfully updated.', 'remote-data-blocks' ),
-				sourceConfig.slug
+			sprintf(
+				__( '"%s" has been successfully updated.', 'remote-data-blocks' ),
+				sourceConfig.display_name
 			)
 		);
 		return result;
@@ -89,7 +69,10 @@ export const useDataSources = ( loadOnMount = true ) => {
 
 		showSnackbar(
 			'success',
-			__( sprintf( '"%s" has been successfully added.', 'remote-data-blocks' ), source.slug )
+			sprintf(
+				__( '"%s" has been successfully added.', 'remote-data-blocks' ),
+				source.display_name
+			)
 		);
 		return result;
 	}
@@ -108,7 +91,10 @@ export const useDataSources = ( loadOnMount = true ) => {
 
 		showSnackbar(
 			'success',
-			__( sprintf( '"%s" has been successfully deleted.', 'remote-data-blocks' ), source.slug )
+			sprintf(
+				__( '"%s" has been successfully deleted.', 'remote-data-blocks' ),
+				source.display_name
+			)
 		);
 	}
 
@@ -140,8 +126,5 @@ export const useDataSources = ( loadOnMount = true ) => {
 		loadingDataSources,
 		updateDataSource,
 		fetchDataSources,
-		slugConflicts,
-		loadingSlugConflicts,
-		checkSlugConflict,
 	};
 };

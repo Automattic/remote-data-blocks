@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Integrations\GenericHttp;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use WP_Error;
 
 class GenericHttpDataSource extends HttpDataSource {
 	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE;
@@ -47,18 +48,22 @@ class GenericHttpDataSource extends HttpDataSource {
 				'callback' => '\RemoteDataBlocks\Validation\is_url',
 				'sanitize' => 'sanitize_url',
 			],
+			'display_name' => [
+				'type' => 'string',
+				'required' => false,
+			],
 		],
 	];
 
 	public function get_display_name(): string {
-		return 'HTTP Connection (' . $this->config['slug'] . ')';
+		return 'HTTP Connection (' . $this->config['display_name'] . ')';
 	}
 
 	public function get_endpoint(): string {
 		return $this->config['url'];
 	}
 
-	public function get_request_headers(): array {
+	public function get_request_headers(): array|WP_Error {
 		return [
 			'Accept' => 'application/json',
 		];
@@ -66,16 +71,16 @@ class GenericHttpDataSource extends HttpDataSource {
 	
 	public static function create( string $url, string $auth, string $display_name ): self {
 		return parent::from_array([
+			'display_name' => $display_name,
 			'service' => REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE,
 			'url' => $url,
 			'auth' => $auth,
-			'slug' => sanitize_title( $display_name ),
 		]);
 	}
 
 	public function to_ui_display(): array {
 		return [
-			'slug' => $this->get_slug(),
+			'display_name' => $this->get_display_name(),
 			'service' => REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE,
 			'url' => $this->config['url'],
 			'auth_type' => $this->config['auth']['type'],

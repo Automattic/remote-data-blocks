@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Tests\Mocks;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use WP_Error;
 
 class MockDataSource extends HttpDataSource {
 	private $endpoint = 'https://example.com/api';
@@ -11,7 +12,6 @@ class MockDataSource extends HttpDataSource {
 	public const MOCK_CONFIG = [
 		'uuid' => 'e3458c42-4cf4-4214-aaf6-3628e33ed07a',
 		'service' => 'mock',
-		'slug' => 'mock-thingy-1',
 		'api_key' => '1234567890',
 	];
 
@@ -32,10 +32,7 @@ class MockDataSource extends HttpDataSource {
 		return $this->endpoint;
 	}
 
-	/**
-	 * @inheritDoc
-	 */
-	public function get_request_headers(): array {
+	public function get_request_headers(): array|WP_Error {
 		return $this->headers;
 	}
 

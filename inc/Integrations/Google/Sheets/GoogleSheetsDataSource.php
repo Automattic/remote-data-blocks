@@ -12,7 +12,7 @@ class GoogleSheetsDataSource extends HttpDataSource {
 
 	protected const SERVICE_SCHEMA = [
 		'type' => 'object',
-		'properties' => [       
+		'properties' => [
 			'credentials' => [
 				'type' => 'object',
 				'properties' => [
@@ -80,11 +80,15 @@ class GoogleSheetsDataSource extends HttpDataSource {
 		return sprintf( 'https://sheets.googleapis.com/v4/spreadsheets/%s', $this->config['spreadsheet']['id'] );
 	}
 
-	public function get_request_headers(): array {
+	public function get_request_headers(): array|WP_Error {
 		$access_token = GoogleAuth::generate_token_from_service_account_key(
 			$this->config['credentials'],
 			GoogleAuth::GOOGLE_SHEETS_SCOPES
 		);
+
+		if ( is_wp_error( $access_token ) ) {
+			return $access_token;
+		}
 
 		return [
 			'Authorization' => sprintf( 'Bearer %s', $access_token ),
@@ -105,13 +109,12 @@ class GoogleSheetsDataSource extends HttpDataSource {
 				'name' => '',
 				'id' => 0,
 			],
-			'slug' => sanitize_title( $display_name ),
 		]);
 	}
 
 	public function to_ui_display(): array {
 		return [
-			'slug' => $this->get_slug(),
+			'display_name' => $this->get_display_name(),
 			'service' => REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE,
 			'spreadsheet' => [ 'name' => $this->config['spreadsheet_id'] ],
 			'sheet' => [ 'name' => '' ],
