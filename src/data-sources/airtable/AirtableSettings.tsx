@@ -240,8 +240,8 @@ export const AirtableSettings = ( {
 
 					if ( selectedTable ) {
 						return sprintf(
-							__( 'Fields: %s', 'remote-data-blocks' ),
-							selectedTable.fields.map( field => field.name ).join( ', ' )
+							__( '%s fields found', 'remote-data-blocks' ),
+							selectedTable.fields.length
 						);
 					}
 				}
