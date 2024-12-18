@@ -29,7 +29,7 @@ final class Types {
 	/* Primitive types do not accept type arguments! */
 
 	public static function any(): array {
-		return self::generate_primitive_type( 'any' );
+		return self::skip_sanitize( self::generate_primitive_type( 'any' ) );
 	}
 
 	public static function boolean(): array {
