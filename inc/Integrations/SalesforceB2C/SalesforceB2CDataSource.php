@@ -25,6 +25,7 @@ class SalesforceB2CDataSource extends HttpDataSource {
 
 	protected static function map_service_config( array $service_config ): array {
 		return [
+			'display_name' => $service_config['display_name'],
 			'endpoint' => sprintf( 'https://%s.api.commercecloud.salesforce.com', $service_config['shortcode'] ),
 			'image_url' => plugins_url( './assets/salesforce_commerce_cloud_logo.png', __FILE__ ),
 			'request_headers' => [

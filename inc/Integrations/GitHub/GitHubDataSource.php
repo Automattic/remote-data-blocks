@@ -21,6 +21,7 @@ class GitHubDataSource extends HttpDataSource {
 
 	protected static function map_service_config( array $service_config ): array {
 		return [
+			'display_name' => $service_config['display_name'],
 			'endpoint' => sprintf(
 				'https://api.github.com/repos/%s/%s/git/trees/%s?recursive=1',
 				$service_config['repo_owner'],

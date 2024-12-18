@@ -23,6 +23,7 @@ class ShopifyDataSource extends HttpDataSource {
 
 	protected static function map_service_config( array $service_config ): array {
 		return [
+			'display_name' => $service_config['display_name'],
 			'endpoint' => 'https://' . $service_config['store_name'] . '.myshopify.com/api/2024-04/graphql.json',
 			'image_url' => plugins_url( './assets/shopify_logo_black.png', __FILE__ ),
 			'request_headers' => [

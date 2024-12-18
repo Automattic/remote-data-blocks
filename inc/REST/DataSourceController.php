@@ -143,7 +143,7 @@ class DataSourceController extends WP_REST_Controller {
 		$data_sources = array_values( array_reduce(
 			array_merge( $code_configured_data_sources, $ui_configured_data_sources ),
 			function ( $acc, $item ) {
-				$identifier = $item['uuid'] ?? md5( sprintf( '%s_%s', $item['display_name'], $item['service'] ) );
+				$identifier = $item['uuid'] ?? md5( sprintf( '%s_%s', $item['service_config']['display_name'], $item['service'] ) );
 				$acc[ $identifier ] = $item;
 				return $acc;
 			},
