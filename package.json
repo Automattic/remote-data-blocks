@@ -107,6 +107,7 @@
     "extends": "./node_modules/@wordpress/scripts/config/.stylelintrc.json"
   },
   "dependencies": {
-    "@automattic/calypso-analytics": "^1.1.3"
+    "@automattic/calypso-analytics": "^1.1.3",
+    "@wordpress/dataviews": "^4.10.0"
   }
 }
