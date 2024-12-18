@@ -15,5 +15,5 @@ export const REMOTE_DATA_REST_API_URL = getRestUrl();
 export const CONTAINER_CLASS_NAME = getClassName( 'container' );
 
 export const IMAGE_FIELD_TYPES = [ 'image_alt', 'image_url' ];
-export const TEXT_FIELD_TYPES = [ 'email_address', 'integer', 'number', 'string' ];
+export const TEXT_FIELD_TYPES = [ 'email_address', 'html', 'integer', 'number', 'string' ];
 export const BUTTON_FIELD_TYPES = [ 'button_url' ];
