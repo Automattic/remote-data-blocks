@@ -11,6 +11,9 @@ const PasswordInputControl = ( { ...props }: PasswordInputControlProps ) => {
 
 	return (
 		<InputControl
+			autoComplete="off"
+			// prevent 1password suggestions since they ignore autocomplete
+			data-1p-ignore
 			className="password-input-control"
 			type={ visible ? 'text' : 'password' }
 			suffix={

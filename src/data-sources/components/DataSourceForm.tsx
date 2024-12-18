@@ -299,6 +299,9 @@ const DataSourceFormSetup = ( {
 			}
 		>
 			<InputControl
+				autoComplete="off"
+				// prevent 1password suggestions since they ignore autocomplete
+				data-1p-ignore
 				className={ `rdb-settings-page_data-source-form-input ${
 					errors.displayName ? 'has-error' : ''
 				}   ` }
