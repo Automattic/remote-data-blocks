@@ -220,12 +220,12 @@ class BlockBindings {
 		// We may be passed a block instance (by core block bindings) or a block
 		// array (by our hooks into the Block Data API).
 		if ( $block instanceof WP_Block ) {
-			$fallback_content = $block->attributes['content'] ?? '';
 			$block_context = $block->context[ self::$context_name ] ?? [];
 		} else {
-			$fallback_content = $block['attributes']['content'] ?? '';
 			$block_context = $block['context'][ self::$context_name ] ?? [];
 		}
+
+		$fallback_content = self::get_block_fallback_content( $source_args, $block_context );
 
 		// Fallback to the content if we don't have the expected context.
 		if ( ! isset( $block_context['blockName'] ) || ! isset( $block_context['queryInput'] ) ) {
@@ -241,6 +241,23 @@ class BlockBindings {
 		}
 
 		return $value;
+	}
+
+	private static function get_block_fallback_content( array $source_args, array $block_context ): string {
+		$fallback_content = '';
+
+		$source_field = $source_args['field'] ?? null;
+		if ( null === $source_field ) {
+			return $fallback_content;
+		}
+
+		$result = $block_context['results'][0] ?? null;
+
+		if ( isset( $result[ $source_field ] ) ) {
+			$fallback_content = $result[ $source_field ];
+		}
+
+		return $fallback_content;
 	}
 
 	public static function get_remote_value( array $block_context, array $source_args ): string|null {
