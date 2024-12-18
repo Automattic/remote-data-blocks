@@ -59,7 +59,7 @@ export const getAirtableOutputQueryMappingValue = (
 				type: 'image_url',
 			};
 
-		case 'multipleCollaborator':
+		case 'multipleCollaborators':
 			return {
 				...baseField,
 				path: `$.fields["${ field.name }"][*].name`,

@@ -56,7 +56,7 @@ export const SUPPORTED_AIRTABLE_TYPES = Object.freeze( [
 	'lastModifiedBy',
 	'singleCollaborator',
 	// Other types
-	'multipleCollaborator',
+	'multipleCollaborators',
 	'currency',
 	'checkbox',
 	'multipleAttachments',
