@@ -14,9 +14,6 @@ function register_github_file_as_html_block(): void {
 		'ref' => 'trunk',
 		'repo_owner' => 'Automattic',
 		'repo_name' => 'remote-data-blocks',
-		'request_headers' => [
-			'Accept' => 'application/vnd.github.html+json',
-		],
 	];
 
 	$block_title = sprintf( 'GitHub File As HTML (%s/%s)', $service_config['repo_owner'], $service_config['repo_name'] );
@@ -54,6 +51,9 @@ function register_github_file_as_html_block(): void {
 					'type' => 'string',
 				],
 			],
+		],
+		'request_headers' => [
+			'Accept' => 'application/vnd.github.html+json',
 		],
 		'query_runner' => new GitHubQueryRunner(),
 	] );
