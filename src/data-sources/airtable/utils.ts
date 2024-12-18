@@ -28,10 +28,6 @@ export const getAirtableOutputQueryMappingValue = (
 	}
 
 	switch ( field.type ) {
-		case 'url':
-		case 'button':
-			return { ...baseField, type: 'button_url' };
-
 		case 'currency':
 			return {
 				...baseField,
@@ -63,7 +59,7 @@ export const getAirtableOutputQueryMappingValue = (
 				type: 'image_url',
 			};
 
-		case 'multipleCollaborator':
+		case 'multipleCollaborators':
 			return {
 				...baseField,
 				path: `$.fields["${ field.name }"][*].name`,
