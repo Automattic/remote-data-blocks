@@ -26,14 +26,27 @@ class GitHubQueryRunner extends QueryRunner {
 		return parent::execute( $query, $input_variables );
 	}
 
+	/**
+	 * @inheritDoc
+	 *
+	 * The API response is raw HTML, so we return an object construct containing
+	 * the HTML as a property.
+	 */
+	protected function deserialize_response( string $raw_response_data, array $input_variables ): array {
+		return [
+			'content' => $raw_response_data,
+			'path' => $input_variables['file_path'],
+		];
+	}
+
 	private function ensure_file_extension( string $file_path ): string {
 		return str_ends_with( $file_path, $this->default_file_extension ) ? $file_path : $file_path . $this->default_file_extension;
 	}
 
 	public static function generate_file_content( array $response_data ): string {
-		$file_content = base64_decode( $response_data['content'] ?? '' );
+		$file_content = $response_data['content'] ?? '';
 		$file_path = $response_data['file_path'] ?? '';
-	 
+
 		return self::update_markdown_links( $file_content, $file_path );
 	}
 

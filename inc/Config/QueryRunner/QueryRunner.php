@@ -147,7 +147,7 @@ class QueryRunner implements QueryRunnerInterface {
 				'age' => intval( $response->getHeaderLine( 'Age' ) ),
 				'status_code' => $response_code,
 			],
-			'response_data' => $this->deserialize_response( $raw_response_string ),
+			'response_data' => $this->deserialize_response( $raw_response_string, $input_variables ),
 		];
 	}
 
@@ -232,8 +232,10 @@ class QueryRunner implements QueryRunnerInterface {
 	 *
 	 * @param string $raw_response_data The raw response data.
 	 * @return mixed The deserialized response data.
+	 *
+	 * @psalm-suppress PossiblyUnusedParam
 	 */
-	protected function deserialize_response( string $raw_response_data ): mixed {
+	protected function deserialize_response( string $raw_response_data, array $input_variables ): mixed {
 		return json_decode( $raw_response_data, true );
 	}
 
