@@ -33,6 +33,11 @@ class ShopifySearchProductsQuery extends GraphqlQueryContext {
 					'path' => '$.node.priceRange.maxVariantPrice.amount',
 					'type' => 'currency',
 				],
+				'product_type' => [
+					'name' => 'Product Type',
+					'path' => '$.node.productType',
+					'type' => 'string',
+				],
 				'image_url' => [
 					'name' => 'Item image URL',
 					'path' => '$.node.images.edges[0].node.originalSrc',
@@ -55,6 +60,7 @@ class ShopifySearchProductsQuery extends GraphqlQueryContext {
 								amount
 							}
 						}
+						productType
 						images(first: 1) {
 							edges {
 								node {
@@ -69,6 +75,6 @@ class ShopifySearchProductsQuery extends GraphqlQueryContext {
 	}
 
 	public function get_query_name(): string {
-		return 'Search products';
+		return 'Choose product';
 	}
 }
