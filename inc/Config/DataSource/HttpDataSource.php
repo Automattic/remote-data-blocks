@@ -18,7 +18,7 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE;
 	protected const SERVICE_SCHEMA_VERSION = 1;
 
-	public function get_display_name(): string {
+	final public function get_display_name(): string {
 		return $this->config['display_name'];
 	}
 
@@ -31,11 +31,11 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 	}
 
 	public function get_image_url(): ?string {
-		return null;
+		return $this->config['image_url'] ?? null;
 	}
 
-	public function get_service_name(): ?string {
-		return $this->config['service'] ?? null;
+	final public function get_service_name(): string {
+		return static::SERVICE_NAME;
 	}
 
 	/**
@@ -55,16 +55,13 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 
 		return parent::from_array(
 			array_merge(
-				[
-					'__metadata' => $config['__metadata'] ?? [],
-					'display_name' => $service_config['display_name'] ?? static::SERVICE_NAME,
-					'endpoint' => $service_config['endpoint'] ?? null, // Invalid, but we won't guess it.
-					'request_headers' => $service_config['request_headers'] ?? [],
-					'service' => static::SERVICE_NAME,
-					'uuid' => $config['uuid'] ?? null,
-				],
 				static::map_service_config( $service_config ),
-				[ 'service_config' => $service_config ] // Ensure an unmodified service_config for determinism.
+				[
+					// Store the exact data used to create the instance to preserve determinism.
+					'service' => static::SERVICE_NAME,
+					'service_config' => $service_config,
+					'uuid' => $config['uuid'] ?? null,
+				]
 			)
 		);
 	}
@@ -84,12 +81,11 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 	 *
 	 * TODO: Do we need to sanitize this to prevent leaking sensitive data?
 	 */
-	public function to_array(): array {
+	final public function to_array(): array {
 		return [
-			'__metadata' => $this->config['__metadata'] ?? [],
-			'service' => $this->get_service_name(),
-			'service_config' => $this->config['service_config'] ?? [],
-			'uuid' => $this->config['uuid'] ?? null,
+			'service' => static::SERVICE_NAME,
+			'service_config' => $this->config['service_config'],
+			'uuid' => $this->config['uuid'],
 		];
 	}
 
@@ -106,7 +102,9 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 
 	protected static function map_service_config( array $service_config ): array {
 		return [
-			// TODO: Request headers
+			'display_name' => $service_config['display_name'] ?? static::SERVICE_NAME,
+			'endpoint' => $service_config['endpoint'] ?? null, // Invalid, but we won't guess it.
+			'request_headers' => $service_config['request_headers'] ?? [],
 		];
 	}
 }

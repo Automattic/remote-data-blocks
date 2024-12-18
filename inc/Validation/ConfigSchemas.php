@@ -124,8 +124,8 @@ final class ConfigSchemas {
 					Types::record( Types::string(), Types::string() ),
 				)
 			),
-			'service' => Types::nullable( Types::string() ),
-			'service_config' => Types::nullable( Types::record( Types::string(), Types::any() ) ),
+			'service' => Types::string(),
+			'service_config' => Types::record( Types::string(), Types::any() ),
 			'uuid' => Types::nullable( Types::uuid() ),
 		] );
 	}

@@ -39,6 +39,7 @@ class AirtableDataSource extends HttpDataSource {
 
 	protected static function map_service_config( array $service_config ): array {
 		return [
+			'display_name' => $service_config['display_name'],
 			'endpoint' => sprintf( 'https://api.airtable.com/v0/%s', $service_config['base']['id'] ),
 			'request_headers' => [
 				'Authorization' => sprintf( 'Bearer %s', $service_config['access_token'] ),

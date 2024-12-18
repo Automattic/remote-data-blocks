@@ -13,6 +13,7 @@ interface ArraySerializableInterface {
 	 * deserialization or when creating objects from structured data (e.g., JSON).
 	 *
 	 * @param array<string, mixed> $config An associative array containing the configuration or data needed to create an instance of the class.
+	 * @param ValidatorInterface|null $validator An optional validator instance to use for validating the configuration.
 	 * @return mixed Returns a new instance of the implementing class.
 	 */
 	public static function from_array( array $config, ?ValidatorInterface $validator ): mixed;
