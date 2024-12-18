@@ -168,7 +168,7 @@ By default, the `get_request_headers` method proxies to the `get_request_headers
 ### Example
 
 ```php
-public function get_request_headers( array $input_variables ): array {
+public function get_request_headers( array $input_variables ): array|WP_Error {
 	return array_merge(
 		$this->get_data_source()->get_request_headers(),
 		[ 'X-Product-ID' => $input_variables['product_id'] ]
