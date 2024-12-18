@@ -133,17 +133,21 @@
 	gap: 12px;
 }
 
-.rdb-settings-page_data-source-form-uuid-error {
-	color: var(--Gutenberg-Alert-Red, #d94f4f);
-	font-size: var(--s, 12px);
-	line-height: var(--xs, 16px);
-	margin-top: 4px;
-}
+.rdb-settings-page_data-source-form-input.has-error {
 
-.rdb-settings-page_data-source-form-uuid-input .components-input-control__input:focus,
-.rdb-settings-page_data-source-form-uuid-input .components-input-control__container .components-input-control__backdrop:focus {
-	border-color: var(--wp-components-color-accent, var(--Gutenberg-Alert-Red, #d94f4f)) !important;
-	box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--Gutenberg-Alert-Red, #d94f4f)) !important;
+	.components-input-control__container .components-input-control__input:not(:focus) {
+		border-radius: var(--radius-s, 2px);
+		outline: 2px solid var(--Gutenberg-Alert-Red, #cc1818);
+		outline-offset: -2px;
+
+	}
+
+	span {
+		color: var(--Gutenberg-Alert-Red, #cc1818);
+		font-size: var(--s, 12px);
+		line-height: var(--xs, 16px);
+		margin-top: 4px;
+	}
 }
 
 .rdb-settings-page_data-source-multi-step-form,
