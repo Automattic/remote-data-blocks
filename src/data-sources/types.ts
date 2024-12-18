@@ -5,11 +5,18 @@ import { GoogleServiceAccountKey } from '@/types/google';
 
 export type DataSourceType = ( typeof SUPPORTED_SERVICES )[ number ];
 
-interface BaseDataSourceConfig {
+interface BaseServiceConfig extends Record< string, unknown > {
+	__version: number;
 	display_name: string;
-	uuid: string;
-	newUUID?: string;
-	service: DataSourceType;
+}
+
+interface BaseDataSourceConfig<
+	ServiceName extends DataSourceType,
+	ServiceConfig extends BaseServiceConfig
+> {
+	service: ServiceName;
+	service_config: ServiceConfig;
+	uuid: string | null;
 }
 
 export interface DataSourceQueryMappingValue {
@@ -43,39 +50,43 @@ export interface AirtableTableConfig extends StringIdName {
 	output_query_mappings: AirtableOutputQueryMappingValue[];
 }
 
-export interface AirtableConfig extends BaseDataSourceConfig {
-	service: 'airtable';
+export interface AirtableServiceConfig extends BaseServiceConfig {
 	access_token: string;
 	base: StringIdName;
 	tables: AirtableTableConfig[];
 }
 
-export interface GoogleSheetsConfig extends BaseDataSourceConfig {
-	service: 'google-sheets';
+export interface GoogleSheetsServiceConfig extends BaseServiceConfig {
 	credentials: GoogleServiceAccountKey;
 	spreadsheet: StringIdName;
 	sheet: NumberIdName;
 }
 
-export interface HttpConfig extends BaseDataSourceConfig {
-	service: 'generic-http';
-	url: string;
-	auth: HttpAuth;
+export interface HttpServiceConfig extends BaseServiceConfig {
+	auth?: HttpAuth;
+	endpoint: string;
 }
 
-export interface SalesforceB2CConfig extends BaseDataSourceConfig {
-	service: 'salesforce-b2c';
+export interface SalesforceB2CServiceConfig extends BaseServiceConfig {
 	shortcode: string;
 	organization_id: string;
 	client_id: string;
 	client_secret: string;
 }
 
-export interface ShopifyConfig extends BaseDataSourceConfig {
-	service: 'shopify';
+export interface ShopifyServiceConfig extends BaseServiceConfig {
 	access_token: string;
 	store_name: string;
 }
+
+export type AirtableConfig = BaseDataSourceConfig< 'airtable', AirtableServiceConfig >;
+export type GoogleSheetsConfig = BaseDataSourceConfig< 'google-sheets', GoogleSheetsServiceConfig >;
+export type HttpConfig = BaseDataSourceConfig< 'generic-http', HttpServiceConfig >;
+export type SalesforceB2CConfig = BaseDataSourceConfig<
+	'salesforce-b2c',
+	SalesforceB2CServiceConfig
+>;
+export type ShopifyConfig = BaseDataSourceConfig< 'shopify', ShopifyServiceConfig >;
 
 export type DataSourceConfig =
 	| AirtableConfig
@@ -84,7 +95,7 @@ export type DataSourceConfig =
 	| SalesforceB2CConfig
 	| ShopifyConfig;
 
-export type SettingsComponentProps< T extends BaseDataSourceConfig > = {
+export type SettingsComponentProps< T extends DataSourceConfig > = {
 	mode: 'add' | 'edit';
 	uuid?: string;
 	config?: T;

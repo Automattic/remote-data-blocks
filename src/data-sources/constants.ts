@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n';
 
+import { HttpAuthTypes, HttpApiKeyDestination } from '@/data-sources/http/types';
 import { SelectOption } from '@/types/input';
 
 export const SUPPORTED_SERVICES = [
@@ -32,25 +33,15 @@ export const GOOGLE_SHEETS_API_SCOPES = [
 ];
 
 /**
- * REST API Source Constants
- */
-export const AUTH_TYPES = [ 'bearer', 'basic', 'api-key', 'none' ] as const;
-export const API_KEY_ADD_TO = [ 'queryparams', 'header' ] as const;
-
-/**
  * REST API Source SelectOptions
  */
-export const HTTP_SOURCE_AUTH_TYPE_SELECT_OPTIONS: SelectOption<
-	( typeof AUTH_TYPES )[ number ]
->[] = [
+export const HTTP_SOURCE_AUTH_TYPE_SELECT_OPTIONS: SelectOption< HttpAuthTypes >[] = [
+	{ label: __( 'None', 'remote-data-blocks' ), value: 'none' },
 	{ label: __( 'Bearer', 'remote-data-blocks' ), value: 'bearer' },
 	{ label: __( 'Basic', 'remote-data-blocks' ), value: 'basic' },
 	{ label: __( 'API Key', 'remote-data-blocks' ), value: 'api-key' },
-	{ label: __( 'None', 'remote-data-blocks' ), value: 'none' },
 ];
-export const HTTP_SOURCE_ADD_TO_SELECT_OPTIONS: SelectOption<
-	( typeof API_KEY_ADD_TO )[ number ]
->[] = [
+export const HTTP_SOURCE_ADD_TO_SELECT_OPTIONS: SelectOption< HttpApiKeyDestination >[] = [
 	{ label: __( 'Header', 'remote-data-blocks' ), value: 'header' },
 	{ label: __( 'Query Params', 'remote-data-blocks' ), value: 'queryparams' },
 ];

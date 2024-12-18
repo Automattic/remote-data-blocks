@@ -34,7 +34,7 @@ class RemoteDataController {
 						return strval( $value );
 					},
 					'validate_callback' => function ( $value ) {
-						return null !== ConfigStore::get_configuration( $value );
+						return null !== ConfigStore::get_block_configuration( $value );
 					},
 				],
 				'query_key' => [
@@ -58,15 +58,14 @@ class RemoteDataController {
 		$query_key = $request->get_param( 'query_key' );
 		$query_input = $request->get_param( 'query_input' );
 
-		$block_config = ConfigStore::get_configuration( $block_name );
+		$block_config = ConfigStore::get_block_configuration( $block_name );
 		$query = $block_config['queries'][ $query_key ];
 
 		// The frontend might send more input variables than the query needs or
 		// expects, so only include those defined by the query.
-		$query_input = array_intersect_key( $query_input, $query->input_schema );
+		$query_input = array_intersect_key( $query_input, $query->get_input_schema() );
 
-		$query_runner = $query->get_query_runner();
-		$query_result = $query_runner->execute( $query_input );
+		$query_result = $query->execute( $query_input );
 
 		if ( is_wp_error( $query_result ) ) {
 			$logger = LoggerManager::instance();

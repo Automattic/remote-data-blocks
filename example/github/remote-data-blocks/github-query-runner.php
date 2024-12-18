@@ -2,96 +2,52 @@
 
 namespace RemoteDataBlocks\Example\GitHub;
 
-use RemoteDataBlocks\Config\DataSource\HttpDataSource;
-use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
-use RemoteDataBlocks\Integrations\GitHub\GitHubDataSource;
+use RemoteDataBlocks\Config\Query\HttpQueryInterface;
+use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
+use DOMElement;
+use DOMXPath;
+use WP_Error;
 
-class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
+defined( 'ABSPATH' ) || exit();
+
+/**
+ * Custom query runner that process custom processing for GitHub API responses
+ * that return HTML / Markdown instead of JSON. This also provides custom
+ * processing to adjust embedded links.
+ *
+ * Data fetching and caching is still delegated to the parent QueryRunner class.
+ */
+class GitHubQueryRunner extends QueryRunner {
+	private string $default_file_extension = '.md';
+
+	public function execute( HttpQueryInterface $query, array $input_variables ): array|WP_Error {
+		$input_variables['file_path'] = $this->ensure_file_extension( $input_variables['file_path'] );
+
+		return parent::execute( $query, $input_variables );
+	}
+
 	/**
 	 * @inheritDoc
-	 * @param string|null $default_file_extension Optional file extension to append if missing (e.g., '.md')
+	 *
+	 * The API response is raw HTML, so we return an object construct containing
+	 * the HTML as a property.
 	 */
-	public function __construct(
-		private HttpDataSource $data_source,
-		private ?string $default_file_extension = null
-	) {
-		parent::__construct( $data_source );
+	protected function deserialize_response( string $raw_response_data, array $input_variables ): array {
+		return [
+			'content' => $raw_response_data,
+			'path' => $input_variables['file_path'],
+		];
 	}
 
 	private function ensure_file_extension( string $file_path ): string {
-		if ( ! $this->default_file_extension ) {
-			return $file_path;
-		}
-
 		return str_ends_with( $file_path, $this->default_file_extension ) ? $file_path : $file_path . $this->default_file_extension;
 	}
 
-	public function get_input_schema(): array {
-		return [
-			'file_path' => [
-				'name' => 'File Path',
-				'type' => 'string',
-				'overrides' => [
-					[
-						'target' => 'utm_content',
-						'type' => 'url',
-					],
-				],
-				'transform' => function ( array $data ): string {
-					return $this->ensure_file_extension( $data['file_path'] );
-				},
-			],
-		];
-	}
+	public static function generate_file_content( array $response_data ): string {
+		$file_content = $response_data['content'] ?? '';
+		$file_path = $response_data['file_path'] ?? '';
 
-	public function get_output_schema(): array {
-		return [
-			'is_collection' => false,
-			'mappings' => [
-				'file_content' => [
-					'name' => 'File Content',
-					'path' => '$.content',
-					'type' => 'html',
-				],
-				'file_path' => [
-					'name' => 'File Path',
-					'path' => '$.path',
-					'type' => 'string',
-				],
-			],
-		];
-	}
-
-	public function get_endpoint( array $input_variables ): string {
-		/** @var GitHubDataSource $data_source */
-		$data_source = $this->get_data_source();
-
-		return sprintf(
-			'https://api.github.com/repos/%s/%s/contents/%s?ref=%s',
-			$data_source->get_repo_owner(),
-			$data_source->get_repo_name(),
-			$input_variables['file_path'],
-			$data_source->get_ref()
-		);
-	}
-
-	public function get_request_headers( array $input_variables ): array {
-		return [
-			'Accept' => 'application/vnd.github.html+json',
-		];
-	}
-
-	public function process_response( string $html_response_data, array $input_variables ): array {
-		$content = $html_response_data;
-		$file_path = $input_variables['file_path'];
-		if ( '.md' === $this->default_file_extension ) {
-			$content = $this->update_markdown_links( $content, $file_path );
-		}
-
-		return [
-			'content' => $content,
-			'file_path' => $file_path,
-		];
+		return self::update_markdown_links( $file_content, $file_path );
 	}
 
 	/**
@@ -105,7 +61,7 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 	 * @param string $current_file_path The current file's path.
 	 * @return string The updated HTML response data.
 	 */
-	private function update_markdown_links( string $html, string $current_file_path = '' ): string {
+	private static function update_markdown_links( string $html, string $current_file_path = '' ): string {
 		// Load the HTML into a DOMDocument
 		$dom = new \DOMDocument();
 
@@ -117,12 +73,12 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 		@$dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
 
 		// Create an XPath to query href attributes
-		$xpath = new \DOMXPath( $dom );
+		$xpath = new DOMXPath( $dom );
 
 		// Query all elements with href attributes
 		$nodes = $xpath->query( '//*[@href]' );
 		foreach ( $nodes as $node ) {
-			if ( ! $node instanceof \DOMElement ) {
+			if ( ! $node instanceof DOMElement ) {
 				continue;
 			}
 			$href = $node->getAttribute( 'href' );
@@ -133,7 +89,7 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 				! preg_match( '/^(https?:)?\/\//', $href )
 			) {
 				// Adjust the path
-				$new_href = $this->adjust_markdown_file_path( $href, $current_file_path );
+				$new_href = self::adjust_markdown_file_path( $href, $current_file_path );
 
 				// Set the new href
 				$node->setAttribute( 'href', $new_href );
@@ -152,7 +108,7 @@ class GitHubGetFileAsHtmlQuery extends HttpQueryContext {
 	 * @param string $current_file_path The current file's path.
 	 * @return string The adjusted path.
 	 */
-	private function adjust_markdown_file_path( string $path, string $current_file_path = '' ): string {
+	private static function adjust_markdown_file_path( string $path, string $current_file_path = '' ): string {
 		global $post;
 		$page_slug = $post->post_name;
 

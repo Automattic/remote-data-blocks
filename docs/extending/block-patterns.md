@@ -1,6 +1,6 @@
 # Block patterns
 
-Patterns allow you to represent your remote data if different ways. By default, the plugin registers a unstyled block pattern that you can use out of the box. You can create additional patterns in the WordPress Dashboard or programmatically using the `register_remote_data_block_pattern` function.
+Patterns allow you to represent your remote data if different ways. By default, the plugin registers a unstyled block pattern that you can use out of the box. You can create additional patterns in the WordPress Dashboard or programmatically by passing a `patterns` property to your block options.
 
 Example:
 
@@ -18,11 +18,14 @@ Example:
 ```
 
 ```php
-function register_your_block_pattern() {
-    $block_name    = 'Your Custom Block';
-    $block_pattern = file_get_contents( '/path/to/your-pattern.html' );
-
-    register_remote_data_block_pattern( $block_name, 'Pattern Title', $block_pattern );
-}
-add_action( 'init', 'YourNamespace\\register_your_block_pattern', 10, 0 );
+register_remote_data_block( [
+	'title' => 'My Remote Data Block',
+	'queries' => [ /* ... */ ],
+	'patterns' => [
+		[
+			'title' => 'My Pattern',
+			'content' => file_get_contents( '/path/to/your-pattern.html' ),
+		],
+	],
+] );
 ```

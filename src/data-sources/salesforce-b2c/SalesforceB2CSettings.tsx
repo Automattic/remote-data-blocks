@@ -1,51 +1,29 @@
 import { TextControl } from '@wordpress/components';
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { DataSourceForm } from '../components/DataSourceForm';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
-import { SettingsComponentProps, SalesforceB2CConfig } from '@/data-sources/types';
+import {
+	SettingsComponentProps,
+	SalesforceB2CConfig,
+	SalesforceB2CServiceConfig,
+} from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
-import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import SalesforceCommerceB2CIcon from '@/settings/icons/SalesforceCommerceB2CIcon';
 
-export type SalesforceB2CFormState = Omit< SalesforceB2CConfig, 'service' | 'uuid' >;
-
-const initialState: SalesforceB2CFormState = {
-	display_name: '',
-	shortcode: '',
-	organization_id: '',
-	client_id: '',
-	client_secret: '',
-};
-
-const getInitialStateFromConfig = ( config?: SalesforceB2CConfig ): SalesforceB2CFormState => {
-	if ( ! config ) {
-		return initialState;
-	}
-
-	return {
-		display_name: config.display_name,
-		shortcode: config.shortcode,
-		organization_id: config.organization_id,
-		client_id: config.client_id,
-		client_secret: config.client_secret,
-	};
-};
+const SERVICE_CONFIG_VERSION = 1;
 
 export const SalesforceB2CSettings = ( {
 	mode,
-	uuid: uuidFromProps,
+	uuid,
 	config,
 }: SettingsComponentProps< SalesforceB2CConfig > ) => {
-	const { goToMainScreen } = useSettingsContext();
-	const { updateDataSource, addDataSource } = useDataSources( false );
+	const { onSave } = useDataSources< SalesforceB2CConfig >( false );
 
-	const [ newUUID, setNewUUID ] = useState< string | null >( uuidFromProps ?? null );
-
-	const { state, handleOnChange } = useForm< SalesforceB2CFormState >( {
-		initialValues: getInitialStateFromConfig( config ),
+	const { state, handleOnChange, validState } = useForm< SalesforceB2CServiceConfig >( {
+		initialValues: config?.service_config ?? { __version: SERVICE_CONFIG_VERSION },
 	} );
 
 	const shouldAllowSubmit = useMemo( () => {
@@ -53,31 +31,24 @@ export const SalesforceB2CSettings = ( {
 	}, [ state.shortcode, state.organization_id, state.client_id, state.client_secret ] );
 
 	const onSaveClick = async () => {
-		const salesforceConfig: SalesforceB2CConfig = {
-			uuid: uuidFromProps ?? '',
-			newUUID: newUUID ?? '',
-			display_name: state.display_name,
-			service: 'salesforce-b2c',
-			shortcode: state.shortcode,
-			organization_id: state.organization_id,
-			client_id: state.client_id,
-			client_secret: state.client_secret,
-		};
-
-		if ( mode === 'add' ) {
-			await addDataSource( salesforceConfig );
-		} else {
-			await updateDataSource( salesforceConfig );
+		if ( ! validState ) {
+			return;
 		}
 
-		goToMainScreen();
+		const data: SalesforceB2CConfig = {
+			service: 'salesforce-b2c',
+			service_config: validState,
+			uuid: uuid ?? null,
+		};
+
+		return onSave( data, mode );
 	};
 
 	return (
 		<DataSourceForm onSave={ onSaveClick }>
 			<DataSourceForm.Setup
 				canProceed={ Boolean( shouldAllowSubmit ) }
-				displayName={ state.display_name }
+				displayName={ state.display_name ?? '' }
 				handleOnChange={ handleOnChange }
 				heading={ {
 					icon: SalesforceCommerceB2CIcon,
@@ -86,9 +57,6 @@ export const SalesforceB2CSettings = ( {
 					verticalAlign: 'middle',
 				} }
 				inputIcon={ SalesforceCommerceB2CIcon }
-				newUUID={ newUUID }
-				setNewUUID={ setNewUUID }
-				uuidFromProps={ uuidFromProps }
 			>
 				<TextControl
 					type="text"
@@ -96,7 +64,7 @@ export const SalesforceB2CSettings = ( {
 					onChange={ shortCode => {
 						handleOnChange( 'shortcode', shortCode ?? '' );
 					} }
-					value={ state.shortcode }
+					value={ state.shortcode ?? '' }
 					help={ __( 'The region-specific merchant identifier. Example: 0dnz6ope' ) }
 					autoComplete="off"
 					__next40pxDefaultSize
@@ -108,7 +76,7 @@ export const SalesforceB2CSettings = ( {
 					onChange={ shortCode => {
 						handleOnChange( 'organization_id', shortCode ?? '' );
 					} }
-					value={ state.organization_id }
+					value={ state.organization_id ?? '' }
 					help={ __( 'The organization ID. Example: f_ecom_mirl_012' ) }
 					autoComplete="off"
 					__next40pxDefaultSize
@@ -120,7 +88,7 @@ export const SalesforceB2CSettings = ( {
 					onChange={ shortCode => {
 						handleOnChange( 'client_id', shortCode ?? '' );
 					} }
-					value={ state.client_id }
+					value={ state.client_id ?? '' }
 					help={ __( 'Example: bc2991f1-eec8-4976-8774-935cbbe84f18' ) }
 					autoComplete="off"
 					__next40pxDefaultSize
