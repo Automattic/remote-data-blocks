@@ -221,11 +221,13 @@ class BlockBindings {
 		// array (by our hooks into the Block Data API).
 		if ( $block instanceof WP_Block ) {
 			$block_context = $block->context[ self::$context_name ] ?? [];
+			$block_attributes = $block->attributes;
 		} else {
 			$block_context = $block['context'][ self::$context_name ] ?? [];
+			$block_attributes = $block['attributes'];
 		}
 
-		$fallback_content = self::get_block_fallback_content( $source_args, $block_context );
+		$fallback_content = self::get_block_fallback_content( $source_args, $block_context, $block_attributes );
 
 		// Fallback to the content if we don't have the expected context.
 		if ( ! isset( $block_context['blockName'] ) || ! isset( $block_context['queryInput'] ) ) {
@@ -243,7 +245,7 @@ class BlockBindings {
 		return $value;
 	}
 
-	private static function get_block_fallback_content( array $source_args, array $block_context ): string {
+	private static function get_block_fallback_content( array $source_args, array $block_context, array $block_attributes ): string {
 		$fallback_content = '';
 
 		$source_field = $source_args['field'] ?? null;
@@ -256,6 +258,10 @@ class BlockBindings {
 
 		if ( isset( $result[ $source_field ] ) ) {
 			$fallback_content = $result[ $source_field ];
+		}
+
+		if ( '' === $fallback_content ) {
+			$fallback_content = $block_attributes['content'] ?? '';
 		}
 
 		return $fallback_content;
