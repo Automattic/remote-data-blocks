@@ -92,7 +92,7 @@ class QueryRunner implements QueryRunnerInterface {
 		 * Filters the request details before the HTTP request is dispatched.
 		 *
 		 * @param array<string, mixed> $request_details The request details.
-		 * @param HttpQuery $query_context The query context.
+		 * @param HttpQueryInterface $query The query being executed.
 		 * @param array<string, mixed> $input_variables The input variables for the current request.
 		 * @return array<string, array{
 		 *   method: string,
@@ -185,7 +185,7 @@ class QueryRunner implements QueryRunnerInterface {
 		 * field shortcodes.
 		 *
 		 * @param array $query_response_metadata The query response metadata.
-		 * @param HttpQuery $query_context The query context.
+		 * @param HttpQueryInterface $query The query context.
 		 * @param array $response_metadata The response metadata returned by the query runner.
 		 * @param array $query_results The results of the query.
 		 * @return array The filtered query response metadata.

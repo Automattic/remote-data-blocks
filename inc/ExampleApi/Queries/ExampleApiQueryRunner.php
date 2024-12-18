@@ -14,8 +14,8 @@ defined( 'ABSPATH' ) || exit();
  *
  * Execute the query by making an internal REST API request. This allows the
  * example API to work when running locally (inside a container). Otherwise,
- * there would be a mismatch between the public address (e.g., localhost:888) and
- * what is reachable inside a container.
+ * there would be a mismatch between the public address (e.g., localhost:8888)
+ * and what is reachable inside a container.
  *
  */
 class ExampleApiQueryRunner extends QueryRunner {
