@@ -2,6 +2,8 @@
 
 namespace RemoteDataBlocks\Config\DataSource;
 
+use WP_Error;
+
 /**
  * HttpDataSourceInterface
  *
@@ -38,5 +40,5 @@ interface HttpDataSourceInterface {
 	 *
 	 * @return array Associative array of request headers.
 	 */
-	public function get_request_headers(): array;
+	public function get_request_headers(): array|WP_Error;
 }

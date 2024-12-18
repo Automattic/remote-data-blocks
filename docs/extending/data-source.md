@@ -30,7 +30,7 @@ class ZipCodeDataSource extends HttpDataSource {
 		return 'https://api.zippopotam.us/us/';
 	}
 
-	public function get_request_headers(): array {
+	public function get_request_headers(): array|WP_Error {
 		return [
 			'Content-Type' => 'application/json',
 		];

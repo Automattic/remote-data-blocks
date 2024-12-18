@@ -18,26 +18,28 @@ class SalesforceB2CAuth {
 	 * @param string $organization_id The organization ID for the data source.
 	 * @param string $client_id The client ID (a version 4 UUID).
 	 * @param string $client_secret The client secret.
-	 * @return WP_Error|string The token or an error.
+	 * @return string|WP_Error The token or an error.
 	 */
 	public static function generate_token(
 		string $endpoint,
 		string $organization_id,
 		string $client_id,
 		string $client_secret
-	): WP_Error|string {
+	): string|WP_Error {
 		$saved_access_token = self::get_saved_access_token( $organization_id, $client_id );
 
 		if ( null !== $saved_access_token ) {
 			return $saved_access_token;
 		}
 
+		$access_token = null;
+
 		$saved_refresh_token = self::get_saved_refresh_token( $organization_id, $client_id );
 		if ( null !== $saved_refresh_token ) {
 			$access_token = self::get_token_using_refresh_token( $saved_refresh_token, $client_id, $client_secret, $endpoint, $organization_id );
 		}
 
-		if ( null !== $access_token ) {
+		if ( null !== $access_token && ! is_wp_error( $access_token ) ) {
 			return $access_token;
 		}
 
@@ -123,8 +125,13 @@ class SalesforceB2CAuth {
 			],
 		]);
 
+		$refresh_token_error = new WP_Error(
+			'salesforce_b2c_auth_error_refresh_token',
+			__( 'Failed to refresh authorization with refresh token', 'remote-data-blocks' )
+		);
+
 		if ( is_wp_error( $client_auth_response ) ) {
-			return null;
+			return $refresh_token_error;
 		}
 
 		$response_code = wp_remote_retrieve_response_code( $client_auth_response );
@@ -132,7 +139,7 @@ class SalesforceB2CAuth {
 		$response_data = json_decode( $response_body, true );
 
 		if ( 400 === $response_code ) {
-			return null;
+			return $refresh_token_error;
 		}
 
 		$access_token = $response_data['access_token'];
