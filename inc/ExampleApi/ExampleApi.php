@@ -7,6 +7,16 @@ use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\ExampleApi\Queries\ExampleApiQueryRunner;
 use function register_remote_data_block;
 
+/**
+ * This example API is bundled with the plugin to provide a working demonstration
+ * of Remote Data Blocks without requiring an external API. It is backed by a
+ * flat file bundled with the plugin, so it can be used without an internet
+ * connection and without reliance on an external server.
+ *
+ * It can be disabled with the following code snippet:
+ *
+ * add_filter( 'remote_data_blocks_register_example_block', '__return_false' );
+ */
 class ExampleApi {
 	private static string $block_title = 'Conference Event';
 
@@ -32,7 +42,7 @@ class ExampleApi {
 		$data_source = HttpDataSource::from_array( [
 			'service_config' => [
 				'__version' => 1,
-				'display_name' => 'Example API',
+				'display_name' => 'Example API (Conference Event)',
 				'endpoint' => 'https://example.com/api/v1', // dummy URL
 			],
 		] );

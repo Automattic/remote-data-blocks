@@ -8,7 +8,6 @@ use function add_query_arg;
 
 function register_aic_block(): void {
 	$aic_data_source = HttpDataSource::from_array( [
-		'service' => 'art-institute',
 		'service_config' => [
 			'__version' => 1,
 			'display_name' => 'Art Institute of Chicago',
