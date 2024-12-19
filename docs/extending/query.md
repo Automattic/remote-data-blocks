@@ -114,7 +114,7 @@ The `output_schema` property defines how to extract data from the API response. 
 - `is_collection` (optional, default `false`): A boolean indicating whether the response data is a collection. If false, only a single item will be returned.
 - `name` (optional): The human-friendly display name of the output variable.
 - `default_value` (optional): The default value for the output variable.
-- `path` (required): A [JSONPath](https://jsonpath.com/) expression to extract the variable value.
+- `path` (optional): A [JSONPath](https://jsonpath.com/) expression to extract the variable value.
 - `type` (required): A primitive type (e.g., `string`, `boolean`) or a nested output schema. Accepted primitive types are:
   - `boolean`
   - `button_url`
