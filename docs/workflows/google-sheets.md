@@ -22,12 +22,10 @@ The Service Account Keys JSON should be provided to your application securely. O
 
 ## Block Registration and Styling
 
-This would be similar to the [Airtable workflow](airtable-with-code.md). Refer the following sections from that workflow -
+This would be similar to the [Airtable workflow](airtable.md). Refer the following sections from that workflow:
 
-- [Define a query](./airtable-with-code.md#define-a-query)
-- [Register a block](./airtable-with-code.md#register-a-block)
+- [Create the data source](./airtable.md#create-the-data-source)
 - [Insert the block](./airtable-with-code.md#insert-the-block)
-- [Register a list query](./airtable-with-code.md#register-a-list-query)
 - [Custom patterns and styling](./airtable-with-code.md#custom-patterns-and-styling)
 
 ## Code Reference

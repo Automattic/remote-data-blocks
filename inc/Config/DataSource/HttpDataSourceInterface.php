@@ -20,9 +20,9 @@ use WP_Error;
  *
  * If you are a WPVIP customer, data sources are automatically provided by VIP.
  * Only implement this interface if you have custom data sources not provided by VIP.
- * 
+ *
  */
-interface HttpDataSourceInterface {
+interface HttpDataSourceInterface extends DataSourceInterface {
 	/**
 	 * Get the endpoint for the query. Note that the query configuration has an
 	 * opportunity to change / override the endpoint at request time. For REST

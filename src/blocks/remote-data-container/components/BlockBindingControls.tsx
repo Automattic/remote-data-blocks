@@ -1,6 +1,12 @@
 import { CheckboxControl, SelectControl } from '@wordpress/components';
 
-import { TEXT_FIELD_TYPES } from '@/blocks/remote-data-container/config/constants';
+import {
+	BUTTON_TEXT_FIELD_TYPES,
+	BUTTON_URL_FIELD_TYPES,
+	IMAGE_ALT_FIELD_TYPES,
+	IMAGE_URL_FIELD_TYPES,
+	TEXT_FIELD_TYPES,
+} from '@/blocks/remote-data-container/config/constants';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
 import { getBlockDataSourceType } from '@/utils/localized-block-data';
 
@@ -118,7 +124,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 				<>
 					<BlockBindingFieldControl
 						availableBindings={ availableBindings }
-						fieldTypes={ [ 'image_url' ] }
+						fieldTypes={ IMAGE_URL_FIELD_TYPES }
 						label="Image URL"
 						target="url"
 						updateFieldBinding={ updateFieldBinding }
@@ -126,7 +132,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 					/>
 					<BlockBindingFieldControl
 						availableBindings={ availableBindings }
-						fieldTypes={ [ 'image_alt', 'string' ] }
+						fieldTypes={ IMAGE_ALT_FIELD_TYPES }
 						label="Image alt text"
 						target="alt"
 						updateFieldBinding={ updateFieldBinding }
@@ -139,7 +145,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 				<>
 					<BlockBindingFieldControl
 						availableBindings={ availableBindings }
-						fieldTypes={ [ 'button_url' ] }
+						fieldTypes={ BUTTON_URL_FIELD_TYPES }
 						label="Button URL"
 						target="url"
 						updateFieldBinding={ updateFieldBinding }
@@ -147,7 +153,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 					/>
 					<BlockBindingFieldControl
 						availableBindings={ availableBindings }
-						fieldTypes={ [ 'button_text', 'string' ] }
+						fieldTypes={ BUTTON_TEXT_FIELD_TYPES }
 						label="Button Text"
 						target="text"
 						updateFieldBinding={ updateFieldBinding }
