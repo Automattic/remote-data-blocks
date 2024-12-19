@@ -4,7 +4,7 @@ A data source defines basic reusable properties of an API and is used by a [quer
 
 ## Example
 
-Most HTTP-powered APIs can be represented by defining a class that extends `HttpDataSource`. Here's an example of a data source for US ZIP code data:
+Most HTTP-powered APIs can be represented by defining a class that extends `HttpDataSource`. Here's an example of a data source for an example HTTP API:
 
 ```php
 $data_source = HttpDataSource::from_array( [
