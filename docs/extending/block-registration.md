@@ -36,7 +36,7 @@ function register_your_custom_block() {
 		],
 	] );
 
-    register_remote_data_block( [
+	register_remote_data_block( [
 		'title' => 'My Block',
 		'queries' => [
 			'display' => $display_query,

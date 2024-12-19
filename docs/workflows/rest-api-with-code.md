@@ -21,7 +21,7 @@ function register_zipcode_block(): void {
 			'display_name' => 'Zip Code API',
 			'endpoint' => 'https://api.zippopotam.us/us/',
 		],
-    ] );
+	] );
 
 	$zipcode_query = HttpQuery::from_array( [
 		'data_source' => $zipcode_data_source,
