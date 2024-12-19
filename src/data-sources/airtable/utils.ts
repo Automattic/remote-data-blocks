@@ -28,6 +28,9 @@ export const getAirtableOutputQueryMappingValue = (
 	}
 
 	switch ( field.type ) {
+		case 'richText':
+			return { ...baseField, type: 'markdown' };
+
 		case 'currency':
 			return {
 				...baseField,
