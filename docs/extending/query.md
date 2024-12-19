@@ -183,6 +183,8 @@ The `cache_ttl` property defines how long the query response should be cached, i
 
 A value of `-1` indicates the query should not be cached. A value of `null` indicates the default TTL should be used (60 seconds). If omitted, the default TTL is used.
 
+Remote data blocks utilize the WordPress object cache (`wp_cache_get()` / `wp_cache_set()`) for response caching. Ensure a persistent object cache plugin is provided by your platform or installed for this value to be respected.
+
 ### image_url: string|null
 
 The `image_url` property defines an image URL that represents the query in the UI. If omitted, the query will use the image URL defined by the data source.
