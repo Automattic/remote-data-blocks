@@ -261,7 +261,7 @@ const DataSourceList = () => {
 				onChangeView={ setView }
 				paginationInfo={ paginationInfo }
 				defaultLayouts={ defaultLayouts }
-				getItemId={ ( item: DataSourceConfig ) => item.uuid ?? 'not-persisted' }
+				getItemId={ ( item: DataSourceConfig ) => item.uuid ?? `not-persisted-${ Math.random() }` }
 				isLoading={ loadingDataSources }
 			/>
 			{ dataSourceToDelete && (
