@@ -68,14 +68,9 @@ The `get_input_schema` method defines the input data expected by the query. The 
   - `type`: The type of the override. Supported values are `query_var` and `url`.
   - `target`: The targeted entity for the override (e.g., the query or URL variable that contains the overridde).
 - `type` (required): The type of the input variable. Supported types are:
-  - `base64`
-  - `boolean`
-  - `button_url`
-  - `image_alt`
-  - `image_url`
   - `number`
-  - `currency`
   - `string`
+  - `id`
 
 #### Example
 
@@ -101,7 +96,17 @@ The `get_output_schema` method defines how to extract data from the API response
   - `name` (optional): The human-friendly display name of the output variable.
   - `default_value` (optional): The default value for the output variable.
   - `path` (required): A [JSONPath](https://jsonpath.com/) expression to extract the variable value.
-  - `type` (required): The type of the output variable. Supported types are `string`, `number`, and `boolean`.
+  - `type` (required): The type of the output variable. Supported types are -
+    - `id`
+    - `base64`
+    - `boolean`
+    - `number`
+    - `string`
+    - `button_url`
+    - `image_url`
+    - `image_alt`
+    - `currency`
+    - `markdown`
 
 #### Example
 

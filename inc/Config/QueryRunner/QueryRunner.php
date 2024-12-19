@@ -5,6 +5,7 @@ namespace RemoteDataBlocks\Config\QueryRunner;
 use Exception;
 use GuzzleHttp\RequestOptions;
 use JsonPath\JsonObject;
+use Parsedown;
 use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
 use RemoteDataBlocks\HttpClient\HttpClient;
 use WP_Error;
@@ -258,6 +259,9 @@ class QueryRunner implements QueryRunnerInterface {
 
 			case 'html':
 				return $field_value_single;
+
+			case 'markdown':
+				return Parsedown::instance()->text( $field_value_single );
 
 			case 'currency':
 				$currency_symbol = $mapping['prefix'] ?? '$';
