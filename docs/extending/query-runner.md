@@ -8,7 +8,7 @@ A query runner executes a query and processes the results. The default `QueryRun
 
 ## Custom QueryRunner for HTTP queries
 
-If your API transacts over HTTP and you want to customize the query runner, consider extending the `QueryRunner` class and providing an instance to your query via the `query_runner` option. Here are the methods
+If your API transacts over HTTP and you want to customize the query runner, consider extending the `QueryRunner` class and providing an instance to your query via the `query_runner` option. Here are the methods:
 
 ### execute( HttpQueryInterface $query, array $input_variables ): array|WP_Error
 
