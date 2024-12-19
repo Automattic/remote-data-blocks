@@ -12,6 +12,10 @@ use function register_remote_data_search_query;
 
 class ShopifyIntegration {
 	public static function init(): void {
+		add_action( 'init', [ __CLASS__, 'register_blocks' ] );
+	}
+
+	public static function register_blocks(): void {
 		$data_sources = DataSourceCrud::get_data_sources( REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE );
 
 		foreach ( $data_sources as $config ) {

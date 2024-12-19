@@ -7,6 +7,7 @@ use RemoteDataBlocks\REST\AuthController;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use function wp_get_environment_type;
 use function wp_is_development_mode;
+use function add_settings_error;
 
 defined( 'ABSPATH' ) || exit();
 
@@ -154,19 +155,36 @@ class PluginSettings {
 		}
 	}
 
-	public static function decrypt_option( string $value ): array|null {
+	public static function decrypt_option( string $value ): array {
 		$decryptor = new \RemoteDataBlocks\WpdbStorage\DataEncryption();
+		$is_error = false;
 
 		try {
 			$decrypted = $decryptor->decrypt( $value );
-			return json_decode( $decrypted, true );
+
+			if ( false === $decrypted ) {
+				$is_error = true;
+			}
 		} catch ( \Exception $e ) {
+			$is_error = true;
+		}
+
+		if ( $is_error ) {
+			self::show_decryption_error();
+			return [];
+		} else {
+			return json_decode( $decrypted, true );
+		}
+	}
+
+	private static function show_decryption_error(): void {
+		// Check that we have add_settings_error() available. This can be unavailable during wp-env startup.
+		if ( is_admin() ) {
 			add_settings_error(
 				'remote_data_blocks_settings',
 				'decryption_error',
 				__( 'Error decrypting remote-data-blocks settings.', 'remote-data-blocks' )
 			);
-			return null;
 		}
 	}
 }
