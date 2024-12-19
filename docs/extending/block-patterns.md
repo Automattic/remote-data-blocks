@@ -24,7 +24,7 @@ register_remote_data_block( [
 	'patterns' => [
 		[
 			'title' => 'My Pattern',
-			'content' => file_get_contents( '/path/to/your-pattern.html' ),
+			'content' => file_get_contents( __DIR__ . '/my-pattern.html' ),
 		],
 	],
 ] );
