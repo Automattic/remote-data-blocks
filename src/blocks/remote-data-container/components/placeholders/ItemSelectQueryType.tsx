@@ -1,8 +1,7 @@
 import { ButtonGroup } from '@wordpress/components';
 
+import { DataViewsModal } from '@/blocks/remote-data-container/components/modals/DataViewsModal';
 import { InputModal } from '@/blocks/remote-data-container/components/modals/InputModal';
-import { ListModal } from '@/blocks/remote-data-container/components/modals/ListModal';
-import { SearchModal } from '@/blocks/remote-data-container/components/modals/SearchModal';
 
 interface ItemSelectQueryTypeProps {
 	blockConfig: BlockConfig;
@@ -29,9 +28,8 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 
 				switch ( selector.type ) {
 					case 'search':
-						return <SearchModal key={ title } { ...selectorProps } />;
 					case 'list':
-						return <ListModal key={ title } { ...selectorProps } />;
+						return <DataViewsModal key={ title } { ...selectorProps } />;
 					case 'input':
 						return <InputModal key={ title } inputs={ selector.inputs } { ...selectorProps } />;
 				}
