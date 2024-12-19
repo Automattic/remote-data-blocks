@@ -4,9 +4,7 @@ namespace RemoteDataBlocks\Config\QueryRunner;
 
 use Exception;
 use GuzzleHttp\RequestOptions;
-use JsonPath\JsonObject;
-use Parsedown;
-use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
+use RemoteDataBlocks\Config\Query\HttpQueryInterface;
 use RemoteDataBlocks\HttpClient\HttpClient;
 use WP_Error;
 
@@ -15,16 +13,13 @@ defined( 'ABSPATH' ) || exit();
 /**
  * QueryRunner class
  *
- * Class that executes queries, leveraging provided QueryContext.
- *
+ * Class that executes queries.
  */
 class QueryRunner implements QueryRunnerInterface {
-
-	public function __construct(
-		private HttpQueryContext $query_context,
-		private HttpClient $http_client = new HttpClient()
-	) {
-	}
+	/**
+	 * @param HttpClient $http_client The HTTP client used to make HTTP requests.
+	 */
+	public function __construct( private HttpClient $http_client = new HttpClient() ) {}
 
 	/**
 	 * Get the HTTP request details for the query
@@ -36,20 +31,19 @@ class QueryRunner implements QueryRunnerInterface {
 	 *   origin: string,
 	 *   ttl: int|null,
 	 *   uri: string,
-	 * } The request details.
+	 * }
 	 */
-	protected function get_request_details( array $input_variables ): array|WP_Error {
-		$headers = $this->query_context->get_request_headers( $input_variables );
+	protected function get_request_details( HttpQueryInterface $query, array $input_variables ): array|WP_Error {
+		$headers = $query->get_request_headers( $input_variables );
 
 		if ( is_wp_error( $headers ) ) {
 			return $headers;
 		}
 
-		$method = $this->query_context->get_request_method();
-		$body = $this->query_context->get_request_body( $input_variables );
-		$endpoint = $this->query_context->get_endpoint( $input_variables );
-		$cache_ttl = $this->query_context->get_cache_ttl( $input_variables );
-
+		$method = $query->get_request_method();
+		$body = $query->get_request_body( $input_variables );
+		$endpoint = $query->get_endpoint( $input_variables );
+		$cache_ttl = $query->get_cache_ttl( $input_variables );
 		$parsed_url = wp_parse_url( $endpoint );
 
 		if ( false === $parsed_url ) {
@@ -60,10 +54,10 @@ class QueryRunner implements QueryRunnerInterface {
 		 * Filters the allowed URL schemes for this request.
 		 *
 		 * @param array<string>    $allowed_url_schemes The allowed URL schemes.
-		 * @param HttpQueryContext $query_context       The current query context.
+		 * @param HttpQueryInterface $query The current query.
 		 * @return array<string> The filtered allowed URL schemes.
 		 */
-		$allowed_url_schemes = apply_filters( 'remote_data_blocks_allowed_url_schemes', [ 'https' ], $this->query_context );
+		$allowed_url_schemes = apply_filters( 'remote_data_blocks_allowed_url_schemes', [ 'https' ], $query );
 
 		if ( empty( $parsed_url['scheme'] ?? '' ) || ! in_array( $parsed_url['scheme'], $allowed_url_schemes, true ) ) {
 			return new WP_Error( 'Invalid endpoint URL scheme' );
@@ -98,7 +92,7 @@ class QueryRunner implements QueryRunnerInterface {
 		 * Filters the request details before the HTTP request is dispatched.
 		 *
 		 * @param array<string, mixed> $request_details The request details.
-		 * @param HttpQueryContext $query_context The query context.
+		 * @param HttpQuery $query_context The query context.
 		 * @param array<string, mixed> $input_variables The input variables for the current request.
 		 * @return array<string, array{
 		 *   method: string,
@@ -107,20 +101,21 @@ class QueryRunner implements QueryRunnerInterface {
 		 *   uri: string,
 		 * }>
 		 */
-		return apply_filters( 'remote_data_blocks_request_details', $request_details, $this->query_context, $input_variables );
+		return apply_filters( 'remote_data_blocks_request_details', $request_details, $query, $input_variables );
 	}
 
 	/**
 	 * Dispatch the HTTP request and assemble the raw (pre-processed) response data.
 	 *
+	 * @param HttpQueryInterface $query The query being executed.
 	 * @param array<string, mixed> $input_variables The input variables for the current request.
 	 * @return WP_Error|array{
 	 *   metadata:      array<string, string|int|null>,
 	 *   response_data: string|array|object|null,
 	 * }
 	 */
-	protected function get_raw_response_data( array $input_variables ): array|WP_Error {
-		$request_details = $this->get_request_details( $input_variables );
+	protected function get_raw_response_data( HttpQueryInterface $query, array $input_variables ): array|WP_Error {
+		$request_details = $this->get_request_details( $query, $input_variables );
 
 		if ( is_wp_error( $request_details ) ) {
 			return $request_details;
@@ -152,7 +147,7 @@ class QueryRunner implements QueryRunnerInterface {
 				'age' => intval( $response->getHeaderLine( 'Age' ) ),
 				'status_code' => $response_code,
 			],
-			'response_data' => $raw_response_string,
+			'response_data' => $this->deserialize_response( $raw_response_string ),
 		];
 	}
 
@@ -168,7 +163,7 @@ class QueryRunner implements QueryRunnerInterface {
 	 *   value: string|int|null,
 	 * }>,
 	 */
-	protected function get_response_metadata( array $response_metadata, array $query_results ): array {
+	protected function get_response_metadata( HttpQueryInterface $query, array $response_metadata, array $query_results ): array {
 		$age = intval( $response_metadata['age'] ?? 0 );
 		$time = time() - $age;
 
@@ -180,7 +175,7 @@ class QueryRunner implements QueryRunnerInterface {
 			],
 			'total_count' => [
 				'name' => 'Total count',
-				'type' => 'number',
+				'type' => 'integer',
 				'value' => count( $query_results ),
 			],
 		];
@@ -190,152 +185,65 @@ class QueryRunner implements QueryRunnerInterface {
 		 * field shortcodes.
 		 *
 		 * @param array $query_response_metadata The query response metadata.
-		 * @param HttpQueryContext $query_context The query context.
+		 * @param HttpQuery $query_context The query context.
 		 * @param array $response_metadata The response metadata returned by the query runner.
 		 * @param array $query_results The results of the query.
 		 * @return array The filtered query response metadata.
 		 */
-		return apply_filters( 'remote_data_blocks_query_response_metadata', $query_response_metadata, $this->query_context, $response_metadata, $query_results );
+		return apply_filters( 'remote_data_blocks_query_response_metadata', $query_response_metadata, $query, $response_metadata, $query_results );
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function execute( array $input_variables ): array|WP_Error {
-		$raw_response_data = $this->get_raw_response_data( $input_variables );
+	public function execute( HttpQueryInterface $query, array $input_variables ): array|WP_Error {
+		$raw_response_data = $this->get_raw_response_data( $query, $input_variables );
 
 		if ( is_wp_error( $raw_response_data ) ) {
 			return $raw_response_data;
 		}
 
-		// Loose validation of the raw response data.
-		if ( ! isset( $raw_response_data['metadata'], $raw_response_data['response_data'] ) || ! is_array( $raw_response_data['metadata'] ) ) {
-			return new WP_Error( 'Invalid raw response data' );
-		}
-
-		$metadata = $raw_response_data['metadata'];
-		$response_data = $raw_response_data['response_data'];
-
-		// If the response data is a string, allow queries to implement their own
-		// deserialization logic. Otherwise, JsonPath is prepared to work with a
-		// string, array, object, or null.
-		if ( is_string( $response_data ) ) {
-			$response_data = $this->query_context->process_response( $response_data, $input_variables );
-		}
+		// Preprocess the response data.
+		$response_data = $this->preprocess_response( $query, $raw_response_data['response_data'], $input_variables );
 
 		// Determine if the response data is expected to be a collection.
-		$is_collection = $this->query_context->is_response_data_collection();
+		$schema = $query->get_output_schema();
+		$is_collection = $schema['is_collection'] ?? false;
 
-		// This method always returns an array, even if it's a single item. This
+		// The parser always returns an array, even if it's a single item. This
 		// ensures a consistent response shape. The requestor is expected to inspect
 		// is_collection and unwrap if necessary.
-		$results = $this->map_fields( $response_data, $is_collection );
+		$parser = new QueryResponseParser();
+		$results = $parser->parse( $response_data, $schema );
+		$results = $is_collection ? $results : [ $results ];
+		$metadata = $this->get_response_metadata( $query, $raw_response_data['metadata'], $results );
 
 		return [
 			'is_collection' => $is_collection,
-			'metadata' => $this->get_response_metadata( $metadata, $results ),
+			'metadata' => $metadata,
 			'results' => $results,
 		];
 	}
 
 	/**
-	 * Get the field value based on the field type. This method casts the field
-	 * value to a string (since this will ultimately be used as block content).
+	 * Deserialize the raw response data into an associative array. By default we
+	 * assume a JSON string, but this method can be overridden to handle custom
+	 * deserialization logic and/or transformation.
 	 *
-	 * @param array|string $field_value   The field value.
-	 * @param string       $default_value The default value.
-	 * @param string       $field_type    The field type.
-	 * @return string The field value.
+	 * @param string $raw_response_data The raw response data.
+	 * @return mixed The deserialized response data.
 	 */
-	protected function get_field_value( array|string $field_value, array $mapping ): string {
-		$default_value = $mapping['default_value'] ?? '';
-		$field_type = $mapping['type'];
-
-		$field_value_single = is_array( $field_value ) && count( $field_value ) > 1 ? $field_value : ( $field_value[0] ?? $default_value );
-
-		switch ( $field_type ) {
-			case 'base64':
-				return base64_decode( $field_value_single );
-
-			case 'html':
-				return $field_value_single;
-
-			case 'markdown':
-				return Parsedown::instance()->text( $field_value_single );
-
-			case 'currency':
-				$currency_symbol = $mapping['prefix'] ?? '$';
-				return sprintf( '%s%s', $currency_symbol, number_format( (float) $field_value_single, 2 ) );
-
-			case 'string':
-				if ( is_array( $field_value_single ) ) {
-					// Ensure all elements are strings and filter out non-string values
-					$string_values = array_filter( $field_value_single, '\is_string' );
-					if ( ! empty( $string_values ) ) {
-						return wp_strip_all_tags( implode( ', ', $string_values ) );
-					}
-				}
-				return wp_strip_all_tags( $field_value_single );
-		}
-
-		return (string) $field_value_single;
+	protected function deserialize_response( string $raw_response_data ): mixed {
+		return json_decode( $raw_response_data, true );
 	}
 
 	/**
-	 * Map fields from the response data, adhering to the output schema defined by
-	 * the query.
+	 * Preprocess the response data before it is passed to the response parser.
 	 *
-	 * @param string|array|object|null $response_data The response data to map. Can be JSON string, PHP associative array, PHP object, or null.
-	 * @param bool                     $is_collection Whether the response data is a collection.
-	 * @return null|array<int, array{
-	 *   result: array{
-	 *     name: string,
-	 *     type: string,
-	 *     value: string,
-	 *   },
-	 * }>
+	 * @param array $response_data The raw response data.
+	 * @return array Preprocessed response. The deserialized response data or (re-)serialized JSON.
 	 */
-	protected function map_fields( string|array|object|null $response_data, bool $is_collection ): ?array {
-		$root = $response_data;
-		$output_schema = $this->query_context->output_schema;
-
-		if ( ! empty( $output_schema['root_path'] ) ) {
-			$json = new JsonObject( $root );
-			$root = $json->get( $output_schema['root_path'] );
-		} else {
-			$root = $is_collection ? $root : [ $root ];
-		}
-
-		if ( empty( $root ) || empty( $output_schema['mappings'] ) ) {
-			return $root;
-		}
-
-		// Loop over the returned items in the query result.
-		return array_map( function ( $item ) use ( $output_schema ) {
-			$json = new JsonObject( $item );
-
-			// Loop over the output variables and extract the values from the item.
-			$result = array_map( function ( $mapping ) use ( $json ) {
-				if ( array_key_exists( 'generate', $mapping ) && is_callable( $mapping['generate'] ) ) {
-					$field_value_single = $mapping['generate']( json_decode( $json->getJson(), true ) );
-				} else {
-					$field_path = $mapping['path'] ?? null;
-					$field_value = $field_path ? $json->get( $field_path ) : '';
-
-					// JSONPath always returns values in an array, even if there's only one value.
-					// Because we're mostly interested in single values for field mapping, unwrap the array if it's only one item.
-					$field_value_single = self::get_field_value( $field_value, $mapping );
-				}
-
-				return array_merge( $mapping, [
-					'value' => $field_value_single,
-				] );
-			}, $output_schema['mappings'] );
-
-			// Nest result property to reserve additional meta in the future.
-			return [
-				'result' => $result,
-			];
-		}, $root );
+	protected function preprocess_response( HttpQueryInterface $query, mixed $response_data, array $input_variables ): mixed {
+		return $query->preprocess_response( $response_data, $input_variables );
 	}
 }
