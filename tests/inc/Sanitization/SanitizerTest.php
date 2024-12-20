@@ -4,81 +4,92 @@ namespace RemoteDataBlocks\Tests\Sanitization;
 
 use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\Sanitization\Sanitizer;
+use RemoteDataBlocks\Validation\Types;
 
 class SanitizerTest extends TestCase {
 	public function test_sanitize_string() {
-		$schema = [
-			'type' => 'object',
-			'properties' => [
-				'name' => [ 'type' => 'string' ],
-			],
-		];
-		$data = [ 'name' => ' John Doe ' ];
-		
+		$schema = Types::object( [
+			'name' => Types::string(),
+		] );
+
 		$sanitizer = new Sanitizer( $schema );
-		$result = $sanitizer->sanitize( $data );
-		
+		$result = $sanitizer->sanitize( [ 'name' => ' John Doe ' ] );
+
+		$this->assertSame( 'John Doe', $result['name'] );
+
+		// Takes the first element of the array.
+		$result = $sanitizer->sanitize( [ 'name' => [ [ 'John Doe' ], 'Jane Doe', 33 ] ] );
+
 		$this->assertSame( 'John Doe', $result['name'] );
 	}
 
 	public function test_sanitize_integer() {
-		$schema = [
-			'type' => 'object',
-			'properties' => [
-				'age' => [ 'type' => 'integer' ],
-			],
-		];
+		$schema = Types::object( [
+			'age' => Types::integer(),
+		] );
 		$data = [ 'age' => '25' ];
-		
+
 		$sanitizer = new Sanitizer( $schema );
 		$result = $sanitizer->sanitize( $data );
-		
+
 		$this->assertSame( 25, $result['age'] );
 	}
 
 	public function test_sanitize_boolean() {
-		$schema = [
-			'type' => 'object',
-			'properties' => [
-				'is_active' => [ 'type' => 'boolean' ],
-			],
-		];
+		$schema = Types::object( [
+			'is_active' => Types::boolean(),
+		] );
 		$data = [ 'is_active' => 1 ];
-		
+
 		$sanitizer = new Sanitizer( $schema );
 		$result = $sanitizer->sanitize( $data );
-		
+
 		$this->assertSame( true, $result['is_active'] );
 	}
 
-	public function test_sanitize_array() {
-		$schema = [
-			'type' => 'object',
-			'properties' => [
-				'tags' => [ 'type' => 'array' ],
-			],
+	public function test_sanitize_any() {
+		$schema = Types::object( [
+			'one' => Types::any(),
+			'two' => Types::any(),
+			'three' => Types::any(),
+			'four' => Types::any(),
+			'five' => Types::any(),
+		] );
+		$data = [
+			'one' => 'string',
+			'two' => 123,
+			'three' => true,
+			'four' => [ 'array' ],
+			'five' => null,
 		];
-		$data = [ 'tags' => [ 'php', ' javascript ', 'python ' ] ];
-		
+
 		$sanitizer = new Sanitizer( $schema );
 		$result = $sanitizer->sanitize( $data );
-		
+
+		$this->assertSame( $data, $result );
+	}
+
+	public function test_sanitize_array() {
+		$schema = Types::object( [
+			'tags' => Types::list_of( Types::string() ),
+		] );
+		$data = [ 'tags' => [ 'php', ' javascript ', 'python ' ] ];
+
+		$sanitizer = new Sanitizer( $schema );
+		$result = $sanitizer->sanitize( $data );
+
 		$this->assertSame( [ 'php', 'javascript', 'python' ], $result['tags'] );
 	}
 
 	public function test_sanitize_nested_array() {
-		$schema = [ 
-			'type' => 'object',
-			'properties' => [
-				'users' => [
-					'type' => 'array',
-					'items' => [
-						'name' => [ 'type' => 'string' ],
-						'age' => [ 'type' => 'integer' ],
-					],
-				],
-			],
-		];
+		$schema = Types::object( [
+			'users' => Types::list_of(
+				Types::object( [
+					'name' => Types::string(),
+					'age' => Types::integer(),
+				] )
+			),
+		] );
 		$data = [
 			'users' => [
 				[
@@ -91,10 +102,10 @@ class SanitizerTest extends TestCase {
 				],
 			],
 		];
-		
+
 		$sanitizer = new Sanitizer( $schema );
 		$result = $sanitizer->sanitize( $data );
-		
+
 		$expected = [
 			'users' => [
 				[
@@ -111,21 +122,14 @@ class SanitizerTest extends TestCase {
 	}
 
 	public function test_sanitize_nested_array_of_objects() {
-		$schema = [
-			'type' => 'object',
-			'properties' => [
-				'users' => [
-					'type' => 'array',
-					'items' => [
-						'type' => 'object',
-						'properties' => [
-							'name' => [ 'type' => 'string' ],
-							'age' => [ 'type' => 'integer' ],
-						],
-					],
-				],
-			],
-		];
+		$schema = Types::object( [
+			'users' => Types::list_of(
+				Types::object( [
+					'name' => Types::string(),
+					'age' => Types::integer(),
+				] )
+			),
+		] );
 		$data = [
 			'users' => [
 				[
@@ -139,10 +143,10 @@ class SanitizerTest extends TestCase {
 				],
 			],
 		];
-		
+
 		$sanitizer = new Sanitizer( $schema );
 		$result = $sanitizer->sanitize( $data );
-		
+
 		$expected = [
 			'users' => [
 				[
@@ -160,28 +164,22 @@ class SanitizerTest extends TestCase {
 
 
 	public function test_sanitize_object() {
-		$schema = [
-			'type' => 'object',
-			'properties' => [
-				'user' => [
-					'type' => 'object',
-					'properties' => [
-						'name' => [ 'type' => 'string' ],
-						'age' => [ 'type' => 'integer' ],
-					],
-				],
-			],
-		];
+		$schema = Types::object( [
+			'user' => Types::object( [
+				'name' => Types::string(),
+				'age' => Types::integer(),
+			] ),
+		] );
 		$data = [
 			'user' => [
 				'name' => ' John Doe ',
 				'age' => '30',
 			],
 		];
-		
+
 		$sanitizer = new Sanitizer( $schema );
 		$result = $sanitizer->sanitize( $data );
-		
+
 		$expected = [
 			'user' => [
 				'name' => 'John Doe',
@@ -191,65 +189,62 @@ class SanitizerTest extends TestCase {
 		$this->assertSame( $expected, $result );
 	}
 
-	public function test_sanitize_with_custom_sanitizer() {
-		$schema = [
-			'type' => 'object',
-			'properties' => [
-				'email' => [
-					'type' => 'string',
-					'sanitize' => function ( $value ) {
-						return strtolower( trim( $value ) );
-					},
-				],
+	public function test_sanitize_record() {
+		$schema = Types::record(
+			Types::string(),
+			Types::object( [
+				'name' => Types::string(),
+				'age' => Types::integer(),
+			] ),
+		);
+		$data = [
+			'123' => [
+				'name' => ' John Doe ',
+				'age' => '30',
 			],
 		];
-		$data = [ 'email' => ' User@Example.com ' ];
-		
+
 		$sanitizer = new Sanitizer( $schema );
 		$result = $sanitizer->sanitize( $data );
-		
-		$this->assertSame( 'user@example.com', $result['email'] );
-	}
 
-	public function test_sanitize_ignores_undefined_fields() {
-		$schema = [
-			'type' => 'object',
-			'properties' => [
-				'name' => [ 'type' => 'string' ],
+		$expected = [
+			'123' => [
+				'name' => 'John Doe',
+				'age' => 30,
 			],
 		];
+		$this->assertSame( $expected, $result );
+	}
+
+	public function test_sanitize_removes_undefined_fields() {
+		$schema = Types::object( [
+			'name' => Types::string(),
+		] );
 		$data = [
 			'name' => 'John Doe',
 			'age' => 30,
 		];
-		
+
 		$sanitizer = new Sanitizer( $schema );
 		$result = $sanitizer->sanitize( $data );
-		
+
 		$this->assertArrayHasKey( 'name', $result );
 		$this->assertArrayNotHasKey( 'age', $result );
 	}
 
 	public function test_sanitize_complex_nested_structure() {
-		$schema = [
-			'type' => 'object',
-			'properties' => [
-				'company' => [
-					'type' => 'object',
-					'properties' => [
-						'name' => [ 'type' => 'string' ],
-						'employees' => [
-							'type' => 'array',
-							'items' => [
-								'name' => [ 'type' => 'string' ],
-								'position' => [ 'type' => 'string' ],
-								'skills' => [ 'type' => 'array' ],
-							],
-						],
-					],
-				],
-			],
-		];
+		$schema = Types::object( [
+			'company' => Types::object( [
+				'name' => Types::string(),
+				'employees' => Types::list_of(
+					Types::object( [
+						'name' => Types::string(),
+						'position' => Types::string(),
+						'skills' => Types::list_of( Types::string() ),
+					] )
+				),
+			] ),
+		] );
 		$data = [
 			'company' => [
 				'name' => ' Acme Corp ',
@@ -267,10 +262,10 @@ class SanitizerTest extends TestCase {
 				],
 			],
 		];
-		
+
 		$sanitizer = new Sanitizer( $schema );
 		$result = $sanitizer->sanitize( $data );
-		
+
 		$expected = [
 			'company' => [
 				'name' => 'Acme Corp',
@@ -289,5 +284,17 @@ class SanitizerTest extends TestCase {
 			],
 		];
 		$this->assertSame( $expected, $result );
+	}
+
+	public function test_skip_sanitize_string() {
+		$schema = Types::object( [
+			'password' => Types::skip_sanitize( Types::string() ),
+		] );
+		$data = [ 'password' => ' John Doe ' ];
+
+		$sanitizer = new Sanitizer( $schema );
+		$result = $sanitizer->sanitize( $data );
+
+		$this->assertSame( ' John Doe ', $result['password'] );
 	}
 }

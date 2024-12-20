@@ -2,34 +2,45 @@
 
 namespace RemoteDataBlocks\Integrations\Airtable;
 
-use RemoteDataBlocks\Logging\LoggerManager;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 
 class AirtableIntegration {
 	public static function init(): void {
-		$data_sources = DataSourceCrud::get_data_sources( REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE );
+		$data_source_configs = DataSourceCrud::get_configs_by_service( REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE );
 
-		foreach ( $data_sources as $config ) {
-			self::register_blocks_for_airtable_data_source( $config );
+		foreach ( $data_source_configs as $config ) {
+			$data_source = AirtableDataSource::from_array( $config );
+			self::register_block_for_airtable_data_source( $data_source );
 		}
 	}
 
-	private static function register_blocks_for_airtable_data_source( array $config ): void {
-		/** @var AirtableDataSource $airtable_data_source */
-		$airtable_data_source = AirtableDataSource::from_array( $config );
+	public static function register_block_for_airtable_data_source( AirtableDataSource $data_source, array $block_overrides = [] ): void {
+		register_remote_data_block(
+			array_merge(
+				[
+					'title' => $data_source->get_display_name(),
+					'queries' => [
+						'display' => $data_source->___temp_get_query(),
+						'list' => $data_source->___temp_get_list_query(),
+					],
+				],
+				$block_overrides
+			)
+		);
+	}
 
-		$block_name = $airtable_data_source->get_display_name();
-		$query = $airtable_data_source->___temp_get_query();
-		$list_query = $airtable_data_source->___temp_get_list_query();
-
-		if ( is_wp_error( $query ) || is_wp_error( $list_query ) ) {
-			LoggerManager::instance()->error( 'Failed to get query for Airtable block' );
-			return;
-		}
-
-		register_remote_data_block( $block_name, $query );
-		register_remote_data_list_query( $block_name, $list_query );
-		
-		LoggerManager::instance()->info( 'Registered Airtable block', [ 'block_name' => $block_name ] );
+	public static function register_loop_block_for_airtable_data_source( AirtableDataSource $data_source, array $block_overrides = [] ): void {
+		register_remote_data_block(
+			array_merge(
+				[
+					'title' => sprintf( '%s Loop', $data_source->get_display_name() ),
+					'loop' => true,
+					'queries' => [
+						'display' => $data_source->___temp_get_list_query(),
+					],
+				],
+				$block_overrides
+			)
+		);
 	}
 }

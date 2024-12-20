@@ -35,38 +35,25 @@ class BlockRegistration {
 		$remote_data_blocks_config = [];
 		$scripts_to_localize = [];
 
-		foreach ( ConfigStore::get_block_names() as $block_name ) {
+		foreach ( ConfigStore::get_block_configurations() as $config ) {
+			$block_name = $config['name'];
 			$block_path = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-container';
-			$config = ConfigStore::get_configuration( $block_name );
-
-			$input_vars_with_overrides = array_filter( $config['queries']['__DISPLAY__']->input_schema, function ( $input_var ) {
-				return isset( $input_var['overrides'] );
-			} );
 
 			$formatted_overrides = [];
-			foreach ( $input_vars_with_overrides as $name => $input_var ) {
-				$formatted_overrides[ $name ] = array_merge( $input_var, [
-					'overrides' => array_map( function ( $override ) use ( $name ) {
-						$display = '';
-						switch ( $override['type'] ) {
-							case 'query_var':
-								$display = sprintf( '?%s={%s}', $override['target'], $name );
-								break;
-							case 'url':
-								$display = sprintf( '/%s/{%s}', $override['target'], $name );
-								break;
-						}
-
-						$override['display'] = $override['display'] ?? $display;
-
-						return $override;
-					}, $input_var['overrides'] ),
-				] );
+			foreach ( $config['query_input_overrides'] as $override ) {
+				$formatted_overrides[ $override['target'] ] = [
+					[
+						'display' => sprintf( '%s={%s}', $override['source'], $override['target'] ),
+						'source' => $override['source'],
+						'sourceType' => $override['source_type'],
+					],
+				];
 			}
 
 			// Set available bindings from the display query output mappings.
 			$available_bindings = [];
-			foreach ( $config['queries']['__DISPLAY__']->output_schema['mappings'] ?? [] as $key => $mapping ) {
+			$output_schema = $config['queries'][ ConfigRegistry::DISPLAY_QUERY_KEY ]->get_output_schema();
+			foreach ( $output_schema['type'] ?? [] as $key => $mapping ) {
 				$available_bindings[ $key ] = [
 					'name' => $mapping['name'],
 					'type' => $mapping['type'],
@@ -104,7 +91,7 @@ class BlockRegistration {
 			$scripts_to_localize[] = $block_type->editor_script_handles[0];
 
 			// Register a default pattern that simply displays the available data.
-			$default_pattern_name = BlockPatterns::register_default_block_pattern( $block_name, $config['title'], $config['queries']['__DISPLAY__'] );
+			$default_pattern_name = BlockPatterns::register_default_block_pattern( $block_name, $config['title'], $config['queries'][ ConfigRegistry::DISPLAY_QUERY_KEY ] );
 			$remote_data_blocks_config[ $block_name ]['patterns']['default'] = $default_pattern_name;
 		}
 
@@ -112,7 +99,7 @@ class BlockRegistration {
 			wp_localize_script( $script_handle, 'REMOTE_DATA_BLOCKS', [
 				'config' => $remote_data_blocks_config,
 				'rest_url' => RemoteDataController::get_url(),
-				'tracks_global_properties' => TracksAnalytics::get_global_properties(), 
+				'tracks_global_properties' => TracksAnalytics::get_global_properties(),
 			] );
 		}
 	}
