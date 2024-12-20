@@ -116,7 +116,7 @@ class ShopifyIntegration {
 			'title' => $block_title,
 			'queries' => [
 				'display' => $queries['shopify_get_product'],
-				'list' => $queries['shopify_search_products'],
+				'search' => $queries['shopify_search_products'],
 			],
 			'patterns' => [
 				[
