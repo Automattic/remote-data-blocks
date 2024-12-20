@@ -54,4 +54,4 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 			/>
 		</ModalWithButtonTrigger>
 	);
-}
+};
