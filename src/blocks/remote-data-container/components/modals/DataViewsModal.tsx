@@ -15,7 +15,7 @@ interface DataViewsModalProps {
 	title: string;
 }
 
-export function DataViewsModal( props: DataViewsModalProps ) {
+export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 	const { blockName, onSelect, queryKey, title } = props;
 
 	const { loading, results, searchTerms, setSearchTerms } = useSearchResults( {
