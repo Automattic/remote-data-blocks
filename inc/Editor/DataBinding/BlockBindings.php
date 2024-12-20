@@ -214,7 +214,7 @@ class BlockBindings {
 		return $value;
 	}
 
-	private static function get_block_fallback_content( array $source_args, array $block_context, array $block_attributes ): string {
+	private static function get_block_fallback_content( array $source_args, array $block_context, array $block_attributes ): ?string {
 		// Returning null from get_value() cancels the binding and allows the default saved content to show.
 		$fallback_content = null;
 
