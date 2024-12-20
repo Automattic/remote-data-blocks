@@ -1,115 +1,35 @@
 # Query
 
-A query defines a request for data from a [data source](data-source.md) and makes that data available to a remote data block. A query defines input and output variables so that the Remote Data Blocks plugin knows how to interact with it.
+A query defines a request for data from a [data source](data-source.md). It defines input and output variables so that the Remote Data Blocks plugin knows how to interact with it.
 
-## HttpQueryContext
+## HttpQuery
 
-Most HTTP-powered APIs can be queried by defining a class that extends `HttpQueryContext`. Here's an example of a query for US ZIP code data:
-
-```php
-class GetZipCodeQuery extends HttpQueryContext {
-	public function get_input_schema(): array {
-		return [
-			'zip_code' => [
-				'name' => 'Zip Code',
-				'type' => 'string',
-			],
-		];
-	}
-
-	public function get_output_schema(): array {
-		return [
-			'is_collection' => false,
-			'mappings'      => [
-				'zip_code' => [
-					'name' => 'Zip Code',
-					'path' => '$["post code"]',
-					'type' => 'string',
-				],
-				'city'     => [
-					'name' => 'City',
-					'path' => '$.places[0]["place name"]',
-					'type' => 'string',
-				],
-				'state'    => [
-					'name' => 'State',
-					'path' => '$.places[0].state',
-					'type' => 'string',
-				],
-			],
-		];
-	}
-
-	public function get_endpoint( $input_variables ): string {
-		return $this->get_data_source()->get_endpoint() . $input_variables['zip_code'];
-	}
-}
-```
-
-The `get_input_schema` method defines the input data expected by the query. For some queries, input variables might be used to construct a request body, but in this case the `zip_code` input variable is used to customize the query endpoint via the `get_endpoint()` method.
-
-The `get_output_schema` method defines how to extract data from the API response. The `path` property uses [JSONPath](https://jsonpath.com/) expressions to allow concise, no-code references to nested data.
-
-This example features a snall subset of the customization available for a query; see the full documentation below for details.
-
-## HttpQueryContext documentation
-
-### VERSION
-
-The `VERSION` constant defines the current semver of `HttpQueryContext`. It is currently ignored but in the future may be used to navigate breaking changes.
-
-### get_input_schema(): array
-
-The `get_input_schema` method defines the input data expected by the query. The method should return an associative array of input variable definitions. The keys of the array are machine-friendly input variable names and the values are associative arrays with the following structure:
-
-- `name` (optional): The human-friendly display name of the input variable
-- `default_value` (optional): The default value for the input variable.
-- `overrides` (optional): An array of possible [overrides](overrides.md) for the input variable. Each override is an associative array with the following keys:
-  - `type`: The type of the override. Supported values are `query_var` and `url`.
-  - `target`: The targeted entity for the override (e.g., the query or URL variable that contains the overridde).
-- `type` (required): The type of the input variable. Supported types are:
-  - `base64`
-  - `boolean`
-  - `button_url`
-  - `image_alt`
-  - `image_url`
-  - `number`
-  - `currency`
-  - `string`
-
-#### Example
+Most HTTP-powered APIs can be queried using an `HttpQuery`. Here's an example of a query for US ZIP code data:
 
 ```php
-public function get_input_schema(): array {
-	return [
+$data_source = HttpDataSource::from_array( [
+	'service_config' => [
+		'__version' => 1,
+		'display_name' => 'Zip Code API',
+		'endpoint' => 'https://api.zippopotam.us/us/',
+	],
+] );
+
+$query = HttpQuery::from_array( [
+	'display_name' => 'Get location by Zip code',
+	'data_source' => $data_source,
+	'endpoint' => function( array $input_variables ) use ( $data_source ): string {
+		return $data_source->get_endpoint() . $input_variables['zip_code'];
+	},
+	'input_schema' => [
 		'zip_code' => [
 			'name' => 'Zip Code',
 			'type' => 'string',
 		],
-	];
-}
-```
-
-The default implementation returns an empty array.
-
-### get_output_schema(): array
-
-The `get_output_schema` method defines how to extract data from the API response. The method should return an associative array with the following structure:
-
-- `is_collection` (optional, default `false`): A boolean indicating whether the response data is a collection. If false, only a single item will be returned.
-- `mappings` (required): An associative array of output variable definitions. The keys of the array are machine-friendly output variable names and the values are associative arrays with the following structure:
-  - `name` (optional): The human-friendly display name of the output variable.
-  - `default_value` (optional): The default value for the output variable.
-  - `path` (required): A [JSONPath](https://jsonpath.com/) expression to extract the variable value.
-  - `type` (required): The type of the output variable. Supported types are `string`, `number`, and `boolean`.
-
-#### Example
-
-```php
-public function get_output_schema(): array {
-	return [
+	],
+	'output_schema' => [
 		'is_collection' => false,
-		'mappings'      => [
+		'type' => [
 			'zip_code' => [
 				'name' => 'Zip Code',
 				'path' => '$["post code"]',
@@ -126,67 +46,166 @@ public function get_output_schema(): array {
 				'type' => 'string',
 			],
 		],
-	];
-}
+	],
+] );
 ```
 
-The default implementation returns an empty array.
+- The `endpoint` property is a callback function that constructs the query endpoint. In this case, the endpoint is constructed by appending the `zip_code` input variable to the data source endpoint.
+- The `input_schema` property defines the input variables expected by the query. For some queries, input variables might be used to construct a request body, but in this case the `zip_code` input variable is used to customize the query endpoint via the `endpoint` callback function.
+- The `output_schema` property defines the output data that will be extracted from the API response. The `path` property uses [JSONPath](https://jsonpath.com/) expressions to allow concise, no-code references to nested data.
 
-### get_data_source(): DataSourceInterface
+This example features a small subset of the customization available for a query; see the full documentation below for details.
 
-The `get_data_source` method returns the data source associated with the query. By default, this method returns the data source that was provided to the class constructor. In most instances, you should not need to override this method.
+## HttpQuery configuration
 
-### get_endpoint( array $input_variables ): string
+### display_name: string (required)
 
-By default, the `get_endpoint` method proxies to the `get_endpoint` method of query's data source. Override this method to set a custom endpoint for the query—for example, to construct the endpoints using an input variable. The input variables for the current request are provided as an associative array (`[ $var_name => $value ]`).
+The `display_name` property defines the human-friendly name of the query.
+
+### data_source: HttpDataSourceInterface (required)
+
+The `data_source` property provides the [data source](./data-source.md) used by the query.
+
+### endpoint: string|callable
+
+The `endpoint` property defines the query endpoint. It can be a string or a callable function that constructs the endpoint. The callable function accepts an associative array of input variables (`[ $var_name => $value ]`). If omitted, the query will use the endpoint defined by the data source.
 
 #### Example
 
 ```php
-public function get_endpoint( $input_variables ): string {
-	return $this->get_data_source()->get_endpoint() . $input_variables['zip_code'];
-}
+'endpoint' => function( array $input_variables ) use ( $data_source ): string {
+	return $data_source->get_endpoint() . $input_variables['zip_code'];
+},
 ```
 
-### get_image_url(): string|null
+### input_schema: array
 
-By default, the `get_image_url` method proxies to the `get_image_url` method of the query's data source. Override this method to provide an image URL that will represent the query in the UI.
+The `input_schema` property defines the input variables expected by the query. The method should return an associative array of input variable definitions. The keys of the array are machine-friendly input variable names and the values are associative arrays with the following structure:
 
-### get_request_method(): string
+- `name` (optional): The human-friendly display name of the input variable
+- `default_value` (optional): The default value for the input variable.
+- `type` (required): The primitive type of the input variable. Supported types are:
+  - `boolean`
+  - `id`
+  - `integer`
+  - `null`
+  - `number`
+  - `string`
 
-By default, `get_request_method` returns `'GET'`. Override this method if your query uses a different HTTP request method.
+#### Example
 
-### get_request_headers( array $input_variables ): array
+```php
+'input_schema' => [
+	'zip_code' => [
+		'name' => 'Zip Code',
+		'type' => 'string',
+	],
+],
+```
 
-By default, the `get_request_headers` method proxies to the `get_request_headers` method of the query's data source. Override this method to provide custom request headers for the query. The input variables for the current request are provided as an associative array (`[ $var_name => $value ]`).
+If omitted, it defaults to an empty array.
+
+### output_schema: array (required)
+
+The `output_schema` property defines how to extract data from the API response. The method should return an associative array with the following structure:
+
+- `format` (optional): A callable function that formats the output variable value.
+- `generate` (optional): A callable function that generates or extracts the output variable value from the response, as an alternative to `path`.
+- `is_collection` (optional, default `false`): A boolean indicating whether the response data is a collection. If false, only a single item will be returned.
+- `name` (optional): The human-friendly display name of the output variable.
+- `default_value` (optional): The default value for the output variable.
+- `path` (optional): A [JSONPath](https://jsonpath.com/) expression to extract the variable value.
+- `type` (required): A primitive type (e.g., `string`, `boolean`) or a nested output schema. Accepted primitive types are:
+  - `boolean`
+  - `button_url`
+  - `email_address`
+  - `html`
+  - `id`
+  - `image_alt`
+  - `image_url`
+  - `integer`
+  - `markdown`
+  - `null`
+  - `number`
+  - `string`
+  - `url`
+  - `uuid`
+
+#### Example
+
+```php
+'output_schema' => [
+	'is_collection' => false,
+	'type' => [
+		'zip_code' => [
+			'name' => 'Zip Code',
+			'path' => '$["post code"]',
+			'type' => 'string',
+		],
+		'city_state' => [
+			'name' => 'City, State',
+			'default_value' => 'Unknown',
+			'generate' => function( array $response_data ): string {
+				return $response_data[0]['place name'] . ', ' . $response_data[0]['state'];
+			},
+			'type' => 'string',
+		],
+	],
+],
+```
+
+### request_method: string
+
+The `request_method` property defines the HTTP request method used by the query. By default, it is `'GET'`.
+
+### request_headers: array|callable
+
+The `request_headers` property defines the request headers for the query. It can be an associative array or a callable function that returns an associative array. The callable function accepts an associative array of input variables (`[ $var_name => $value ]`). If omitted, the query will use the request headers defined by the data source.
 
 ### Example
 
 ```php
-public function get_request_headers( array $input_variables ): array|WP_Error {
+'request_headers' => function( array $input_variables ) use ( $data_source ): array {
 	return array_merge(
-		$this->get_data_source()->get_request_headers(),
-		[ 'X-Product-ID' => $input_variables['product_id'] ]
+		$data_source->get_request_headers(),
+		[ 'X-Foo' => $input_variables['foo'] ]
 	);
-}
+},
 ```
 
-### get_request_body( array $input_variables ): array|null
+### request_body: array|callable
 
-Override this method to define a request body for this query. The return value will be converted to JSON using `wp_json_encode`. The input variables for the current request are provided as an associative array (`[ $var_name => $value ]`).
+The `request_body` property defines the request body for the query. It can be an associative array or a callable function that returns an associative array. The callable function accepts an associative array of input variables (`[ $var_name => $value ]`). If omitted, the query will not have a request body.
 
-### get_query_name(): string
+### cache_ttl: int|null|callable
 
-Override this method to specify a name that represents the query in UI.
+The `cache_ttl` property defines how long the query response should be cached, in seconds. It can be an integer, a callable function that returns an integer, or `null`. The callable function accepts an associative array of input variables (`[ $var_name => $value ]`).
 
-### get_query_runner(): QueryRunnerInterface
+A value of `-1` indicates the query should not be cached. A value of `null` indicates the default TTL should be used (60 seconds). If omitted, the default TTL is used.
 
-Override this method to specify a custom [query runner](query-runner.md) for this query. The default query runner works well with most HTTP-powered APIs.
+Remote data blocks utilize the WordPress object cache (`wp_cache_get()` / `wp_cache_set()`) for response caching. Ensure a persistent object cache plugin is provided by your platform or installed for this value to be respected.
 
-### process_response( string $raw_response_data, array $input_variables ): string|array|object|null
+### image_url: string|null
 
-The default query runner assumes a JSON response and decodes it. If you need to implement custom deserialization or want to process the response in some way before the output variables are extracted, override this method. The mappings and JSONPath expressions defined by `get_output_schema` will be applied to the return value of this method.
+The `image_url` property defines an image URL that represents the query in the UI. If omitted, the query will use the image URL defined by the data source.
 
-## QueryContextInterface
+### preprocess_response: callable
 
-The `QueryContextInterface` interface defines the methods that must be implemented by a query class. If you have highly custom requirements that cannot be met by `HttpQueryContext`, you can implement `QueryContextInterface` directly.
+If you need to prerocess the response in some way before the output variables are extracted, provide a `preprocess_response` function. The function will receive the deserialized response.
+
+#### Example
+
+```php
+'preprocess_response' => function( mixed $response_data, array $input_variables ): array {
+	$some_computed_property = compute_property( $response_data['foo']['bar'] ?? '' );
+
+	return array_merge(
+		$response_data,
+		[ 'computed_property' => $some_computed_property ]
+	);
+},
+```
+
+### query_runner: QueryRunnerInterface
+
+Use the `query_runner` property to provide a custom [query runner](./query-runner.md) for the query. If omitted, the query will use the default query runner, which works well with most HTTP-powered APIs.

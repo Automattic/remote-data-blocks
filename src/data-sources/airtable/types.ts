@@ -1,5 +1,3 @@
-import { StringIdName } from '@/types/common';
-
 export interface AirtableBase {
 	id: string;
 	name: string;
@@ -14,14 +12,6 @@ export interface AirtableBasesResult {
 export interface AirtableBaseSchema {
 	tables: AirtableTable[];
 }
-
-export type AirtableFormState = {
-	access_token: string;
-	base: StringIdName | null;
-	display_name: string;
-	table: StringIdName | null;
-	table_fields: Set< string >;
-};
 
 export interface AirtableTable {
 	id: string;

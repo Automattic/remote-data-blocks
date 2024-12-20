@@ -28,11 +28,17 @@ export const getAirtableOutputQueryMappingValue = (
 	}
 
 	switch ( field.type ) {
+		case 'richText':
+			return { ...baseField, type: 'markdown' };
+
 		case 'currency':
 			return {
 				...baseField,
-				type: 'currency',
-				prefix: field.options?.symbol,
+				type: 'currency_in_current_locale',
+				// Symbol is not enough information for proper currency formatting that
+				// respects the user's locale. We will table proper formatting until
+				// we understand use cases better.
+				// prefix: field.options?.symbol,
 			};
 
 		case 'checkbox':
