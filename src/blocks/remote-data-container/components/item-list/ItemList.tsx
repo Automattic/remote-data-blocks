@@ -1,5 +1,5 @@
 import { useInstanceId } from '@wordpress/compose';
-import { DataViews, filterSortAndPaginate, Operator, View } from '@wordpress/dataviews/wp';
+import { DataViews, filterSortAndPaginate, View } from '@wordpress/dataviews/wp';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -35,85 +35,87 @@ export function ItemList( props: ItemListProps ) {
 	}, [ results ] );
 
 	// get fields from results data to use as columns
-	const tableFields = useMemo( () => Array.from( new Set( results?.flatMap( Object.keys ) ) ), [] );
+	const { fields, mediaField, tableFields, titleField } = useMemo( () => {
+		const getFields: string[] = Array.from(
+			new Set(
+				data
+					?.flatMap( item => Object.keys( item ) )
+					.filter( ( key: string ) => ! /(^|_)(id)$/i.test( key ) ) // Filters out keys containing 'id' or similar patterns
+			)
+		);
 
-	// generic search for title
-	const titleField =
-		tableFields.find(
-			field => field.toLowerCase().includes( 'title' ) || field.toLowerCase().includes( 'name' )
-		) || '';
+		// generic search for title
+		const title: string =
+			getFields.find(
+				( field: string ) =>
+					field.toLowerCase().includes( 'title' ) || field.toLowerCase().includes( 'name' )
+			) || '';
 
-	// generic search for media
-	const mediaField =
-		tableFields.find(
-			field => field.toLowerCase().includes( 'url' ) || field.toLowerCase().includes( 'image' )
-		) || '';
+		// generic search for media
+		const media: string =
+			getFields.find(
+				( field: string ) =>
+					field.toLowerCase().includes( 'url' ) || field.toLowerCase().includes( 'image' )
+			) || '';
+
+		const fieldObject: {
+			id: string;
+			label: string;
+			enableGlobalSearch: boolean;
+			render?: ( { item }: { item: RemoteData[ 'results' ][ 0 ] } ) => JSX.Element;
+			enableSorting: boolean;
+		}[] = getFields.map( field => {
+			return {
+				id: field,
+				label: field ?? '',
+				enableGlobalSearch: true,
+				render:
+					field === media
+						? ( { item }: { item: RemoteData[ 'results' ][ 0 ] } ) => {
+								return (
+									<img
+										// temporary until we pull in more data
+										alt=""
+										src={ item[ field ] as string }
+									/>
+								);
+						  }
+						: undefined,
+				enableSorting: field !== media,
+			};
+		} );
+
+		return { fields: fieldObject, tableFields: getFields, titleField: title, mediaField: media };
+	}, [ data ] );
 
 	const [ view, setView ] = useState< View >( {
 		type: 'table' as const,
 		perPage: 8,
 		page: 1,
 		search: '',
-		fields: tableFields.filter(
-			field => field !== mediaField && field !== titleField && ! /(^|_)(id)$/i.test( field )
-		),
+		fields: [],
 		filters: [],
 		layout: {},
 		titleField,
 		mediaField,
 	} );
 
-	const fields = tableFields.map( field => {
-		// merge duplicate fields for filters
-		const mergedDuplicateFields = Array.from(
-			new Set(
-				results
-					?.map( result => result[ field ] )
-					.filter( value => value !== '' && value !== undefined )
-			)
-		);
+	const defaultLayouts = mediaField
+		? {
+				table: {},
+				grid: {},
+		  }
+		: { table: {} };
 
-		return {
-			id: field,
-			label: field ?? '',
-			enableGlobalSearch: true,
-			elements: mergedDuplicateFields.map( value => ( {
-				label: value ?? '',
-				value: value ?? '',
-			} ) ),
-			render:
-				field === mediaField
-					? ( { item }: { item: Record< string, string > } ) => {
-							return (
-								<img
-									alt={
-										Object.prototype.hasOwnProperty.call( item, titleField )
-											? item[ titleField ]
-											: ''
-									}
-									src={
-										typeof item[ field ] === 'string' &&
-										/^(https?|data:image\/)/.test( item[ field ] ) &&
-										( item[ field ].startsWith( 'http' ) ||
-											item[ field ].startsWith( 'data:image/' ) )
-											? item[ field ]
-											: ''
-									}
-								/>
-							);
-					  }
-					: undefined,
-			enableSorting: field !== mediaField,
-			filterBy: {
-				operators: [ 'isAny', 'isNone', 'isAll', 'isNotAll' ] as Operator[],
-			},
-		};
-	} );
-
-	const defaultLayouts = {
-		table: {},
-		grid: {},
-	};
+	// this prevents just an empty table rendering
+	useEffect( () => {
+		if ( tableFields.length > 0 ) {
+			setView( prevView => ( {
+				...prevView,
+				fields: tableFields.filter( field => field !== mediaField ),
+			} ) );
+		}
+	}, [ mediaField, tableFields ] );
 
 	useEffect( () => {
 		if ( view.search !== searchTerms ) {
@@ -145,7 +147,7 @@ export function ItemList( props: ItemListProps ) {
 			defaultLayouts={ defaultLayouts }
 			fields={ fields }
 			getItemId={ ( item: { id?: string } ) => item.id || '' }
-			isLoading={ loading || ! pattern }
+			isLoading={ loading || ! pattern || ! results || results.length === 0 }
 			isItemClickable={ () => true }
 			onClickItem={ item => onSelect( item ) }
 			onChangeView={ setView }
