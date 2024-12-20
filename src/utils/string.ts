@@ -52,3 +52,13 @@ export function safeParseJSON< T = unknown >( value: unknown ): T | null {
 
 	return null;
 }
+
+/**
+ * Checks if a string is a positive integer value.
+ *
+ * @param value string to check
+ * @returns true if the string is a positive integer value, false otherwise
+ */
+export function isPositiveIntegerString( value: string ): boolean {
+	return /^\d+$/.test( value ) && parseInt( value, 10 ) > 0;
+}

@@ -1,7 +1,6 @@
 import { TextareaControl, SelectControl } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { ChangeEvent } from 'react';
 
 import { DataSourceForm } from '../components/DataSourceForm';
 import { getConnectionMessage } from '../utils';
@@ -19,8 +18,8 @@ import {
 } from '@/data-sources/types';
 import { useForm, ValidationRules } from '@/hooks/useForm';
 import { GoogleSheetsIcon, GoogleSheetsIconWithText } from '@/settings/icons/GoogleSheetsIcon';
-import { StringIdName } from '@/types/common';
 import { SelectOption } from '@/types/input';
+import { isPositiveIntegerString } from '@/utils/string';
 
 const SERVICE_CONFIG_VERSION = 1;
 
@@ -94,27 +93,20 @@ export const GoogleSheetsSettings = ( {
 	};
 
 	const onCredentialsChange = ( nextValue: string ) => {
-		handleOnChange( 'credentials', nextValue );
+		handleOnChange( 'credentials', JSON.parse( nextValue ) );
 	};
 
-	const onSelectChange = (
-		value: string,
-		extra?: { event?: ChangeEvent< HTMLSelectElement > }
-	) => {
-		if ( extra?.event ) {
-			const { id } = extra.event.target;
-			let newValue: StringIdName | null = null;
-			if ( id === 'spreadsheet' ) {
-				const selectedSpreadsheet = spreadsheets?.find(
-					spreadsheet => spreadsheet.value === value
-				);
-				newValue = { id: value, name: selectedSpreadsheet?.label ?? '' };
-			} else if ( id === 'sheet' ) {
-				const selectedSheet = sheets?.find( sheet => sheet.value === value );
-				newValue = { id: value, name: selectedSheet?.label ?? '' };
-			}
-			handleOnChange( id, newValue );
+	const onSheetChange = ( value: string ) => {
+		if ( isPositiveIntegerString( value ) ) {
+			const parsedValue = parseInt( value, 10 );
+			const selectedSheet = sheets?.find( sheet => sheet.value === value );
+			handleOnChange( 'sheet', { id: parsedValue, name: selectedSheet?.label ?? '' } );
 		}
+	};
+
+	const onSpreadsheetChange = ( value: string ) => {
+		const selectedSpreadsheet = spreadsheets?.find( spreadsheet => spreadsheet.value === value );
+		handleOnChange( 'spreadsheet', { id: value, name: selectedSpreadsheet?.label ?? '' } );
 	};
 
 	const credentialsHelpText = useMemo( () => {
@@ -221,7 +213,7 @@ export const GoogleSheetsSettings = ( {
 			>
 				<TextareaControl
 					label={ __( 'Credentials', 'remote-data-blocks' ) }
-					value={ state.credentials ? JSON.stringify( state.credentials ) : '' }
+					value={ state.credentials ? JSON.stringify( state.credentials, null, 2 ) : '' }
 					onChange={ onCredentialsChange }
 					help={ credentialsHelpText }
 					rows={ 10 }
@@ -234,7 +226,7 @@ export const GoogleSheetsSettings = ( {
 					id="spreadsheet"
 					label={ __( 'Spreadsheet', 'remote-data-blocks' ) }
 					value={ state.spreadsheet?.id ?? '' }
-					onChange={ onSelectChange }
+					onChange={ onSpreadsheetChange }
 					options={ spreadsheetOptions }
 					help={ spreadsheetHelpText }
 					disabled={ fetchingToken || ! spreadsheets?.length }
@@ -246,7 +238,7 @@ export const GoogleSheetsSettings = ( {
 					id="sheet"
 					label={ __( 'Sheet', 'remote-data-blocks' ) }
 					value={ state.sheet?.id.toString() ?? '' }
-					onChange={ onSelectChange }
+					onChange={ onSheetChange }
 					options={ sheetOptions }
 					help={ sheetHelpText }
 					disabled={ fetchingToken || ! sheets?.length }
