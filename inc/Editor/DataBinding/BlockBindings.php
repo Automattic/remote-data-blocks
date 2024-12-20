@@ -185,16 +185,18 @@ class BlockBindings {
 		}
 	}
 
-	public static function get_value( array $source_args, WP_Block|array $block ): string {
+	public static function get_value( array $source_args, WP_Block|array $block ): ?string {
 		// We may be passed a block instance (by core block bindings) or a block
 		// array (by our hooks into the Block Data API).
 		if ( $block instanceof WP_Block ) {
-			$fallback_content = $block->attributes['content'] ?? '';
 			$block_context = $block->context[ self::$context_name ] ?? [];
+			$block_attributes = $block->attributes;
 		} else {
-			$fallback_content = $block['attributes']['content'] ?? '';
 			$block_context = $block['context'][ self::$context_name ] ?? [];
+			$block_attributes = $block['attributes'];
 		}
+
+		$fallback_content = self::get_block_fallback_content( $source_args, $block_context, $block_attributes );
 
 		// Fallback to the content if we don't have the expected context.
 		if ( ! isset( $block_context['blockName'] ) || ! isset( $block_context['queryInput'] ) ) {
@@ -210,6 +212,29 @@ class BlockBindings {
 		}
 
 		return $value;
+	}
+
+	private static function get_block_fallback_content( array $source_args, array $block_context, array $block_attributes ): ?string {
+		// Returning null from get_value() cancels the binding and allows the default saved content to show.
+		$fallback_content = null;
+
+		$source_field = $source_args['field'] ?? null;
+		if ( null === $source_field ) {
+			return $fallback_content;
+		}
+
+		$result_index = $source_args['index'] ?? 0;
+		$result = $block_context['results'][ $result_index ] ?? null;
+
+		if ( isset( $result[ $source_field ] ) ) {
+			$fallback_content = $result[ $source_field ];
+		}
+
+		if ( '' === $fallback_content ) {
+			$fallback_content = $block_attributes['content'] ?? null;
+		}
+
+		return $fallback_content;
 	}
 
 	public static function get_remote_value( array $block_context, array $source_args ): string|null {
@@ -256,9 +281,16 @@ class BlockBindings {
 		$loop_template_content = $block->parsed_block['innerContent'];
 		$query_results = self::execute_query( $block_context, 'loop' );
 
-		if ( ! isset( $query_results['results'] ) ) {
+		if ( isset( $query_results['results'] ) ) {
+			$results = $query_results['results'];
+		} else {
 			self::log_error( 'Cannot load results for data loop', $block->name, 'loop' );
-			return $content;
+
+			if ( isset( $block_context['results'] ) ) {
+				$results = $block_context['results'];
+			} else {
+				return $content;
+			}
 		}
 
 		$block->parsed_block['innerBlocks'] = [];
@@ -267,7 +299,7 @@ class BlockBindings {
 		// Loop through the query results and make a copy of the template for each
 		// result, updating the bindings with the result index. This will be used
 		// by the binding source to render the correct result.
-		foreach ( array_keys( $query_results['results'] ) as $index ) {
+		foreach ( array_keys( $results ) as $index ) {
 
 			// Loop over the inner blocks of the template and update the bindings to
 			// include the current index.
