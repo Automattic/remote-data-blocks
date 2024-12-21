@@ -4,20 +4,25 @@ namespace RemoteDataBlocks\Tests\Config;
 
 use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\Tests\Mocks\MockDataSource;
-use RemoteDataBlocks\Tests\Mocks\MockValidator;
 
 class HttpDataSourceTest extends TestCase {
 	private MockDataSource $http_data_source;
 
-	public function testGetServiceMethodReturnsNull(): void {
-		$this->http_data_source = MockDataSource::from_array( [], new MockValidator() );
+	public function testGetServiceMethodCannotBeOverriddenl(): void {
+		$config = [
+			'service' => 'mock',
+			'service_config' => [
+				'endpoint' => 'http://example.com',
+			],
+		];
+		$this->http_data_source = MockDataSource::from_array( $config );
 
-		$this->assertNull( $this->http_data_source->get_service() );
+		$this->assertSame( 'generic-http', $this->http_data_source->get_service_name() );
 	}
 
 	public function testGetServiceMethodReturnsCorrectValue(): void {
-		$this->http_data_source = MockDataSource::from_array( MockDataSource::MOCK_CONFIG, new MockValidator() );
+		$this->http_data_source = MockDataSource::from_array();
 
-		$this->assertEquals( 'mock', $this->http_data_source->get_service() );
+		$this->assertEquals( 'generic-http', $this->http_data_source->get_service_name() );
 	}
 }

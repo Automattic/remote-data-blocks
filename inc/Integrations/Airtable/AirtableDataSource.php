@@ -3,116 +3,52 @@
 namespace RemoteDataBlocks\Integrations\Airtable;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use RemoteDataBlocks\Config\Query\HttpQuery;
+use RemoteDataBlocks\Validation\Types;
+use WP_Error;
 
 class AirtableDataSource extends HttpDataSource {
+	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE;
 	protected const SERVICE_SCHEMA_VERSION = 1;
 
-	protected const SERVICE_SCHEMA = [
-		'type' => 'object',
-		'properties' => [
-			'service' => [
-				'type' => 'string',
-				'const' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
-			],
-			'service_schema_version' => [
-				'type' => 'integer',
-				'const' => self::SERVICE_SCHEMA_VERSION,
-			],
-			'access_token' => [ 'type' => 'string' ],
-			'base' => [
-				'type' => 'object',
-				'properties' => [
-					'id' => [ 'type' => 'string' ],
-					'name' => [
-						'type' => 'string',
-						'required' => false,
-					],
-				],
-			],
-			'tables' => [
-				'type' => 'array',
-				'items' => [
-					'type' => 'object',
-					'properties' => [
-						'id' => [ 'type' => 'string' ],
-						'name' => [
-							'type' => 'string',
-							'required' => false,
-						],
-						'output_query_mappings' => [
-							'type' => 'array',
-							'items' => [
-								'type' => 'object',
-								'properties' => [
-									'key' => [ 'type' => 'string' ],
-									'name' => [
-										'type' => 'string',
-										'required' => false,
-									],
-									'type' => [
-										'type' => 'string',
-										'required' => false,
-									],
-									'path' => [
-										'type' => 'string',
-										'required' => false,
-									],
-									'prefix' => [
-										'type' => 'string',
-										'required' => false,
-									],
-								],
-							],
-						],
-					],
-				],
-			],
-			'display_name' => [
-				'type' => 'string',
-				'required' => true,
-			],
-		],
-	];
-
-	public function get_display_name(): string {
-		return sprintf( 'Airtable (%s)', $this->config['display_name'] ?? $this->config['base']['name'] );
+	protected static function get_service_config_schema(): array {
+		return Types::object( [
+			'__version' => Types::integer(),
+			'access_token' => Types::string(),
+			'base' => Types::object( [
+				'id' => Types::string(),
+				'name' => Types::nullable( Types::string() ),
+			] ),
+			'display_name' => Types::string(),
+			'tables' => Types::list_of(
+				Types::object( [
+					'id' => Types::id(),
+					'name' => Types::nullable( Types::string() ),
+					'output_query_mappings' => Types::list_of(
+						Types::object( [
+							'key' => Types::string(),
+							'name' => Types::nullable( Types::string() ),
+							'path' => Types::nullable( Types::json_path() ),
+							'type' => Types::nullable( Types::string() ),
+						] )
+					),
+				] )
+			),
+		] );
 	}
 
-	public function get_endpoint(): string {
-		return 'https://api.airtable.com/v0/' . $this->config['base']['id'];
-	}
-
-	public function get_request_headers(): array {
+	protected static function map_service_config( array $service_config ): array {
 		return [
-			'Authorization' => sprintf( 'Bearer %s', $this->config['access_token'] ),
-			'Content-Type' => 'application/json',
+			'display_name' => $service_config['display_name'],
+			'endpoint' => sprintf( 'https://api.airtable.com/v0/%s', $service_config['base']['id'] ),
+			'request_headers' => [
+				'Authorization' => sprintf( 'Bearer %s', $service_config['access_token'] ),
+				'Content-Type' => 'application/json',
+			],
 		];
 	}
 
-	public static function create( string $access_token, string $base_id, ?array $tables = [], ?string $display_name = null ): self {
-		return parent::from_array([
-			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
-			'access_token' => $access_token,
-			'base' => [ 'id' => $base_id ],
-			'tables' => $tables,
-			'display_name' => $display_name,
-		]);
-	}
-
-	public function to_ui_display(): array {
-		return [
-			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
-			'base' => [
-				'id' => $this->config['base']['id'],
-				'name' => $this->config['base']['name'] ?? null,
-			],
-			'tables' => $this->config['tables'] ?? [],
-			'uuid' => $this->config['uuid'] ?? null,
-			'display_name' => $this->config['display_name'] ?? null,
-		];
-	}
-
-	public function ___temp_get_query(): AirtableGetItemQuery|\WP_Error {
+	public function ___temp_get_query(): HttpQuery|WP_Error {
 		$input_schema = [
 			'record_id' => [
 				'name' => 'Record ID',
@@ -122,7 +58,7 @@ class AirtableDataSource extends HttpDataSource {
 
 		$output_schema = [
 			'is_collection' => false,
-			'mappings' => [
+			'type' => [
 				'id' => [
 					'name' => 'Record ID',
 					'path' => '$.id',
@@ -131,31 +67,30 @@ class AirtableDataSource extends HttpDataSource {
 			],
 		];
 
-		foreach ( $this->config['tables'][0]['output_query_mappings'] as $mapping ) {
+		foreach ( $this->config['service_config']['tables'][0]['output_query_mappings'] as $mapping ) {
 			$mapping_key = $mapping['key'];
-			$output_schema['mappings'][ $mapping_key ] = [
+			$output_schema['type'][ $mapping_key ] = [
 				'name' => $mapping['name'] ?? $mapping_key,
 				'path' => $mapping['path'] ?? '$.fields["' . $mapping_key . '"]',
 				'type' => $mapping['type'] ?? 'string',
 			];
-
-			if ( 'currency' === $mapping['type'] && isset( $mapping['prefix'] ) ) {
-				$output_schema['mappings'][ $mapping_key ]['prefix'] = $mapping['prefix'];
-			}
 		}
 
-		return AirtableGetItemQuery::from_array([
+		return HttpQuery::from_array( [
 			'data_source' => $this,
+			'endpoint' => function ( array $input_variables ): string {
+				return $this->get_endpoint() . '/' . $this->config['service_config']['tables'][0]['id'] . '/' . $input_variables['record_id'];
+			},
 			'input_schema' => $input_schema,
 			'output_schema' => $output_schema,
-		]);
+		] );
 	}
 
-	public function ___temp_get_list_query(): AirtableListItemsQuery|\WP_Error {
+	public function ___temp_get_list_query(): HttpQuery|WP_Error {
 		$output_schema = [
-			'root_path' => '$.records[*]',
 			'is_collection' => true,
-			'mappings' => [
+			'path' => '$.records[*]',
+			'type' => [
 				'record_id' => [
 					'name' => 'Record ID',
 					'path' => '$.id',
@@ -164,19 +99,19 @@ class AirtableDataSource extends HttpDataSource {
 			],
 		];
 
-		foreach ( $this->config['tables'][0]['output_query_mappings'] as $mapping ) {
-			$output_schema['mappings'][ $mapping['name'] ] = [
+		foreach ( $this->config['service_config']['tables'][0]['output_query_mappings'] as $mapping ) {
+			$output_schema['type'][ $mapping['name'] ] = [
 				'name' => $mapping['name'],
 				'path' => '$.fields.' . $mapping['name'],
 				'type' => $mapping['type'] ?? 'string',
 			];
 		}
 
-		return AirtableListItemsQuery::from_array([
+		return HttpQuery::from_array( [
 			'data_source' => $this,
+			'endpoint' => $this->get_endpoint() . '/' . $this->config['service_config']['tables'][0]['id'],
 			'input_schema' => [],
 			'output_schema' => $output_schema,
-			'query_name' => $this->config['tables'][0]['name'],
-		]);
+		] );
 	}
 }

@@ -10,8 +10,8 @@ interface RemoteDataResultFields {
 
 interface QueryInputOverride {
 	display: string;
-	target: string;
-	type: 'query_var' | 'url';
+	source: string;
+	sourceType: 'query_var';
 }
 
 interface RemoteData {
@@ -71,7 +71,6 @@ interface RemoteDataApiRequest {
 }
 
 interface RemoteDataApiResult {
-	output: Record< string, string >;
 	result: Record< string, RemoteDataResultFields >;
 }
 

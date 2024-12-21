@@ -6,9 +6,9 @@ use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use RemoteDataBlocks\Analytics\TracksAnalytics;
 use RemoteDataBlocks\Analytics\EnvironmentConfig;
-use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
+use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
-use RemoteDataBlocks\ExampleApi\Queries\ExampleApiDataSource;
 use RemoteDataBlocks\Integrations\Shopify\ShopifyDataSource;
 
 // Define a mock class for Tracks.
@@ -133,7 +133,7 @@ class TracksAnalyticsTest extends TestCase {
 		/** @var MockObject|EnvironmentConfig */
 		$env_config_mock = $this->getMockBuilder( EnvironmentConfig::class )->onlyMethods( [ 'is_remote_data_blocks_plugin' ] )->getMock();
 		$env_config_mock->method( 'is_remote_data_blocks_plugin' )->with()->willReturn( true );
-	
+
 		/** @var MockTracks|MockObject */
 		$tracks_mock = $this->getMockBuilder( MockTracks::class )->onlyMethods( [ 'record_event' ] )->getMock();
 		$tracks_mock->expects( $this->exactly( 1 ) )->method( 'record_event' )->with( 'remotedatablocks_plugin_toggle', $this->isType( 'array' ) );
@@ -161,11 +161,11 @@ class TracksAnalyticsTest extends TestCase {
 			/** @var MockObject|EnvironmentConfig */
 			$env_config_mock = $this->getMockBuilder( EnvironmentConfig::class )->onlyMethods( [ 'should_track_post_having_remote_data_blocks' ] )->getMock();
 			$env_config_mock->method( 'should_track_post_having_remote_data_blocks' )->with( 1 )->willReturn( true );
-	
+
 			/** @var MockTracks|MockObject */
 			$tracks_mock = $this->getMockBuilder( MockTracks::class )->onlyMethods( [ 'record_event' ] )->getMock();
 			$tracks_mock->expects( $this->exactly( 0 ) )->method( 'record_event' );
-	
+
 			set_private_property( TracksAnalytics::class, null, 'instance', $tracks_mock );
 			TracksAnalytics::init( $env_config_mock );
 			TracksAnalytics::track_remote_data_blocks_usage( 1, (object) [ 'post_status' => 'draft' ] );
@@ -178,8 +178,15 @@ class TracksAnalyticsTest extends TestCase {
 
 		// Setup data sources.
 		ConfigStore::init();
-		ConfigStore::set_configuration( 'remote-data-blocks/shopify-vip-store', [
-			'queries' => [ new HttpQueryContext( ShopifyDataSource::create( 'access_token', 'name' ) ) ],
+		ConfigStore::set_block_configuration( 'remote-data-blocks/shopify-vip-store', [
+			'queries' => [
+				'display' => HttpQuery::from_array( [
+					'data_source' => ShopifyDataSource::from_array( [
+						'access_token' => 'token',
+						'store_name' => 'B. Walton',
+					] ),
+				] ),
+			],
 		] );
 
 		/** @var MockTracks|MockObject */
@@ -202,14 +209,34 @@ class TracksAnalyticsTest extends TestCase {
 
 		// Setup data sources.
 		ConfigStore::init();
-		ConfigStore::set_configuration( 'remote-data-blocks/shopify-vip-store', [
-			'queries' => [ new HttpQueryContext( ShopifyDataSource::create( 'access_token', 'name' ) ) ],
-		] );
-		ConfigStore::set_configuration( 'remote-data-blocks/conference-event', [
+		ConfigStore::set_block_configuration( 'remote-data-blocks/shopify-vip-store', [
 			'queries' => [
-				new HttpQueryContext( ExampleApiDataSource::from_array( [
-					'service' => 'example_api',
-				] ) ),
+				'display' => HttpQuery::from_array( [
+					'data_source' => ShopifyDataSource::from_array( [
+						'service_config' => [
+							'__version' => 1,
+							'access_token' => 'token',
+							'display_name' => 'Shopify Source',
+							'store_name' => 'B. Walton',
+						],
+					] ),
+					'output_schema' => [ 'type' => 'string' ],
+				] ),
+			],
+		] );
+
+		ConfigStore::set_block_configuration( 'remote-data-blocks/conference-event', [
+			'queries' => [
+				'display' => HttpQuery::from_array( [
+					'data_source' => HttpDataSource::from_array( [
+						'service_config' => [
+							'__version' => 1,
+							'display_name' => 'HTTP Source',
+							'endpoint' => 'https://example.com/api/v1',
+						],
+					] ),
+					'output_schema' => [ 'type' => 'string' ],
+				] ),
 			],
 		] );
 
@@ -220,7 +247,7 @@ class TracksAnalyticsTest extends TestCase {
 			'post_type' => 'post',
 			'shopify_data_source_count' => 2,
 			'remote_data_blocks_total_count' => 3,
-			'example_api_data_source_count' => 1,
+			'generic-http_data_source_count' => 1,
 		] );
 
 		set_private_property( TracksAnalytics::class, null, 'instance', $tracks_mock );

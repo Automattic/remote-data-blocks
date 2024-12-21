@@ -2,10 +2,8 @@
 
 namespace RemoteDataBlocks\Config\DataSource;
 
-use RemoteDataBlocks\Config\ArraySerializableInterface;
-use RemoteDataBlocks\Config\UiDisplayableInterface;
-use RemoteDataBlocks\Sanitization\Sanitizer;
-use RemoteDataBlocks\Sanitization\SanitizerInterface;
+use RemoteDataBlocks\Config\ArraySerializable;
+use RemoteDataBlocks\Validation\ConfigSchemas;
 use RemoteDataBlocks\Validation\Validator;
 use RemoteDataBlocks\Validation\ValidatorInterface;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
@@ -16,55 +14,63 @@ use WP_Error;
  *
  * Implements the HttpDataSourceInterface to define a generic HTTP data source.
  */
-abstract class HttpDataSource implements DataSourceInterface, HttpDataSourceInterface, ArraySerializableInterface, UiDisplayableInterface {
-	protected const SERVICE_NAME = 'unknown';
-	protected const SERVICE_SCHEMA_VERSION = -1;
-	protected const SERVICE_SCHEMA = [];
+class HttpDataSource extends ArraySerializable implements HttpDataSourceInterface {
+	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE;
+	protected const SERVICE_SCHEMA_VERSION = 1;
 
-	final private function __construct( protected array $config ) {}
+	final public function get_display_name(): string {
+		return $this->config['display_name'];
+	}
 
-	abstract public function get_display_name(): string;
+	public function get_endpoint(): string {
+		return $this->config['endpoint'];
+	}
 
-	abstract public function get_endpoint(): string;
-
-	/**
-	 * @inheritDoc
-	 */
-	abstract public function get_request_headers(): array;
+	public function get_request_headers(): array|WP_Error {
+		return $this->get_or_call_from_config( 'request_headers' ) ?? [];
+	}
 
 	public function get_image_url(): ?string {
-		return null;
+		return $this->config['image_url'] ?? null;
 	}
 
-	/**
-	 * Get the service name.
-	 */
-	public function get_service(): ?string {
-		return $this->config['service'] ?? null;
-	}
-
-	public function get_uuid(): string {
-		return $this->config['uuid'];
+	final public function get_service_name(): string {
+		return static::SERVICE_NAME;
 	}
 
 	/**
 	 * @inheritDoc
+	 *
+	 * NOTE: This method uses late static bindings to allow child classes to
+	 * define their own validation schema.
 	 */
-	final public static function get_config_schema(): array {
-		$schema = DataSourceInterface::BASE_SCHEMA;
+	public static function from_array( array $config, ?ValidatorInterface $validator = null ): self|WP_Error {
+		$service_config = $config['service_config'] ?? [];
+		$validator = $validator ?? new Validator( static::get_service_config_schema() );
+		$validated = $validator->validate( $service_config );
 
-		if ( isset( static::SERVICE_SCHEMA['properties'] ) ) {
-			$schema['properties'] = array_merge( DataSourceInterface::BASE_SCHEMA['properties'], static::SERVICE_SCHEMA['properties'] );
+		if ( is_wp_error( $validated ) ) {
+			return $validated;
 		}
 
-		return $schema;
+		return parent::from_array(
+			array_merge(
+				static::map_service_config( $service_config ),
+				[
+					// Store the exact data used to create the instance to preserve determinism.
+					'service' => static::SERVICE_NAME,
+					'service_config' => $service_config,
+					'uuid' => $config['uuid'] ?? null,
+				]
+			)
+		);
 	}
 
 	public static function from_uuid( string $uuid ): DataSourceInterface|WP_Error {
-		$config = DataSourceCrud::get_by_uuid( $uuid );
+		$config = DataSourceCrud::get_config_by_uuid( $uuid );
 
-		if ( ! $config ) {
-			return new WP_Error( 'data_source_not_found', __( 'Data source not found.', 'remote-data-blocks' ), [ 'status' => 404 ] );
+		if ( is_wp_error( $config ) ) {
+			return $config;
 		}
 
 		return static::from_array( $config );
@@ -72,41 +78,33 @@ abstract class HttpDataSource implements DataSourceInterface, HttpDataSourceInte
 
 	/**
 	 * @inheritDoc
-	 * @psalm-suppress ParamNameMismatch reason: we want the clarity provided by the rename here
+	 *
+	 * TODO: Do we need to sanitize this to prevent leaking sensitive data?
 	 */
-	final public static function from_array( array $config, ?ValidatorInterface $validator = null, ?SanitizerInterface $sanitizer = null ): DataSourceInterface|WP_Error {
-		$config['service_schema_version'] = static::SERVICE_SCHEMA_VERSION;
-		$schema = static::get_config_schema();
-
-		$validator = $validator ?? new Validator( $schema );
-		$validated = $validator->validate( $config );
-
-		if ( is_wp_error( $validated ) ) {
-			return $validated;
-		}
-
-		$sanitizer = $sanitizer ?? new Sanitizer( $schema );
-		$sanitized = $sanitizer->sanitize( $config );
-
-		return new static( $sanitized );
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function to_array(): array {
-		return $this->config;
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function to_ui_display(): array {
-		// TODO: Implement remove from children and implement here in standardized way
+	final public function to_array(): array {
 		return [
-			'display_name' => $this->get_display_name(),
-			'uuid' => $this->get_uuid(),
 			'service' => static::SERVICE_NAME,
+			'service_config' => $this->config['service_config'],
+			'uuid' => $this->config['uuid'],
+		];
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	protected static function get_config_schema(): array {
+		return ConfigSchemas::get_http_data_source_config_schema();
+	}
+
+	protected static function get_service_config_schema(): array {
+		return ConfigSchemas::get_http_data_source_service_config_schema();
+	}
+
+	protected static function map_service_config( array $service_config ): array {
+		return [
+			'display_name' => $service_config['display_name'] ?? static::SERVICE_NAME,
+			'endpoint' => $service_config['endpoint'] ?? null, // Invalid, but we won't guess it.
+			'request_headers' => $service_config['request_headers'] ?? [],
 		];
 	}
 }

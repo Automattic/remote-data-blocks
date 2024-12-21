@@ -3,25 +3,12 @@
 namespace RemoteDataBlocks\Tests\Integrations\VipBlockDataApi;
 
 use PHPUnit\Framework\TestCase;
-use RemoteDataBlocks\Config\QueryContext\HttpQueryContext;
-use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Integrations\VipBlockDataApi\VipBlockDataApi;
+use RemoteDataBlocks\Tests\Mocks\MockQuery;
 use RemoteDataBlocks\Tests\Mocks\MockQueryRunner;
-use RemoteDataBlocks\Tests\Mocks\MockDataSource;
-use RemoteDataBlocks\Tests\Mocks\MockValidator;
 
 use function register_remote_data_block;
-
-class TestQueryContext extends HttpQueryContext {
-	public function __construct( private QueryRunnerInterface $mock_qr ) {
-		parent::__construct( MockDataSource::from_array( MockDataSource::MOCK_CONFIG, new MockValidator() ) );
-	}
-
-	public function get_query_runner(): QueryRunnerInterface {
-		return $this->mock_qr;
-	}
-}
 
 class VipBlockDataApiTest extends TestCase {
 	private static $sourced_block1 = [
@@ -160,10 +147,15 @@ class VipBlockDataApiTest extends TestCase {
 		$mock_qr->addResult( 'title', $expected1 );
 		$mock_qr->addResult( 'location', $expected2 );
 
-		$mock_query_context = new TestQueryContext( $mock_qr );
-		register_remote_data_block( 'Events', $mock_query_context );
+		$mock_query = MockQuery::from_array( [ 'query_runner' => $mock_qr ] );
+		register_remote_data_block( [
+			'title' => 'Events',
+			'queries' => [
+				'display' => $mock_query,
+			],
+		] );
 
-		$result = VipBlockDataApi::resolve_remote_data( self::$sourced_block1, 'remote-data-blocks/events', 12, self::$parsed_block1, $mock_qr );
+		$result = VipBlockDataApi::resolve_remote_data( self::$sourced_block1, 'remote-data-blocks/events', 12, self::$parsed_block1 );
 		$this->assertSame( $expected1, $result['innerBlocks'][0]['attributes']['content'] );
 		$this->assertSame( $expected2, $result['innerBlocks'][1]['attributes']['content'] );
 	}
@@ -179,10 +171,15 @@ class VipBlockDataApiTest extends TestCase {
 		$mock_qr->addResult( 'title', 'Happy happy hour! No networking!' );
 		$mock_qr->addResult( 'location', new \WP_Error( 'rdb-uh-oh', 'uh-oh!' ) );
 
-		$mock_query_context = new TestQueryContext( $mock_qr );
-		register_remote_data_block( 'Events', $mock_query_context );
+		$mock_query = MockQuery::from_array( [ 'query_runner' => $mock_qr ] );
+		register_remote_data_block( [
+			'title' => 'Events',
+			'queries' => [
+				'display' => $mock_query,
+			],
+		] );
 
-		$result = VipBlockDataApi::resolve_remote_data( self::$sourced_block1, 'remote-data-blocks/events', 12, self::$parsed_block1, $mock_qr );
+		$result = VipBlockDataApi::resolve_remote_data( self::$sourced_block1, 'remote-data-blocks/events', 12, self::$parsed_block1 );
 
 		$this->assertSame(
 			[

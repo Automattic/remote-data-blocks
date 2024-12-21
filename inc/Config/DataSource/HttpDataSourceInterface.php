@@ -2,6 +2,8 @@
 
 namespace RemoteDataBlocks\Config\DataSource;
 
+use WP_Error;
+
 /**
  * HttpDataSourceInterface
  *
@@ -18,9 +20,9 @@ namespace RemoteDataBlocks\Config\DataSource;
  *
  * If you are a WPVIP customer, data sources are automatically provided by VIP.
  * Only implement this interface if you have custom data sources not provided by VIP.
- * 
+ *
  */
-interface HttpDataSourceInterface {
+interface HttpDataSourceInterface extends DataSourceInterface {
 	/**
 	 * Get the endpoint for the query. Note that the query configuration has an
 	 * opportunity to change / override the endpoint at request time. For REST
@@ -38,5 +40,5 @@ interface HttpDataSourceInterface {
 	 *
 	 * @return array Associative array of request headers.
 	 */
-	public function get_request_headers(): array;
+	public function get_request_headers(): array|WP_Error;
 }

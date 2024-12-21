@@ -31,16 +31,26 @@ class GoogleSheetsDataSourceTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->data_source = GoogleSheetsDataSource::create(
-			self::MOCK_CREDENTIALS,
-			'test_spreadsheet_id',
-			'Test Display Name'
-		);
+		$this->data_source = GoogleSheetsDataSource::from_array( [
+			'service_config' => [
+				'__version' => 1,
+				'display_name' => 'Google Sheets Source',
+				'credentials' => self::MOCK_CREDENTIALS,
+				'spreadsheet' => [
+					'id' => 'test_spreadsheet_id',
+					'name' => 'Test Spreadsheet Name',
+				],
+				'sheet' => [
+					'id' => 1,
+					'name' => 'Test Sheet Name',
+				],
+			],
+		] );
 	}
 
 	public function test_get_display_name(): void {
 		$this->assertSame(
-			'Google Sheets: Test Display Name',
+			'Google Sheets Source',
 			$this->data_source->get_display_name()
 		);
 	}
@@ -79,14 +89,8 @@ class GoogleSheetsDataSourceTest extends TestCase {
 	}
 
 	public function test_create(): void {
-		$data_source = GoogleSheetsDataSource::create(
-			self::MOCK_CREDENTIALS,
-			'test_spreadsheet_id',
-			'New Google Sheet'
-		);
-
-		$this->assertInstanceOf( GoogleSheetsDataSource::class, $data_source );
-		$this->assertSame( 'Google Sheets: New Google Sheet', $data_source->get_display_name() );
-		$this->assertSame( 'https://sheets.googleapis.com/v4/spreadsheets/test_spreadsheet_id', $data_source->get_endpoint() );
+		$this->assertInstanceOf( GoogleSheetsDataSource::class, $this->data_source );
+		$this->assertSame( 'Google Sheets Source', $this->data_source->get_display_name() );
+		$this->assertSame( 'https://sheets.googleapis.com/v4/spreadsheets/test_spreadsheet_id', $this->data_source->get_endpoint() );
 	}
 }
