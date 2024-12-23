@@ -61,7 +61,7 @@
     "@testing-library/jest-dom": "6.6.3",
     "@testing-library/react": "16.1.0",
     "@types/wordpress__block-editor": "11.5.15",
-    "@types/wordpress__blocks": "12.5.15",
+    "@types/wordpress__blocks": "12.5.16",
     "@vitest/coverage-v8": "2.1.2",
     "@wordpress/api-fetch": "7.14.0",
     "@wordpress/block-editor": "14.9.0",
