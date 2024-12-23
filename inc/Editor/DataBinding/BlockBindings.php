@@ -212,7 +212,7 @@ class BlockBindings {
 		return $value;
 	}
 
-	public static function get_remote_value( array $block_context, array $source_args ): string|null {
+	public static function get_remote_value( array $block_context, array $source_args ): string|int|null {
 		$block_name = $block_context['blockName'];
 		$field_name = $source_args['field'];
 		$index = $source_args['index'] ?? 0; // Index is only set for loop queries.

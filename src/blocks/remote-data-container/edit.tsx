@@ -41,14 +41,14 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	const [ initialLoad, setInitialLoad ] = useState< boolean >( true );
 
 	function fetchRemoteData( input: RemoteDataQueryInput, insertBlocks = true ) {
-		console.log( { input } );
+		console.log( { _i: input } );
 		updateRemoteData(
 			{
 				blockName,
-				queryInput: { id: input.id ? input.id : '' },
+				queryInput: { id: input.record_id },
 				isCollection: false,
 				metadata: {},
-				resultId: '',
+				resultId: input.record_id,
 				results: [],
 			},
 			insertBlocks

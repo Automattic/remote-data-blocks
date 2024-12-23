@@ -13,6 +13,7 @@ import { withBlockBindingShim } from '@/blocks/remote-data-container/filters/wit
 import { Save } from '@/blocks/remote-data-container/save';
 import { getBlocksConfig } from '@/utils/localized-block-data';
 import './style.scss';
+import * as constants from './config/constants';
 
 // Register a unique block definition for each of the context blocks.
 Object.values( getBlocksConfig() ).forEach( blockConfig => {
@@ -81,11 +82,17 @@ const remoteDataBlocksStoreConfig: ReduxStoreConfig< State, Actions, Selectors >
 			( queryKey: string, blockName: string, queryInput: Record< string, string > ) =>
 			async ( { dispatch } ) => {
 				try {
+					console.log({ fetchingWith: {
+						block_name: blockName,
+						query_key: queryKey,
+						query_input: queryInput,
+					}})
 					const data = await fetchRemoteData( {
 						block_name: blockName,
 						query_key: queryKey,
 						query_input: queryInput,
 					} );
+					console.log({retrievedData:data});
 					dispatch( { type: 'RECEIVE_REMOTE_DATA', queryKey, data } );
 				} catch ( err: unknown ) {
 					dispatch( { type: 'RECEIVE_REMOTE_DATA_ERROR', queryKey, error: err } );
@@ -121,12 +128,21 @@ registerBlockBindingsSource( {
 
 		console.log( { blockConfig } );
 
+		console.log( {
+			_c: {
+				blockName: remoteDataContext.blockName,
+				queryKey: remoteDataContext.queryKey,
+				remoteDataContext,
+			},
+		} );
+		console.log({remoteDataContext});
 		const data = select( remoteDataBlocksStore ).getRemoteData(
-			blockName,
-			'queryKey',
-			remoteDataContext
+			constants.DISPLAY_QUERY_KEY,
+			remoteDataContext.blockName,
+			remoteDataContext.queryInput
 		);
 		console.log( { data } );
+		console.log( { bindings } );
 
 		const newValues = {};
 
@@ -137,7 +153,7 @@ registerBlockBindingsSource( {
 			// const data = select( gravatarStore ).getGravatarData( id );
 			newValues[ attributeName ] = 'TEST'; // data?.[ key || field ];
 		}
-		console.log(remoteDataContext?.results?.[0])
-		return remoteDataContext?.results?.[0];
+		console.log( remoteDataContext?.results?.[ 0 ] );
+		return newValues;
 	},
 } );

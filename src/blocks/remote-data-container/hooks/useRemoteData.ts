@@ -12,6 +12,8 @@ export async function fetchRemoteData(
 		data: requestData,
 	} );
 
+	console.log( { body } );
+
 	if ( ! body ) {
 		return null;
 	}
