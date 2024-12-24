@@ -1,13 +1,13 @@
-import { SelectControl, Spinner } from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
-import { CustomFormFieldToken } from '../components/CustomFormFieldToken';
 import { SUPPORTED_AIRTABLE_TYPES } from '@/data-sources/airtable/constants';
 import { getAirtableOutputQueryMappingValue } from '@/data-sources/airtable/utils';
 import { DataSourceForm } from '@/data-sources/components/DataSourceForm';
+import { FieldsSelection } from '@/data-sources/components/FieldsSelection';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import {
 	useAirtableApiBases,
@@ -240,30 +240,18 @@ export const AirtableSettings = ( {
 						__nextHasNoMarginBottom
 					/>
 
-					{ selectedTable && availableTableFields.length ? (
-						<CustomFormFieldToken
-							label={ __( 'Fields', 'remote-data-blocks' ) }
-							onChange={ selection => {
-								let newTableFields: string[];
-								if ( selection.includes( 'Select All' ) ) {
-									newTableFields = Array.from( new Set( availableTableFields ) );
-								} else if ( selection.includes( 'Deselect All' ) ) {
-									newTableFields = [];
-								} else {
-									newTableFields = Array.from(
-										new Set(
-											selection
-												.filter( item => item !== 'Select All' && item !== 'Deselect All' )
-												.map( item => ( 'object' === typeof item ? item.value : item ) )
-										)
-									);
-								}
-								setTableFields( newTableFields );
+					{ selectedTable && (
+						<FieldsSelection
+							selectedFields={ tableFields }
+							availableFields={ availableTableFields }
+							isLoading={ ! availableTableFields.length }
+							onFieldsChange={ newFields => {
+								setTableFields( newFields );
 								handleOnChange( 'tables', [
 									{
 										id: selectedTable.id,
 										name: selectedTable.name,
-										output_query_mappings: newTableFields
+										output_query_mappings: newFields
 											.map( key => {
 												const field = selectedTable.fields.find(
 													tableField => tableField.name === key
@@ -280,24 +268,7 @@ export const AirtableSettings = ( {
 									},
 								] );
 							} }
-							suggestions={ [
-								...( tableFields.length === availableTableFields.length
-									? [ 'Deselect All' ]
-									: [ 'Select All' ] ),
-								...availableTableFields,
-							] }
-							value={ tableFields }
-							__experimentalValidateInput={ input =>
-								availableTableFields.includes( input ) ||
-								input === 'Select All' ||
-								input === 'Deselect All'
-							}
-							__nextHasNoMarginBottom
-							__experimentalExpandOnFocus
-							__next40pxDefaultSize
 						/>
-					) : (
-						selectedTable && <Spinner />
 					) }
 				</DataSourceForm.Scope>
 			</DataSourceForm>
