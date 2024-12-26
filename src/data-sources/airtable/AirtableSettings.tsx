@@ -248,11 +248,15 @@ export const AirtableSettings = ( {
 							! selectedTable ? __( 'Please select a table first.', 'remote-data-blocks' ) : null
 						}
 						onFieldsChange={ newFields => {
+							if ( ! selectedTable ) {
+								return;
+							}
+
 							setTableFields( newFields );
 							handleOnChange( 'tables', [
 								{
-									id: selectedTable?.id,
-									name: selectedTable?.name,
+									id: selectedTable.id,
+									name: selectedTable.name,
 									output_query_mappings: newFields
 										.map( key => {
 											const field = selectedTable?.fields.find(
@@ -266,7 +270,7 @@ export const AirtableSettings = ( {
 											 */
 											return null;
 										} )
-										.filter( Boolean ) as DataSourceQueryMappingValue[],
+										.filter( ( value ): value is DataSourceQueryMappingValue => value !== null ),
 								},
 							] );
 						} }

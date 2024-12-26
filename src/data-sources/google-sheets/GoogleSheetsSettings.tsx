@@ -20,6 +20,7 @@ import {
 import { getConnectionMessage } from '@/data-sources/utils';
 import { useForm, ValidationRules } from '@/hooks/useForm';
 import { GoogleSheetsIcon, GoogleSheetsIconWithText } from '@/settings/icons/GoogleSheetsIcon';
+import { GoogleServiceAccountKey } from '@/types/google';
 import { SelectOption } from '@/types/input';
 import { isPositiveIntegerString, safeParseJSON } from '@/utils/string';
 
@@ -113,16 +114,18 @@ export const GoogleSheetsSettings = ( {
 	};
 
 	const onCredentialsChange = ( nextValue: string ) => {
-		handleOnChange( 'credentials', safeParseJSON( nextValue ) );
+		const credentials = safeParseJSON< GoogleServiceAccountKey >( nextValue );
+		if ( credentials ) {
+			handleOnChange( 'credentials', credentials );
+		}
 	};
 
 	const onSheetChange = ( value: string ) => {
 		if ( isPositiveIntegerString( value ) ) {
-			const parsedValue = parseInt( value, 10 );
 			const selectedSheet = sheets?.find( sheet => sheet.value === value );
 			handleOnChange( 'sheets', [
 				{
-					id: parsedValue,
+					id: value,
 					name: selectedSheet?.label ?? '',
 					output_query_mappings: [],
 				},
@@ -137,6 +140,10 @@ export const GoogleSheetsSettings = ( {
 	};
 
 	const onSheetsFieldsChange = ( newFields: string[] ) => {
+		if ( ! currentSheet ) {
+			return;
+		}
+
 		handleOnChange( 'sheets', [
 			{
 				...currentSheet,
