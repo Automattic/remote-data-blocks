@@ -1,59 +1,41 @@
 # Data source
 
-A data source defines basic reusable properties of an API and is required to define a [query](query.md).
-
-## DataSourceInterface
-
-At its simplest, a data source implements `DataSourceInterface` and describes itself with the following methods:
-
-- `get_display_name(): string`: Return the display name of the data source.
-- `get_image_url(): string|null`: Optionally, return an image URL that can represent the data source in UI.
-
-## HttpDataSource
-
-The `HttpDataSource` class implements `DataSourceInterface` and provides common reusable properties of an HTTP API:
-
-- `get_endpoint(): string`: Returns the base URL of the API endpoint. This can be overridden by a query.
-- `get_request_headers(): array`: Returns an associative array of HTTP headers to be sent with each request. This is a common place to set authentication headers such as `Authorization`. This array can be extended or overridden by a query.
+A data source defines basic reusable properties of an API and is used by a [query](query.md) to reduce boilerplate. It allows helps this plugin represent your data source in the plugin settings screen and other UI.
 
 ## Example
 
-Most HTTP-powered APIs can be represented by defining a class that extends `HttpDataSource`. Here's an example of a data source for US ZIP code data:
+Most HTTP-powered APIs can be represented by defining a class that extends `HttpDataSource`. Here's an example of a data source for an example HTTP API:
 
 ```php
-class ZipCodeDataSource extends HttpDataSource {
-	public function get_display_name(): string {
-		return 'US ZIP codes';
-	}
-
-	public function get_endpoint(): string {
-		return 'https://api.zippopotam.us/us/';
-	}
-
-	public function get_request_headers(): array|WP_Error {
-		return [
+$data_source = HttpDataSource::from_array( [
+	'service_config' => [
+		'__version' => 1,
+		'display_name' => 'Example API',
+		'endpoint' => 'https://api.example.com/',
+		'request_headers' => [
 			'Content-Type' => 'application/json',
-		];
-	}
-}
+			'X-Api-Key': MY_API_KEY_CONSTANT,
+		],
+	],
+] );
 ```
 
-The logic to fetch data from the API is defined in a [query](query.md).
+The configuration array passed to `from_array` is very flexible, so it's usually not necessary to extend `HttpDataSource`, but you can do so if you need to add custom behavior.
 
-## Custom data source
+## Custom data sources
 
-APIs that do not use HTTP as transport may require a custom data source. Implement `DataSourceInterface` and provide methods that define reusable properties of your API. The actual implementation of your transport will likely be provided via a [custom query runner](./query-runner.md).
+For APIs that use non-HTTP transports, you can also implement `DataSourceInterface` and provide methods that define reusable properties of your API. The actual implementation of your transport will need to be provided by a [custom query runner](./query-runner.md).
 
-Here is an example of a data source for a WebDAV server:
+Here is a theoretical example of a data source for a WebDAV server:
 
 ```php
 class WebDavFilesDataSource implements DataSourceInterface {
 	public function get_display_name(): string {
-		return 'WebDAV Files';
+		return 'My WebDAV Files';
 	}
 
-	public function get_image_url(): null {
-		return null;
+	public function get_image_url(): string {
+		return 'https://example.com/webdav-icon.png';
 	}
 
 	public function get_webdav_root(): string {

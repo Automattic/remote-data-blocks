@@ -61,6 +61,10 @@ class DataSourceController extends WP_REST_Controller {
 						'required' => true,
 						'enum' => REMOTE_DATA_BLOCKS__SERVICES,
 					],
+					'service_config' => [
+						'type' => 'object',
+						'required' => true,
+					],
 				],
 			]
 		);
@@ -73,6 +77,12 @@ class DataSourceController extends WP_REST_Controller {
 				'methods' => 'PUT',
 				'callback' => [ $this, 'update_item' ],
 				'permission_callback' => [ $this, 'update_item_permissions_check' ],
+				'args' => [
+					'uuid' => [
+						'type' => 'string',
+						'required' => true,
+					],
+				],
 			]
 		);
 
@@ -84,6 +94,12 @@ class DataSourceController extends WP_REST_Controller {
 				'methods' => 'DELETE',
 				'callback' => [ $this, 'delete_item' ],
 				'permission_callback' => [ $this, 'delete_item_permissions_check' ],
+				'args' => [
+					'uuid' => [
+						'type' => 'string',
+						'required' => true,
+					],
+				],
 			]
 		);
 	}
@@ -96,7 +112,7 @@ class DataSourceController extends WP_REST_Controller {
 	 */
 	public function create_item( $request ) {
 		$data_source_properties = $request->get_json_params();
-		$item = DataSourceCrud::register_new_data_source( $data_source_properties );
+		$item = DataSourceCrud::create_config( $data_source_properties );
 
 		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', array_merge( [
 			'data_source_type' => $data_source_properties['service'],
@@ -113,33 +129,26 @@ class DataSourceController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
-		$code_configured_data_sources = ConfigStore::get_data_sources_displayable();
-		$ui_configured_data_sources = DataSourceCrud::get_data_sources_list();
+		$code_configured_data_sources = ConfigStore::get_data_sources_as_array();
+		$ui_configured_data_sources = DataSourceCrud::get_configs();
 
 		/**
-		 * Quick and dirty de-duplication of data sources by uuid.
+		 * Quick and dirty de-duplication of data sources. If the data source does
+		 * not have a UUID (because it is registered in code), we generate an
+		 * identifier based on the display name and service name.
 		 *
 		 * UI configured data sources take precedence over code configured ones
 		 * here due to the ordering of the two arrays passed to array_reduce.
-		 *
-		 * @todo: refactor this out in the near future in favor of an upstream
-		 * single source of truth for data source configurations
 		 */
-		$data_sources = array_values(array_reduce(
+		$data_sources = array_values( array_reduce(
 			array_merge( $code_configured_data_sources, $ui_configured_data_sources ),
 			function ( $acc, $item ) {
-				// Check if item with the same UUID already exists
-				if ( isset( $acc[ $item['uuid'] ] ) ) {
-					// Merge the properties of the existing item with the new one
-					$acc[ $item['uuid'] ] = array_merge( $acc[ $item['uuid'] ], $item );
-				} else {
-					// Otherwise, add the new item
-					$acc[ $item['uuid'] ] = $item;
-				}
+				$identifier = $item['uuid'] ?? md5( sprintf( '%s_%s', $item['service_config']['display_name'], $item['service'] ) );
+				$acc[ $identifier ] = $item;
 				return $acc;
 			},
 			[]
-		));
+		) );
 
 		// Tracks Analytics. Only once per day to reduce noise.
 		$track_transient_key = 'remotedatablocks_view_data_sources_tracked';
@@ -164,64 +173,31 @@ class DataSourceController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
+	public function get_item( $request ) {
+		$response = DataSourceCrud::get_config_by_uuid( $request->get_param( 'uuid' ) );
+		return rest_ensure_response( $response );
+	}
+
+	/**
+	 * Updates a single item.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
 	public function update_item( $request ) {
-		$current_uuid = $request->get_param( 'uuid' );
 		$data_source_properties = $request->get_json_params();
+		$item = DataSourceCrud::update_config_by_uuid( $request->get_param( 'uuid' ), $data_source_properties );
 
-		// Extract new UUID if provided
-		$new_uuid = $data_source_properties['newUUID'] ?? null;
-
-		// Retrieve the current data sources and the item by its current UUID
-		$data_sources = DataSourceCrud::get_data_sources();
-		$item = DataSourceCrud::get_item_by_uuid( $data_sources, $current_uuid );
-
-		// Handle item not found
-		if ( ! $item ) {
-			return new WP_Error(
-				'data_source_not_found',
-				__( 'Data source not found.', 'remote-data-blocks' ),
-				[ 'status' => 404 ]
-			);
+		if ( is_wp_error( $item ) ) {
+			return $item; // Return WP_Error if update fails
 		}
 
-		// Handle new UUID conflicts
-		if ( $new_uuid && $new_uuid !== $current_uuid ) {
-			// Ensure no conflict with existing UUID
-			if ( DataSourceCrud::get_item_by_uuid( $data_sources, $new_uuid ) ) {
-				return new WP_Error(
-					'uuid_conflict',
-					__( 'The new UUID already exists.', 'remote-data-blocks' ),
-					[ 'status' => 409 ]
-				);
-			}
-		}
+		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', array_merge( [
+			'data_source_type' => $item['service'],
+			'action' => 'update',
+		], $this->get_data_source_interaction_track_props( $item ) ) );
 
-		// Set the new UUID in the properties
-		$data_source_properties['uuid'] = $new_uuid;
-
-		// Merge the updated properties with the existing item
-		$updated_item = array_merge( $item, $data_source_properties );
-
-		// Pass the original UUID when updating the item to avoid duplication
-		$result = DataSourceCrud::update_item_by_uuid( $current_uuid, $updated_item, $current_uuid );
-
-		if ( is_wp_error( $result ) ) {
-			return $result; // Return WP_Error if update fails
-		}
-
-		// Log the update action
-		TracksAnalytics::record_event(
-			'remotedatablocks_data_source_interaction',
-			array_merge(
-				[
-					'data_source_type' => $data_source_properties['service'],
-					'action' => 'update',
-				],
-				$this->get_data_source_interaction_track_props( $data_source_properties )
-			)
-		);
-
-		return rest_ensure_response( $result );
+		return rest_ensure_response( $item );
 	}
 
 	/**
@@ -232,7 +208,7 @@ class DataSourceController extends WP_REST_Controller {
 	 */
 	public function delete_item( $request ) {
 		$data_source_properties = $request->get_json_params();
-		$result = DataSourceCrud::delete_item_by_uuid( $request->get_param( 'uuid' ) );
+		$result = DataSourceCrud::delete_config_by_uuid( $request->get_param( 'uuid' ) );
 
 		// Tracks Analytics.
 		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', [
@@ -242,7 +218,6 @@ class DataSourceController extends WP_REST_Controller {
 
 		return rest_ensure_response( $result );
 	}
-
 
 	// These all require manage_options for now, but we can adjust as needed
 
@@ -270,7 +245,7 @@ class DataSourceController extends WP_REST_Controller {
 		$props = [];
 
 		if ( 'generic-http' === $data_source_properties['service'] ) {
-			$auth = $data_source_properties['auth'];
+			$auth = $data_source_properties['service_config']['auth'] ?? [];
 			$props['authentication_type'] = $auth['type'] ?? '';
 			$props['api_key_location'] = $auth['addTo'] ?? '';
 		}

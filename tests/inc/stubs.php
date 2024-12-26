@@ -35,8 +35,16 @@ function get_bloginfo( $_property ): void {
 	// Do nothing
 }
 
+function plugins_url( string $path ): string {
+	return sprintf( 'https://example.com/%s/', $path );
+}
+
 function sanitize_title( string $title ): string {
 	return str_replace( ' ', '-', strtolower( $title ) );
+}
+
+function sanitize_title_with_dashes( string $title ): string {
+	return preg_replace( '/[^a-z0-9-]/', '-', sanitize_title( $title ) );
 }
 
 function sanitize_text_field( string $text ): string {

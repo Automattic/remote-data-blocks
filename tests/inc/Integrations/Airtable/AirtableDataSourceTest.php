@@ -11,36 +11,24 @@ class AirtableDataSourceTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->data_source = AirtableDataSource::create(
-			'test_access_token',
-			'test_base_id',
-			[],
-			'Test Airtable Base'
-		);
+		$this->data_source = AirtableDataSource::from_array( [
+			'service_config' => [
+				'__version' => 1,
+				'access_token' => 'test_access_token',
+				'display_name' => 'Airtable Source',
+				'base' => [
+					'id' => 'test_base_id',
+					'name' => 'Test Airtable Base',
+				],
+				'tables' => [],
+			],
+		] );
 	}
 
 	public function test_get_display_name(): void {
 		$this->assertSame(
-			'Airtable (Test Airtable Base)',
+			'Airtable Source',
 			$this->data_source->get_display_name()
-		);
-	}
-
-	public function test_get_display_name_with_base_name_override(): void {
-		$data_source = AirtableDataSource::from_array([
-			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
-			'access_token' => 'test_access_token',
-			'base' => [
-				'id' => 'test_base_id',
-				'name' => 'Test Base Name',
-			],
-			'tables' => [],
-			'display_name' => 'Test Base Name',
-		]);
-
-		$this->assertSame(
-			'Airtable (Test Base Name)',
-			$data_source->get_display_name()
 		);
 	}
 
@@ -61,15 +49,8 @@ class AirtableDataSourceTest extends TestCase {
 	}
 
 	public function test_create(): void {
-		$data_source = AirtableDataSource::create(
-			'new_access_token',
-			'new_base_id',
-			[],
-			'New Airtable Base'
-		);
-
-		$this->assertInstanceOf( AirtableDataSource::class, $data_source );
-		$this->assertSame( 'Airtable (New Airtable Base)', $data_source->get_display_name() );
-		$this->assertSame( 'https://api.airtable.com/v0/new_base_id', $data_source->get_endpoint() );
+		$this->assertInstanceOf( AirtableDataSource::class, $this->data_source );
+		$this->assertSame( 'Airtable Source', $this->data_source->get_display_name() );
+		$this->assertSame( 'https://api.airtable.com/v0/test_base_id', $this->data_source->get_endpoint() );
 	}
 }

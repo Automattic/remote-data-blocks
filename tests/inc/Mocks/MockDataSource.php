@@ -3,50 +3,30 @@
 namespace RemoteDataBlocks\Tests\Mocks;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use RemoteDataBlocks\Tests\Mocks\MockValidator;
+use RemoteDataBlocks\Validation\ValidatorInterface;
 use WP_Error;
 
 class MockDataSource extends HttpDataSource {
-	private $endpoint = 'https://example.com/api';
-	private $headers = [ 'Content-Type' => 'application/json' ];
-
 	public const MOCK_CONFIG = [
-		'uuid' => 'e3458c42-4cf4-4214-aaf6-3628e33ed07a',
 		'service' => 'mock',
-		'api_key' => '1234567890',
-	];
-
-	protected const SERVICE_SCHEMA = [
-		'type' => 'object',
-		'properties' => [
-			'api_key' => [
-				'type' => 'string',
+		'service_config' => [
+			'display_name' => 'Mock Data Source',
+			'endpoint' => 'https://example.com/api',
+			'request_headers' => [
+				'Content-Type' => 'application/json',
 			],
 		],
 	];
 
-	public function get_display_name(): string {
-		return 'Mock Data Source';
-	}
-
-	public function get_endpoint(): string {
-		return $this->endpoint;
-	}
-
-	public function get_request_headers(): array|WP_Error {
-		return $this->headers;
+	public static function from_array( ?array $config = self::MOCK_CONFIG, ?ValidatorInterface $validator = null ): self|WP_Error {
+		return parent::from_array( $config, $validator ?? new MockValidator() );
 	}
 
 	/**
 	 * Override the endpoint.
 	 */
 	public function set_endpoint( string $endpoint ): void {
-		$this->endpoint = $endpoint;
-	}
-
-	/**
-	 * Override the headers.
-	 */
-	public function set_headers( array $headers ): void {
-		$this->headers = $headers;
+		$this->config['endpoint'] = $endpoint;
 	}
 }

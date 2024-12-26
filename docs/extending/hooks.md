@@ -36,7 +36,7 @@ add_filter( 'remote_data_blocks_register_example_block', '__return_false' );
 Filter the allowed URL schemes for this request. By default, only HTTPS is allowed, but it might be useful to relax this restriction in local environments.
 
 ```php
-function custom_allowed_url_schemes( array $allowed_url_schemes, HttpQueryContext $query_context ): array {
+function custom_allowed_url_schemes( array $allowed_url_schemes, HttpQueryInterface $query ): array {
 	// Modify the allowed URL schemes.
 	return $allowed_url_schemes;
 }
@@ -48,7 +48,7 @@ add_filter( 'remote_data_blocks_allowed_url_schemes', 'custom_allowed_url_scheme
 Filter the request details (method, options, url) before the HTTP request is dispatched.
 
 ```php
-function custom_request_details( array $request_details, HttpQueryContext $query_context, array $input_variables ): array {
+function custom_request_details( array $request_details, HttpQueryInterface $query, array $input_variables ): array {
 	// Modify the request details.
 	return $request_details;
 }
@@ -60,7 +60,7 @@ add_filter( 'remote_data_blocks_request_details', 'custom_request_details', 10, 
 Filter the query response metadata, which are available as bindings for field shortcodes. In most cases, it is better to provide a custom query class and override the `get_response_metadata` method but this filter is available in case that is not possible.
 
 ```php
-function custom_query_response_metadata( array $metadata, HttpQueryContext $query_context, array $input_variables ): array {
+function custom_query_response_metadata( array $metadata, HttpQueryInterface $query, array $input_variables ): array {
 	// Modify the response metadata.
 	return $metadata;
 }

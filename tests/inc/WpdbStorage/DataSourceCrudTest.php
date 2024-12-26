@@ -3,7 +3,6 @@
 namespace RemoteDataBlocks\Tests\WpdbStorage;
 
 use PHPUnit\Framework\TestCase;
-use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use WP_Error;
 
@@ -11,31 +10,33 @@ class DataSourceCrudTest extends TestCase {
 	protected function tearDown(): void {
 		clear_mocked_options();
 	}
-	
+
 	public function test_register_new_data_source_with_valid_input() {
 		$valid_source = [
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
-			'service_schema_version' => 1,
-			'uuid' => wp_generate_uuid4(),
-			'access_token' => 'valid_token',
-			'base' => [
-				'id' => 'base_id',
-				'name' => 'Base Name',
+			'service_config' => [
+				'__version' => 1,
+				'access_token' => 'valid_token',
+				'base' => [
+					'id' => 'base_id',
+					'name' => 'Base Name',
+				],
+				'display_name' => 'Airtable Source',
+				'tables' => [],
 			],
-			'tables' => [],
-			'display_name' => 'Crud Test',
 		];
 
-		$result = DataSourceCrud::register_new_data_source( $valid_source );
+		$result = DataSourceCrud::create_config( $valid_source );
 
-		$this->assertInstanceOf( HttpDataSource::class, $result );
-		$this->assertTrue( wp_is_uuid( $result->to_array()['uuid'] ) );
+		$this->assertIsArray( $result );
+		$this->assertSame( REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE, $result['service'] );
+		$this->assertTrue( wp_is_uuid( $result['uuid'] ) );
 	}
 
 	public function test_register_new_data_source_with_invalid_input() {
 		$invalid_source = [
 			'service' => 'unsupported',
-			'service_schema_version' => 1,
+			'service_config' => [],
 			'uuid' => wp_generate_uuid4(),
 		];
 
@@ -46,134 +47,139 @@ class DataSourceCrudTest extends TestCase {
 		}, E_USER_WARNING);
 		// phpcs:enable
 
-		$result = DataSourceCrud::register_new_data_source( $invalid_source );
+		$result = DataSourceCrud::create_config( $invalid_source );
 		restore_error_handler();
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'unsupported_data_source', $result->get_error_code() );
+		$this->assertsame( 'unsupported_data_source', $result->get_error_code() );
 	}
 
-	public function test_get_data_sources() {
-		$source1 = DataSourceCrud::register_new_data_source( [
+	public function test_get_configs() {
+		$source1 = DataSourceCrud::create_config( [
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
-			'service_schema_version' => 1,
-			'uuid' => wp_generate_uuid4(),
-			'access_token' => 'token1',
-			'base' => [
-				'id' => 'base_id1',
-				'name' => 'Base Name 1',
+			'service_config' => [
+				'__version' => 1,
+				'access_token' => 'token1',
+				'display_name' => 'Airtable Source',
+				'base' => [
+					'id' => 'base_id1',
+					'name' => 'Base Name 1',
+				],
+				'tables' => [],
 			],
-			'tables' => [],
-			'display_name' => 'Base Name 1',
-		] );
-
-		$source2 = DataSourceCrud::register_new_data_source( [
-			'service' => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
-			'service_schema_version' => 1,
 			'uuid' => wp_generate_uuid4(),
-			'access_token' => 'token2',
-			'store_name' => 'mystore',
 		] );
 
-		set_mocked_option( DataSourceCrud::CONFIG_OPTION_NAME, [
-			$source1->to_array(),
-			$source2->to_array(),
+		$source2 = DataSourceCrud::create_config( [
+			'service' => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
+			'service_config' => [
+				'__version' => 1,
+				'access_token' => 'token2',
+				'display_name' => 'Shopify Source',
+				'store_name' => 'mystore',
+			],
+			'uuid' => wp_generate_uuid4(),
 		] );
 
-		$all_sources = DataSourceCrud::get_data_sources();
+		$all_sources = DataSourceCrud::get_configs();
 		$this->assertCount( 2, $all_sources );
 
-		$airtable_sources = DataSourceCrud::get_data_sources( 'airtable' );
+		$airtable_sources = DataSourceCrud::get_configs_by_service( 'airtable' );
 		$this->assertCount( 1, $airtable_sources );
-		$this->assertSame( 'Base Name 1', $airtable_sources[0]['display_name'] );
+		$this->assertSame( 'token1', $airtable_sources[0]['service_config']['access_token'] );
+		$this->assertSame( $source1['uuid'], $airtable_sources[0]['uuid'] );
 
-		$shopify_sources = DataSourceCrud::get_data_sources( 'shopify' );
+		$shopify_sources = DataSourceCrud::get_configs_by_service( 'shopify' );
 		$this->assertCount( 1, $shopify_sources );
-		$this->assertSame( 'mystore', $shopify_sources[0]['store_name'] );
+		$this->assertSame( 'mystore', $shopify_sources[0]['service_config']['store_name'] );
+		$this->assertSame( $source2['uuid'], $shopify_sources[0]['uuid'] );
 	}
 
 	public function test_get_item_by_uuid_with_valid_uuid() {
-		$source = DataSourceCrud::register_new_data_source( [
+		$source = DataSourceCrud::create_config( [
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
-			'service_schema_version' => 1,
-			'uuid' => wp_generate_uuid4(),
-			'access_token' => 'token1',
-			'base' => [
-				'id' => 'base_id1',
-				'name' => 'Base Name 1',
+			'service_config' => [
+				'__version' => 1,
+				'access_token' => 'token1',
+				'base' => [
+					'id' => 'base_id1',
+					'name' => 'Base Name 1',
+				],
+				'display_name' => 'Airtable Source',
+				'tables' => [],
 			],
-			'tables' => [],
-			'display_name' => 'Crud Test',
+			'uuid' => wp_generate_uuid4(),
 		] );
 
-		$retrieved_source = DataSourceCrud::get_item_by_uuid( DataSourceCrud::get_data_sources(), $source->to_array()['uuid'] );
-		$this->assertSame( 'token1', $retrieved_source['access_token'] );
-		$this->assertSame( 'base_id1', $retrieved_source['base']['id'] );
-		$this->assertSame( 'Base Name 1', $retrieved_source['base']['name'] );
-		$this->assertSame( 'Crud Test', $retrieved_source['display_name'] );
+		$retrieved_source = DataSourceCrud::get_config_by_uuid( $source['uuid'] );
 		$this->assertArrayHasKey( '__metadata', $retrieved_source );
 		$this->assertArrayHasKey( 'created_at', $retrieved_source['__metadata'] );
 		$this->assertArrayHasKey( 'updated_at', $retrieved_source['__metadata'] );
 	}
 
 	public function test_get_item_by_uuid_with_invalid_uuid() {
-		$non_existent = DataSourceCrud::get_item_by_uuid( DataSourceCrud::get_data_sources(), 'non-existent-uuid' );
-		$this->assertFalse( $non_existent );
+		$non_existent = DataSourceCrud::get_config_by_uuid( 'non-existent-uuid' );
+		$this->assertInstanceOf( WP_Error::class, $non_existent );
+		$this->assertsame( 'data_source_not_found', $non_existent->get_error_code() );
 	}
 
 	public function test_update_item_by_uuid_with_valid_uuid() {
-		$source = DataSourceCrud::register_new_data_source( [
+		$source = DataSourceCrud::create_config( [
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
-			'service_schema_version' => 1,
-			'uuid' => wp_generate_uuid4(),
-			'newUUID' => '2ced7a88-5a61-4e66-840e-26baefdfdfd5',
-			'access_token' => 'token1',
-			'base' => [
-				'id' => 'base_id1',
-				'name' => 'Base Name 1',
+			'service_config' => [
+				'__version' => 1,
+				'access_token' => 'token1',
+				'base' => [
+					'id' => 'base_id1',
+					'name' => 'Base Name 1',
+				],
+				'display_name' => 'Airtable Source',
+				'tables' => [],
 			],
-			'tables' => [],
-			'display_name' => 'Crud Test',
+			'uuid' => wp_generate_uuid4(),
 		] );
 
-		$updated_source = DataSourceCrud::update_item_by_uuid( $source->to_array()['uuid'], [
+		$updated_source = DataSourceCrud::update_config_by_uuid( $source['uuid'], [
 			'access_token' => 'updated_token',
-			'uuid' => '2ced7a88-5a61-4e66-840e-26baefdfdfd5',
 		] );
 
-		$this->assertInstanceOf( HttpDataSource::class, $updated_source );
-		$this->assertSame( 'updated_token', $updated_source->to_array()['access_token'] );
-		$this->assertSame( '2ced7a88-5a61-4e66-840e-26baefdfdfd5', $updated_source->to_array()['uuid'] );
+		$this->assertIsArray( $updated_source );
+		$this->assertSame( 'updated_token', $updated_source['service_config']['access_token'] );
 	}
 
 	public function test_update_item_by_uuid_with_invalid_uuid() {
-		$non_existent = DataSourceCrud::update_item_by_uuid( 'non-existent-uuid', [ 'token' => 'new_token' ] );
+		$non_existent = DataSourceCrud::update_config_by_uuid( 'non-existent-uuid', [ 'token' => 'new_token' ] );
 		$this->assertInstanceOf( WP_Error::class, $non_existent );
+		$this->assertSame( 'data_source_not_found', $non_existent->get_error_code() );
 	}
 
 	public function test_delete_item_by_uuid() {
-		$source = DataSourceCrud::register_new_data_source( [
+		$source = DataSourceCrud::create_config( [
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
-			'service_schema_version' => 1,
-			'uuid' => wp_generate_uuid4(),
-			'access_token' => 'token1',
-			'base' => [
-				'id' => 'base_id1',
-				'name' => 'Base Name 1',
+			'service_config' => [
+				'__version' => 1,
+				'access_token' => 'token1',
+				'base' => [
+					'id' => 'base_id1',
+					'name' => 'Base Name 1',
+				],
+				'display_name' => 'Airtable Source',
+				'tables' => [],
 			],
-			'tables' => [],
-			'display_name' => 'Crud Test',
+			'uuid' => wp_generate_uuid4(),
 		] );
 
-		$result = DataSourceCrud::delete_item_by_uuid( $source->to_array()['uuid'] );
+		$result = DataSourceCrud::delete_config_by_uuid( $source['uuid'] );
 		$this->assertTrue( $result );
 
-		$deleted_source = DataSourceCrud::get_item_by_uuid( DataSourceCrud::get_data_sources(), $source->to_array()['uuid'] );
-		$this->assertFalse( $deleted_source );
+		$deleted_source = DataSourceCrud::get_config_by_uuid( $source['uuid'] );
+		$this->assertInstanceOf( WP_Error::class, $deleted_source );
+		$this->assertSame( 'data_source_not_found', $deleted_source->get_error_code() );
 	}
 
 	public function test_get_by_uuid_with_non_existent_uuid() {
-		$non_existent = DataSourceCrud::get_by_uuid( '64af9297-867e-4e39-b51d-7c97beeebec6' );
-		$this->assertFalse( $non_existent );
+		$non_existent = DataSourceCrud::get_config_by_uuid( '64af9297-867e-4e39-b51d-7c97beeebec6' );
+		$this->assertInstanceOf( WP_Error::class, $non_existent );
+		$this->assertSame( 'data_source_not_found', $non_existent->get_error_code() );
 	}
 }

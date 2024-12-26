@@ -9,7 +9,6 @@ use WP_REST_Response;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit();
-defined( 'ABSPATH' ) || exit();
 
 /**
  * Auth REST API controller.

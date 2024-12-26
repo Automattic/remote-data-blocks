@@ -1,11 +1,11 @@
-import { FormTokenField, SelectControl, Spinner } from '@wordpress/components';
+import { SelectControl, Spinner } from '@wordpress/components';
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
+import { CustomFormFieldToken } from '../components/CustomFormFieldToken';
 import { SUPPORTED_AIRTABLE_TYPES } from '@/data-sources/airtable/constants';
-import { AirtableFormState } from '@/data-sources/airtable/types';
 import { getAirtableOutputQueryMappingValue } from '@/data-sources/airtable/utils';
 import { DataSourceForm } from '@/data-sources/components/DataSourceForm';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
@@ -18,51 +18,15 @@ import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import {
 	AirtableConfig,
 	AirtableOutputQueryMappingValue,
+	AirtableServiceConfig,
 	SettingsComponentProps,
 } from '@/data-sources/types';
 import { getConnectionMessage } from '@/data-sources/utils';
 import { useForm } from '@/hooks/useForm';
-import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import { AirtableIcon, AirtableIconWithText } from '@/settings/icons/AirtableIcon';
-import { StringIdName } from '@/types/common';
 import { SelectOption } from '@/types/input';
 
-const initialState: AirtableFormState = {
-	access_token: '',
-	base: null,
-	display_name: '',
-	table: null,
-	table_fields: new Set< string >(),
-};
-
-const getInitialStateFromConfig = ( config?: AirtableConfig ): AirtableFormState => {
-	if ( ! config ) {
-		return initialState;
-	}
-	const initialStateFromConfig: AirtableFormState = {
-		access_token: config.access_token,
-		base: config.base,
-		display_name: config.display_name,
-		table: null,
-		table_fields: new Set< string >(),
-	};
-
-	if ( Array.isArray( config.tables ) ) {
-		const [ table ] = config.tables;
-
-		if ( table ) {
-			initialStateFromConfig.table = {
-				id: table.id,
-				name: table.name,
-			};
-			initialStateFromConfig.table_fields = new Set(
-				table.output_query_mappings.map( ( { key } ) => key )
-			);
-		}
-	}
-
-	return initialStateFromConfig;
-};
+const SERVICE_CONFIG_VERSION = 1;
 
 const defaultSelectBaseOption: SelectOption = {
 	disabled: true,
@@ -76,79 +40,67 @@ const defaultSelectTableOption: SelectOption = {
 	value: '',
 };
 
+// eslint-disable-next-line complexity
 export const AirtableSettings = ( {
 	mode,
-	uuid: uuidFromProps,
+	uuid,
 	config,
 }: SettingsComponentProps< AirtableConfig > ) => {
-	const { goToMainScreen } = useSettingsContext();
-	const { updateDataSource, addDataSource } = useDataSources( false );
+	const { onSave } = useDataSources< AirtableConfig >( false );
 
-	const { state, handleOnChange } = useForm< AirtableFormState >( {
-		initialValues: getInitialStateFromConfig( config ),
+	const { state, handleOnChange, validState } = useForm< AirtableServiceConfig >( {
+		initialValues: config?.service_config ?? { __version: SERVICE_CONFIG_VERSION },
 	} );
 
-	const [ baseOptions, setBaseOptions ] = useState< SelectOption[] >( [ defaultSelectBaseOption ] );
-	const [ tableOptions, setTableOptions ] = useState< SelectOption[] >( [
-		defaultSelectTableOption,
-	] );
-	const [ availableTableFields, setAvailableTableFields ] = useState< string[] >( [] );
-	const { fetchingUserId, userId, userIdError } = useAirtableApiUserId( state.access_token );
+	const [ currentTableId, setCurrentTableId ] = useState< string | null >(
+		state.tables?.[ 0 ]?.id ?? null
+	);
+	const [ tableFields, setTableFields ] = useState< string[] >(
+		state.tables?.[ 0 ]?.output_query_mappings.map( mapping => mapping.key ).filter( Boolean ) ?? []
+	);
+	const { fetchingUserId, userId, userIdError } = useAirtableApiUserId( state.access_token ?? '' );
 	const { bases, basesError, fetchingBases } = useAirtableApiBases(
-		state.access_token,
+		state.access_token ?? '',
 		userId ?? ''
 	);
 	const { fetchingTables, tables, tablesError } = useAirtableApiTables(
-		state.access_token,
+		state.access_token ?? '',
 		state.base?.id ?? ''
 	);
 
-	const [ newUUID, setNewUUID ] = useState< string | null >( uuidFromProps ?? null );
+	const selectedTable = tables?.find( table => table.id === currentTableId ) ?? null;
+	const availableTableFields: string[] =
+		selectedTable?.fields
+			.filter( field => SUPPORTED_AIRTABLE_TYPES.includes( field.type ) )
+			.map( field => field.name ) ?? [];
+
+	const baseOptions = [
+		{
+			...defaultSelectBaseOption,
+			label: __( 'Select a base', 'remote-data-blocks' ),
+		},
+		...( bases ?? [] ).map( ( { name, id } ) => ( { label: name, value: id } ) ),
+	];
+	const tableOptions = [
+		{
+			...defaultSelectTableOption,
+			label: __( 'Select a table', 'remote-data-blocks' ),
+		},
+		...( tables ?? [] ).map( ( { name, id } ) => ( { label: name, value: id, disabled: false } ) ),
+	];
 
 	const onSaveClick = async () => {
-		if ( ! state.base || ! state.table ) {
-			// TODO: Error handling
-			return;
-		}
-
-		const selectedTable = tables?.find( table => table.id === state.table?.id );
-		if ( ! selectedTable ) {
+		if ( ! validState || ! selectedTable ) {
 			return;
 		}
 
 		const airtableConfig: AirtableConfig = {
-			uuid: uuidFromProps ?? '',
-			newUUID: newUUID ?? '',
 			service: 'airtable',
-			access_token: state.access_token,
-			base: state.base,
-			display_name: state.display_name,
-			tables: [
-				{
-					id: state.table.id,
-					name: state.table.name,
-					output_query_mappings: Array.from( state.table_fields )
-						.map( key => {
-							const field = selectedTable.fields.find( tableField => tableField.name === key );
-							if ( field ) {
-								return getAirtableOutputQueryMappingValue( field );
-							}
-							/**
-							 * Remove any fields which are not from this table or not supported.
-							 */
-							return null;
-						} )
-						.filter( Boolean ) as AirtableOutputQueryMappingValue[],
-				},
-			],
+			service_config: validState,
+			uuid: uuid ?? null,
 		};
 
-		if ( mode === 'add' ) {
-			await addDataSource( airtableConfig );
-		} else {
-			await updateDataSource( airtableConfig );
-		}
-		goToMainScreen();
+		return onSave( airtableConfig, mode );
 	};
 
 	const onTokenInputChange: InputChangeCallback = ( token: string | undefined ) => {
@@ -161,161 +113,100 @@ export const AirtableSettings = ( {
 	) => {
 		if ( extra?.event ) {
 			const { id } = extra.event.target;
-			let newValue: StringIdName | null = null;
 			if ( id === 'base' ) {
 				const selectedBase = bases?.find( base => base.id === value );
-				newValue = { id: value, name: selectedBase?.name ?? '' };
-			} else if ( id === 'table' ) {
-				const selectedTable = tables?.find( table => table.id === value );
-				newValue = { id: value, name: selectedTable?.name ?? '' };
-
-				if ( value !== state.table?.id ) {
-					// Reset the selected fields when the table changes.
-					handleOnChange( 'table_fields', new Set< string >() );
-				}
+				handleOnChange( 'base', { id: value, name: selectedBase?.name ?? '' } );
+				return;
 			}
-			handleOnChange( id, newValue );
+
+			if ( id === 'tables' ) {
+				if ( selectedTable ) {
+					return;
+				}
+
+				handleOnChange( 'tables', [] );
+				return;
+			}
+
+			handleOnChange( id, value );
 		}
 	};
 
-	const connectionMessage = useMemo( () => {
-		if ( fetchingUserId ) {
-			return __( 'Validating connection...', 'remote-data-blocks' );
-		} else if ( userIdError ) {
-			return getConnectionMessage(
-				'error',
-				__( 'Connection failed. Please verify your access token.', 'remote-data-blocks' )
-			);
-		} else if ( userId ) {
-			return getConnectionMessage(
-				'success',
-				__( 'Connection successful.', 'remote-data-blocks' )
-			);
-		}
-		return (
-			<span>
-				<a href="https://support.airtable.com/docs/creating-personal-access-tokens" target="_label">
-					{ __( 'How do I get my token?', 'remote-data-blocks' ) }
-				</a>
-			</span>
+	let connectionMessage: React.ReactNode = (
+		<span>
+			<a href="https://support.airtable.com/docs/creating-personal-access-tokens" target="_label">
+				{ __( 'How do I get my token?', 'remote-data-blocks' ) }
+			</a>
+		</span>
+	);
+
+	if ( fetchingUserId ) {
+		connectionMessage = __( 'Validating connection...', 'remote-data-blocks' );
+	} else if ( userIdError ) {
+		connectionMessage = getConnectionMessage(
+			'error',
+			__( 'Connection failed. Please verify your access token.', 'remote-data-blocks' )
 		);
-	}, [ fetchingUserId, userId, userIdError ] );
+	} else if ( userId ) {
+		connectionMessage = getConnectionMessage(
+			'success',
+			__( 'Connection successful.', 'remote-data-blocks' )
+		);
+	}
 
-	const shouldAllowContinue = useMemo( () => {
-		return userId !== null;
-	}, [ userId ] );
+	const shouldAllowContinue = userId !== null;
+	const shouldAllowSubmit =
+		bases !== null && tables !== null && Boolean( state.base ) && Boolean( selectedTable );
 
-	const shouldAllowSubmit = useMemo( () => {
-		return bases !== null && tables !== null && Boolean( state.base ) && Boolean( state.table );
-	}, [ bases, tables, state.base, state.table ] );
-
-	const basesHelpText = useMemo( () => {
-		if ( userId ) {
-			if ( basesError ) {
-				return __(
-					'Failed to fetch bases. Please check that your access token has the `schema.bases:read` Scope.'
-				);
-			} else if ( fetchingBases ) {
-				return __( 'Fetching bases...' );
-			} else if ( bases?.length === 0 ) {
-				return __( 'No bases found.' );
-			}
+	let basesHelpText: React.ReactNode = 'Select a base from which to fetch data.';
+	if ( userId ) {
+		if ( basesError ) {
+			basesHelpText = __(
+				'Failed to fetch bases. Please check that your access token has the `schema.bases:read` Scope.'
+			);
+		} else if ( fetchingBases ) {
+			basesHelpText = __( 'Fetching bases...' );
+		} else if ( bases?.length === 0 ) {
+			basesHelpText = __( 'No bases found.' );
 		}
+	}
 
-		return 'Select a base from which to fetch data.';
-	}, [ bases, basesError, fetchingBases, userId ] );
-
-	const tablesHelpText = useMemo( () => {
-		if ( bases?.length && state.base ) {
-			if ( tablesError ) {
-				return __(
-					'Failed to fetch tables. Please check that your access token has the `schema.tables:read` Scope.',
-					'remote-data-blocks'
-				);
-			} else if ( fetchingTables ) {
-				return __( 'Fetching tables...', 'remote-data-blocks' );
-			} else if ( tables ) {
-				if ( state.table ) {
-					const selectedTable = tables.find( table => table.id === state.table?.id );
-
-					if ( selectedTable ) {
-						return sprintf(
-							__( 'Fields: %s', 'remote-data-blocks' ),
-							selectedTable.fields.map( field => field.name ).join( ', ' )
-						);
-					}
-				}
-
-				if ( ! tables.length ) {
-					return __( 'No tables found', 'remote-data-blocks' );
-				}
-			}
-
-			return __( 'Select a table from which to fetch data.', 'remote-data-blocks' );
-		}
-
-		return 'Select a table to attach with this data source.';
-	}, [ bases, fetchingTables, state.base, state.table, tables, tablesError ] );
-
-	useEffect( () => {
-		if ( ! bases?.length ) {
-			return;
-		}
-
-		setBaseOptions( [
-			{
-				...defaultSelectBaseOption,
-				label: __( 'Select a base', 'remote-data-blocks' ),
-			},
-			...( bases ?? [] ).map( ( { name, id } ) => ( { label: name, value: id } ) ),
-		] );
-	}, [ bases ] );
-
-	useEffect( () => {
-		if ( ! state?.base ) {
-			return;
-		}
-
-		if ( tables ) {
-			setTableOptions( [
-				{
-					...defaultSelectBaseOption,
-					label: __( 'Select a table', 'remote-data-blocks' ),
-				},
-				...tables.map( ( { name, id } ) => ( { label: name, value: id, disabled: false } ) ),
-			] );
-		}
-	}, [ state.base, tables ] );
-
-	useEffect( () => {
-		const newAvailableTableFields: string[] = [];
-
-		if ( state.table && tables ) {
-			const selectedTable = tables.find( table => table.id === state.table?.id );
-
+	let tablesHelpText: string = __(
+		'Select a table to attach with this data source.',
+		'remote-data-blocks'
+	);
+	if ( bases?.length && state.base ) {
+		if ( tablesError ) {
+			tablesHelpText = __(
+				'Failed to fetch tables. Please check that your access token has the `schema.tables:read` Scope.',
+				'remote-data-blocks'
+			);
+		} else if ( fetchingTables ) {
+			tablesHelpText = __( 'Fetching tables...', 'remote-data-blocks' );
+		} else if ( tables ) {
 			if ( selectedTable ) {
-				selectedTable.fields.forEach( field => {
-					if ( SUPPORTED_AIRTABLE_TYPES.includes( field.type ) ) {
-						newAvailableTableFields.push( field.name );
-					}
-				} );
+				tablesHelpText = sprintf(
+					__( '%s fields found', 'remote-data-blocks' ),
+					selectedTable.fields.length
+				);
+			}
+
+			if ( ! tables.length ) {
+				tablesHelpText = __( 'No tables found', 'remote-data-blocks' );
 			}
 		}
 
-		setAvailableTableFields( newAvailableTableFields );
-	}, [ state.table, tables ] );
+		tablesHelpText = __( 'Select a table from which to fetch data.', 'remote-data-blocks' );
+	}
 
 	return (
 		<>
 			<DataSourceForm onSave={ onSaveClick }>
 				<DataSourceForm.Setup
-					displayName={ state.display_name }
+					displayName={ state.display_name ?? '' }
 					handleOnChange={ handleOnChange }
 					heading={ { icon: AirtableIconWithText, width: '113.81px', height: '25px' } }
 					inputIcon={ AirtableIcon }
-					newUUID={ newUUID }
-					setNewUUID={ setNewUUID }
-					uuidFromProps={ uuidFromProps }
 					canProceed={ shouldAllowContinue }
 				>
 					<PasswordInputControl
@@ -340,8 +231,8 @@ export const AirtableSettings = ( {
 					<SelectControl
 						id="table"
 						label={ __( 'Table', 'remote-data-blocks' ) }
-						value={ state.table?.id ?? '' }
-						onChange={ onSelectChange }
+						value={ selectedTable?.id ?? '' }
+						onChange={ setCurrentTableId }
 						options={ tableOptions }
 						help={ tablesHelpText }
 						disabled={ fetchingTables || ! tables?.length }
@@ -349,35 +240,64 @@ export const AirtableSettings = ( {
 						__nextHasNoMarginBottom
 					/>
 
-					{ state.table && availableTableFields.length ? (
-						<FormTokenField
+					{ selectedTable && availableTableFields.length ? (
+						<CustomFormFieldToken
 							label={ __( 'Fields', 'remote-data-blocks' ) }
 							onChange={ selection => {
+								let newTableFields: string[];
 								if ( selection.includes( 'Select All' ) ) {
-									handleOnChange( 'table_fields', new Set( availableTableFields ) );
+									newTableFields = Array.from( new Set( availableTableFields ) );
 								} else if ( selection.includes( 'Deselect All' ) ) {
-									handleOnChange( 'table_fields', new Set() );
+									newTableFields = [];
 								} else {
-									handleOnChange(
-										'table_fields',
+									newTableFields = Array.from(
 										new Set(
-											selection.filter( item => item !== 'Select All' && item !== 'Deselect All' )
+											selection
+												.filter( item => item !== 'Select All' && item !== 'Deselect All' )
+												.map( item => ( 'object' === typeof item ? item.value : item ) )
 										)
 									);
 								}
+								setTableFields( newTableFields );
+								handleOnChange( 'tables', [
+									{
+										id: selectedTable.id,
+										name: selectedTable.name,
+										output_query_mappings: newTableFields
+											.map( key => {
+												const field = selectedTable.fields.find(
+													tableField => tableField.name === key
+												);
+												if ( field ) {
+													return getAirtableOutputQueryMappingValue( field );
+												}
+												/**
+												 * Remove any fields which are not from this table or not supported.
+												 */
+												return null;
+											} )
+											.filter( Boolean ) as AirtableOutputQueryMappingValue[],
+									},
+								] );
 							} }
 							suggestions={ [
-								...( state.table_fields.size === availableTableFields.length
+								...( tableFields.length === availableTableFields.length
 									? [ 'Deselect All' ]
 									: [ 'Select All' ] ),
 								...availableTableFields,
 							] }
-							value={ Array.from( state.table_fields ) }
+							value={ tableFields }
+							__experimentalValidateInput={ input =>
+								availableTableFields.includes( input ) ||
+								input === 'Select All' ||
+								input === 'Deselect All'
+							}
 							__nextHasNoMarginBottom
 							__experimentalExpandOnFocus
+							__next40pxDefaultSize
 						/>
 					) : (
-						state.table && <Spinner />
+						selectedTable && <Spinner />
 					) }
 				</DataSourceForm.Scope>
 			</DataSourceForm>

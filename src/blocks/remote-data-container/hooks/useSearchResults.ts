@@ -18,10 +18,6 @@ export function useSearchResults( {
 	const { data, execute, loading } = useRemoteData( blockName, queryKey );
 	const timer = useRef< NodeJS.Timeout >();
 
-	function onChange( newValue: string ): void {
-		setSearchTerms( newValue );
-	}
-
 	function onSubmit(): void {
 		void execute( { search_terms: searchTerms } );
 	}
@@ -48,9 +44,9 @@ export function useSearchResults( {
 
 	return {
 		loading,
-		onChange,
 		onKeyDown,
 		results: data?.results,
 		searchTerms,
+		setSearchTerms,
 	};
 }

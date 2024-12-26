@@ -19,7 +19,7 @@ npm run dev
 
 This will spin up a WordPress environment and a Valkey (Redis) instance for object cache. It will also build the block editor scripts, watch for changes, and open a Node.js debugging port. The WordPress environment will be available at `http://localhost:8888` (admin user: `admin`, password: `password`).
 
-Stop the development environment with `Ctrl+C` and resume it by running the same command. You can also manually stop the environment with `npm run stop`. Stopping the environment stops the WordPress containers but preserves their state.
+Stop the development environment with `Ctrl+C` and resume it by running the same command. You can also manually stop the environment with `npm run dev:stop`. Stopping the environment optionally stops the WordPress containers but preserves their state.
 
 ### Testing
 
@@ -56,7 +56,7 @@ npm run wp-cli option get siteurl
 Destroy your local environment and irreversibly delete all content, configuration, and data:
 
 ```sh
-npm run destroy
+npm run dev:destroy
 ```
 
 ## Local playground

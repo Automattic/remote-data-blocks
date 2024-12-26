@@ -6,12 +6,16 @@ import { store as noticesStore, NoticeStoreActions, WPNotice } from '@wordpress/
 
 import { REST_BASE_DATA_SOURCES } from '@/data-sources/constants';
 import { DataSourceConfig } from '@/data-sources/types';
+import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
-export const useDataSources = ( loadOnMount = true ) => {
+export const useDataSources = < SourceConfig extends DataSourceConfig = DataSourceConfig >(
+	loadOnMount = true
+) => {
 	const [ loadingDataSources, setLoadingDataSources ] = useState< boolean >( false );
 	const [ dataSources, setDataSources ] = useState< DataSourceConfig[] >( [] );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch< NoticeStoreActions >( noticesStore );
+	const { goToMainScreen } = useSettingsContext();
 
 	async function fetchDataSources() {
 		setLoadingDataSources( true );
@@ -24,22 +28,29 @@ export const useDataSources = ( loadOnMount = true ) => {
 		setLoadingDataSources( false );
 	}
 
-	async function updateDataSource( sourceConfig: DataSourceConfig ) {
-		let result: DataSourceConfig;
+	async function updateDataSource( sourceConfig: SourceConfig ) {
+		let result: SourceConfig;
 
 		try {
-			const data = { ...sourceConfig };
-			if ( sourceConfig.newUUID && sourceConfig.newUUID !== sourceConfig.uuid ) {
-				data.newUUID = sourceConfig.newUUID;
-			}
-
 			result = await apiFetch( {
 				path: `${ REST_BASE_DATA_SOURCES }/${ sourceConfig.uuid }`,
 				method: 'PUT',
-				data,
+				data: sourceConfig.service_config,
 			} );
 		} catch ( error ) {
-			showSnackbar( 'error', __( 'Failed to update data source.', 'remote-data-blocks' ) );
+			let message = __( 'Failed to update data source.' );
+
+			if (
+				'object' === typeof error &&
+				null !== error &&
+				'code' in error &&
+				'invalid_type' === error?.code &&
+				'message' in error &&
+				'string' === typeof error.message
+			) {
+				message = __( error.message, 'remote-data-blocks' );
+			}
+			showSnackbar( 'error', message );
 			throw error;
 		}
 
@@ -47,14 +58,14 @@ export const useDataSources = ( loadOnMount = true ) => {
 			'success',
 			sprintf(
 				__( '"%s" has been successfully updated.', 'remote-data-blocks' ),
-				sourceConfig.display_name
+				sourceConfig.service_config.display_name
 			)
 		);
 		return result;
 	}
 
-	async function addDataSource( source: DataSourceConfig ) {
-		let result: DataSourceConfig;
+	async function addDataSource( source: SourceConfig ) {
+		let result: SourceConfig;
 
 		try {
 			result = await apiFetch( {
@@ -62,8 +73,20 @@ export const useDataSources = ( loadOnMount = true ) => {
 				method: 'POST',
 				data: source,
 			} );
-		} catch ( error ) {
-			showSnackbar( 'error', __( 'Failed to add data source.', 'remote-data-blocks' ) );
+		} catch ( error: unknown ) {
+			let message = __( 'Failed to add data source.' );
+
+			if (
+				'object' === typeof error &&
+				null !== error &&
+				'code' in error &&
+				'invalid_type' === error?.code &&
+				'message' in error &&
+				'string' === typeof error.message
+			) {
+				message = __( error.message, 'remote-data-blocks' );
+			}
+			showSnackbar( 'error', message );
 			throw error;
 		}
 
@@ -71,7 +94,7 @@ export const useDataSources = ( loadOnMount = true ) => {
 			'success',
 			sprintf(
 				__( '"%s" has been successfully added.', 'remote-data-blocks' ),
-				source.display_name
+				source.service_config.display_name
 			)
 		);
 		return result;
@@ -93,9 +116,18 @@ export const useDataSources = ( loadOnMount = true ) => {
 			'success',
 			sprintf(
 				__( '"%s" has been successfully deleted.', 'remote-data-blocks' ),
-				source.display_name
+				source.service_config.display_name
 			)
 		);
+	}
+
+	async function onSave( config: SourceConfig, mode: 'add' | 'edit' ): Promise< void > {
+		if ( mode === 'add' ) {
+			await addDataSource( config );
+		} else {
+			await updateDataSource( config );
+		}
+		goToMainScreen();
 	}
 
 	function showSnackbar( type: 'success' | 'error', message: string ): void {
@@ -126,5 +158,6 @@ export const useDataSources = ( loadOnMount = true ) => {
 		loadingDataSources,
 		updateDataSource,
 		fetchDataSources,
+		onSave,
 	};
 };

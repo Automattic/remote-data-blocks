@@ -9,14 +9,13 @@ Data sources and queries can be configured on the settings screen, but sometimes
 
 Here's a short overview of how data flows through the plugin when a post with a remote data block is rendered:
 
-1. WordPress core loads the post content, parses the blocks, and recognizes that a paragraph block has a [block binding](https://make.wordpress.org/core/2024/03/06/new-feature-the-block-bindings-api/).
+1. WordPress core loads the post content, parses the blocks, and recognizes that a paragraph block has a [block binding](../concepts/block-bindings.md).
 2. WordPress core calls the block binding callback function: `BlockBindings::get_value()`.
-3. The callback function inspects the paragraph block. Using the block context supplied by the parent remote data block, it determines which query to execute.
-4. The query runner is loaded: `$query->get_query_runner()`.
-5. The query runner executes the query: `$query_runner->execute()`.
-6. Various properties of the query are requested by the query runner, including the endpoint, request headers, request method, and request body. Some of these properties are delegated to the data source (`$query->get_data_source()`).
-7. The query is dispatched and the response data is inspected, formatted into a consistent shape, and returned to the block binding callback function.
-8. The callback function extracts the requested field from the response data and returns it to WordPress core for rendering.
+3. The callback function inspects the paragraph block. Using the block context supplied by the parent remote data block, it determines which [query](./query.md) to execute.
+4. The query is executed: `$query->execute()` (usually by delegating to a [query runner](./query-runner.md)).
+5. Various properties of the query are requested by the query runner, including the endpoint, request headers, request method, and request body. Some of these properties are delegated to the data source (`$query->get_data_source()`).
+6. The query is dispatched and the response data is inspected, formatted into a consistent shape, and returned to the block binding callback function.
+7. The callback function extracts the requested field from the response data and returns it to WordPress core for rendering.
 
 ## Customization
 

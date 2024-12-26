@@ -2,10 +2,10 @@ import { useReducer, useState } from '@wordpress/element';
 
 import { isNonEmptyObj, constructObjectWithValues } from '@/utils/object';
 
-export type ValidationRuleFn< T > = ( v: T ) => string | null;
+export type ValidationRuleFn< T > = ( v: Partial< T > ) => string | null;
 
 export type ValidationRules< T > = {
-	[ P in keyof T ]?: ValidationRuleFn< T >;
+	[ P in keyof Omit< T, '__version' | 'display_name' > ]: ValidationRuleFn< T >;
 };
 
 const executeValidationRules = < T >( rule: ValidationRuleFn< T >, value: T ): string | null => {
@@ -43,14 +43,15 @@ const executeAllValidationRules = < T >(
 };
 
 interface UseForm< T > {
-	state: T;
+	state: Partial< T >;
 	errors: { [ x: string ]: string | null };
-	setFormState: ( newState: T ) => void;
+	setFormState: ( newState: Partial< T > ) => void;
 	resetFormState: () => void;
 	resetErrorState: () => void;
 	handleOnChange: ( id: string, value: unknown ) => void;
 	handleOnBlur: ( id: string ) => void;
 	handleOnSubmit: () => void;
+	validState: T | null;
 }
 
 export interface ValidationFnResponse {
@@ -59,10 +60,10 @@ export interface ValidationFnResponse {
 }
 
 interface UseFormProps< T > {
-	initialValues: T;
-	validationRules?: ValidationRules< T >;
+	initialValues: Partial< T >;
+	validationRules?: ValidationRules< Partial< T > >;
 	submit?: ( state: T, resetForm: () => void ) => void;
-	submitValidationFn?: ( state: T ) => ValidationFnResponse;
+	submitValidationFn?: ( state: Partial< T > ) => ValidationFnResponse;
 }
 
 type FormAction< T > =
@@ -82,11 +83,14 @@ const reducer = < T >( state: T, action: FormAction< T > ): T => {
 
 export const useForm = < T extends Record< string, unknown > >( {
 	initialValues,
-	validationRules = {} as ValidationRules< T >,
+	validationRules = {} as ValidationRules< Partial< T > >,
 	submit,
 	submitValidationFn,
 }: UseFormProps< T > ): UseForm< T > => {
-	const [ state, dispatch ] = useReducer< typeof reducer< T > >( reducer, initialValues );
+	const [ state, dispatch ] = useReducer< typeof reducer< Partial< T > > >(
+		reducer,
+		initialValues
+	);
 	const [ touched, setTouched ] = useState(
 		constructObjectWithValues< boolean >( validationRules, false )
 	);
@@ -103,7 +107,7 @@ export const useForm = < T extends Record< string, unknown > >( {
 		resetErrorState();
 	};
 
-	const setFormState = ( newState: T ): void => {
+	const setFormState = ( newState: Partial< T > ): void => {
 		dispatch( { type: 'setState', payload: { value: newState } } );
 	};
 
@@ -131,9 +135,14 @@ export const useForm = < T extends Record< string, unknown > >( {
 		} );
 	};
 
+	const validation = executeAllValidationRules( validationRules, state );
+	const validateState = ( _partialState: Partial< T > ): _partialState is T => {
+		return ! validation.hasError;
+	};
+
 	const handleOnSubmit = (): void => {
 		if ( isNonEmptyObj( errors ) ) {
-			const { errorsObj, hasError } = executeAllValidationRules( validationRules, state );
+			const { errorsObj, hasError } = validation;
 			let finalErrorsObj: { [ x: string ]: string | null };
 			let finalHasError: boolean;
 			if ( submitValidationFn && typeof submitValidationFn === 'function' ) {
@@ -149,10 +158,10 @@ export const useForm = < T extends Record< string, unknown > >( {
 				finalHasError = hasError;
 			}
 			setErrors( finalErrorsObj );
-			if ( ! finalHasError && submit ) {
+			if ( ! finalHasError && submit && validateState( state ) ) {
 				submit( state, resetFormState );
 			}
-		} else if ( submit ) {
+		} else if ( submit && validateState( state ) ) {
 			submit( state, resetFormState );
 		}
 	};
@@ -166,6 +175,7 @@ export const useForm = < T extends Record< string, unknown > >( {
 		handleOnChange,
 		handleOnBlur,
 		handleOnSubmit,
+		validState: validateState( state ) ? state : null,
 	};
 };
 

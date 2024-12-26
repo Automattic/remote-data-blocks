@@ -2,21 +2,58 @@
 
 namespace RemoteDataBlocks\Example\ZipCode;
 
-use RemoteDataBlocks\Integrations\GenericHttp\GenericHttpDataSource;
-use RemoteDataBlocks\Logging\LoggerManager;
+use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use RemoteDataBlocks\Config\Query\HttpQuery;
 
-require_once __DIR__ . '/inc/queries/class-get-zip-code-query.php';
-
-function register_zipcode_block() {
-	$zipcode_data_source = GenericHttpDataSource::from_uuid( '0d8f9e74-5244-49b4-981b-e5374107aa5c' );
-
-	if ( ! $zipcode_data_source instanceof GenericHttpDataSource ) {
-		LoggerManager::instance()->debug( 'Zip Code data source not found' );
+function register_zipcode_block(): void {
+	if ( ! defined( 'REMOTE_DATA_BLOCKS_EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID' ) ) {
 		return;
 	}
 
-	$zipcode_query = new GetZipCodeQuery( $zipcode_data_source );
+	$zipcode_data_source = HttpDataSource::from_uuid( REMOTE_DATA_BLOCKS_EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID );
 
-	register_remote_data_block( 'Zip Code', $zipcode_query );
+	if ( ! $zipcode_data_source instanceof HttpDataSource ) {
+		return;
+	}
+
+	$zipcode_query = HttpQuery::from_array( [
+		'data_source' => $zipcode_data_source,
+		'endpoint' => function ( array $input_variables ) use ( $zipcode_data_source ): string {
+			return $zipcode_data_source->get_endpoint() . $input_variables['zip_code'];
+		},
+		'input_schema' => [
+			'zip_code' => [
+				'name' => 'Zip Code',
+				'type' => 'string',
+			],
+		],
+		'output_schema' => [
+			'is_collection' => false,
+			'type' => [
+				'zip_code' => [
+					'name' => 'Zip Code',
+					'path' => '$["post code"]',
+					'type' => 'string',
+				],
+				'city' => [
+					'name' => 'City',
+					'path' => '$.places[0]["place name"]',
+					'type' => 'string',
+				],
+				'state' => [
+					'name' => 'State',
+					'path' => '$.places[0].state',
+					'type' => 'string',
+				],
+			],
+		],
+	] );
+
+	register_remote_data_block( [
+		'title' => 'Zip Code',
+		'queries' => [
+			'display' => $zipcode_query,
+		],
+	] );
 }
 add_action( 'init', __NAMESPACE__ . '\\register_zipcode_block' );

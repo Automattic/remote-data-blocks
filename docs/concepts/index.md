@@ -18,17 +18,19 @@ Remote data blocks are custom blocks, but they are created and registered by our
 
 ## Data sources and queries
 
-Each remote data block is associated with a **data source** and a **query** that defines how data is fetched, processed, and displayed. Simple data sources and queries can be configured via the plugin's settings screen, while others may require custom PHP code (see [extending](../extending/index.md)).
+Each remote data block is associated with at least one **query** that defines how data is fetched, processed, and displayed. Queries delegate some logic to a **data source**, which can be reused by multiple queries.
+
+Simple data sources and queries can be configured via the plugin's settings screen, while others may require custom PHP code (see [extending](../extending/index.md)).
 
 ## Data fetching
 
-Data fetching is handled by the plugin and wraps `wp_remote_request`. When a request to your site resolves to one or more remote data blocks, the remote data will be fetched and potentially cached by our plugin. Multiple requests for the same data will be deduped, even if the requests are not cacheable.
+Data fetching is handled by the plugin and wraps `wp_remote_request`. When a request to your site resolves to one or more remote data blocks, the remote data will be fetched and potentially cached by our plugin. Multiple requests for the same data within a single page load will be deduped, even if the requests are not cacheable.
 
 ### Caching
 
-The plugin offers a caching layer for optimal performance and to help avoid rate limiting from remote data sources. If your WordPress environment has configured a [persistent object cache](https://developer.wordpress.org/reference/classes/wp_object_cache/#persistent-cache-plugins), it will be used. Otherwise, the plugin will utilize in-memory (per-request) caching. Deploying to production without a persistent object cache is not recommended.
+The plugin offers a caching layer for optimal performance and to help avoid rate limiting from remote data sources. If your WordPress environment has configured a [persistent object cache](https://developer.wordpress.org/reference/classes/wp_object_cache/#persistent-cache-plugins), it will be used. Otherwise, the plugin will utilize in-memory (per-page-load) caching. Deploying to production without a persistent object cache is not recommended.
 
-The default TTL for all cache objects is 60 seconds, but can be adjusted by extending the query class and [overriding the `get_cache_ttl` method](../extending/query.md#get_cache_ttl).
+The default TTL for all cache objects is 60 seconds, but it can be [configured per query or per request](../extending/query.md#get_cache_ttl).
 
 ## Theming
 

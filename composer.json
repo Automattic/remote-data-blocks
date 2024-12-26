@@ -32,7 +32,8 @@
     "galbar/jsonpath": "^3.0",
     "guzzlehttp/guzzle": "^7.8",
     "kevinrob/guzzle-cache-middleware": "^6.0",
-    "psr/log": "^3.0"
+    "psr/log": "^3.0",
+    "erusev/parsedown": "^1.7"
   },
   "require-dev": {
     "automattic/vipwpcs": "^3.0",

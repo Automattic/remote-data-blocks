@@ -4,7 +4,6 @@ export const AIRTABLE_STRING_TYPES = Object.freeze(
 		'multilineText',
 		'email',
 		'phoneNumber',
-		'richText',
 		'barcode',
 		'singleSelect',
 		'date',
@@ -32,7 +31,6 @@ export const SUPPORTED_AIRTABLE_TYPES = Object.freeze( [
 	'multilineText',
 	'email',
 	'phoneNumber',
-	'richText',
 	'barcode',
 	'singleSelect',
 	'multipleSelects',
@@ -55,6 +53,8 @@ export const SUPPORTED_AIRTABLE_TYPES = Object.freeze( [
 	'createdBy',
 	'lastModifiedBy',
 	'singleCollaborator',
+	// Markdown types
+	'richText',
 	// Other types
 	'multipleCollaborators',
 	'currency',

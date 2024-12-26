@@ -6,15 +6,12 @@ import {
 	VisuallyHidden,
 	__experimentalInputControl as InputControl,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
-	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
 import { Children, createPortal, isValidElement, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { lockSmall } from '@wordpress/icons';
 
 import { DataSourceFormActions } from './DataSourceFormActions';
-import { ModalWithButtonTrigger } from '@/blocks/remote-data-container/components/modals/BaseModal';
-import { useModalState } from '@/blocks/remote-data-container/hooks/useModalState';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
 interface DataSourceFormProps {
@@ -43,8 +40,8 @@ interface DataSourceFormSetupProps {
 				verticalAlign?: string;
 		  };
 	inputIcon: IconType;
-	newUUID: string | null;
-	setNewUUID: ( uuid: string | null ) => void;
+	newUUID?: string | null;
+	setNewUUID?: ( uuid: string | null ) => void;
 	uuidFromProps?: string;
 }
 
@@ -75,9 +72,12 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 
 	const canProceedToNextStep = (): boolean => {
 		const step = steps[ currentStep - 1 ];
-		return isValidElement< { canProceed?: boolean } >( step )
-			? Boolean( step.props?.canProceed )
-			: false;
+		if (
+			isValidElement< { canProceed?: boolean; displayName: string; uuidFromProps: string } >( step )
+		) {
+			return Boolean( step.props?.canProceed );
+		}
+		return false;
 	};
 
 	const handleNextStep = () => {
@@ -119,7 +119,10 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 				{ screen === 'editDataSource' && (
 					<>
 						{ createPortal(
-							<DataSourceFormActions onSave={ onSave } isSaveDisabled={ false } />,
+							<DataSourceFormActions
+								onSave={ onSave }
+								isSaveDisabled={ ! canProceedToNextStep() }
+							/>,
 							document.getElementById( 'rdb-settings-page-form-save-button' ) ||
 								document.createElement( 'div' )
 						) }
@@ -191,17 +194,16 @@ const DataSourceFormSetup = ( {
 	handleOnChange,
 	heading,
 	inputIcon,
-	newUUID,
-	setNewUUID,
-	uuidFromProps,
 }: DataSourceFormSetupProps ) => {
-	const [ displayName, setDisplayName ] = useState( initialDisplayName );
-	const { close, isOpen, open } = useModalState();
-
 	const { screen, service } = useSettingsContext();
+
+	const [ displayName, setDisplayName ] = useState( initialDisplayName );
+	const [ errors, setErrors ] = useState< Record< string, string > >( {} );
+
 	const { icon, height, label, width, verticalAlign } = heading;
 
 	const onDisplayNameChange = ( displayNameInput: string | undefined ) => {
+		setErrors( {} );
 		const sanitizedDisplayName = displayNameInput
 			?.toString()
 			.trim()
@@ -210,21 +212,15 @@ const DataSourceFormSetup = ( {
 		handleOnChange( 'display_name', sanitizedDisplayName ?? '' );
 	};
 
-	const isValidUUIDv4 = ( uuid: string ) => {
-		const uuidv4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-		return uuidv4Regex.test( uuid );
+	const validateDisplayName = () => {
+		if ( ! displayName.trim() ) {
+			setErrors( {
+				displayName: __( 'Please provide a name for your data source.', 'remote-data-blocks' ),
+			} );
+		} else {
+			setErrors( {} );
+		}
 	};
-
-	const defaultUUIDHelpText = (
-		<>
-			{ __(
-				'Unique identifier allows you to reference this data source in code.',
-				'remote-data-blocks'
-			) }
-		</>
-	);
-
-	const [ UUIDHelpText, setUUIDHelpText ] = useState( defaultUUIDHelpText );
 
 	return (
 		<DataSourceFormStep
@@ -260,72 +256,22 @@ const DataSourceFormSetup = ( {
 			}
 		>
 			<InputControl
+				autoComplete="off"
+				// prevent 1password suggestions since they ignore autocomplete
+				data-1p-ignore
+				className={ `rdb-settings-page_data-source-form-input ${
+					errors.displayName ? 'has-error' : ''
+				}   ` }
 				help={
-					<>
-						<span>
-							{ __( 'Only visible to you and other site managers. ', 'remote-data-blocks' ) }
-						</span>
-						{ screen === 'editDataSource' && (
-							<ModalWithButtonTrigger
-								buttonText={ __( 'Edit identifier', 'remote-data-blocks' ) }
-								isOpen={ isOpen }
-								onClose={ close }
-								onOpen={ open }
-								title={ __( 'Edit identifier', 'remote-data-blocks' ) }
-								buttonVariant="link"
-								size="medium"
-							>
-								<form
-									onSubmit={ event => {
-										event.preventDefault();
-										if ( newUUID && isValidUUIDv4( newUUID ) ) {
-											isValidUUIDv4( newUUID );
-											handleOnChange( 'uuid', newUUID ?? '' );
-											close();
-										} else {
-											setUUIDHelpText(
-												<span className="rdb-settings-page_data-source-form-uuid-error">
-													{ __(
-														'Please use valid UUIDv4 formatting to save changes.',
-														'remote-data-blocks'
-													) }
-												</span>
-											);
-										}
-									} }
-								>
-									<InputControl
-										label={ __( 'UUID', 'remote-data-blocks' ) }
-										value={ newUUID ?? '' }
-										onChange={ ( uuid?: string ) => setNewUUID( uuid ?? null ) }
-										placeholcomponents-base-control__helpder={ uuidFromProps }
-										__next40pxDefaultSize
-										help={ UUIDHelpText }
-									/>
-									<Spacer marginBottom={ 8 } />
-									<div className="rdb-settings-page_data-source-form-uuid-actions">
-										<Button
-											onClick={ () => {
-												setNewUUID( uuidFromProps ?? null );
-												setUUIDHelpText( defaultUUIDHelpText );
-												close();
-											} }
-											variant="tertiary"
-											__next40pxDefaultSize
-										>
-											Cancel
-										</Button>
-										<Button type="submit" variant="primary">
-											Save
-										</Button>
-									</div>
-								</form>
-							</ModalWithButtonTrigger>
-						) }
-					</>
+					<span>
+						{ errors.displayName
+							? errors.displayName
+							: __( 'Only visible to you and other site managers. ', 'remote-data-blocks' ) }
+					</span>
 				}
 				label={ __( 'Data Source Name' ) }
 				onChange={ onDisplayNameChange }
+				onBlur={ validateDisplayName }
 				value={ displayName }
 				prefix={
 					screen === 'editDataSource' ? (
