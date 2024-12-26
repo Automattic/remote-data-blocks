@@ -334,4 +334,100 @@ class BlockBindingsTest extends TestCase {
 			'test_input_field' => 'override_value transformed',
 		] );
 	}
+
+	/**
+	 * @runInSeparateProcess
+	 */
+	public function test_get_remote_value(): void {
+		/**
+		 * Mock the QueryRunner to return a result.
+		 */
+		$mock_qr = new MockQueryRunner();
+		$mock_qr->addResult( 'output_field', 'Test Output Value' );
+
+		$block_context = [
+			'blockName' => self::MOCK_BLOCK_NAME,
+			'queryInput' => [
+				'test_input_field' => 'test_value',
+			],
+		];
+
+		$input_schema = [
+			'test_input_field' => [
+				'name' => 'Test Input Field',
+				'type' => 'string',
+			],
+		];
+
+		$mock_block_config = [
+			'queries' => [
+				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::from_array( [
+					'input_schema' => $input_schema,
+					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
+					'query_runner' => $mock_qr,
+				] ),
+			],
+		];
+
+		$mock_config_store = Mockery::namedMock( ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_block_configuration' )
+			->once()
+			->with( self::MOCK_BLOCK_NAME )
+			->andReturn( $mock_block_config );
+
+		$source_args = [
+			'field' => self::MOCK_OUTPUT_FIELD_NAME,
+		];
+
+		$remote_value = BlockBindings::get_remote_value( $block_context, $source_args );
+		$this->assertSame( $remote_value, self::MOCK_OUTPUT_FIELD_VALUE );
+	}
+
+	/**
+	 * @runInSeparateProcess
+	 */
+	public function test_get_remote_value_with_non_string(): void {
+		/**
+		 * Mock the QueryRunner to return a result.
+		 */
+		$mock_qr = new MockQueryRunner();
+		$mock_qr->addResult( 'output_field', 123 );
+
+		$block_context = [
+			'blockName' => self::MOCK_BLOCK_NAME,
+			'queryInput' => [
+				'test_input_field' => 'test_value',
+			],
+		];
+
+		$input_schema = [
+			'test_input_field' => [
+				'name' => 'Test Input Field',
+				'type' => 'string',
+			],
+		];
+
+		$mock_block_config = [
+			'queries' => [
+				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::from_array( [
+					'input_schema' => $input_schema,
+					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
+					'query_runner' => $mock_qr,
+				] ),
+			],
+		];
+
+		$mock_config_store = Mockery::namedMock( ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_block_configuration' )
+			->once()
+			->with( self::MOCK_BLOCK_NAME )
+			->andReturn( $mock_block_config );
+
+		$source_args = [
+			'field' => self::MOCK_OUTPUT_FIELD_NAME,
+		];
+
+		$remote_value = BlockBindings::get_remote_value( $block_context, $source_args );
+		$this->assertSame( $remote_value, '123' );
+	}
 }

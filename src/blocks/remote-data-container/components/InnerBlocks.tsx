@@ -5,9 +5,7 @@ import { LoopTemplate } from '@/blocks/remote-data-container/components/loop-tem
 
 interface InnerBlocksProps {
 	blockConfig: BlockConfig;
-	getInnerBlocks: (
-		result: Record< string, string >
-	) => BlockInstance< RemoteDataInnerBlockAttributes >[];
+	getInnerBlocks: ( result: RemoteDataResult ) => BlockInstance< RemoteDataInnerBlockAttributes >[];
 	remoteData: RemoteData;
 }
 

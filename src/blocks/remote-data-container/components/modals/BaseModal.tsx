@@ -4,6 +4,7 @@ import { __ } from '@/utils/i18n';
 
 export interface BaseModalProps {
 	children: JSX.Element;
+	className?: string;
 	headerActions?: JSX.Element;
 	headerImage?: string;
 	onClose: () => void;
@@ -14,14 +15,14 @@ export interface BaseModalProps {
 export function BaseModal( props: BaseModalProps ) {
 	return (
 		<Modal
-			className="remote-data-blocks-modal"
+			className={ `${ props.className } remote-data-blocks-modal` }
 			headerActions={
 				<>
 					{ props.headerImage && (
 						<img
 							alt={ props.title }
 							src={ props.headerImage }
-							style={ { height: '90%', marginRight: '2em', objectFit: 'contain' } }
+							style={ { marginRight: '2em', objectFit: 'contain' } }
 						/>
 					) }
 					{ props.headerActions }
