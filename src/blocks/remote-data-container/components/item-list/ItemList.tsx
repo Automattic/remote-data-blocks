@@ -9,7 +9,7 @@ interface ItemListProps {
 	blockName: string;
 	loading: boolean;
 	onSelect: ( data: RemoteDataQueryInput ) => void;
-	results?: RemoteData[ 'results' ];
+	results?: RemoteDataResult[];
 	searchTerms: string;
 	setSearchTerms: ( newValue: string ) => void;
 }
@@ -31,7 +31,7 @@ export function ItemList( props: ItemListProps ) {
 							? item[ Object.keys( item ).find( key => /(^|_)(id)$/i.test( key ) ) as string ]
 							: instanceId,
 				  }
-		) as RemoteData[ 'results' ];
+		) as RemoteDataResult[];
 	}, [ results ] );
 
 	// get fields from results data to use as columns
@@ -62,7 +62,7 @@ export function ItemList( props: ItemListProps ) {
 			id: string;
 			label: string;
 			enableGlobalSearch: boolean;
-			render?: ( { item }: { item: RemoteData[ 'results' ][ 0 ] } ) => JSX.Element;
+			render?: ( { item }: { item: RemoteDataResult } ) => JSX.Element;
 			enableSorting: boolean;
 		}[] = getFields.map( field => {
 			return {
@@ -71,7 +71,7 @@ export function ItemList( props: ItemListProps ) {
 				enableGlobalSearch: true,
 				render:
 					field === media
-						? ( { item }: { item: RemoteData[ 'results' ][ 0 ] } ) => {
+						? ( { item }: { item: RemoteDataResult } ) => {
 								return (
 									<img
 										// temporary until we pull in more data
@@ -134,7 +134,7 @@ export function ItemList( props: ItemListProps ) {
 			icon: <>{ __( 'Choose' ) }</>,
 			isPrimary: true,
 			label: '',
-			callback: ( items: RemoteData[ 'results' ] ) => {
+			callback: ( items: RemoteDataResult[] ) => {
 				items.map( item => onSelect( item ) );
 			},
 		},

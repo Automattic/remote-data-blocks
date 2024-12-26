@@ -236,7 +236,7 @@ class BlockBindings {
 			return sprintf( '<span class="rdb-block-label">%s</span> %s', $source_args['label'], $value );
 		}
 
-		return $value;
+		return strval( $value );
 	}
 
 	public static function loop_block_render_callback( array $attributes, string $content, WP_Block $block ): string {

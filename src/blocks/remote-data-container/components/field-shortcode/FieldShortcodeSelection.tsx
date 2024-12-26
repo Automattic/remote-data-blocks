@@ -74,7 +74,8 @@ export function FieldSelectionFromAvailableBindings( props: FieldSelectionWithFi
 				...acc,
 				[ fieldName ]: {
 					name: binding.name,
-					value: fieldValue,
+					// eslint-disable-next-line @typescript-eslint/no-base-to-string
+					value: fieldValue?.toString() ?? '',
 				},
 			};
 		},
