@@ -230,7 +230,7 @@ class BlockBindings {
 			$fallback_content = $result[ $source_field ];
 		}
 
-		if ( '' === $fallback_content ) {
+		if ( null === $fallback_content ) {
 			$fallback_content = $block_attributes['content'] ?? null;
 		}
 
