@@ -19,21 +19,21 @@ function getAttributeValue( attributes: unknown, key: string | undefined | null 
 }
 
 function getExpectedAttributeValue(
-	result?: Record< string, string >,
+	result?: Record< string, unknown >,
 	args?: RemoteDataBlockBindingArgs
 ): string | null {
 	if ( ! args?.field || ! result?.[ args.field ] ) {
 		return null;
 	}
 
-	let expectedValue = result[ args.field ];
+	// See comment on toString() in getAttributeValue.
+	let expectedValue = result[ args.field ]?.toString() ?? '';
 	if ( args.label ) {
 		const labelClass = getClassName( 'block-label' );
 		expectedValue = `<span class="${ labelClass }">${ args.label }</span> ${ expectedValue }`;
 	}
 
-	// See comment on toString() in getAttributeValue.
-	return expectedValue?.toString() ?? null;
+	return expectedValue;
 }
 
 export function getBoundAttributeEntries(
@@ -65,7 +65,7 @@ export function getBoundBlockClassName(
 
 export function getMismatchedAttributes(
 	attributes: RemoteDataInnerBlockAttributes,
-	results: RemoteData[ 'results' ],
+	results: RemoteDataResult[],
 	remoteDataBlockName: string,
 	index = 0
 ): Partial< RemoteDataInnerBlockAttributes > {
