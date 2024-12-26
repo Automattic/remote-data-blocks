@@ -1,4 +1,5 @@
-import { Icon } from '@wordpress/components';
+import { Icon, Tooltip } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { chevronRightSmall } from '@wordpress/icons';
 
 import { DataSourceConfig } from '@/data-sources/types';
@@ -54,10 +55,18 @@ const DataSourceDescriptor = ( props: DataSourceMetaTagsProps ) => {
 	);
 };
 
+const CodeBadge = () => {
+	return (
+		<Tooltip text={ __( 'This data source is configured in code.', 'remote-data-blocks' ) }>
+			<span className="data-source-badge">Code</span>
+		</Tooltip>
+	);
+};
+
 const DataSourceMetaTags = ( props: DataSourceMetaTagsProps ) => {
 	return (
 		<>
-			{ ! props.source.uuid && <span className="data-source-badge">Code</span> }
+			{ ! props.source.uuid && <CodeBadge /> }
 			<DataSourceDescriptor source={ props.source } />
 		</>
 	);
