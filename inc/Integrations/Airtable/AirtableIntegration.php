@@ -6,7 +6,7 @@ use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 
 class AirtableIntegration {
 	public static function init(): void {
-		add_action( 'init', [ __CLASS__, 'register_blocks' ] );
+		add_action( 'init', [ __CLASS__, 'register_blocks' ], 10, 0 );
 	}
 
 	public static function register_blocks(): void {
