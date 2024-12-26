@@ -17,8 +17,8 @@ import {
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import {
 	AirtableConfig,
-	AirtableOutputQueryMappingValue,
 	AirtableServiceConfig,
+	DataSourceQueryMappingValue,
 	SettingsComponentProps,
 } from '@/data-sources/types';
 import { getConnectionMessage } from '@/data-sources/utils';
@@ -266,7 +266,7 @@ export const AirtableSettings = ( {
 											 */
 											return null;
 										} )
-										.filter( Boolean ) as AirtableOutputQueryMappingValue[],
+										.filter( Boolean ) as DataSourceQueryMappingValue[],
 								},
 							] );
 						} }

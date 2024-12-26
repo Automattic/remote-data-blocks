@@ -1,6 +1,11 @@
 import { __, sprintf } from '@wordpress/i18n';
 
-import { GoogleSpreadsheet, GoogleDriveFileList, GoogleDriveFile } from '@/types/google';
+import {
+	GoogleSpreadsheet,
+	GoogleDriveFileList,
+	GoogleDriveFile,
+	GoogleSheetsValueRange,
+} from '@/types/google';
 import { SelectOption } from '@/types/input';
 
 export class GoogleApi {
@@ -65,5 +70,20 @@ export class GoogleApi {
 			label: sheet.properties.title,
 			value: sheet.properties.sheetId.toString(),
 		} ) );
+	}
+
+	private async getSheetValues(
+		spreadsheetId: string,
+		sheetTitle: string,
+		cellRange: string
+	): Promise< GoogleSheetsValueRange > {
+		const url = `${ GoogleApi.SHEETS_BASE_URL }/spreadsheets/${ spreadsheetId }/values/${ sheetTitle }!${ cellRange }`;
+		const result = await this.fetchApi< GoogleSheetsValueRange >( url );
+		return result;
+	}
+
+	public async getSheetFields( spreadsheetId: string, sheetTitle: string ): Promise< string[] > {
+		const values = await this.getSheetValues( spreadsheetId, sheetTitle, 'A1:Z1' );
+		return values.values[ 0 ] ?? [];
 	}
 }

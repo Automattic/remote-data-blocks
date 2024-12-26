@@ -72,7 +72,7 @@ const DataSourceList = () => {
 				tags.push( {
 					key: 'spreadsheet',
 					primaryValue: source.service_config.spreadsheet.name ?? 'Google Sheet',
-					secondaryValue: source.service_config.sheet.name,
+					secondaryValue: source.service_config.sheets[ 0 ]?.name,
 				} );
 				break;
 		}
