@@ -36,11 +36,11 @@ class GoogleSheetsDataSource extends HttpDataSource {
 					'id' => Types::integer(),
 					'name' => Types::string(),
 					'output_query_mappings' => Types::list_of(
-					Types::object( [
-						'key' => Types::string(),
-						'name' => Types::nullable( Types::string() ),
-						'path' => Types::nullable( Types::json_path() ),
-						'type' => Types::nullable( Types::string() ),
+						Types::object( [
+							'key' => Types::string(),
+							'name' => Types::nullable( Types::string() ),
+							'path' => Types::nullable( Types::json_path() ),
+							'type' => Types::nullable( Types::string() ),
 						] )
 					),
 				] )

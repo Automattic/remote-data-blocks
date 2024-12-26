@@ -1,6 +1,6 @@
 import { SUPPORTED_SERVICES } from '@/data-sources/constants';
 import { HttpAuth } from '@/data-sources/http/types';
-import { NumberIdName, StringIdName } from '@/types/common';
+import { StringIdName } from '@/types/common';
 import { GoogleServiceAccountKey } from '@/types/google';
 
 export type DataSourceType = ( typeof SUPPORTED_SERVICES )[ number ];
