@@ -1,4 +1,3 @@
-import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 import { CustomFormFieldToken } from '@/data-sources/components/CustomFormFieldToken';
@@ -7,18 +6,17 @@ interface FieldsSelectionProps {
 	selectedFields: string[];
 	availableFields: string[];
 	onFieldsChange: ( fields: string[] ) => void;
-	isLoading?: boolean;
+	disabled?: boolean;
+	customHelpText?: string | null;
 }
 
 export const FieldsSelection = ( {
 	selectedFields,
 	availableFields,
 	onFieldsChange,
-	isLoading = false,
+	customHelpText,
+	disabled = false,
 }: FieldsSelectionProps ) => {
-	if ( isLoading ) return <Spinner />;
-	if ( ! availableFields.length ) return null;
-
 	return (
 		<CustomFormFieldToken
 			label={ __( 'Fields', 'remote-data-blocks' ) }
@@ -52,6 +50,8 @@ export const FieldsSelection = ( {
 			__nextHasNoMarginBottom
 			__experimentalExpandOnFocus
 			__next40pxDefaultSize
+			disabled={ disabled }
+			customHelpText={ customHelpText }
 		/>
 	);
 };

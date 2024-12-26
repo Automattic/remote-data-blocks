@@ -240,36 +240,37 @@ export const AirtableSettings = ( {
 						__nextHasNoMarginBottom
 					/>
 
-					{ selectedTable && (
-						<FieldsSelection
-							selectedFields={ tableFields }
-							availableFields={ availableTableFields }
-							isLoading={ ! availableTableFields.length }
-							onFieldsChange={ newFields => {
-								setTableFields( newFields );
-								handleOnChange( 'tables', [
-									{
-										id: selectedTable.id,
-										name: selectedTable.name,
-										output_query_mappings: newFields
-											.map( key => {
-												const field = selectedTable.fields.find(
-													tableField => tableField.name === key
-												);
-												if ( field ) {
-													return getAirtableOutputQueryMappingValue( field );
-												}
-												/**
-												 * Remove any fields which are not from this table or not supported.
-												 */
-												return null;
-											} )
-											.filter( Boolean ) as AirtableOutputQueryMappingValue[],
-									},
-								] );
-							} }
-						/>
-					) }
+					<FieldsSelection
+						selectedFields={ tableFields }
+						availableFields={ availableTableFields }
+						disabled={ ! selectedTable }
+						customHelpText={
+							! selectedTable ? __( 'Please select a table first.', 'remote-data-blocks' ) : null
+						}
+						onFieldsChange={ newFields => {
+							setTableFields( newFields );
+							handleOnChange( 'tables', [
+								{
+									id: selectedTable?.id,
+									name: selectedTable?.name,
+									output_query_mappings: newFields
+										.map( key => {
+											const field = selectedTable?.fields.find(
+												tableField => tableField.name === key
+											);
+											if ( field ) {
+												return getAirtableOutputQueryMappingValue( field );
+											}
+											/**
+											 * Remove any fields which are not from this table or not supported.
+											 */
+											return null;
+										} )
+										.filter( Boolean ) as AirtableOutputQueryMappingValue[],
+								},
+							] );
+						} }
+					/>
 				</DataSourceForm.Scope>
 			</DataSourceForm>
 		</>
