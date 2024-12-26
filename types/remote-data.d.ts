@@ -14,14 +14,17 @@ interface QueryInputOverride {
 	sourceType: 'query_var';
 }
 
+type RemoteDataResult = Record< string, unknown >;
+type RemoteDataQueryInput = Record< string, unknown >;
+
 interface RemoteData {
 	blockName: string;
 	isCollection: boolean;
 	metadata: Record< string, RemoteDataResultFields >;
-	queryInput: Record< string, string >;
+	queryInput: RemoteDataQueryInput;
 	queryInputOverrides?: Record< string, QueryInputOverride >;
 	resultId: string;
-	results: Record< string, string >[];
+	results: RemoteDataResult[];
 }
 
 interface RemoteDataBlockAttributes {
@@ -61,8 +64,6 @@ interface RemoteDataInnerBlockAttributes {
 	};
 	url?: string | RichTextData;
 }
-
-type RemoteDataQueryInput = Record< string, string >;
 
 interface RemoteDataApiRequest {
 	block_name: string;
