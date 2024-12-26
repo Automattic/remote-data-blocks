@@ -9,6 +9,10 @@ use WP_Error;
 
 class SalesforceB2CIntegration {
 	public static function init(): void {
+		add_action( 'init', [ __CLASS__, 'register_blocks' ], 10, 0 );
+	}
+
+	public static function register_blocks(): void {
 		$data_source_configs = DataSourceCrud::get_configs_by_service( REMOTE_DATA_BLOCKS_SALESFORCE_B2C_SERVICE );
 
 		foreach ( $data_source_configs as $config ) {
