@@ -32,7 +32,8 @@ function getExpectedAttributeValue(
 		expectedValue = `<span class="${ labelClass }">${ args.label }</span> ${ expectedValue }`;
 	}
 
-	return expectedValue ?? null;
+	// See comment on toString() in getAttributeValue.
+	return expectedValue?.toString() ?? null;
 }
 
 export function getBoundAttributeEntries(
