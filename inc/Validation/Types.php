@@ -61,7 +61,7 @@ final class Types {
 	}
 
 	public static function button_url(): array {
-		return self::generate_primitive_type( 'image_url' );
+		return self::generate_primitive_type( 'button_url' );
 	}
 
 	/**

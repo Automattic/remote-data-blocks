@@ -63,6 +63,14 @@ interface GridProperties {
 	columnGroupControlAfter?: boolean;
 }
 
+export type GoogleSheetsValues = string[];
+
+export interface GoogleSheetsValueRange {
+	range: string;
+	majorDimension: 'ROWS' | 'COLUMNS' | 'DIMENSION_UNSPECIFIED';
+	values: GoogleSheetsValues[];
+}
+
 // Service Account
 export interface GoogleServiceAccountKey {
 	[ key: string ]: string;
