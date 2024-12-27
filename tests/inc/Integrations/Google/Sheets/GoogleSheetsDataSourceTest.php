@@ -42,7 +42,7 @@ class GoogleSheetsDataSourceTest extends TestCase {
 				],
 				'sheets' => [
 					[
-						'id' => 1,
+						'id' => '1',
 						'name' => 'Test Sheet Name',
 						'output_query_mappings' => [
 							[
