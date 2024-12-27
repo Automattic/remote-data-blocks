@@ -33,7 +33,7 @@ class GoogleSheetsDataSource extends HttpDataSource {
 			] ),
 			'sheets' => Types::list_of(
 				Types::object( [
-					'id' => Types::integer(),
+					'id' => Types::string(),
 					'name' => Types::string(),
 					'output_query_mappings' => Types::list_of(
 						Types::object( [
