@@ -27,9 +27,12 @@ function register_westeros_houses_block(): void {
 			'spreadsheet' => [
 				'id' => '1EHdQg53Doz0B-ImrGz_hTleYeSvkVIk_NSJCOM1FQk0',
 			],
-			'sheet' => [
-				'id' => 1,
-				'name' => 'Houses',
+			'sheets' => [
+				[
+					'id' => '1',
+					'name' => 'Houses',
+					'output_query_mappings' => [],
+				],
 			],
 		],
 	] );

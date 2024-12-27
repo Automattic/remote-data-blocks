@@ -33,7 +33,7 @@ const DataSourceDescriptor = ( props: DataSourceMetaTagsProps ) => {
 			tag = {
 				key: 'spreadsheet',
 				primaryValue: props.source.service_config.spreadsheet.name ?? 'Google Sheet',
-				secondaryValue: props.source.service_config.sheet.name,
+				secondaryValue: props.source.service_config.sheets[ 0 ]?.name,
 			};
 			break;
 	}
