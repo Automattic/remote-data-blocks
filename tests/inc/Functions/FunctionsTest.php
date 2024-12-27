@@ -38,8 +38,8 @@ class FunctionsTest extends TestCase {
 	public function testRegisterBlock() {
 		register_remote_data_block( [
 			'title' => 'Test Block',
-			'queries' => [
-				'display' => $this->mock_query,
+			'render_query' => [
+				'query' => $this->mock_query,
 			],
 		] );
 
@@ -56,10 +56,10 @@ class FunctionsTest extends TestCase {
 	public function testRegisterLoopBlock() {
 		register_remote_data_block( [
 			'title' => 'Loop Block',
-			'queries' => [
-				'display' => $this->mock_list_query,
+			'render_query' => [
+				'loop' => true,
+				'query' => $this->mock_list_query,
 			],
-			'loop' => true,
 		] );
 
 		$block_name = 'remote-data-blocks/loop-block';
@@ -73,9 +73,14 @@ class FunctionsTest extends TestCase {
 	public function testRegisterListQuery() {
 		register_remote_data_block( [
 			'title' => 'Test Block with List Query',
-			'queries' => [
-				'display' => $this->mock_query,
-				'list' => $this->mock_list_query,
+			'render_query' => [
+				'query' => $this->mock_query,
+			],
+			'selection_queries' => [
+				[
+					'query' => $this->mock_list_query,
+					'type' => 'list',
+				],
 			],
 		] );
 
@@ -87,9 +92,14 @@ class FunctionsTest extends TestCase {
 	public function testRegisterSearchQuery() {
 		register_remote_data_block( [
 			'title' => 'Test Block with Search Query',
-			'queries' => [
-				'display' => $this->mock_query,
-				'search' => $this->mock_search_query,
+			'render_query' => [
+				'query' => $this->mock_query,
+			],
+			'selection_queries' => [
+				[
+					'query' => $this->mock_search_query,
+					'type' => 'search',
+				],
 			],
 		] );
 
@@ -101,8 +111,8 @@ class FunctionsTest extends TestCase {
 	public function testIsRegisteredBlockReturnsTrueForRegisteredBlock() {
 		register_remote_data_block( [
 			'title' => 'Some Slick Block',
-			'queries' => [
-				'display' => $this->mock_query,
+			'render_query' => [
+				'query' => $this->mock_query,
 			],
 		] );
 
@@ -123,14 +133,14 @@ class FunctionsTest extends TestCase {
 	public function testRegisterDuplicateBlock() {
 		register_remote_data_block( [
 			'title' => 'Duplicate Block',
-			'queries' => [
-				'display' => $this->mock_query,
+			'render_query' => [
+				'query' => $this->mock_query,
 			],
 		] );
 		register_remote_data_block( [
 			'title' => 'Duplicate Block',
-			'queries' => [
-				'display' => $this->mock_query,
+			'render_query' => [
+				'query' => $this->mock_query,
 			],
 		] );
 
@@ -142,9 +152,14 @@ class FunctionsTest extends TestCase {
 	public function testRegisterSearchQueryWithoutSearchTerms() {
 		register_remote_data_block( [
 			'title' => 'Invalid Search Block',
-			'queries' => [
-				'display' => $this->mock_query,
-				'search' => $this->mock_query,
+			'render_query' => [
+				'query' => $this->mock_query,
+			],
+			'selection_queries' => [
+				[
+					'query' => $this->mock_query,
+					'type' => 'search',
+				],
 			],
 		] );
 

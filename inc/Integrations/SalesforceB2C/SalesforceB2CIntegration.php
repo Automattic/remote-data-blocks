@@ -138,17 +138,26 @@ class SalesforceB2CIntegration {
 	}
 
 	public static function register_blocks_for_salesforce_data_source( SalesforceB2CDataSource $data_source ): void {
+		$queries = self::get_queries( $data_source );
+
 		register_remote_data_block(
 			[
 				'title' => $data_source->get_display_name(),
-				'queries' => self::get_queries( $data_source ),
-				'query_input_overrides' => [
+				'render_query' => [
+					'query' => $queries['display'],
+					'input_overrides' => [
+						[
+							'source' => 'utm_content',
+							'source_type' => 'query_var',
+							'target' => 'product_id',
+							'target_type' => 'input_var',
+						],
+					],
+				],
+				'selection_queries' => [
 					[
-						'query' => 'display',
-						'source' => 'utm_content',
-						'source_type' => 'query_var',
-						'target' => 'product_id',
-						'target_type' => 'input_var',
+						'query' => $queries['search'],
+						'type' => 'search',
 					],
 				],
 			]

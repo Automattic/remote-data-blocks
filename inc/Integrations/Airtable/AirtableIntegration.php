@@ -19,9 +19,14 @@ class AirtableIntegration {
 			array_merge(
 				[
 					'title' => $data_source->get_display_name(),
-					'queries' => [
-						'display' => $data_source->___temp_get_query(),
-						'list' => $data_source->___temp_get_list_query(),
+					'render_query' => [
+						'query' => $data_source->___temp_get_query(),
+					],
+					'selection_queries' => [
+						[
+							'query' => $data_source->___temp_get_list_query(),
+							'type' => 'list',
+						],
 					],
 				],
 				$block_overrides
@@ -34,9 +39,9 @@ class AirtableIntegration {
 			array_merge(
 				[
 					'title' => sprintf( '%s Loop', $data_source->get_display_name() ),
-					'loop' => true,
-					'queries' => [
-						'display' => $data_source->___temp_get_list_query(),
+					'render_query' => [
+						'loop' => true,
+						'query' => $data_source->___temp_get_list_query(),
 					],
 				],
 				$block_overrides

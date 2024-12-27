@@ -114,9 +114,14 @@ class ShopifyIntegration {
 
 		register_remote_data_block( [
 			'title' => $block_title,
-			'queries' => [
-				'display' => $queries['shopify_get_product'],
-				'search' => $queries['shopify_search_products'],
+			'render_query' => [
+				'query' => $queries['shopify_get_product'],
+			],
+			'selection_queries' => [
+				[
+					'query' => $queries['shopify_search_products'],
+					'type' => 'search',
+				],
 			],
 			'patterns' => [
 				[
