@@ -40,9 +40,19 @@ class GoogleSheetsDataSourceTest extends TestCase {
 					'id' => 'test_spreadsheet_id',
 					'name' => 'Test Spreadsheet Name',
 				],
-				'sheet' => [
-					'id' => 1,
-					'name' => 'Test Sheet Name',
+				'sheets' => [
+					[
+						'id' => '1',
+						'name' => 'Test Sheet Name',
+						'output_query_mappings' => [
+							[
+								'key' => 'test_key',
+								'name' => 'Test Key',
+								'path' => '$.test_key',
+								'type' => 'string',
+							],
+						],
+					],
 				],
 			],
 		] );

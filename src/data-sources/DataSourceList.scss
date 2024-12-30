@@ -51,7 +51,6 @@ table.data-source-list {
 	}
 }
 
-
 .data-source-actions {
 
 	button.components-button {
@@ -67,3 +66,12 @@ table.data-source-list {
 	}
 }
 
+.data-source-badge {
+	background-color: rgba(56, 88, 233, 0.04);
+	border-radius: 4px;
+	display: inline-block;
+	font-weight: 500;
+	margin: 0 8px 0 -8px;
+	padding: 4px 8px;
+	vertical-align: baseline;
+}
