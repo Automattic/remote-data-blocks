@@ -32,20 +32,20 @@ class BlockRegistration {
 	}
 
 	public static function register_blocks(): void {
-		$all_remote_data_config = [];
+		$all_remote_block_configs = [];
 		$scripts_to_localize = [];
 
 		foreach ( ConfigStore::get_block_configurations() as $block_configuration ) {
 			$block_name = $block_configuration['name'];
 
 			[ $config, $script_handle ] = self::register_block_configuration( $block_configuration );
-			$all_remote_data_config[ $block_name ] = $config;
+			$all_remote_block_configs[ $block_name ] = $config;
 			$scripts_to_localize[] = $script_handle;
 		}
 
 		foreach ( array_unique( $scripts_to_localize ) as $script_handle ) {
 			wp_localize_script( $script_handle, 'REMOTE_DATA_BLOCKS', [
-				'config' => $all_remote_data_config,
+				'config' => $all_remote_block_configs,
 				'rest_url' => RemoteDataController::get_url(),
 				'tracks_global_properties' => TracksAnalytics::get_global_properties(),
 			] );
