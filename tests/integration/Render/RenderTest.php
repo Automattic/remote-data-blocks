@@ -82,34 +82,25 @@ class RenderTest extends WP_UnitTestCase {
 			<!-- wp:remote-data-blocks/test-zip-api {"remoteData":{"blockName":"remote-data-blocks/test-zip-api","queryInput":{"zip_code":"12345"}}} -->
 			<div class="wp-block-remote-data-blocks-test-zip-api rdb-container">
 				<!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"block":"remote-data-blocks/test-zip-api","field":"zip_code"}}},"name":"Zip Code"}} -->
-				<h2 class="wp-block-heading field-zip-code"></h2>
+				<h2 id="field-zip-code" class="wp-block-heading"></h2>
 				<!-- /wp:heading -->
 
 				<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"block":"remote-data-blocks/test-zip-api","field":"city"}}},"name":"City"}} -->
-				<p class="field-city"></p>
+				<p id="field-city"></p>
 				<!-- /wp:paragraph -->
 
 				<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"block":"remote-data-blocks/test-zip-api","field":"state"}}},"name":"State"}} -->
-				<p class="field-state"></p>
+				<p id="field-state"></p>
 				<!-- /wp:paragraph -->
 			</div>
 			<!-- /wp:remote-data-blocks/test-zip-api -->
 		');
 
 		$dom = self::load_html_into_dom( $result_html );
-		$xpath = new DOMXPath( $dom );
 
-		$zip_code_nodes = $xpath->query( "//*[contains(@class, 'field-zip-code')]" );
-		$this->assertCount( 1, $zip_code_nodes );
-		$this->assertEquals( '12345', $zip_code_nodes[0]->textContent );
-
-		$city_nodes = $xpath->query( "//*[contains(@class, 'field-city')]" );
-		$this->assertCount( 1, $city_nodes );
-		$this->assertEquals( 'Test City', $city_nodes[0]->textContent );
-
-		$state_nodes = $xpath->query( "//*[contains(@class, 'field-state')]" );
-		$this->assertCount( 1, $state_nodes );
-		$this->assertEquals( 'Test State', $state_nodes[0]->textContent );
+		$this->assertIdInDomHasContent( $dom, 'field-zip-code', '12345' );
+		$this->assertIdInDomHasContent( $dom, 'field-city', 'Test City' );
+		$this->assertIdInDomHasContent( $dom, 'field-state', 'Test State' );
 	}
 
 	private function get_query_runner_with_response( array $response_data ) {
@@ -143,5 +134,13 @@ class RenderTest extends WP_UnitTestCase {
 		}
 
 		return $dom;
+	}
+
+	private function assertIdInDomHasContent( DOMDocument $dom, string $html_id, string $expected_content ): void {
+		$xpath = new DOMXPath( $dom );
+		$id_nodes = $xpath->query( sprintf( "//*[@id='%s']", $html_id ) );
+
+		$this->assertCount( 1, $id_nodes, sprintf( "Should be 1 matching node with HTML ID '%s' but %d found.", $html_id, count( $id_nodes ) ) );
+		$this->assertEquals( $expected_content, $id_nodes[0]->textContent, sprintf( "Expected '%s' in node with HTML ID '%s', but found '%s' instead.", $expected_content, $html_id, $id_nodes[0]->textContent ) );
 	}
 }
