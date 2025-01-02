@@ -1,9 +1,5 @@
 <?php declare(strict_types = 1);
 
-/**
- * PHPUnit bootstrap file.
- */
-
 // Do not require Redis running for integration tests
 define( 'WP_REDIS_DISABLED', true );
 
