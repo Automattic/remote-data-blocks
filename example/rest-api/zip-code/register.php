@@ -51,8 +51,8 @@ function register_zipcode_block(): void {
 
 	register_remote_data_block( [
 		'title' => 'Zip Code',
-		'queries' => [
-			'display' => $zipcode_query,
+		'render_query' => [
+			'query' => $zipcode_query,
 		],
 	] );
 }

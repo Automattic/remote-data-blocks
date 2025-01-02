@@ -1,6 +1,6 @@
 import { SUPPORTED_SERVICES } from '@/data-sources/constants';
 import { HttpAuth } from '@/data-sources/http/types';
-import { NumberIdName, StringIdName } from '@/types/common';
+import { StringIdName } from '@/types/common';
 import { GoogleServiceAccountKey } from '@/types/google';
 
 export type DataSourceType = ( typeof SUPPORTED_SERVICES )[ number ];
@@ -21,25 +21,6 @@ interface BaseDataSourceConfig<
 
 export interface DataSourceQueryMappingValue {
 	key: string;
-	name: string;
-	path: string;
-	type: string;
-}
-
-export type DataSourceQueryMapping = Record< string, DataSourceQueryMappingValue >;
-
-export interface DataSourceQuery {
-	isCollection: boolean;
-	mappings?: DataSourceQueryMapping;
-}
-
-/**
- * Currently this is an subset of DataSourceQueryMappingValue. Following fields are inferred:
- * - `path` can be constructed automatically assuming we use same field names we get from Airtable.
- * - `type` is always string for now.
- */
-export interface AirtableOutputQueryMappingValue {
-	key: string;
 	name?: string;
 	path?: string;
 	type?: string;
@@ -47,7 +28,7 @@ export interface AirtableOutputQueryMappingValue {
 }
 
 export interface AirtableTableConfig extends StringIdName {
-	output_query_mappings: AirtableOutputQueryMappingValue[];
+	output_query_mappings: DataSourceQueryMappingValue[];
 }
 
 export interface AirtableServiceConfig extends BaseServiceConfig {
@@ -56,10 +37,14 @@ export interface AirtableServiceConfig extends BaseServiceConfig {
 	tables: AirtableTableConfig[];
 }
 
+export interface GoogleSheetsSheetConfig extends StringIdName {
+	output_query_mappings: DataSourceQueryMappingValue[];
+}
+
 export interface GoogleSheetsServiceConfig extends BaseServiceConfig {
 	credentials: GoogleServiceAccountKey;
 	spreadsheet: StringIdName;
-	sheet: NumberIdName;
+	sheets: GoogleSheetsSheetConfig[];
 }
 
 export interface HttpServiceConfig extends BaseServiceConfig {

@@ -2,11 +2,14 @@ import { FormTokenField } from '@wordpress/components';
 import { FormTokenFieldProps } from '@wordpress/components/build-types/form-token-field/types';
 import { useEffect, useRef, useState } from '@wordpress/element';
 
-type CustomFormFieldTokenProps = FormTokenFieldProps;
+type CustomFormFieldTokenProps = FormTokenFieldProps & {
+	customHelpText?: string | null;
+};
 
 export const CustomFormFieldToken = ( props: CustomFormFieldTokenProps ) => {
 	const [ isAbove, setIsAbove ] = useState( false );
 	const inputRef = useRef( null );
+	const { customHelpText, ...formTokenFieldProps } = props;
 
 	const handlePosition = () => {
 		if ( ! inputRef.current ) return;
@@ -36,7 +39,8 @@ export const CustomFormFieldToken = ( props: CustomFormFieldTokenProps ) => {
 			className={ `form-token-field-wrapper ${ isAbove ? 'above' : 'below' }` }
 			style={ { position: 'relative' } }
 		>
-			<FormTokenField { ...props } />
+			<FormTokenField { ...formTokenFieldProps } __experimentalShowHowTo={ ! customHelpText } />
+			{ customHelpText && <p className="input-help-text">{ customHelpText }</p> }
 		</div>
 	);
 };

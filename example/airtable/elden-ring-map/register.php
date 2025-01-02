@@ -99,9 +99,14 @@ function register_airtable_elden_ring_map_block(): void {
 
 	register_remote_data_block( [
 		'title' => $block_name,
-		'queries' => [
-			'display' => $list_locations_query,
-			'list' => $list_maps_query,
+		'render_query' => [
+			'query' => $list_locations_query,
+		],
+		'selection_queries' => [
+			[
+				'query' => $list_maps_query,
+				'type' => 'list',
+			],
 		],
 		'patterns' => [
 			[
