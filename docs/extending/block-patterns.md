@@ -20,7 +20,7 @@ Example:
 ```php
 register_remote_data_block( [
 	'title' => 'My Remote Data Block',
-	'queries' => [ /* ... */ ],
+	'render_query' => [ /* ... */ ],
 	'patterns' => [
 		[
 			'title' => 'My Pattern',

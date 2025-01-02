@@ -17,7 +17,7 @@ function register_your_custom_block() {
 		],
 	] );
 
-	$display_query = HttpQuery::from_array( [
+	$render_query = HttpQuery::from_array( [
 		'display_name' => 'Example Query',
 		'data_source' => $data_source,
 		'output_schema' => [
@@ -38,8 +38,8 @@ function register_your_custom_block() {
 
 	register_remote_data_block( [
 		'title' => 'My Block',
-		'queries' => [
-			'display' => $display_query,
+		'render_query' => [
+			'query' => $render_query,
 		],
 	] );
 }

@@ -64,23 +64,6 @@ final class ConfigSchemas {
 
 	private static function generate_remote_data_block_config_schema(): array {
 		return Types::object( [
-			'queries' => Types::object( [
-				ConfigRegistry::DISPLAY_QUERY_KEY => Types::instance_of( QueryInterface::class ),
-				ConfigRegistry::LIST_QUERY_KEY => Types::nullable( Types::instance_of( QueryInterface::class ) ),
-				ConfigRegistry::SEARCH_QUERY_KEY => Types::nullable( Types::instance_of( QueryInterface::class ) ),
-			] ),
-			'query_input_overrides' => Types::nullable(
-				Types::list_of(
-					Types::object( [
-						'query' => Types::enum( ConfigRegistry::DISPLAY_QUERY_KEY ), // only display query for now
-						'source' => Types::string(), // e.g., the name of the query var
-						'source_type' => Types::enum( 'page', 'query_var' ),
-						'target' => Types::string(), // e.g., input variable name
-						'target_type' => Types::const( 'input_var' ),
-					] ),
-				)
-			),
-			'loop' => Types::nullable( Types::boolean() ),
 			'pages' => Types::nullable(
 				Types::list_of(
 					Types::object( [
@@ -96,6 +79,32 @@ final class ConfigSchemas {
 						'html' => Types::html(),
 						'role' => Types::nullable( Types::enum( 'inner_blocks' ) ),
 						'title' => Types::string(),
+					] )
+				)
+			),
+			'render_query' => Types::object( [
+				'query' => Types::instance_of( QueryInterface::class ),
+				'input_overrides' => Types::nullable(
+					Types::list_of(
+						Types::object( [
+							'source' => Types::string(), // e.g., the name of the query var
+							'source_type' => Types::enum( 'page', 'query_var' ),
+							'target' => Types::string(), // e.g., input variable name
+							'target_type' => Types::const( 'input_var' ),
+						] ),
+					)
+				),
+				'loop' => Types::nullable( Types::boolean() ),
+			] ),
+			'selection_queries' => Types::nullable(
+				Types::list_of(
+					Types::object( [
+						'display_name' => Types::nullable( Types::string() ),
+						'query' => Types::instance_of( QueryInterface::class ),
+						'type' => Types::enum(
+							ConfigRegistry::LIST_QUERY_KEY,
+							ConfigRegistry::SEARCH_QUERY_KEY
+						),
 					] )
 				)
 			),
