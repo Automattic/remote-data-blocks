@@ -30,12 +30,10 @@ jobs:
           cache: npm
 
       - name: Npm install
-        run: |
-          npm ci
+        run: npm ci
 
       - name: Start up WordPress environment
-        run: |
-          npm run dev:build
+        run: npm run dev:build
 
       - name: Run Integration tests
-          npm run test:integration
+        run: npm run test:integration
