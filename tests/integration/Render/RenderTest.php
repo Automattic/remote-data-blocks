@@ -76,7 +76,7 @@ class RenderTest extends WP_UnitTestCase {
 		// Register block configuration with WordPress, normally done during the 'init' filter
 		$block_config = ConfigStore::get_block_configuration( 'remote-data-blocks/test-zip-api' );
 		$this->assertTrue( is_array( $block_config ) && [] !== $block_config );
-		BlockRegistration::register_block_config( $block_config );
+		BlockRegistration::register_block_configuration( $block_config );
 
 		$result_html = do_blocks('
 			<!-- wp:remote-data-blocks/test-zip-api {"remoteData":{"blockName":"remote-data-blocks/test-zip-api","queryInput":{"zip_code":"12345"}}} -->
