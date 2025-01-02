@@ -68,6 +68,7 @@ class BlockBindingsTest extends TestCase {
 
 	/**
 	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function test_execute_query_with_no_config(): void {
 		/**
@@ -94,6 +95,7 @@ class BlockBindingsTest extends TestCase {
 
 	/**
 	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function test_execute_query_returns_query_results(): void {
 		/**
@@ -124,9 +126,9 @@ class BlockBindingsTest extends TestCase {
 		 */
 		$mock_config_store = Mockery::namedMock( ConfigStore::class );
 		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
+		->once()
+		->with( self::MOCK_BLOCK_NAME )
+		->andReturn( $mock_block_config );
 
 		$query_results = BlockBindings::execute_query( $block_context, self::MOCK_OPERATION_NAME );
 		$this->assertSame( $query_results, self::MOCK_OUTPUT_QUERY_RESULTS );
@@ -134,6 +136,7 @@ class BlockBindingsTest extends TestCase {
 
 	/**
 	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function test_execute_query_with_overrides(): void {
 		/**
@@ -188,9 +191,9 @@ class BlockBindingsTest extends TestCase {
 
 		$mock_config_store = Mockery::namedMock( ConfigStore::class );
 		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
+		->once()
+		->with( self::MOCK_BLOCK_NAME )
+		->andReturn( $mock_block_config );
 
 		$query_results = BlockBindings::execute_query( $block_context, self::MOCK_OPERATION_NAME );
 
@@ -206,6 +209,7 @@ class BlockBindingsTest extends TestCase {
 
 	/**
 	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function test_execute_query_with_query_input_transformed_by_custom_query_runner(): void {
 		/**
@@ -249,9 +253,9 @@ class BlockBindingsTest extends TestCase {
 
 		$mock_config_store = Mockery::namedMock( ConfigStore::class );
 		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
+		->once()
+		->with( self::MOCK_BLOCK_NAME )
+		->andReturn( $mock_block_config );
 
 		$query_results = BlockBindings::execute_query( $block_context, self::MOCK_OPERATION_NAME );
 		$this->assertSame( $query_results, self::MOCK_OUTPUT_QUERY_RESULTS );
@@ -267,6 +271,7 @@ class BlockBindingsTest extends TestCase {
 
 	/**
 	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function test_execute_query_with_query_input_transformations_and_overrides(): void {
 		/**
@@ -320,9 +325,9 @@ class BlockBindingsTest extends TestCase {
 
 		$mock_config_store = Mockery::namedMock( ConfigStore::class );
 		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
+		->once()
+		->with( self::MOCK_BLOCK_NAME )
+		->andReturn( $mock_block_config );
 
 		$query_results = BlockBindings::execute_query( $block_context, self::MOCK_OPERATION_NAME );
 		$this->assertSame( $query_results, self::MOCK_OUTPUT_QUERY_RESULTS );
@@ -337,6 +342,7 @@ class BlockBindingsTest extends TestCase {
 
 	/**
 	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function test_get_remote_value(): void {
 		/**
@@ -371,9 +377,9 @@ class BlockBindingsTest extends TestCase {
 
 		$mock_config_store = Mockery::namedMock( ConfigStore::class );
 		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
+		->once()
+		->with( self::MOCK_BLOCK_NAME )
+		->andReturn( $mock_block_config );
 
 		$source_args = [
 			'field' => self::MOCK_OUTPUT_FIELD_NAME,
@@ -385,6 +391,7 @@ class BlockBindingsTest extends TestCase {
 
 	/**
 	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function test_get_remote_value_with_non_string(): void {
 		/**
@@ -419,9 +426,9 @@ class BlockBindingsTest extends TestCase {
 
 		$mock_config_store = Mockery::namedMock( ConfigStore::class );
 		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
+		->once()
+		->with( self::MOCK_BLOCK_NAME )
+		->andReturn( $mock_block_config );
 
 		$source_args = [
 			'field' => self::MOCK_OUTPUT_FIELD_NAME,

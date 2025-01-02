@@ -3,23 +3,15 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.2/phpunit.xsd"
   bootstrap="tests/inc/bootstrap.php"
-  cacheDirectory=".phpunit.cache"
   colors="true"
-  displayDetailsOnPhpunitDeprecations="true"
-  displayDetailsOnTestsThatTriggerDeprecations="true"
-  displayDetailsOnTestsThatTriggerErrors="true"
-  displayDetailsOnTestsThatTriggerNotices="true"
-  displayDetailsOnTestsThatTriggerWarnings="true"
+  convertErrorsToExceptions="true"
+  convertNoticesToExceptions="true"
+  convertWarningsToExceptions="true"
+  convertDeprecationsToExceptions="true"
 >
   <testsuites>
     <testsuite name="Remote Data Blocks Test Suite">
       <directory>tests/inc/</directory>
     </testsuite>
   </testsuites>
-
-  <source>
-    <include>
-      <directory suffix=".php">inc</directory>
-    </include>
-  </source>
 </phpunit>
