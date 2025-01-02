@@ -45,7 +45,8 @@
     "mockery/mockery": "^1.6",
     "wp-phpunit/wp-phpunit": "^6.7",
     "yoast/phpunit-polyfills": "^2.0",
-    "php-stubs/wordpress-globals": "^0.2.0"
+    "php-stubs/wordpress-globals": "^0.2.0",
+    "php-stubs/wordpress-tests-stubs": "^6.7"
   },
   "config": {
     "allow-plugins": {
