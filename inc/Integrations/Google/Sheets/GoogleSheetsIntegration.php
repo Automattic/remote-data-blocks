@@ -15,6 +15,7 @@ class GoogleSheetsIntegration {
 		foreach ( $data_source_configs as $config ) {
 			$data_source = GoogleSheetsDataSource::from_array( $config );
 			self::register_block_for_google_sheets_data_source( $data_source );
+			self::register_loop_block_for_google_sheets_data_source( $data_source );
 		}
 	}
 	public static function register_block_for_google_sheets_data_source( GoogleSheetsDataSource $data_source, array $block_overrides = [] ): void {
