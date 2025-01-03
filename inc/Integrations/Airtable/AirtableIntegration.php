@@ -10,7 +10,9 @@ class AirtableIntegration {
 	}
 
 	public static function register_blocks(): void {
-		$data_source_configs = DataSourceCrud::get_configs_by_service( REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE );
+		$data_source_configs = DataSourceCrud::get_configs_by_service(
+			REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE
+		);
 
 		foreach ( $data_source_configs as $config ) {
 			$data_source = AirtableDataSource::from_array( $config );
@@ -18,7 +20,10 @@ class AirtableIntegration {
 		}
 	}
 
-	public static function register_block_for_airtable_data_source( AirtableDataSource $data_source, array $block_overrides = [] ): void {
+	public static function register_block_for_airtable_data_source(
+		AirtableDataSource $data_source,
+		array $block_overrides = []
+	): void {
 		register_remote_data_block(
 			array_merge(
 				[
@@ -38,7 +43,10 @@ class AirtableIntegration {
 		);
 	}
 
-	public static function register_loop_block_for_airtable_data_source( AirtableDataSource $data_source, array $block_overrides = [] ): void {
+	public static function register_loop_block_for_airtable_data_source(
+		AirtableDataSource $data_source,
+		array $block_overrides = []
+	): void {
 		register_remote_data_block(
 			array_merge(
 				[

@@ -52,7 +52,10 @@ class GoogleSheetsDataSource extends HttpDataSource {
 	protected static function map_service_config( array $service_config ): array {
 		return [
 			'display_name' => $service_config['display_name'],
-			'endpoint' => sprintf( 'https://sheets.googleapis.com/v4/spreadsheets/%s', $service_config['spreadsheet']['id'] ),
+			'endpoint' => sprintf(
+				'https://sheets.googleapis.com/v4/spreadsheets/%s',
+				$service_config['spreadsheet']['id']
+			),
 			'request_headers' => function () use ( $service_config ): array {
 				$access_token = GoogleAuth::generate_token_from_service_account_key(
 					$service_config['credentials'],
@@ -87,7 +90,6 @@ class GoogleSheetsDataSource extends HttpDataSource {
 				],
 			],
 		];
-
 
 		foreach ( $service_config['sheets'][0]['output_query_mappings'] as $mapping ) {
 			$mapping_key = $mapping['key'];
@@ -125,7 +127,6 @@ class GoogleSheetsDataSource extends HttpDataSource {
 				],
 			],
 		];
-
 
 		foreach ( $service_config['sheets'][0]['output_query_mappings'] as $mapping ) {
 			$mapping_key = $mapping['key'];
