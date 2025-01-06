@@ -19,7 +19,7 @@ export function ItemListModal( props: ItemListModalProps ) {
 	const { close, isOpen, open } = useModalState( props.onOpen );
 
 	function wrappedOnSelect( data: RemoteDataQueryInput ): void {
-		console.log( { wrappedOnSelectData: data } );
+		// console.log( { wrappedOnSelectData: data } );
 		props.onSelect( data );
 		close();
 	}

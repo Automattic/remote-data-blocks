@@ -64,38 +64,47 @@ type Actions = {
 
 interface Selectors {}
 
+const queryDataStateKey = (queryKey: string, blockName: string, queryInput: Record<string, string>) => `${blockName}:${queryKey}:${JSON.stringify(queryInput)}`;
+
 const remoteDataBlocksStoreConfig: ReduxStoreConfig< State, Actions, Selectors > = {
 	reducer: ( state = {}, action ) => {
 		switch ( action.type ) {
 			case 'RECEIVE_REMOTE_DATA':
-				return { ...state, [ action.queryKey ]: action.data };
+				console.log('store: RECEIVED REMOTE DATA')
+				console.log({action});
+				console.log(`key: ${queryDataStateKey(action.queryKey, action.blockName, action.queryInput)}`);
+				return { ...state, [ queryDataStateKey(action.queryKey, action.blockName, action.queryInput) ]: action.data };
+			case 'RECEIVE_REMOTE_DATA_ERROR':
+				console.log('store: RECEIVED REMOTE DATA ERROR')
+				return { ...state, [ queryDataStateKey(action.queryKey, action.blockName, action.queryInput) ]: action.error };
 		}
 		return state;
 	},
 	selectors: {
 		getRemoteData: ( state, queryKey, blockName, queryInput = {} ) => {
-			return state[ `${ queryKey }:${ JSON.stringify( queryInput ) }` ];
+			// console.log( 'store: CALLED SELECTOR' );
+			console.log( { state, queryKey, blockName, queryInput } );
+			return state[ queryDataStateKey(queryKey, blockName, queryInput) ];
 		},
 	},
 	resolvers: {
 		getRemoteData:
 			( queryKey: string, blockName: string, queryInput: Record< string, string > ) =>
 			async ( { dispatch } ) => {
+				// console.log( 'store: CALLED RESOLVER', { queryKey, blockName, queryInput } );
 				try {
-					console.log({ fetchingWith: {
-						block_name: blockName,
-						query_key: queryKey,
-						query_input: queryInput,
-					}})
+					console.log({blockName, queryKey, queryInput });
 					const data = await fetchRemoteData( {
 						block_name: blockName,
 						query_key: queryKey,
 						query_input: queryInput,
 					} );
-					console.log({retrievedData:data});
-					dispatch( { type: 'RECEIVE_REMOTE_DATA', queryKey, data } );
+					// console.log('store: DISPATCHING RECEIVE_REMOTE_DATA')
+					console.log( { retrievedData: data } );
+					dispatch( { type: 'RECEIVE_REMOTE_DATA', blockName, queryKey, data, queryInput } );
 				} catch ( err: unknown ) {
-					dispatch( { type: 'RECEIVE_REMOTE_DATA_ERROR', queryKey, error: err } );
+					console.error(err);
+					dispatch( { type: 'RECEIVE_REMOTE_DATA_ERROR', blockName, queryKey, error: err } );
 				}
 			},
 	},
@@ -113,36 +122,38 @@ registerBlockBindingsSource( {
 	label: 'Remote Data Binding',
 	usesContext: [ 'remote-data-blocks/remoteData' ],
 	getValues( { context, clientId, bindings, select } ) {
-		console.log( { context, clientId, bindings } );
+		// console.log( { context, clientId, bindings } );
 		const remoteDataContext = context[ 'remote-data-blocks/remoteData' ];
 
 		if ( remoteDataContext === undefined ) {
 			return null;
 		}
 
-		const input = remoteDataContext.queryInput;
+		// const input = remoteDataContext.queryInput;
 
-		const blockConfig: BlockInstance< {} > =
-			select( 'core/block-editor' ).getBlocksByClientId( clientId )[ 0 ];
-		const blockName = blockConfig.name;
+		// const blockConfig: BlockInstance< {} > =
+		// 	select( 'core/block-editor' ).getBlocksByClientId( clientId )[ 0 ];
+		// const blockName = blockConfig[ 'remote-data-blocks/remoteData' ].blockName;
+// console.log({blockConfig});
+		// console.log( { blockConfig } );
 
-		console.log( { blockConfig } );
-
-		console.log( {
-			_c: {
-				blockName: remoteDataContext.blockName,
-				queryKey: remoteDataContext.queryKey,
-				remoteDataContext,
-			},
-		} );
-		console.log({remoteDataContext});
+		// console.log( {
+		// 	_c: {
+		// 		blockName: remoteDataContext.blockName,
+		// 		queryKey: remoteDataContext.queryKey,
+		// 		remoteDataContext,
+		// 	},
+		// } );
+		// console.log({remoteDataContext});
 		const data = select( remoteDataBlocksStore ).getRemoteData(
 			constants.DISPLAY_QUERY_KEY,
 			remoteDataContext.blockName,
 			remoteDataContext.queryInput
 		);
-		console.log( { data } );
-		console.log( { bindings } );
+		// console.log( { data } );
+		// console.log( { bindings } );
+
+		const result = data?.results?.[0];
 
 		const newValues = {};
 
@@ -151,9 +162,9 @@ registerBlockBindingsSource( {
 			// const { gravatar_id: id } =
 			// 	getEditedEntityRecord( 'postType', context?.postType, context?.postId ).meta || {};
 			// const data = select( gravatarStore ).getGravatarData( id );
-			newValues[ attributeName ] = 'TEST'; // data?.[ key || field ];
+			newValues[ attributeName ] = result?.[ field ]?.toString() ?? 'TEST'; // data?.[ key || field ];
 		}
-		console.log( remoteDataContext?.results?.[ 0 ] );
+		// console.log( remoteDataContext?.results?.[ 0 ] );
 		return newValues;
 	},
 } );

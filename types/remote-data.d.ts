@@ -15,13 +15,13 @@ interface QueryInputOverride {
 }
 
 interface RemoteData {
-	blockName: string;
-	isCollection: boolean;
-	metadata: Record< string, RemoteDataResultFields >;
+	blockName?: string;
+	isCollection?: boolean;
+	metadata?: Record< string, RemoteDataResultFields >;
 	queryInput: Record< string, string >;
 	queryInputOverrides?: Record< string, QueryInputOverride >;
-	resultId: string;
-	results: Record< string, string >[];
+	resultId?: string;
+	results?: Record< string, string >[];
 }
 
 interface RemoteDataBlockAttributes {

@@ -24,7 +24,7 @@ export async function fetchRemoteData(
 		metadata: body.metadata,
 		queryInput: body.query_input,
 		resultId: body.result_id,
-		results: body.results.map( result =>
+		results: body.results?.map( result =>
 			Object.entries( result.result ).reduce(
 				( acc, [ key, value ] ) => ( {
 					...acc,

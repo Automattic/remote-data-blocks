@@ -26,7 +26,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 	const { close, isOpen, open } = useModalState();
 
 	function onSelectItem( data: RemoteDataQueryInput ): void {
-		onSelect( data );
+		onSelect( {queryInput: { record_id: data.record_id ?? data.id ?? data.Id ?? data.ID }} );
 		sendTracksEvent( 'remotedatablocks_add_block', {
 			action: 'select_item',
 			selected_option: 'search_from_list',

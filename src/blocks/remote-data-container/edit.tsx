@@ -40,17 +40,10 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	const { execute } = useRemoteData( blockName, DISPLAY_QUERY_KEY );
 	const [ initialLoad, setInitialLoad ] = useState< boolean >( true );
 
-	function fetchRemoteData( input: RemoteDataQueryInput, insertBlocks = true ) {
-		console.log( { _i: input } );
+	function fetchRemoteData( remoteData: RemoteDataQueryInput, insertBlocks = true ) {
+		// This is where the remoteData attribute is set in the block after selection
 		updateRemoteData(
-			{
-				blockName,
-				queryInput: { id: input.record_id },
-				isCollection: false,
-				metadata: {},
-				resultId: input.record_id,
-				results: [],
-			},
+			{ blockName, queryKey: DISPLAY_QUERY_KEY, queryInput: remoteData.query_input ?? remoteData.queryInput },
 			insertBlocks
 		);
 		setInitialLoad( false );
@@ -64,7 +57,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 		// 					...remoteData,
 		// 				},
 		// 				insertBlocks
-		// 			);
+		// 			);bn
 		// 		}
 		// 	} )
 		// 	.catch( () => {} )
@@ -75,9 +68,13 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	// to children blocks. If this is the initial load of remote data, show the
 	// pattern selection modal so that we can insert the blocks from the pattern.
 	function updateRemoteData( remoteData: RemoteData, insertBlocks = false ) {
-		if ( hasRemoteDataChanged( props.attributes.remoteData, remoteData ) ) {
+		// console.log({_updateRemoteData: remoteData})
+		// if ( hasRemoteDataChanged( props.attributes.remoteData, remoteData ) ) {
+		if ( remoteData.queryInput ) {
 			props.setAttributes( { remoteData } );
 		}
+		
+		// }
 
 		if ( insertBlocks ) {
 			markReadyForInsertion();
@@ -89,7 +86,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 			return;
 		}
 
-		fetchRemoteData( props.attributes.remoteData.queryInput, false );
+		fetchRemoteData( props.attributes.remoteData, false );
 	}
 
 	function resetRemoteData() {
