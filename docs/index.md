@@ -22,7 +22,7 @@ For plugin overview and getting started guide, see [README](../README.md).
 
   - [Airtable Integration](workflows/airtable.md)
   - [Google Sheets Integration](workflows/google-sheets.md)
-  - [ZIP Code Integration](workflows/zip-code-with-contract.md)
+  - [REST API Integration](workflows/rest-api.md)
 
 - [Development](local-development.md)
 - [Troubleshooting](troubleshooting.md)
