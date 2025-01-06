@@ -1,6 +1,6 @@
 # Create a Google Sheets remote data block
 
-This page will walk you through connecting a [Google Sheets](https://workspace.google.com/products/sheets/) data source. The remote block registration to display sheet records and the styling of that block is similar to the [Airtable workflow](./airtable-with-code.md). If you have not yet installed and activated the Remote Data Blocks plugin, visit [Getting Started](https://remotedatablocks.com/getting-started/).
+This page will walk you through connecting a [Google Sheets](https://workspace.google.com/products/sheets/) data source. The remote block registration to display sheet records and the styling of that block is similar to the [Airtable workflow](./airtable.md). If you have not yet installed and activated the Remote Data Blocks plugin, visit [Getting Started](https://remotedatablocks.com/getting-started/).
 
 ## Google Sheets API Access
 
@@ -25,8 +25,8 @@ The Service Account Keys JSON should be provided to your application securely. O
 This would be similar to the [Airtable workflow](airtable.md). Refer the following sections from that workflow:
 
 - [Create the data source](./airtable.md#create-the-data-source)
-- [Insert the block](./airtable-with-code.md#insert-the-block)
-- [Custom patterns and styling](./airtable-with-code.md#custom-patterns-and-styling)
+- [Insert the block](./airtable.md#insert-the-block)
+- [Custom patterns and styling](./airtable.md#custom-patterns-and-styling)
 
 ## Code Reference
 

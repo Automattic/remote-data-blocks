@@ -20,7 +20,7 @@ For plugin overview and getting started guide, see [README](../README.md).
 
 - [Workflows](workflows/index.md)
 
-  - [Airtable Integration](workflows/airtable-with-code.md)
+  - [Airtable Integration](workflows/airtable.md)
   - [Google Sheets Integration](workflows/google-sheets-with-code.md)
   - [ZIP Code Integration](workflows/zip-code-with-contract.md)
 
