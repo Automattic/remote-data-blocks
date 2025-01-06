@@ -36,7 +36,7 @@ Check out [a working example](https://github.com/Automattic/remote-data-blocks/t
 
 Follow following setup steps to get the Westeros Houses example working:
 
-- [Configure the Google Sheet API Access](./google-sheets-with-code.md#google-sheets-api-access) and [Create a new Google Sheet](./google-sheets-with-code.md#setting-up-the-google-sheet) by following the steps above.
+- [Configure the Google Sheet API Access](./google-sheets.md#google-sheets-api-access) and [Create a new Google Sheet](./google-sheets.md#setting-up-the-google-sheet) by following the steps above.
 - Add sheet named `Houses` inside the newly created Google Sheet with columns with headers as
   - House
   - Seat
