@@ -107,7 +107,7 @@ class SalesforceB2CAuth {
 		string $client_secret,
 		string $endpoint,
 		string $organization_id,
-	): ?string {
+	): string|WP_Error {
 		$client_auth_url = sprintf( '%s/shopper/auth/v1/organizations/%s/oauth2/token', $endpoint, $organization_id );
 
 		// Even though we're using a refresh token, authentication is still required to receive a new secret

@@ -150,8 +150,8 @@ class VipBlockDataApiTest extends TestCase {
 		$mock_query = MockQuery::from_array( [ 'query_runner' => $mock_qr ] );
 		register_remote_data_block( [
 			'title' => 'Events',
-			'queries' => [
-				'display' => $mock_query,
+			'render_query' => [
+				'query' => $mock_query,
 			],
 		] );
 
@@ -174,8 +174,8 @@ class VipBlockDataApiTest extends TestCase {
 		$mock_query = MockQuery::from_array( [ 'query_runner' => $mock_qr ] );
 		register_remote_data_block( [
 			'title' => 'Events',
-			'queries' => [
-				'display' => $mock_query,
+			'render_query' => [
+				'query' => $mock_query,
 			],
 		] );
 

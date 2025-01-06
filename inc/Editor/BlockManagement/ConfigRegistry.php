@@ -20,6 +20,8 @@ use function wp_insert_post;
 class ConfigRegistry {
 	private static LoggerInterface $logger;
 
+	public const RENDER_QUERY_KEY = 'render_query';
+	public const SELECTION_QUERIES_KEY = 'selection_queries';
 	public const DISPLAY_QUERY_KEY = 'display';
 	public const LIST_QUERY_KEY = 'list';
 	public const SEARCH_QUERY_KEY = 'search';
@@ -46,7 +48,7 @@ class ConfigRegistry {
 			return self::create_error( $block_title, sprintf( 'Block %s has already been registered', $block_name ) );
 		}
 
-		$display_query = $user_config['queries'][ self::DISPLAY_QUERY_KEY ];
+		$display_query = $user_config[ self::RENDER_QUERY_KEY ]['query'];
 		$input_schema = $display_query->get_input_schema();
 
 		// Build the base configuration for the block. This is our own internal
@@ -55,7 +57,7 @@ class ConfigRegistry {
 		$config = [
 			'description' => '',
 			'name' => $block_name,
-			'loop' => $user_config['loop'] ?? false,
+			'loop' => $user_config[ self::RENDER_QUERY_KEY ]['loop'] ?? false,
 			'patterns' => [],
 			'queries' => [
 				self::DISPLAY_QUERY_KEY => $display_query,
@@ -82,53 +84,48 @@ class ConfigRegistry {
 
 		// Register "selectors" which allow the user to use a query to assist in
 		// selecting data for display by the block.
-		foreach ( [ self::LIST_QUERY_KEY, self::SEARCH_QUERY_KEY ] as $from_query_type ) {
-			if ( isset( $user_config['queries'][ $from_query_type ] ) ) {
-				$to_query = $display_query;
-				$from_query = $user_config['queries'][ $from_query_type ];
+		foreach ( $user_config[ self::SELECTION_QUERIES_KEY ] ?? [] as $selection_query ) {
+			$from_query = $selection_query['query'];
+			$from_query_type = $selection_query['type'];
+			$to_query = $display_query;
 
-				$config['queries'][ $from_query_type ] = $from_query;
+			$config['queries'][ $from_query::class ] = $from_query;
 
-				$from_input_schema = $from_query->get_input_schema();
-				$from_output_schema = $from_query->get_output_schema();
+			$from_input_schema = $from_query->get_input_schema();
+			$from_output_schema = $from_query->get_output_schema();
 
-				foreach ( array_keys( $to_query->get_input_schema() ) as $to ) {
-					if ( ! isset( $from_output_schema['type'][ $to ] ) ) {
-						return self::create_error( $block_title, sprintf( 'Cannot map key "%s" from %s query', esc_html( $to ), $from_query_type ) );
-					}
+			foreach ( array_keys( $to_query->get_input_schema() ) as $to ) {
+				if ( ! isset( $from_output_schema['type'][ $to ] ) ) {
+					return self::create_error( $block_title, sprintf( 'Cannot map key "%s" from %s query', esc_html( $to ), $from_query_type ) );
 				}
-
-				if ( self::SEARCH_QUERY_KEY === $from_query_type && ! isset( $from_input_schema['search_terms'] ) ) {
-					return self::create_error( $block_title, 'A search query must have a "search_terms" input variable' );
-				}
-
-				// Add the selector to the configuration.
-				array_unshift(
-					$config['selectors'],
-					[
-						'image_url' => $from_query->get_image_url(),
-						'inputs' => [],
-						'name' => ucfirst( $from_query_type ),
-						'query_key' => $from_query_type,
-						'type' => $from_query_type,
-					]
-				);
 			}
+
+			if ( self::SEARCH_QUERY_KEY === $from_query_type && ! isset( $from_input_schema['search_terms'] ) ) {
+				return self::create_error( $block_title, 'A search query must have a "search_terms" input variable' );
+			}
+
+			// Add the selector to the configuration.
+			array_unshift(
+				$config['selectors'],
+				[
+					'image_url' => $from_query->get_image_url(),
+					'inputs' => [],
+					'name' => $selection_query['display_name'] ?? ucfirst( $from_query_type ),
+					'query_key' => $from_query::class,
+					'type' => $from_query_type,
+				]
+			);
 		}
 
 		// Register query input overrides which allow the user to specify how
 		// query inputs can be overridden by URL parameters or query variables.
-		foreach ( $user_config['query_input_overrides'] ?? [] as $override ) {
-			if ( ! isset( $config['queries'][ $override['query'] ] ) ) {
-				return self::create_error( $block_title, sprintf( 'Query input override targets a non-existent query "%s"', esc_html( $override['query'] ) ) );
-			}
-
+		foreach ( $user_config[ self::RENDER_QUERY_KEY ]['input_overrides'] ?? [] as $override ) {
 			if ( 'input_var' !== $override['target_type'] ) {
 				return self::create_error( $block_title, 'Only input variables can be targeted by query input overrides' );
 			}
 
-			if ( ! isset( $config['queries'][ $override['query'] ]->get_input_schema()[ $override['target'] ] ) ) {
-				return self::create_error( $block_title, sprintf( 'Query input override "%s" does not exist as input variable for query "%s"', esc_html( $override['target'] ), esc_html( $override['query'] ) ) );
+			if ( ! isset( $input_schema[ $override['target'] ] ) ) {
+				return self::create_error( $block_title, sprintf( 'Input override "%s" does not exist as input variable for render query', esc_html( $override['target'] ) ) );
 			}
 
 			$config['query_input_overrides'][] = $override;
@@ -196,11 +193,11 @@ class ConfigRegistry {
 	 */
 	private static function register_page( array $query_input_overrides, string $block_title, array $options = [] ): bool|WP_Error {
 		$overrides = array_values( array_filter( $query_input_overrides, function ( $override ) {
-			return 'page' === $override['source_type'] && ConfigRegistry::DISPLAY_QUERY_KEY === $override['query'];
+			return 'page' === $override['source_type'];
 		} ) );
 
 		if ( empty( $overrides ) ) {
-			return new WP_Error( 'useless_page', 'A page is only useful with query input overrides with page sources.' );
+			return new WP_Error( 'useless_page', 'A page is only useful when there are query input overrides with page sources.' );
 		}
 
 		$allow_nested_paths = $options['allow_nested_paths'] ?? false;

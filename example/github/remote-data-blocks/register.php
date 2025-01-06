@@ -96,17 +96,21 @@ function register_github_file_as_html_block(): void {
 
 	register_remote_data_block( [
 		'title' => $block_title,
-		'queries' => [
-			'display' => $github_get_file_as_html_query,
-			'list' => $github_get_list_files_query,
+		'render_query' => [
+			'query' => $github_get_file_as_html_query,
+			'input_overrides' => [
+				[
+					'source' => 'file_path',
+					'source_type' => 'page',
+					'target' => 'file_path',
+					'target_type' => 'input_var',
+				],
+			],
 		],
-		'query_input_overrides' => [
+		'selection_queries' => [
 			[
-				'query' => 'display',
-				'source' => 'file_path',
-				'source_type' => 'page',
-				'target' => 'file_path',
-				'target_type' => 'input_var',
+				'query' => $github_get_list_files_query,
+				'type' => 'list',
 			],
 		],
 		'pages' => [

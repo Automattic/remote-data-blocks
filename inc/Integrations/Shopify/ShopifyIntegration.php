@@ -9,6 +9,10 @@ use function register_remote_data_block;
 
 class ShopifyIntegration {
 	public static function init(): void {
+		add_action( 'init', [ __CLASS__, 'register_blocks' ], 10, 0 );
+	}
+
+	public static function register_blocks(): void {
 		$data_source_configs = DataSourceCrud::get_configs_by_service( REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE );
 
 		foreach ( $data_source_configs as $config ) {
@@ -114,9 +118,14 @@ class ShopifyIntegration {
 
 		register_remote_data_block( [
 			'title' => $block_title,
-			'queries' => [
-				'display' => $queries['shopify_get_product'],
-				'search' => $queries['shopify_search_products'],
+			'render_query' => [
+				'query' => $queries['shopify_get_product'],
+			],
+			'selection_queries' => [
+				[
+					'query' => $queries['shopify_search_products'],
+					'type' => 'search',
+				],
 			],
 			'patterns' => [
 				[
