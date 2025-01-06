@@ -49,3 +49,30 @@ export const useGoogleSheetsOptions = ( token: string | null, spreadsheetId: str
 
 	return { sheets, isLoadingSheets, errorSheets, refetchSheets };
 };
+
+export const useGoogleSheetFields = (
+	token: string | null,
+	spreadsheetId: string,
+	sheetTitle: string
+) => {
+	const api = useMemo( () => new GoogleApi( token ), [ token ] );
+
+	const queryFn = useCallback( async () => {
+		if ( ! token || ! spreadsheetId || ! sheetTitle ) {
+			return null;
+		}
+		return api.getSheetFields( spreadsheetId, sheetTitle );
+	}, [ api, token, spreadsheetId, sheetTitle ] );
+
+	const {
+		data: sheetFields,
+		isLoading: isLoadingSheetFields,
+		error: errorSheetFields,
+		refetch: refetchSheetFields,
+	} = useQuery( queryFn, { manualFetchOnly: true } );
+
+	const debouncedFetchSheetFields = useDebounce( refetchSheetFields, 500 );
+	useEffect( debouncedFetchSheetFields, [ token, debouncedFetchSheetFields ] );
+
+	return { sheetFields, isLoadingSheetFields, errorSheetFields };
+};

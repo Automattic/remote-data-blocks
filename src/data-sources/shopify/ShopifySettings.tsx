@@ -44,7 +44,7 @@ export const ShopifySettings = ( {
 		const urlPattern = /^https?:\/\/([^.]+)\.myshopify\.com$/;
 		const match = shopNameInput.match( urlPattern );
 		const extractedShopName = match ? match[ 1 ] : shopNameInput;
-		handleOnChange( 'store_name', extractedShopName );
+		handleOnChange( 'store_name', extractedShopName ?? '' );
 	};
 
 	const onSaveClick = async () => {

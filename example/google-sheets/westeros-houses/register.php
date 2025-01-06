@@ -27,9 +27,12 @@ function register_westeros_houses_block(): void {
 			'spreadsheet' => [
 				'id' => '1EHdQg53Doz0B-ImrGz_hTleYeSvkVIk_NSJCOM1FQk0',
 			],
-			'sheet' => [
-				'id' => 1,
-				'name' => 'Houses',
+			'sheets' => [
+				[
+					'id' => '1',
+					'name' => 'Houses',
+					'output_query_mappings' => [],
+				],
 			],
 		],
 	] );
@@ -155,17 +158,21 @@ function register_westeros_houses_block(): void {
 
 	register_remote_data_block( [
 		'title' => 'Westeros House',
-		'queries' => [
-			'display' => $get_westeros_houses_query,
-			'list' => $list_westeros_houses_query,
+		'render_query' => [
+			'query' => $get_westeros_houses_query,
+			'input_overrides' => [
+				[
+					'source' => 'house',
+					'source_type' => 'page',
+					'target' => 'row_id',
+					'target_type' => 'input_var',
+				],
+			],
 		],
-		'query_input_overrides' => [
+		'selection_queries' => [
 			[
-				'query' => 'display',
-				'source' => 'house',
-				'source_type' => 'page',
-				'target' => 'row_id',
-				'target_type' => 'input_var',
+				'query' => $list_westeros_houses_query,
+				'type' => 'list',
 			],
 		],
 		'pages' => [
@@ -178,9 +185,9 @@ function register_westeros_houses_block(): void {
 
 	register_remote_data_block( [
 		'title' => 'Westeros Houses List',
-		'loop' => true,
-		'queries' => [
-			'display' => $list_westeros_houses_query,
+		'render_query' => [
+			'loop' => true,
+			'query' => $list_westeros_houses_query,
 		],
 	] );
 }

@@ -2,13 +2,14 @@ import { useReducer, useState } from '@wordpress/element';
 
 import { isNonEmptyObj, constructObjectWithValues } from '@/utils/object';
 
-export type ValidationRuleFn< T > = ( v: Partial< T > ) => string | null;
+type StateObject = Record< string, unknown >;
+type ValidationRuleFn< T > = ( v: Partial< T > ) => string | null;
+export type ValidationRules< T extends StateObject > = Record< keyof T, ValidationRuleFn< T > >;
 
-export type ValidationRules< T > = {
-	[ P in keyof Omit< T, '__version' | 'display_name' > ]: ValidationRuleFn< T >;
-};
-
-const executeValidationRules = < T >( rule: ValidationRuleFn< T >, value: T ): string | null => {
+const executeValidationRules = < T >(
+	rule: ValidationRuleFn< T >,
+	value: Partial< T >
+): string | null => {
 	const error = rule( value );
 	if ( error ) {
 		return error;
@@ -21,7 +22,7 @@ interface ExecuteAllValidationRules {
 	hasError: boolean;
 }
 
-const executeAllValidationRules = < T >(
+const executeAllValidationRules = < T extends StateObject >(
 	validationRules: ValidationRules< T >,
 	values: T
 ): ExecuteAllValidationRules => {
@@ -30,8 +31,7 @@ const executeAllValidationRules = < T >(
 
 	Object.entries( validationRules ).forEach( ( [ ruleId, rule ] ) => {
 		if ( Object.prototype.hasOwnProperty.call( values, ruleId ) ) {
-			// eslint-disable-next-line security/detect-object-injection
-			const error = executeValidationRules< T >( rule as ValidationRuleFn< T >, values );
+			const error = executeValidationRules< T >( rule, values );
 			errorsMap.set( ruleId, error );
 
 			if ( ! hasError && error !== null ) {
@@ -42,13 +42,13 @@ const executeAllValidationRules = < T >(
 	return { errorsObj: Object.fromEntries( errorsMap ), hasError };
 };
 
-interface UseForm< T > {
+export interface UseForm< T extends StateObject > {
 	state: Partial< T >;
 	errors: { [ x: string ]: string | null };
 	setFormState: ( newState: Partial< T > ) => void;
 	resetFormState: () => void;
 	resetErrorState: () => void;
-	handleOnChange: ( id: string, value: unknown ) => void;
+	handleOnChange: < K extends keyof T >( id: K, value: T[ K ] ) => void;
 	handleOnBlur: ( id: string ) => void;
 	handleOnSubmit: () => void;
 	validState: T | null;
@@ -59,18 +59,18 @@ export interface ValidationFnResponse {
 	hasError: boolean;
 }
 
-interface UseFormProps< T > {
+interface UseFormProps< T extends StateObject > {
 	initialValues: Partial< T >;
-	validationRules?: ValidationRules< Partial< T > >;
+	validationRules?: ValidationRules< T >;
 	submit?: ( state: T, resetForm: () => void ) => void;
 	submitValidationFn?: ( state: Partial< T > ) => ValidationFnResponse;
 }
 
 type FormAction< T > =
-	| { type: 'setField'; payload: { id: string; value: unknown } }
-	| { type: 'setState'; payload: { value: T } };
+	| { type: 'setField'; payload: { id: keyof T; value: unknown } }
+	| { type: 'setState'; payload: { value: Partial< T > } };
 
-const reducer = < T >( state: T, action: FormAction< T > ): T => {
+const reducer = < T >( state: Partial< T >, action: FormAction< T > ): Partial< T > => {
 	switch ( action.type ) {
 		case 'setField':
 			return { ...state, [ action.payload.id ]: action.payload.value };
@@ -81,25 +81,23 @@ const reducer = < T >( state: T, action: FormAction< T > ): T => {
 	}
 };
 
-export const useForm = < T extends Record< string, unknown > >( {
+export const useForm = < T extends StateObject >( {
 	initialValues,
-	validationRules = {} as ValidationRules< Partial< T > >,
+	validationRules = <ValidationRules< T >>{},
 	submit,
 	submitValidationFn,
 }: UseFormProps< T > ): UseForm< T > => {
-	const [ state, dispatch ] = useReducer< typeof reducer< Partial< T > > >(
-		reducer,
-		initialValues
-	);
+	const stateKeys = Object.keys( initialValues ) ?? [];
+	const [ state, dispatch ] = useReducer< typeof reducer< T > >( reducer, initialValues );
 	const [ touched, setTouched ] = useState(
-		constructObjectWithValues< boolean >( validationRules, false )
+		constructObjectWithValues< boolean >( stateKeys, false )
 	);
 	const [ errors, setErrors ] = useState(
-		constructObjectWithValues< string | null >( validationRules, null )
+		constructObjectWithValues< string | null >( stateKeys, null )
 	);
 
 	const resetErrorState = (): void => {
-		setErrors( constructObjectWithValues< string | null >( validationRules, null ) );
+		setErrors( constructObjectWithValues< string | null >( stateKeys, null ) );
 	};
 
 	const resetFormState = (): void => {
@@ -111,15 +109,15 @@ export const useForm = < T extends Record< string, unknown > >( {
 		dispatch( { type: 'setState', payload: { value: newState } } );
 	};
 
-	const handleOnChange = ( id: string, value: unknown ): void => {
+	const handleOnChange = < K extends keyof T = keyof T >( id: K, value: T[ K ] ): void => {
 		dispatch( { type: 'setField', payload: { id, value } } );
 		if ( isNonEmptyObj( validationRules ) && Object.prototype.hasOwnProperty.call( errors, id ) ) {
 			setErrors( {
 				...errors,
-				[ id ]: executeValidationRules(
-					validationRules[ id as keyof typeof validationRules ] ?? ( () => null ),
-					{ ...state, [ id ]: value }
-				),
+				[ id ]: executeValidationRules( validationRules[ id ] ?? ( () => null ), {
+					...state,
+					[ id ]: value,
+				} ),
 			} );
 		}
 	};

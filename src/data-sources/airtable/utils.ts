@@ -4,11 +4,11 @@ import {
 	AIRTABLE_USER_TYPES,
 } from '@/data-sources/airtable/constants';
 import { AirtableField } from '@/data-sources/airtable/types';
-import { AirtableOutputQueryMappingValue } from '@/data-sources/types';
+import { DataSourceQueryMappingValue } from '@/data-sources/types';
 
 export const getAirtableOutputQueryMappingValue = (
 	field: AirtableField
-): AirtableOutputQueryMappingValue => {
+): DataSourceQueryMappingValue => {
 	const baseField = {
 		path: `$.fields["${ field.name }"]`,
 		name: field.name,

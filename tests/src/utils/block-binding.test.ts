@@ -127,5 +127,43 @@ describe( 'block-binding utils', () => {
 				content: '<span class="rdb-block-label">Title</span> My Title',
 			} );
 		} );
+
+		it( 'should handle mismatched types', () => {
+			const block = 'test/block';
+			const attributes: RemoteDataInnerBlockAttributes = {
+				content: '123',
+				metadata: {
+					bindings: {
+						content: { source: BLOCK_BINDING_SOURCE, args: { block, field: 'a_field' } },
+					},
+				},
+			};
+
+			const results: Record< string, unknown >[] = [ { a_field: 123 } ];
+
+			const result = getMismatchedAttributes( attributes, results, block );
+
+			expect( result ).toEqual( {} );
+		} );
+
+		it( 'should handle convert mismatched attributes to string', () => {
+			const block = 'test/block';
+			const attributes: RemoteDataInnerBlockAttributes = {
+				content: '123',
+				metadata: {
+					bindings: {
+						content: { source: BLOCK_BINDING_SOURCE, args: { block, field: 'a_field' } },
+					},
+				},
+			};
+
+			const results: Record< string, unknown >[] = [ { a_field: 1234 } ];
+
+			const result = getMismatchedAttributes( attributes, results, block );
+
+			expect( result ).toEqual( {
+				content: '1234',
+			} );
+		} );
 	} );
 } );

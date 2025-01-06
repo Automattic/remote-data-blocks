@@ -28,23 +28,20 @@ describe( 'object utils', () => {
 
 	describe( 'constructObjectWithValues', () => {
 		it( 'should construct an object with default values', () => {
-			const input = { a: 1, b: 'two', c: true };
 			const defaultValue = 'default';
 			const expected = { a: 'default', b: 'default', c: 'default' };
-			expect( constructObjectWithValues( input, defaultValue ) ).toEqual( expected );
+			expect( constructObjectWithValues( [ 'a', 'b', 'c' ], defaultValue ) ).toEqual( expected );
 		} );
 
 		it( 'should handle empty input object', () => {
-			const input = {};
 			const defaultValue = 0;
-			expect( constructObjectWithValues( input, defaultValue ) ).toEqual( {} );
+			expect( constructObjectWithValues( [], defaultValue ) ).toEqual( {} );
 		} );
 
 		it( 'should work with different default value types', () => {
-			const input = { x: 'x', y: 'y' };
-			expect( constructObjectWithValues( input, 42 ) ).toEqual( { x: 42, y: 42 } );
-			expect( constructObjectWithValues( input, true ) ).toEqual( { x: true, y: true } );
-			expect( constructObjectWithValues( input, null ) ).toEqual( { x: null, y: null } );
+			expect( constructObjectWithValues( [ 'x', 'y' ], 42 ) ).toEqual( { x: 42, y: 42 } );
+			expect( constructObjectWithValues( [ 'x', 'y' ], true ) ).toEqual( { x: true, y: true } );
+			expect( constructObjectWithValues( [ 'x', 'y' ], null ) ).toEqual( { x: null, y: null } );
 		} );
 	} );
 } );

@@ -13,10 +13,11 @@ import {
 } from '@wordpress/dataviews/wp';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { chevronRightSmall, info } from '@wordpress/icons';
+import { info } from '@wordpress/icons';
 import { store as noticesStore, NoticeStoreActions, WPNotice } from '@wordpress/notices';
 
 import { SUPPORTED_SERVICES, SUPPORTED_SERVICES_LABELS } from './constants';
+import DataSourceMetaTags from '@/data-sources/DataSourceMetaTags';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
@@ -53,44 +54,6 @@ const DataSourceList = () => {
 		await Promise.all( sources.map( src => deleteDataSource( src ).catch( () => null ) ) );
 		setDataSourceToDelete( null );
 		await fetchDataSources().catch( () => null );
-	};
-
-	const renderDataSourceMeta = ( source: DataSourceConfig ) => {
-		const tags: { key: string; primaryValue: string; secondaryValue?: string }[] = [];
-		switch ( source.service ) {
-			case 'airtable':
-				tags.push( {
-					key: 'base',
-					primaryValue: source.service_config.base?.name,
-					secondaryValue: source.service_config.tables?.[ 0 ]?.name,
-				} );
-				break;
-			case 'shopify':
-				tags.push( { key: 'store', primaryValue: source.service_config.store_name } );
-				break;
-			case 'google-sheets':
-				tags.push( {
-					key: 'spreadsheet',
-					primaryValue: source.service_config.spreadsheet.name ?? 'Google Sheet',
-					secondaryValue: source.service_config.sheet.name,
-				} );
-				break;
-		}
-
-		return tags.filter( Boolean ).map( tag => (
-			<span key={ tag.key } className="data-source-meta">
-				{ tag.primaryValue }
-				{ tag.secondaryValue && (
-					<>
-						<Icon
-							icon={ chevronRightSmall }
-							style={ { fill: '#949494', verticalAlign: 'middle' } }
-						/>
-						{ tag.secondaryValue }
-					</>
-				) }
-			</span>
-		) );
 	};
 
 	const getServiceLabel = ( service: ( typeof SUPPORTED_SERVICES )[ number ] ) => {
@@ -168,7 +131,7 @@ const DataSourceList = () => {
 			id: 'meta',
 			label: __( 'Meta', 'remote-data-blocks' ),
 			enableGlobalSearch: true,
-			render: ( { item }: { item: DataSourceConfig } ) => renderDataSourceMeta( item ),
+			render: ( { item }: { item: DataSourceConfig } ) => <DataSourceMetaTags source={ item } />,
 		},
 	];
 
