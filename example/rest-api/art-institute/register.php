@@ -88,9 +88,14 @@ function register_aic_block(): void {
 
 	register_remote_data_block( [
 		'title' => 'Art Institute of Chicago',
-		'queries' => [
-			'display' => $get_art_query,
-			'search' => $search_art_query,
+		'render_query' => [
+			'query' => $get_art_query,
+		],
+		'selection_queries' => [
+			[
+				'query' => $search_art_query,
+				'type' => 'search',
+			],
 		],
 	] );
 }
