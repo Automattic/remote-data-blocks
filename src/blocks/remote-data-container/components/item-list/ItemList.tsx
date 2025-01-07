@@ -21,10 +21,10 @@ export function ItemList( props: ItemListProps ) {
 	const instanceId = useInstanceId( ItemList, blockName );
 
 	const data = useMemo( () => {
-		// Remove null values from the data to prevent errors in filterSortAndPaginate
+		// remove null values from the data to prevent errors in filterSortAndPaginate
 		const removeNullValues = ( obj: Record< string, unknown > ): Record< string, unknown > => {
 			return Object.fromEntries(
-				Object.entries( obj ).filter( ( [ _, value ] ) => value !== null ) // Keep only non-null values
+				Object.entries( obj ).filter( ( [ _, value ] ) => value !== null )
 			);
 		};
 
