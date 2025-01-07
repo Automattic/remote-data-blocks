@@ -86,4 +86,23 @@ export class GoogleApi {
 		const values = await this.getSheetValues( spreadsheetId, sheetTitle, 'A1:Z1' );
 		return values.values[ 0 ] ?? [];
 	}
+
+	/**
+	 * Get all fields for all sheets in a spreadsheet.
+	 *
+	 * @param spreadsheetId - The ID of the spreadsheet.
+	 * @returns An object with sheet titles as keys and their corresponding fields as values.
+	 */
+	public async getSpreadsheetFields(
+		spreadsheetId: string
+	): Promise< Record< string, string[] > > {
+		const sheets = await this.getSheetsOptions( spreadsheetId );
+		const fields = await Promise.all(
+			sheets.map( sheet => this.getSheetFields( spreadsheetId, sheet.label ) )
+		);
+
+		return Object.fromEntries(
+			sheets.map( ( sheet, index ) => [ sheet.label, fields.at( index ) ?? [] ] )
+		);
+	}
 }

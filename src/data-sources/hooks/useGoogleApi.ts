@@ -50,29 +50,25 @@ export const useGoogleSheetsOptions = ( token: string | null, spreadsheetId: str
 	return { sheets, isLoadingSheets, errorSheets, refetchSheets };
 };
 
-export const useGoogleSheetFields = (
-	token: string | null,
-	spreadsheetId: string,
-	sheetTitle: string
-) => {
+export const useGoogleSheetFields = ( token: string | null, spreadsheetId: string ) => {
 	const api = useMemo( () => new GoogleApi( token ), [ token ] );
 
 	const queryFn = useCallback( async () => {
-		if ( ! token || ! spreadsheetId || ! sheetTitle ) {
+		if ( ! token || ! spreadsheetId ) {
 			return null;
 		}
-		return api.getSheetFields( spreadsheetId, sheetTitle );
-	}, [ api, token, spreadsheetId, sheetTitle ] );
+		return api.getSpreadsheetFields( spreadsheetId );
+	}, [ api, token, spreadsheetId ] );
 
 	const {
-		data: sheetFields,
-		isLoading: isLoadingSheetFields,
-		error: errorSheetFields,
-		refetch: refetchSheetFields,
+		data: spreadsheetFields,
+		isLoading: isLoadingSpreadsheetFields,
+		error: errorSpreadsheetFields,
+		refetch: refetchSpreadsheetFields,
 	} = useQuery( queryFn, { manualFetchOnly: true } );
 
-	const debouncedFetchSheetFields = useDebounce( refetchSheetFields, 500 );
-	useEffect( debouncedFetchSheetFields, [ token, debouncedFetchSheetFields ] );
+	const debouncedFetchSpreadsheetFields = useDebounce( refetchSpreadsheetFields, 500 );
+	useEffect( debouncedFetchSpreadsheetFields, [ token, debouncedFetchSpreadsheetFields ] );
 
-	return { sheetFields, isLoadingSheetFields, errorSheetFields };
+	return { spreadsheetFields, isLoadingSpreadsheetFields, errorSpreadsheetFields };
 };
