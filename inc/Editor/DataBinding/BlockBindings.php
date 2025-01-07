@@ -234,7 +234,7 @@ class BlockBindings {
 			$fallback_content = $block_attributes['content'] ?? null;
 		}
 
-		return $fallback_content;
+		return strval( $fallback_content );
 	}
 
 	public static function get_remote_value( array $block_context, array $source_args ): string|null {
