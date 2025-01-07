@@ -1,6 +1,6 @@
 import { SelectControl } from '@wordpress/components';
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
@@ -131,6 +131,13 @@ export const AirtableSettings = ( {
 			handleOnChange( id, value );
 		}
 	};
+
+	// if the selected table changes, reset the fields
+	useEffect( () => {
+		if ( currentTableId !== state.tables?.[ 0 ]?.id ) {
+			setTableFields( [] );
+		}
+	}, [ currentTableId ] );
 
 	let connectionMessage: React.ReactNode = (
 		<span>

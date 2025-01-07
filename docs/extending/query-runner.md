@@ -28,7 +28,7 @@ The `get_raw_response_data` method dispatches the HTTP request and assembles the
 
 ### get_response_metadata( HttpQueryInterface $query, array $response_metadata, array $query_results ): array
 
-The `get_response_metadata` method returns the response metadata for the query, which are available as bindings for [field shortcodes](field-shortcodes.md).
+The `get_response_metadata` method returns the response metadata for the query, which are available as bindings for [field shortcodes](../concepts/field-shortcodes.md).
 
 ## Custom query execution
 

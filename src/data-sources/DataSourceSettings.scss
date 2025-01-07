@@ -79,7 +79,6 @@
 
 
 .rdb-settings-page_data-source-form {
-	overflow-y: auto;
 	padding: 0 16px 40px;
 
 	@media screen and (min-width: 782px) {
@@ -231,6 +230,11 @@
 			}
 		}
 	}
+}
+
+.components-form-token-field__input-container > div:first-child {
+	max-height: 220px;
+	overflow-y: scroll;
 }
 
 .components-form-token-field__input-container.is-active {

@@ -76,23 +76,8 @@ function register_westeros_houses_block(): void {
 				],
 			],
 		],
-		'preprocess_response' => function ( mixed $response_data ) use ( $columns ): array {
-			if ( isset( $response_data['values'] ) && is_array( $response_data['values'] ) ) {
-				$values = $response_data['values'];
-				array_shift( $values ); // Drop the first row
-
-				$response_data['values'] = array_map(
-					function ( $row, $index ) use ( $columns ) {
-						$combined = array_combine( $columns, $row );
-						$combined['RowId'] = $index + 1; // Add row_id field, starting from 1
-						return $combined;
-					},
-					$values,
-					array_keys( $values )
-				);
-			}
-
-			return $response_data;
+		'preprocess_response' => function ( mixed $response_data ): array {
+			return GoogleSheetsDataSource::preprocess_list_response( $response_data );
 		},
 	] );
 
@@ -139,20 +124,8 @@ function register_westeros_houses_block(): void {
 				],
 			],
 		],
-		'preprocess_response' => function ( mixed $response_data, array $input_variables ) use ( $columns ): array {
-			$selected_row = null;
-			$row_id = $input_variables['row_id'];
-
-			if ( isset( $response_data['values'] ) && is_array( $response_data['values'] ) ) {
-				$raw_selected_row = $response_data['values'][ $row_id ];
-				if ( is_array( $raw_selected_row ) ) {
-					$selected_row = array_combine( $columns, $raw_selected_row );
-					$selected_row = array_combine( $columns, $selected_row );
-					$selected_row['RowId'] = $row_id;
-				}
-			}
-
-			return $selected_row;
+		'preprocess_response' => function ( mixed $response_data, array $input_variables ): array {
+			return GoogleSheetsDataSource::preprocess_get_response( $response_data, $input_variables );
 		},
 	] );
 
