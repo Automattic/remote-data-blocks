@@ -30,7 +30,14 @@ import { ShopifyIcon } from '@/settings/icons/ShopifyIcon';
 const DataSourceList = () => {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch< NoticeStoreActions >( noticesStore );
-	const { dataSources, loadingDataSources, deleteDataSource, fetchDataSources } = useDataSources();
+	const {
+		dataSources,
+		loadingDataSources,
+		deleteDataSource,
+		deleteMultipleDataSources,
+		fetchDataSources,
+		addDataSource,
+	} = useDataSources();
 	const [ dataSourceToDelete, setDataSourceToDelete ] = useState<
 		DataSourceConfig | DataSourceConfig[] | null
 	>( null );
@@ -50,8 +57,11 @@ const DataSourceList = () => {
 	};
 
 	const onConfirmDeleteDataSource = async ( source: DataSourceConfig | DataSourceConfig[] ) => {
-		const sources = Array.isArray( source ) ? source : [ source ];
-		await Promise.all( sources.map( src => deleteDataSource( src ).catch( () => null ) ) );
+		if ( Array.isArray( source ) ) {
+			await deleteMultipleDataSources( source );
+		} else {
+			await deleteDataSource( source );
+		}
 		setDataSourceToDelete( null );
 		await fetchDataSources().catch( () => null );
 	};
@@ -198,6 +208,38 @@ const DataSourceList = () => {
 				}
 			},
 			supportsBulk: true,
+		},
+		{
+			id: 'duplicate',
+			label: __( 'Duplicate', 'remote-data-blocks' ),
+			isEligible: ( item: DataSourceConfig ) => {
+				return Boolean( item?.uuid );
+			},
+			callback: ( [ item ]: DataSourceConfig[] ) => {
+				if ( item ) {
+					const duplicatedSource = {
+						...item,
+						uuid: null,
+						service: item.service,
+						service_config: {
+							...item.service_config,
+							display_name: item.service_config.display_name + __( ' copy ', 'remote-data-blocks' ),
+						} as DataSourceConfig[ 'service_config' ],
+					};
+					addDataSource( duplicatedSource as DataSourceConfig )
+						.then( result => {
+							if ( result && result.uuid ) {
+								return onEditDataSource( result.uuid );
+							}
+						} )
+						.catch( () => {
+							showSnackbar(
+								'error',
+								__( 'Failed to duplicate data source.', 'remote-data-blocks' )
+							);
+						} );
+				}
+			},
 		},
 	];
 
