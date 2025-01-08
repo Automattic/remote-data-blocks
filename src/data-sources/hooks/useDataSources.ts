@@ -136,6 +136,11 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 			);
 			throw error;
 		}
+
+		showSnackbar(
+			'success',
+			__( 'Selected data sources have been successfully deleted.', 'remote-data-blocks' )
+		);
 	}
 
 	async function onSave( config: SourceConfig, mode: 'add' | 'edit' ): Promise< void > {
