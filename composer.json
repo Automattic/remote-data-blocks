@@ -38,12 +38,15 @@
   "require-dev": {
     "automattic/vipwpcs": "^3.0",
     "phpcompatibility/phpcompatibility-wp": "^2.1",
-    "phpunit/phpunit": "^10",
+    "phpunit/phpunit": "^9",
     "slevomat/coding-standard": "^8.15",
     "php-stubs/wordpress-stubs": "^6.6",
     "psalm/phar": "^5.26",
     "mockery/mockery": "^1.6",
-    "php-stubs/wordpress-globals": "^0.2.0"
+    "wp-phpunit/wp-phpunit": "^6.7",
+    "yoast/phpunit-polyfills": "^2.0",
+    "php-stubs/wordpress-globals": "^0.2.0",
+    "php-stubs/wordpress-tests-stubs": "^6.7"
   },
   "config": {
     "allow-plugins": {

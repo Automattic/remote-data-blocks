@@ -20,18 +20,28 @@ export function ItemList( props: ItemListProps ) {
 
 	const instanceId = useInstanceId( ItemList, blockName );
 
-	// ensure each result has an 'id' key
 	const data = useMemo( () => {
-		return ( results ?? [] ).map( ( item: Record< string, unknown > ) =>
-			item.id
-				? item
-				: {
-						...item,
-						id: Object.keys( item ).find( key => /(^|_)(id)$/i.test( key ) ) // Regex to match 'id' or part of '_id'
-							? item[ Object.keys( item ).find( key => /(^|_)(id)$/i.test( key ) ) as string ]
-							: instanceId,
-				  }
-		) as RemoteDataResult[];
+		// remove null values from the data to prevent errors in filterSortAndPaginate
+		const removeNullValues = ( obj: Record< string, unknown > ): Record< string, unknown > => {
+			return Object.fromEntries(
+				Object.entries( obj ).filter( ( [ _, value ] ) => value !== null )
+			);
+		};
+
+		return ( results ?? [] ).map( ( item: Record< string, unknown > ) => {
+			const parsedItem = removeNullValues( item );
+
+			if ( parsedItem.id ) {
+				return parsedItem;
+			}
+
+			// ensure each result has an 'id' key
+			const idKey = Object.keys( parsedItem ).find( key => /(^|_)(id)$/i.test( key ) );
+			return {
+				...parsedItem,
+				id: idKey ? parsedItem[ idKey ] : instanceId,
+			};
+		} ) as RemoteDataResult[];
 	}, [ results ] );
 
 	// get fields from results data to use as columns

@@ -68,6 +68,7 @@ class BlockBindingsTest extends TestCase {
 
 	/**
 	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function test_execute_query_with_no_config(): void {
 		/**
@@ -94,6 +95,7 @@ class BlockBindingsTest extends TestCase {
 
 	/**
 	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function test_execute_query_returns_query_results(): void {
 		/**
@@ -134,6 +136,7 @@ class BlockBindingsTest extends TestCase {
 
 	/**
 	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function test_execute_query_with_overrides(): void {
 		/**
@@ -206,6 +209,7 @@ class BlockBindingsTest extends TestCase {
 
 	/**
 	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function test_execute_query_with_query_input_transformed_by_custom_query_runner(): void {
 		/**
@@ -267,6 +271,7 @@ class BlockBindingsTest extends TestCase {
 
 	/**
 	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function test_execute_query_with_query_input_transformations_and_overrides(): void {
 		/**
@@ -337,6 +342,7 @@ class BlockBindingsTest extends TestCase {
 
 	/**
 	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function test_get_remote_value(): void {
 		/**
@@ -385,6 +391,7 @@ class BlockBindingsTest extends TestCase {
 
 	/**
 	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function test_get_remote_value_with_non_string(): void {
 		/**

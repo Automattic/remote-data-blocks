@@ -41,6 +41,7 @@ vendor/
 
 # PHPUnit
 .phpunit.cache/
+.phpunit.result.cache
 
 # Editors
 .idea/*
