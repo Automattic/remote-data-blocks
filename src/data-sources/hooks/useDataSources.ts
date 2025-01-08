@@ -121,6 +121,23 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 		);
 	}
 
+	async function deleteMultipleDataSources( sources: DataSourceConfig[] ) {
+		const uuids = sources.map( source => source.uuid ).join( ',' );
+
+		try {
+			await apiFetch( {
+				path: `${ REST_BASE_DATA_SOURCES }/${ uuids }`,
+				method: 'DELETE',
+			} );
+		} catch ( error ) {
+			showSnackbar(
+				'error',
+				__( 'Failed to delete selected data sources.', 'remote-data-blocks' )
+			);
+			throw error;
+		}
+	}
+
 	async function onSave( config: SourceConfig, mode: 'add' | 'edit' ): Promise< void > {
 		if ( mode === 'add' ) {
 			await addDataSource( config );
@@ -155,6 +172,7 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 		addDataSource,
 		dataSources,
 		deleteDataSource,
+		deleteMultipleDataSources,
 		loadingDataSources,
 		updateDataSource,
 		fetchDataSources,
