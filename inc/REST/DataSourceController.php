@@ -110,7 +110,7 @@ class DataSourceController extends WP_REST_Controller {
 			[
 				'methods' => 'DELETE',
 				'callback' => [ $this, 'delete_multiple_items' ], 
-				'permission_callback' => [ $this, 'delete_items_permissions_check' ],
+				'permission_callback' => [ $this, 'delete_item_permissions_check' ],
 				'args' => [
 					'uuids' => [
 						'type' => 'string',
@@ -298,10 +298,6 @@ class DataSourceController extends WP_REST_Controller {
 	}
 
 	public function delete_item_permissions_check( $request ) {
-		return current_user_can( 'manage_options' );
-	}
-
-	public function delete_items_permissions_check( $request ) {
 		return current_user_can( 'manage_options' );
 	}
 
