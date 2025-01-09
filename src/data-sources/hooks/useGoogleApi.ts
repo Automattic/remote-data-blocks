@@ -27,48 +27,28 @@ export const useGoogleSpreadsheetsOptions = ( token: string | null ) => {
 	return { spreadsheets, isLoadingSpreadsheets, errorSpreadsheets, refetchSpreadsheets };
 };
 
-export const useGoogleSheetsOptions = ( token: string | null, spreadsheetId: string ) => {
+export const useGoogleSheetsWithFields = ( token: string | null, spreadsheetId: string ) => {
 	const api = useMemo( () => new GoogleApi( token ), [ token ] );
 
 	const queryFn = useCallback( async () => {
 		if ( ! token || ! spreadsheetId ) {
 			return null;
 		}
-		return api.getSheetsOptions( spreadsheetId );
+		return api.getSheetsWithFieldNames( spreadsheetId );
 	}, [ api, token, spreadsheetId ] );
 
 	const {
-		data: sheets,
+		data: sheetsWithFields,
 		isLoading: isLoadingSheets,
 		error: errorSheets,
-		refetch: refetchSheets,
-	} = useQuery( queryFn, { manualFetchOnly: true } );
+	} = useQuery( queryFn );
 
-	const debouncedFetchSheets = useDebounce( refetchSheets, 500 );
-	useEffect( debouncedFetchSheets, [ token, debouncedFetchSheets ] );
+	const sheets = sheetsWithFields
+		? Array.from( sheetsWithFields.values() ).map( sheet => ( {
+				id: sheet.id,
+				name: sheet.name,
+		  } ) )
+		: null;
 
-	return { sheets, isLoadingSheets, errorSheets, refetchSheets };
-};
-
-export const useGoogleSheetFields = ( token: string | null, spreadsheetId: string ) => {
-	const api = useMemo( () => new GoogleApi( token ), [ token ] );
-
-	const queryFn = useCallback( async () => {
-		if ( ! token || ! spreadsheetId ) {
-			return null;
-		}
-		return api.getSpreadsheetFields( spreadsheetId );
-	}, [ api, token, spreadsheetId ] );
-
-	const {
-		data: spreadsheetFields,
-		isLoading: isLoadingSpreadsheetFields,
-		error: errorSpreadsheetFields,
-		refetch: refetchSpreadsheetFields,
-	} = useQuery( queryFn, { manualFetchOnly: true } );
-
-	const debouncedFetchSpreadsheetFields = useDebounce( refetchSpreadsheetFields, 500 );
-	useEffect( debouncedFetchSpreadsheetFields, [ token, debouncedFetchSpreadsheetFields ] );
-
-	return { spreadsheetFields, isLoadingSpreadsheetFields, errorSpreadsheetFields };
+	return { sheets, sheetsWithFields, isLoadingSheets, errorSheets };
 };

@@ -8,8 +8,7 @@ import { GOOGLE_SHEETS_API_SCOPES } from '@/data-sources/constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import {
 	useGoogleSpreadsheetsOptions,
-	useGoogleSheetsOptions,
-	useGoogleSheetFields,
+	useGoogleSheetsWithFields,
 } from '@/data-sources/hooks/useGoogleApi';
 import { useGoogleAuth } from '@/data-sources/hooks/useGoogleAuth';
 import {
@@ -72,16 +71,13 @@ export const GoogleSheetsSettings = ( {
 	);
 	const { spreadsheets, isLoadingSpreadsheets, errorSpreadsheets } =
 		useGoogleSpreadsheetsOptions( token );
-	const { sheets, isLoadingSheets, errorSheets } = useGoogleSheetsOptions(
+	const { sheets, sheetsWithFields, isLoadingSheets, errorSheets } = useGoogleSheetsWithFields(
 		token,
 		state.spreadsheet?.id ?? ''
 	);
 
-	const availableSheets = sheets?.length ? sheets?.map( sheet => sheet.label ) : [];
+	const availableSheets = sheets?.length ? sheets?.map( sheet => sheet.name ) : [];
 	const selectedSheets = state.sheets?.map( sheet => sheet.name ) ?? [];
-
-	const { spreadsheetFields, isLoadingSpreadsheetFields, errorSpreadsheetFields } =
-		useGoogleSheetFields( token, state.spreadsheet?.id ?? '' );
 
 	const onSaveClick = async () => {
 		if ( ! validState ) {
@@ -113,14 +109,29 @@ export const GoogleSheetsSettings = ( {
 	const onSheetsChange = ( sheetNames: string[] ) => {
 		let newSheets: GoogleSheetsSheetConfig[] = [];
 
-		if ( state.sheets?.length ) {
-			newSheets = state.sheets
-				.filter( sheet => sheetNames.includes( sheet.name ) )
-				.map( sheet => ( {
-					id: sheet.id,
-					name: sheet.name,
-					output_query_mappings: [] as DataSourceQueryMappingValue[],
-				} ) );
+		if ( sheetNames.length ) {
+			newSheets = sheetNames
+				.map( name => {
+					const sheet = sheetsWithFields?.get( name );
+
+					if ( ! sheet ) {
+						return null;
+					}
+
+					const outputQueryMappings: DataSourceQueryMappingValue[] = sheet.fields.map( field => ( {
+						key: field,
+						name: field,
+						path: `$.${ field }`,
+						type: 'string',
+					} ) );
+
+					return {
+						id: `${ sheet.id }`,
+						name: sheet.name,
+						output_query_mappings: outputQueryMappings,
+					};
+				} )
+				.filter( Boolean ) as GoogleSheetsSheetConfig[];
 		}
 
 		handleOnChange( 'sheets', newSheets );
@@ -184,7 +195,7 @@ export const GoogleSheetsSettings = ( {
 	}, [ spreadsheets ] );
 
 	const getSheetsHelpText = () => {
-		if ( token && ! state.spreadsheet ) {
+		if ( token && state.spreadsheet ) {
 			if ( errorSheets ) {
 				const errorMessage = errorSheets?.message ?? __( 'Unknown error', 'remote-data-blocks' );
 				return __( 'Failed to fetch sheets.', 'remote-data-blocks' ) + ' ' + errorMessage;
@@ -194,7 +205,11 @@ export const GoogleSheetsSettings = ( {
 				return __( 'Fetching sheets...', 'remote-data-blocks' );
 			}
 
-			return __( 'No sheets found', 'remote-data-blocks' );
+			if ( ! sheets?.length ) {
+				return __( 'No sheets found', 'remote-data-blocks' );
+			}
+
+			return __( 'Select sheets to attach with this data source.', 'remote-data-blocks' );
 		}
 
 		return __( 'Auto-filled on valid spreadsheet.', 'remote-data-blocks' );
@@ -242,7 +257,7 @@ export const GoogleSheetsSettings = ( {
 					selectedFields={ selectedSheets }
 					availableFields={ availableSheets }
 					onFieldsChange={ onSheetsChange }
-					disabled={ ! state.spreadsheet }
+					disabled={ ! availableSheets?.length }
 					customHelpText={ getSheetsHelpText() }
 				/>
 			</DataSourceForm.Scope>
