@@ -69,7 +69,7 @@ class BlockRegistration {
 		// Create the localized data that will be used by our block editor script.
 		$block_config = [
 			'availableBindings' => $available_bindings,
-			'availableOverrides' => $config['query_input_overrides'] ?? [],
+			'availableOverrides' => $config['overrides'] ?? [],
 			'loop' => $config['loop'],
 			'name' => $block_name,
 			'dataSourceType' => ConfigStore::get_data_source_type( $block_name ),

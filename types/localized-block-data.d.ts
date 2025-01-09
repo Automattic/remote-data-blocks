@@ -10,6 +10,7 @@ interface InputVariable {
 
 interface InputVariableOverride {
 	display_name?: string;
+	help_text?: string;
 	name: string;
 }
 

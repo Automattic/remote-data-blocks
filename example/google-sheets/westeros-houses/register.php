@@ -126,17 +126,17 @@ function register_westeros_houses_block(): void {
 		'title' => 'Westeros House',
 		'render_query' => [
 			'query' => $get_westeros_houses_query,
-			'input_overrides' => [
-				[
-					'display_name' => 'Use Westeros House from URL',
-					'name' => 'westeros_house',
-				],
-			],
 		],
 		'selection_queries' => [
 			[
 				'query' => $list_westeros_houses_query,
 				'type' => 'list',
+			],
+		],
+		'overrides' => [
+			[
+				'display_name' => 'Use Westeros House from URL',
+				'name' => 'westeros_house',
 			],
 		],
 	] );

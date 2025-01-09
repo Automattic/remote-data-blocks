@@ -75,14 +75,6 @@ final class ConfigSchemas {
 			),
 			'render_query' => Types::object( [
 				'query' => Types::instance_of( QueryInterface::class ),
-				'input_overrides' => Types::nullable(
-					Types::list_of(
-						Types::object( [
-							'name' => Types::string(),
-							'display_name' => Types::nullable( Types::string() ),
-						] ),
-					)
-				),
 				'loop' => Types::nullable( Types::boolean() ),
 			] ),
 			'selection_queries' => Types::nullable(
@@ -95,6 +87,14 @@ final class ConfigSchemas {
 							ConfigRegistry::SEARCH_QUERY_KEY
 						),
 					] )
+				)
+			),
+			'overrides' => Types::nullable(
+				Types::list_of(
+					Types::object( [
+						'name' => Types::string(),
+						'display_name' => Types::nullable( Types::string() ),
+					] ),
 				)
 			),
 			'title' => Types::string(),

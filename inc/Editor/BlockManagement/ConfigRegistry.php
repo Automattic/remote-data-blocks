@@ -56,11 +56,11 @@ class ConfigRegistry {
 			'description' => '',
 			'name' => $block_name,
 			'loop' => $user_config[ self::RENDER_QUERY_KEY ]['loop'] ?? false,
+			'overrides' => $user_config['overrides'] ?? [],
 			'patterns' => [],
 			'queries' => [
 				self::DISPLAY_QUERY_KEY => $display_query,
 			],
-			'query_input_overrides' => $user_config[ self::RENDER_QUERY_KEY ]['input_overrides'] ?? [],
 			'selectors' => [
 				[
 					'image_url' => $display_query->get_image_url(),

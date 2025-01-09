@@ -42,15 +42,16 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 		<PanelBody title={ __( 'Remote data overrides', 'remote-data-blocks' ) }>
 			<p>
 				{ __(
-					'Override the query input at run-time using the selected strategy',
+					'Overrides potentially alter the behavior of this block based on custom logic. If you have questions about what these overrides do, please contact your site administrator.',
 					'remote-data-blocks'
 				) }
 			</p>
 			{ availableOverrides.map( override => (
 				<CheckboxControl
+					checked={ remoteData.enabledOverrides?.includes( override.name ) }
+					help={ override.help_text }
 					key={ override.name }
 					label={ override.display_name || override.name }
-					checked={ remoteData.enabledOverrides?.includes( override.name ) }
 					onChange={ enabled => updateOverrides( override.name, enabled ) }
 				/>
 			) ) }

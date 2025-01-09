@@ -98,17 +98,18 @@ function register_github_file_as_html_block(): void {
 		'title' => $block_title,
 		'render_query' => [
 			'query' => $github_get_file_as_html_query,
-			'input_overrides' => [
-				[
-					'name' => 'github_file_path',
-					'display_name' => __( 'Use GitHub file path from URL', 'rdb-example' ),
-				],
-			],
 		],
 		'selection_queries' => [
 			[
 				'query' => $github_get_list_files_query,
 				'type' => 'list',
+			],
+		],
+		'overrides' => [
+			[
+				'name' => 'github_file_path',
+				'display_name' => __( 'Use GitHub file path from URL', 'rdb-example' ),
+				'help_text' => __( 'Enable this override when using this block on the /gh/ page.', 'rdb-example' ),
 			],
 		],
 		'patterns' => [
