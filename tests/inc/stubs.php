@@ -1,22 +1,37 @@
 <?php declare(strict_types = 1);
 
-$GLOBALS['__wordpress_filters'] = [];
-function apply_filters( string $filter, mixed $thing ): mixed {
-	return $GLOBALS['__wordpress_filters'][ $filter ] ?? $thing;
-}
-
 $GLOBALS['__wordpress_actions'] = [];
 function add_action( string $action, mixed ...$args ): void {
 	$GLOBALS['__wordpress_actions'][ $action ][] = $args;
 }
-function add_filter( string $filter, mixed ...$args ): void {
-	$GLOBALS['__wordpress_filters'][ $filter ][] = $args;
+
+$GLOBALS['__wordpress_filters'] = [];
+function add_filter( string $filter, callable $callback ): void {
+	$GLOBALS['__wordpress_filters'][ $filter ] = $callback;
 }
 
 $GLOBALS['__wordpress_done_actions'] = [];
 function do_action( string $action, mixed ...$args ): void {
 	$GLOBALS['__wordpress_done_actions'][ $action ] = $GLOBALS['__wordpress_done_actions'][ $action ] ?? [];
 	$GLOBALS['__wordpress_done_actions'][ $action ][] = $args;
+}
+
+$GLOBALS['__wordpress_done_filters'] = [];
+function apply_filters( string $filter, mixed $thing, mixed ...$args ): mixed {
+	$GLOBALS['__wordpress_done_filters'][ $filter ] = $args;
+	if ( is_callable( $GLOBALS['__wordpress_filters'][ $filter ] ?? null ) ) {
+		return call_user_func_array( $GLOBALS['__wordpress_filters'][ $filter ], [ $thing, ...$args ] );
+	}
+
+	return $thing;
+}
+
+/**
+ * @phpcs:disable PHPCompatibility.FunctionNameRestrictions.ReservedFunctionNames.FunctionDoubleUnderscore
+ * @phpcs:disable WordPress.NamingConventions.ValidFunctionName.FunctionDoubleUnderscore
+ */
+function __return_true(): bool {
+	return true;
 }
 
 function esc_html( string $text ): string {

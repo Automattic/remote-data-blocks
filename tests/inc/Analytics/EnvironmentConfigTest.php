@@ -18,7 +18,7 @@ class EnvironmentConfigTest extends TestCase {
 	}
 
 	public function testIsEnabledViaFilterReturnsTrue(): void {
-		$GLOBALS['__wordpress_filters']['remote_data_blocks_enable_tracks_analytics'] = true;
+		add_filter( 'remote_data_blocks_enable_tracks_analytics', '__return_true' );
 		$obj = new EnvironmentConfig();
 
 		$this->assertEquals( true, $obj->is_enabled_via_filter() );

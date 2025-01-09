@@ -8,21 +8,15 @@ interface RemoteDataResultFields {
 	value: string;
 }
 
-interface QueryInputOverride {
-	display: string;
-	source: string;
-	sourceType: 'query_var';
-}
-
 type RemoteDataResult = Record< string, unknown >;
 type RemoteDataQueryInput = Record< string, unknown >;
 
 interface RemoteData {
 	blockName: string;
+	enabledOverrides?: string[];
 	isCollection: boolean;
 	metadata: Record< string, RemoteDataResultFields >;
 	queryInput: RemoteDataQueryInput;
-	queryInputOverrides?: Record< string, QueryInputOverride >;
 	resultId: string;
 	results: RemoteDataResult[];
 }

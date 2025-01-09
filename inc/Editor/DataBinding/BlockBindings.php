@@ -105,59 +105,23 @@ class BlockBindings {
 		return $block_type_args;
 	}
 
-	/**
-	 * Load possible query input overrides for a block binding. Allowed overrides
-	 * are defined in the query configuration. The block editor determines if an
-	 * override is applied.
-	 */
-	private static function apply_query_input_overrides( array $input_variables, array $overrides, string $block_name ): array {
-		$resolved_overrides = [];
-
-		foreach ( $overrides as $input_var_name => $override ) {
-			if ( empty( $override['source'] ?? '' ) || empty( $override['sourceType'] ?? '' ) ) {
-				continue;
-			}
-
-			$override_value = '';
-
-			switch ( $override['sourceType'] ) {
-				// Source the input variable override from a query variable.
-				case 'page':
-				case 'query_var':
-					$override_value = get_query_var( $override['source'], '' );
-					break;
-			}
-
-			if ( ! empty( $override_value ) ) {
-				$resolved_overrides[ $input_var_name ] = $override_value;
-			}
-		}
-
+	private static function get_query_input( array $block_context ): array {
 		/**
 		 * Filter the resolved query input overrides for a block binding.
 		 *
-		 * @param array  $resolved_overrides The resolved query input overrides.
-		 * @param array  $input_variables The original query input variables.
-		 * @param string $block_name The block name.
+		 * @param array $input_variables The original query input variables.
+		 * @param array<string> $enabled_overrides The names of overrides that have been enabled for the current block.
+		 * @param string $block_name The current block name.
+		 * @param array $block_context The block context.
+		 * @return array The filtered query input variables.
 		 */
-		$resolved_overrides = apply_filters(
-			'remote_data_blocks_query_input_overrides',
-			$resolved_overrides,
-			$input_variables,
-			$block_name
+		return apply_filters(
+			'remote_data_blocks_query_input_variables',
+			$block_context['queryInput'] ?? [],
+			$block_context['enabledOverrides'] ?? [],
+			$block_context['blockName'],
+			$block_context
 		);
-
-		return array_merge( $input_variables, $resolved_overrides );
-	}
-
-	private static function get_query_input( array $block_context ): array {
-		$block_name = $block_context['blockName'];
-		$query_input = $block_context['queryInput'];
-		$overrides = $block_context['queryInputOverrides'] ?? [];
-
-		$query_input = self::apply_query_input_overrides( $query_input, $overrides, $block_name );
-
-		return $query_input;
 	}
 
 	public static function execute_query( array $block_context, string $operation_name ): array|null {
