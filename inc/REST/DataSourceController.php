@@ -102,6 +102,23 @@ class DataSourceController extends WP_REST_Controller {
 				],
 			]
 		);
+
+		// delete_multiple_items
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<uuids>[a-zA-Z0-9,-]+)',
+			[
+				'methods' => 'DELETE',
+				'callback' => [ $this, 'delete_multiple_items' ], 
+				'permission_callback' => [ $this, 'delete_item_permissions_check' ],
+				'args' => [
+					'uuids' => [
+						'type' => 'string',
+						'required' => true,
+					],
+				],
+			]
+		);
 	}
 
 	/**
@@ -218,6 +235,49 @@ class DataSourceController extends WP_REST_Controller {
 
 		return rest_ensure_response( $result );
 	}
+
+	/**
+	 * Deletes multiple items.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function delete_multiple_items( $request ) {
+		$uuids = explode( ',', $request->get_param( 'uuids' ) );
+
+		if ( empty( $uuids ) ) {
+			return new WP_Error(
+				'no_uuids_provided',
+				__( 'No items provided for deletion.', 'remote-data-blocks' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		$failed = [];
+		foreach ( $uuids as $uuid ) {
+			$result = DataSourceCrud::delete_config_by_uuid( $uuid );
+			if ( is_wp_error( $result ) ) {
+				$failed[] = [
+					'uuid' => $uuid,
+					'error' => $result->get_error_message(),
+				];
+			}
+		}
+
+		if ( ! empty( $failed ) ) {
+			return rest_ensure_response([
+				'status' => 'partial_success',
+				'message' => __( 'Some items could not be deleted.', 'remote-data-blocks' ),
+				'failed' => $failed,
+			]);
+		}
+
+		return rest_ensure_response([
+			'status' => 'success',
+			'message' => __( 'All items deleted successfully.', 'remote-data-blocks' ),
+		]);
+	}
+
 
 	// These all require manage_options for now, but we can adjust as needed
 
