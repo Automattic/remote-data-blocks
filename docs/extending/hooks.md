@@ -55,6 +55,24 @@ function custom_request_details( array $request_details, HttpQueryInterface $que
 add_filter( 'remote_data_blocks_request_details', 'custom_request_details', 10, 3 );
 ```
 
+### remote_data_blocks_query_input_variables
+
+Filter the query input variables prior to query execution. This filter is useful for modifying the input variables for the current page-load, e.g., by pulling in data from query variables or other context. See [Overrides](overrides.md) for more information.
+
+```php
+add_filter( 'remote_data_blocks_query_input_variables', function ( array $input_variables, array $enabled_overrides, string $block_name, array $block_context ): array {
+	if ( true === in_array( 'my_override', $enabled_overrides, true ) ) {
+		$override_value = get_query_var( 'override_id' );
+
+		if ( ! empty( $override_value ) ) {
+			$input_variables['id'] = $override_value;
+		}
+	}
+
+	return $input_variables;
+}, 10, 4 );
+```
+
 ### remote_data_blocks_query_response_metadata
 
 Filter the query response metadata, which are available as bindings for field shortcodes. In most cases, it is better to provide a custom query class and override the `get_response_metadata` method but this filter is available in case that is not possible.

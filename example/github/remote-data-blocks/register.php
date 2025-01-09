@@ -121,6 +121,7 @@ function register_github_file_as_html_block(): void {
 		],
 	] );
 
+	// A page with slug "gh" must be created.
 	add_rewrite_rule( '^gh/(.+)/?', 'index.php?pagename=gh&file_path=$matches[1]', 'top' );
 
 	add_filter( 'query_vars', function ( array $query_vars ): array {

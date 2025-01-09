@@ -149,6 +149,7 @@ function register_westeros_houses_block(): void {
 		],
 	] );
 
+	// A page with slug "westeros-houses" must be created.
 	add_rewrite_rule( '^westeros-houses/([^/]+)/?', 'index.php?pagename=westeros-houses&row_id=$matches[1]', 'top' );
 
 	add_filter( 'query_vars', function ( array $query_vars ): array {
