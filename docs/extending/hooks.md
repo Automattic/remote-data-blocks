@@ -80,13 +80,13 @@ Keep in mind modifying query input variables will affect the object cache key fo
 Filter the query response just after query execution. This filter is useful for modifying the query response for the current page-load, e.g., by pulling in data from query variables or other context. See [Overrides](overrides.md) for more information.
 
 ```php
-add_filter( 'remote_data_blocks_query_input_variables', function ( array $input_variables, array $enabled_overrides, string $block_name, array $block_context ): array {
-	if ( true === in_array( 'my_override', $enabled_overrides, true ) ) {
-		$override_value = get_query_var( 'override_id' );
-
-		if ( ! empty( $override_value ) ) {
-			$input_variables['id'] = $override_value;
-		}
+add_filter( 'remote_data_blocks_query_response', function ( array $query_response, array $enabled_overrides, string $block_name, array $block_context ): array {
+	if ( true === in_array( 'alternate_date_format', $enabled_overrides, true ) ) {
+		$query_response['results'] = array_map( function ( array $result ) {
+			$date = new DateTime( $result['date'] );
+			$result['date'] = $date->format( 'Y F d' );
+			return $result;
+		}, $query_response['results'] );
 	}
 
 	return $input_variables;
