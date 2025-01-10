@@ -472,6 +472,17 @@ class BlockBindingsTest extends TestCase {
 		$this->assertSame( $remote_value, '123' );
 	}
 
+	public function test_get_value_with_null_fallback_content_attribute(): void {
+		$block = [
+			'attributes' => [
+				'content' => null,
+			],
+		];
+
+		$remote_value = BlockBindings::get_value( [], $block );
+		$this->assertNull( $remote_value );
+	}
+
 	public function test_get_value_with_fallback_results_context(): void {
 		$block = [
 			'context' => [
@@ -508,5 +519,24 @@ class BlockBindingsTest extends TestCase {
 
 		$remote_value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block );
 		$this->assertSame( $remote_value, '456' );
+	}
+
+	public function test_get_value_with_null_fallback_results_context(): void {
+		$block = [
+			'context' => [
+				BlockBindings::$context_name => [
+					'blockName' => self::MOCK_BLOCK_NAME,
+					'queryInput' => [],
+					'results' => [
+						[
+							self::MOCK_OUTPUT_FIELD_NAME => null,
+						],
+					],
+				],
+			],
+		];
+
+		$remote_value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block );
+		$this->assertNull( $remote_value );
 	}
 }
