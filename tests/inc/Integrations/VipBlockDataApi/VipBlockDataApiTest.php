@@ -7,6 +7,7 @@ use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Integrations\VipBlockDataApi\VipBlockDataApi;
 use RemoteDataBlocks\Tests\Mocks\MockQuery;
 use RemoteDataBlocks\Tests\Mocks\MockQueryRunner;
+use RemoteDataBlocks\Tests\Mocks\MockWordPressFunctions;
 
 use function register_remote_data_block;
 
@@ -130,8 +131,7 @@ class VipBlockDataApiTest extends TestCase {
 			E_USER_WARNING
 		);
 
-		$GLOBALS['__wordpress_done_actions'] = [];
-
+		MockWordPressFunctions::reset();
 		ConfigRegistry::init();
 	}
 
@@ -188,7 +188,7 @@ class VipBlockDataApiTest extends TestCase {
 				'Error executing query for block binding: uh-oh! remote-data-blocks/remoteData (block: remote-data-blocks/events; operation: location)',
 				[],
 			],
-			$GLOBALS['__wordpress_done_actions']['wpcomvip_log'][0],
+			MockWordPressFunctions::get_done_action( 'wpcomvip_log' )[0]
 		);
 		$this->assertSame( 'Happy happy hour! No networking!', $result['innerBlocks'][0]['attributes']['content'] );
 		$this->assertSame( "President's dining hall", $result['innerBlocks'][1]['attributes']['content'] );

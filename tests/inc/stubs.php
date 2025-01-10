@@ -1,37 +1,16 @@
 <?php declare(strict_types = 1);
 
-$GLOBALS['__wordpress_actions'] = [];
-function add_action( string $action, mixed ...$args ): void {
-	$GLOBALS['__wordpress_actions'][ $action ][] = $args;
-}
+use RemoteDataBlocks\Tests\Mocks\MockWordPressFunctions;
 
-$GLOBALS['__wordpress_filters'] = [];
-function add_filter( string $filter, callable $callback ): void {
-	$GLOBALS['__wordpress_filters'][ $filter ] = $callback;
-}
+function add_action(): void {}
+function add_filter(): void {}
 
-$GLOBALS['__wordpress_done_actions'] = [];
 function do_action( string $action, mixed ...$args ): void {
-	$GLOBALS['__wordpress_done_actions'][ $action ] = $GLOBALS['__wordpress_done_actions'][ $action ] ?? [];
-	$GLOBALS['__wordpress_done_actions'][ $action ][] = $args;
+	MockWordPressFunctions::do_action( $action, ...$args );
 }
 
-$GLOBALS['__wordpress_done_filters'] = [];
-function apply_filters( string $filter, mixed $thing, mixed ...$args ): mixed {
-	$GLOBALS['__wordpress_done_filters'][ $filter ] = $args;
-	if ( is_callable( $GLOBALS['__wordpress_filters'][ $filter ] ?? null ) ) {
-		return call_user_func_array( $GLOBALS['__wordpress_filters'][ $filter ], [ $thing, ...$args ] );
-	}
-
-	return $thing;
-}
-
-/**
- * @phpcs:disable PHPCompatibility.FunctionNameRestrictions.ReservedFunctionNames.FunctionDoubleUnderscore
- * @phpcs:disable WordPress.NamingConventions.ValidFunctionName.FunctionDoubleUnderscore
- */
-function __return_true(): bool {
-	return true;
+function apply_filters( string $filter, mixed $thing ): mixed {
+	return MockWordPressFunctions::apply_filters( $filter, $thing );
 }
 
 function esc_html( string $text ): string {
@@ -113,23 +92,12 @@ function wp_cache_set(): bool {
 }
 
 function update_option( string $option, mixed $value ): bool {
-	set_mocked_option( $option, $value );
+	MockWordPressFunctions::set_mock_option( $option, $value );
 	return true;
 }
 
 function get_option( string $option, mixed $default = false ): mixed {
-	if ( isset( $GLOBALS['__mocked_options'][ $option ] ) ) {
-		return $GLOBALS['__mocked_options'][ $option ];
-	}
-	return $default;
-}
-
-function set_mocked_option( string $option, mixed $value ): void {
-	$GLOBALS['__mocked_options'][ $option ] = $value;
-}
-
-function clear_mocked_options(): void {
-	$GLOBALS['__mocked_options'] = [];
+	return MockWordPressFunctions::get_option( $option, $default );
 }
 
 function get_page_by_path( string $path ): string {

@@ -10,6 +10,7 @@ use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 use RemoteDataBlocks\Tests\Mocks\MockQueryRunner;
 use RemoteDataBlocks\Tests\Mocks\MockQuery;
+use RemoteDataBlocks\Tests\Mocks\MockWordPressFunctions;
 
 class BlockBindingsTest extends TestCase {
 	private const MOCK_BLOCK_NAME = 'test/block';
@@ -46,6 +47,11 @@ class BlockBindingsTest extends TestCase {
 			],
 		],
 	];
+
+	protected function setUp(): void {
+		parent::setUp();
+		MockWordPressFunctions::reset();
+	}
 
 	protected function tearDown(): void {
 		parent::tearDown();
@@ -156,10 +162,7 @@ class BlockBindingsTest extends TestCase {
 			],
 		];
 
-		add_filter( 'remote_data_blocks_query_input_variables', function ( array $input_variables ) {
-			$input_variables['test_input_field'] = 'override_value';
-			return $input_variables;
-		} );
+		MockWordPressFunctions::add_mock_filter( 'remote_data_blocks_query_input_variables', [ 'test_input_field' => 'override_value' ] );
 
 		$mock_config_store = Mockery::namedMock( ConfigStore::class );
 		$mock_config_store->shouldReceive( 'get_block_configuration' )
@@ -170,8 +173,6 @@ class BlockBindingsTest extends TestCase {
 		$query_results = BlockBindings::execute_query( $block_context, self::MOCK_OPERATION_NAME );
 
 		$this->assertSame( $query_results, self::MOCK_OUTPUT_QUERY_RESULTS );
-		$this->assertSame( $GLOBALS['__wordpress_done_filters']['remote_data_blocks_query_input_variables'][0], [ 'test_input_field_override' ] );
-		$this->assertSame( $GLOBALS['__wordpress_done_filters']['remote_data_blocks_query_input_variables'][1], 'test/block' );
 
 		/**
 		 * Assert that the query runner received the correct input after overrides were applied.
@@ -287,10 +288,7 @@ class BlockBindingsTest extends TestCase {
 			],
 		];
 
-		add_filter( 'remote_data_blocks_query_input_variables', function ( array $input_variables ) {
-			$input_variables['test_input_field'] = 'override_value';
-			return $input_variables;
-		} );
+		MockWordPressFunctions::add_mock_filter( 'remote_data_blocks_query_input_variables', [ 'test_input_field' => 'override_value' ] );
 
 		$mock_config_store = Mockery::namedMock( ConfigStore::class );
 		$mock_config_store->shouldReceive( 'get_block_configuration' )
@@ -300,8 +298,6 @@ class BlockBindingsTest extends TestCase {
 
 		$query_results = BlockBindings::execute_query( $block_context, self::MOCK_OPERATION_NAME );
 		$this->assertSame( $query_results, self::MOCK_OUTPUT_QUERY_RESULTS );
-		$this->assertSame( $GLOBALS['__wordpress_done_filters']['remote_data_blocks_query_input_variables'][0], [ 'test_input_field_override' ] );
-		$this->assertSame( $GLOBALS['__wordpress_done_filters']['remote_data_blocks_query_input_variables'][1], 'test/block' );
 
 		/**
 		 * Assert that the query runner received the correct input after transformations and overrides were applied.

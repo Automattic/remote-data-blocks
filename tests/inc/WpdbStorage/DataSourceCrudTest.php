@@ -3,12 +3,13 @@
 namespace RemoteDataBlocks\Tests\WpdbStorage;
 
 use PHPUnit\Framework\TestCase;
+use RemoteDataBlocks\Tests\Mocks\MockWordPressFunctions;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use WP_Error;
 
 class DataSourceCrudTest extends TestCase {
 	protected function tearDown(): void {
-		clear_mocked_options();
+		MockWordPressFunctions::reset();
 	}
 
 	public function test_register_new_data_source_with_valid_input() {
