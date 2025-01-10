@@ -73,6 +73,28 @@ add_filter( 'remote_data_blocks_query_input_variables', function ( array $input_
 }, 10, 4 );
 ```
 
+Note that if your filter modify a query's input variables, it will modify the object cache key for that query execution, possibly resulting in a cache miss.
+
+### remote_data_blocks_query_response
+
+Filter the query response just after query execution. This filter is useful for modifying the query response for the current page-load, e.g., by pulling in data from query variables or other context. See [Overrides](overrides.md) for more information.
+
+```php
+add_filter( 'remote_data_blocks_query_input_variables', function ( array $input_variables, array $enabled_overrides, string $block_name, array $block_context ): array {
+	if ( true === in_array( 'my_override', $enabled_overrides, true ) ) {
+		$override_value = get_query_var( 'override_id' );
+
+		if ( ! empty( $override_value ) ) {
+			$input_variables['id'] = $override_value;
+		}
+	}
+
+	return $input_variables;
+}, 10, 4 );
+```
+
+The result of this filter is not cached, and will run for every block binding.
+
 ### remote_data_blocks_query_response_metadata
 
 Filter the query response metadata, which are available as bindings for field shortcodes. In most cases, it is better to provide a custom query class and override the `get_response_metadata` method but this filter is available in case that is not possible.
