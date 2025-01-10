@@ -2,6 +2,41 @@
 
 Remote Data Blocks allows you to integrate remote data into posts, pages, patterns, or anywhere else on your site where you use the block editor. This guide will help you understand the core concepts of the plugin and how they work.
 
+## Supported use cases
+
+Like WordPress, Remote Data Blocks is flexible. It can be used to enable advanced integrations with external data. 
+
+What follows is a discussion of specific use cases where Remote Data Blocks shines. We are working to expand these use cases, but before we get started, think carefully if Remote Data Blocks is the right tool for the job.
+
+### Remote Data Blocks is a good fit if:
+
+* Your remote data represents entities with a consistent schema.
+** Example: Product data representing items of clothing with defined attributes like “Name,” “Price,” “Color,” “Size,” etc.
+You want humans to select specific entities for display within the block editor.
+Example: Select and display an item of clothing within a marketing post.
+You want to display arbitrary remote data based on a URL parameter and are willing to write a small amount of code.
+Example: Create a page and rewrite rule for /products/{product_id}/ and configure a Remote Data Block on that page to display the referenced product.
+Your presentation of remote data aligns with the capabilities of Block Bindings.
+Example: Display an item of clothing using core paragraph, heading, image, and button blocks.
+You do not require complex filtering or pagination.
+Example: In order to select an item of clothing, load a finite list of top-selling products, or search all products by a specific term.
+Your data is denormalized and relatively flat.
+Example: A row from a Google Sheet with no references to external entities.
+The Remote Data Blocks plugin may not be a good fit if:
+
+Your remote data is schema-less or the schema changes over time.
+Queries for remote data must define a schema for the data they return. Schema changes result in broken blocks.
+You want to display remote data outside the context of the block editor.
+Block bindings are only available in block content—posts, pages, or full-site editing. Using our plugin may still provide some benefit (e.g., caching), but could require significant custom PHP code.
+Your data is normalized (and cannot be denormalized automatically by your API).
+Some APIs can denormalize data by “inflating” referenced records for you automatically. For example, data representing an item of clothing might reference a color by ID instead of a renderable string like “forest green.” If your API does not denormalize this relationship automatically, you will need to write custom code to perform additional queries and stitch the responses together.
+This can lead to a large number of API requests which may not be tolerated by your API. Airtable’s API, as an example, returns record IDs / foreign keys to represent data from other tables. It also imposes a rate limit of 5 request per second, making inflation impractical.
+You have multiple remote data sources that require interaction. Or, you want to implement a complex content architecture using Remote Data Blocks instead of leveraging WordPress custom post types and/or taxonomies.
+These two challenges are directly related to the issues with normalized data. If you have data sources that relate to one another, you will need to write custom code to query missing data and stitch them together.
+Judging complexity is difficult, but implementing large applications using Remote Data Blocks is not advisable.
+You require complex filtering or rely heavily on pagination.
+Our UI components for filtering and pagination are still under heavy development.
+
 ## Remote data
 
 **Remote data** refers to data that is fetched from an external source, such as an API or a third-party service. This might be a product in your Shopify store, data in an Airtable or Google Sheet, or a file in a GitHub repository. Remote data is usually fetched via HTTP requests but you can [extend the plugin](../extending/index.md) to support other transports.
