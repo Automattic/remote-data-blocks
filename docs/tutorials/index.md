@@ -5,7 +5,8 @@ There are
 - [Airtable](airtable.md)
 - [Google Sheets integration](google-sheets.md)
 - [Shopify](shopify.md)
-- [REST API](rest-api.md)
+- [Salesforce Commerce B2C](salesforce-commerce.md)
+- [HTTP](http.md)
 
 ## Code-configured sources
 

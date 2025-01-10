@@ -87,6 +87,10 @@ Since remote data blocks are container blocks, you can associate a remote data b
 
 Select the specifc block that is appropriate for this pattern. Once saved, content creators will be able to select this pattern when adding the associated remote data block.
 
+You can also create a pattern directly from content.
+<video src="https://github.com/user-attachments/assets/358d9d40-557b-4f39-b943-ed73d6f18adb"></video>
+
+
 The plugin supports both synced and unsynced patterns.
 
 ## Technical concepts

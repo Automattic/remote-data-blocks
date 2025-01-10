@@ -1,6 +1,6 @@
 # Create a Google Sheets remote data block
 
-This page will walk you through connecting a [Google Sheets](https://workspace.google.com/products/sheets/) data source. The remote block registration to display sheet records and the styling of that block is similar to the [Airtable workflow](./airtable.md). If you have not yet installed and activated the Remote Data Blocks plugin, visit [Getting Started](https://remotedatablocks.com/getting-started/).
+This tutorial will walk you through connecting a [Google Sheets](https://workspace.google.com/products/sheets/) data source and how to use the automattically created block in the WordPress editor. 
 
 ## Google Sheets API Access
 
@@ -20,30 +20,33 @@ The Service Account Keys JSON should be provided to your application securely. O
 - Note down the Google Sheet ID from the URL. For example, in the URL `https://docs.google.com/spreadsheets/d/test_spreadsheet_id/edit?gid=0#gid=0`, the Google Sheet ID is `test_spreadsheet_id`. The Google Sheet ID is the unique identifier for the Google Sheet.
 - Share the Google Sheet with the service account email address.
 
-## Block Registration and Styling
+## Create the data source
 
-This would be similar to the [Airtable workflow](airtable.md). Refer the following sections from that workflow:
+1. Go to the Settings > Remote Data Blocks in your WordPress admin.
+2. Click on the "Connect new" button.
+3. Choose "Airtable" from the dropdown menu as the data source type.
+4. Name this Data source, this name is only used internally. 
+5. Enter the access token you created in Airtable.
 
-- [Create the data source](./airtable.md#create-the-data-source)
-- [Insert the block](./airtable.md#insert-the-block)
-- [Custom patterns and styling](./airtable.md#custom-patterns-and-styling)
+If the personal access token is correct, you will be able to procede to the other steps. If you recieve an error check the token and try again.
+
+6. Select your desired base, table, and fields.
+7. Save the data source and return the data source list.
+
+## Insert the block
+
+Open a post for editing and select the block in the Block Inserter using the display name you provided.
+
+<video src="https://github.com/user-attachments/assets/67f22710-b1bd-4f2c-a410-2e20fe27b348"></video>
+
+## Patterns and styling
+
+You can use patterns to create conistent reuasble layout for your remote data. You can read more about [patterns and other Core Concepts](../concepts/index.md#patterns).
+
+Remote data blocks can be styled using the block editor's style settings, `theme.json`, or custom stylesheets. See the [example child theme](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/theme) for more details.
 
 ## Code Reference
 
-Check out [a working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/google-sheets/westeros-houses) of the concepts above in the Remote Data Blocks GitHub repository and feel free to open an issue if you run into any difficulty when registering or customizing your remote data blocks.
+Check out [a working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/google-sheets/westeros-houses) of the concepts above in the Remote Data Blocks GitHub repository.
 
-### Westeros Houses Example Setup
 
-Follow following setup steps to get the Westeros Houses example working:
-
-- [Configure the Google Sheet API Access](./google-sheets.md#google-sheets-api-access) and [Create a new Google Sheet](./google-sheets.md#setting-up-the-google-sheet) by following the steps above.
-- Add sheet named `Houses` inside the newly created Google Sheet with columns with headers as
-  - House
-  - Seat
-  - Region
-  - Words
-  - Sigil (image url)
-- Add some data to the sheet.
-- Base64 encode the JSON key file and set it so that its available via `REMOTE_DATA_BLOCKS_EXAMPLE_GOOGLE_SHEETS_WESTEROS_HOUSES_ACCESS_TOKEN` constant.
-
-Now the blocks with name `Westeros House` and `Westeros Houses List` should be available in the editor.
