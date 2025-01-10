@@ -1,6 +1,6 @@
 # Create an Airtable remote data block
 
-This tutorial will walk you through connecting an [Airtable](https://airtable.com/) data source and using the automattically created block in the WordPress editor.
+This tutorial will walk you through connecting an [Airtable](https://airtable.com/) data source and how to use the automattically created block in the WordPress editor.
 
 ## Base and personal access token
 
