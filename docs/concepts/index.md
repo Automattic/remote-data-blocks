@@ -6,60 +6,68 @@ Remote Data Blocks allows you to integrate remote data into posts, pages, patter
 
 Like WordPress, Remote Data Blocks is flexible. It can be used to enable advanced integrations with external data. 
 
-What follows is a discussion of specific use cases where Remote Data Blocks shines. We are working to expand these use cases, but before we get started, think carefully if Remote Data Blocks is the right tool for the job.
+What follows is a discussion of specific use cases where Remote Data Blocks shines. We are working to expand these use cases, but before you get started, think carefully if Remote Data Blocks is the right tool for the job.
 
 ### Remote Data Blocks is a good fit if:
 
 * Your remote data represents entities with a consistent schema.
-** Example: Product data representing items of clothing with defined attributes like “Name,” “Price,” “Color,” “Size,” etc.
-You want humans to select specific entities for display within the block editor.
-Example: Select and display an item of clothing within a marketing post.
-You want to display arbitrary remote data based on a URL parameter and are willing to write a small amount of code.
-Example: Create a page and rewrite rule for /products/{product_id}/ and configure a Remote Data Block on that page to display the referenced product.
-Your presentation of remote data aligns with the capabilities of Block Bindings.
-Example: Display an item of clothing using core paragraph, heading, image, and button blocks.
-You do not require complex filtering or pagination.
-Example: In order to select an item of clothing, load a finite list of top-selling products, or search all products by a specific term.
-Your data is denormalized and relatively flat.
-Example: A row from a Google Sheet with no references to external entities.
-The Remote Data Blocks plugin may not be a good fit if:
+  * **Example:** Product data representing items of clothing with defined attributes like “Name,” “Price,” “Color,” “Size,” etc.
+* You want humans to select specific entities for display within the block editor.
+  * **Example:** Select and display an item of clothing within a marketing post.
+* You want to display arbitrary remote data based on a URL parameter and are willing to write a small amount of code.
+  * **Example:** Create a page and rewrite rule for /products/{product_id}/ and configure a Remote Data Block on that page to display the referenced product.
+* Your presentation of remote data aligns with the capabilities of Block Bindings.
+  * **Example:** Display an item of clothing using core paragraph, heading, image, and button blocks.
+* You do not require complex filtering or pagination.
+  * **Example:** In order to select an item of clothing, load a finite list of top-selling products, or search all products by a specific term.
+* Your data is denormalized and relatively flat.
+  * **Example:** A row from a Google Sheet with no references to external entities.
 
-Your remote data is schema-less or the schema changes over time.
-Queries for remote data must define a schema for the data they return. Schema changes result in broken blocks.
-You want to display remote data outside the context of the block editor.
-Block bindings are only available in block content—posts, pages, or full-site editing. Using our plugin may still provide some benefit (e.g., caching), but could require significant custom PHP code.
-Your data is normalized (and cannot be denormalized automatically by your API).
-Some APIs can denormalize data by “inflating” referenced records for you automatically. For example, data representing an item of clothing might reference a color by ID instead of a renderable string like “forest green.” If your API does not denormalize this relationship automatically, you will need to write custom code to perform additional queries and stitch the responses together.
-This can lead to a large number of API requests which may not be tolerated by your API. Airtable’s API, as an example, returns record IDs / foreign keys to represent data from other tables. It also imposes a rate limit of 5 request per second, making inflation impractical.
-You have multiple remote data sources that require interaction. Or, you want to implement a complex content architecture using Remote Data Blocks instead of leveraging WordPress custom post types and/or taxonomies.
-These two challenges are directly related to the issues with normalized data. If you have data sources that relate to one another, you will need to write custom code to query missing data and stitch them together.
-Judging complexity is difficult, but implementing large applications using Remote Data Blocks is not advisable.
-You require complex filtering or rely heavily on pagination.
-Our UI components for filtering and pagination are still under heavy development.
+### Remote Data Blocks may not be a good fit if:
 
-## Remote data
+* Your remote data is schema-less or the schema changes over time.
+  * Queries for remote data must define a schema for the data they return. Schema changes result in broken blocks.
+* You want to display remote data outside the context of the block editor.
+  * Block bindings are only available in block content—posts, pages, or full-site editing. Using our plugin may still provide some benefit (e.g., caching), but could require significant custom PHP code.
+* Your data is normalized (and cannot be denormalized automatically by your API).
+  * Some APIs can denormalize data by “inflating” referenced records for you automatically. For example, data representing an item of clothing might reference a color by ID instead of a renderable string like “forest green.” If your API does not denormalize this relationship automatically, you will need to write custom code to perform additional queries and stitch the responses together.
+  * This can lead to a large number of API requests which may not be tolerated by your API. Airtable’s API, as an example imposes a rate limit of 5 request per second, making multiple calls impractical.
+* You have multiple remote data sources that require interaction. Or, you want to implement a complex content architecture using Remote Data Blocks instead of leveraging WordPress custom post types and/or taxonomies.
+  * These two challenges are directly related to the issues with normalized data. If you have data sources that relate to one another, you will need to write custom code to query missing data and stitch them together.
+  * Judging complexity is difficult, but implementing large applications using Remote Data Blocks is not advisable.
+* You require complex filtering or rely heavily on pagination.
+  * Our UI components for filtering and pagination are still under development.
 
-**Remote data** refers to data that is fetched from an external source, such as an API or a third-party service. This might be a product in your Shopify store, data in an Airtable or Google Sheet, or a file in a GitHub repository. Remote data is usually fetched via HTTP requests but you can [extend the plugin](../extending/index.md) to support other transports.
+  Over time Remote Data Blocks will grow and some of the words of caution here, like filtering and pagination, will be solved.
+
+## Remote data source
+
+**Remote data source** refers to data that is fetched from an external source, such as an API or a third-party service. This might be a product in your Shopify store, data in an Airtable or Google Sheet, or a file in a GitHub repository. Remote data is usually fetched via HTTP requests but you can [extend the plugin](../extending/index.md) to support other transports.
+
+Simple data sources can be configured via the plugin's settings screen, while others may require custom PHP code (see [extending](../extending/index.md)).
+
+## Queries
+
+**Queries** defines how data is fetched, processed, and displayed. Queries delegate some logic to a **data source**, which can be reused by multiple queries. For example on query to retrive a single item, and one to retrieve a list.
+
+Simple queries can be configured via the plugin's settings screen, while others may require custom PHP code (see [extending](../extending/index.md)).
 
 ## Remote data block
 
-A **remote data block** is a custom block that fetches and displays data from a specific remote source. Each remote data block has a unique name and provides a specific kind of data.
+A **remote data block** is a custom block connected to a specifc query.  Each remote data block has a unique name and is strictly tied to a data source.
 
 For example, you might have a remote data block named "Shopify Product" that fetches a product from your Shopify store and displays the product's name, description, price, and image. Or, you might have a remote data block named "Conference event" that displays rows from an Airtable and displays the event's name, location, and type.
 
-Remote data blocks are **container blocks** that contain other blocks and provide remote data to them. You retain full control over the layout, design, and content. You can leverage patterns to enable consistent styling and workflows, and you can customize the block's appearance using the block editor or `theme.json`.
+Remote data blocks are **container blocks** that contain other blocks and provide remote data to them. You retain full control over the layout, design, and content. You can leverage patterns to enable consistent styling and you can customize the block's appearance using the block editor or `theme.json`.
 
-Remote data blocks are custom blocks, but they are created and registered by our plugin and don't require custom block development. Remote data is loaded via [the block bindings API](https://make.wordpress.org/core/2024/03/06/new-feature-the-block-bindings-api/).
+Remote data blocks are custom blocks, but they are created and registered by our plugin and don't require custom block development. Remote data is loaded via [the block bindings API](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-bindings/).
 
-## Data sources and queries
-
-Each remote data block is associated with at least one **query** that defines how data is fetched, processed, and displayed. Queries delegate some logic to a **data source**, which can be reused by multiple queries.
-
-Simple data sources and queries can be configured via the plugin's settings screen, while others may require custom PHP code (see [extending](../extending/index.md)).
 
 ## Data fetching
 
-Data fetching is handled by the plugin and wraps `wp_remote_request`. When a request to your site resolves to one or more remote data blocks, the remote data will be fetched and potentially cached by our plugin. Multiple requests for the same data within a single page load will be deduped, even if the requests are not cacheable.
+Data fetching is handled by the plugin and wraps [`wp_remote_request`](https://developer.wordpress.org/reference/functions/wp_remote_request/). 
+
+When a request to your site renders one or more remote data blocks, the remote data will be fetched and potentially cached by our plugin. Multiple requests for the same data within a single page load will be deduped, even if the requests are not cacheable.
 
 ### Caching
 
@@ -73,8 +81,14 @@ Remote data blocks can be styled using the block editor's style settings, `theme
 
 ## Patterns
 
-Since remote data blocks are container blocks, you can use patterns to create reusable layouts and to streamline your workflows. Patterns can be associated with a remote data block in the "Pattern" settings in the sidebar of the pattern editor. Once associated with a remote data block, patterns will appear in the pattern selection modal. The plugin supports both synced and unsynced patterns.
+Since remote data blocks are container blocks, you can associate a remote data block with a pattern to create reusable layouts. You link a pattern to a particular remote data block in the Site Editor. When editiong a pattern you will see a new Remote Data Blocks section in the right hand panel.
+
+![Screenshot showing the right hand panel of the WordPress Site Editor](patterns-right-panel.png)
+
+Select the specifc block that is appropriate for this pattern. Once saved, content creators will be able to select this pattern when adding the associated remote data block.
+
+The plugin supports both synced and unsynced patterns.
 
 ## Technical concepts
 
-If you're a developer and want to understand the internals of Remote Data Blocks so that you can extend its functionality, head over the [extending guide](../extending/index.md).
+If you want to understand the internals of Remote Data Blocks so that you can extend its functionality, head over the [extending guide](../extending/index.md).
