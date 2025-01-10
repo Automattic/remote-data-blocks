@@ -3,8 +3,5 @@
 namespace RemoteDataBlocks\Tests\Mocks;
 
 class MockTracks {
-	/**
-	 * @psalm-suppress PossiblyUnusedParam
-	 */
 	public function record_event( $_name, $_props ) {}
 }
