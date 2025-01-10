@@ -121,37 +121,29 @@ registerBlockBindingsSource( {
 	name: 'remote-data/binding',
 	label: 'Remote Data Binding',
 	usesContext: [ 'remote-data-blocks/remoteData' ],
-	getValues( { context, clientId, bindings, select } ) {
-		// console.log( { context, clientId, bindings } );
+	getValues( { context, clientId, bindings, select, ...other } ) {
+		console.log({other});
 		const remoteDataContext = context[ 'remote-data-blocks/remoteData' ];
+		console.log({CONTEXT:remoteDataContext});
 
 		if ( remoteDataContext === undefined ) {
-			return null;
+			const nullValues = {};
+			for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
+				const { key, field } = source.args;
+				// const { gravatar_id: id } =
+				// 	getEditedEntityRecord( 'postType', context?.postType, context?.postId ).meta || {};
+				// const data = select( gravatarStore ).getGravatarData( id );
+				nullValues[ attributeName ] = '123'; // data?.[ key || field ];
+			}
+			// console.log( remoteDataContext?.results?.[ 0 ] );
+			return nullValues;
 		}
 
-		// const input = remoteDataContext.queryInput;
-
-		// const blockConfig: BlockInstance< {} > =
-		// 	select( 'core/block-editor' ).getBlocksByClientId( clientId )[ 0 ];
-		// const blockName = blockConfig[ 'remote-data-blocks/remoteData' ].blockName;
-// console.log({blockConfig});
-		// console.log( { blockConfig } );
-
-		// console.log( {
-		// 	_c: {
-		// 		blockName: remoteDataContext.blockName,
-		// 		queryKey: remoteDataContext.queryKey,
-		// 		remoteDataContext,
-		// 	},
-		// } );
-		// console.log({remoteDataContext});
 		const data = select( remoteDataBlocksStore ).getRemoteData(
 			constants.DISPLAY_QUERY_KEY,
 			remoteDataContext.blockName,
 			remoteDataContext.queryInput
 		);
-		// console.log( { data } );
-		// console.log( { bindings } );
 
 		const result = data?.results?.[0];
 
