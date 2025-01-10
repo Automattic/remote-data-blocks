@@ -1,3 +1,5 @@
+import { NumberIdName } from '@/types/common';
+
 // Google Drive
 export interface GoogleDriveFile {
 	kind: 'drive#file';
@@ -70,6 +72,16 @@ export interface GoogleSheetsValueRange {
 	majorDimension: 'ROWS' | 'COLUMNS' | 'DIMENSION_UNSPECIFIED';
 	values: GoogleSheetsValues[];
 }
+
+// Derived Google Sheet types
+
+export type GoogleSheetIdName = NumberIdName;
+
+export type GoogleSheetWithFields = GoogleSheetIdName & {
+	fields: string[];
+};
+
+export type GoogleSpreadsheetFields = Map< string, GoogleSheetWithFields >;
 
 // Service Account
 export interface GoogleServiceAccountKey {

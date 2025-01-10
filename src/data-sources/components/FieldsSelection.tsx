@@ -8,6 +8,7 @@ interface FieldsSelectionProps {
 	onFieldsChange: ( fields: string[] ) => void;
 	disabled?: boolean;
 	customHelpText?: string | null;
+	label?: string;
 }
 
 export const FieldsSelection = ( {
@@ -16,10 +17,11 @@ export const FieldsSelection = ( {
 	onFieldsChange,
 	customHelpText,
 	disabled = false,
+	label,
 }: FieldsSelectionProps ) => {
 	return (
 		<CustomFormFieldToken
-			label={ __( 'Fields', 'remote-data-blocks' ) }
+			label={ label ?? __( 'Fields', 'remote-data-blocks' ) }
 			onChange={ selection => {
 				let newFields: string[];
 				if ( selection.includes( 'Select All' ) ) {

@@ -65,10 +65,7 @@ export const useAirtableApiTables = ( token: string, base: string ) => {
 		isLoading: fetchingTables,
 		error: tablesError,
 		refetch: fetchTables,
-	} = useQuery( queryFn, { manualFetchOnly: true } );
-
-	const debouncedFetchTables = useDebounce( fetchTables, 500 );
-	useEffect( debouncedFetchTables, [ token, base, debouncedFetchTables ] );
+	} = useQuery( queryFn );
 
 	return { fetchingTables, fetchTables, tables, tablesError };
 };

@@ -26,6 +26,7 @@ export function useQuery< T >(
 	const [ error, setError ] = useState< Error | null >( null );
 
 	const fetchData = useCallback( async () => {
+		setData( null );
 		setIsLoading( true );
 		setError( null );
 		try {

@@ -27,52 +27,28 @@ export const useGoogleSpreadsheetsOptions = ( token: string | null ) => {
 	return { spreadsheets, isLoadingSpreadsheets, errorSpreadsheets, refetchSpreadsheets };
 };
 
-export const useGoogleSheetsOptions = ( token: string | null, spreadsheetId: string ) => {
+export const useGoogleSheetsWithFields = ( token: string | null, spreadsheetId: string ) => {
 	const api = useMemo( () => new GoogleApi( token ), [ token ] );
 
 	const queryFn = useCallback( async () => {
 		if ( ! token || ! spreadsheetId ) {
 			return null;
 		}
-		return api.getSheetsOptions( spreadsheetId );
+		return api.getSheetsWithFieldNames( spreadsheetId );
 	}, [ api, token, spreadsheetId ] );
 
 	const {
-		data: sheets,
+		data: sheetsWithFields,
 		isLoading: isLoadingSheets,
 		error: errorSheets,
-		refetch: refetchSheets,
-	} = useQuery( queryFn, { manualFetchOnly: true } );
+	} = useQuery( queryFn );
 
-	const debouncedFetchSheets = useDebounce( refetchSheets, 500 );
-	useEffect( debouncedFetchSheets, [ token, debouncedFetchSheets ] );
+	const sheets = sheetsWithFields
+		? Array.from( sheetsWithFields.values() ).map( sheet => ( {
+				id: sheet.id,
+				name: sheet.name,
+		  } ) )
+		: null;
 
-	return { sheets, isLoadingSheets, errorSheets, refetchSheets };
-};
-
-export const useGoogleSheetFields = (
-	token: string | null,
-	spreadsheetId: string,
-	sheetTitle: string
-) => {
-	const api = useMemo( () => new GoogleApi( token ), [ token ] );
-
-	const queryFn = useCallback( async () => {
-		if ( ! token || ! spreadsheetId || ! sheetTitle ) {
-			return null;
-		}
-		return api.getSheetFields( spreadsheetId, sheetTitle );
-	}, [ api, token, spreadsheetId, sheetTitle ] );
-
-	const {
-		data: sheetFields,
-		isLoading: isLoadingSheetFields,
-		error: errorSheetFields,
-		refetch: refetchSheetFields,
-	} = useQuery( queryFn, { manualFetchOnly: true } );
-
-	const debouncedFetchSheetFields = useDebounce( refetchSheetFields, 500 );
-	useEffect( debouncedFetchSheetFields, [ token, debouncedFetchSheetFields ] );
-
-	return { sheetFields, isLoadingSheetFields, errorSheetFields };
+	return { sheets, sheetsWithFields, isLoadingSheets, errorSheets };
 };

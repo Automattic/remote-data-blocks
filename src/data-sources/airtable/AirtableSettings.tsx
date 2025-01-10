@@ -1,11 +1,9 @@
 import { SelectControl } from '@wordpress/components';
 import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
-import { useState, useEffect } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
-import { SUPPORTED_AIRTABLE_TYPES } from '@/data-sources/airtable/constants';
-import { getAirtableOutputQueryMappingValue } from '@/data-sources/airtable/utils';
+import { getAirtableOutputQueryMappingValues } from '@/data-sources/airtable/utils';
 import { DataSourceForm } from '@/data-sources/components/DataSourceForm';
 import { FieldsSelection } from '@/data-sources/components/FieldsSelection';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
@@ -18,7 +16,7 @@ import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import {
 	AirtableConfig,
 	AirtableServiceConfig,
-	DataSourceQueryMappingValue,
+	AirtableTableConfig,
 	SettingsComponentProps,
 } from '@/data-sources/types';
 import { getConnectionMessage } from '@/data-sources/utils';
@@ -34,12 +32,6 @@ const defaultSelectBaseOption: SelectOption = {
 	value: '',
 };
 
-const defaultSelectTableOption: SelectOption = {
-	disabled: true,
-	label: __( 'Auto-filled on valid base.', 'remote-data-blocks' ),
-	value: '',
-};
-
 // eslint-disable-next-line complexity
 export const AirtableSettings = ( {
 	mode,
@@ -51,13 +43,6 @@ export const AirtableSettings = ( {
 	const { state, handleOnChange, validState } = useForm< AirtableServiceConfig >( {
 		initialValues: config?.service_config ?? { __version: SERVICE_CONFIG_VERSION },
 	} );
-
-	const [ currentTableId, setCurrentTableId ] = useState< string | null >(
-		state.tables?.[ 0 ]?.id ?? null
-	);
-	const [ tableFields, setTableFields ] = useState< string[] >(
-		state.tables?.[ 0 ]?.output_query_mappings.map( mapping => mapping.key ).filter( Boolean ) ?? []
-	);
 	const { fetchingUserId, userId, userIdError } = useAirtableApiUserId( state.access_token ?? '' );
 	const { bases, basesError, fetchingBases } = useAirtableApiBases(
 		state.access_token ?? '',
@@ -68,11 +53,8 @@ export const AirtableSettings = ( {
 		state.base?.id ?? ''
 	);
 
-	const selectedTable = tables?.find( table => table.id === currentTableId ) ?? null;
-	const availableTableFields: string[] =
-		selectedTable?.fields
-			.filter( field => SUPPORTED_AIRTABLE_TYPES.includes( field.type ) )
-			.map( field => field.name ) ?? [];
+	const availableTables = tables?.length ? tables?.map( table => table.name ) : [];
+	const selectedTables = state.tables?.map( table => table.name ) ?? [];
 
 	const baseOptions = [
 		{
@@ -81,16 +63,9 @@ export const AirtableSettings = ( {
 		},
 		...( bases ?? [] ).map( ( { name, id } ) => ( { label: name, value: id } ) ),
 	];
-	const tableOptions = [
-		{
-			...defaultSelectTableOption,
-			label: __( 'Select a table', 'remote-data-blocks' ),
-		},
-		...( tables ?? [] ).map( ( { name, id } ) => ( { label: name, value: id, disabled: false } ) ),
-	];
 
 	const onSaveClick = async () => {
-		if ( ! validState || ! selectedTable ) {
+		if ( ! validState || ! selectedTables?.length ) {
 			return;
 		}
 
@@ -107,23 +82,12 @@ export const AirtableSettings = ( {
 		handleOnChange( 'access_token', token ?? '' );
 	};
 
-	const onSelectChange = (
-		value: string,
-		extra?: { event?: ChangeEvent< HTMLSelectElement > }
-	) => {
+	const onBaseChange = ( value: string, extra?: { event?: ChangeEvent< HTMLSelectElement > } ) => {
 		if ( extra?.event ) {
 			const { id } = extra.event.target;
 			if ( id === 'base' ) {
 				const selectedBase = bases?.find( base => base.id === value );
 				handleOnChange( 'base', { id: value, name: selectedBase?.name ?? '' } );
-				return;
-			}
-
-			if ( id === 'tables' ) {
-				if ( selectedTable ) {
-					return;
-				}
-
 				handleOnChange( 'tables', [] );
 				return;
 			}
@@ -132,12 +96,21 @@ export const AirtableSettings = ( {
 		}
 	};
 
-	// if the selected table changes, reset the fields
-	useEffect( () => {
-		if ( currentTableId !== state.tables?.[ 0 ]?.id ) {
-			setTableFields( [] );
+	const onTablesChange = ( tablesNames: string[] ) => {
+		let newTables: AirtableTableConfig[] = [];
+
+		if ( tables?.length ) {
+			newTables = tables
+				?.filter( table => tablesNames.includes( table.name ) )
+				.map( table => ( {
+					id: table.id,
+					name: table.name,
+					output_query_mappings: getAirtableOutputQueryMappingValues( table.fields ),
+				} ) );
 		}
-	}, [ currentTableId ] );
+
+		handleOnChange( 'tables', newTables );
+	};
 
 	let connectionMessage: React.ReactNode = (
 		<span>
@@ -163,7 +136,7 @@ export const AirtableSettings = ( {
 
 	const shouldAllowContinue = userId !== null;
 	const shouldAllowSubmit =
-		bases !== null && tables !== null && Boolean( state.base ) && Boolean( selectedTable );
+		bases !== null && tables !== null && Boolean( state.base ) && Boolean( selectedTables?.length );
 
 	let basesHelpText: React.ReactNode = 'Select a base from which to fetch data.';
 	if ( userId ) {
@@ -178,10 +151,7 @@ export const AirtableSettings = ( {
 		}
 	}
 
-	let tablesHelpText: string = __(
-		'Select a table to attach with this data source.',
-		'remote-data-blocks'
-	);
+	let tablesHelpText: string = __( 'Auto-filled on valid base.', 'remote-data-blocks' );
 	if ( bases?.length && state.base ) {
 		if ( tablesError ) {
 			tablesHelpText = __(
@@ -190,20 +160,11 @@ export const AirtableSettings = ( {
 			);
 		} else if ( fetchingTables ) {
 			tablesHelpText = __( 'Fetching tables...', 'remote-data-blocks' );
-		} else if ( tables ) {
-			if ( selectedTable ) {
-				tablesHelpText = sprintf(
-					__( '%s fields found', 'remote-data-blocks' ),
-					selectedTable.fields.length
-				);
-			}
-
-			if ( ! tables.length ) {
-				tablesHelpText = __( 'No tables found', 'remote-data-blocks' );
-			}
+		} else if ( ! tables?.length ) {
+			tablesHelpText = __( 'No tables found', 'remote-data-blocks' );
+		} else {
+			tablesHelpText = __( 'Select tables to attach with this data source.', 'remote-data-blocks' );
 		}
-
-		tablesHelpText = __( 'Select a table from which to fetch data.', 'remote-data-blocks' );
 	}
 
 	return (
@@ -228,59 +189,21 @@ export const AirtableSettings = ( {
 						id="base"
 						label={ __( 'Base', 'remote-data-blocks' ) }
 						value={ state.base?.id ?? '' }
-						onChange={ onSelectChange }
+						onChange={ onBaseChange }
 						options={ baseOptions }
 						help={ basesHelpText }
 						disabled={ fetchingBases || ! bases?.length }
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 					/>
-					<SelectControl
-						id="table"
-						label={ __( 'Table', 'remote-data-blocks' ) }
-						value={ selectedTable?.id ?? '' }
-						onChange={ setCurrentTableId }
-						options={ tableOptions }
-						help={ tablesHelpText }
-						disabled={ fetchingTables || ! tables?.length }
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-					/>
 
 					<FieldsSelection
-						selectedFields={ tableFields }
-						availableFields={ availableTableFields }
-						disabled={ ! selectedTable }
-						customHelpText={
-							! selectedTable ? __( 'Please select a table first.', 'remote-data-blocks' ) : null
-						}
-						onFieldsChange={ newFields => {
-							if ( ! selectedTable ) {
-								return;
-							}
-
-							setTableFields( newFields );
-							handleOnChange( 'tables', [
-								{
-									id: selectedTable.id,
-									name: selectedTable.name,
-									output_query_mappings: newFields
-										.map( key => {
-											const field = selectedTable?.fields.find(
-												tableField => tableField.name === key
-											);
-											if ( field ) {
-												return getAirtableOutputQueryMappingValue( field );
-											}
-											/**
-											 * Remove any fields which are not from this table or not supported.
-											 */
-											return null;
-										} )
-										.filter( ( value ): value is DataSourceQueryMappingValue => value !== null ),
-								},
-							] );
-						} }
+						label={ __( 'Tables', 'remote-data-blocks' ) }
+						customHelpText={ tablesHelpText }
+						selectedFields={ selectedTables }
+						availableFields={ availableTables }
+						disabled={ ! availableTables?.length }
+						onFieldsChange={ onTablesChange }
 					/>
 				</DataSourceForm.Scope>
 			</DataSourceForm>

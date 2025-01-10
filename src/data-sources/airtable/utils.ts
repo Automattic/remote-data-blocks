@@ -6,7 +6,7 @@ import {
 import { AirtableField } from '@/data-sources/airtable/types';
 import { DataSourceQueryMappingValue } from '@/data-sources/types';
 
-export const getAirtableOutputQueryMappingValue = (
+const getAirtableFieldOutputQueryMappingValue = (
 	field: AirtableField
 ): DataSourceQueryMappingValue => {
 	const baseField = {
@@ -75,7 +75,7 @@ export const getAirtableOutputQueryMappingValue = (
 		case 'formula':
 		case 'lookup':
 			if ( field.options?.result?.type ) {
-				return getAirtableOutputQueryMappingValue( {
+				return getAirtableFieldOutputQueryMappingValue( {
 					...field,
 					type: field.options.result.type,
 				} );
@@ -85,4 +85,10 @@ export const getAirtableOutputQueryMappingValue = (
 		default:
 			return { ...baseField, type: 'string' };
 	}
+};
+
+export const getAirtableOutputQueryMappingValues = (
+	fields: AirtableField[]
+): DataSourceQueryMappingValue[] => {
+	return fields.map( field => getAirtableFieldOutputQueryMappingValue( field ) );
 };
