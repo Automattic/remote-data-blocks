@@ -93,7 +93,8 @@ final class ConfigSchemas {
 				Types::list_of(
 					Types::object( [
 						'name' => Types::string(),
-						'display_name' => Types::nullable( Types::string() ),
+						'display_name' => Types::string(),
+						'help_text' => Types::nullable( Types::string() ),
 					] ),
 				)
 			),
