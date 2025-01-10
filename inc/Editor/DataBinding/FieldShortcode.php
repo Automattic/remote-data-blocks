@@ -46,17 +46,21 @@ class FieldShortcode {
 				$status = 'parse-error';
 				$value = $fallback_value;
 			} else {
-				$context = [
-					'blockName' => $query_data['remoteData']['blockName'],
-					'queryInput' => $query_data['remoteData']['queryInput'],
+				$block = [
+					'context' => [
+						BlockBindings::$context_name => [
+							'blockName' => $query_data['remoteData']['blockName'],
+							'queryInput' => $query_data['remoteData']['queryInput'],
+						],
+					],
 				];
 				$field = $query_data['selectedField'];
 				$type = $query_data['type'] ?? 'field';
 
 				if ( 'meta' === $type ) {
-					$value = self::get_meta_field_value( $context, $field );
+					$value = self::get_meta_field_value( $block['context'], $field );
 				} else {
-					$value = BlockBindings::get_remote_value( $context, [ 'field' => $field ] );
+					$value = BlockBindings::get_value( [ 'field' => $field ], $block );
 				}
 
 				if ( is_null( $value ) ) {

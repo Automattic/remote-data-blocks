@@ -102,7 +102,7 @@ class BlockBindingsTest extends TestCase {
 		 * Mock the QueryRunner to return a result.
 		 */
 		$mock_qr = new MockQueryRunner();
-		$mock_qr->addResult( 'output_field', 'Test Output Value' );
+		$mock_qr->addResult( 'output_field', self::MOCK_OUTPUT_FIELD_VALUE );
 
 		$block_context = [
 			'blockName' => self::MOCK_BLOCK_NAME,
@@ -344,7 +344,7 @@ class BlockBindingsTest extends TestCase {
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
 	 */
-	public function test_get_remote_value(): void {
+	public function test_get_value(): void {
 		/**
 		 * Mock the QueryRunner to return a result.
 		 */
@@ -385,7 +385,13 @@ class BlockBindingsTest extends TestCase {
 			'field' => self::MOCK_OUTPUT_FIELD_NAME,
 		];
 
-		$remote_value = BlockBindings::get_remote_value( $block_context, $source_args );
+		$block = [
+			'context' => [
+				BlockBindings::$context_name => $block_context,
+			],
+		];
+
+		$remote_value = BlockBindings::get_value( $source_args, $block );
 		$this->assertSame( $remote_value, self::MOCK_OUTPUT_FIELD_VALUE );
 	}
 
@@ -393,7 +399,7 @@ class BlockBindingsTest extends TestCase {
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
 	 */
-	public function test_get_remote_value_with_non_string(): void {
+	public function test_get_value_with_non_string(): void {
 		/**
 		 * Mock the QueryRunner to return a result.
 		 */
@@ -434,7 +440,73 @@ class BlockBindingsTest extends TestCase {
 			'field' => self::MOCK_OUTPUT_FIELD_NAME,
 		];
 
-		$remote_value = BlockBindings::get_remote_value( $block_context, $source_args );
+		$block = [
+			'context' => [
+				BlockBindings::$context_name => $block_context,
+			],
+		];
+
+		$remote_value = BlockBindings::get_value( $source_args, $block );
 		$this->assertSame( $remote_value, '123' );
+	}
+
+	public function test_get_value_with_fallback_content_attribute(): void {
+		$block = [
+			'attributes' => [
+				'content' => 'Fallback Content',
+			],
+		];
+
+		$remote_value = BlockBindings::get_value( [], $block );
+		$this->assertSame( $remote_value, 'Fallback Content' );
+	}
+
+	public function test_get_value_with_non_string_fallback_content_attribute(): void {
+		$block = [
+			'attributes' => [
+				'content' => 123,
+			],
+		];
+
+		$remote_value = BlockBindings::get_value( [], $block );
+		$this->assertSame( $remote_value, '123' );
+	}
+
+	public function test_get_value_with_fallback_results_context(): void {
+		$block = [
+			'context' => [
+				BlockBindings::$context_name => [
+					'blockName' => self::MOCK_BLOCK_NAME,
+					'queryInput' => [],
+					'results' => [
+						[
+							self::MOCK_OUTPUT_FIELD_NAME => 'Stored Output Value',
+						],
+					],
+				],
+			],
+		];
+
+		$remote_value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block );
+		$this->assertSame( $remote_value, 'Stored Output Value' );
+	}
+
+	public function test_get_value_with_non_string_fallback_results_context(): void {
+		$block = [
+			'context' => [
+				BlockBindings::$context_name => [
+					'blockName' => self::MOCK_BLOCK_NAME,
+					'queryInput' => [],
+					'results' => [
+						[
+							self::MOCK_OUTPUT_FIELD_NAME => 456,
+						],
+					],
+				],
+			],
+		];
+
+		$remote_value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block );
+		$this->assertSame( $remote_value, '456' );
 	}
 }
