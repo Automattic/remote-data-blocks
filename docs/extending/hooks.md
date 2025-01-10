@@ -73,7 +73,7 @@ add_filter( 'remote_data_blocks_query_input_variables', function ( array $input_
 }, 10, 4 );
 ```
 
-Note that if your filter modify a query's input variables, it will modify the object cache key for that query execution, possibly resulting in a cache miss.
+Keep in mind modifying query input variables will affect the object cache key for that query execution. This could result in a cache miss.
 
 ### remote_data_blocks_query_response
 
