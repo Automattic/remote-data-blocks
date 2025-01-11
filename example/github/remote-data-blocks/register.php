@@ -98,14 +98,6 @@ function register_github_file_as_html_block(): void {
 		'title' => $block_title,
 		'render_query' => [
 			'query' => $github_get_file_as_html_query,
-			'input_overrides' => [
-				[
-					'source' => 'file_path',
-					'source_type' => 'page',
-					'target' => 'file_path',
-					'target_type' => 'input_var',
-				],
-			],
 		],
 		'selection_queries' => [
 			[
@@ -113,11 +105,11 @@ function register_github_file_as_html_block(): void {
 				'type' => 'list',
 			],
 		],
-		'pages' => [
+		'overrides' => [
 			[
-				'allow_nested_paths' => true,
-				'slug' => 'gh',
-				'title' => 'GitHub File',
+				'name' => 'github_file_path',
+				'display_name' => __( 'Use GitHub file path from URL', 'rdb-example' ),
+				'help_text' => __( 'Enable this override when using this block on the /gh/ page.', 'rdb-example' ),
 			],
 		],
 		'patterns' => [
@@ -128,6 +120,26 @@ function register_github_file_as_html_block(): void {
 			],
 		],
 	] );
+
+	// A page with slug "gh" must be created.
+	add_rewrite_rule( '^gh/(.+)/?', 'index.php?pagename=gh&file_path=$matches[1]', 'top' );
+
+	add_filter( 'query_vars', function ( array $query_vars ): array {
+		$query_vars[] = 'file_path';
+		return $query_vars;
+	}, 10, 1 );
+
+	add_filter( 'remote_data_blocks_query_input_variables', function ( array $input_variables, array $enabled_overrides ): array {
+		if ( true === in_array( 'github_file_path', $enabled_overrides, true ) ) {
+			$file_path = get_query_var( 'file_path' );
+
+			if ( ! empty( $file_path ) ) {
+				$input_variables['file_path'] = $file_path;
+			}
+		}
+
+		return $input_variables;
+	}, 10, 2 );
 }
 
 add_action( 'init', __NAMESPACE__ . '\\register_github_file_as_html_block' );

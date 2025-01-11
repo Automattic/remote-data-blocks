@@ -32,7 +32,8 @@
     {
       "step": "installPlugin",
       "options": {
-        "activate": true
+        "activate": true,
+        "targetFolderName": "remote-data-blocks"
       },
       "pluginData": {
         "caption": "Installing Remote Data Blocks",

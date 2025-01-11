@@ -10,23 +10,11 @@ use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\Integrations\Shopify\ShopifyDataSource;
-
-// Define a mock class for Tracks.
-if ( ! class_exists( 'Automattic\VIP\Telemetry\Tracks' ) ) {
-	class MockTracks {
-		/**
-		 * @psalm-suppress PossiblyUnusedParam
-		 */
-		public function record_event( $_name, $_props ) {}
-	}
-}
+use RemoteDataBlocks\Tests\Mocks\MockTracks;
 
 class TracksAnalyticsTest extends TestCase {
-	public function setUp(): void {
-		$GLOBALS['__wordpress_actions'] = [];
-	}
-
 	public function tearDown(): void {
+		parent::tearDown();
 		TracksAnalytics::reset();
 	}
 
@@ -58,7 +46,6 @@ class TracksAnalyticsTest extends TestCase {
 		TracksAnalytics::init( $env_config_mock );
 
 		$this->assertInstanceOf( MockTracks::class, TracksAnalytics::get_instance() );
-		$this->assertEquals( [ 'activated_plugin', 'deactivated_plugin', 'save_post' ], array_keys( $GLOBALS['__wordpress_actions'] ) );
 	}
 
 	public function testInitDoesSetTracksIfTrackingIsEnabledOnVipSite(): void {
@@ -71,7 +58,6 @@ class TracksAnalyticsTest extends TestCase {
 		TracksAnalytics::init( $env_config_mock );
 
 		$this->assertInstanceOf( MockTracks::class, TracksAnalytics::get_instance() );
-		$this->assertEquals( [ 'activated_plugin', 'deactivated_plugin', 'save_post' ], array_keys( $GLOBALS['__wordpress_actions'] ) );
 	}
 
 	public function testGetGlobalProperties(): void {

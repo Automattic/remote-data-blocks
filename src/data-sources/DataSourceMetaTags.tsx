@@ -23,7 +23,6 @@ const DataSourceDescriptor = ( props: DataSourceMetaTagsProps ) => {
 			tag = {
 				key: 'base',
 				primaryValue: props.source.service_config.base?.name,
-				secondaryValue: props.source.service_config.tables?.[ 0 ]?.name,
 			};
 			break;
 		case 'shopify':
@@ -33,7 +32,6 @@ const DataSourceDescriptor = ( props: DataSourceMetaTagsProps ) => {
 			tag = {
 				key: 'spreadsheet',
 				primaryValue: props.source.service_config.spreadsheet.name ?? 'Google Sheet',
-				secondaryValue: props.source.service_config.sheets[ 0 ]?.name,
 			};
 			break;
 	}

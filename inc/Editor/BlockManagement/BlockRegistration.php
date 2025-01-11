@@ -56,17 +56,6 @@ class BlockRegistration {
 		$block_name = $config['name'];
 		$block_path = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-container';
 
-		$formatted_overrides = [];
-		foreach ( $config['query_input_overrides'] as $override ) {
-			$formatted_overrides[ $override['target'] ] = [
-				[
-					'display' => sprintf( '%s={%s}', $override['source'], $override['target'] ),
-					'source' => $override['source'],
-					'sourceType' => $override['source_type'],
-				],
-			];
-		}
-
 		// Set available bindings from the display query output mappings.
 		$available_bindings = [];
 		$output_schema = $config['queries'][ ConfigRegistry::DISPLAY_QUERY_KEY ]->get_output_schema();
@@ -80,10 +69,10 @@ class BlockRegistration {
 		// Create the localized data that will be used by our block editor script.
 		$block_config = [
 			'availableBindings' => $available_bindings,
+			'availableOverrides' => $config['overrides'] ?? [],
 			'loop' => $config['loop'],
 			'name' => $block_name,
 			'dataSourceType' => ConfigStore::get_data_source_type( $block_name ),
-			'overrides' => $formatted_overrides,
 			'patterns' => $config['patterns'],
 			'selectors' => $config['selectors'],
 			'settings' => [

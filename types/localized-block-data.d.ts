@@ -8,12 +8,18 @@ interface InputVariable {
 	type: string;
 }
 
+interface InputVariableOverride {
+	display_name?: string;
+	help_text?: string;
+	name: string;
+}
+
 interface BlockConfig {
 	availableBindings: AvailableBindings;
+	availableOverrides: InputVariableOverride[];
 	dataSourceType: string;
 	loop: boolean;
 	name: string;
-	overrides: Record< string, QueryInputOverride[] >;
 	patterns: {
 		default: string;
 		inner_blocks?: string;

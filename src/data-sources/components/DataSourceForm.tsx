@@ -129,21 +129,21 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 					</>
 				) }
 			</div>
+			{ screen === 'addDataSource' && currentStep === 1 && (
+				<div className="rdb-settings-page_data-source-form-setup-info">
+					<Icon icon={ lockSmall } />
+					<p>
+						{ __(
+							'Connecting to an external source will not store the data. We issue queries to the database, but all your data stays with the provider. '
+						) }
+						<ExternalLink href="https://remotedatablocks.com/">
+							{ __( 'Learn more', 'remote-data-blocks' ) }
+						</ExternalLink>
+					</p>
+				</div>
+			) }
 			{ screen === 'addDataSource' && (
 				<div className="rdb-settings-page_data-source-form-footer">
-					{ currentStep === 1 && (
-						<div className="rdb-settings-page_data-source-form-setup-info">
-							<Icon icon={ lockSmall } />
-							<p>
-								{ __(
-									'Connecting to an external source will not store the data. We issue queries to the database, but all your data stays with the provider. '
-								) }
-								<ExternalLink href="https://remotedatablocks.com/">
-									{ __( 'Learn more', 'remote-data-blocks' ) }
-								</ExternalLink>
-							</p>
-						</div>
-					) }
 					<div className="rdb-settings-page_data-source-form-setup-actions">
 						<>
 							{ currentStep === 1 && (
