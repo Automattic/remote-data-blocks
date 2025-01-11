@@ -11,6 +11,7 @@ The Google Sheets API access is required for connecting to Google Sheets. The pl
 - [Create a service account](https://cloud.google.com/iam/docs/service-accounts-create) which will be used to authenticate the requests to the Google Sheets API. You will need to Enable the IAM API first, and then if you scroll down further on the page linked above, you can click the button to "Go to Create service account." 
 - Select the "Owner" role and note down the service account email address.
 - You will need to create the JSON key for this account. You can access the key by clicking on the three dots under Actions in the Service account table and choosing "Manage Keys." 
+![Screenshot showing a portion of the Google Console](google-console.png)
 - Click to "Add Key" and choose the JSON type. The file will be automatically downloaded. Keep this file safe as it will be used to authenticate the block.
 - Grant access of the service account email to the Google Sheet after which the service account can be used to authenticate the requests to the Google Sheets API for the given sheet.
 
