@@ -11,11 +11,9 @@ use RemoteDataBlocks\Validation\ConfigSchemas;
 use RemoteDataBlocks\Validation\Validator;
 use WP_Error;
 
-use function get_page_by_path;
 use function parse_blocks;
 use function register_block_pattern;
 use function serialize_blocks;
-use function wp_insert_post;
 
 class ConfigRegistry {
 	private static LoggerInterface $logger;
@@ -58,11 +56,11 @@ class ConfigRegistry {
 			'description' => '',
 			'name' => $block_name,
 			'loop' => $user_config[ self::RENDER_QUERY_KEY ]['loop'] ?? false,
+			'overrides' => $user_config['overrides'] ?? [],
 			'patterns' => [],
 			'queries' => [
 				self::DISPLAY_QUERY_KEY => $display_query,
 			],
-			'query_input_overrides' => [],
 			'selectors' => [
 				[
 					'image_url' => $display_query->get_image_url(),
@@ -117,20 +115,6 @@ class ConfigRegistry {
 			);
 		}
 
-		// Register query input overrides which allow the user to specify how
-		// query inputs can be overridden by URL parameters or query variables.
-		foreach ( $user_config[ self::RENDER_QUERY_KEY ]['input_overrides'] ?? [] as $override ) {
-			if ( 'input_var' !== $override['target_type'] ) {
-				return self::create_error( $block_title, 'Only input variables can be targeted by query input overrides' );
-			}
-
-			if ( ! isset( $input_schema[ $override['target'] ] ) ) {
-				return self::create_error( $block_title, sprintf( 'Input override "%s" does not exist as input variable for render query', esc_html( $override['target'] ) ) );
-			}
-
-			$config['query_input_overrides'][] = $override;
-		}
-
 		// Register patterns which can be used with the block.
 		foreach ( $user_config['patterns'] ?? [] as $pattern ) {
 			$parsed_blocks = parse_blocks( $pattern['html'] );
@@ -143,15 +127,6 @@ class ConfigRegistry {
 			$recognized_roles = [ 'inner_blocks' ];
 			if ( isset( $pattern['role'] ) && in_array( $pattern['role'], $recognized_roles, true ) ) {
 				$config['patterns'][ $pattern['role'] ] = $pattern_name;
-			}
-		}
-
-		// Register pages assosciated with the block.
-		foreach ( $user_config['pages'] ?? [] as $page_options ) {
-			$registered = self::register_page( $config['query_input_overrides'], $block_title, $page_options );
-
-			if ( is_wp_error( $registered ) ) {
-				return self::create_error( $block_title, $registered->get_error_message() );
 			}
 		}
 
@@ -178,69 +153,6 @@ class ConfigRegistry {
 		register_block_pattern( $pattern_name, $pattern_properties );
 
 		return $pattern_name;
-	}
-
-	/**
-	 * Registers a page with optional configuration.
-	 *
-	 * @param array $query_input_overrides The query input overrides that will be targeted on the page.
-	 * @param string $block_title The title of the block associated with the page.
-	 * @param array {
-	 *   allow_nested_paths?: bool
-	 *   slug: string
-	 *   title?: string
-	 * } $options Configuration options for the page and rewrite rule.
-	 */
-	private static function register_page( array $query_input_overrides, string $block_title, array $options = [] ): bool|WP_Error {
-		$overrides = array_values( array_filter( $query_input_overrides, function ( $override ) {
-			return 'page' === $override['source_type'];
-		} ) );
-
-		if ( empty( $overrides ) ) {
-			return new WP_Error( 'useless_page', 'A page is only useful when there are query input overrides with page sources.' );
-		}
-
-		$allow_nested_paths = $options['allow_nested_paths'] ?? false;
-		$page_slug = $options['slug'];
-		$page_title = $options['title'] ?? $block_title;
-
-		// Create the page if it doesn't already exist.
-		if ( null === get_page_by_path( '/' . $page_slug ) ) {
-			$post_content = sprintf(
-				"<!-- wp:paragraph -->\n<p>Add a %s block and use the “Remote data overrides” panel to allow URL parameters to override the selected data.</p>\n<!-- /wp:paragraph -->",
-				$block_title
-			);
-
-			wp_insert_post( [
-				'post_content' => $post_content,
-				'post_name' => $page_slug,
-				'post_status' => 'draft',
-				'post_title' => $page_title,
-				'post_type' => 'page',
-			] );
-		}
-
-		// Add a rewrite rule targeting the provided page slug.
-		$query_var_pattern = '/([^/]+)';
-
-		/**
-		 * If nested paths are allowed and there is only one query variable,
-		 * allow slashes in the query variable value.
-		 */
-		if ( $allow_nested_paths && 1 === count( $overrides ) ) {
-			$query_var_pattern = '/(.+)';
-		}
-
-		$rewrite_rule = sprintf( '^%s%s/?$', $page_slug, str_repeat( $query_var_pattern, count( $overrides ) ) );
-		$rewrite_rule_target = sprintf( 'index.php?pagename=%s', $page_slug );
-
-		foreach ( $overrides as $index => $override ) {
-			$rewrite_rule_target .= sprintf( '&%s=$matches[%d]', $override['source'], $index + 1 );
-		}
-
-		add_rewrite_rule( $rewrite_rule, $rewrite_rule_target, 'top' );
-
-		return true;
 	}
 
 	private static function create_error( string $block_title, string $message ): WP_Error {

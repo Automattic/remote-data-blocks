@@ -11,6 +11,7 @@ class MockDataSource extends HttpDataSource {
 	public const MOCK_CONFIG = [
 		'service' => 'mock',
 		'service_config' => [
+			'__version' => 1,
 			'display_name' => 'Mock Data Source',
 			'endpoint' => 'https://example.com/api',
 			'request_headers' => [

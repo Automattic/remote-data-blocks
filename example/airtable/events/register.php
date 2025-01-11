@@ -25,17 +25,8 @@ function register_airtable_events_block(): void {
 		],
 	] );
 
-	$block_options = [
-		'pages' => [
-			[
-				'slug' => 'conference-event',
-				'title' => 'Conference Events',
-			],
-		],
-	];
-
-	AirtableIntegration::register_block_for_airtable_data_source( $airtable_data_source, $block_options );
-	AirtableIntegration::register_loop_block_for_airtable_data_source( $airtable_data_source, $block_options );
+	AirtableIntegration::register_block_for_airtable_data_source( $airtable_data_source );
+	AirtableIntegration::register_loop_block_for_airtable_data_source( $airtable_data_source );
 }
 
 add_action( 'init', __NAMESPACE__ . '\\register_airtable_events_block' );

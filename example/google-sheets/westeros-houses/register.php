@@ -7,13 +7,6 @@ use RemoteDataBlocks\Integrations\Google\Sheets\GoogleSheetsDataSource;
 
 function register_westeros_houses_block(): void {
 	$credentials = json_decode( base64_decode( \RemoteDataBlocks\Example\get_access_token( 'google_sheets_westeros_houses' ) ), true );
-	$columns = [
-		'House',
-		'Seat',
-		'Region',
-		'Words',
-		'Sigil',
-	];
 
 	if ( empty( $credentials ) ) {
 		return;
@@ -133,14 +126,6 @@ function register_westeros_houses_block(): void {
 		'title' => 'Westeros House',
 		'render_query' => [
 			'query' => $get_westeros_houses_query,
-			'input_overrides' => [
-				[
-					'source' => 'house',
-					'source_type' => 'page',
-					'target' => 'row_id',
-					'target_type' => 'input_var',
-				],
-			],
 		],
 		'selection_queries' => [
 			[
@@ -148,10 +133,10 @@ function register_westeros_houses_block(): void {
 				'type' => 'list',
 			],
 		],
-		'pages' => [
+		'overrides' => [
 			[
-				'slug' => 'westeros-houses',
-				'title' => 'Westeros Houses',
+				'display_name' => 'Use Westeros House from URL',
+				'name' => 'westeros_house',
 			],
 		],
 	] );
@@ -163,6 +148,26 @@ function register_westeros_houses_block(): void {
 			'query' => $list_westeros_houses_query,
 		],
 	] );
+
+	// A page with slug "westeros-houses" must be created.
+	add_rewrite_rule( '^westeros-houses/([^/]+)/?', 'index.php?pagename=westeros-houses&row_id=$matches[1]', 'top' );
+
+	add_filter( 'query_vars', function ( array $query_vars ): array {
+		$query_vars[] = 'row_id';
+		return $query_vars;
+	}, 10, 1 );
+
+	add_filter( 'remote_data_blocks_query_input_variables', function ( array $input_variables, array $enabled_overrides ): array {
+		if ( true === in_array( 'westeros_house', $enabled_overrides, true ) ) {
+			$row_id = get_query_var( 'row_id' );
+
+			if ( ! empty( $row_id ) ) {
+				$input_variables['row_id'] = $row_id;
+			}
+		}
+
+		return $input_variables;
+	}, 10, 2 );
 }
 
 add_action( 'init', __NAMESPACE__ . '\\register_westeros_houses_block' );

@@ -1,22 +1,16 @@
 <?php declare(strict_types = 1);
 
-$GLOBALS['__wordpress_filters'] = [];
-function apply_filters( string $filter, mixed $thing ): mixed {
-	return $GLOBALS['__wordpress_filters'][ $filter ] ?? $thing;
-}
+use RemoteDataBlocks\Tests\Mocks\MockWordPressFunctions;
 
-$GLOBALS['__wordpress_actions'] = [];
-function add_action( string $action, mixed ...$args ): void {
-	$GLOBALS['__wordpress_actions'][ $action ][] = $args;
-}
-function add_filter( string $filter, mixed ...$args ): void {
-	$GLOBALS['__wordpress_filters'][ $filter ][] = $args;
-}
+function add_action(): void {}
+function add_filter(): void {}
 
-$GLOBALS['__wordpress_done_actions'] = [];
 function do_action( string $action, mixed ...$args ): void {
-	$GLOBALS['__wordpress_done_actions'][ $action ] = $GLOBALS['__wordpress_done_actions'][ $action ] ?? [];
-	$GLOBALS['__wordpress_done_actions'][ $action ][] = $args;
+	MockWordPressFunctions::do_action( $action, ...$args );
+}
+
+function apply_filters( string $filter, mixed $thing ): mixed {
+	return MockWordPressFunctions::apply_filters( $filter, $thing );
 }
 
 function esc_html( string $text ): string {
@@ -98,23 +92,12 @@ function wp_cache_set(): bool {
 }
 
 function update_option( string $option, mixed $value ): bool {
-	set_mocked_option( $option, $value );
+	MockWordPressFunctions::set_mock_option( $option, $value );
 	return true;
 }
 
 function get_option( string $option, mixed $default = false ): mixed {
-	if ( isset( $GLOBALS['__mocked_options'][ $option ] ) ) {
-		return $GLOBALS['__mocked_options'][ $option ];
-	}
-	return $default;
-}
-
-function set_mocked_option( string $option, mixed $value ): void {
-	$GLOBALS['__mocked_options'][ $option ] = $value;
-}
-
-function clear_mocked_options(): void {
-	$GLOBALS['__mocked_options'] = [];
+	return MockWordPressFunctions::get_option( $option, $default );
 }
 
 function get_page_by_path( string $path ): string {
