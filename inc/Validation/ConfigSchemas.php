@@ -64,15 +64,6 @@ final class ConfigSchemas {
 
 	private static function generate_remote_data_block_config_schema(): array {
 		return Types::object( [
-			'pages' => Types::nullable(
-				Types::list_of(
-					Types::object( [
-						'allow_nested_paths' => Types::nullable( Types::boolean() ),
-						'slug' => Types::string(),
-						'title' => Types::nullable( Types::string() ),
-					] )
-				)
-			),
 			'patterns' => Types::nullable(
 				Types::list_of(
 					Types::object( [
@@ -84,16 +75,6 @@ final class ConfigSchemas {
 			),
 			'render_query' => Types::object( [
 				'query' => Types::instance_of( QueryInterface::class ),
-				'input_overrides' => Types::nullable(
-					Types::list_of(
-						Types::object( [
-							'source' => Types::string(), // e.g., the name of the query var
-							'source_type' => Types::enum( 'page', 'query_var' ),
-							'target' => Types::string(), // e.g., input variable name
-							'target_type' => Types::const( 'input_var' ),
-						] ),
-					)
-				),
 				'loop' => Types::nullable( Types::boolean() ),
 			] ),
 			'selection_queries' => Types::nullable(
@@ -106,6 +87,15 @@ final class ConfigSchemas {
 							ConfigRegistry::SEARCH_QUERY_KEY
 						),
 					] )
+				)
+			),
+			'overrides' => Types::nullable(
+				Types::list_of(
+					Types::object( [
+						'name' => Types::string(),
+						'display_name' => Types::string(),
+						'help_text' => Types::nullable( Types::string() ),
+					] ),
 				)
 			),
 			'title' => Types::string(),

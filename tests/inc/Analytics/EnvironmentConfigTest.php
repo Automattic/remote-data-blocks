@@ -5,10 +5,11 @@ namespace RemoteDataBlocks\Tests\Analytics;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use RemoteDataBlocks\Analytics\EnvironmentConfig;
+use RemoteDataBlocks\Tests\Mocks\MockWordPressFunctions;
 
 class EnvironmentConfigTest extends TestCase {
 	public function setUp(): void {
-		$GLOBALS['__wordpress_filters'] = [];
+		MockWordPressFunctions::reset();
 	}
 
 	public function testIsEnabledViaFilterReturnsFalse(): void {
@@ -18,7 +19,8 @@ class EnvironmentConfigTest extends TestCase {
 	}
 
 	public function testIsEnabledViaFilterReturnsTrue(): void {
-		$GLOBALS['__wordpress_filters']['remote_data_blocks_enable_tracks_analytics'] = true;
+		MockWordPressFunctions::add_mock_filter( 'remote_data_blocks_enable_tracks_analytics', true );
+
 		$obj = new EnvironmentConfig();
 
 		$this->assertEquals( true, $obj->is_enabled_via_filter() );

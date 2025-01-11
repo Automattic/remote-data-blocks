@@ -149,14 +149,6 @@ class SalesforceB2CIntegration {
 				'title' => $data_source->get_display_name(),
 				'render_query' => [
 					'query' => $queries['display'],
-					'input_overrides' => [
-						[
-							'source' => 'utm_content',
-							'source_type' => 'query_var',
-							'target' => 'product_id',
-							'target_type' => 'input_var',
-						],
-					],
 				],
 				'selection_queries' => [
 					[
@@ -164,7 +156,30 @@ class SalesforceB2CIntegration {
 						'type' => 'search',
 					],
 				],
+				'overrides' => [
+					[
+						'display_name' => 'Use Salesforce product from URL',
+						'name' => 'salesforce_product_id',
+					],
+				],
 			]
 		);
+
+		add_filter( 'query_vars', function ( array $query_vars ): array {
+			$query_vars[] = 'utm_content';
+			return $query_vars;
+		}, 10, 1 );
+
+		add_filter( 'remote_data_blocks_query_input_variables', function ( array $input_variables, array $enabled_overrides ): array {
+			if ( true === in_array( 'salesforce_product_id', $enabled_overrides, true ) ) {
+				$product_id = get_query_var( 'utm_content' );
+
+				if ( ! empty( $product_id ) ) {
+					$input_variables['product_id'] = $product_id;
+				}
+			}
+
+			return $input_variables;
+		}, 10, 2 );
 	}
 }

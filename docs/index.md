@@ -15,6 +15,7 @@ For plugin overview and getting started guide, see [README](../README.md).
   - [Block Registration](extending/block-registration.md)
   - [Data Source](extending/data-source.md)
   - [Hooks](extending/hooks.md)
+  - [Overrides](extending/overrides.md)
   - [Query](extending/query.md)
   - [Query Runner](extending/query-runner.md)
 

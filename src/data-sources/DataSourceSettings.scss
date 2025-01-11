@@ -1,10 +1,8 @@
 .rdb-settings-page_add-edit {
-
-	@media screen and (min-width: 782px) {
-		height: calc(100vh - 132px);
-		display: grid;
-		grid-template-rows: 1fr auto;
-	}
+	height: calc(100vh - 200px);
+	display: grid;
+	grid-template-rows: 1fr min-content auto;
+	overflow-y: scroll;
 }
 
 .rdb-settings-page_sources {
@@ -15,27 +13,16 @@
 }
 
 .rdb-settings-page_data-source-form-footer {
-	align-self: end;
+	position: fixed;
+	bottom: 0;
+	width: 100%;
 
-	.rdb-settings-page_data-source-form-setup-info {
-		display: flex;
-		justify-content: center;
-		margin-bottom: 4px;
-		padding: 16px;
+	@media screen and (min-width: 782px) {
 
-		svg {
-			fill: var(--Gutenberg-Alert-Green, #4ab866);
-			flex-shrink: 0;
-		}
-
-		p {
-			color: var(--Gutenberg-Gray-700, #757575);
-			font-size: var(--s, 12px);
-			line-height: var(--xs, 16px);
-			margin-top: 4px;
-			max-width: 500px;
-		}
+		left: calc(var(--wp-admin-menu-width, 160px));
+		width: calc(100% - var(--wp-admin-menu-width, 160px));
 	}
+
 
 	.rdb-settings-page_data-source-form-setup-actions {
 		display: flex;
@@ -58,6 +45,35 @@
 		padding: var(--grid-unit-10, 8px);
 		justify-content: center;
 		align-items: center;
+	}
+}
+
+.rdb-settings-page_data-source-form-setup-info {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 4px;
+	padding: 16px;
+
+	svg {
+		fill: var(--Gutenberg-Alert-Green, #4ab866);
+		flex-shrink: 0;
+	}
+
+	p {
+		color: var(--Gutenberg-Gray-700, #757575);
+		font-size: var(--s, 12px);
+		line-height: var(--xs, 16px);
+		margin-top: 4px;
+		max-width: 500px;
+	}
+
+}
+
+body.folded .rdb-settings-page_data-source-form-footer {
+
+	@media screen and (min-width: 782px) {
+		left: calc(36px);
+		width: calc(100% - 36px);
 	}
 }
 
@@ -97,17 +113,6 @@
 		textarea {
 			font-family: monospace;
 		}
-	}
-
-	.form-actions {
-		margin-top: 32px;
-		display: flex;
-		gap: 12px;
-	}
-
-	button {
-		min-width: 80px;
-		justify-content: center;
 	}
 
 	.components-base-control__help {
@@ -187,8 +192,6 @@
 
 .rdb-settings-page_data-source-multi-step-form {
 	padding: 24px;
-	overflow: hidden;
-
 
 	@media screen and (min-width: 782px) {
 		display: grid;

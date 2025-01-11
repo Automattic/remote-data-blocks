@@ -7,6 +7,7 @@ defined( 'ABSPATH' ) || exit();
 use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\Logging\LoggerManager;
+use RemoteDataBlocks\Sanitization\Sanitizer;
 use WP_Block;
 
 use function register_block_bindings_source;
@@ -105,61 +106,6 @@ class BlockBindings {
 		return $block_type_args;
 	}
 
-	/**
-	 * Load possible query input overrides for a block binding. Allowed overrides
-	 * are defined in the query configuration. The block editor determines if an
-	 * override is applied.
-	 */
-	private static function apply_query_input_overrides( array $input_variables, array $overrides, string $block_name ): array {
-		$resolved_overrides = [];
-
-		foreach ( $overrides as $input_var_name => $override ) {
-			if ( empty( $override['source'] ?? '' ) || empty( $override['sourceType'] ?? '' ) ) {
-				continue;
-			}
-
-			$override_value = '';
-
-			switch ( $override['sourceType'] ) {
-				// Source the input variable override from a query variable.
-				case 'page':
-				case 'query_var':
-					$override_value = get_query_var( $override['source'], '' );
-					break;
-			}
-
-			if ( ! empty( $override_value ) ) {
-				$resolved_overrides[ $input_var_name ] = $override_value;
-			}
-		}
-
-		/**
-		 * Filter the resolved query input overrides for a block binding.
-		 *
-		 * @param array  $resolved_overrides The resolved query input overrides.
-		 * @param array  $input_variables The original query input variables.
-		 * @param string $block_name The block name.
-		 */
-		$resolved_overrides = apply_filters(
-			'remote_data_blocks_query_input_overrides',
-			$resolved_overrides,
-			$input_variables,
-			$block_name
-		);
-
-		return array_merge( $input_variables, $resolved_overrides );
-	}
-
-	private static function get_query_input( array $block_context ): array {
-		$block_name = $block_context['blockName'];
-		$query_input = $block_context['queryInput'];
-		$overrides = $block_context['queryInputOverrides'] ?? [];
-
-		$query_input = self::apply_query_input_overrides( $query_input, $overrides, $block_name );
-
-		return $query_input;
-	}
-
 	public static function execute_query( array $block_context, string $operation_name ): array|null {
 		$block_name = $block_context['blockName'];
 		$block_config = ConfigStore::get_block_configuration( $block_name );
@@ -170,15 +116,49 @@ class BlockBindings {
 
 		try {
 			$query = $block_config['queries'][ ConfigRegistry::DISPLAY_QUERY_KEY ];
-			$query_input = self::get_query_input( $block_context );
-			$query_results = $query->execute( $query_input );
 
-			if ( is_wp_error( $query_results ) ) {
-				self::log_error( 'Error executing query for block binding: ' . $query_results->get_error_message(), $block_name, $operation_name );
+			/**
+			 * Filter the query input overrides for a block binding.
+			 *
+			 * @param array $input_variables The original query input variables.
+			 * @param array<string> $enabled_overrides The names of overrides that have been enabled for the current block.
+			 * @param string $block_name The current block name.
+			 * @param array $block_context The block context.
+			 * @return array The filtered query input variables.
+			 */
+			$query_input = apply_filters(
+				'remote_data_blocks_query_input_variables',
+				$block_context['queryInput'] ?? [],
+				$block_context['enabledOverrides'] ?? [],
+				$block_context['blockName'],
+				$block_context
+			);
+
+			$query_response = $query->execute( $query_input );
+
+			/**
+			 * Filter the query response for a block binding.
+			 *
+			 * @param array $query_results The original query response.
+			 * @param array<string> $enabled_overrides The names of overrides that have been enabled for the current block.
+			 * @param string $block_name The current block name.
+			 * @param array $block_context The block context.
+			 * @return array|WP_Error The filtered query response.
+			 */
+			$query_response = apply_filters(
+				'remote_data_blocks_query_response',
+				$query_response,
+				$block_context['enabledOverrides'] ?? [],
+				$block_context['blockName'],
+				$block_context
+			);
+
+			if ( is_wp_error( $query_response ) ) {
+				self::log_error( 'Error executing query for block binding: ' . $query_response->get_error_message(), $block_name, $operation_name );
 				return null;
 			}
 
-			return $query_results;
+			return $query_response;
 		} catch ( \Exception $e ) {
 			self::log_error( 'Unexpected exception for block binding: ' . $e->getMessage(), $block_name, $operation_name );
 			return null;
@@ -193,7 +173,7 @@ class BlockBindings {
 			$block_attributes = $block->attributes;
 		} else {
 			$block_context = $block['context'][ self::$context_name ] ?? [];
-			$block_attributes = $block['attributes'];
+			$block_attributes = $block['attributes'] ?? [];
 		}
 
 		$fallback_content = self::get_block_fallback_content( $source_args, $block_context, $block_attributes );
@@ -204,64 +184,51 @@ class BlockBindings {
 			return $fallback_content;
 		}
 
-		$value = self::get_remote_value( $block_context, $source_args );
+		$block_name = $block_context['blockName'];
+		$field_name = $source_args['field'] ?? null;
+		$index = $source_args['index'] ?? 0; // Index is only set for loop queries.
 
-		if ( ! is_string( $value ) ) {
-			self::log_error( 'Received non-string value for block binding', $block_context['blockName'], $source_args['field'] );
+		if ( null === $field_name ) {
+			self::log_error( sprintf( 'Missing field mapping for block binding %s', $block_name ), 'unknown' );
 			return $fallback_content;
+		}
+
+		if ( isset( $source_args['block'] ) && $source_args['block'] !== $block_name ) {
+			self::log_error( 'Block binding belongs to a different remote data block', $block_name, $field_name );
+			return $fallback_content;
+		}
+
+		$query_response = self::execute_query( $block_context, $field_name );
+
+		$value = $query_response['results'][ $index ]['result'][ $field_name ]['value'] ?? null;
+		if ( null === $value ) {
+			self::log_error( 'Cannot resolve field for block binding', $block_name, $field_name );
+			return $fallback_content;
+		}
+
+		// Sanitize the value as string.
+		$value = Sanitizer::sanitize_primitive_type( 'string', $value );
+
+		// Prepend label to value if provided. Class name should match the one
+		// generated by the block editor script.
+		if ( ! empty( $source_args['label'] ?? '' ) ) {
+			return sprintf( '<span class="rdb-block-label">%s</span> %s', $source_args['label'], $value );
 		}
 
 		return $value;
 	}
 
 	private static function get_block_fallback_content( array $source_args, array $block_context, array $block_attributes ): ?string {
-		// Returning null from get_value() cancels the binding and allows the default saved content to show.
-		$fallback_content = null;
-
-		$source_field = $source_args['field'] ?? null;
-		if ( null === $source_field ) {
-			return $fallback_content;
-		}
-
 		$result_index = $source_args['index'] ?? 0;
-		$result = $block_context['results'][ $result_index ] ?? null;
+		$source_field = $source_args['field'] ?? null;
+		$fallback_content = $block_context['results'][ $result_index ][ $source_field ] ?? $block_attributes['content'] ?? null;
 
-		if ( isset( $result[ $source_field ] ) ) {
-			$fallback_content = $result[ $source_field ];
-		}
-
+		// NOTE: Returning null from get_value() cancels the binding and allows the default saved content to show.
 		if ( null === $fallback_content ) {
-			$fallback_content = $block_attributes['content'] ?? null;
-		}
-
-		return $fallback_content;
-	}
-
-	public static function get_remote_value( array $block_context, array $source_args ): string|null {
-		$block_name = $block_context['blockName'];
-		$field_name = $source_args['field'];
-		$index = $source_args['index'] ?? 0; // Index is only set for loop queries.
-
-		if ( isset( $source_args['block'] ) && $source_args['block'] !== $block_name ) {
-			self::log_error( 'Block binding belongs to a different remote data block', $block_name, $field_name );
 			return null;
 		}
 
-		$query_results = self::execute_query( $block_context, $field_name );
-
-		if ( ! isset( $query_results['results'][ $index ]['result'][ $field_name ]['value'] ) ) {
-			self::log_error( 'Cannot resolve field for block binding', $block_name, $field_name );
-			return null;
-		}
-
-		// Prepend label to value if provided. Class name should match the one
-		// generated by the block editor script.
-		$value = $query_results['results'][ $index ]['result'][ $field_name ]['value'];
-		if ( ! empty( $source_args['label'] ?? '' ) ) {
-			return sprintf( '<span class="rdb-block-label">%s</span> %s', $source_args['label'], $value );
-		}
-
-		return strval( $value );
+		return Sanitizer::sanitize_primitive_type( 'string', $fallback_content );
 	}
 
 	public static function loop_block_render_callback( array $attributes, string $content, WP_Block $block ): string {

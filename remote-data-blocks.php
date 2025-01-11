@@ -29,7 +29,6 @@ require_once __DIR__ . '/vendor/autoload.php';
 Editor\AdminNotices\AdminNotices::init();
 Editor\DataBinding\BlockBindings::init();
 Editor\DataBinding\FieldShortcode::init();
-Editor\DataBinding\QueryOverrides::init();
 Editor\BlockManagement\BlockRegistration::init();
 Editor\BlockManagement\ConfigRegistry::init();
 Editor\PatternEditor\PatternEditor::init();
