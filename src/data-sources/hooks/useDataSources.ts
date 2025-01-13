@@ -1,6 +1,6 @@
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch } from '@wordpress/data';
-import { useCallback, useEffect, useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore, NoticeStoreActions, WPNotice } from '@wordpress/notices';
 
@@ -17,15 +17,11 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 		useDispatch< NoticeStoreActions >( noticesStore );
 	const { goToMainScreen } = useSettingsContext();
 
-	const canUseDisplayName = useCallback(
-		( displayName: string, uuid: string ): boolean =>
-			// ensure display name isn't an empty string or already in use by another data source
-			! displayName ||
-			! dataSources.some(
-				source => source.uuid !== uuid && source.service_config.display_name === displayName
-			),
-		[ dataSources ]
-	);
+	const canUseDisplayName = ( displayName: string, uuid: string ) =>
+		displayName &&
+		dataSources.every(
+			source => source.uuid === uuid || source.service_config.display_name !== displayName
+		);
 
 	async function fetchDataSources() {
 		setLoadingDataSources( true );
