@@ -21,7 +21,44 @@ function register_airtable_events_block(): void {
 				'name' => 'Conference Events',
 			],
 			'display_name' => 'Conference Events',
-			'tables' => [], // AirtableDataSource does not formally provide queries.
+			'tables' => [
+				[
+					'id' => 'tblyGtuxblLtmoqMI',
+					'name' => 'Conference Events',
+					'output_query_mappings' => [
+						[
+							'key' => 'record_id',
+							'name' => 'ID',
+							'path' => '$.id',
+							'type' => 'id',
+						],
+						[
+							'key' => 'title',
+							'name' => 'Title',
+							'path' => '$.fields.Activity',
+							'type' => 'string',
+						],
+						[
+							'key' => 'type',
+							'name' => 'Type',
+							'path' => '$.fields.Type',
+							'type' => 'string',
+						],
+						[
+							'key' => 'location',
+							'name' => 'Location',
+							'path' => '$.fields.Location',
+							'type' => 'string',
+						],
+						[
+							'key' => 'notes',
+							'name' => 'Notes',
+							'path' => '$.fields.Notes',
+							'type' => 'string',
+						],
+					],
+				],
+			],
 		],
 	] );
 
