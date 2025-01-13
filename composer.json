@@ -38,7 +38,7 @@
   "require-dev": {
     "automattic/vipwpcs": "^3.0",
     "phpcompatibility/phpcompatibility-wp": "^2.1",
-    "phpunit/phpunit": "^9",
+    "phpunit/phpunit": "^10",
     "slevomat/coding-standard": "^8.15",
     "php-stubs/wordpress-stubs": "^6.6",
     "psalm/phar": "^5.26",
