@@ -83,8 +83,11 @@ remote-data-blocks-inline-field {
 }
 
 .dataviews-view-table tbody .dataviews-view-table__cell-content-wrapper {
-	max-width: 250px;
-	text-wrap: auto;
+	white-space: normal;
+	width: 300px;
+	max-width: 100%;
+	min-width: 150px;
+	overflow-wrap: break-word;
 }
 
 .dataviews-view-table__row .dataviews-view-table__actions-column .components-button.is-compact.has-icon:not(.has-text) {
