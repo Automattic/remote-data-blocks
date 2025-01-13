@@ -74,13 +74,14 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 
 	const canProceedToNextStep = (): boolean => {
 		const step = steps[ currentStep - 1 ];
-		if ( isValidElement< { canProceed?: boolean; displayName: string; uuid: string } >( step ) ) {
-			const { displayName, uuid } = step.props;
-			if ( currentStep === 1 ) {
-				return Boolean( step.props?.canProceed ) && checkDisplayNameConflict( displayName, uuid );
-			}
+		if ( ! isValidElement< { canProceed?: boolean; displayName: string; uuid: string } >( step ) ) {
+			return false;
 		}
-		return false;
+		const { canProceed, displayName, uuid } = step.props;
+		return (
+			Boolean( canProceed ) &&
+			( currentStep !== 1 || checkDisplayNameConflict( displayName, uuid ) )
+		);
 	};
 
 	const handleNextStep = () => {

@@ -22,10 +22,10 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 			if ( ! displayName ) {
 				return false;
 			}
-			const existingSource = dataSources.find(
+			const alreadyExists = dataSources.some(
 				source => source.uuid !== uuid && source.service_config.display_name === displayName
 			);
-			return ! existingSource;
+			return ! alreadyExists;
 		},
 		[ dataSources ]
 	);
