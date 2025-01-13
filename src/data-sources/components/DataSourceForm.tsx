@@ -72,7 +72,7 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 
 	const stepHeadings = [ 'Setup', 'Scope' ];
 
-	const canProceedToNextStep = (): boolean => {
+	const canProceedToNextStep = () => {
 		const step = steps[ currentStep - 1 ];
 		if ( ! isValidElement< { canProceed?: boolean; displayName: string; uuid: string } >( step ) ) {
 			return false;
