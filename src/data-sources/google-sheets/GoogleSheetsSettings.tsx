@@ -228,6 +228,7 @@ export const GoogleSheetsSettings = ( {
 					verticalAlign: 'text-top',
 				} }
 				inputIcon={ GoogleSheetsIcon }
+				uuid={ uuid }
 			>
 				<TextareaControl
 					label={ __( 'Credentials', 'remote-data-blocks' ) }

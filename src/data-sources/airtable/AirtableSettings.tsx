@@ -176,6 +176,7 @@ export const AirtableSettings = ( {
 					heading={ { icon: AirtableIconWithText, width: '113.81px', height: '25px' } }
 					inputIcon={ AirtableIcon }
 					canProceed={ shouldAllowContinue }
+					uuid={ uuid }
 				>
 					<PasswordInputControl
 						label={ __( 'Access Token', 'remote-data-blocks' ) }

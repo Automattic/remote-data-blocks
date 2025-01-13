@@ -7,11 +7,19 @@ import {
 	__experimentalInputControl as InputControl,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
-import { Children, createPortal, isValidElement, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import {
+	Children,
+	createPortal,
+	isValidElement,
+	useEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 import { lockSmall } from '@wordpress/icons';
 
 import { DataSourceFormActions } from './DataSourceFormActions';
+import { useDataSources } from '../hooks/useDataSources';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
 interface DataSourceFormProps {
@@ -42,7 +50,7 @@ interface DataSourceFormSetupProps {
 	inputIcon: IconType;
 	newUUID?: string | null;
 	setNewUUID?: ( uuid: string | null ) => void;
-	uuidFromProps?: string;
+	uuid?: string;
 }
 
 const DataSourceFormStep = ( {
@@ -64,6 +72,7 @@ const DataSourceFormStep = ( {
 const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 	const [ currentStep, setCurrentStep ] = useState( 1 );
 	const { goToMainScreen, screen } = useSettingsContext();
+	const { checkDisplayNameConflict } = useDataSources();
 
 	const steps = Children.toArray( children );
 	const singleStep = steps.length === 1 || screen === 'editDataSource';
@@ -72,10 +81,11 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 
 	const canProceedToNextStep = (): boolean => {
 		const step = steps[ currentStep - 1 ];
-		if (
-			isValidElement< { canProceed?: boolean; displayName: string; uuidFromProps: string } >( step )
-		) {
-			return Boolean( step.props?.canProceed );
+		if ( isValidElement< { canProceed?: boolean; displayName: string; uuid: string } >( step ) ) {
+			const { displayName, uuid } = step.props;
+			if ( currentStep === 1 ) {
+				return Boolean( step.props?.canProceed ) && checkDisplayNameConflict( displayName, uuid );
+			}
 		}
 		return false;
 	};
@@ -189,16 +199,21 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 };
 
 const DataSourceFormSetup = ( {
+	canProceed,
 	children,
 	displayName: initialDisplayName,
 	handleOnChange,
 	heading,
 	inputIcon,
+	uuid,
 }: DataSourceFormSetupProps ) => {
 	const { screen, service } = useSettingsContext();
+	const { checkDisplayNameConflict } = useDataSources();
 
 	const [ displayName, setDisplayName ] = useState( initialDisplayName );
 	const [ errors, setErrors ] = useState< Record< string, string > >( {} );
+
+	const initialValidationDone = useRef( false ); // Track whether initial validation is complete.
 
 	const { icon, height, label, width, verticalAlign } = heading;
 
@@ -213,14 +228,33 @@ const DataSourceFormSetup = ( {
 	};
 
 	const validateDisplayName = () => {
+		const hasConflict = ! checkDisplayNameConflict( displayName, uuid ?? '' );
+
 		if ( ! displayName.trim() ) {
 			setErrors( {
 				displayName: __( 'Please provide a name for your data source.', 'remote-data-blocks' ),
+			} );
+		} else if ( hasConflict ) {
+			setErrors( {
+				displayName: sprintf(
+					__(
+						'Data source "%s" already exists. Please choose another name.',
+						'remote-data-blocks'
+					),
+					displayName
+				),
 			} );
 		} else {
 			setErrors( {} );
 		}
 	};
+
+	useEffect( () => {
+		if ( ! initialValidationDone.current || canProceed ) {
+			validateDisplayName();
+			initialValidationDone.current = true;
+		}
+	}, [ canProceed, displayName ] );
 
 	return (
 		<DataSourceFormStep
@@ -261,7 +295,7 @@ const DataSourceFormSetup = ( {
 				data-1p-ignore
 				className={ `rdb-settings-page_data-source-form-input ${
 					errors.displayName ? 'has-error' : ''
-				}   ` }
+				}` }
 				help={
 					<span>
 						{ errors.displayName

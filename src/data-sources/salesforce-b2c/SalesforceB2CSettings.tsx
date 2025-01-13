@@ -57,6 +57,7 @@ export const SalesforceB2CSettings = ( {
 					verticalAlign: 'middle',
 				} }
 				inputIcon={ SalesforceCommerceB2CIcon }
+				uuid={ uuid }
 			>
 				<TextControl
 					type="text"
