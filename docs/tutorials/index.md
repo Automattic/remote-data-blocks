@@ -6,8 +6,9 @@ There are
 - [Google Sheets integration](google-sheets.md)
 - [Shopify](shopify.md)
 - [Salesforce Commerce B2C](salesforce-commerce.md)
-- [HTTP](http.md)
+
 
 ## Code-configured sources
+- [HTTP](http.md)
 
-- [Create a REST API integration with a code-configured data source](rest-api-with-code.md)
+You can see other code based examples in our repositories Examples directory. Learn more in the [examples README](../../example/README.md).

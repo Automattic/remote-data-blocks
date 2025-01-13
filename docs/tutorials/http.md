@@ -1,10 +1,6 @@
-# Create a remote data block using a data source defined in the UI
+# Create a remote data block using an HTTP data source
 
-This page will walk you through registering a remote data block that loads data from a Zip code REST API. It will require you to commit code to a WordPress theme or plugin. If you have not yet installed and activated the Remote Data Blocks plugin, visit [Getting Started](https://remotedatablocks.com/getting-started/).
-
-## The contract
-
-Developers can use a UUID (v4) to define a "contract" between the remote data block integration they build and data sources defined in the Remote Data Blocks plugin settings screen.
+This page will walk you through registering a remote data block that loads data from a Zip code REST API. It will require you to commit code to a WordPress theme or plugin. 
 
 ## Create the data source
 
@@ -14,68 +10,18 @@ Developers can use a UUID (v4) to define a "contract" between the remote data bl
 4. Fill in the following details:
    - Name: Zip Code API
    - Endpoint: https://api.zippopotam.us/us/
-5. Save the data source and return the data source list.
-6. In the actions column, click on the copy button to copy the data source's UUID to your clipboard.
+5. If your API requires authentication, enter those details. This API does not. 
+6. Save the data source and return the data source list.
+7. In the actions column, click on the copy button to copy the data source's UUID to your clipboard.
 
 ## Register the block
 
 In code, we'll define a query that uses the data source we just created using its UUID.
 
-```php
-<?php declare(strict_types = 1);
+Check out [a working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/rest-api/zip-code) of the concepts above in the Remote Data Blocks GitHub repository.
 
-namespace RemoteDataBlocks\Example\ZipCode;
+## Patterns and styling
 
-use RemoteDataBlocks\Config\DataSource\HttpDataSource;
-use RemoteDataBlocks\Config\Query\HttpQuery;
+You can use patterns to create conistent reuasble layout for your remote data. You can read more about [patterns and other Core Concepts](../concepts/index.md#patterns).
 
-function register_zipcode_block(): void {
-    // Use the UUID you copied in the previous step.
-	$zipcode_data_source = HttpDataSource::from_uuid( '0d8f9e74-5244-49b4-981b-e5374107aa5c' );
-
-	if ( ! $zipcode_data_source instanceof HttpDataSource ) {
-		return;
-	}
-
-	$zipcode_query = HttpQuery::from_array( [
-		'data_source' => $zipcode_data_source,
-		'endpoint' => function ( array $input_variables ) use ( $zipcode_data_source ): string {
-			return $zipcode_data_source->get_endpoint() . $input_variables['zip_code'];
-		},
-		'input_schema' => [
-			'zip_code' => [
-				'name' => 'Zip Code',
-				'type' => 'string',
-			],
-		],
-		'output_schema' => [
-			'is_collection' => false,
-			'type' => [
-				'zip_code' => [
-					'name' => 'Zip Code',
-					'path' => '$["post code"]',
-					'type' => 'string',
-				],
-				'city' => [
-					'name' => 'City',
-					'path' => '$.places[0]["place name"]',
-					'type' => 'string',
-				],
-				'state' => [
-					'name' => 'State',
-					'path' => '$.places[0].state',
-					'type' => 'string',
-				],
-			],
-		],
-	] );
-
-	register_remote_data_block( [
-		'title' => 'Zip Code',
-		'render_query' => [
-			'query' => $zipcode_query,
-		],
-	] );
-}
-add_action( 'init', __NAMESPACE__ . '\\register_zipcode_block' );
-```
+Remote data blocks can be styled using the block editor's style settings, `theme.json`, or custom stylesheets. See the [example child theme](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/theme) for more details.
