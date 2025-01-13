@@ -7,14 +7,7 @@ import {
 	__experimentalInputControl as InputControl,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
-import {
-	Children,
-	createPortal,
-	isValidElement,
-	useEffect,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { Children, createPortal, isValidElement, useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { lockSmall } from '@wordpress/icons';
 
@@ -213,8 +206,6 @@ const DataSourceFormSetup = ( {
 	const [ displayName, setDisplayName ] = useState( initialDisplayName );
 	const [ errors, setErrors ] = useState< Record< string, string > >( {} );
 
-	const initialValidationDone = useRef( false ); // Track whether initial validation is complete.
-
 	const { icon, height, label, width, verticalAlign } = heading;
 
 	const onDisplayNameChange = ( displayNameInput: string | undefined ) => {
@@ -250,9 +241,8 @@ const DataSourceFormSetup = ( {
 	};
 
 	useEffect( () => {
-		if ( ! initialValidationDone.current || canProceed ) {
+		if ( canProceed || ( displayName === '' && screen === 'editDataSource' ) ) {
 			validateDisplayName();
-			initialValidationDone.current = true;
 		}
 	}, [ canProceed, displayName ] );
 
@@ -295,7 +285,7 @@ const DataSourceFormSetup = ( {
 				data-1p-ignore
 				className={ `rdb-settings-page_data-source-form-input ${
 					errors.displayName ? 'has-error' : ''
-				}` }
+				}   ` }
 				help={
 					<span>
 						{ errors.displayName
