@@ -17,16 +17,13 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 		useDispatch< NoticeStoreActions >( noticesStore );
 	const { goToMainScreen } = useSettingsContext();
 
-	const checkDisplayNameConflict = useCallback(
-		( displayName: string, uuid: string ): boolean => {
-			if ( ! displayName ) {
-				return false;
-			}
-			const alreadyExists = dataSources.some(
+	const canUseDisplayName = useCallback(
+		( displayName: string, uuid: string ): boolean =>
+			// ensure display name isn't an empty string or already in use by another data source
+			! displayName ||
+			! dataSources.some(
 				source => source.uuid !== uuid && source.service_config.display_name === displayName
-			);
-			return ! alreadyExists;
-		},
+			),
 		[ dataSources ]
 	);
 
@@ -188,8 +185,8 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 
 	return {
 		addDataSource,
+		canUseDisplayName,
 		dataSources,
-		checkDisplayNameConflict,
 		deleteDataSource,
 		deleteMultipleDataSources,
 		loadingDataSources,

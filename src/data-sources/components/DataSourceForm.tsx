@@ -65,7 +65,7 @@ const DataSourceFormStep = ( {
 const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 	const [ currentStep, setCurrentStep ] = useState( 1 );
 	const { goToMainScreen, screen } = useSettingsContext();
-	const { checkDisplayNameConflict } = useDataSources();
+	const { canUseDisplayName } = useDataSources();
 
 	const steps = Children.toArray( children );
 	const singleStep = steps.length === 1 || screen === 'editDataSource';
@@ -78,10 +78,7 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 			return false;
 		}
 		const { canProceed, displayName, uuid } = step.props;
-		return (
-			Boolean( canProceed ) &&
-			( currentStep !== 1 || checkDisplayNameConflict( displayName, uuid ) )
-		);
+		return Boolean( canProceed ) && ( currentStep !== 1 || canUseDisplayName( displayName, uuid ) );
 	};
 
 	const handleNextStep = () => {
@@ -202,7 +199,7 @@ const DataSourceFormSetup = ( {
 	uuid,
 }: DataSourceFormSetupProps ) => {
 	const { screen, service } = useSettingsContext();
-	const { checkDisplayNameConflict } = useDataSources();
+	const { canUseDisplayName } = useDataSources();
 
 	const [ displayName, setDisplayName ] = useState( initialDisplayName );
 	const [ errors, setErrors ] = useState< Record< string, string > >( {} );
@@ -220,7 +217,7 @@ const DataSourceFormSetup = ( {
 	};
 
 	const validateDisplayName = () => {
-		const hasConflict = ! checkDisplayNameConflict( displayName, uuid ?? '' );
+		const hasConflict = ! canUseDisplayName( displayName, uuid ?? '' );
 
 		if ( ! displayName.trim() ) {
 			setErrors( {
