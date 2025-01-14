@@ -1,6 +1,6 @@
 # Block patterns
 
-Patterns allow you to represent your remote data if different ways. By default, the plugin registers a unstyled block pattern that you can use out of the box. You can create additional patterns in the WordPress Dashboard or programmatically by passing a `patterns` property to your block options.
+Patterns allow you to represent your remote data in different ways. By default, the plugin registers an unstyled block pattern that you can use out of the box. You can create additional patterns in the WordPress Dashboard or programmatically by passing a `patterns` property to your block options.
 
 Example:
 

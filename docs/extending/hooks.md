@@ -33,7 +33,7 @@ add_filter( 'remote_data_blocks_register_example_block', '__return_false' );
 
 ### remote_data_blocks_allowed_url_schemes
 
-Filter the allowed URL schemes for this request. By default, only HTTPS is allowed, but it might be useful to relax this restriction in local environments.
+Filter the allowed URL schemes for this request. Only HTTPS is allowed by default, but it might be useful to relax this restriction in local environments.
 
 ```php
 function custom_allowed_url_schemes( array $allowed_url_schemes, HttpQueryInterface $query ): array {
@@ -73,7 +73,7 @@ add_filter( 'remote_data_blocks_query_input_variables', function ( array $input_
 }, 10, 4 );
 ```
 
-Keep in mind modifying query input variables will affect the object cache key for that query execution. This could result in a cache miss.
+Keep in mind that modifying query input variables will affect the object cache key used for query execution. This could result in a cache miss.
 
 ### remote_data_blocks_query_response
 
@@ -97,7 +97,7 @@ The result of this filter is not cached, and will run for every block binding.
 
 ### remote_data_blocks_query_response_metadata
 
-Filter the query response metadata, which are available as bindings for field shortcodes. In most cases, it is better to provide a custom query class and override the `get_response_metadata` method but this filter is available in case that is not possible.
+Filter the query response metadata, which are available as bindings for field shortcodes. In most cases, it is better to provide a custom query class and override the `get_response_metadata` method, but this filter is available in case that is not possible.
 
 ```php
 function custom_query_response_metadata( array $metadata, HttpQueryInterface $query, array $input_variables ): array {

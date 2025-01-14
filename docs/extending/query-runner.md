@@ -4,7 +4,7 @@ A query runner executes a query and processes the results. The default `QueryRun
 
 - Your API does not respond with JSON or requires custom deserialization logic.
 - Your API uses a non-HTTP transport.
-- You want to implement custom processing of the response data that is not possible with the provided filters.
+- You want to implement custom processing of the response data, which is not possible with the provided filters.
 
 ## Custom QueryRunner for HTTP queries
 

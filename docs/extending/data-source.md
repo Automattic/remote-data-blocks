@@ -1,6 +1,6 @@
 # Data source
 
-A data source defines basic reusable properties of an API and is used by a [query](query.md) to reduce boilerplate. It allows helps this plugin represent your data source in the plugin settings screen and other UI.
+A data source defines basic reusable properties of an API and is used by a [query](query.md) to reduce boilerplate. It helps this plugin represent your data source in the plugin settings screen and other UI.
 
 ## Example
 
