@@ -45,7 +45,7 @@ class GitHubQueryRunner extends QueryRunner {
 
 	public static function generate_file_content( array $response_data ): string {
 		$file_content = $response_data['content'] ?? '';
-		$file_path = $response_data['file_path'] ?? '';
+		$file_path = $response_data['path'] ?? '';
 
 		return self::update_markdown_links( $file_content, $file_path );
 	}
