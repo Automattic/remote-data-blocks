@@ -36,10 +36,9 @@ Below, you'll find specific use cases where Remote Data Blocks shines. We are wo
   - These two challenges are directly related to the issues with normalized data. If you have data sources that relate to one another, you have to write custom code to query missing data and stitch them together.
   - Judging complexity is difficult, but implementing large applications using Remote Data Blocks is not advisable.
 - You require complex filtering or rely heavily on pagination.
-
   - Our UI components for filtering and pagination are still under development.
 
-Over time, Remote Data Blocks will grow, and some of the words of caution here, like filtering and pagination, will be solved.
+Over time, Remote Data Blocks will grow and improve and these guidelines will change.
 
 ## Remote data source
 
@@ -61,7 +60,7 @@ For example, you might have a remote data block named "Shopify Product" that fet
 
 Remote data blocks are **container blocks** that contain other blocks and provide remote data to them. You retain complete control over the layout, design, and content. You can leverage patterns to enable consistent styling and customize the block's appearance using the block editor or `theme.json`.
 
-Remote data blocks are custom blocks, but they are created and registered by our plugin and don't require custom block development. Remote data is loaded via [the block bindings API](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-bindings/).
+Remote data blocks are custom blocks, but they are created and registered by our plugin and don't require custom block development. Remote data is loaded via [the block bindings API](./block-bindings.md) or [field shortcodes](./field-shortcodes.md).
 
 ## Data fetching
 
