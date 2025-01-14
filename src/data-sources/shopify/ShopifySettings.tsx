@@ -69,6 +69,7 @@ export const ShopifySettings = ( {
 				handleOnChange={ handleOnChange }
 				heading={ { icon: ShopifyIconWithText, width: '102px', height: '32px' } }
 				inputIcon={ ShopifyIcon }
+				uuid={ uuid }
 			>
 				<TextControl
 					type="url"
