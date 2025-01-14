@@ -1,28 +1,26 @@
 # Create a Salesforce Commerce B2C remote data block
 
-This tutorial will walk you through connecting a [Salesforce Commerce B2C](https://developer.salesforce.com/docs/commerce/b2c-commerce/overview) data source and how to use the automattically created block in the WordPress editor. 
+This tutorial will walk you through connecting a [Salesforce Commerce B2C](https://developer.salesforce.com/docs/commerce/b2c-commerce/overview) data source and how to use the automatically created block in the WordPress editor.
 
 ## Salesforce Commerce B2C API Access
 
 ## Create the data source
 
-1. Go to the Settings > Remote Data Blocks in your WordPress admin.
+1. Go to Settings > Remote Data Blocks in your WordPress admin.
 2. Click on the "Connect new" button.
 3. Choose "Salesforce Commerce B2C" from the dropdown menu as the data source type.
-4. Name this Data source, this name is only used internally. 
+4. Name this data source (this name is only used internally).
 
 ## Insert the block
 
-Open a post for editing and select the block in the Block Inserter using the display name you provided. 
+Create or edit a page or post, then using the Block Inserter, search for the block using the name you provided in step four.
 
 ## Patterns and styling
 
-You can use patterns to create conistent reuasble layout for your remote data. You can read more about [patterns and other Core Concepts](../concepts/index.md#patterns).
+You can use patterns to create a consistent, reusable layout for your remote data. You can read more about [patterns and other Core Concepts](../concepts/index.md#patterns).
 
 Remote data blocks can be styled using the block editor's style settings, `theme.json`, or custom stylesheets. See the [example child theme](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/theme) for more details.
 
 ## Code Reference
 
 Check out [a working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/shopify) of the concepts above in the Remote Data Blocks GitHub repository.
-
-
