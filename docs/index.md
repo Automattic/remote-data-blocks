@@ -19,11 +19,13 @@ For plugin overview and getting started guide, see [README](../README.md).
   - [Query](extending/query.md)
   - [Query Runner](extending/query-runner.md)
 
-- [Workflows](workflows/index.md)
+- [Tutorials](tutorials/index.md)
 
-  - [Airtable Integration](workflows/airtable.md)
-  - [Google Sheets Integration](workflows/google-sheets.md)
-  - [REST API Integration](workflows/rest-api.md)
+  - [Airtable](tutorials/airtable.md)
+  - [Google Sheets integration](tutorials/google-sheets.md)
+  - [HTTP](tutorials/http.md)
+  - [Shopify](tutorials/shopify.md)
+  - [Salesforce Commerce B2C](tutorials/salesforce-commerce.md)
 
 - [Development](local-development.md)
 - [Troubleshooting](troubleshooting.md)

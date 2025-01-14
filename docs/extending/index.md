@@ -34,9 +34,9 @@ Once you've defined your custom classes, you can [register a remote data block](
 - [Block patterns](block-patterns.md)
 - [Hooks (actions and filters)](hooks.md)
 
-## Workflows
+## Examples
 
-The [workflows guide](../workflows/index.md) provides detailed code examples of various methods of extending the plugin.
+The [examples](../../example/README.md) provide detailed code samples of interacting with the plugin various methods of extending the plugin.
 
 ## Create a local development environment
 
