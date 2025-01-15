@@ -48,7 +48,7 @@ export interface UseForm< T extends StateObject > {
 	setFormState: ( newState: Partial< T > ) => void;
 	resetFormState: () => void;
 	resetErrorState: () => void;
-	handleOnChange: < K extends keyof T >( id: K, value: T[ K ] ) => void;
+	handleOnChange: < K extends keyof T >( id: K, value: T[ K ] | undefined ) => void;
 	handleOnBlur: ( id: string ) => void;
 	handleOnSubmit: () => void;
 	validState: T | null;
