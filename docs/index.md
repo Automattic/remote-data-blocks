@@ -11,12 +11,12 @@ For plugin overview and getting started guide, see [README](../README.md).
 
 - [Extending](extending/index.md)
 
-  - [Block Patterns](extending/block-patterns.md)
-  - [Block Registration](extending/block-registration.md)
   - [Data Source](extending/data-source.md)
-  - [Hooks](extending/hooks.md)
-  - [Overrides](extending/overrides.md)
   - [Query](extending/query.md)
+  - [Block Registration](extending/block-registration.md)
+  - [Block Patterns](extending/block-patterns.md)
+  - [Overrides](extending/overrides.md)
+  - [Hooks](extending/hooks.md)
   - [Query Runner](extending/query-runner.md)
 
 - [Tutorials](tutorials/index.md)

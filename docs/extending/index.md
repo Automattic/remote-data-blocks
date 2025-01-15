@@ -25,14 +25,14 @@ Here are some detailed overviews of these classes with notes on how and why to e
 
 - [Data source](data-source.md)
 - [Query](query.md)
-- [Query runner](query-runner.md)
 
-Once you've defined your custom classes, you can [register a remote data block](block-registration.md) that uses them.
+Once you've defined your data source and queries, you can [register a remote data block](block-registration.md) that uses them.
 
 ### Additional customization
 
 - [Block patterns](block-patterns.md)
 - [Hooks (actions and filters)](hooks.md)
+- [Query runner](query-runner.md)
 
 ## Examples
 
