@@ -62,8 +62,8 @@ function register_airtable_events_block(): void {
 		],
 	] );
 
-	AirtableIntegration::register_block_for_airtable_data_source( $airtable_data_source );
-	AirtableIntegration::register_loop_block_for_airtable_data_source( $airtable_data_source );
+	AirtableIntegration::register_blocks_for_airtable_data_source( $airtable_data_source );
+	AirtableIntegration::register_loop_blocks_for_airtable_data_source( $airtable_data_source );
 }
 
 add_action( 'init', __NAMESPACE__ . '\\register_airtable_events_block' );
