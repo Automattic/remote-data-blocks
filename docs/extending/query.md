@@ -2,11 +2,7 @@
 
 A query defines a request for data from a [data source](data-source.md). It defines input and output variables so that the Remote Data Blocks plugin knows how to interact with it.
 
-## Extending a data source
-A common approach is to define a data source on the settings screen and then commit a custom query in code to fetch and process the data.
-
-Here's an example of how to do that with 
-
+A common approach is to define a data source on the settings screen and then commit a custom query in code to fetch and process the data. The follwoing example code does just that.
 
 
 ## HttpQuery
@@ -193,6 +189,8 @@ The `cache_ttl` property defines how long the query response should be cached in
 A value of `-1` indicates the query should not be cached. A value of `null` indicates the default TTL should be used (60 seconds). If omitted, the default TTL is used.
 
 Remote data blocks utilize the WordPress object cache (`wp_cache_get()` / `wp_cache_set()`) for response caching. Ensure that your platform provides or installs a persistent object cache plugin so that this value is respected.
+
+If you do not have a peristent object cache, no caching will be available. We do not recommend running the Remote Data Blocks plugin in this configuration.
 
 ### image_url: string|null
 
