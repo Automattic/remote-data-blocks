@@ -3,7 +3,7 @@
 > [!TIP]
 > Make sure you've read the [core concepts](../concepts/index.md) behind Remote Data Blocks before extending the plugin.
 
-Data sources and queries can be configured on the settings screen, but sometimes, you need to extend the plugin to implement custom functionality. Remote Data Blocks provides extendable classes, global functions, hooks, and filters to help you connect remote data blocks to any data source and customize their behavior.
+Data sources and queries can be configured in the plugin UI, but sometimes, you need to extend the plugin to implement custom functionality. Remote Data Blocks provides extendable classes, global functions, hooks, and filters to help you connect to any data source, parse responses, and customize the display of data.
 
 ## Data flow
 

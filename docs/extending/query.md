@@ -2,18 +2,27 @@
 
 A query defines a request for data from a [data source](data-source.md). It defines input and output variables so that the Remote Data Blocks plugin knows how to interact with it.
 
+## Extending a data source
+A common approach is to define a data source on the settings screen and then commit a custom query in code to fetch and process the data.
+
+Here's an example of how to do that with 
+
+
+
 ## HttpQuery
 
-Most HTTP-powered APIs can be queried using an `HttpQuery`. Here's an example of a query for US ZIP code data:
+Most HTTP-powered APIs can be queried using an `HttpQuery`. Here's an example of a query for US ZIP code data. This examples assumes you have configured the data source in the UI, and have the UUID.
 
 ```php
-$data_source = HttpDataSource::from_array( [
-	'service_config' => [
-		'__version' => 1,
-		'display_name' => 'Zip Code API',
-		'endpoint' => 'https://api.zippopotam.us/us/',
-	],
-] );
+if ( ! defined( 'REMOTE_DATA_BLOCKS_EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID' ) ) {
+	return;
+}
+
+$data_source = HttpDataSource::from_uuid( REMOTE_DATA_BLOCKS_EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID );
+
+if ( ! $data_source instanceof HttpDataSource ) {
+	return;
+}
 
 $query = HttpQuery::from_array( [
 	'display_name' => 'Get location by Zip code',
