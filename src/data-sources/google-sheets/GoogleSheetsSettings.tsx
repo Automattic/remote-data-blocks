@@ -128,7 +128,7 @@ export const GoogleSheetsSettings = ( {
 					const outputQueryMappings: DataSourceQueryMappingValue[] = sheet.fields.map( field => ( {
 						key: field,
 						name: field,
-						path: `$.${ field }`,
+						path: `$["${ field }"]`,
 						type: 'string',
 					} ) );
 
