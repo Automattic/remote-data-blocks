@@ -4,7 +4,6 @@ A query defines a request for data from a [data source](data-source.md). It defi
 
 A common approach is to define a data source on the settings screen and then commit a custom query in code to fetch and process the data. The follwoing example code does just that.
 
-
 ## HttpQuery
 
 Most HTTP-powered APIs can be queried using an `HttpQuery`. Here's an example of a query for US ZIP code data. This examples assumes you have configured the data source in the UI, and have the UUID.
