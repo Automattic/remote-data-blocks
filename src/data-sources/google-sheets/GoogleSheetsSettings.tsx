@@ -37,7 +37,7 @@ const validationRules: ValidationRules< GoogleSheetsServiceConfig > = {
 	credentials: ( state: Partial< GoogleSheetsServiceConfig > ) => {
 		if ( ! state.credentials ) {
 			return __(
-				'Please provide credentials JSON for the service account to connect to Google Sheets.',
+				'Please provide valid credentials JSON for the service account to connect to Google Sheets.',
 				'remote-data-blocks'
 			);
 		}
@@ -51,6 +51,12 @@ export const GoogleSheetsSettings = ( {
 	uuid,
 	config,
 }: SettingsComponentProps< GoogleSheetsConfig > ) => {
+	const [ rawCredentials, setRawCredentials ] = useState< string >(
+		config?.service_config?.credentials
+			? JSON.stringify( config?.service_config?.credentials, null, 2 )
+			: ''
+	);
+
 	const { onSave } = useDataSources< GoogleSheetsConfig >( false );
 
 	const { state, errors, handleOnChange, validState } = useForm< GoogleSheetsServiceConfig >( {
@@ -66,7 +72,7 @@ export const GoogleSheetsSettings = ( {
 	] );
 
 	const { fetchingToken, token, tokenError } = useGoogleAuth(
-		JSON.stringify( state.credentials ),
+		JSON.stringify( state.credentials ) ?? '',
 		GOOGLE_SHEETS_API_SCOPES
 	);
 	const { spreadsheets, isLoadingSpreadsheets, errorSpreadsheets } =
@@ -94,10 +100,11 @@ export const GoogleSheetsSettings = ( {
 	};
 
 	const onCredentialsChange = ( nextValue: string ) => {
+		setRawCredentials( nextValue );
 		const credentials = safeParseJSON< GoogleServiceAccountKey >( nextValue );
-		if ( credentials ) {
-			handleOnChange( 'credentials', credentials );
-		}
+		handleOnChange( 'credentials', credentials ?? undefined );
+		handleOnChange( 'sheets', [] );
+		handleOnChange( 'spreadsheet' );
 	};
 
 	const onSpreadsheetChange = ( value: string ) => {
@@ -232,7 +239,7 @@ export const GoogleSheetsSettings = ( {
 			>
 				<TextareaControl
 					label={ __( 'Credentials', 'remote-data-blocks' ) }
-					value={ state.credentials ? JSON.stringify( state.credentials, null, 2 ) : '' }
+					value={ rawCredentials }
 					onChange={ onCredentialsChange }
 					help={ credentialsHelpText }
 					rows={ 10 }
