@@ -104,7 +104,7 @@ export const GoogleSheetsSettings = ( {
 		const credentials = safeParseJSON< GoogleServiceAccountKey >( nextValue );
 		handleOnChange( 'credentials', credentials ?? undefined );
 		handleOnChange( 'sheets', [] );
-		handleOnChange( 'spreadsheet', undefined );
+		handleOnChange( 'spreadsheet' );
 	};
 
 	const onSpreadsheetChange = ( value: string ) => {
