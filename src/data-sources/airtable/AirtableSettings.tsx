@@ -80,6 +80,8 @@ export const AirtableSettings = ( {
 
 	const onTokenInputChange: InputChangeCallback = ( token: string | undefined ) => {
 		handleOnChange( 'access_token', token ?? '' );
+		handleOnChange( 'tables', [] );
+		handleOnChange( 'base', undefined );
 	};
 
 	const onBaseChange = ( value: string, extra?: { event?: ChangeEvent< HTMLSelectElement > } ) => {
