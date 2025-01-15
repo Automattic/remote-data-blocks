@@ -103,6 +103,8 @@ export const GoogleSheetsSettings = ( {
 		setRawCredentials( nextValue );
 		const credentials = safeParseJSON< GoogleServiceAccountKey >( nextValue );
 		handleOnChange( 'credentials', credentials ?? undefined );
+		handleOnChange( 'sheets', [] );
+		handleOnChange( 'spreadsheet', undefined );
 	};
 
 	const onSpreadsheetChange = ( value: string ) => {
