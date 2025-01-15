@@ -37,7 +37,7 @@ const validationRules: ValidationRules< GoogleSheetsServiceConfig > = {
 	credentials: ( state: Partial< GoogleSheetsServiceConfig > ) => {
 		if ( ! state.credentials ) {
 			return __(
-				'Please provide credentials JSON for the service account to connect to Google Sheets.',
+				'Please provide valid credentials JSON for the service account to connect to Google Sheets.',
 				'remote-data-blocks'
 			);
 		}
