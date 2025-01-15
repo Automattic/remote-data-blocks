@@ -6,24 +6,27 @@ use RemoteDataBlocks\Integrations\Airtable\AirtableDataSource;
 use RemoteDataBlocks\Integrations\Airtable\AirtableIntegration;
 
 function register_airtable_events_block(): void {
-	$access_token = \RemoteDataBlocks\Example\get_access_token( 'airtable_events' );
-
-	if ( empty( $access_token ) ) {
+	if ( ! defined( 'EXAMPLE_AIRTABLE_EVENTS_ACCESS_TOKEN' ) ) {
 		return;
 	}
 
+	$access_token = constant( 'EXAMPLE_AIRTABLE_EVENTS_ACCESS_TOKEN' );
+	$base_id = 'appVQ2PAl95wQSo9S'; // Airtable base ID
+	$table_id = 'tblyGtuxblLtmoqMI'; // Airtable table ID
+
+	// Define the data source
 	$airtable_data_source = AirtableDataSource::from_array( [
 		'service_config' => [
 			'__version' => 1,
 			'access_token' => $access_token,
 			'base' => [
-				'id' => 'appVQ2PAl95wQSo9S',
+				'id' => $base_id,
 				'name' => 'Conference Events',
 			],
 			'display_name' => 'Conference Events',
 			'tables' => [
 				[
-					'id' => 'tblyGtuxblLtmoqMI',
+					'id' => $table_id,
 					'name' => 'Conference Events',
 					'output_query_mappings' => [
 						[
