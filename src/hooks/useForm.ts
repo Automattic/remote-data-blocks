@@ -48,7 +48,7 @@ export interface UseForm< T extends StateObject > {
 	setFormState: ( newState: Partial< T > ) => void;
 	resetFormState: () => void;
 	resetErrorState: () => void;
-	handleOnChange: < K extends keyof T >( id: K, value: T[ K ] ) => void;
+	handleOnChange: < K extends keyof T >( id: K, value?: T[ K ] ) => void;
 	handleOnBlur: ( id: string ) => void;
 	handleOnSubmit: () => void;
 	validState: T | null;
@@ -109,7 +109,7 @@ export const useForm = < T extends StateObject >( {
 		dispatch( { type: 'setState', payload: { value: newState } } );
 	};
 
-	const handleOnChange = < K extends keyof T = keyof T >( id: K, value: T[ K ] ): void => {
+	const handleOnChange = < K extends keyof T = keyof T >( id: K, value?: T[ K ] ): void => {
 		dispatch( { type: 'setField', payload: { id, value } } );
 		if ( isNonEmptyObj( validationRules ) && Object.prototype.hasOwnProperty.call( errors, id ) ) {
 			setErrors( {
