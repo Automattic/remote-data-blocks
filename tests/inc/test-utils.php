@@ -5,7 +5,6 @@
  *
  * @param class-string $class_name Name of the class.
  * @param string       $property_name Name of the property.
- * @return ReflectionProperty
  */
 function get_private_property( string $class_name, string $property_name ): ReflectionProperty {
 	$reflector = new ReflectionClass( $class_name );
@@ -33,9 +32,9 @@ function get_private_property( string $class_name, string $property_name ): Refl
  */
 function set_private_property(
 	string $class_name,
-	$object_instance,
+	?object $object_instance,
 	string $property_name,
-	$value
+	mixed $value
 ): void {
 	$property = get_private_property( $class_name, $property_name );
 	$property->setValue( $object_instance, $value );
@@ -46,7 +45,6 @@ function set_private_property(
  *
  * @param class-string $class_name Name of the class.
  * @param string       $method Name of the method.
- * @return ReflectionMethod
  */
 function get_private_method( string $class_name, string $method ): ReflectionMethod {
 	$reflector = new ReflectionClass( $class_name );

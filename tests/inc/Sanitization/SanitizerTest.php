@@ -7,7 +7,7 @@ use RemoteDataBlocks\Sanitization\Sanitizer;
 use RemoteDataBlocks\Validation\Types;
 
 class SanitizerTest extends TestCase {
-	public function test_sanitize_string() {
+	public function test_sanitize_string(): void {
 		$schema = Types::object( [
 			'name' => Types::string(),
 		] );
@@ -23,7 +23,7 @@ class SanitizerTest extends TestCase {
 		$this->assertSame( 'John Doe', $result['name'] );
 	}
 
-	public function test_sanitize_integer() {
+	public function test_sanitize_integer(): void {
 		$schema = Types::object( [
 			'age' => Types::integer(),
 		] );
@@ -35,7 +35,7 @@ class SanitizerTest extends TestCase {
 		$this->assertSame( 25, $result['age'] );
 	}
 
-	public function test_sanitize_boolean() {
+	public function test_sanitize_boolean(): void {
 		$schema = Types::object( [
 			'is_active' => Types::boolean(),
 		] );
@@ -47,7 +47,7 @@ class SanitizerTest extends TestCase {
 		$this->assertSame( true, $result['is_active'] );
 	}
 
-	public function test_sanitize_any() {
+	public function test_sanitize_any(): void {
 		$schema = Types::object( [
 			'one' => Types::any(),
 			'two' => Types::any(),
@@ -69,7 +69,7 @@ class SanitizerTest extends TestCase {
 		$this->assertSame( $data, $result );
 	}
 
-	public function test_sanitize_array() {
+	public function test_sanitize_array(): void {
 		$schema = Types::object( [
 			'tags' => Types::list_of( Types::string() ),
 		] );
@@ -81,7 +81,7 @@ class SanitizerTest extends TestCase {
 		$this->assertSame( [ 'php', 'javascript', 'python' ], $result['tags'] );
 	}
 
-	public function test_sanitize_nested_array() {
+	public function test_sanitize_nested_array(): void {
 		$schema = Types::object( [
 			'users' => Types::list_of(
 				Types::object( [
@@ -121,7 +121,7 @@ class SanitizerTest extends TestCase {
 		$this->assertSame( $expected, $result );
 	}
 
-	public function test_sanitize_nested_array_of_objects() {
+	public function test_sanitize_nested_array_of_objects(): void {
 		$schema = Types::object( [
 			'users' => Types::list_of(
 				Types::object( [
@@ -163,7 +163,7 @@ class SanitizerTest extends TestCase {
 	}
 
 
-	public function test_sanitize_object() {
+	public function test_sanitize_object(): void {
 		$schema = Types::object( [
 			'user' => Types::object( [
 				'name' => Types::string(),
@@ -189,7 +189,7 @@ class SanitizerTest extends TestCase {
 		$this->assertSame( $expected, $result );
 	}
 
-	public function test_sanitize_record() {
+	public function test_sanitize_record(): void {
 		$schema = Types::record(
 			Types::string(),
 			Types::object( [
@@ -216,7 +216,7 @@ class SanitizerTest extends TestCase {
 		$this->assertSame( $expected, $result );
 	}
 
-	public function test_sanitize_removes_undefined_fields() {
+	public function test_sanitize_removes_undefined_fields(): void {
 		$schema = Types::object( [
 			'name' => Types::string(),
 		] );
@@ -232,7 +232,7 @@ class SanitizerTest extends TestCase {
 		$this->assertArrayNotHasKey( 'age', $result );
 	}
 
-	public function test_sanitize_complex_nested_structure() {
+	public function test_sanitize_complex_nested_structure(): void {
 		$schema = Types::object( [
 			'company' => Types::object( [
 				'name' => Types::string(),
@@ -286,7 +286,7 @@ class SanitizerTest extends TestCase {
 		$this->assertSame( $expected, $result );
 	}
 
-	public function test_skip_sanitize_string() {
+	public function test_skip_sanitize_string(): void {
 		$schema = Types::object( [
 			'password' => Types::skip_sanitize( Types::string() ),
 		] );

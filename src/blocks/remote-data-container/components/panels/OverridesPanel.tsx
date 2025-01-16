@@ -14,7 +14,7 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 	const { blockConfig, remoteData, updateRemoteData } = props;
 	const { availableOverrides } = blockConfig;
 
-	if ( ! availableOverrides.length ) {
+	if ( ! availableOverrides?.length ) {
 		return null;
 	}
 

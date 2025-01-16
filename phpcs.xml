@@ -91,7 +91,7 @@
 	</rule>
 
 	<rule ref="Universal.Files.SeparateFunctionsFromOO.Mixed">
-		<exclude-pattern>/tests/*</exclude-pattern>
+		<exclude-pattern>/tests/inc/stubs.php</exclude-pattern>
 	</rule>
 
 	<rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
@@ -149,16 +149,9 @@
 	<rule ref="SlevomatCodingStandard.TypeHints.LongTypeHints"/>
 	<rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue"/>
 	<rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint">
-		<exclude-pattern>/tests/*</exclude-pattern>
-		<exclude-pattern>/inc/REST/DataSourceController.php</exclude-pattern>
 		<exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification" />
 	</rule>
-	<rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint">
-		<exclude-pattern>/tests/*</exclude-pattern>
-	</rule>
 	<rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint">
-		<exclude-pattern>/tests/*</exclude-pattern>
-		<exclude-pattern>/inc/REST/DataSourceController.php</exclude-pattern>
 		<exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification" />
 	</rule>
 </ruleset>

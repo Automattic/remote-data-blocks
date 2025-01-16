@@ -14,7 +14,7 @@ use WP_Error;
 use WP_UnitTestCase;
 
 class RenderTest extends WP_UnitTestCase {
-	public function testRenderQueryBlockBindingsRender() {
+	public function testRenderQueryBlockBindingsRender(): void {
 		$test_data_source = HttpDataSource::from_array( [
 			'service_config' => [
 				'__version' => 1,
@@ -103,11 +103,11 @@ class RenderTest extends WP_UnitTestCase {
 		$this->assertIdInDomHasContent( $dom, 'field-state', 'Test State' );
 	}
 
-	private function get_query_runner_with_response( array $response_data ) {
+	private function get_query_runner_with_response( array $response_data ): QueryRunner {
 		return new class($response_data) extends QueryRunner {
 			private $response_data;
 
-			public function __construct( $response_data ) {
+			public function __construct( array $response_data ) {
 				$this->response_data = $response_data;
 			}
 
@@ -123,9 +123,8 @@ class RenderTest extends WP_UnitTestCase {
 		};
 	}
 
-	private function load_html_into_dom( $html ): DOMDocument {
+	private function load_html_into_dom( string $html ): DOMDocument {
 		$dom = new DOMDocument();
-		$dom_html = '<?xml encoding="UTF-8">' . $html;
 
 		try {
 			$dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
