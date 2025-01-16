@@ -15,7 +15,6 @@
         <directory name="*"/>
         <ignoreFiles allowMissingFiles="true">
             <directory name="build/"/>
-            <directory name="example/"/>
             <directory name="node_modules/"/>
             <directory name="vendor/"/>
         </ignoreFiles>

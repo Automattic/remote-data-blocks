@@ -133,7 +133,7 @@ function register_github_file_as_html_block(): void {
 }
 add_action( 'init', __NAMESPACE__ . '\\register_github_file_as_html_block' );
 
-function handle_github_file_path_override() {
+function handle_github_file_path_override(): void {
 	// This rewrite targets a page with the slug "gh", which must be created.
 	add_rewrite_rule( '^gh/(.+)/?', 'index.php?pagename=gh&file_path=$matches[1]', 'top' );
 

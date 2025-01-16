@@ -85,14 +85,12 @@
 		</properties>
 	</rule>
 
-	<!-- Relax a few rules for tests and example code -->
+	<!-- Relax a few rules for test code -->
 	<rule ref="Generic.Files.OneObjectStructurePerFile.MultipleFound">
-		<exclude-pattern>/example/*</exclude-pattern>
 		<exclude-pattern>/tests/*</exclude-pattern>
 	</rule>
 
 	<rule ref="Universal.Files.SeparateFunctionsFromOO.Mixed">
-		<exclude-pattern>/example/*</exclude-pattern>
 		<exclude-pattern>/tests/*</exclude-pattern>
 	</rule>
 
@@ -105,7 +103,6 @@
 	<rule ref="PSR12.Files.FileHeader.IncorrectOrder">
 		<exclude-pattern>remote-data-blocks.php</exclude-pattern>
 		<exclude-pattern>functions.php</exclude-pattern>
-		<exclude-pattern>example/remote-data-blocks-example-code.php</exclude-pattern>
 	</rule>
 
 	<!-- These functions are new via the Interactivity API and are auto-escaped -->
@@ -152,17 +149,14 @@
 	<rule ref="SlevomatCodingStandard.TypeHints.LongTypeHints"/>
 	<rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue"/>
 	<rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint">
-		<exclude-pattern>/example/*</exclude-pattern>
 		<exclude-pattern>/tests/*</exclude-pattern>
 		<exclude-pattern>/inc/REST/DataSourceController.php</exclude-pattern>
 		<exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification" />
 	</rule>
 	<rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint">
-		<exclude-pattern>/example/*</exclude-pattern>
 		<exclude-pattern>/tests/*</exclude-pattern>
 	</rule>
 	<rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint">
-		<exclude-pattern>/example/*</exclude-pattern>
 		<exclude-pattern>/tests/*</exclude-pattern>
 		<exclude-pattern>/inc/REST/DataSourceController.php</exclude-pattern>
 		<exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification" />
