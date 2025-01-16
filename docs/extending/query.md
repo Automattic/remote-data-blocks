@@ -159,24 +159,25 @@ The `output_schema` property defines how to extract data from the API response. 
 ```
 
 #### More on `type`
-The `type` property is where your data shape definition happens. 
+
+The `type` property is where your data shape definition happens.
 
 In the above Zip Code example the JSON response looks like this:
 
 ```json
 {
-  "post code": "17057",
-  "country": "United States",
-  "country abbreviation": "US",
-  "places": [
-    {
-      "place name": "Middletown",
-      "longitude": "-76.7331",
-      "state": "Pennsylvania",
-      "state abbreviation": "PA",
-      "latitude": "40.2041"
-    }
-  ]
+	"post code": "17057",
+	"country": "United States",
+	"country abbreviation": "US",
+	"places": [
+		{
+			"place name": "Middletown",
+			"longitude": "-76.7331",
+			"state": "Pennsylvania",
+			"state abbreviation": "PA",
+			"latitude": "40.2041"
+		}
+	]
 }
 ```
 
@@ -188,58 +189,58 @@ An example of collection JSON can be found in the [Chicago Institue of Art examp
 
 ```json
 {
-  "preference": null,
-  "pagination": {
-    "total": 183,
-    "limit": 10,
-    "offset": 0,
-    "total_pages": 19,
-    "current_page": 1
-  },
-  "data": [
-    {
-      "_score": 155.49371,
-      "thumbnail": {
-        "alt_text": "Color pastel drawing of ballerinas in tutus on stage, watched by audience.",
-        "width": 3000,
-        "lqip": "data:image/gif;base64,R0lGODlhCgAFAPUAADtMRVJPRFlOQlBNSFFNSEVURU1USldSS1dSTVRXTV9ZTldVUl1ZU2hbTVdkU19kVV5tX2FkUGFjVWVoVGhoVGZhW29lXGVtXG1rWmlpXW5tXmZxX3VxX1toZG5oYG5uZ3ZsY3BqZGN1a3RxYnFyZXRxZntxan19bnl9cnh7dX57doJ/dpGEeJKOhaCUjKebk6yflsGupQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAAAAAAALAAAAAAKAAUAAAYuQIjoQuGQTqhOyrEZYSQJA6AweURYrxIoxAhoMp9VywWLmRYqj6BxQFQshIEiCAA7",
-        "height": 1502
-      },
-      "api_model": "artworks",
-      "is_boosted": true,
-      "api_link": "https://api.artic.edu/api/v1/artworks/61603",
-      "id": 61603,
-      "title": "Ballet at the Paris Opéra",
-      "timestamp": "2025-01-14T22:26:21-06:00"
-    },
-    {
-      "_score": 152.35487,
-      "thumbnail": {
-        "alt_text": "Impressionist painting of woman wearing green dress trying on hats.",
-        "width": 5003,
-        "lqip": "data:image/gif;base64,R0lGODlhBgAFAPQAAEMtIk40KE83KlhHLVxELlNPN1hLMVJOP19UN1dYM1lUOVpUP2dAIWlKKHZKKXZLKWRNPGpbMGpaNGtaOkxUTF9dRlJaS15YSV5kUnZpRH12W4ZkM49uRI52VQAAAAAAACH5BAAAAAAALAAAAAAGAAUAAAUY4AUtFWZxHZIdExFEybAJQGE00sNQmqOEADs=",
-        "height": 4543
-      },
-      "api_model": "artworks",
-      "is_boosted": true,
-      "api_link": "https://api.artic.edu/api/v1/artworks/14572",
-      "id": 14572,
-      "title": "The Millinery Shop",
-      "timestamp": "2025-01-14T23:26:12-06:00"
-    },
-  ],
-  "info": {
-    "license_text": "The `description` field in this response is licensed under a Creative Commons Attribution 4.0 Generic License (CC-By) and the Terms and Conditions of artic.edu. All other data in this response is licensed under a Creative Commons Zero (CC0) 1.0 designation and the Terms and Conditions of artic.edu.",
-    "license_links": [
-      "https://creativecommons.org/publicdomain/zero/1.0/",
-      "https://www.artic.edu/terms"
-    ],
-    "version": "1.10"
-  },
-  "config": {
-    "iiif_url": "https://www.artic.edu/iiif/2",
-    "website_url": "http://www.artic.edu"
-  }
+	"preference": null,
+	"pagination": {
+		"total": 183,
+		"limit": 10,
+		"offset": 0,
+		"total_pages": 19,
+		"current_page": 1
+	},
+	"data": [
+		{
+			"_score": 155.49371,
+			"thumbnail": {
+				"alt_text": "Color pastel drawing of ballerinas in tutus on stage, watched by audience.",
+				"width": 3000,
+				"lqip": "data:image/gif;base64,R0lGODlhCgAFAPUAADtMRVJPRFlOQlBNSFFNSEVURU1USldSS1dSTVRXTV9ZTldVUl1ZU2hbTVdkU19kVV5tX2FkUGFjVWVoVGhoVGZhW29lXGVtXG1rWmlpXW5tXmZxX3VxX1toZG5oYG5uZ3ZsY3BqZGN1a3RxYnFyZXRxZntxan19bnl9cnh7dX57doJ/dpGEeJKOhaCUjKebk6yflsGupQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAAAAAAALAAAAAAKAAUAAAYuQIjoQuGQTqhOyrEZYSQJA6AweURYrxIoxAhoMp9VywWLmRYqj6BxQFQshIEiCAA7",
+				"height": 1502
+			},
+			"api_model": "artworks",
+			"is_boosted": true,
+			"api_link": "https://api.artic.edu/api/v1/artworks/61603",
+			"id": 61603,
+			"title": "Ballet at the Paris Opéra",
+			"timestamp": "2025-01-14T22:26:21-06:00"
+		},
+		{
+			"_score": 152.35487,
+			"thumbnail": {
+				"alt_text": "Impressionist painting of woman wearing green dress trying on hats.",
+				"width": 5003,
+				"lqip": "data:image/gif;base64,R0lGODlhBgAFAPQAAEMtIk40KE83KlhHLVxELlNPN1hLMVJOP19UN1dYM1lUOVpUP2dAIWlKKHZKKXZLKWRNPGpbMGpaNGtaOkxUTF9dRlJaS15YSV5kUnZpRH12W4ZkM49uRI52VQAAAAAAACH5BAAAAAAALAAAAAAGAAUAAAUY4AUtFWZxHZIdExFEybAJQGE00sNQmqOEADs=",
+				"height": 4543
+			},
+			"api_model": "artworks",
+			"is_boosted": true,
+			"api_link": "https://api.artic.edu/api/v1/artworks/14572",
+			"id": 14572,
+			"title": "The Millinery Shop",
+			"timestamp": "2025-01-14T23:26:12-06:00"
+		}
+	],
+	"info": {
+		"license_text": "The `description` field in this response is licensed under a Creative Commons Attribution 4.0 Generic License (CC-By) and the Terms and Conditions of artic.edu. All other data in this response is licensed under a Creative Commons Zero (CC0) 1.0 designation and the Terms and Conditions of artic.edu.",
+		"license_links": [
+			"https://creativecommons.org/publicdomain/zero/1.0/",
+			"https://www.artic.edu/terms"
+		],
+		"version": "1.10"
+	},
+	"config": {
+		"iiif_url": "https://www.artic.edu/iiif/2",
+		"website_url": "http://www.artic.edu"
+	}
 }
 ```
 
@@ -272,8 +273,8 @@ And the output schema is defined as:
 	],
 ],
 ```
-Here we can see at the top level a `path` variable is defined. From there the output variables used for each entry are named to match the property names in the JSON. This is a shortcut, you could 
 
+Here we can see at the top level a `path` variable is defined. From there the output variables used for each entry are named to match the property names in the JSON. This is a shortcut, you could
 
 ### request_method: string
 
