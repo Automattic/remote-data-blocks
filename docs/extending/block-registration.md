@@ -22,7 +22,7 @@ function register_your_custom_block() {
 		'data_source' => $data_source,
 		'output_schema' => [
 			'type' => [
-				'id => [
+				'id' => [
 					'name' => 'ID',
 					'path' => '$.id',
 					'type' => 'id',
