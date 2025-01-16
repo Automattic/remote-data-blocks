@@ -1,5 +1,5 @@
 ---
-### :warning: This plugin is currently in Beta. It is designed to run on [WordPress VIP](https://wpvip.com). This beta release is not intended for use on a production environment.
+### :warning: This plugin is currently in Beta. Breaking changes could occur with any update. Please test each release thoroughly before updating.
 ---
 
 # Remote Data Blocks
