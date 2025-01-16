@@ -6,8 +6,10 @@ use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Integrations\GitHub\GitHubDataSource;
 
 require_once __DIR__ . '/github-query-runner.php';
+require_once __DIR__ . '/markdown-links.php';
 
 function register_github_file_as_html_block(): void {
+	// Note: This repository is public, so GitHub's API does not require authorization.
 	$service_config = [
 		'__version' => 1,
 		'display_name' => 'Automattic/remote-data-blocks#trunk',
@@ -16,7 +18,7 @@ function register_github_file_as_html_block(): void {
 		'repo_name' => 'remote-data-blocks',
 	];
 
-	$block_title = sprintf( 'GitHub File As HTML (%s/%s)', $service_config['repo_owner'], $service_config['repo_name'] );
+	$block_title = sprintf( 'GitHub Markdown File (%s/%s)', $service_config['repo_owner'], $service_config['repo_name'] );
 	$file_extension = '.md';
 	$github_data_source = GitHubDataSource::from_array( [ 'service_config' => $service_config ] );
 
@@ -42,7 +44,13 @@ function register_github_file_as_html_block(): void {
 			'type' => [
 				'file_content' => [
 					'name' => 'File Content',
-					'generate' => [ GitHubQueryRunner::class, 'generate_file_content' ],
+					'generate' => static function ( array $response_data ): string {
+						$file_content = $response_data['content'] ?? '';
+						$file_path = $response_data['path'] ?? '';
+
+						// Update the markdown links so that they point to the correct location.
+						return update_markdown_links( $file_content, $file_path );
+					},
 					'type' => 'html',
 				],
 				'file_path' => [
@@ -53,8 +61,10 @@ function register_github_file_as_html_block(): void {
 			],
 		],
 		'request_headers' => [
+			// This request header instructs GitHub's API to convert the Markdown to HTML.
 			'Accept' => 'application/vnd.github.html+json',
 		],
+		// A custom query runner allows us to work with raw HTML responses (instead of JSON).
 		'query_runner' => new GitHubQueryRunner(),
 	] );
 
@@ -115,20 +125,27 @@ function register_github_file_as_html_block(): void {
 		'patterns' => [
 			[
 				'html' => file_get_contents( __DIR__ . '/inc/patterns/file-render.html' ),
-				'role' => 'inner_blocks',
+				'role' => 'inner_blocks', // Bypass the pattern selection step.
 				'title' => 'GitHub File Render',
 			],
 		],
 	] );
+}
+add_action( 'init', __NAMESPACE__ . '\\register_github_file_as_html_block' );
 
-	// A page with slug "gh" must be created.
+function handle_github_file_path_override() {
+	// This rewrite targets a page with the slug "gh", which must be created.
 	add_rewrite_rule( '^gh/(.+)/?', 'index.php?pagename=gh&file_path=$matches[1]', 'top' );
 
+	// Add the "file_path" query variable to the list of recognized query variables.
 	add_filter( 'query_vars', function ( array $query_vars ): array {
 		$query_vars[] = 'file_path';
 		return $query_vars;
 	}, 10, 1 );
 
+	// Filter the query input variables to inject the "file_path" value from the
+	// URL. Note that the override must match the override name defined in the
+	// block registration above.
 	add_filter( 'remote_data_blocks_query_input_variables', function ( array $input_variables, array $enabled_overrides ): array {
 		if ( true === in_array( 'github_file_path', $enabled_overrides, true ) ) {
 			$file_path = get_query_var( 'file_path' );
@@ -141,5 +158,4 @@ function register_github_file_as_html_block(): void {
 		return $input_variables;
 	}, 10, 2 );
 }
-
-add_action( 'init', __NAMESPACE__ . '\\register_github_file_as_html_block' );
+add_action( 'init', __NAMESPACE__ . '\\handle_github_file_path_override' );
