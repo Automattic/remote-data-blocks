@@ -1,10 +1,10 @@
 # Example: "Leaflet Map" block
 
-This example illustrates the flexibility of the Remote Data Blocks plugin. Instead of registering a remote data block via `register_remote_data_block`, this example builds a custom dynamic block that uses the [Leaflet library](https://leafletjs.com) to display a map with marked locations.
+This example illustrates the flexibility of the Remote Data Blocks plugin. Instead of registering a block via `register_remote_data_block`, this example builds a custom dynamic block that uses the [Leaflet library](https://leafletjs.com) to display a map with marked locations.
 
 The map locations are loaded from an Airtable base that contains longitude and latitude coordinates. Instead of using block bindings, this example creates a data source and a query and executes it manually in `render.php`.
 
-The result is a registered "Leaflet Map" block that works both in the block editor and on the WordPress frontend.
+The result is a registered "Leaflet Map" block that renders remote data in the block editor and on the WordPress frontend.
 
 <p><img width="700" alt="A Leaflet Map block in the block editor" src="https://github.com/user-attachments/assets/25f23e1a-2088-4b7e-896a-781c656294a5" /></p>
 
