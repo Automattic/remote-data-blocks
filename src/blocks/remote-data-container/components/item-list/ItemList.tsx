@@ -21,15 +21,21 @@ export function ItemList( props: ItemListProps ) {
 	const instanceId = useInstanceId( ItemList, blockName );
 
 	const data = useMemo( () => {
-		// remove null values from the data to prevent errors in filterSortAndPaginate
-		const removeNullValues = ( obj: Record< string, unknown > ): Record< string, unknown > => {
-			return Object.fromEntries(
-				Object.entries( obj ).filter( ( [ _, value ] ) => value !== null )
-			);
-		};
-
 		return ( results ?? [] ).map( ( item: Record< string, unknown > ) => {
-			const parsedItem = removeNullValues( item );
+			// Remove null values and dots to prevent errors in DataViewsd
+			const sanitizeAndRemoveNullValues = (
+				obj: Record< string, unknown >
+			): Record< string, unknown > => {
+				return Object.fromEntries(
+					Object.entries( obj )
+						.filter( ( [ _, value ] ) => value !== null ) // Remove null values
+						.map( ( [ key, value ] ) => {
+							const sanitizedKey = key.replace( /\./g, '' ); // Remove dots
+							return [ sanitizedKey, value ];
+						} )
+				);
+			};
+			const parsedItem = sanitizeAndRemoveNullValues( item );
 
 			if ( parsedItem.id ) {
 				return parsedItem;
