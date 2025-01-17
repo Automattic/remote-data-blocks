@@ -48,7 +48,13 @@ export function InputModal( props: InputModalProps ) {
 			onOpen={ open }
 			title={ props.title }
 		>
-			<form style={ { marginTop: '1rem' } }>
+			<form
+				style={ { marginTop: '1rem' } }
+				onSubmit={ event => {
+					event.preventDefault();
+					onSelectItem();
+				} }
+			>
 				{ props.inputs.map( input => (
 					<TextControl
 						key={ input.slug }
@@ -60,7 +66,7 @@ export function InputModal( props: InputModalProps ) {
 						style={ { marginBottom: '8px' } }
 					/>
 				) ) }
-				<Button variant="primary" onClick={ onSelectItem }>
+				<Button variant="primary" type="submit">
 					{ __( 'Save' ) }
 				</Button>
 			</form>
