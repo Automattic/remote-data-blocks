@@ -60,7 +60,7 @@ export function InputModal( props: InputModalProps ) {
 						style={ { marginBottom: '8px' } }
 					/>
 				) ) }
-				<Button variant="primary" onClick={ onSelectItem }>
+				<Button variant="primary" onClick={ onSelectItem } type="submit">
 					{ __( 'Save' ) }
 				</Button>
 			</form>
