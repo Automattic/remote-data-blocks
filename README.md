@@ -9,6 +9,13 @@
 
 [Launch the plugin in WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/blueprint.json) and explore. An example API ("Conference Event") is included, or visit Settings > Remote Data Blocks to add your own. Visit the [workflows guide](docs/workflows/index.md) to dive in.
 
+## Next steps
+
+- Learn about the [core concepts](docs/concepts/index.md) behind Remote Data Blocks.
+- Follow our [tutorials](docs/tutorials/index.md) to create your first connection and see Remote Data Blocks in action.
+- If you're a developer, you're ready to [extend Remote Data Blocks with custom code](docs/extending/index.md).
+- Interested in contributing? Issues, pull requests, and discussions are welcome. Please see our [contribution guide](CONTRIBUTING.md) for more information.
+
 ## Requirements
 
 - PHP 8.1+
@@ -19,13 +26,6 @@ A [persistent object cache](https://developer.wordpress.org/reference/classes/wp
 ## Installation
 
 Download [the latest release of the plugin](https://github.com/Automattic/remote-data-blocks/releases/latest/download/remote-data-blocks.zip), unzip, and add it to the `plugins/` directory of your WordPress site.
-
-## Next steps
-
-- Learn about the [core concepts](docs/concepts/index.md) behind Remote Data Blocks.
-- Follow our [tutorials](docs/tutorials/index.md) to create your first connection and see Remote Data Blocks in action.
-- If you're a developer, you're ready to [extend Remote Data Blocks with custom code](docs/extending/index.md).
-- Interested in contributing? Issues, pull requests, and discussions are welcome. Please see our [contribution guide](CONTRIBUTING.md) for more information.
 
 ## License
 
