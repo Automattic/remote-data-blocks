@@ -18,7 +18,7 @@ A [persistent object cache](https://developer.wordpress.org/reference/classes/wp
 
 ## Installation
 
-Download [the latest release of the plugin](https://github.com/Automattic/remote-data-blocks/releases/latest/download/remote-data-blocks.zip), unzip, and add it to the `plugins/` directory of your WordPress site. For more detailed installation instructions, see the [installation guide](docs/installation.md).
+Download [the latest release of the plugin](https://github.com/Automattic/remote-data-blocks/releases/latest/download/remote-data-blocks.zip), unzip, and add it to the `plugins/` directory of your WordPress site.
 
 ## Next steps
 
