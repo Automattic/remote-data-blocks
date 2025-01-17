@@ -1,4 +1,4 @@
-# Example: "Event Planning" Airtable
+# Example: "Event Planning" Airtable blocks
 
 This example registers remote data blocks for an Airtable base that contains information about conference events. This base was created from the official ["Event Planning" template](https://www.airtable.com/templates/event-planning/expKIiL87pUceFRjc) provided by Airtable.
 

@@ -6,11 +6,12 @@ use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 
 function register_zipcode_block(): void {
-	if ( ! defined( 'REMOTE_DATA_BLOCKS_EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID' ) ) {
+	if ( ! defined( 'EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID' ) ) {
 		return;
 	}
 
-	$zipcode_data_source = HttpDataSource::from_uuid( REMOTE_DATA_BLOCKS_EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID );
+	$uuid = constant( EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID );
+	$zipcode_data_source = HttpDataSource::from_uuid( $uuid );
 
 	if ( ! $zipcode_data_source instanceof HttpDataSource ) {
 		return;

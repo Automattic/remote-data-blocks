@@ -3,5 +3,5 @@
 namespace RemoteDataBlocks\Tests\Mocks;
 
 class MockTracks {
-	public function record_event( $_name, $_props ) {}
+	public function record_event( string $_name, array $_props ): void {}
 }

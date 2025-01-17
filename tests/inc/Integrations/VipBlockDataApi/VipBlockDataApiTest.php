@@ -125,7 +125,7 @@ class VipBlockDataApiTest extends TestCase {
 	protected function setUp(): void {
 		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
 		\set_error_handler(
-			static function ( $errno, $errstr ) {
+			static function ( $errno, $errstr ): void {
 				throw new \Exception( $errstr, $errno ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			},
 			E_USER_WARNING
@@ -139,7 +139,7 @@ class VipBlockDataApiTest extends TestCase {
 		\restore_error_handler();
 	}
 
-	public function testResolveRemoteDataSimple() {
+	public function testResolveRemoteDataSimple(): void {
 		$expected1 = 'Happy happy hour! No networking!';
 		$expected2 = 'Comedor del Presidente';
 
@@ -160,13 +160,13 @@ class VipBlockDataApiTest extends TestCase {
 		$this->assertSame( $expected2, $result['innerBlocks'][1]['attributes']['content'] );
 	}
 
-	public function testResolveRemoteDataPassesThroughUnregisteredBlocks() {
+	public function testResolveRemoteDataPassesThroughUnregisteredBlocks(): void {
 		$result = VipBlockDataApi::resolve_remote_data( self::$sourced_block1, 'remote-data-blocks/events', 12, self::$parsed_block1 );
 		$this->assertSame( 'Happy hour &amp; networking', $result['innerBlocks'][0]['attributes']['content'] );
 		$this->assertSame( "President's dining hall", $result['innerBlocks'][1]['attributes']['content'] );
 	}
 
-	public function testResolveRemoteDataFallsBackToDbOnQuery() {
+	public function testResolveRemoteDataFallsBackToDbOnQuery(): void {
 		$mock_qr = new MockQueryRunner();
 		$mock_qr->addResult( 'title', 'Happy happy hour! No networking!' );
 		$mock_qr->addResult( 'location', new \WP_Error( 'rdb-uh-oh', 'uh-oh!' ) );

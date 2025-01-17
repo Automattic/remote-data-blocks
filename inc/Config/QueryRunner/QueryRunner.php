@@ -232,8 +232,6 @@ class QueryRunner implements QueryRunnerInterface {
 	 *
 	 * @param string $raw_response_data The raw response data.
 	 * @return mixed The deserialized response data.
-	 *
-	 * @psalm-suppress PossiblyUnusedParam
 	 */
 	protected function deserialize_response( string $raw_response_data, array $input_variables ): mixed {
 		return json_decode( $raw_response_data, true );

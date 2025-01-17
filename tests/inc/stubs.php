@@ -25,10 +25,6 @@ function is_multisite(): void {
 	// Do nothing
 }
 
-function get_bloginfo( $_property ): void {
-	// Do nothing
-}
-
 function plugins_url( string $path ): string {
 	return sprintf( 'https://example.com/%s/', $path );
 }
@@ -69,7 +65,7 @@ function wp_strip_all_tags( string $string ): string {
 	return $string;
 }
 
-function is_wp_error( $thing ): bool {
+function is_wp_error( mixed $thing ): bool {
 	return $thing instanceof \WP_Error;
 }
 
@@ -78,7 +74,7 @@ function wp_parse_url( string $url ): array|false {
 	return parse_url( $url );
 }
 
-function wp_json_encode( $data ): string {
+function wp_json_encode( mixed $data ): string {
     // phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode
 	return json_encode( $data );
 }
@@ -104,11 +100,7 @@ function get_page_by_path( string $path ): string {
 	return $path ?? 'fake WP_Post';
 }
 
-function add_rewrite_rule( string $_regex, string $_target, string $_position ): void {
-	// Do nothing
-}
-
-function wp_generate_uuid4() {
+function wp_generate_uuid4(): string {
 	return sprintf(
 		'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
@@ -130,11 +122,11 @@ function wp_generate_uuid4() {
 	);
 }
 
-function is_email( $email ) {
+function is_email( mixed $email ): bool {
 	return filter_var( $email, FILTER_VALIDATE_EMAIL ) !== false;
 }
 
-function wp_is_uuid( $uuid, $version = null ) {
+function wp_is_uuid( mixed $uuid, ?int $version = null ): bool {
 	if ( ! is_string( $uuid ) ) {
 		return false;
 	}
@@ -152,99 +144,17 @@ function wp_is_uuid( $uuid, $version = null ) {
 }
 
 class WP_Error {
-	public $errors = array();
-	public $error_data = array();
-	protected $additional_data = array();
+	public function __construct( private string $code = '', private string $message = '', private mixed $data = null ) {}
 
-	public function __construct( $code = '', $message = '', $data = '' ) {
-		if ( empty( $code ) ) {
-			return;
-		}
-
-		$this->add( $code, $message, $data );
+	public function get_error_code(): string {
+			return $this->code;
 	}
 
-	public function get_error_codes() {
-		if ( ! $this->has_errors() ) {
-			return array();
-		}
-
-		return array_keys( $this->errors );
+	public function get_error_data(): mixed {
+		return $this->data;
 	}
 
-	public function get_error_code() {
-		$codes = $this->get_error_codes();
-
-		if ( empty( $codes ) ) {
-			return '';
-		}
-
-		return $codes[0];
-	}
-
-	public function get_error_messages( $code = '' ) {
-		// Return all messages if no code specified.
-		if ( empty( $code ) ) {
-			$all_messages = array();
-			foreach ( (array) $this->errors as $_code => $messages ) {
-				$all_messages = array_merge( $all_messages, $messages );
-			}
-
-			return $all_messages;
-		}
-
-		if ( isset( $this->errors[ $code ] ) ) {
-			return $this->errors[ $code ];
-		} else {
-			return array();
-		}
-	}
-
-	public function get_error_message( $code = '' ) {
-		if ( empty( $code ) ) {
-			$code = $this->get_error_code();
-		}
-		$messages = $this->get_error_messages( $code );
-		if ( empty( $messages ) ) {
-			return '';
-		}
-		return $messages[0];
-	}
-
-	public function get_error_data( $code = '' ) {
-		if ( empty( $code ) ) {
-			$code = $this->get_error_code();
-		}
-
-		if ( isset( $this->error_data[ $code ] ) ) {
-			return $this->error_data[ $code ];
-		}
-	}
-
-	public function has_errors() {
-		if ( ! empty( $this->errors ) ) {
-			return true;
-		}
-		return false;
-	}
-
-	public function add( $code, $message, $data = '' ) {
-		$this->errors[ $code ][] = $message;
-
-		if ( ! empty( $data ) ) {
-			$this->add_data( $data, $code );
-		}
-	}
-
-	public function add_data( $data, $code = '' ) {
-		if ( empty( $code ) ) {
-			$code = $this->get_error_code();
-		}
-
-		if ( isset( $this->error_data[ $code ] ) ) {
-			$this->additional_data[ $code ][] = $this->error_data[ $code ];
-		}
-
-		$this->error_data[ $code ] = $data;
+	public function get_error_message(): string {
+		return $this->message;
 	}
 }

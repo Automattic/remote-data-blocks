@@ -18,35 +18,35 @@ class QueryTest extends TestCase {
 		] );
 	}
 
-	public function testGetEndpoint() {
+	public function testGetEndpoint(): void {
 		$result = $this->query_context->get_endpoint( [] );
 		$this->assertSame( 'https://example.com/api', $result );
 	}
 
-	public function testGetImageUrl() {
+	public function testGetImageUrl(): void {
 		$result = $this->query_context->get_image_url();
 		$this->assertNull( $result );
 	}
 
-	public function testGetRequestMethod() {
+	public function testGetRequestMethod(): void {
 		$this->assertSame( 'GET', $this->query_context->get_request_method() );
 	}
 
-	public function testGetRequestHeaders() {
+	public function testGetRequestHeaders(): void {
 		$result = $this->query_context->get_request_headers( [] );
 		$this->assertSame( [ 'Content-Type' => 'application/json' ], $result );
 	}
 
-	public function testGetRequestBody() {
+	public function testGetRequestBody(): void {
 		$this->assertNull( $this->query_context->get_request_body( [] ) );
 	}
 
-	public function testDefaultPreprocessResponse() {
+	public function testDefaultPreprocessResponse(): void {
 		$raw_data = '{"key": "value"}';
 		$this->assertSame( $raw_data, $this->query_context->preprocess_response( $raw_data, [] ) );
 	}
 
-	public function testCustomPreprocessResponse() {
+	public function testCustomPreprocessResponse(): void {
 		$custom_query_context = HttpQuery::from_array( [
 			'data_source' => $this->data_source,
 			'output_schema' => [ 'type' => 'string' ],
