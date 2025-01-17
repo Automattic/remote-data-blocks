@@ -84,10 +84,10 @@ remote-data-blocks-inline-field {
 
 .dataviews-view-table tbody .dataviews-view-table__cell-content-wrapper {
 	white-space: normal;
-	width: 300px;
+	width: 250px;
 	max-width: 100%;
 	min-width: 150px;
-	overflow-wrap: break-word;
+	overflow-wrap: anywhere;
 }
 
 .dataviews-view-table__row .dataviews-view-table__actions-column .components-button.is-compact.has-icon:not(.has-text) {
@@ -112,11 +112,6 @@ remote-data-blocks-inline-field {
 	vertical-align: middle;
 }
 
-.dataviews-view-table tr td:last-child,
-.dataviews-view-table tr th:last-child {
-	padding-left: 48px;
-}
-
 .rdb-editor_data-views-modal .components-modal__content {
 	padding: 0;
 
@@ -127,4 +122,27 @@ remote-data-blocks-inline-field {
 	.dataviews-view-table {
 		padding: 4px 32px 32px;
 	}
+}
+
+
+.dataviews-view-table tr th.dataviews-view-table__actions-column,
+.dataviews-view-table tr td.dataviews-view-table__actions-column {
+	position: sticky;
+	right: 0;
+	background: #fff;
+	z-index: 1;
+	padding-left: 24px;
+	padding-right: 24px;
+	text-align: center;
+}
+
+td.dataviews-view-table__actions-column::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: -1px;
+	width: 1px;
+	height: 100%;
+	background-color: #f0f0f0;
+	z-index: 2;
 }
