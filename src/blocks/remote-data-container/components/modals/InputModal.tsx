@@ -50,7 +50,7 @@ export function InputModal( props: InputModalProps ) {
 		>
 			<form
 				style={ { marginTop: '1rem' } }
-				onSubmit={ ( event: React.FormEvent ) => {
+				onSubmit={ event => {
 					event.preventDefault();
 					onSelectItem();
 				} }
