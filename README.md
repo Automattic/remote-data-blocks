@@ -30,7 +30,3 @@ Download [the latest release of the plugin](https://github.com/Automattic/remote
 ## License
 
 Remote Data Blocks is licensed under the [GPLv2 (or later)](LICENSE).
-
----
-
-Made with ❤️ by [WordPress VIP](https://wpvip.com/).
