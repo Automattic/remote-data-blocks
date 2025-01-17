@@ -48,7 +48,7 @@ Simple data sources can be configured via the plugin's settings screen, while ot
 
 ## Queries
 
-**Queries** defines how data is fetched, processed, and displayed. Queries delegate some logic to a **data source**, which can be reused by multiple queries. For example, one query to retrieve a single item, and one to retrieve a list.
+**Queries** define how data is fetched, processed, and displayed. Queries delegate some logic to a **data source**, which can be reused by multiple queries. For example, one query to retrieve a single item, and one to retrieve a list.
 
 Simple queries can be configured via the plugin's settings screen, while others may require custom PHP code (see [extending](../extending/index.md)).
 
