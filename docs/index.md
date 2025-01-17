@@ -4,6 +4,7 @@ For plugin overview and getting started guide, see [README](../README.md).
 
 ## Table of Contents
 
+- [Quickstart](quickstart.md)
 - [Core Concepts](concepts/index.md)
 
   - [Block Bindings](concepts/block-bindings.md)
