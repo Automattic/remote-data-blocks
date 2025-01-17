@@ -16,7 +16,29 @@ This page will walk you through registering a remote data block that loads data 
 
 ## Register the block
 
-In code, we'll define a query using the data source we just created using its UUID.
+In code, we'll define a query using the data source we just created. We'll use the UUID we copied from the configuration page to reference the data source in our query.
+
+```php
+$data_source = HttpDataSource::from_uuid( $uuid );
+
+$query = HttpQuery::from_array( [
+   'data_source' => $data_source,
+   'endpoint' => function ( array $input_variables ) use ( $data_source ): string {
+		return $data_source->get_endpoint() . $input_variables['foo'];
+   },
+   'input_schema' => [ ... ],
+   'output_schema' => [ ... ],
+] );
+```
+And then register a block using the query.
+```php
+register_remote_data_block( [
+   'title' => 'Block Title',
+   'render_query' => [
+      'query' => $query,
+   ],
+] );
+```
 
 Check out [a working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/rest-api/zip-code) of the concepts above in the Remote Data Blocks GitHub repository.
 
