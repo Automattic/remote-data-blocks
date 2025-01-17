@@ -1,4 +1,5 @@
 <?php declare(strict_types = 1);
+
 /**
  * Plugin Name: Zip Code RDB Example
  * Description: Creates a custom block to be used with Remote Data Blocks in order to retrieve the city and state from a US zip code.

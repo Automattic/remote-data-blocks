@@ -1,4 +1,5 @@
 <?php declare(strict_types = 1);
+
 /**
  * Plugin Name: Art Institute RDB Example
  * Description: Creates a custom block to be used with Remote Data Blocks in order to retrieve artwork from the Art Institute of Chicago.
