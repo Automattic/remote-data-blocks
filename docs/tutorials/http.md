@@ -30,7 +30,9 @@ $query = HttpQuery::from_array( [
    'output_schema' => [ ... ],
 ] );
 ```
+
 And then register a block using the query.
+
 ```php
 register_remote_data_block( [
    'title' => 'Block Title',

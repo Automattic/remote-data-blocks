@@ -9,7 +9,7 @@ This tutorial will walk you through connecting a [Salesforce Commerce B2C](https
 1. Go to Settings > Remote Data Blocks in your WordPress admin.
 2. Click on the "Connect new" button.
 3. Choose "Salesforce Commerce B2C" from the dropdown menu as the data source type.
-4. Name this data source (this name is only used internally).
+4. Name the data source. This name is only used for display purposes.
 
 ## Insert the block
 
