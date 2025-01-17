@@ -4,13 +4,25 @@ This tutorial will walk you through connecting a [Shopify](https://www.shopify.c
 
 ## Shopify API Access
 
+To use the Shopify data source, you need to have an access token. You can create one by following these steps:
+
+1. Login to your Shopify admin account.
+2. Click "Apps" in the left sidebar.
+3. Click "Apps and sales channels" in the dropdown menu.
+4. Click "Develop apps".
+5. Click "Create an app".
+6. Give the app a name and click "Create app".
+7. Give the app `unauthenticated_read_product_listings` permissions and click "Install".
+8. Copy the access token from the "API Credentials" section.
+
 ## Create the data source
 
 1. Go to Settings > Remote Data Blocks in your WordPress admin.
 2. Click on the "Connect new" button.
 3. Choose "Shopify" from the dropdown menu as the data source type.
-4. Name this data source (this name is only used internally).
+4. Name the data source. This name is only used for display purposes.
 5. Enter the subdomain of your Shopify store. To find this, log into Shopify, the subdomain of your store is the portion of the URL before `myshopify.com`.
+6. Enter your access token.
 
 If the credentials are correct, you can save the data source. If you receive an error, check the token and try again.
 
