@@ -78,6 +78,11 @@
 		<exclude name="WordPress.WhiteSpace.OperatorSpacing" />
 	</rule>
 
+	<rule ref="PSR12">
+		<exclude name="PSR12.Files.FileHeader" />
+		<exclude name="PSR12.Files.OpenTag" />
+	</rule>
+
 	<rule ref="Squiz.WhiteSpace.OperatorSpacing">
 		<properties>
 			<!-- Standardize on a single space after assignments -->
