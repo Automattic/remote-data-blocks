@@ -1,5 +1,15 @@
 <?php declare(strict_types = 1);
 
+/**
+* Plugin Name: Art Institute RDB Example
+* Description: Creates a custom block to be used with Remote Data Blocks in order to retrieve artwork from the Art Institute of Chicago.
+ * Author: WPVIP
+ * Author URI: https://remotedatablocks.com/
+ * Text Domain: remote-data-blocks
+ * Version: 1.0.0
+ * Requires Plugins: remote-data-blocks
+*/
+
 namespace RemoteDataBlocks\Example\ArtInstituteOfChicago;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
