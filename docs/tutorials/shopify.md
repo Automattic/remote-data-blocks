@@ -30,7 +30,7 @@ If the credentials are correct, you can save the data source. If you receive an 
 
 Create or edit a page or post, then using the Block Inserter, search for the block using the name you provided in step four.
 
-![How inserting a Shopify block looks in the WordPress Editor](insert-shopify-block.gif)
+![How inserting a Shopify block looks in the WordPress Editor](https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/docs/tutorials/insert-shopify-block.gif)
 
 ## Patterns and styling
 

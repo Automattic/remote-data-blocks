@@ -82,7 +82,7 @@ Remote data blocks can be styled using the block editor's style settings, `theme
 
 Since remote data blocks are container blocks, you can associate a remote data block with a pattern to create reusable layouts. You link a pattern to a particular remote data block in the Site Editor. You will see a new Remote Data Blocks section in the right-hand panel when editing a pattern.
 
-![Screenshot showing the right hand panel of the WordPress Site Editor](patterns-right-panel.png)
+![Screenshot showing the right hand panel of the WordPress Site Editor](https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/docs/concepts/patterns-right-panel.png)
 
 Select the specific block that is appropriate for this pattern. Once saved, content creators can select this pattern when adding the associated remote data block.
 
