@@ -58,7 +58,7 @@ A [persistent object cache](https://developer.wordpress.org/reference/classes/wp
 ## Next steps
 
 - Learn about the [core concepts](docs/concepts/index.md) behind Remote Data Blocks.
-- Create your first connecting following our [tutorials](docs/tutorials/index.md) to see Remote Data Blocks in action.
+- Follow our [tutorials](docs/tutorials/index.md) to create your first connection and see Remote Data Blocks in action.
 - If you're a developer, you're ready to [extend Remote Data Blocks with custom code](docs/extending/index.md).
 - Interested in contributing? Issues, pull requests, and discussions are welcome. Please see our [contribution guide](CONTRIBUTING.md) for more information.
 
