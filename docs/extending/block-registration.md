@@ -7,6 +7,15 @@ Use the `register_remote_data_block` function to register your block and associa
 3. Defines the output schema of a query, which tells the plugin how to map the query response to blocks.
 4. Registers a remote data block.
 
+We are assuming `https://api.example.com/` returns JSON that has a shape like:
+
+```json
+{
+	"id": 12345,
+	"title": "An awesome title"
+}
+```
+
 ```php
 function register_your_custom_block() {
 	$data_source = HttpDataSource::from_array( [
@@ -56,8 +65,8 @@ The human-friendly name of the block. It is also used to construct the block's n
 
 The render query is executed when the block is rendered and fetches the data that will be provided to block bindings. It is an array with the following properties:
 
-- `query`: An instance of `QueryInterface` that fetches the data.
-- `loop`: A boolean that determines if the query returns a collection of data. If `true`, the block will be rendered for each item in the collection.
+- `query`: An instance of [`QueryInterface`](./query.md) that fetches the data.
+- `loop`: A boolean that indicates if the query returns a collection of data. If `true`, the block will be rendered for each item in the collection.
 
 ### `selection_queries`: array (optional)
 
