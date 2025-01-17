@@ -5,5 +5,5 @@ This section will guide you through configuring data sources in the plugin UI. C
 - [Airtable](airtable.md)
 - [Google Sheets integration](google-sheets.md)
 - [HTTP](http.md)
-- [Shopify](shopify.md)
 - [Salesforce Commerce B2C](salesforce-commerce.md)
+- [Shopify](shopify.md)
