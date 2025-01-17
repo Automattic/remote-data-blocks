@@ -140,26 +140,26 @@ Accepted primitive types are:
 #### Example
 ```php
 'output_schema' => [
-	'is_collection' => false,
-	'type' => [
-		'zip_code' => [
-			'name' => 'Zip Code',
-			'path' => '$["post code"]',
-			'type' => 'string',
-		],
-		'city_state' => [
-			'name' => 'City, State',
-			'default_value' => 'Unknown',
-			'generate' => function( array $response_data ): string {
-				return $response_data['places'][0]['place name'] . ', ' . $response_data['places'][0]['state'];
-			},
-			'type' => 'string',
-		],
-	],
+    'is_collection' => false,
+    'type' => [
+        'zip_code' => [
+            'name' => 'Zip Code',
+            'path' => '$["post code"]',
+            'type' => 'string',
+        ],
+        'city_state' => [
+            'name' => 'City, State',
+            'default_value' => 'Unknown',
+            'generate' => function(array $response_data): string {
+                return $response_data['places'][0]['place name'] . ', ' . $response_data['places'][0]['state'];
+            },
+            'type' => 'string',
+        ],
+    ],
 ],
 ```
 
-We have more in depth [`output_schema`](./query-output_schema.md) examples.
+We have more in-depth [`output_schema`](./query-output_schema.md) examples.
 
 ### request_method: string
 

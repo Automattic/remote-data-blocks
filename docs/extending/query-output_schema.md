@@ -1,8 +1,8 @@
 # The Query `output_schema` property
 
-The `output_schema` property is where your data shape definition happens. It should be created with care, and requires updates anytime the incoming response changes.
+The `output_schema` property is where your data shape definition happens. It should be created with care and requires updates anytime the incoming response changes.
 
-Unless your API returns a single value, `type` will be constructed of an associative array of nested output schemeas that eventual resolve to one of the accepted primitive types:
+Unless your API returns a single value, `type` will be constructed of an associative array of nested output schemas that eventually resolve to one of the accepted primitive types:
   - `boolean`
   - `button_url`
   - `email_address`
@@ -20,7 +20,7 @@ Unless your API returns a single value, `type` will be constructed of an associa
 
 ## Single Entry Example
 
-Using the [Zip Code example](../../example/rest-api/zip-code/README.md) the JSON response returned by the API looks like this:
+Using the [Zip Code example](../../example/rest-api/zip-code/README.md), the JSON response returned by the API looks like this:
 
 ```json
 {
