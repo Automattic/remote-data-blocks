@@ -49,3 +49,9 @@ Check out [a working example](https://github.com/Automattic/remote-data-blocks/t
 You can use patterns to create a consistent, reusable layout for your remote data. You can read more about [patterns and other Core Concepts](../concepts/index.md#patterns).
 
 Remote data blocks can be styled using the block editor's style settings, `theme.json`, or custom stylesheets. See the [example child theme](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/theme) for more details.
+
+## Code reference
+
+You can also configure HTTP integrations with code. These integrations appear in the WordPress admin but can not be modified. You may wish to do this to have more control over the data source or because you have more advanced data processing needs.
+
+This [working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/rest-api/zip-code) will replicate what we've done in this tutorial.

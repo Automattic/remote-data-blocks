@@ -21,6 +21,6 @@ You can use patterns to create a consistent, reusable layout for your remote dat
 
 Remote data blocks can be styled using the block editor's style settings, `theme.json`, or custom stylesheets. See the [example child theme](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/theme) for more details.
 
-## Code Reference
+## Code reference
 
-Check out [a working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/shopify) of the concepts above in the Remote Data Blocks GitHub repository.
+You can also configure Salesforce Commerce D2C integrations with code. These integrations appear in the WordPress admin but can not be modified. You may wish to do this to have more control over the data source or because you have more advanced data processing needs.
