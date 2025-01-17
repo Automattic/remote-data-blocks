@@ -1,24 +1,35 @@
-import domReady from '@wordpress/dom-ready';
+import { LitElement, html, css } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 
-/* global document, leaflet */
+/* global leaflet */
 
-export function initMaps( mapElements ) {
-	mapElements.forEach( element => {
-		const data = element?.dataset.mapCoordinates ?? '';
+// Registers the element
+@customElement( 'leaflet-map' )
+export class LeafletMap extends LitElement {
+	// Styles are applied to the shadow root and scoped to this element
+	static styles = css`
+		div {
+			height: 400px;
+		}
+	`;
 
+	@property()
+	accessor coordinates = [];
+
+	firstUpdated() {
 		let coordinates = [];
 		try {
-			coordinates = JSON.parse( data ) ?? [];
+			coordinates = JSON.parse( this.coordinates ) ?? [];
 		} catch ( error ) {}
 
-		delete element.dataset.mapCoordinates;
-
-		const map = leaflet.map( element ).setView( [ coordinates[ 0 ].x, coordinates[ 0 ].y ], 25 );
-		const layerGroup = leaflet.layerGroup().addTo( map );
+		this.map = leaflet
+			.map( this.renderRoot.querySelector( 'div' ) )
+			.setView( [ coordinates[ 0 ].x, coordinates[ 0 ].y ], 25 );
+		const layerGroup = leaflet.layerGroup().addTo( this.map );
 
 		leaflet
 			.tileLayer( 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 4 } )
-			.addTo( map );
+			.addTo( this.map );
 
 		coordinates
 			.filter( location => location.x && location.y )
@@ -26,11 +37,14 @@ export function initMaps( mapElements ) {
 				leaflet.marker( [ location.x, location.y ], { title: location.name } ).addTo( layerGroup );
 			} );
 
-		map.flyTo( [ coordinates[ 0 ].x, coordinates[ 0 ].y ] );
-	} );
-}
+		this.map.flyTo( [ coordinates[ 0 ].x, coordinates[ 0 ].y ] );
+	}
 
-// When the document is ready, find all maps and initialize them with Leaflet.
-domReady( () => {
-	initMaps( document.querySelectorAll( '.wp-block-example-leaflet-map[data-map-coordinates]' ) );
-} );
+	// Render the component's DOM by returning a Lit template
+	render() {
+		return html`
+			<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+			<div></div>
+		`;
+	}
+}

@@ -13,17 +13,12 @@
   "textdomain": "remote-data-blocks-examples",
   "editorScript": [
     "file:./index.js",
+    "file:./view.js",
     "leaflet-script"
-  ],
-  "editorStyle": [
-    "leaflet-style"
   ],
   "render": "file:./render.php",
   "viewScript": [
     "file:./view.js",
     "leaflet-script"
-  ],
-  "viewStyle": [
-    "leaflet-style"
   ]
 }

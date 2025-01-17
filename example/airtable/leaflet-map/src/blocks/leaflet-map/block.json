@@ -11,9 +11,7 @@
     "html": false
   },
   "textdomain": "remote-data-blocks-examples",
-  "editorScript": [ "file:./index.js", "leaflet-script" ],
-  "editorStyle": [ "leaflet-style" ],
+  "editorScript": [ "file:./index.js", "file:./view.js", "leaflet-script" ],
   "render": "file:./render.php",
-  "viewScript": [ "file:./view.js", "leaflet-script" ],
-  "viewStyle": [ "leaflet-style" ]
+  "viewScript": [ "file:./view.js", "leaflet-script" ]
 }

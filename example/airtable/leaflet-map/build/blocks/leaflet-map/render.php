@@ -69,9 +69,4 @@ if ( ! is_wp_error( $response ) ) {
 }
 
 ?>
-<div
-	<?php echo get_block_wrapper_attributes(); ?>
-	data-map-coordinates="<?php echo( esc_attr( wp_json_encode( $coordinates ) ) ); ?>"
-	style="height: 400px;"
->
-</div>
+<leaflet-map coordinates="<?php echo esc_attr( wp_json_encode( $coordinates ) ); ?>"></leaflet-map>
