@@ -1,8 +1,7 @@
----
-### :warning: This plugin is currently in Beta. Breaking changes could occur with any update. Please test each release thoroughly before updating.
----
-
 # Remote Data Blocks
+
+> [!WARNING]
+> This plugin is currently in Beta. Breaking changes could occur with any update. Please test each release thoroughly before updating.
 
 **Remote Data Blocks** is a WordPress plugin that makes it easy to combine content and remote data in the block editor. Easily register blocks that load data from Airtable, Google Sheets, Shopify, GitHub, or any other API. Your data stays in sync. Built-in caching ensures performance and reliability.
 
