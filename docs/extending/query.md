@@ -247,8 +247,8 @@ And the output schema is defined as:
 
 ```php
 'output_schema' => [
-	'is_collection' => false,
-	'path' => '$.data',
+	'is_collection' => true,
+	'path' => '$.data[*]',
 	'type' => [
 		'id' => [
 			'name' => 'Art ID',
@@ -258,22 +258,10 @@ And the output schema is defined as:
 			'name' => 'Title',
 			'type' => 'string',
 		],
-		'image_id' => [
-			'name' => 'Image ID',
-			'type' => 'id',
-		],
-		'image_url' => [
-			'name' => 'Image URL',
-			'generate' => function ( $data ): string {
-				return 'https://www.artic.edu/iiif/2/' . $data['image_id'] . '/full/843,/0/default.jpg';
-			},
-			'type' => 'image_url',
-		],
 	],
 ],
 ```
-Here we can see at the top level a `path` variable is defined. From there the output variables used for each entry are named to match the property names in the JSON. This is a shortcut, you could 
-
+Here we can see at the top level a `path` variable is defined explictly as an array and we are capturing all elements `[*]`. From there the output variables used for each entry are named to match the property names in the JSON. 
 
 ### request_method: string
 
