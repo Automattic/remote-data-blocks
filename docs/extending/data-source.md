@@ -19,21 +19,27 @@ $data_source = HttpDataSource::from_array( [
     ],
 ] );
 ```
+
 ## HttpDataSource configuration
 
-### __version__: number (required)
+### **version**: number (required)
+
 There is no built-in versioning logic, but a version number is required for best practice reasons. Changes to the data source could significantly affect [queries](query.md). Checking the data source version is a sensible defensive practice.
 
 ### display_name: string (required)
+
 The display name is used in the UI to identify your data source.
 
 ### endpoint: string
+
 This is the default endpoint for the data source and can save repeated use in queries. We would suggest putting the root API URL here and then manipulating it as necessary in individual [queries](query.md).
 
 ### request_headers: array
+
 Headers will be set according to the properties of the array. When providing authentication credentials, take care to keep them from appearing in code repositories. We strongly recommend using environment variables or other secure means for storage.
 
 ## Additional parameters
+
 You can add any additional parameters that are necessary for your data source. In our [Airtable example](../../example/airtable/events/register.php), you can see that we are setting values for the Airtable `base` and `table`.
 
 Consider adding whatever configuration would be useful to queries. As an example, queries have an `endpoint` property. Our [Zip code example](../../example/rest-api/zip-code/register.php) sets the endpoint with a function:
@@ -60,7 +66,6 @@ $zipcode_query = HttpQuery::from_array( [
 
 The goal with design was to provide you with flexibility you need to represent any data source.
 
-
 ## Custom data sources
 
 The configuration array passed to `from_array` is very flexible, so it's usually not necessary to extend `HttpDataSource`, but you can do so if you need to add custom behavior.
@@ -84,4 +89,7 @@ class WebDavFilesDataSource implements DataSourceInterface {
     }
 }
 ```
-````
+
+```
+
+```

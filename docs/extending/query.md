@@ -1,6 +1,6 @@
 # Query
 
-A query defines a request for data from a [data source](data-source.md). It defines input and output variables so that the Remote Data Blocks plugin knows how to interact with it. 
+A query defines a request for data from a [data source](data-source.md). It defines input and output variables so that the Remote Data Blocks plugin knows how to interact with it.
 
 A common approach is to define a data source on the settings screen and then commit a custom query in code to fetch and process the data. The following example code does just that.
 
@@ -119,25 +119,27 @@ The `output_schema` property defines how to extract data from the API response. 
 - `name` (optional): The human-friendly display name of the output variable.
 - `default_value` (optional): The default value for the output variable.
 - `path` (optional): A [JSONPath](https://jsonpath.com/) expression to extract the variable value.
-- `type` (required): A primitive type (e.g., `string`, `boolean`) or a nested output schema. 
+- `type` (required): A primitive type (e.g., `string`, `boolean`) or a nested output schema.
 
 Accepted primitive types are:
-  - `boolean`
-  - `button_url`
-  - `email_address`
-  - `html`
-  - `id`
-  - `image_alt`
-  - `image_url`
-  - `integer`
-  - `markdown`
-  - `null`
-  - `number`
-  - `string`
-  - `url`
-  - `uuid`
+
+- `boolean`
+- `button_url`
+- `email_address`
+- `html`
+- `id`
+- `image_alt`
+- `image_url`
+- `integer`
+- `markdown`
+- `null`
+- `number`
+- `string`
+- `url`
+- `uuid`
 
 #### Example
+
 ```php
 'output_schema' => [
     'is_collection' => false,

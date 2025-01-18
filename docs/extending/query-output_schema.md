@@ -3,20 +3,21 @@
 The `output_schema` property is where your data shape definition happens. It should be created with care and requires updates anytime the incoming response changes.
 
 Unless your API returns a single value, `type` will be constructed of an associative array of nested output schemas that eventually resolve to one of the accepted primitive types:
-  - `boolean`
-  - `button_url`
-  - `email_address`
-  - `html`
-  - `id`
-  - `image_alt`
-  - `image_url`
-  - `integer`
-  - `markdown`
-  - `null`
-  - `number`
-  - `string`
-  - `url`
-  - `uuid`
+
+- `boolean`
+- `button_url`
+- `email_address`
+- `html`
+- `id`
+- `image_alt`
+- `image_url`
+- `integer`
+- `markdown`
+- `null`
+- `number`
+- `string`
+- `url`
+- `uuid`
 
 ## Single Entry Example
 
@@ -67,6 +68,7 @@ You can see how the `type` property contains a nested output schema. The `zip_co
 Where `city_state` uses the genrate function to combine two elements from inside the response. In this case we assume that the first returned place is accurate for the zip. This is a safe assumption for U.S. zip codes.
 
 ## Collection Example
+
 An example of collection JSON can be found in the [Chicago Institue of Art example](../../example/rest-api/art-institute/README.md). That API returns (in part):
 
 ```json
@@ -144,8 +146,8 @@ And the output schema is defined as:
 	],
 ],
 ```
-Here we can see at the top level a `path` variable is defined explictly as an array and we are capturing all elements `[*]`. From there the output variables used for each entry are named to match the property names in the JSON. This is a shortcut. This output schemea would also work:
 
+Here we can see at the top level a `path` variable is defined explictly as an array and we are capturing all elements `[*]`. From there the output variables used for each entry are named to match the property names in the JSON. This is a shortcut. This output schemea would also work:
 
 ```php
 'output_schema' => [
