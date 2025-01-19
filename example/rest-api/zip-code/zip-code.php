@@ -66,7 +66,6 @@ function register_zipcode_block(): void {
 		'render_query' => [
 			'query' => $zipcode_query,
 		],
-		'icon' => 'smiley',
 	]);
 }
 add_action( 'init', __NAMESPACE__ . '\\register_zipcode_block' );
