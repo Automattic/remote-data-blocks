@@ -1,5 +1,15 @@
 <?php declare(strict_types = 1);
 
+/**
+ * Plugin Name: Art Institute RDB Example
+ * Description: Creates a custom block to be used with Remote Data Blocks in order to retrieve artwork from the Art Institute of Chicago.
+ * Author: WPVIP
+ * Author URI: https://remotedatablocks.com/
+ * Text Domain: remote-data-blocks
+ * Version: 1.0.0
+ * Requires Plugins: remote-data-blocks
+ */
+
 namespace RemoteDataBlocks\Example\ArtInstituteOfChicago;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
@@ -7,7 +17,7 @@ use RemoteDataBlocks\Config\Query\HttpQuery;
 use function add_query_arg;
 
 function register_aic_block(): void {
-	$aic_data_source = HttpDataSource::from_array( [
+	$aic_data_source = HttpDataSource::from_array([
 		'service_config' => [
 			'__version' => 1,
 			'display_name' => 'Art Institute of Chicago',
@@ -16,9 +26,9 @@ function register_aic_block(): void {
 				'Content-Type' => 'application/json',
 			],
 		],
-	] );
+	]);
 
-	$get_art_query = HttpQuery::from_array( [
+	$get_art_query = HttpQuery::from_array([
 		'data_source' => $aic_data_source,
 		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
 			return sprintf( '%s/%s', $aic_data_source->get_endpoint(), $input_variables['id'] ?? '' );
@@ -54,9 +64,9 @@ function register_aic_block(): void {
 				],
 			],
 		],
-	] );
+	]);
 
-	$search_art_query = HttpQuery::from_array( [
+	$search_art_query = HttpQuery::from_array([
 		'data_source' => $aic_data_source,
 		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
 			$query = $input_variables['search_terms'];
@@ -84,9 +94,9 @@ function register_aic_block(): void {
 				],
 			],
 		],
-	] );
+	]);
 
-	register_remote_data_block( [
+	register_remote_data_block([
 		'title' => 'Art Institute of Chicago',
 		'render_query' => [
 			'query' => $get_art_query,
@@ -97,6 +107,6 @@ function register_aic_block(): void {
 				'type' => 'search',
 			],
 		],
-	] );
+	]);
 }
 add_action( 'init', __NAMESPACE__ . '\\register_aic_block' );

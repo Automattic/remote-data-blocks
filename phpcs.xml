@@ -102,6 +102,8 @@
 	<!-- Exclude PSR12.Files.FileHeader.IncorrectOrder for specific files -->
 	<rule ref="PSR12.Files.FileHeader.IncorrectOrder">
 		<exclude-pattern>remote-data-blocks.php</exclude-pattern>
+		<exclude-pattern>zip-code.php</exclude-pattern>
+		<exclude-pattern>art-institute.php</exclude-pattern>
 		<exclude-pattern>functions.php</exclude-pattern>
 	</rule>
 

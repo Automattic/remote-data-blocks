@@ -4,6 +4,7 @@ For plugin overview and getting started guide, see [README](../README.md).
 
 ## Table of Contents
 
+- [Quickstart](quickstart.md)
 - [Core Concepts](concepts/index.md)
 
   - [Block Bindings](concepts/block-bindings.md)
@@ -24,8 +25,8 @@ For plugin overview and getting started guide, see [README](../README.md).
   - [Airtable](tutorials/airtable.md)
   - [Google Sheets integration](tutorials/google-sheets.md)
   - [HTTP](tutorials/http.md)
-  - [Shopify](tutorials/shopify.md)
   - [Salesforce Commerce B2C](tutorials/salesforce-commerce.md)
+  - [Shopify](tutorials/shopify.md)
 
 - [Development](local-development.md)
 - [Troubleshooting](troubleshooting.md)

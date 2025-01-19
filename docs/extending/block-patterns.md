@@ -1,8 +1,10 @@
 # Block patterns
 
-Patterns allow you to represent your remote data in different ways. By default, the plugin registers an unstyled block pattern that you can use out of the box. You can create additional patterns in the WordPress Dashboard or programmatically by passing a `patterns` property to your block options.
+Patterns allow you to represent your remote data in different ways. The plugin registers an unstyled block pattern anytime you register a remote data block either in the WordPress admin or with `register_remote_data_block`. You can create additional patterns in the WordPress Site Editor or programmatically by passing a `patterns` property to your block options.
 
-Example:
+You cannot edit the default pattern, but you can duplicate it and make changes. We recommend starting with a duplicate and then making changes in the Site Editor. If you want to lock the pattern down from further edits, copy the block markup from the editor and associate the pattern via code.
+
+## Example
 
 ```html
 <!-- wp:group {"layout":{"type":"constrained"}} -->
@@ -17,15 +19,17 @@ Example:
 <!-- /wp:group -->
 ```
 
+You could save this file as `my-pattern.html` in the same directory as the code that registers your block.
+
 ```php
 register_remote_data_block( [
-	'title' => 'My Remote Data Block',
-	'render_query' => [ /* ... */ ],
-	'patterns' => [
-		[
-			'title' => 'My Pattern',
-			'content' => file_get_contents( __DIR__ . '/my-pattern.html' ),
-		],
-	],
+    'title' => 'My Remote Data Block',
+    'render_query' => [ /* ... */ ],
+    'patterns' => [
+        [
+            'title' => 'My Pattern',
+            'content' => file_get_contents( __DIR__ . '/my-pattern.html' ),
+        ],
+    ],
 ] );
 ```
