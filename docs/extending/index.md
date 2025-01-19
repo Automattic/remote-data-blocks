@@ -26,11 +26,10 @@ Here are some detailed overviews of these classes with notes on how and why to e
 - [Data source](data-source.md)
 - [Query](query.md)
 
-Once you've defined your data source and queries, you can [register a remote data block](block-registration.md) that uses them.
+Once you've defined your data source and queries, you can [register a remote data block](block-registration.md) that uses them. That block can use a [pattern](block-patterns.md) for display. You can also use [overrides](./overrides.md) to dynamically select the displayed content.
 
 ### Additional customization
 
-- [Block patterns](block-patterns.md)
 - [Hooks (actions and filters)](hooks.md)
 - [Query runner](query-runner.md)
 

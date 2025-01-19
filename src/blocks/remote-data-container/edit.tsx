@@ -72,12 +72,21 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 		}
 	}
 
+	const hasInputVariables = Boolean(
+		blockConfig.selectors.find( selector => selector.query_key === DISPLAY_QUERY_KEY )?.inputs
+			?.length
+	);
+
 	function refreshRemoteData() {
 		if ( ! props.attributes.remoteData?.queryInput ) {
-			return;
-		}
+			if ( hasInputVariables ) {
+				return;
+			}
 
-		fetchRemoteData( props.attributes.remoteData.queryInput, false );
+			fetchRemoteData( {}, true );
+		} else {
+			fetchRemoteData( props.attributes.remoteData.queryInput, false );
+		}
 	}
 
 	function resetRemoteData() {
@@ -92,6 +101,10 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 
 	// No remote data has been selected yet, show a placeholder.
 	if ( ! props.attributes.remoteData ) {
+		if ( ! hasInputVariables ) {
+			return null;
+		}
+
 		return (
 			<div { ...blockProps }>
 				<Placeholder blockConfig={ blockConfig } fetchRemoteData={ fetchRemoteData } />

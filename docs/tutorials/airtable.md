@@ -19,7 +19,7 @@ You should not commit this token directly to your code or share it publicly. The
 1. Go to Settings > Remote Data Blocks in your WordPress admin.
 2. Click on the "Connect new" button.
 3. Choose "Airtable" from the dropdown menu as the data source type.
-4. Name this data source (this name is only used internally).
+4. Name this data source. This name is only used for display purposes.
 5. Enter the access token you created in Airtable.
 
 If the personal access token is correct, you will be able to proceed to the other steps. If you receive an error, check the token and try again.
