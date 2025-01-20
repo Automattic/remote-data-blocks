@@ -9,10 +9,22 @@
 	"icon": "html",
 	"description": "Remote data block for HTML content binding.",
 	"example": {},
+	"attributes": {
+		"content": {
+			"type": "string",
+			"source": "raw"
+		}
+	},
 	"supports": {
-		"html": false
+		"customClassName": false,
+		"className": false,
+		"html": false,
+		"interactivity": {
+			"clientNavigation": true
+		}
 	},
 	"textdomain": "remote-data-blocks",
 	"editorScript": "file:./index.js",
-	"render": "file:./render.php"
+	"render": "file:./render.php",
+	"editorStyle": "file:./index.css"
 }

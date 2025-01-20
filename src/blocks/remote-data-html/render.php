@@ -11,12 +11,9 @@ $source_args = $block->attributes['metadata']['bindings']['content']['args'] ?? 
 ?>
 
 <div <?php echo get_block_wrapper_attributes(); ?>>
-	<pre><code>Render output:</code></pre>
-	<div style="border: 1px solid #ccc; padding: 1em;">
-		<?php
-		$binding_value = BlockBindings::get_value( $source_args, $block );
+	<?php
+	$binding_value = BlockBindings::get_value( $source_args, $block );
 
-		echo $binding_value;
-		?>
-	</div>
+	echo $binding_value;
+	?>
 </div>

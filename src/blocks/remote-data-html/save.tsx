@@ -1,9 +1,14 @@
-import { useBlockProps } from '@wordpress/block-editor';
+import { BlockSaveProps } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 
-export default function save() {
-	return <div { ...useBlockProps.save() }>
-		Test save content
-		{/* <RawHTML>{ attributes.content }</RawHTML>; */}
-	</div>
+interface RemoteDataHTMLSaveAttributes {
+	content?: string;
+}
+
+export default function save( props: BlockSaveProps<RemoteDataHTMLSaveAttributes> ) {
+	const { attributes } = props;
+
+	const content = attributes.content ?? '';
+
+	return <RawHTML>{ content }</RawHTML>;
 }
