@@ -5,12 +5,16 @@ import { useMemo } from '@wordpress/element';
 import {
 	transformStyles,
 	store as blockEditorStore,
+	EditorStyle,
+	BlockEditorStoreActions,
+	BlockEditorStoreSelectors,
 } from '@wordpress/block-editor';
-import { store as editPostStore } from '@wordpress/edit-post';
+import { store as editPostStore, EditPostStoreActions } from '@wordpress/edit-post';
 import { SandBox, Placeholder, Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@/utils/i18n';
 import { useRemoteDataContext } from '@/blocks/remote-data-container/hooks/useRemoteDataContext';
+import { BlockEditProps } from '@wordpress/blocks';
 
 // This block is based on the official core/html block from Gutenberg.
 // The main difference is that this block uses HTML from remote data block context instead of user input.
@@ -26,13 +30,12 @@ const DEFAULT_STYLES = `
 	}
 `;
 
-export default function RemoteDataHTML( props ) {
-	const { attributes, context, name, setAttributes, isSelected, clientId } = props;
+export default function RemoteDataHTML( props: BlockEditProps< RemoteDataInnerBlockAttributes > ): JSX.Element {
+	const { attributes, context, isSelected, clientId } = props;
 	const { remoteData, index } = useRemoteDataContext( context );
-	console.log( { remoteData, index } );
 
-	const settingStyles = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().styles,
+	const settingStyles = useSelect< BlockEditorStoreSelectors, EditorStyle[] >(
+		select => select( blockEditorStore ).getSettings().styles,
 		[]
 	);
 
@@ -40,7 +43,7 @@ export default function RemoteDataHTML( props ) {
 		() => [
 			DEFAULT_STYLES,
 			...transformStyles(
-				( settingStyles ?? [] ).filter( ( style ) => style.css )
+				( settingStyles ?? [] ).filter( ( style: EditorStyle ) => style.css)
 			),
 		],
 		[ settingStyles ]
@@ -72,9 +75,13 @@ export default function RemoteDataHTML( props ) {
 	);
 }
 
-const PlaceholderInstructions = ( { clientId } ) => {
-	const { selectBlock } = useDispatch( blockEditorStore );
-	const { openGeneralSidebar } = useDispatch( editPostStore );
+interface PlaceholderInstructionsProps {
+	clientId: string;
+}
+
+const PlaceholderInstructions = ( { clientId }: PlaceholderInstructionsProps ) => {
+	const { selectBlock } = useDispatch<BlockEditorStoreActions>( blockEditorStore );
+	const { openGeneralSidebar } = useDispatch<EditPostStoreActions> ( editPostStore );
 
 	const openSidebar = () => {
 		selectBlock( clientId );
