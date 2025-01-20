@@ -1,17 +1,22 @@
-<?php
+<?php declare(strict_types = 1);
 
+use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 
 // $attributes (array): The block attributes.
 // $content (string): The block default content.
 // $block (WP_Block): The block instance.
 
-$context = $block->context;
-$remote_data_context = $context['remote-data-blocks/remoteData'] ?? [];
-$remote_data_result = $remote_data_context['results'][0] ?? [];
-$remote_data_html = $remote_data_result['htmlContent'] ?? '';
+$source_args = $block->attributes['metadata']['bindings']['content']['args'] ?? [];
 
 ?>
 
 <div <?php echo get_block_wrapper_attributes(); ?>>
-	<?php echo $remote_data_html; ?>
+	<pre><code>Render output:</code></pre>
+	<div style="border: 1px solid #ccc; padding: 1em;">
+		<?php
+		$binding_value = BlockBindings::get_value( $source_args, $block );
+
+		echo $binding_value;
+		?>
+	</div>
 </div>

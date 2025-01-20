@@ -3,12 +3,14 @@ import { CheckboxControl, SelectControl } from '@wordpress/components';
 import {
 	BUTTON_TEXT_FIELD_TYPES,
 	BUTTON_URL_FIELD_TYPES,
+	HTML_FIELD_TYPES,
 	IMAGE_ALT_FIELD_TYPES,
 	IMAGE_URL_FIELD_TYPES,
 	TEXT_FIELD_TYPES,
 } from '@/blocks/remote-data-container/config/constants';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
 import { getBlockDataSourceType } from '@/utils/localized-block-data';
+import { applyFilters } from '@wordpress/hooks';
 
 interface BlockBindingFieldControlProps {
 	availableBindings: AvailableBindings;
@@ -158,6 +160,20 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 						target="text"
 						updateFieldBinding={ updateFieldBinding }
 						value={ buttonTextField }
+					/>
+				</>
+			);
+
+		case 'remote-data-blocks/remote-html':
+			return (
+				<>
+					<BlockBindingFieldControl
+						availableBindings={ availableBindings }
+						fieldTypes={ HTML_FIELD_TYPES }
+						label="Content"
+						target="content"
+						updateFieldBinding={ updateFieldBinding }
+						value={ contentField }
 					/>
 				</>
 			);
