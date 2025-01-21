@@ -1,6 +1,6 @@
 # Query
 
-A query defines a request for data from a [data source](data-source.md). It defines input and output variables so that the Remote Data Blocks plugin knows how to interact with it.
+A query defines a request for data from a [data source](data-source.md). It defines input and output variables so that the Remote Data Blocks plugin knows how to interact with it. 
 
 A common approach is to define a data source on the settings screen and then commit a custom query in code to fetch and process the data. The following example code does just that.
 
@@ -139,7 +139,6 @@ Accepted primitive types are:
 - `uuid`
 
 #### Example
-
 ```php
 'output_schema' => [
     'is_collection' => false,

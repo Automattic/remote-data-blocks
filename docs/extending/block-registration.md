@@ -65,15 +65,15 @@ The human-friendly name of the block. It is also used to construct the block's n
 
 The render query is executed when the block is rendered and fetches the data that will be provided to block bindings. It is an array with the following properties:
 
-- `query`: An instance of [`QueryInterface`](./query.md) that fetches the data.
-- `loop`: A boolean that indicates if the query returns a collection of data. If `true`, the block will be rendered for each item in the collection.
+- `query` (required): An instance of [`QueryInterface`](./query.md) that fetches the data.
+- `loop`: A boolean that indicates if the query returns a collection of data. If `true`, the block will be rendered for each item in the collection. If not provided `false` is the default.
 
 ### `selection_queries`: array (optional)
 
-Selection queries are used to select or curate remote data in the block editor. For example, you may wish to load a list of products and select one for render, or you may want to allow a user to search for a specific item. Selection queries are an array of objects with the following properties:
+Selection queries are used by content creators to select or curate remote data in the block editor. For example, you may wish to provide a list of products to users and allow them to select one to incled, or you may want to allow a user to search for a specific item. Selection queries are an array of objects with the following properties:
 
 - `display_name`: A human-friendly name for the selection query.
-- `query`: An instance of `QueryInterface` that fetches the data.
+- `query` (required): An instance of `QueryInterface` that fetches the data.
 - `type`: A string that determines the type of selection query. Accepted values are currently `list` or `search`.
 
 Example:
