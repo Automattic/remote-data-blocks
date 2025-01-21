@@ -110,7 +110,7 @@ class GoogleSheetsIntegration {
 
 		return HttpQuery::from_array( [
 			'data_source' => $data_source,
-			'endpoint' => $data_source->get_endpoint() . '/values/' . $sheet['name'],
+			'endpoint' => $data_source->get_endpoint() . '/values/' . rawurlencode( $sheet['name'] ),
 			'input_schema' => $input_schema,
 			'output_schema' => $output_schema,
 			'preprocess_response' => function ( mixed $response_data, array $input_variables ): array {
@@ -146,7 +146,7 @@ class GoogleSheetsIntegration {
 
 		return HttpQuery::from_array( [
 			'data_source' => $data_source,
-			'endpoint' => $data_source->get_endpoint() . '/values/' . $sheet['name'],
+			'endpoint' => $data_source->get_endpoint() . '/values/' . rawurlencode( $sheet['name'] ),
 			'input_schema' => [],
 			'output_schema' => $output_schema,
 			'preprocess_response' => function ( mixed $response_data ): array {

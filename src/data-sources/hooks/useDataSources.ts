@@ -17,6 +17,12 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 		useDispatch< NoticeStoreActions >( noticesStore );
 	const { goToMainScreen } = useSettingsContext();
 
+	const canUseDisplayName = ( displayName: string, uuid: string ) =>
+		displayName &&
+		dataSources.every(
+			source => source.uuid === uuid || source.service_config.display_name !== displayName
+		);
+
 	async function fetchDataSources() {
 		setLoadingDataSources( true );
 		try {
@@ -175,6 +181,7 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 
 	return {
 		addDataSource,
+		canUseDisplayName,
 		dataSources,
 		deleteDataSource,
 		deleteMultipleDataSources,

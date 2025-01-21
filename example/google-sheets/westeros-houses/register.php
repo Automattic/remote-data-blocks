@@ -5,12 +5,16 @@ namespace RemoteDataBlocks\Example\GoogleSheets\WesterosHouses;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Integrations\Google\Sheets\GoogleSheetsDataSource;
 
-function register_westeros_houses_block(): void {
-	$credentials = json_decode( base64_decode( \RemoteDataBlocks\Example\get_access_token( 'google_sheets_westeros_houses' ) ), true );
-
-	if ( empty( $credentials ) ) {
+function register_google_sheets_westeros_houses_blocks(): void {
+	if ( ! defined( 'EXAMPLE_GOOGLE_SHEETS_WESTEROS_HOUSES_ENCODED_CREDENTIALS' ) ) {
 		return;
 	}
+
+	$encoded_credentials = constant( 'EXAMPLE_GOOGLE_SHEETS_WESTEROS_HOUSES_ENCODED_CREDENTIALS' );
+	$spreadsheet_id = '1EHdQg53Doz0B-ImrGz_hTleYeSvkVIk_NSJCOM1FQk0'; // Spreadsheet ID
+	$sheet_id = '1'; // Sheet ID / GID
+	$sheet_name = 'Houses';
+	$credentials = json_decode( base64_decode( $encoded_credentials ), true );
 
 	$westeros_houses_data_source = GoogleSheetsDataSource::from_array( [
 		'service_config' => [
@@ -18,12 +22,12 @@ function register_westeros_houses_block(): void {
 			'credentials' => $credentials,
 			'display_name' => 'Westeros Houses',
 			'spreadsheet' => [
-				'id' => '1EHdQg53Doz0B-ImrGz_hTleYeSvkVIk_NSJCOM1FQk0',
+				'id' => $spreadsheet_id,
 			],
 			'sheets' => [
 				[
-					'id' => '1',
-					'name' => 'Houses',
+					'id' => $sheet_id,
+					'name' => $sheet_name,
 					'output_query_mappings' => [],
 				],
 			],
@@ -32,7 +36,7 @@ function register_westeros_houses_block(): void {
 
 	$list_westeros_houses_query = HttpQuery::from_array( [
 		'data_source' => $westeros_houses_data_source,
-		'endpoint' => $westeros_houses_data_source->get_endpoint() . '/values/Houses',
+		'endpoint' => sprintf( '%s/values/%s', $westeros_houses_data_source->get_endpoint(), $sheet_name ),
 		'output_schema' => [
 			'is_collection' => true,
 			'path' => '$.values[*]',
@@ -76,7 +80,7 @@ function register_westeros_houses_block(): void {
 
 	$get_westeros_houses_query = HttpQuery::from_array( [
 		'data_source' => $westeros_houses_data_source,
-		'endpoint' => $westeros_houses_data_source->get_endpoint() . '/values/Houses',
+		'endpoint' => sprintf( '%s/values/%s', $westeros_houses_data_source->get_endpoint(), $sheet_name ),
 		'input_schema' => [
 			'row_id' => [
 				'name' => 'Row ID',
@@ -148,15 +152,22 @@ function register_westeros_houses_block(): void {
 			'query' => $list_westeros_houses_query,
 		],
 	] );
+}
+add_action( 'init', __NAMESPACE__ . '\\register_google_sheets_westeros_houses_blocks' );
 
-	// A page with slug "westeros-houses" must be created.
+function handle_westeros_house_override(): void {
+	// This rewrite targets a page with the slug "westeros-houses", which must be created.
 	add_rewrite_rule( '^westeros-houses/([^/]+)/?', 'index.php?pagename=westeros-houses&row_id=$matches[1]', 'top' );
 
+	// Add the "file_path" query variable to the list of recognized query variables.
 	add_filter( 'query_vars', function ( array $query_vars ): array {
 		$query_vars[] = 'row_id';
 		return $query_vars;
 	}, 10, 1 );
 
+	// Filter the query input variables to inject the "row_id" value from the
+	// URL. Note that the override must match the override name defined in the
+	// block registration above.
 	add_filter( 'remote_data_blocks_query_input_variables', function ( array $input_variables, array $enabled_overrides ): array {
 		if ( true === in_array( 'westeros_house', $enabled_overrides, true ) ) {
 			$row_id = get_query_var( 'row_id' );
@@ -169,5 +180,4 @@ function register_westeros_houses_block(): void {
 		return $input_variables;
 	}, 10, 2 );
 }
-
-add_action( 'init', __NAMESPACE__ . '\\register_westeros_houses_block' );
+add_action( 'init', __NAMESPACE__ . '\\handle_westeros_house_override' );

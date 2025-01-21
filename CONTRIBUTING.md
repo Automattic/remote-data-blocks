@@ -6,7 +6,7 @@
 
 - Contributors should review the WordPress [PHP coding standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/php/), [JavaScript coding standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/javascript/), and [accessibility coding standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/accessibility/). Accessibility in particular should be top of mind and thoroughly tested.
 
-- You maintain copyright over any contribution you make. By submitting a pull request, you agree to release that code under [our license](LICENSE).
+- You maintain copyright over any contribution you make. By submitting a pull request, you agree to release that code under [our license](https://github.com/Automattic/remote-data-blocks/blob/trunk/LICENSE).
 
 - When contributing to this repository, please first discuss the change you wish to make via an issue or discussion.
 

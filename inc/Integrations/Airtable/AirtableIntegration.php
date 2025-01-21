@@ -77,7 +77,7 @@ class AirtableIntegration {
 		}
 	}
 
-	private static function get_query( AirtableDataSource $data_source, array $table ): HttpQuery|WP_Error {
+	public static function get_query( AirtableDataSource $data_source, array $table ): HttpQuery|WP_Error {
 		$input_schema = [
 			'record_id' => [
 				'name' => 'Record ID',
@@ -115,7 +115,7 @@ class AirtableIntegration {
 		] );
 	}
 
-	private static function get_list_query( AirtableDataSource $data_source, array $table ): HttpQuery|WP_Error {
+	public static function get_list_query( AirtableDataSource $data_source, array $table ): HttpQuery|WP_Error {
 		$output_schema = [
 			'is_collection' => true,
 			'path' => '$.records[*]',

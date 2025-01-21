@@ -79,6 +79,7 @@ export function ItemList( props: ItemListProps ) {
 				id: field,
 				label: field ?? '',
 				enableGlobalSearch: true,
+				getValue: ( { item }: { item: RemoteDataResult } ) => item[ field ] as string,
 				render:
 					field === media
 						? ( { item }: { item: RemoteDataResult } ) => {

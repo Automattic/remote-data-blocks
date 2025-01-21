@@ -223,7 +223,7 @@ const DataSourceList = () => {
 						service: item.service,
 						service_config: {
 							...item.service_config,
-							display_name: item.service_config.display_name + __( ' copy ', 'remote-data-blocks' ),
+							display_name: item.service_config.display_name + __( ' copy', 'remote-data-blocks' ),
 						} as DataSourceConfig[ 'service_config' ],
 					};
 					addDataSource( duplicatedSource as DataSourceConfig )

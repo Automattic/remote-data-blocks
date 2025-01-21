@@ -4,6 +4,7 @@ For plugin overview and getting started guide, see [README](../README.md).
 
 ## Table of Contents
 
+- [Quickstart](quickstart.md)
 - [Core Concepts](concepts/index.md)
 
   - [Block Bindings](concepts/block-bindings.md)
@@ -11,19 +12,21 @@ For plugin overview and getting started guide, see [README](../README.md).
 
 - [Extending](extending/index.md)
 
-  - [Block Patterns](extending/block-patterns.md)
-  - [Block Registration](extending/block-registration.md)
   - [Data Source](extending/data-source.md)
-  - [Hooks](extending/hooks.md)
-  - [Overrides](extending/overrides.md)
   - [Query](extending/query.md)
+  - [Block Registration](extending/block-registration.md)
+  - [Block Patterns](extending/block-patterns.md)
+  - [Overrides](extending/overrides.md)
+  - [Hooks](extending/hooks.md)
   - [Query Runner](extending/query-runner.md)
 
-- [Workflows](workflows/index.md)
+- [Tutorials](tutorials/index.md)
 
-  - [Airtable Integration](workflows/airtable.md)
-  - [Google Sheets Integration](workflows/google-sheets.md)
-  - [REST API Integration](workflows/rest-api.md)
+  - [Airtable](tutorials/airtable.md)
+  - [Google Sheets integration](tutorials/google-sheets.md)
+  - [HTTP](tutorials/http.md)
+  - [Salesforce Commerce B2C](tutorials/salesforce-commerce.md)
+  - [Shopify](tutorials/shopify.md)
 
 - [Development](local-development.md)
 - [Troubleshooting](troubleshooting.md)

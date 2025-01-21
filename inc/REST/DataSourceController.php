@@ -127,7 +127,7 @@ class DataSourceController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function create_item( $request ) {
+	public function create_item( mixed $request ): WP_REST_Response|WP_Error {
 		$data_source_properties = $request->get_json_params();
 		$item = DataSourceCrud::create_config( $data_source_properties );
 
@@ -145,7 +145,7 @@ class DataSourceController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function get_items( $request ) {
+	public function get_items( mixed $request ): WP_REST_Response|WP_Error {
 		$code_configured_data_sources = ConfigStore::get_data_sources_as_array();
 		$ui_configured_data_sources = DataSourceCrud::get_configs();
 
@@ -190,7 +190,7 @@ class DataSourceController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function get_item( $request ) {
+	public function get_item( mixed $request ): WP_REST_Response|WP_Error {
 		$response = DataSourceCrud::get_config_by_uuid( $request->get_param( 'uuid' ) );
 		return rest_ensure_response( $response );
 	}
@@ -201,7 +201,7 @@ class DataSourceController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function update_item( $request ) {
+	public function update_item( mixed $request ): WP_REST_Response|WP_Error {
 		$data_source_properties = $request->get_json_params();
 		$item = DataSourceCrud::update_config_by_uuid( $request->get_param( 'uuid' ), $data_source_properties );
 
@@ -223,7 +223,7 @@ class DataSourceController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function delete_item( $request ) {
+	public function delete_item( mixed $request ): WP_REST_Response|WP_Error {
 		$data_source_properties = $request->get_json_params();
 		$result = DataSourceCrud::delete_config_by_uuid( $request->get_param( 'uuid' ) );
 
@@ -242,7 +242,7 @@ class DataSourceController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function delete_multiple_items( $request ) {
+	public function delete_multiple_items( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$uuids = explode( ',', $request->get_param( 'uuids' ) );
 
 		if ( empty( $uuids ) ) {
@@ -281,27 +281,27 @@ class DataSourceController extends WP_REST_Controller {
 
 	// These all require manage_options for now, but we can adjust as needed
 
-	public function get_item_permissions_check( $request ) {
+	public function get_item_permissions_check( mixed $request ): bool|WP_Error {
 		return current_user_can( 'manage_options' );
 	}
 
-	public function get_items_permissions_check( $request ) {
+	public function get_items_permissions_check( mixed $request ): bool|WP_Error {
 		return current_user_can( 'manage_options' );
 	}
 
-	public function create_item_permissions_check( $request ) {
+	public function create_item_permissions_check( mixed $request ): bool|WP_Error {
 		return current_user_can( 'manage_options' );
 	}
 
-	public function update_item_permissions_check( $request ) {
+	public function update_item_permissions_check( mixed $request ): bool|WP_Error {
 		return current_user_can( 'manage_options' );
 	}
 
-	public function delete_item_permissions_check( $request ) {
+	public function delete_item_permissions_check( mixed $request ): bool|WP_Error {
 		return current_user_can( 'manage_options' );
 	}
 
-	private function get_data_source_interaction_track_props( $data_source_properties ): array {
+	private function get_data_source_interaction_track_props( array $data_source_properties ): array {
 		$props = [];
 
 		if ( 'generic-http' === $data_source_properties['service'] ) {

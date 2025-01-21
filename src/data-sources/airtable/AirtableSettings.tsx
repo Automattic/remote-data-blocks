@@ -80,6 +80,8 @@ export const AirtableSettings = ( {
 
 	const onTokenInputChange: InputChangeCallback = ( token: string | undefined ) => {
 		handleOnChange( 'access_token', token ?? '' );
+		handleOnChange( 'tables', [] );
+		handleOnChange( 'base', undefined );
 	};
 
 	const onBaseChange = ( value: string, extra?: { event?: ChangeEvent< HTMLSelectElement > } ) => {
@@ -176,6 +178,7 @@ export const AirtableSettings = ( {
 					heading={ { icon: AirtableIconWithText, width: '113.81px', height: '25px' } }
 					inputIcon={ AirtableIcon }
 					canProceed={ shouldAllowContinue }
+					uuid={ uuid }
 				>
 					<PasswordInputControl
 						label={ __( 'Access Token', 'remote-data-blocks' ) }

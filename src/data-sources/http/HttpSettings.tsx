@@ -76,6 +76,7 @@ export const HttpSettings = ( { mode, uuid, config }: SettingsComponentProps< Ht
 				handleOnChange={ handleOnChange }
 				heading={ { label: __( 'Connect HTTP Data Source', 'remote-data-blocks' ) } }
 				inputIcon={ HttpIcon }
+				uuid={ uuid }
 			>
 				<TextControl
 					type="url"
