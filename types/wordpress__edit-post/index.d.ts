@@ -8,4 +8,8 @@ declare module '@wordpress/edit-post' {
 	interface EditPostStoreActions {
 		openGeneralSidebar: ( name: string? ) => Promise< void >;
 	}
+
+	interface EditPostStoreSelectors {
+		isEditorSidebarOpened: () => boolean;
+	}
 }

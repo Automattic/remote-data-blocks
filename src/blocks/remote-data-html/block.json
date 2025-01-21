@@ -18,10 +18,7 @@
 	"supports": {
 		"customClassName": false,
 		"className": false,
-		"html": false,
-		"interactivity": {
-			"clientNavigation": true
-		}
+		"html": false
 	},
 	"textdomain": "remote-data-blocks",
 	"editorScript": "file:./index.js",
