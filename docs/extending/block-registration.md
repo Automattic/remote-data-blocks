@@ -93,6 +93,43 @@ Example:
 ],
 ```
 
+#### Search queries
+Search queries must return a collection and must accept a string input variable of `search_terms`. The [Art Institute of Chicago](../../example/rest-api/art-institute/README.md) example looks like this:
+
+```php
+$search_art_query = HttpQuery::from_array([
+	'data_source' => $aic_data_source,
+	'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
+		$query = $input_variables['search_terms'];
+		$endpoint = $aic_data_source->get_endpoint() . '/search';
+
+		return add_query_arg( [ 'q' => $query ], $endpoint );
+	},
+	'input_schema' => [
+		'search_terms' => [
+			'name' => 'Search Terms',
+			'type' => 'string',
+		],
+	],
+	'output_schema' => [
+		'is_collection' => true,
+		'path' => '$.data[*]',
+		'type' => [
+			'id' => [
+				'name' => 'Art ID',
+				'type' => 'id',
+			],
+			'title' => [
+				'name' => 'Title',
+				'type' => 'string',
+			],
+		],
+	],
+]);
+```
+
+Here you can see the input variable of `search_terms` is used in the endpoint method to populate a query string. You can read more about [queries](./query.md) and how to construct them.
+
 ### `overrides`: array (optional)
 
 [Overrides](./overrides.md) are used to customize the behavior of the block on a per-block basis.
