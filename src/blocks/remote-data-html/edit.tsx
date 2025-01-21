@@ -5,21 +5,14 @@ import {
 	transformStyles,
 	store as blockEditorStore,
 	EditorStyle,
-	BlockEditorStoreActions,
 	BlockEditorStoreSelectors,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { BlockEditProps } from '@wordpress/blocks';
-import { SandBox, Placeholder, Button } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	store as editPostStore,
-	EditPostStoreActions,
-	EditPostStoreSelectors,
-} from '@wordpress/edit-post';
+import { SandBox, Placeholder } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { useEffect, useMemo } from '@wordpress/element';
 
-import { useRemoteDataContext } from '@/blocks/remote-data-container/hooks/useRemoteDataContext';
 import { __ } from '@/utils/i18n';
 
 import './editor.scss';
@@ -43,8 +36,7 @@ const DEFAULT_STYLES = `
 export default function RemoteDataHTML(
 	props: BlockEditProps< RemoteDataInnerBlockAttributes >
 ): JSX.Element {
-	const { attributes, setAttributes, context, isSelected, clientId } = props;
-	const { remoteData } = useRemoteDataContext( context );
+	const { attributes, setAttributes, isSelected } = props;
 	const blockProps = useBlockProps();
 
 	// Pass the content provided by bindings to save() via setAttributes with changed content
@@ -67,15 +59,14 @@ export default function RemoteDataHTML(
 	);
 
 	const hasBindings = attributes?.metadata?.bindings?.content !== undefined;
-	const hasRemoteDataContext = remoteData !== undefined;
 
-	if ( ! hasBindings || ! hasRemoteDataContext ) {
+	const contentString = content?.toString() ?? '';
+	const hasContent = contentString.length > 0;
+
+	if ( ! hasBindings && ! hasContent ) {
 		return (
 			<div { ...blockProps }>
-				<PlaceholderInstructions
-					clientId={ clientId }
-					hasRemoteDataContext={ hasRemoteDataContext }
-				/>
+				<PlaceholderInstructions />
 			</div>
 		);
 	}
@@ -83,7 +74,7 @@ export default function RemoteDataHTML(
 	return (
 		<div { ...blockProps }>
 			<SandBox
-				html={ attributes.content?.toString() }
+				html={ contentString }
 				styles={ styles }
 				title={ __( 'Remote Data Block HTML Preview' ) }
 				tabIndex={ -1 }
@@ -96,39 +87,13 @@ export default function RemoteDataHTML(
 	);
 }
 
-interface PlaceholderInstructionsProps {
-	clientId: string;
-	hasRemoteDataContext: boolean;
-}
-
-const PlaceholderInstructions = ( {
-	clientId,
-	hasRemoteDataContext,
-}: PlaceholderInstructionsProps ) => {
-	const { isEditorSidebarOpened } = useSelect< EditPostStoreSelectors >( editPostStore );
-	const { openGeneralSidebar } = useDispatch< EditPostStoreActions >( editPostStore );
-	const { selectBlock } = useDispatch< BlockEditorStoreActions >( blockEditorStore );
-
-	const openSidebar = async () => {
-		await selectBlock( clientId );
-
-		if ( ! isEditorSidebarOpened() ) {
-			await openGeneralSidebar( 'edit-post/block' );
-		}
-	};
-
+const PlaceholderInstructions = () => {
 	return (
 		<Placeholder
 			label={ __( 'Remote HTML' ) }
 			instructions={ __(
 				'Place this block in a remote data container and bind to an attribute to view HTML.'
 			) }
-		>
-			{ hasRemoteDataContext && (
-				<Button variant="primary" onClick={ () => void openSidebar() }>
-					{ __( 'Select a field' ) }
-				</Button>
-			) }
-		</Placeholder>
+		/>
 	);
 };
