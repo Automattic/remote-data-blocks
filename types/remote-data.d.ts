@@ -47,16 +47,20 @@ interface RemoteDataBlockBinding {
 	args: RemoteDataBlockBindingArgs;
 }
 
+interface StringSeriablizable {
+	toString(): string;
+}
+
 interface RemoteDataInnerBlockAttributes {
-	alt?: string | RichTextData;
+	alt?: string | StringSeriablizable;
 	className?: string;
-	content?: string | RichTextData;
+	content?: string | StringSeriablizable;
 	index?: number;
 	metadata?: {
 		bindings?: Record< string, RemoteDataBlockBinding >;
 		name?: string;
 	};
-	url?: string | RichTextData;
+	url?: string | StringSeriablizable;
 }
 
 interface RemoteDataApiRequest {
