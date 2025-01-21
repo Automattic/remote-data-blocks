@@ -2,7 +2,7 @@ import { BlockSaveProps } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 
 interface RemoteDataHTMLSaveAttributes {
-	content?: string;
+	content?: string | StringSeriablizable;
 }
 
 export default function save( props: BlockSaveProps< RemoteDataHTMLSaveAttributes > ) {
@@ -10,5 +10,5 @@ export default function save( props: BlockSaveProps< RemoteDataHTMLSaveAttribute
 
 	const content = attributes.content ?? '';
 
-	return <RawHTML>{ content }</RawHTML>;
+	return <RawHTML>{ content?.toString() }</RawHTML>;
 }

@@ -83,7 +83,7 @@ export default function RemoteDataHTML(
 	return (
 		<div { ...blockProps }>
 			<SandBox
-				html={ attributes.content }
+				html={ attributes.content?.toString() }
 				styles={ styles }
 				title={ __( 'Remote Data Block HTML Preview' ) }
 				tabIndex={ -1 }
