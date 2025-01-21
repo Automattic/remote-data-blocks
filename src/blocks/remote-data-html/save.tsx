@@ -5,7 +5,7 @@ interface RemoteDataHTMLSaveAttributes {
 	content?: string;
 }
 
-export default function save( props: BlockSaveProps<RemoteDataHTMLSaveAttributes> ) {
+export default function save( props: BlockSaveProps< RemoteDataHTMLSaveAttributes > ) {
 	const { attributes } = props;
 
 	const content = attributes.content ?? '';

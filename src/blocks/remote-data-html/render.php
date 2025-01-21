@@ -14,6 +14,7 @@ $source_args = $block->attributes['metadata']['bindings']['content']['args'] ?? 
 	<?php
 	$binding_value = BlockBindings::get_value( $source_args, $block );
 
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- This output is specifically for raw HTML.
 	echo $binding_value;
 	?>
 </div>

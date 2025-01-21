@@ -10,7 +10,6 @@ import {
 } from '@/blocks/remote-data-container/config/constants';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
 import { getBlockDataSourceType } from '@/utils/localized-block-data';
-import { applyFilters } from '@wordpress/hooks';
 
 interface BlockBindingFieldControlProps {
 	availableBindings: AvailableBindings;

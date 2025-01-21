@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo } from '@wordpress/element';
 import {
 	transformStyles,
 	store as blockEditorStore,
@@ -10,12 +9,18 @@ import {
 	BlockEditorStoreSelectors,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { store as editPostStore, EditPostStoreActions, EditPostStoreSelectors } from '@wordpress/edit-post';
+import { BlockEditProps } from '@wordpress/blocks';
 import { SandBox, Placeholder, Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __ } from '@/utils/i18n';
+import {
+	store as editPostStore,
+	EditPostStoreActions,
+	EditPostStoreSelectors,
+} from '@wordpress/edit-post';
+import { useEffect, useMemo } from '@wordpress/element';
+
 import { useRemoteDataContext } from '@/blocks/remote-data-container/hooks/useRemoteDataContext';
-import { BlockEditProps } from '@wordpress/blocks';
+import { __ } from '@/utils/i18n';
 
 import './editor.scss';
 
@@ -35,15 +40,18 @@ const DEFAULT_STYLES = `
 	}
 `;
 
-export default function RemoteDataHTML( props: BlockEditProps< RemoteDataInnerBlockAttributes > ): JSX.Element {
+export default function RemoteDataHTML(
+	props: BlockEditProps< RemoteDataInnerBlockAttributes >
+): JSX.Element {
 	const { attributes, setAttributes, context, isSelected, clientId } = props;
 	const { remoteData } = useRemoteDataContext( context );
+	const blockProps = useBlockProps();
 
 	// Pass the content provided by bindings to save() via setAttributes with changed content
 	const { content } = attributes;
-	useEffect(() => {
+	useEffect( () => {
 		setAttributes( { content } );
-	}, [ content ]);
+	}, [ content ] );
 
 	const settingStyles = useSelect< BlockEditorStoreSelectors, EditorStyle[] >(
 		select => select( blockEditorStore ).getSettings().styles,
@@ -53,9 +61,7 @@ export default function RemoteDataHTML( props: BlockEditProps< RemoteDataInnerBl
 	const styles = useMemo(
 		() => [
 			DEFAULT_STYLES,
-			...transformStyles(
-				( settingStyles ?? [] ).filter( ( style: EditorStyle ) => style.css)
-			),
+			...transformStyles( ( settingStyles ?? [] ).filter( ( style: EditorStyle ) => style.css ) ),
 		],
 		[ settingStyles ]
 	);
@@ -64,23 +70,28 @@ export default function RemoteDataHTML( props: BlockEditProps< RemoteDataInnerBl
 	const hasRemoteDataContext = remoteData !== undefined;
 
 	if ( ! hasBindings || ! hasRemoteDataContext ) {
-		return <div {...useBlockProps()}>
-			<PlaceholderInstructions clientId={clientId} hasRemoteDataContext={hasRemoteDataContext} />
-		</div>;
+		return (
+			<div { ...blockProps }>
+				<PlaceholderInstructions
+					clientId={ clientId }
+					hasRemoteDataContext={ hasRemoteDataContext }
+				/>
+			</div>
+		);
 	}
 
 	return (
-		<div {...useBlockProps()}>
+		<div { ...blockProps }>
 			<SandBox
 				html={ attributes.content }
 				styles={ styles }
 				title={ __( 'Remote Data Block HTML Preview' ) }
 				tabIndex={ -1 }
 			/>
-			{ /* Similar to core/html, add an overlay register click events. */
-			! isSelected && (
-				<div className="remote-data-block-html-overlay"></div>
-			) }
+			{
+				/* Similar to core/html, add an overlay register click events. */
+				! isSelected && <div className="remote-data-block-html-overlay"></div>
+			}
 		</div>
 	);
 }
@@ -90,23 +101,34 @@ interface PlaceholderInstructionsProps {
 	hasRemoteDataContext: boolean;
 }
 
-const PlaceholderInstructions = ( { clientId, hasRemoteDataContext }: PlaceholderInstructionsProps ) => {
+const PlaceholderInstructions = ( {
+	clientId,
+	hasRemoteDataContext,
+}: PlaceholderInstructionsProps ) => {
 	const { isEditorSidebarOpened } = useSelect< EditPostStoreSelectors >( editPostStore );
-	const { openGeneralSidebar } = useDispatch<EditPostStoreActions> ( editPostStore );
-	const { selectBlock } = useDispatch<BlockEditorStoreActions>( blockEditorStore );
+	const { openGeneralSidebar } = useDispatch< EditPostStoreActions >( editPostStore );
+	const { selectBlock } = useDispatch< BlockEditorStoreActions >( blockEditorStore );
 
-	const openSidebar = () => {
-		selectBlock( clientId );
+	const openSidebar = async () => {
+		await selectBlock( clientId );
 
 		if ( ! isEditorSidebarOpened() ) {
-			openGeneralSidebar( 'edit-post/block' );
+			await openGeneralSidebar( 'edit-post/block' );
 		}
 	};
 
-	return <Placeholder
-		label={__('Remote HTML')}
-		instructions={__('Place this block in a remote data container and bind to an attribute to view HTML.')}
-	>
-		{ hasRemoteDataContext && <Button variant='primary' onClick={openSidebar}>{ __('Select a field') }</Button> }
-	</Placeholder>;
-}
+	return (
+		<Placeholder
+			label={ __( 'Remote HTML' ) }
+			instructions={ __(
+				'Place this block in a remote data container and bind to an attribute to view HTML.'
+			) }
+		>
+			{ hasRemoteDataContext && (
+				<Button variant="primary" onClick={ openSidebar }>
+					{ __( 'Select a field' ) }
+				</Button>
+			) }
+		</Placeholder>
+	);
+};
