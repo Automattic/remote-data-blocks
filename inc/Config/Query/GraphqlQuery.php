@@ -9,8 +9,8 @@ defined( 'ABSPATH' ) || exit();
 /**
  * GraphqlQuery class
  *
- * Base class used to define a Remote Data Query. This class defines a
- * composable query that allows it to be composed with another query or a block.
+ * This class can be used to implement most GraphQL queries. It extends the
+ * HttpQuery class to modify its behavior.
  *
  */
 class GraphqlQuery extends HttpQuery {
@@ -19,7 +19,7 @@ class GraphqlQuery extends HttpQuery {
 	}
 
 	/**
-	 * Convert the query and variables into a GraphQL request body.
+	 * Assemble the GraphQL query and variables into a GraphQL request body.
 	 */
 	public function get_request_body( array $input_variables ): array {
 		return [

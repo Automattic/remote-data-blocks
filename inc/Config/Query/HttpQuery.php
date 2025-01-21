@@ -13,12 +13,12 @@ defined( 'ABSPATH' ) || exit();
 /**
  * HttpQuery class
  *
- * Base class used to define a Remote Data Blocks Query. This class defines a
- * composable query that allows it to be composed with another query or a block.
+ * This class can be used to implement most HTTP queries.
  */
 class HttpQuery extends ArraySerializable implements HttpQueryInterface {
 	/**
-	 * Override this method to provide a custom execution implementation.
+	 * Execute the query with the provided input variables. Execution can be
+	 * customized by providing a custom query runner.
 	 */
 	public function execute( array $input_variables ): array|WP_Error {
 		$query_runner = $this->config['query_runner'] ?? new QueryRunner();
@@ -27,8 +27,10 @@ class HttpQuery extends ArraySerializable implements HttpQueryInterface {
 	}
 
 	/**
-	 * Override this method to define the cache object TTL for this query. Return
-	 * -1 to disable caching. Return null to use the default cache TTL.
+	 * Define the cache object TTL for the current query execution's responses:
+	 * - Return a positive integer to set a custom TTL in seconds.
+	 * - Return -1 to disable caching.
+	 * - Return null to use the global default cache TTL (60 seconds).
 	 *
 	 * @return int|null The cache object TTL in seconds.
 	 */
@@ -56,31 +58,37 @@ class HttpQuery extends ArraySerializable implements HttpQueryInterface {
 	}
 
 	/**
-	 * Override this method to specify a custom endpoint for this query.
+	 * Get the HTTP endpoint for the current query execution.
 	 */
 	public function get_endpoint( array $input_variables ): string {
 		return $this->get_or_call_from_config( 'endpoint', $input_variables ) ?? $this->get_data_source()->get_endpoint();
 	}
 
 	/**
-	 * Override this method to specify a custom image URL for this query that will
-	 * represent it in the UI.
+	 * Get the image URL that will represent this query in the UI. Return null to
+	 * use the default image.
 	 */
 	public function get_image_url(): string|null {
 		return $this->config['image_url'] ?? $this->get_data_source()->get_image_url();
 	}
 
+	/**
+	 * Get the input schema for this query.
+	 */
 	public function get_input_schema(): array {
 		return $this->config['input_schema'] ?? [];
 	}
 
+	/**
+	 * Get the output schema for this query.
+	 */
 	public function get_output_schema(): array {
 		return $this->config['output_schema'];
 	}
 
 	/**
-	 * Override this method to define a request body for this query. A non-null
-	 * result will be converted to JSON using `wp_json_encode`.
+	 * Get the request body for the current query execution. Any non-null result
+	 * will be converted to JSON using `wp_json_encode`.
 	 *
 	 * @param array $input_variables The input variables for this query.
 	 */
@@ -89,7 +97,7 @@ class HttpQuery extends ArraySerializable implements HttpQueryInterface {
 	}
 
 	/**
-	 * Override this method to specify custom request headers for this query.
+	 * Get the request headers for the current query execution.
 	 *
 	 * @param array $input_variables The input variables for this query.
 	 */
@@ -98,7 +106,7 @@ class HttpQuery extends ArraySerializable implements HttpQueryInterface {
 	}
 
 	/**
-	 * Override this method to define a request method for this query.
+	 * Get the request method for this query.
 	 */
 	public function get_request_method(): string {
 		return $this->config['request_method'] ?? 'GET';
@@ -112,8 +120,7 @@ class HttpQuery extends ArraySerializable implements HttpQueryInterface {
 	}
 
 	/**
-	 * Override this method to preprocess the response data before it is passed to
-	 * the response parser.
+	 * Preprocess the response data before it is passed to the response parser.
 	 *
 	 * @param mixed $response_data The raw deserialized response data.
 	 * @param array $input_variables The input variables for this query.
