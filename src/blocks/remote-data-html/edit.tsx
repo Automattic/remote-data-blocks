@@ -51,7 +51,7 @@ export default function RemoteDataHTML(
 	const { content } = attributes;
 	useEffect( () => {
 		setAttributes( { content } );
-	}, [ content ] );
+	}, [ content, setAttributes ] );
 
 	const settingStyles = useSelect< BlockEditorStoreSelectors, EditorStyle[] >(
 		select => select( blockEditorStore ).getSettings().styles,
@@ -125,7 +125,7 @@ const PlaceholderInstructions = ( {
 			) }
 		>
 			{ hasRemoteDataContext && (
-				<Button variant="primary" onClick={ openSidebar }>
+				<Button variant="primary" onClick={ () => void openSidebar() }>
 					{ __( 'Select a field' ) }
 				</Button>
 			) }
