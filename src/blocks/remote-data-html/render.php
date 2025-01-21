@@ -21,6 +21,11 @@ $source_args = $block->attributes['metadata']['bindings']['content']['args'] ?? 
 	if ( null === $binding_value ) {
 		// Similar to actual data bindings, if the binding value is null,
 		// we'll use the default stored in the block markup.
+
+		/**
+		 * @psalm-suppress UndefinedGlobalVariable
+		 * $content is provided by WordPress for rendering, see header comments
+		 */
 		$binding_value = $content;
 	}
 
