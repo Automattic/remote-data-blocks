@@ -129,24 +129,22 @@ class HttpClient {
 	 * @return bool Whether the request should be retried.
 	 */
 	public static function retry_decider( int $retries, RequestInterface $request, ?ResponseInterface $response = null, ?Exception $exception = null ): bool {
+		// Exceeding max retries is not overrideable.
 		if ( $retries >= self::MAX_RETRIES ) {
 			return false;
 		}
 
-		if ( $response && $response->getStatusCode() < 500 ) {
-			return false;
-		}
+		$should_retry = false;
 
 		if ( $response && $response->getStatusCode() >= 500 ) {
-			return true;
+			$should_retry = true;
 		}
 
 		if ( $exception ) {
-			$retry_on_exception = $exception instanceof ConnectException;
-			return apply_filters( 'remote_data_blocks_http_client_retry_on_exception', $retry_on_exception, $retries, $request, $response, $exception );
+			$should_retry = $should_retry || $exception instanceof ConnectException;
 		}
 
-		return apply_filters( 'remote_data_blocks_http_client_retry_decider', false, $retries, $request, $response );
+		return apply_filters( 'remote_data_blocks_http_client_retry_decider', $should_retry, $retries, $request, $response, $exception );
 	}
 
 	/**

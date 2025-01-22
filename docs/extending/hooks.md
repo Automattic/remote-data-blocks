@@ -137,29 +137,14 @@ function custom_response_retry_delay( int $retry_after_ms, int $retries, Respons
 add_filter( 'remote_data_blocks_http_client_retry_delay', 'custom_response_retry_delay', 10, 3 );
 ```
 
-### remote_data_blocks_http_client_retry_on_exception
-
-Filter to determine if a retry should happen on exception, by default connection exceptions will be retried. The Remote Data Blocks Plugin uses the [Guzzle](https://github.com/guzzle/guzzle) HTTP client. You can read about the request, response, and exception interfaces in their [documentation](https://docs.guzzlephp.org/en/stable/).
-
-```php
-function custom_response_retry_on_exception( bool $retry_on_exception, int $retries, RequestInterface $request, ResponseInterface $response, Exception $exception ): bool {
-	// Also retry when the server is a teapot.
-	if ($response->getStatusCode() == 418) {
-		return true;
-	}
-	return $retry_on_exception;
-}
-add_filter( 'remote_data_blocks_http_client_retry_on_exception', 'custom_response_retry_on_exception', 10, 5 );
-```
-
 ### remote_data_blocks_http_client_retry_decider
 
-Filter the HTTP retry logic when an HTTP request fails (default: `false` as in do not retry). The Remote Data Blocks Plugin uses the [Guzzle](https://github.com/guzzle/guzzle) HTTP client. You can read about the request, response, and exception interfaces in their [documentation](https://docs.guzzlephp.org/en/stable/).
+Filter the default HTTP retry logic when an HTTP request fails or encounters an exception. The Remote Data Blocks Plugin uses the [Guzzle](https://github.com/guzzle/guzzle) HTTP client. You can read about the request, response, and exception interfaces in their [documentation](https://docs.guzzlephp.org/en/stable/).
 
 ```php
-function custom_retry_decider( bool $should_retry, int $retries, RequestInterface $request, ResponseInterface $response ): bool {
-	// Retry on a 429 error if the number of retries is less than 10.
-	if ($retries < 10 && $response->getStatusCode == 429 ) {
+function custom_retry_decider( bool $should_retry, int $retries, RequestInterface $request, ?ResponseInterface $response, ?Exception $exception ): bool {
+	// Retry on a 408 error if the number of retries is less than 5.
+	if ( $retries < 5 && $response && 408 === $response->getStatusCode ) {
 		return true;
 	}
 	return $should_retry;
