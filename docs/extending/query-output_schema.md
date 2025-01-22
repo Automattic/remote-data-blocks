@@ -1,6 +1,6 @@
-# The Query `output_schema` property
+# The Query `output_schema` Property
 
-The `output_schema` property is where your data shape definition happens. It should be created with care and requires updates anytime the incoming response changes.
+The `output_schema` property is where your data shape definition happens. It should be created with care and requires updates any time the incoming response changes.
 
 Unless your API returns a single value, `type` will be constructed of an associative array of nested output schemas that eventually resolve to one of the accepted primitive types:
 
@@ -25,18 +25,18 @@ Using the [Zip Code example](../../example/rest-api/zip-code/README.md), the JSO
 
 ```json
 {
-	"post code": "17057",
-	"country": "United States",
-	"country abbreviation": "US",
-	"places": [
-		{
-			"place name": "Middletown",
-			"longitude": "-76.7331",
-			"state": "Pennsylvania",
-			"state abbreviation": "PA",
-			"latitude": "40.2041"
-		}
-	]
+    "post code": "17057",
+    "country": "United States",
+    "country abbreviation": "US",
+    "places": [
+        {
+            "place name": "Middletown",
+            "longitude": "-76.7331",
+            "state": "Pennsylvania",
+            "state abbreviation": "PA",
+            "latitude": "40.2041"
+        }
+    ]
 }
 ```
 
@@ -98,6 +98,7 @@ An example of collection JSON can be found in the [Chicago Institue of Art examp
 			"timestamp": "2025-01-14T22:26:21-06:00"
 		},
 		{
+
 			"_score": 152.35487,
 			"thumbnail": {
 				"alt_text": "Impressionist painting of woman wearing green dress trying on hats.",
