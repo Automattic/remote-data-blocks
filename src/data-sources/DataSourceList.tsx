@@ -3,7 +3,6 @@ import {
 	Icon,
 	Placeholder,
 } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
 import {
 	Action,
 	DataViews,
@@ -14,7 +13,6 @@ import {
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { info } from '@wordpress/icons';
-import { store as noticesStore, NoticeStoreActions, WPNotice } from '@wordpress/notices';
 
 import CodeSnippet from './components/CodeSnippet';
 import { SUPPORTED_SERVICES, SUPPORTED_SERVICES_LABELS } from './constants';
@@ -29,8 +27,6 @@ import HttpIcon from '@/settings/icons/HttpIcon';
 import { ShopifyIcon } from '@/settings/icons/ShopifyIcon';
 
 const DataSourceList = () => {
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch< NoticeStoreActions >( noticesStore );
 	const {
 		dataSources,
 		loadingDataSources,
@@ -39,6 +35,7 @@ const DataSourceList = () => {
 		fetchDataSources,
 		getDataSourceSnippet,
 		addDataSource,
+		showSnackbar,
 	} = useDataSources();
 	const [ dataSourceToDelete, setDataSourceToDelete ] = useState<
 		DataSourceConfig | DataSourceConfig[] | null
@@ -72,21 +69,6 @@ const DataSourceList = () => {
 		// eslint-disable-next-line security/detect-object-injection
 		return SUPPORTED_SERVICES_LABELS[ service ] ?? 'HTTP';
 	};
-
-	function showSnackbar( type: 'success' | 'error', message: string ): void {
-		const SNACKBAR_OPTIONS: Partial< WPNotice > = {
-			isDismissible: true,
-		};
-
-		switch ( type ) {
-			case 'success':
-				createSuccessNotice( message, { ...SNACKBAR_OPTIONS, icon: '✅' } );
-				break;
-			case 'error':
-				createErrorNotice( message, { ...SNACKBAR_OPTIONS, icon: '❌' } );
-				break;
-		}
-	}
 
 	const getServiceIcon = (
 		service: ( typeof SUPPORTED_SERVICES )[ number ]
