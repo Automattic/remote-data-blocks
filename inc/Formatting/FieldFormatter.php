@@ -19,7 +19,7 @@ final class FieldFormatter {
 	public static function format_currency( mixed $value, ?string $iso_4127_currency_code = null, ?string $locale = null ): string {
 		// The PHP 'intl' extension is not available in WordPress Playground.
 		if ( ! class_exists( 'NumberFormatter' ) || ! function_exists( 'numfmt_create' ) ) {
-			return strval($value);
+			return strval( $value );
 		}
 
 		$format = numfmt_create( $locale ?? get_locale(), NumberFormatter::CURRENCY );
