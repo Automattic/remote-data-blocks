@@ -380,6 +380,48 @@ class QueryRunnerTest extends TestCase {
 		$this->assertSame( $expected_result, $result['results'][0] );
 	}
 
+	public function testQueryRunnerAppliesDefaultInputVariables(): void {
+		$query = MockQuery::from_array( [
+			'data_source' => $this->http_data_source,
+			'endpoint' => function ( array $input_variables ): string {
+				return sprintf(
+					'https://example.com/api?foo=%s&baz=%s',
+					$input_variables['foo'] ?? 'MISSING',
+					$input_variables['baz'] ?? 'MISSING',
+				);
+			},
+			'input_schema' => [
+				'baz' => [
+					'name' => 'Baz',
+					'type' => 'string',
+				],
+				'foo' => [
+					'default_value' => 'bar',
+					'name' => 'Foo',
+					'type' => 'string',
+				],
+			],
+			'query_runner' => new QueryRunner( $this->http_client ),
+		] );
+
+		$response_body = $this->createMock( \Psr\Http\Message\StreamInterface::class );
+		$response = new Response( 200, [], $response_body );
+
+		$this
+			->http_client
+			->expects( $this->exactly( 1 ) )
+			->method( 'request' )
+			->willReturn( $response )
+			->with( 'GET', '/api?foo=bar&baz=MISSING' );
+
+		$result = $query->execute( [] );
+
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'is_collection', $result );
+		$this->assertArrayHasKey( 'metadata', $result );
+		$this->assertArrayHasKey( 'results', $result );
+	}
+
 	public function testQueryRunnerProvidesPaginationData(): void {
 		$query = MockQuery::from_array( [
 			'data_source' => $this->http_data_source,
@@ -401,6 +443,9 @@ class QueryRunnerTest extends TestCase {
 		$result = $query->execute( [] );
 
 		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'is_collection', $result );
+		$this->assertArrayHasKey( 'metadata', $result );
+		$this->assertArrayHasKey( 'results', $result );
 		$this->assertArrayHasKey( 'pagination', $result );
 		$this->assertSame( 100, $result['pagination']['total_items'] );
 		$this->assertSame( 2, $result['pagination']['next_input_variables']['page'] );
