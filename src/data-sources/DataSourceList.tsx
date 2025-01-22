@@ -37,6 +37,7 @@ const DataSourceList = () => {
 		deleteDataSource,
 		deleteMultipleDataSources,
 		fetchDataSources,
+		getDataSourceSnippet,
 		addDataSource,
 	} = useDataSources();
 	const [ dataSourceToDelete, setDataSourceToDelete ] = useState<
@@ -248,8 +249,9 @@ const DataSourceList = () => {
 			isEligible: ( item: DataSourceConfig ) => {
 				return Boolean( item?.uuid );
 			},
-			RenderModal: () => {
-				// TO DO
+			RenderModal: ( { items } ) => {
+				// TODO
+				// const snippets = getDataSourceSnippet( items[ 0 ].uuid );
 				return <CodeSnippet code="" />;
 			},
 			modalHeader: __( 'Data Source Code', 'remote-data-blocks' ),
