@@ -1,6 +1,14 @@
 # Hooks
 
+Hooks are a way for one piece of code to interact/modify another piece of code at specific, pre-defined spots.
+
+There are two types of hooks: Actions and Filters. To use either, you need to write a custom function known as a Callback, and then register it with a WordPress hook for a specific action or filter.
+
+[Read more about Hooks](https://developer.wordpress.org/plugins/hooks/)
+
 ## Actions
+
+Actions allow you to add data or change how WordPress operates. Actions will run at a specific point in the execution of plugin. Callback functions for an Action do not return anything back to the calling Action hook.
 
 ### wpcomvip_log
 
@@ -14,6 +22,8 @@ add_action( 'wpcomvip_log', 'custom_log', 10, 4 );
 ```
 
 ## Filters
+
+Filters give you the ability to change data during the execution of the plugin. Callback functions for Filters will accept a variable, modify it, and return it. They are meant to work in an isolated manner, and should never have side effects such as affecting global variables and output.
 
 ### wpcomvip_log_to_query_monitor
 
@@ -117,8 +127,27 @@ add_filter( 'remote_data_blocks_bypass_cache', '__return_true' );
 
 ### remote_data_blocks_http_client_retry_delay
 
-### remote_data_blocks_http_client_retry_on_exception
+Filter to change the defualt 1 second delapy after an HTTP request fails. The Remote Data Blocks Plugin uses the [Guzzle](https://github.com/guzzle/guzzle) HTTP client. You can read about the response interface in their [documentation](https://docs.guzzlephp.org/en/stable/).
+
+```php
+function custom_response_retry_delay( int $retry_after_ms, int $retries, ?ResponseInterface $response ): int {
+	// Implement a custom exponential backoff strategy.
+	return floor( pow( 1.5, $retries ) * 1000 );
+}
+add_filter( 'remote_data_blocks_http_client_retry_delay', 'custom_response_retry_delay', 10, 3 );
+```
 
 ### remote_data_blocks_http_client_retry_decider
 
-Filter the HTTP retry logic when an HTTP request fails.
+Filter the default HTTP retry logic when an HTTP request fails or encounters an exception. The Remote Data Blocks Plugin uses the [Guzzle](https://github.com/guzzle/guzzle) HTTP client. You can read about the request, response, and exception interfaces in their [documentation](https://docs.guzzlephp.org/en/stable/).
+
+```php
+function custom_retry_decider( bool $should_retry, int $retries, RequestInterface $request, ?ResponseInterface $response, ?Exception $exception ): bool {
+	// Retry on a 408 error if the number of retries is less than 5.
+	if ( $retries < 5 && $response && 408 === $response->getStatusCode ) {
+		return true;
+	}
+	return $should_retry;
+}
+add_filter( 'remote_data_blocks_http_client_retry_decider', 'custom_response_retry_on_exception', 10, 5 );
+```

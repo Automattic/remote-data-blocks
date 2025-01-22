@@ -65,15 +65,15 @@ The human-friendly name of the block. It is also used to construct the block's n
 
 The render query is executed when the block is rendered and fetches the data that will be provided to block bindings. It is an array with the following properties:
 
-- `query`: An instance of [`QueryInterface`](./query.md) that fetches the data.
-- `loop`: A boolean that indicates if the query returns a collection of data. If `true`, the block will be rendered for each item in the collection.
+- `query` (required): An instance of [`QueryInterface`](./query.md) that fetches the data.
+- `loop`: A boolean that indicates if the query returns a collection of data. If `true`, the block will be rendered for each item in the collection. If not provided `false` is the default.
 
 ### `selection_queries`: array (optional)
 
-Selection queries are used to select or curate remote data in the block editor. For example, you may wish to load a list of products and select one for render, or you may want to allow a user to search for a specific item. Selection queries are an array of objects with the following properties:
+Selection queries are used by content creators to select or curate remote data in the block editor. For example, you may wish to provide a list of products to users and allow them to select one to incled, or you may want to allow a user to search for a specific item. Selection queries are an array of objects with the following properties:
 
 - `display_name`: A human-friendly name for the selection query.
-- `query`: An instance of `QueryInterface` that fetches the data.
+- `query` (required): An instance of `QueryInterface` that fetches the data.
 - `type`: A string that determines the type of selection query. Accepted values are currently `list` or `search`.
 
 Example:
@@ -92,6 +92,48 @@ Example:
     ],
 ],
 ```
+
+#### Search queries
+
+Search queries must return a collection and must accept a string input variable of `search_terms`. The [Art Institute of Chicago](../../example/rest-api/art-institute/README.md) example looks like this:
+
+```php
+$search_art_query = HttpQuery::from_array([
+	'data_source' => $aic_data_source,
+	'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
+		$query = $input_variables['search_terms'];
+		$endpoint = $aic_data_source->get_endpoint() . '/search';
+
+		return add_query_arg( [ 'q' => $query ], $endpoint );
+	},
+	'input_schema' => [
+		'search_terms' => [
+			'name' => 'Search Terms',
+			'type' => 'string',
+		],
+	],
+	'output_schema' => [
+		'is_collection' => true,
+		'path' => '$.data[*]',
+		'type' => [
+			'id' => [
+				'name' => 'Art ID',
+				'type' => 'id',
+			],
+			'title' => [
+				'name' => 'Title',
+				'type' => 'string',
+			],
+		],
+	],
+]);
+```
+
+Here you can see the input variable of `search_terms` is used in the endpoint method to populate a query string. You can read more about [queries](./query.md) and how to construct them. End users enter the search term to find the specific item.
+
+![Screenshot showing the search inputin the WordPress Editor](https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/docs/extending/search-input.png)
+
+**Note:** The same search box appears for `list` query types. For this type, the form is only filtering the results returned by the initial list query. For `search` queries, an additional query is made for every search.
 
 ### `overrides`: array (optional)
 
