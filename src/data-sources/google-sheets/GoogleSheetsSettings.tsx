@@ -269,6 +269,11 @@ export const GoogleSheetsSettings = ( {
 					customHelpText={ getSheetsHelpText() }
 				/>
 			</DataSourceForm.Scope>
+			<DataSourceForm.Blocks
+				handleOnChange={ handleOnChange }
+				// TO DO
+				hasEnabledBlocks={ true }
+			/>
 		</DataSourceForm>
 	);
 };

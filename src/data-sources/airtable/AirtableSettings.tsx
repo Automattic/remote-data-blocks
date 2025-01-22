@@ -209,6 +209,11 @@ export const AirtableSettings = ( {
 						onFieldsChange={ onTablesChange }
 					/>
 				</DataSourceForm.Scope>
+				<DataSourceForm.Blocks
+					handleOnChange={ handleOnChange }
+					// TO DO
+					hasEnabledBlocks={ true }
+				/>
 			</DataSourceForm>
 		</>
 	);

@@ -103,6 +103,11 @@ export const SalesforceB2CSettings = ( {
 					value={ state.client_secret }
 				/>
 			</DataSourceForm.Setup>
+			<DataSourceForm.Blocks
+				handleOnChange={ handleOnChange }
+				// TO DO
+				hasEnabledBlocks={ true }
+			/>
 		</DataSourceForm>
 	);
 };

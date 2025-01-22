@@ -92,6 +92,11 @@ export const HttpSettings = ( { mode, uuid, config }: SettingsComponentProps< Ht
 
 				<HttpAuthSettingsInput auth={ state.auth } onChange={ handleAuthOnChange } />
 			</DataSourceForm.Setup>
+			<DataSourceForm.Blocks
+				handleOnChange={ handleOnChange }
+				// TO DO
+				hasEnabledBlocks={ true }
+			/>
 		</DataSourceForm>
 	);
 };

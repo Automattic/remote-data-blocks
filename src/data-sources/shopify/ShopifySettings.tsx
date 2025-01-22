@@ -105,6 +105,11 @@ export const ShopifySettings = ( {
 					__nextHasNoMarginBottom
 				/>
 			</DataSourceForm.Setup>
+			<DataSourceForm.Blocks
+				handleOnChange={ handleOnChange }
+				// TO DO
+				hasEnabledBlocks={ true }
+			/>
 		</DataSourceForm>
 	);
 };
