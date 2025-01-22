@@ -2,9 +2,13 @@
 
 Overrides provide a way to customize the behavior of remote data blocks on a per-block basis. You can use them to modify the underlying query input variables, adjust the query response, or change the caching behavior. Overrides are defined when you register a remote data block and can be enabled or disabled via the block settings in the WordPress editor. 
 
-If you have multiple instnaces of the same remote data block in a piece of content, each instance can have a different number of overrides enabled. The default behavior is no overrides.
+If you have multiple instances of the same remote data block in a piece of content, each instance can have a different number of overrides enabled. The default behavior is no overrides.
 
-The actual implementation of overrides is left to you. Here is an example of an override that modifies the query input variables based on a URL query string variable. You would use this to build a one "single product page" in the WordPress admin that would be able to display any product, based on the product id. The example takes advantage of the [`add_rewrite_rule`](https://developer.wordpress.org/reference/functions/add_rewrite_rule/) method and [`query_vars`](https://developer.wordpress.org/reference/hooks/query_vars/) filter that are built into WordPress.
+Here is an example of an override that modifies usesthe query input variables based on the URL. 
+
+You would use this to build a one "single product page" in the WordPress admin that would be able to display any product, based on the product id at a url like: https://example.com/product/123456
+
+The example takes advantage of the [`add_rewrite_rule`](https://developer.wordpress.org/reference/functions/add_rewrite_rule/) method and [`query_vars`](https://developer.wordpress.org/reference/hooks/query_vars/) filter that are built into WordPress.
 
 ```php
 register_remote_data_block( [
@@ -21,7 +25,7 @@ register_remote_data_block( [
     ],
 ] );
 
-add_rewrite_rule( '^products/([0-9]+)/?', 'index.php?pagename=products&acme_product_id=$matches[1]', 'top' );
+add_rewrite_rule( '^product/([0-9]+)/?', 'index.php?pagename=products&acme_product_id=$matches[1]', 'top' );
 
 add_filter( 'query_vars', function ( array $query_vars ): array {
     $query_vars[] = 'acme_product_id';

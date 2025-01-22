@@ -1,6 +1,6 @@
 # Quickstart
 
-The most basic way to see Remote Data Blocks in action is to launch the plugin in WordPress Playground. 
+The easiest way to see Remote Data Blocks in action is to launch the plugin in WordPress Playground. 
 
 [![Launch in WordPress Playground](https://img.shields.io/badge/Launch%20in%20WordPress%20Playground-DA9A45?style=for-the-badge&logo=wordpress)](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/blueprint.json)
 

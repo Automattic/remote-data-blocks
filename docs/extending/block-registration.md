@@ -1,9 +1,9 @@
-# Block registration
+# Block Registration
 
 Use the `register_remote_data_block` function to register your block and associate it with your query and data source. This example:
 
-1. Creates a data source
-2. Associates the data source with a query
+1. Creates a data source.
+2. Associates the data source with a query.
 3. Defines the output schema of a query, which tells the plugin how to map the query response to blocks.
 4. Registers a remote data block.
 
@@ -11,8 +11,8 @@ We are assuming `https://api.example.com/` returns JSON that has a shape like:
 
 ```json
 {
-	"id": 12345,
-	"title": "An awesome title"
+    "id": 12345,
+    "title": "An awesome title"
 }
 ```
 
@@ -142,3 +142,4 @@ Here you can see the input variable of `search_terms` is used in the endpoint me
 ### `patterns`: array (optional)
 
 [Block patterns](./block-patterns.md) allow you to customize the display of your remote data.
+````

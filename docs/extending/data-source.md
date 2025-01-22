@@ -1,4 +1,4 @@
-# Data source
+# Data Source
 
 A data source defines the basic reusable properties of an API and is used by a [query](query.md) to reduce repeating code with every query. It also helps define how your data source looks in the WordPress admin.
 
