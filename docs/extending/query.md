@@ -6,7 +6,7 @@ A common approach is to define a data source on the settings screen and then com
 
 ## HttpQuery
 
-Most HTTP-powered APIs can be queried using an `HttpQuery`. Here's an example of a query for US ZIP code data. This example assumes you have configured the data source in the UI and have the UUID.
+Most HTTP-powered APIs can be queried using an `HttpQuery`. Here's an example of a query for US ZIP
 
 ```php
 if ( ! defined( 'REMOTE_DATA_BLOCKS_EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID' ) ) {
@@ -39,26 +39,6 @@ $query = HttpQuery::from_array( [
 				'path' => '$["post code"]',
 				'type' => 'string',
 			],
-			'city'     => [
-				'name' => 'City',
-				'path' => '$.places[0]["place name"]',
-				'type' => 'string',
-			],
-			'state'    => [
-				'name' => 'State',
-				'path' => '$.places[0].state',
-				'type' => 'string',
-			],
-		],
-	],
-] );
-```
-
-- The `endpoint` property is a callback function that constructs the query endpoint. In this case, the endpoint is constructed by appending the `zip_code` input variable to the data source endpoint.
-- The `input_schema` property defines the input variables the query expects. For some queries, input variables might be used to construct a request body. In this case, the `zip_code` input variable is used to customize the query endpoint via the `endpoint` callback function.
-- The `output_schema` property defines the output data that will be extracted from the API response. The `path` property uses [JSONPath](https://jsonpath.com/) expressions to allow concise, no-code references to nested data.
-
-This example features a small subset of the customization available for a query; see the full documentation below for details.
 			'city'     => [
 				'name' => 'City',
 				'path' => '$.places[0]["place name"]',
