@@ -15,6 +15,7 @@ class MockQuery extends HttpQuery {
 		return parent::from_array( [
 			'data_source' => $config['data_source'] ?? MockDataSource::from_array(),
 			'display_name' => 'Mock Query',
+			'endpoint' => $config['endpoint'] ?? null,
 			'input_schema' => $config['input_schema'] ?? [],
 			'output_schema' => $config['output_schema'] ?? [ 'type' => 'string' ],
 			'query_runner' => $config['query_runner'] ?? new MockQueryRunner(),
