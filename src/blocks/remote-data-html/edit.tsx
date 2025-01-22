@@ -33,7 +33,7 @@ const DEFAULT_STYLES = `
 	}
 `;
 
-export default function RemoteDataHTML(
+export function Edit(
 	props: BlockEditProps< RemoteDataInnerBlockAttributes >
 ): JSX.Element {
 	const { attributes, setAttributes, isSelected } = props;

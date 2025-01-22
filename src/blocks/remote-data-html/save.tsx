@@ -5,7 +5,7 @@ interface RemoteDataHTMLSaveAttributes {
 	content?: string | StringSeriablizable;
 }
 
-export default function save( props: BlockSaveProps< RemoteDataHTMLSaveAttributes > ) {
+export function Save( props: BlockSaveProps< RemoteDataHTMLSaveAttributes > ) {
 	const { attributes } = props;
 
 	const content = attributes.content ?? '';
