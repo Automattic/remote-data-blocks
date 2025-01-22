@@ -204,7 +204,7 @@ class QueryRunner implements QueryRunnerInterface {
 		}
 
 		// Preprocess the response data.
-		$response_data = $this->preprocess_response( $query, $raw_response_data['response_data'], $input_variables );
+		$response_data = $query->preprocess_response( $raw_response_data['response_data'], $input_variables );
 
 		// Determine if the response data is expected to be a collection.
 		$schema = $query->get_output_schema();
@@ -235,15 +235,5 @@ class QueryRunner implements QueryRunnerInterface {
 	 */
 	protected function deserialize_response( string $raw_response_data, array $input_variables ): mixed {
 		return json_decode( $raw_response_data, true );
-	}
-
-	/**
-	 * Preprocess the response data before it is passed to the response parser.
-	 *
-	 * @param array $response_data The raw response data.
-	 * @return array Preprocessed response. The deserialized response data or (re-)serialized JSON.
-	 */
-	protected function preprocess_response( HttpQueryInterface $query, mixed $response_data, array $input_variables ): mixed {
-		return $query->preprocess_response( $response_data, $input_variables );
 	}
 }
