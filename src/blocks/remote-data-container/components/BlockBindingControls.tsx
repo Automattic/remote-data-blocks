@@ -169,7 +169,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 					<BlockBindingFieldControl
 						availableBindings={ availableBindings }
 						fieldTypes={ HTML_FIELD_TYPES }
-						label="Content"
+						label="Raw HTML"
 						target="content"
 						updateFieldBinding={ updateFieldBinding }
 						value={ contentField }

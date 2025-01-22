@@ -22,7 +22,6 @@ export const IMAGE_URL_FIELD_TYPES = [ 'image_url' ];
 export const TEXT_FIELD_TYPES = [
 	'currency_in_current_locale',
 	'email_address',
-	'html',
 	'integer',
 	'markdown',
 	'number',
