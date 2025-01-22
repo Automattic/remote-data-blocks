@@ -9,12 +9,12 @@ You cannot edit the default pattern, but you can duplicate it and make changes. 
 ```html
 <!-- wp:group {"layout":{"type":"constrained"}} -->
 <div class="wp-block-group">
-    <!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"title"}}}}} -->
-    <h2 class="wp-block-heading"></h2>
-    <!-- /wp:heading -->
-    <!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"description"}}}}} -->
-    <p></p>
-    <!-- /wp:paragraph -->
+	<!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"title"}}}}} -->
+	<h2 class="wp-block-heading"></h2>
+	<!-- /wp:heading -->
+	<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"description"}}}}} -->
+	<p></p>
+	<!-- /wp:paragraph -->
 </div>
 <!-- /wp:group -->
 ```

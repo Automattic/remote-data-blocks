@@ -94,6 +94,7 @@ Example:
 ```
 
 #### Search queries
+
 Search queries must return a collection and must accept a string input variable of `search_terms`. The [Art Institute of Chicago](../../example/rest-api/art-institute/README.md) example looks like this:
 
 ```php

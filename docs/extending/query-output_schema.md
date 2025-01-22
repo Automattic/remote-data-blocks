@@ -68,6 +68,7 @@ You can see how the `type` property contains a nested output schema. The `zip_co
 Where `city_state` uses the genrate function to combine two elements from inside the response. In this case we assume that the first returned place is accurate for the zip. This is a safe assumption for U.S. zip codes.
 
 ## Collection Example
+
 An example of collection JSON can be found in the [Chicago Institue of Art example](../../example/rest-api/art-institute/README.md). That API returns (in part):
 
 ```json
