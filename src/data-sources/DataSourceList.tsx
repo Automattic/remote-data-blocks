@@ -16,6 +16,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { info } from '@wordpress/icons';
 import { store as noticesStore, NoticeStoreActions, WPNotice } from '@wordpress/notices';
 
+import CodeSnippet from './components/CodeSnippet';
 import { SUPPORTED_SERVICES, SUPPORTED_SERVICES_LABELS } from './constants';
 import DataSourceMetaTags from '@/data-sources/DataSourceMetaTags';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
@@ -240,6 +241,18 @@ const DataSourceList = () => {
 						} );
 				}
 			},
+		},
+		{
+			id: 'view-code',
+			label: __( 'View Code', 'remote-data-blocks' ),
+			isEligible: ( item: DataSourceConfig ) => {
+				return Boolean( item?.uuid );
+			},
+			RenderModal: () => {
+				// TO DO
+				return <CodeSnippet code="" />;
+			},
+			modalHeader: __( 'Data Source Code', 'remote-data-blocks' ),
 		},
 	];
 
