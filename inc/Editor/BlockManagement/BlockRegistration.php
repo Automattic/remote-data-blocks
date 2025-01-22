@@ -34,7 +34,7 @@ class BlockRegistration {
 
 	public static function register_helper_blocks(): void {
 		// Remote data HTML block - used to render HTML content in the absence of a proper binding.
-		$remote_data_html_block_path = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-html';
+		$remote_data_html_block_path = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-html';
 		register_block_type( $remote_data_html_block_path );
 	}
 
