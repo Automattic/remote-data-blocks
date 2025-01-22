@@ -132,7 +132,7 @@ Filter to change the defualt 1 second delapy after an HTTP request fails. The Re
 ```php
 function custom_response_retry_delay( int $retry_after_ms, int $retries, ResponseInterface $response): int {
 	// More agressively back-off retries after 10.
-	return intval($retries / 10) * $retry_after_ms
+	return intval( $retries / 10 ) * $retry_after_ms;
 }
 add_filter( 'remote_data_blocks_http_client_retry_delay', 'custom_response_retry_delay', 10, 3 );
 ```
