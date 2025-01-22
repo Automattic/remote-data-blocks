@@ -223,6 +223,7 @@ final class ConfigSchemas {
 					),
 				] ),
 			),
+			'pagination_data' => Types::nullable( Types::callable() ),
 			'preprocess_response' => Types::nullable( Types::callable() ),
 			'query_runner' => Types::nullable( Types::instance_of( QueryRunnerInterface::class ) ),
 			'request_body' => Types::nullable(

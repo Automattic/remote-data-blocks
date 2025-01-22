@@ -17,6 +17,7 @@ class MockQuery extends HttpQuery {
 			'display_name' => 'Mock Query',
 			'input_schema' => $config['input_schema'] ?? [],
 			'output_schema' => $config['output_schema'] ?? [ 'type' => 'string' ],
+			'pagination_data' => $config['pagination_data'] ?? null,
 			'query_runner' => $config['query_runner'] ?? new MockQueryRunner(),
 		], $validator ?? new MockValidator() );
 	}

@@ -197,6 +197,14 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
 		$this->assertSame( 1, $result['metadata']['total_count']['value'] );
 
+		$this->assertArrayHasKey( 'pagination', $result );
+		$this->assertArrayHasKey( 'total_items', $result['pagination'] );
+		$this->assertArrayHasKey( 'next_input_variables', $result['pagination'] );
+		$this->assertArrayHasKey( 'previous_input_variables', $result['pagination'] );
+		$this->assertNull( $result['pagination']['total_items'] );
+		$this->assertNull( $result['pagination']['next_input_variables'] );
+		$this->assertNull( $result['pagination']['previous_input_variables'] );
+
 		$expected_result = [
 			'result' => [
 				'test' => [
@@ -240,6 +248,14 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'metadata', $result );
 		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
 		$this->assertSame( 1, $result['metadata']['total_count']['value'] );
+
+		$this->assertArrayHasKey( 'pagination', $result );
+		$this->assertArrayHasKey( 'total_items', $result['pagination'] );
+		$this->assertArrayHasKey( 'next_input_variables', $result['pagination'] );
+		$this->assertArrayHasKey( 'previous_input_variables', $result['pagination'] );
+		$this->assertNull( $result['pagination']['total_items'] );
+		$this->assertNull( $result['pagination']['next_input_variables'] );
+		$this->assertNull( $result['pagination']['previous_input_variables'] );
 
 		$expected_result = [
 			'result' => [
@@ -285,6 +301,14 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'metadata', $result );
 		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
 		$this->assertSame( 1, $result['metadata']['total_count']['value'] );
+
+		$this->assertArrayHasKey( 'pagination', $result );
+		$this->assertArrayHasKey( 'total_items', $result['pagination'] );
+		$this->assertArrayHasKey( 'next_input_variables', $result['pagination'] );
+		$this->assertArrayHasKey( 'previous_input_variables', $result['pagination'] );
+		$this->assertNull( $result['pagination']['total_items'] );
+		$this->assertNull( $result['pagination']['next_input_variables'] );
+		$this->assertNull( $result['pagination']['previous_input_variables'] );
 
 		$expected_result = [
 			'result' => [
@@ -333,6 +357,14 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
 		$this->assertSame( 1, $result['metadata']['total_count']['value'] );
 
+		$this->assertArrayHasKey( 'pagination', $result );
+		$this->assertArrayHasKey( 'total_items', $result['pagination'] );
+		$this->assertArrayHasKey( 'next_input_variables', $result['pagination'] );
+		$this->assertArrayHasKey( 'previous_input_variables', $result['pagination'] );
+		$this->assertNull( $result['pagination']['total_items'] );
+		$this->assertNull( $result['pagination']['next_input_variables'] );
+		$this->assertNull( $result['pagination']['previous_input_variables'] );
+
 		$expected_result = [
 			'result' => [
 				'test' => [
@@ -346,5 +378,32 @@ class QueryRunnerTest extends TestCase {
 		$this->assertIsArray( $result['results'] );
 		$this->assertCount( 1, $result['results'] );
 		$this->assertSame( $expected_result, $result['results'][0] );
+	}
+
+	public function testQueryRunnerProvidesPaginationData(): void {
+		$query = MockQuery::from_array( [
+			'data_source' => $this->http_data_source,
+			'pagination_data' => function ( mixed $response_data, array $input_variables ) {
+				return [
+					'total_items' => 100,
+					'next_input_variables' => [ 'page' => 2 ],
+					'previous_input_variables' => [ 'page' => 1 ],
+				];
+			},
+			'query_runner' => new QueryRunner( $this->http_client ),
+		] );
+
+		$response_body = $this->createMock( \Psr\Http\Message\StreamInterface::class );
+		$response = new Response( 200, [], $response_body );
+
+		$this->http_client->method( 'request' )->willReturn( $response );
+
+		$result = $query->execute( [] );
+
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'pagination', $result );
+		$this->assertSame( 100, $result['pagination']['total_items'] );
+		$this->assertSame( 2, $result['pagination']['next_input_variables']['page'] );
+		$this->assertSame( 1, $result['pagination']['previous_input_variables']['page'] );
 	}
 }

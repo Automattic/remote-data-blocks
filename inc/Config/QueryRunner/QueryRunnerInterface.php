@@ -10,7 +10,7 @@ interface QueryRunnerInterface {
 	 * Execute the query and return processed results.
 	 *
 	 * @param HttpQueryInterface $query The query to execute.
-	 * @param array<string, mixed> $input_variables The input variables for the current request.
+	 * @param array<array-key, mixed> $input_variables The input variables for the current request.
 	 * @return WP_Error|array{
 	 *   is_collection: bool,
 	 *   metadata: array<string, array{
@@ -18,6 +18,11 @@ interface QueryRunnerInterface {
 	 *     type: string,
 	 *     value: string|int|null,
 	 *   }>,
+	 *   pagination: array{
+	 *     total_items: int,
+	 *     next_input_variables: array<array-key, mixed>|null,
+	 *     previous_input_variables: array<array-key, mixed>|null,
+	 *   },
 	 *   results: null|array<int, array{
 	 *     result: array{
 	 *       name: string,

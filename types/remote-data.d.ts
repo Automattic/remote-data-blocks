@@ -73,6 +73,11 @@ interface RemoteDataApiResponseBody {
 	block_name: string;
 	is_collection: boolean;
 	metadata: Record< string, RemoteDataResultFields >;
+	pagination: {
+		total_items: number | null;
+		next_input_variables: RemoteDataQueryInput | null;
+		previous_input_variables: RemoteDataQueryInput | null;
+	};
 	query_input: RemoteDataQueryInput;
 	result_id: string;
 	results: RemoteDataApiResult[];

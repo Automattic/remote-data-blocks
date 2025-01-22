@@ -221,6 +221,7 @@ class QueryRunner implements QueryRunnerInterface {
 		return [
 			'is_collection' => $is_collection,
 			'metadata' => $metadata,
+			'pagination' => $query->get_pagination_data( $response_data, $input_variables ),
 			'results' => $results,
 		];
 	}
