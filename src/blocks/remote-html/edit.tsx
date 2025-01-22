@@ -93,7 +93,7 @@ const PlaceholderInstructions = () => {
 		<Placeholder
 			label={ __( 'Remote HTML' ) }
 			instructions={ __(
-				'Place this block in a remote data container and bind to an attribute to view HTML.'
+				'This block only works when placed inside a remote data block container and bound to an attribute. This block will be ignored as currently configured.'
 			) }
 		/>
 	);
