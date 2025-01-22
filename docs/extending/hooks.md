@@ -142,12 +142,12 @@ add_filter( 'remote_data_blocks_http_client_retry_delay', 'custom_response_retry
 Filter to determine if a retry should happen on exception, by default connection exceptions will be retried. The Remote Data Blocks Plugin uses the [Guzzle](https://github.com/guzzle/guzzle) HTTP client. You can read about the request, response, and exception interfaces in their [documentation](https://docs.guzzlephp.org/en/stable/).
 
 ```php
-function custom_response_retry_on_exception(bool $retry_on_exception, int $retries, RequestInterface $request, ResponseInterface $response, Exception $exception ): bool {
+function custom_response_retry_on_exception( bool $retry_on_exception, int $retries, RequestInterface $request, ResponseInterface $response, Exception $exception ): bool {
 	// Also retry when the server is a teapot.
 	if ($response->getStatusCode() == 418) {
-		return true
+		return true;
 	}
-	return $retry_on_exception
+	return $retry_on_exception;
 }
 add_filter( 'remote_data_blocks_http_client_retry_on_exception', 'custom_response_retry_on_exception', 10, 5 );
 ```
