@@ -189,5 +189,6 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 		updateDataSource,
 		fetchDataSources,
 		onSave,
+		showSnackbar,
 	};
 };

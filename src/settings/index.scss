@@ -36,10 +36,8 @@ body {
 
 	/* Snackbar notice */
 	.components-snackbar-list {
-		position: fixed;
-		bottom: 30px;
-		left: 160px;
-		width: calc(100% - 160px);
+		top: 4px;
+		z-index: 1000002;
 	}
 
 	&.folded .components-snackbar-list {
