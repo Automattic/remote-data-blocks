@@ -50,13 +50,10 @@ export function Edit(
 		[]
 	);
 
-	const styles = useMemo(
-		() => [
-			DEFAULT_STYLES,
-			...transformStyles( ( settingStyles ?? [] ).filter( ( style: EditorStyle ) => style.css ) ),
-		],
-		[ settingStyles ]
-	);
+	const styles = [
+		DEFAULT_STYLES,
+		...transformStyles( ( settingStyles ?? [] ).filter( ( style: EditorStyle ) => style.css ) ),
+	];
 
 	const hasBindings = attributes?.metadata?.bindings?.content !== undefined;
 
