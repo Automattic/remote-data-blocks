@@ -1,0 +1,46 @@
+<?php declare(strict_types = 1);
+
+/**
+ * @template-name Shopify Block Registration
+ * @template-version 1.0.0
+ * @template-description Registers a Shopify block for a given data source.
+ * 
+ * Template variables:
+ * - DATA_SOURCE_UUID: The UUID of the data source to register the block for.
+ */
+
+/**
+ * Update to the actual namespace which would used for the block registration.
+ */
+namespace RemoteDataBlocks\Snippets\Shopify;
+
+use RemoteDataBlocks\Integrations\Shopify\ShopifyDataSource;
+use RemoteDataBlocks\Integrations\Shopify\ShopifyIntegration;
+use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
+
+function register_shopify_block(): void {
+    $data_source_config = DataSourceCrud::get_config_by_uuid( '{{DATA_SOURCE_UUID}}' );
+	
+    if ( is_wp_error( $data_source_config ) ) {
+        return;
+    }
+
+    $service_config = $data_source_config['service_config'];
+
+	$access_token = $service_config['access_token'];
+	$store_slug = $service_config['store_name'];
+    $display_name = $service_config['display_name'];
+
+	$shopify_data_source = ShopifyDataSource::from_array( [
+		'service_config' => [
+			'__version' => 1,
+			'access_token' => $access_token,
+			'display_name' => $display_name,
+			'store_name' => $store_slug,
+		],
+	] );
+
+	ShopifyIntegration::register_blocks_for_shopify_data_source( $shopify_data_source );
+}
+
+add_action( 'init', __NAMESPACE__ . '\\register_shopify_block' );
