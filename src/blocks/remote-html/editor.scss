@@ -1,5 +1,6 @@
 // Styled after core/html. This overlay will allow clicking into the block
-// when HTML is present and bypass iframe bubbling issues.
+// when sandboxed HTML is present and intercept all mouse events.
+// Without this, clicking onto this block does not select it in the editor.
 
 .wp-block-remote-data-blocks-remote-html {
 	position: relative;

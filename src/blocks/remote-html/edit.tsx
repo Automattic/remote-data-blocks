@@ -77,7 +77,11 @@ export function Edit(
 				tabIndex={ -1 }
 			/>
 			{
-				/* Similar to core/html, add an overlay register click events. */
+				/**
+				 * When content is rendered in a Sandbox, clicks on the block's content are consumed
+				 * by the inner DOM and are not registered in the editor. Adding an invisible overlay
+				 * allows this block to be selected in the editor when clicked.
+				 */
 				! isSelected && <div className="remote-data-block-html-overlay"></div>
 			}
 		</div>
