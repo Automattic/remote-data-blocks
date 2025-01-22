@@ -155,15 +155,15 @@ class HttpClient {
 	 * @return int Number of milliseconds to delay.
 	 */
 	public static function retry_delay( int $retries, ?ResponseInterface $response ): int {
-		if ( ! $response instanceof ResponseInterface || ! $response->hasHeader( 'Retry-After' ) ) {
-			$retry_after_ms = 1000 * $retries;
-			return apply_filters( 'remote_data_blocks_http_client_retry_delay', $retry_after_ms, $retries, $response );
-		}
+		// Be default, implement a linear backoff strategy.
+		$retry_after = $retries;
 
-		$retry_after = $response->getHeaderLine( 'Retry-After' );
+		if ( $response instanceof ResponseInterface && $response->hasHeader( 'Retry-After' ) ) {
+			$retry_after = $response->getHeaderLine( 'Retry-After' );
 
-		if ( ! is_numeric( $retry_after ) ) {
-			$retry_after = ( new \DateTime( $retry_after ) )->getTimestamp() - time();
+			if ( ! is_numeric( $retry_after ) ) {
+				$retry_after = ( new \DateTime( $retry_after ) )->getTimestamp() - time();
+			}
 		}
 
 		$retry_after_ms = (int) $retry_after * 1000;

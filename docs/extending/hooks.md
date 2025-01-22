@@ -127,12 +127,12 @@ add_filter( 'remote_data_blocks_bypass_cache', '__return_true' );
 
 ### remote_data_blocks_http_client_retry_delay
 
-Filter to change the defualt 1 second delapy after an HTTP request fails. The Remote Data Blocks Plugin uses the [Guzzle](https://github.com/guzzle/guzzle) HTTP client. You can read about the request, response, and exception interfaces in their [documentation](https://docs.guzzlephp.org/en/stable/).
+Filter to change the defualt 1 second delapy after an HTTP request fails. The Remote Data Blocks Plugin uses the [Guzzle](https://github.com/guzzle/guzzle) HTTP client. You can read about the response interface in their [documentation](https://docs.guzzlephp.org/en/stable/).
 
 ```php
-function custom_response_retry_delay( int $retry_after_ms, int $retries, ResponseInterface $response): int {
-	// More agressively back-off retries after 10.
-	return intval( $retries / 10 ) * $retry_after_ms;
+function custom_response_retry_delay( int $retry_after_ms, int $retries, ?ResponseInterface $response ): int {
+	// Implement a custom exponential backoff strategy.
+	return floor( pow( 1.5, $retries ) * 1000 );
 }
 add_filter( 'remote_data_blocks_http_client_retry_delay', 'custom_response_retry_delay', 10, 3 );
 ```
