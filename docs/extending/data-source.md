@@ -53,13 +53,29 @@ $zipcode_query = HttpQuery::from_array( [
 ])
 ```
 
-In this case the `data_source` has a built in `get_endpoint()` method. You could also retrieve the endpoint this way:
+In this case the `data_source` has a built in `get_endpoint()` method. Other configuration options can be retireved directly. If you had a Data Source config like:
+
+```php
+$comp_data_source = HttpDataSource::from_array( [
+    'service_config' => [
+        '__version' => 1,
+        'display_name' => 'More Complicated Example API',
+        'endpoint' => 'https://api.complexexample.com/',
+		'some_identifier' => 'table-2',
+        'request_headers' => [
+            'Content-Type' => 'application/json',
+            'X-Api-Key' => MY_API_KEY_CONSTANT,
+        ],
+    ],
+] );
+```
+You could retrieve `some_identifier` directly:
 
 ```php
 $zipcode_query = HttpQuery::from_array( [
-    'data_source' => $zipcode_data_source,
-    'endpoint' => function ( array $input_variables ) use ( $zipcode_data_source ): string {
-        return  $zipcode_data_source->to_array()['service_config']['endpoint'] . $input_variables['zip_code'];
+    'data_source' => $comp_data_source,
+    'endpoint' => function ( array $input_variables ) use ( $comp_data_source ): string {
+        return  return $comp_data_source->get_endpoint() . $zipcode_data_source->to_array()['service_config']['some_identifier'] . "/" . $input_variables['search'];
     },
 ])
 ```
