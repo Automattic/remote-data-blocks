@@ -99,17 +99,6 @@ $zipcode_query = HttpQuery::from_array( [
 ])
 ```
 
-In this case the `data_source` has a built in `get_endpoint()` method. You could also retrieve the endpoint this way:
-
-```php
-$zipcode_query = HttpQuery::from_array( [
-    'data_source' => $zipcode_data_source,
-    'endpoint' => function ( array $input_variables ) use ( $zipcode_data_source ): string {
-        return  $zipcode_data_source->to_array()['service_config']['endpoint'] . $input_variables['zip_code'];
-    },
-])
-```
-
 The goal with design was to provide you with flexibility you need to represent any data source.
 
 ## Custom data sources
