@@ -157,12 +157,12 @@ add_filter( 'remote_data_blocks_http_client_retry_on_exception', 'custom_respons
 Filter the HTTP retry logic when an HTTP request fails (default: `false` as in do not retry). The Remote Data Blocks Plugin uses the [Guzzle](https://github.com/guzzle/guzzle) HTTP client. You can read about the request, response, and exception interfaces in their [documentation](https://docs.guzzlephp.org/en/stable/).
 
 ```php
-function custom_retry_decider(bool $should_retry, int $retries, RequestInterface $request, ResponseInterface $response ): bool {
+function custom_retry_decider( bool $should_retry, int $retries, RequestInterface $request, ResponseInterface $response ): bool {
 	// Retry on a 429 error if the number of retries is less than 10.
 	if ($retries < 10 && $response->getStatusCode == 429 ) {
-		return true
+		return true;
 	}
-	return $should_retry
+	return $should_retry;
 }
 add_filter( 'remote_data_blocks_http_client_retry_decider', 'custom_response_retry_on_exception', 10, 5 );
 ```
