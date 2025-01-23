@@ -17,13 +17,16 @@ class AirtableIntegration {
 		);
 
 		foreach ( $data_source_configs as $config ) {
+			// Set enable_blocks to true if it's not set for backwards compatibility
+			if ( ! isset( $config['service_config']['enable_blocks'] ) ) {
+				$config['service_config']['enable_blocks'] = true;
+			}
+		
 			$data_source = AirtableDataSource::from_array( $config );
-			
-			if ( isset( $config['service_config']['enable_blocks'] ) && 
-				$config['service_config']['enable_blocks'] === false ) {
+
+			if ( $config['service_config']['enable_blocks'] === false ) {
 				continue;
 			}
-
 			self::register_blocks_for_airtable_data_source( $data_source );
 			self::register_loop_blocks_for_airtable_data_source( $data_source );
 		}
