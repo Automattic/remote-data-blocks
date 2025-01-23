@@ -18,8 +18,8 @@ Below, you'll find specific use cases where Remote Data Blocks shines. We are wo
   - **Example:** Create a page and rewrite rule for /products/{product_id}/ and configure a Remote Data Block on that page to display the referenced product.
 - Your presentation of remote data aligns with the capabilities of Block Bindings.
   - **Example:** Display an item of clothing using a core paragraph, heading, image, and button blocks.
-- You do not require complex filtering or pagination.
-  - **Example:** To select an item of clothing, load a finite list of top-selling products or search all products by a specific term.
+- You do not require complex filtering.
+  - **Example:** To select an item of clothing, load a list of top-selling products or search all products by a specific term.
 - Your data is denormalized and relatively flat.
   - **Example:** A row from a Google Sheet with no references to external entities.
 
@@ -35,8 +35,8 @@ Below, you'll find specific use cases where Remote Data Blocks shines. We are wo
 - You have multiple remote data sources that require interaction. Or, you want to implement a complex content architecture using Remote Data Blocks instead of leveraging WordPress custom post types and/or taxonomies.
   - These two challenges are directly related to the issues with normalized data. If you have data sources that relate to one another, you have to write custom code to query missing data and stitch them together.
   - Judging complexity is difficult, but implementing large applications using Remote Data Blocks is not advisable.
-- You require complex filtering or rely heavily on pagination.
-  - Our UI components for filtering and pagination are still under development.
+- You require complex filtering or have complex pagination needs.
+  - Our UI components for filtering are pagination still under development.
 
 Over time, Remote Data Blocks will grow and improve and these guidelines will change.
 
