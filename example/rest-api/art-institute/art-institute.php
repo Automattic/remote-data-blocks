@@ -69,15 +69,32 @@ function register_aic_block(): void {
 	$search_art_query = HttpQuery::from_array([
 		'data_source' => $aic_data_source,
 		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
-			$query = $input_variables['search_terms'];
-			$endpoint = $aic_data_source->get_endpoint() . '/search';
+			$endpoint = $aic_data_source->get_endpoint();
+			$search_terms = $input_variables['search'] ?? '';
+			
+			if ( ! empty( $search_terms ) ) {
+				$endpoint = add_query_arg( [ 'q' => $search_terms ], $endpoint . '/search' );
+			}
 
-			return add_query_arg( [ 'q' => $query ], $endpoint );
+			return add_query_arg( [
+				'limit' => $input_variables['limit'],
+				'page' => $input_variables['page'],
+			], $endpoint );
 		},
 		'input_schema' => [
-			'search_terms' => [
-				'name' => 'Search Terms',
-				'type' => 'string',
+			'search' => [
+				'name' => 'Search terms',
+				'type' => 'ui:search',
+			],
+			'limit' => [
+				'default_value' => 10,
+				'name' => 'Pagination limit',
+				'type' => 'integer',
+			],
+			'page' => [
+				'default_value' => 1,
+				'name' => 'Pagination page',
+				'type' => 'integer',
 			],
 		],
 		'output_schema' => [
@@ -94,6 +111,29 @@ function register_aic_block(): void {
 				],
 			],
 		],
+		'pagination_data' => function( mixed $response_data, array $input_variables ): array {
+			$current_limit = $input_variables['limit'] ?? 10;
+			$current_page = $input_variables['pagination']['current_page'] ?? $input_variables['page'] ?? 1;
+			$total_items = $response_data['pagination']['total'];
+			$total_pages = $response_data['pagination']['total_pages'];
+
+			$has_next_page = $current_page < $total_pages;
+			$has_previous_page = $current_page > 1;
+
+			return [
+				'total_items' => $total_items,
+				'next_input_variables' => $has_next_page ? [
+					'limit' => $current_limit,
+					'page' => $current_page + 1,
+				] : null,
+				'previous_input_variables' => $has_previous_page ? [
+					'limit' => $current_limit,
+					'page' => $current_page - 1,
+				] : null,
+			];
+
+			return $pagination;
+		},
 	]);
 
 	register_remote_data_block([
