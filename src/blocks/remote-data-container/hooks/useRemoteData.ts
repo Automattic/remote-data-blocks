@@ -32,21 +32,45 @@ async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< Re
 	};
 }
 
-// This hook fetches remote data and provides state for the data and loading
-// status. If you do not need a separate state update for the data, you can
-// instruct the `execute` function to skip it.
+interface UseRemoteData {
+	data?: RemoteData;
+	fetch: ( queryInput: RemoteDataQueryInput ) => Promise< void >;
+	loading: boolean;
+	reset: () => void;
+}
+
+interface UseRemoteDataInput {
+	blockName: string;
+	enabledOverrides?: string[];
+	externallyManagedRemoteData?: RemoteData;
+	externallyManagedUpdateRemoteData?: ( remoteData?: RemoteData ) => void;
+	onSuccess?: () => void;
+	queryKey: string;
+}
+
+// This hook fetches remote data and manages state for the requests.
+//
+// If you have another way to manage the state of the remote data, then you must
+// pass in the data and a state updater function.
 //
 // Use case: You might be fetching data only to provide it to setAttributes,
 // which is already reactive. Or you might be chaining multiple calls and
 // don't need an intermediate state update / re-render.
-export function useRemoteData( blockName: string, queryKey: string ) {
-	const [ data, setData ] = useState< RemoteData | null >( null );
+export function useRemoteData( {
+	blockName,
+	enabledOverrides = [],
+	externallyManagedRemoteData,
+	externallyManagedUpdateRemoteData,
+	onSuccess,
+	queryKey,
+}: UseRemoteDataInput ): UseRemoteData {
+	const [ data, setData ] = useState< RemoteData >();
 	const [ loading, setLoading ] = useState< boolean >( false );
 
-	async function execute(
-		queryInput: RemoteDataQueryInput,
-		updateDataState = true
-	): Promise< RemoteData | null > {
+	const resolvedData = externallyManagedRemoteData ?? data;
+	const resolvedUpdater = externallyManagedUpdateRemoteData ?? setData;
+
+	async function fetch( queryInput: RemoteDataQueryInput ): Promise< void > {
 		setLoading( true );
 
 		const requestData: RemoteDataApiRequest = {
@@ -57,14 +81,25 @@ export function useRemoteData( blockName: string, queryKey: string ) {
 
 		const remoteData = await fetchRemoteData( requestData ).catch( () => null );
 
-		if ( updateDataState ) {
-			setData( remoteData );
+		if ( ! remoteData ) {
+			resolvedUpdater( undefined );
+			setLoading( false );
+			return;
 		}
 
+		resolvedUpdater( { enabledOverrides, ...remoteData } );
 		setLoading( false );
-
-		return remoteData;
+		onSuccess?.();
 	}
 
-	return { data, execute, loading };
+	function reset(): void {
+		resolvedUpdater( undefined );
+	}
+
+	return {
+		data: resolvedData,
+		fetch,
+		loading,
+		reset,
+	};
 }

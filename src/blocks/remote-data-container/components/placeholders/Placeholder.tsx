@@ -3,19 +3,15 @@ import { PlaceholderSingle } from '@/blocks/remote-data-container/components/pla
 
 export interface PlaceholderProps {
 	blockConfig: BlockConfig;
-	fetchRemoteData: ( input: RemoteDataQueryInput ) => void;
+	onSelect: ( input: RemoteDataQueryInput ) => void;
 }
 
 export function Placeholder( props: PlaceholderProps ) {
 	const { loop } = props.blockConfig;
-	const placeholderProps = {
-		blockConfig: props.blockConfig,
-		onSelect: props.fetchRemoteData,
-	};
 
 	if ( loop ) {
-		return <PlaceholderLoop { ...placeholderProps } />;
+		return <PlaceholderLoop { ...props } />;
 	}
 
-	return <PlaceholderSingle { ...placeholderProps } />;
+	return <PlaceholderSingle { ...props } />;
 }

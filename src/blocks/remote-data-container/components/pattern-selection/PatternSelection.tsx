@@ -10,8 +10,8 @@ import { getBlockDataSourceType } from '@/utils/localized-block-data';
 
 interface PatternSelectionProps {
 	blockName: string;
-	insertPatternBlocks: ( pattern: BlockPattern ) => void;
 	onCancel: () => void;
+	onSelectPattern: ( pattern: BlockPattern ) => void;
 	supportedPatterns: BlockPattern[];
 }
 
@@ -19,7 +19,7 @@ export function PatternSelection( props: PatternSelectionProps ) {
 	const [ showModal, setShowModal ] = useState< boolean >( false );
 
 	function onClickPattern( pattern: BlockPattern ) {
-		props.insertPatternBlocks( pattern );
+		props.onSelectPattern( pattern );
 		setShowModal( false );
 		sendTracksEvent( 'remotedatablocks_add_block', {
 			action: 'select_pattern',

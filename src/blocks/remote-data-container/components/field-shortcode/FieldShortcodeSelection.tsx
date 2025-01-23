@@ -110,14 +110,17 @@ interface FieldShortcodeSelectFieldProps {
 }
 
 export function FieldShortcodeSelectField( props: FieldShortcodeSelectFieldProps ) {
-	const { data, execute, loading } = useRemoteData( props.blockName, DISPLAY_QUERY_KEY );
+	const { data, fetch, loading } = useRemoteData( {
+		blockName: props.blockName,
+		queryKey: DISPLAY_QUERY_KEY,
+	} );
 
 	useEffect( () => {
 		if ( loading || data ) {
 			return;
 		}
 
-		void execute( props.queryInput );
+		void fetch( props.queryInput );
 	}, [ loading, data ] );
 
 	if ( ! data || loading ) {

@@ -6,7 +6,6 @@ import {
 } from '@wordpress/block-editor';
 import { BlockInstance, cloneBlock, createBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
 
 import {
 	getBoundAttributeEntries,
@@ -41,7 +40,6 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 			remoteDataBlockName,
 			[ remoteDataBlockName, rootClientId ],
 		] );
-	const [ showPatternSelection, setShowPatternSelection ] = useState< boolean >( false );
 
 	// Extract patterns with defined roles.
 	const patternsByBlockTypes = getPatternsByBlockTypes( remoteDataBlockName );
@@ -80,9 +78,8 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 				),
 			} ) );
 		},
+		innerBlocksPattern,
 		insertPatternBlocks: ( pattern: BlockPattern ): void => {
-			setShowPatternSelection( false );
-
 			// If the pattern is a synced pattern, insert it directly.
 			if ( isSyncedPattern( pattern ) ) {
 				const syncedPattern = createBlock( 'core/block', { ref: pattern.id } );
@@ -107,19 +104,9 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 
 			replaceInnerBlocks( rootClientId, patternBlocks ).catch( () => {} );
 		},
-		markReadyForInsertion: (): void => {
-			if ( innerBlocksPattern ) {
-				returnValue.insertPatternBlocks( innerBlocksPattern );
-				return;
-			}
-
-			setShowPatternSelection( true );
-		},
-		resetReadyForInsertion: (): void => {
+		resetInnerBlocks: (): void => {
 			replaceInnerBlocks( rootClientId, [] ).catch( () => {} );
-			setShowPatternSelection( false );
 		},
-		showPatternSelection,
 	};
 
 	return returnValue;

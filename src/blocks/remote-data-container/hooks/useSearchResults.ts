@@ -15,11 +15,11 @@ export function useSearchResults( {
 	queryKey,
 }: UseSearchResultsInput ) {
 	const [ searchTerms, setSearchTerms ] = useState< string >( '' );
-	const { data, execute, loading } = useRemoteData( blockName, queryKey );
+	const { data, fetch, loading } = useRemoteData( { blockName, queryKey } );
 	const timer = useRef< NodeJS.Timeout >();
 
 	function onSubmit(): void {
-		void execute( { search_terms: searchTerms } );
+		void fetch( { search_terms: searchTerms } );
 	}
 
 	function onKeyDown( event: React.KeyboardEvent< HTMLInputElement > ): void {
