@@ -14,6 +14,8 @@ export const REMOTE_DATA_REST_API_URL = getRestUrl();
 
 export const CONTAINER_CLASS_NAME = getClassName( 'container' );
 
+export const SEARCH_INPUT_VARIABLE_TYPE = 'ui:search_input';
+
 export const BUTTON_TEXT_FIELD_TYPES = [ 'button_text' ];
 export const BUTTON_URL_FIELD_TYPES = [ 'button_url' ];
 export const IMAGE_ALT_FIELD_TYPES = [ 'image_alt' ];

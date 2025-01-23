@@ -169,7 +169,23 @@ final class ConfigSchemas {
 						// NOTE: These values are string references to the "core primitive
 						// types" from our formal schema. Referencing these types allows us
 						// to use the same validation and sanitization logic.
-						'type' => Types::enum( 'boolean', 'id', 'integer', 'null', 'number', 'string' ),
+						//
+						// There are also special types that are not core primitives, with
+						// accompanying notes.
+						'type' => Types::enum(
+							'boolean',
+							'id',
+							'integer',
+							'null',
+							'number',
+							'string',
+							// Special non-primitive types
+							//
+							// A string that represents search query input. An input variable
+							// with this type must be present for the query to be considered a
+							// search query.
+							'ui:search_input',
+						),
 					] ),
 				)
 			),
