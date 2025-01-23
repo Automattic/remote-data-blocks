@@ -76,7 +76,11 @@ class GoogleSheetsDataSource extends HttpDataSource {
 
 			$response_data['values'] = array_map(
 				function ( $row, $index ) use ( $columns ) {
-					$combined = array_combine( $columns, $row );
+					// If a sheets row has blank elements at the end of the row, it will
+					// return a shorter array and cause array_combine() to throw an error.
+					$row_padded = array_pad( $row, count( $columns ), '' );
+
+					$combined = array_combine( $columns, $row_padded );
 					$combined['RowId'] = $index + 1; // Add row_id field, starting from 1
 					return $combined;
 				},
@@ -91,7 +95,7 @@ class GoogleSheetsDataSource extends HttpDataSource {
 	public static function preprocess_get_response( array $response_data, array $input_variables ): array {
 		$selected_row = null;
 		$row_id = $input_variables['row_id'];
-		
+
 		if ( isset( $response_data['values'] ) && is_array( $response_data['values'] ) ) {
 			$values = $response_data['values'];
 			$columns = array_shift( $values ); // Get column names from first row
