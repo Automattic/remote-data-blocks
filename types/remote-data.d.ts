@@ -2,6 +2,12 @@ interface InnerBlockContext {
 	index: number;
 }
 
+interface RemoteDataPagination {
+	totalItems?: number;
+	nextInputVariables?: RemoteDataQueryInput;
+	previousInputVariables?: RemoteDataQueryInput;
+}
+
 interface RemoteDataResultFields {
 	name: string;
 	type: string;
@@ -16,6 +22,7 @@ interface RemoteData {
 	enabledOverrides?: string[];
 	isCollection: boolean;
 	metadata: Record< string, RemoteDataResultFields >;
+	pagination?: RemoteDataPagination;
 	queryInput: RemoteDataQueryInput;
 	resultId: string;
 	results: RemoteDataResult[];
@@ -74,9 +81,9 @@ interface RemoteDataApiResponseBody {
 	is_collection: boolean;
 	metadata: Record< string, RemoteDataResultFields >;
 	pagination: {
-		total_items: number | null;
 		next_input_variables: RemoteDataQueryInput | null;
 		previous_input_variables: RemoteDataQueryInput | null;
+		total_items: number | null;
 	};
 	query_input: RemoteDataQueryInput;
 	result_id: string;

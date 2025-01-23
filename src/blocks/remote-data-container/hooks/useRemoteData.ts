@@ -18,6 +18,11 @@ async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< Re
 		blockName: body.block_name,
 		isCollection: body.is_collection,
 		metadata: body.metadata,
+		pagination: {
+			nextInputVariables: body.pagination.next_input_variables ?? undefined,
+			previousInputVariables: body.pagination.previous_input_variables ?? undefined,
+			totalItems: body.pagination.total_items ?? undefined,
+		},
 		queryInput: body.query_input,
 		resultId: body.result_id,
 		results: body.results.map( result =>
@@ -35,8 +40,13 @@ async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< Re
 interface UseRemoteData {
 	data?: RemoteData;
 	fetch: ( queryInput: RemoteDataQueryInput ) => Promise< void >;
+	fetchNextPage: () => Promise< void >;
+	fetchPreviousPage: () => Promise< void >;
+	hasNextPage: boolean;
+	hasPreviousPage: boolean;
 	loading: boolean;
 	reset: () => void;
+	totalItems?: number;
 }
 
 interface UseRemoteDataInput {
@@ -92,6 +102,26 @@ export function useRemoteData( {
 		onSuccess?.();
 	}
 
+	async function refetch( queryInputOverrides?: RemoteDataQueryInput ): Promise< void > {
+		return fetch( { ...resolvedData?.queryInput, ...queryInputOverrides } );
+	}
+
+	async function fetchNextPage(): Promise< void > {
+		if ( ! resolvedData?.pagination?.nextInputVariables ) {
+			return;
+		}
+
+		return refetch( resolvedData.pagination.nextInputVariables );
+	}
+
+	async function fetchPreviousPage(): Promise< void > {
+		if ( ! resolvedData?.pagination?.previousInputVariables ) {
+			return;
+		}
+
+		return refetch( resolvedData.pagination.previousInputVariables );
+	}
+
 	function reset(): void {
 		resolvedUpdater( undefined );
 	}
@@ -99,7 +129,12 @@ export function useRemoteData( {
 	return {
 		data: resolvedData,
 		fetch,
+		fetchNextPage,
+		fetchPreviousPage,
+		hasNextPage: Boolean( data?.pagination?.nextInputVariables ),
+		hasPreviousPage: Boolean( data?.pagination?.previousInputVariables ),
 		loading,
 		reset,
+		totalItems: resolvedData?.pagination?.totalItems,
 	};
 }

@@ -1,21 +1,36 @@
 import { useInstanceId } from '@wordpress/compose';
-import { DataViews, filterSortAndPaginate, View } from '@wordpress/dataviews/wp';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { DataViews, View } from '@wordpress/dataviews/wp';
+import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { usePatterns } from '@/blocks/remote-data-container/hooks/usePatterns';
 
 interface ItemListProps {
 	blockName: string;
+	fetchNextPage: () => Promise< void >;
+	fetchPreviousPage: () => Promise< void >;
 	loading: boolean;
 	onSelect: ( data: RemoteDataQueryInput ) => void;
 	results?: RemoteDataResult[];
 	searchTerms: string;
 	setSearchTerms: ( newValue: string ) => void;
+	supportsSearch: boolean;
+	totalItems?: number;
 }
 
 export function ItemList( props: ItemListProps ) {
-	const { blockName, loading, onSelect, results, searchTerms, setSearchTerms } = props;
+	const {
+		blockName,
+		fetchNextPage,
+		fetchPreviousPage,
+		loading,
+		onSelect,
+		results,
+		searchTerms,
+		setSearchTerms,
+		supportsSearch,
+		totalItems,
+	} = props;
 	const { defaultPattern: pattern } = usePatterns( blockName );
 
 	const instanceId = useInstanceId( ItemList, blockName );
@@ -101,7 +116,7 @@ export function ItemList( props: ItemListProps ) {
 
 	const [ view, setView ] = useState< View >( {
 		type: 'table' as const,
-		perPage: 8,
+		perPage: data.length,
 		page: 1,
 		search: '',
 		fields: [],
@@ -111,33 +126,38 @@ export function ItemList( props: ItemListProps ) {
 		mediaField,
 	} );
 
+	function onChangeView( newView: View ) {
+		if ( newView.search !== searchTerms ) {
+			setSearchTerms( newView.search ?? '' );
+		}
+
+		console.log( { view, newView } );
+
+		const currentPage = view.page ?? 1;
+		let newPage = newView.page ?? 1;
+
+		// Only allow incrementing or decrementing the page by 1 at a time.
+		if ( newPage > currentPage ) {
+			newPage = currentPage + 1;
+			void fetchNextPage();
+		} else if ( newPage < currentPage ) {
+			newPage = currentPage - 1;
+			void fetchPreviousPage();
+		}
+
+		setView( {
+			...newView,
+			fields: tableFields.filter( field => field !== mediaField ),
+			page: newPage,
+		} );
+	}
+
 	const defaultLayouts = mediaField
 		? {
 				table: {},
 				grid: {},
 		  }
 		: { table: {} };
-
-	// this prevents just an empty table rendering
-	useEffect( () => {
-		if ( tableFields.length > 0 ) {
-			setView( prevView => ( {
-				...prevView,
-				fields: tableFields.filter( field => field !== mediaField ),
-			} ) );
-		}
-	}, [ mediaField, tableFields ] );
-
-	useEffect( () => {
-		if ( view.search !== searchTerms ) {
-			setSearchTerms( view.search ?? '' );
-		}
-	}, [ view, searchTerms ] );
-
-	// filter, sort and paginate data
-	const { data: filteredData, paginationInfo } = useMemo( () => {
-		return filterSortAndPaginate( data ?? [], view, fields );
-	}, [ data, view ] );
 
 	const actions = [
 		{
@@ -154,15 +174,19 @@ export function ItemList( props: ItemListProps ) {
 	return (
 		<DataViews
 			actions={ actions }
-			data={ filteredData }
+			data={ data }
 			defaultLayouts={ defaultLayouts }
 			fields={ fields }
 			getItemId={ ( item: { id?: string } ) => item.id || '' }
 			isLoading={ loading || ! pattern || ! results || results.length === 0 }
 			isItemClickable={ () => true }
 			onClickItem={ item => onSelect( item ) }
-			onChangeView={ setView }
-			paginationInfo={ paginationInfo }
+			onChangeView={ onChangeView }
+			paginationInfo={ {
+				totalItems: totalItems ?? data.length,
+				totalPages: Math.ceil( ( totalItems ?? data.length ) / Math.max( 1, data.length ) ),
+			} }
+			search={ supportsSearch }
 			view={ view }
 		/>
 	);

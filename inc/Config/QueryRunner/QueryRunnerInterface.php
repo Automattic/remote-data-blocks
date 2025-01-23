@@ -19,7 +19,7 @@ interface QueryRunnerInterface {
 	 *     value: string|int|null,
 	 *   }>,
 	 *   pagination: array{
-	 *     total_items: int,
+	 *     total_items: int|null,
 	 *     next_input_variables: array<array-key, mixed>|null,
 	 *     previous_input_variables: array<array-key, mixed>|null,
 	 *   },

@@ -1,32 +1,56 @@
+import { useCallback, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { ModalWithButtonTrigger } from './BaseModal';
-import { useModalState } from '../../hooks/useModalState';
-import { ItemList } from '../item-list/ItemList';
-import { useSearchResults } from '@/blocks/remote-data-container/hooks/useSearchResults';
+import { ItemList } from '@/blocks/remote-data-container/components/item-list/ItemList';
+import { ModalWithButtonTrigger } from '@/blocks/remote-data-container/components/modals//BaseModal';
+import { SEARCH_INPUT_VARIABLE_TYPE } from '@/blocks/remote-data-container/config/constants';
+import { useModalState } from '@/blocks/remote-data-container/hooks/useModalState';
+import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteData';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
+import { useDebouncedState } from '@/hooks/useDebouncedState';
 import { getBlockDataSourceType } from '@/utils/localized-block-data';
 
 interface DataViewsModalProps {
 	blockName: string;
-	headerImage?: string;
+	inputVariables: InputVariable[];
 	onSelect: ( data: RemoteDataQueryInput ) => void;
 	queryKey: string;
 	title: string;
 }
 
 export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
-	const { blockName, onSelect, queryKey, title } = props;
-
-	const { loading, results, searchTerms, setSearchTerms } = useSearchResults( {
+	const { blockName, inputVariables, onSelect, queryKey, title } = props;
+	const { data, fetch, fetchNextPage, fetchPreviousPage, loading } = useRemoteData( {
 		blockName,
 		queryKey,
 	} );
 
+	const searchTermsVariable = inputVariables.find(
+		input => input.type === SEARCH_INPUT_VARIABLE_TYPE
+	);
+
+	const debounceInMs = 200;
+	const supportsSearch = Boolean( searchTermsVariable );
+	const allowEmptySearchTerms = supportsSearch && ! searchTermsVariable?.required;
+
+	const onSubmit = useCallback(
+		( searchTermsForSubmit: string ) => {
+			if ( searchTermsVariable && ( searchTermsForSubmit || allowEmptySearchTerms ) ) {
+				void fetch( { [ searchTermsVariable.slug ]: searchTermsForSubmit } );
+			}
+		},
+		[ searchTermsVariable ]
+	);
+
+	const [ searchTerms, setSearchTerms ] = useDebouncedState< string >( onSubmit, debounceInMs, '' );
 	const { close, isOpen, open } = useModalState();
 
-	function onSelectItem( data: RemoteDataQueryInput ): void {
-		onSelect( data );
+	useEffect( () => {
+		onSubmit( '' );
+	}, [] );
+
+	function onSelectItem( input: RemoteDataQueryInput ): void {
+		onSelect( input );
 		sendTracksEvent( 'remotedatablocks_add_block', {
 			action: 'select_item',
 			selected_option: 'search_from_list',
@@ -46,11 +70,15 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 		>
 			<ItemList
 				blockName={ props.blockName }
+				fetchNextPage={ fetchNextPage }
+				fetchPreviousPage={ fetchPreviousPage }
 				loading={ loading }
 				onSelect={ onSelectItem }
-				results={ results }
+				results={ data?.results }
 				searchTerms={ searchTerms }
 				setSearchTerms={ setSearchTerms }
+				supportsSearch={ supportsSearch }
+				totalItems={ data?.pagination?.totalItems }
 			/>
 		</ModalWithButtonTrigger>
 	);
