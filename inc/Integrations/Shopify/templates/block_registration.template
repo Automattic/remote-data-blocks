@@ -19,17 +19,17 @@ use RemoteDataBlocks\Integrations\Shopify\ShopifyIntegration;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 
 function register_shopify_block(): void {
-    $data_source_config = DataSourceCrud::get_config_by_uuid( '{{DATA_SOURCE_UUID}}' );
+	$data_source_config = DataSourceCrud::get_config_by_uuid( '{{DATA_SOURCE_UUID}}' );
 	
-    if ( is_wp_error( $data_source_config ) ) {
-        return;
-    }
+	if ( is_wp_error( $data_source_config ) ) {
+		return;
+	}
 
-    $service_config = $data_source_config['service_config'];
+	$service_config = $data_source_config['service_config'];
 
 	$access_token = $service_config['access_token'];
 	$store_slug = $service_config['store_name'];
-    $display_name = $service_config['display_name'];
+	$display_name = $service_config['display_name'];
 
 	$shopify_data_source = ShopifyDataSource::from_array( [
 		'service_config' => [
