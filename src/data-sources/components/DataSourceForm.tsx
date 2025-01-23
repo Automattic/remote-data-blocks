@@ -373,10 +373,28 @@ const DataSourceFormBlocks = ( {
 	return (
 		<DataSourceFormStep
 			heading={ __( 'Set up blocks' ) }
-			subheading={ __( `Option to enable or disable auto-generation of blocks` ) }
+			subheading={
+				<>
+					{ __( 'Enable or disable the auto-generation of remote data container blocks. ' ) }
+					<ExternalLink href="https://remotedatablocks.com/docs/extending/block-registration/">
+						{ __( 'Learn more', 'remote-data-blocks' ) }
+					</ExternalLink>
+				</>
+			}
 		>
 			<ToggleControl
 				checked={ enableBlocks }
+				help={
+					enableBlocks
+						? __(
+								'Turning this off will require you to implement your own configuration code in your site.',
+								'remote-data-blocks'
+						  )
+						: __(
+								'Turning this on will automatically generate blocks for your site.',
+								'remote-data-blocks'
+						  )
+				}
 				label={ __( 'Auto-generate blocks' ) }
 				onChange={ handleToggle }
 			/>
