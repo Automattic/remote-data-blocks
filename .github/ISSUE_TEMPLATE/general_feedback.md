@@ -8,11 +8,10 @@ assignees: smithjw1
 ---
 
 **Summarize your feedback**
-A one sentence summary of your feedback.
+Provide a one-sentence summary of your feedback.
 
-**Go on**
-Add your full feedback here. Issues are public, please be careful to not share any confidential information.
+**Detailed Feedback**
+Please provide your full feedback here. Be as detailed as possible. Issues are public, so please do not share any confidential information.
 
 **Version of the plugin**
-Version of the plugin
-
+Specify the version of the plugin you are using.
