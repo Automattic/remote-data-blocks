@@ -361,15 +361,14 @@ const DataSourceFormBlocks = ( {
 	handleOnChange,
 	hasEnabledBlocks,
 }: {
-	handleOnChange: DataSourceFormSetupProps[ 'handleOnChange' ];
+	handleOnChange: ( key: string, value: boolean ) => void;
 	hasEnabledBlocks: boolean;
 } ) => {
 	const [ enableBlocks, setEnableBlocks ] = useState( hasEnabledBlocks );
 
 	const handleToggle = () => {
 		setEnableBlocks( ! enableBlocks );
-		// TO DO
-		// handleOnChange( 'enable_blocks', ! enableBlocks );
+		handleOnChange( 'enable_blocks', ! enableBlocks );
 	};
 	return (
 		<DataSourceFormStep

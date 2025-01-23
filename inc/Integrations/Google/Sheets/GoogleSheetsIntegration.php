@@ -18,6 +18,12 @@ class GoogleSheetsIntegration {
 
 		foreach ( $data_source_configs as $config ) {
 			$data_source = GoogleSheetsDataSource::from_array( $config );
+
+			if ( isset( $config['service_config']['enable_blocks'] ) && 
+			$config['service_config']['enable_blocks'] === false ) {
+				continue;
+			}
+			
 			self::register_blocks_for_google_sheets_data_source( $data_source );
 			self::register_loop_blocks_for_google_sheets_data_source( $data_source );
 		}

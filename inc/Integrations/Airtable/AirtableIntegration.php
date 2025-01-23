@@ -18,6 +18,12 @@ class AirtableIntegration {
 
 		foreach ( $data_source_configs as $config ) {
 			$data_source = AirtableDataSource::from_array( $config );
+			
+			if ( isset( $config['service_config']['enable_blocks'] ) && 
+				$config['service_config']['enable_blocks'] === false ) {
+				continue;
+			}
+
 			self::register_blocks_for_airtable_data_source( $data_source );
 			self::register_loop_blocks_for_airtable_data_source( $data_source );
 		}
@@ -30,26 +36,26 @@ class AirtableIntegration {
 		$tables = $data_source->to_array()['service_config']['tables'];
 
 		foreach ( $tables as $table ) {
-			$query = self::get_query( $data_source, $table );
-			$list_query = self::get_list_query( $data_source, $table );
+				$query = self::get_query( $data_source, $table );
+				$list_query = self::get_list_query( $data_source, $table );
 
-			register_remote_data_block(
-				array_merge(
-					[
-						'title' => $data_source->get_display_name() . '/' . $table['name'],
-						'render_query' => [
-							'query' => $query,
-						],
-						'selection_queries' => [
-							[
-								'query' => $list_query,
-								'type' => 'list',
+				register_remote_data_block(
+					array_merge(
+						[
+							'title' => $data_source->get_display_name() . '/' . $table['name'],
+							'render_query' => [
+								'query' => $query,
+							],
+							'selection_queries' => [
+								[
+									'query' => $list_query,
+									'type' => 'list',
+								],
 							],
 						],
-					],
-					$block_overrides
-				)
-			);
+						$block_overrides
+					)
+				);
 		}
 	}
 
