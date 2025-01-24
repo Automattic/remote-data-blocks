@@ -179,9 +179,8 @@ final class ConfigSchemas {
 							'null',
 							'number',
 							'string',
-
 							// Special non-primitive types
-
+							//
 							// A string that represents search query input. An input variable
 							// with this type must be present for the query to be considered a
 							// search query.
