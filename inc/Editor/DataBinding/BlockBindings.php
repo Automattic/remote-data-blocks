@@ -179,7 +179,7 @@ class BlockBindings {
 		$fallback_content = self::get_block_fallback_content( $source_args, $block_context, $block_attributes );
 
 		// Fallback to the content if we don't have the expected context.
-		if ( ! isset( $block_context['blockName'] ) || ! isset( $block_context['queryInput'] ) ) {
+		if ( ! isset( $block_context['blockName'] ) ) {
 			self::log_error( sprintf( 'Missing block context for block binding %s', self::$context_name ), 'unknown' );
 			return $fallback_content;
 		}
