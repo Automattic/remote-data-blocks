@@ -71,7 +71,7 @@ function register_aic_block(): void {
 		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
 			$endpoint = $aic_data_source->get_endpoint();
 			$search_terms = $input_variables['search'] ?? '';
-			
+
 			if ( ! empty( $search_terms ) ) {
 				$endpoint = add_query_arg( [ 'q' => $search_terms ], $endpoint . '/search' );
 			}
@@ -84,7 +84,7 @@ function register_aic_block(): void {
 		'input_schema' => [
 			'search' => [
 				'name' => 'Search terms',
-				'type' => 'ui:search',
+				'type' => 'ui:search_input',
 			],
 			'limit' => [
 				'default_value' => 10,
