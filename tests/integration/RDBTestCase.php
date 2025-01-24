@@ -9,6 +9,8 @@ use RemoteDataBlocks\Editor\BlockManagement\BlockRegistration;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 
 class RDBTestCase extends WP_UnitTestCase {
+	// Query mocking
+
 	protected function register_mocked_data_block( string $block_title, array $api_response, array $output_schema ): void {
 		$test_query = $this->generate_query( $api_response, $output_schema );
 
@@ -67,5 +69,45 @@ class RDBTestCase extends WP_UnitTestCase {
 				];
 			}
 		};
+	}
+
+	// DOM testing
+
+	protected function load_html( string $html ): DOMDocument {
+		$dom = new DOMDocument();
+
+		try {
+			$dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+		} catch ( \Throwable $e ) {
+			$this->fail( sprintf( 'Failed to parse HTML: %s', $e ) );
+		}
+
+		return $dom;
+	}
+
+	public function assertDomIdHasTextContent( DOMDocument $dom, string $html_id, string $expected_content ): void {
+		$xpath = new DOMXPath( $dom );
+		$id_nodes = $xpath->query( sprintf( "//*[@id='%s']", $html_id ) );
+
+		$this->assertCount( 1, $id_nodes, sprintf( "Should be 1 matching node with HTML ID '%s' but %d found.", $html_id, count( $id_nodes ) ) );
+		$this->assertEquals( $expected_content, $id_nodes[0]->textContent, sprintf( "Expected '%s' in node with HTML ID '%s', but found '%s' instead.", $expected_content, $html_id, $id_nodes[0]->textContent ) );
+	}
+
+	protected function assertDomIdHasHtmlContent( DOMDocument $dom, string $html_id, string $expected_content ): void {
+		$xpath = new DOMXPath( $dom );
+		$id_nodes = $xpath->query( sprintf( "//*[@id='%s']", $html_id ) );
+
+		$this->assertCount( 1, $id_nodes, sprintf( "Should be 1 matching node with HTML ID '%s' but %d found.", $html_id, count( $id_nodes ) ) );
+
+		// DOM nodes don't have an innerHTML, so build one from child nodes
+		$inner_html_content = array_reduce(
+			iterator_to_array( $id_nodes[0]->childNodes ),
+			function ( $carry, DOMNode $child ) {
+				// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- This is a built-in PHP function
+				return $carry . $child->ownerDocument->saveHTML( $child );
+			}
+		);
+
+		$this->assertEquals( $expected_content, $inner_html_content, sprintf( "Expected '%s' in node with HTML ID '%s', but found '%s' instead.", $expected_content, $html_id, $id_nodes[0]->textContent ) );
 	}
 }

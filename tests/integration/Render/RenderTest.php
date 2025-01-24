@@ -2,8 +2,6 @@
 
 namespace RemoteDataBlocks\IntegrationTests\Render;
 
-use DOMDocument;
-use DOMXPath;
 use RDBTestCase;
 
 class RenderTest extends RDBTestCase {
@@ -59,30 +57,9 @@ class RenderTest extends RDBTestCase {
 			<!-- /wp:remote-data-blocks/test-zip-api -->
 		');
 
-		$dom = self::load_html_into_dom( $result_html );
-
-		$this->assertIdInDomHasContent( $dom, 'field-zip-code', '12345' );
-		$this->assertIdInDomHasContent( $dom, 'field-city', 'Test City' );
-		$this->assertIdInDomHasContent( $dom, 'field-state', 'Test State' );
-	}
-
-	private function load_html_into_dom( string $html ): DOMDocument {
-		$dom = new DOMDocument();
-
-		try {
-			$dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
-		} catch ( \Throwable $e ) {
-			$this->fail( sprintf( 'Failed to parse rendered block as HTML: %s', $e ) );
-		}
-
-		return $dom;
-	}
-
-	private function assertIdInDomHasContent( DOMDocument $dom, string $html_id, string $expected_content ): void {
-		$xpath = new DOMXPath( $dom );
-		$id_nodes = $xpath->query( sprintf( "//*[@id='%s']", $html_id ) );
-
-		$this->assertCount( 1, $id_nodes, sprintf( "Should be 1 matching node with HTML ID '%s' but %d found.", $html_id, count( $id_nodes ) ) );
-		$this->assertEquals( $expected_content, $id_nodes[0]->textContent, sprintf( "Expected '%s' in node with HTML ID '%s', but found '%s' instead.", $expected_content, $html_id, $id_nodes[0]->textContent ) );
+		$dom = self::load_html( $result_html );
+		$this->assertDomIdHasTextContent( $dom, 'field-zip-code', '12345' );
+		$this->assertDomIdHasTextContent( $dom, 'field-city', 'Test City' );
+		$this->assertDomIdHasTextContent( $dom, 'field-state', 'Test State' );
 	}
 }
