@@ -18,7 +18,7 @@ class SalesforceB2CIntegration {
 		foreach ( $data_source_configs as $config ) {
 			$data_source = SalesforceB2CDataSource::from_array( $config );
 	
-			if ( $config['service_config']['enable_blocks'] === false ) {
+			if ( false === $config['service_config']['enable_blocks'] ) {
 				continue;
 			}
 			self::register_blocks_for_salesforce_data_source( $data_source );

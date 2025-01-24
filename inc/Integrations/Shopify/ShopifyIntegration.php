@@ -18,7 +18,7 @@ class ShopifyIntegration {
 		foreach ( $data_source_configs as $config ) {
 			$data_source = ShopifyDataSource::from_array( $config );
 
-			if ( $config['service_config']['enable_blocks'] === false ) {
+			if ( false === $config['service_config']['enable_blocks'] ) {
 				continue;
 			}
 				
