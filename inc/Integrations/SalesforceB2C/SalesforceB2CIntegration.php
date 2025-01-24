@@ -16,12 +16,7 @@ class SalesforceB2CIntegration {
 		$data_source_configs = DataSourceCrud::get_configs_by_service( REMOTE_DATA_BLOCKS_SALESFORCE_B2C_SERVICE );
 
 		foreach ( $data_source_configs as $config ) {
-				// Set enable_blocks to true if it's not set for backwards compatibility
-			if ( ! isset( $config['service_config']['enable_blocks'] ) ) {
-				$config['service_config']['enable_blocks'] = true;
-			}
-			
-				$data_source = SalesforceB2CDataSource::from_array( $config );
+			$data_source = SalesforceB2CDataSource::from_array( $config );
 	
 			if ( $config['service_config']['enable_blocks'] === false ) {
 				continue;

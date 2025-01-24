@@ -17,7 +17,7 @@ class ShopifyDataSource extends HttpDataSource {
 			'__version' => Types::integer(),
 			'access_token' => Types::skip_sanitize( Types::string() ),
 			'display_name' => Types::string(),
-			'enable_blocks' => Types::boolean(),
+			'enable_blocks' => Types::nullable( Types::boolean(), true ),
 			'store_name' => Types::string(),
 		] );
 	}

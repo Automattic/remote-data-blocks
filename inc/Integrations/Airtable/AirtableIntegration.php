@@ -16,12 +16,7 @@ class AirtableIntegration {
 			REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE
 		);
 
-		foreach ( $data_source_configs as $config ) {
-			// Set enable_blocks to true if it's not set for backwards compatibility
-			if ( ! isset( $config['service_config']['enable_blocks'] ) ) {
-				$config['service_config']['enable_blocks'] = true;
-			}
-		
+		foreach ( $data_source_configs as $config ) {		
 			$data_source = AirtableDataSource::from_array( $config );
 
 			if ( $config['service_config']['enable_blocks'] === false ) {

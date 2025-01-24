@@ -16,11 +16,6 @@ class ShopifyIntegration {
 		$data_source_configs = DataSourceCrud::get_configs_by_service( REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE );
 
 		foreach ( $data_source_configs as $config ) {
-			// Set enable_blocks to true if it's not set for backwards compatibility
-			if ( ! isset( $config['service_config']['enable_blocks'] ) ) {
-				$config['service_config']['enable_blocks'] = true;
-			}
-
 			$data_source = ShopifyDataSource::from_array( $config );
 
 			if ( $config['service_config']['enable_blocks'] === false ) {

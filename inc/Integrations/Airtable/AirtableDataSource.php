@@ -17,7 +17,7 @@ class AirtableDataSource extends HttpDataSource {
 				'id' => Types::string(),
 				'name' => Types::nullable( Types::string() ),
 			] ),
-			'enable_blocks' => Types::boolean(),
+			'enable_blocks' => Types::nullable( Types::boolean(), true ),
 			'display_name' => Types::string(),
 			'tables' => Types::list_of(
 				Types::object( [
