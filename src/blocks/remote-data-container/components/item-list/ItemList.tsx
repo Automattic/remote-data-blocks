@@ -7,29 +7,33 @@ import { usePatterns } from '@/blocks/remote-data-container/hooks/usePatterns';
 
 interface ItemListProps {
 	blockName: string;
-	fetchNextPage: () => Promise< void >;
-	fetchPreviousPage: () => Promise< void >;
 	loading: boolean;
 	onSelect: ( data: RemoteDataQueryInput ) => void;
+	page: number;
+	perPage?: number;
 	results?: RemoteDataResult[];
-	searchTerms: string;
-	setSearchTerms: ( newValue: string ) => void;
+	searchInput: string;
+	setPage: ( newPage: number ) => void;
+	setSearchInput: ( newValue: string ) => void;
 	supportsSearch: boolean;
 	totalItems?: number;
+	totalPages?: number;
 }
 
 export function ItemList( props: ItemListProps ) {
 	const {
 		blockName,
-		fetchNextPage,
-		fetchPreviousPage,
 		loading,
 		onSelect,
+		page,
+		perPage,
 		results,
-		searchTerms,
-		setSearchTerms,
+		searchInput,
+		setPage,
+		setSearchInput,
 		supportsSearch,
 		totalItems,
+		totalPages,
 	} = props;
 	const { defaultPattern: pattern } = usePatterns( blockName );
 
@@ -116,9 +120,9 @@ export function ItemList( props: ItemListProps ) {
 
 	const [ view, setView ] = useState< View >( {
 		type: 'table' as const,
-		perPage: data.length,
-		page: 1,
-		search: '',
+		perPage: perPage ?? data.length,
+		page,
+		search: searchInput,
 		fields: [],
 		filters: [],
 		layout: {},
@@ -127,28 +131,12 @@ export function ItemList( props: ItemListProps ) {
 	} );
 
 	function onChangeView( newView: View ) {
-		if ( newView.search !== searchTerms ) {
-			setSearchTerms( newView.search ?? '' );
-		}
-
-		console.log( { view, newView } );
-
-		const currentPage = view.page ?? 1;
-		let newPage = newView.page ?? 1;
-
-		// Only allow incrementing or decrementing the page by 1 at a time.
-		if ( newPage > currentPage ) {
-			newPage = currentPage + 1;
-			void fetchNextPage();
-		} else if ( newPage < currentPage ) {
-			newPage = currentPage - 1;
-			void fetchPreviousPage();
-		}
+		setPage( newView.page ?? 1 );
+		setSearchInput( newView.search ?? '' );
 
 		setView( {
 			...newView,
 			fields: tableFields.filter( field => field !== mediaField ),
-			page: newPage,
 		} );
 	}
 
@@ -184,7 +172,7 @@ export function ItemList( props: ItemListProps ) {
 			onChangeView={ onChangeView }
 			paginationInfo={ {
 				totalItems: totalItems ?? data.length,
-				totalPages: Math.ceil( ( totalItems ?? data.length ) / Math.max( 1, data.length ) ),
+				totalPages: totalPages ?? 1,
 			} }
 			search={ supportsSearch }
 			view={ view }
