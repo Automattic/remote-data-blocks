@@ -10,13 +10,13 @@ Download [the latest release of the plugin](https://github.com/Automattic/remote
 
 ## Step 2: Create a data source
 
-In the WordPress admin, go to **Settings** > **Remote Data Blocks** and click **Connect new**. Give the data source a display name and enter `http://www.zippopotam.us/us/` as the URL. Save the data source.
+In the WordPress admin, go to **Settings** > **Remote Data Blocks** and click **Connect new**. Give the data source a display name and enter `https://api.zippopotam.us/us/` as the URL. Save the data source.
 
 Back on the data source list, click the three dots on the right of the row for your new data source and copy the UUID.
 
 ## Step 3: Copy the zip code data source example
 
-Copy the [zip code data source example](../example/rest-api/zip-code/register.php) into your `/plugins` directory and then activate the plugin.
+Copy the [zip code data source example](../example/rest-api/zip-code/zip-code.php) into your `/plugins` directory, set `EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID` to the UUID copied above and then activate the plugin titled `Zip Code RDB Example`.
 
 ## Step 4: Customize the configuration
 
@@ -24,4 +24,4 @@ Try making changes to the configuration. For example, rename the block in the `r
 
 ## Step 5: Test the block
 
-Go to the page where you want to use the block and add the block to the page.
+Go to the page where you want to use the block and add the block to the page. Click `Provide manual input`, enter a US ZIP code and then hit save. Then, choose a pattern to use to display the data on the page.
