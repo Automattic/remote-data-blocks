@@ -89,12 +89,12 @@ function register_aic_block(): void {
 			'limit' => [
 				'default_value' => 10,
 				'name' => 'Pagination limit',
-				'type' => 'integer',
+				'type' => 'ui:pagination_per_page',
 			],
 			'page' => [
 				'default_value' => 1,
 				'name' => 'Pagination page',
-				'type' => 'integer',
+				'type' => 'ui:pagination_page',
 			],
 		],
 		'output_schema' => [
@@ -111,29 +111,13 @@ function register_aic_block(): void {
 				],
 			],
 		],
-		'pagination_data' => function( mixed $response_data, array $input_variables ): array {
-			$current_limit = $input_variables['limit'] ?? 10;
-			$current_page = $input_variables['pagination']['current_page'] ?? $input_variables['page'] ?? 1;
-			$total_items = $response_data['pagination']['total'];
-			$total_pages = $response_data['pagination']['total_pages'];
-
-			$has_next_page = $current_page < $total_pages;
-			$has_previous_page = $current_page > 1;
-
-			return [
-				'total_items' => $total_items,
-				'next_input_variables' => $has_next_page ? [
-					'limit' => $current_limit,
-					'page' => $current_page + 1,
-				] : null,
-				'previous_input_variables' => $has_previous_page ? [
-					'limit' => $current_limit,
-					'page' => $current_page - 1,
-				] : null,
-			];
-
-			return $pagination;
-		},
+		'pagination_schema' => [
+			'total_items' => [
+				'name' => 'Total items',
+				'path' => '$.pagination.total',
+				'type' => 'integer',
+			],
+		],
 	]);
 
 	register_remote_data_block([
