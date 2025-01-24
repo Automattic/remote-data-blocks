@@ -11,7 +11,7 @@ import {
 import { BlockEditProps } from '@wordpress/blocks';
 import { SandBox, Placeholder } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useMemo } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 
 import { __ } from '@/utils/i18n';
 
@@ -33,9 +33,7 @@ const DEFAULT_STYLES = `
 	}
 `;
 
-export function Edit(
-	props: BlockEditProps< RemoteDataInnerBlockAttributes >
-): JSX.Element {
+export function Edit( props: BlockEditProps< RemoteDataInnerBlockAttributes > ): JSX.Element {
 	const { attributes, setAttributes, isSelected } = props;
 	const blockProps = useBlockProps();
 
