@@ -100,11 +100,11 @@ class ConfigRegistry {
 
 			if ( self::SEARCH_QUERY_KEY === $from_query_type ) {
 				$search_input_count = count( array_filter( $from_input_schema, function ( array $input_var ): bool {
-					return 'ui:search' === $input_var['type'];
+					return 'ui:search_input' === $input_var['type'];
 				} ) );
 
 				if ( 1 !== $search_input_count ) {
-					return self::create_error( $block_title, 'A search query must have one input variable with type "ui:search"' );
+					return self::create_error( $block_title, 'A search query must have one input variable with type "ui:search_input"' );
 				}
 			}
 

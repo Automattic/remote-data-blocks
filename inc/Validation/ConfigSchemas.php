@@ -171,7 +171,7 @@ final class ConfigSchemas {
 						// to use the same validation and sanitization logic.
 						//
 						// There are also special types that are not core primitives:
-						// - `ui:search` is a string that represents a search query.
+						// - `ui:search_input` is a string that represents search query input.
 						'type' => Types::enum(
 							'boolean',
 							'id',
@@ -179,7 +179,7 @@ final class ConfigSchemas {
 							'null',
 							'number',
 							'string',
-							'ui:search',
+							'ui:search_input',
 						),
 					] ),
 				)

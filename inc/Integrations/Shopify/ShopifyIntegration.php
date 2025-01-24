@@ -78,7 +78,7 @@ class ShopifyIntegration {
 				'data_source' => $data_source,
 				'input_schema' => [
 					'search' => [
-						'type' => 'ui:search',
+						'type' => 'ui:search_input',
 					],
 				],
 				'output_schema' => [

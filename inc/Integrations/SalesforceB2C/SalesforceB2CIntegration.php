@@ -107,7 +107,7 @@ class SalesforceB2CIntegration {
 				},
 				'input_schema' => [
 					'search' => [
-						'type' => 'ui:search',
+						'type' => 'ui:search_input',
 					],
 				],
 				'output_schema' => [
