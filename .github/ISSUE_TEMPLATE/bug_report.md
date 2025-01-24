@@ -4,14 +4,15 @@ about: When something has gone wrong.
 title: ''
 labels: bug
 assignees: smithjw1
-
 ---
 
 **Describe the bug**
 A one sentence description of what the bug is.
 
 **To reproduce**
+
 - Include the steps you took when you encountered the bug.
+
 1. Step one
 2. Step two
 3. Step three
@@ -30,6 +31,7 @@ Version of the plugin
 
 **Environment**
 Provide details about your environment:
+
 - WordPress version:
 - PHP version:
 - Browser and version:
