@@ -5,7 +5,7 @@ namespace RemoteDataBlocks\IntegrationTests\Blocks;
 use RDBTestCase;
 
 class RemoteHtmlTest extends RDBTestCase {
-	public function testRemoteHtmlRender(): void {
+	public function testRemoteHtmlBlockRenders(): void {
 		$test_title = 'My Product';
 
 		$test_api_response = [
@@ -38,12 +38,31 @@ class RemoteHtmlTest extends RDBTestCase {
 				<h2 id="field-title" class="wp-block-heading"></h2>
 				<!-- /wp:heading -->
 
-				<!-- wp:remote-data-blocks/remote-html {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"content","block":"remote-data-blocks/test-html-render"}}},"name":"Content"}} --><!-- /wp:remote-data-blocks/remote-html -->
+				<!-- wp:remote-data-blocks/remote-html {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"content","block":"remote-data-blocks/test-html-render"}}},"name":"Content"}} /-->
 			</div>
 			<!-- /wp:remote-data-blocks/test-html-render -->
 		');
 
 		$dom = $this->load_html( $result_html );
 		$this->assertDomIdHasHtmlContent( $dom, 'rendered-html', 'A <strong>one of a kind</strong> product!' );
+	}
+
+	public function testRemoteHtmlBlockRendersFallbackContent(): void {
+		$this->register_failed_query_data_block( 'test-html-failure' );
+
+		$result_html = do_blocks('
+			<!-- wp:remote-data-blocks/test-html-failure {"remoteData":{"blockName":"remote-data-blocks/test-html-failure"}} -->
+			<div>
+				<!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"block":"remote-data-blocks/test-html-failure","field":"title"}}},"name":"Title"}} -->
+				<h2 id="field-title" class="wp-block-heading"></h2>
+				<!-- /wp:heading -->
+
+				<!-- wp:remote-data-blocks/remote-html {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"content","block":"remote-data-blocks/test-html-failure"}}},"name":"Content"}} --><div id="fallback-content"><div class="warning">Use <em>this</em> content in case of emergency!</div></div><!-- /wp:remote-data-blocks/remote-html -->
+			</div>
+			<!-- /wp:remote-data-blocks/test-html-failure -->
+		');
+
+		$dom = $this->load_html( $result_html );
+		$this->assertDomIdHasHtmlContent( $dom, 'fallback-content', '<div class="warning">Use <em>this</em> content in case of emergency!</div>' );
 	}
 }
