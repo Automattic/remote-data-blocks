@@ -86,6 +86,16 @@ function register_aic_block(): void {
 				'name' => 'Search terms',
 				'type' => 'ui:search_input',
 			],
+			'limit' => [
+				'default_value' => 10,
+				'name' => 'Pagination limit',
+				'type' => 'ui:pagination_per_page',
+			],
+			'page' => [
+				'default_value' => 1,
+				'name' => 'Pagination page',
+				'type' => 'ui:pagination_page',
+			],
 		],
 		'output_schema' => [
 			'is_collection' => true,
@@ -99,6 +109,13 @@ function register_aic_block(): void {
 					'name' => 'Title',
 					'type' => 'string',
 				],
+			],
+		],
+		'pagination_schema' => [
+			'total_items' => [
+				'name' => 'Total items',
+				'path' => '$.pagination.total',
+				'type' => 'integer',
 			],
 		],
 	]);
