@@ -18,10 +18,10 @@ interface QueryRunnerInterface {
 	 *     type: string,
 	 *     value: string|int|null,
 	 *   }>,
-	 *   pagination: array{
-	 *     total_items: int|null,
-	 *     next_input_variables: array<array-key, mixed>|null,
-	 *     previous_input_variables: array<array-key, mixed>|null,
+	 *   pagination: null|array{
+	 *     total_items: int,
+	 *     cursor_next: string|null,
+	 *     cursor_previous: string|null,
 	 *   },
 	 *   results: null|array<int, array{
 	 *     result: array{

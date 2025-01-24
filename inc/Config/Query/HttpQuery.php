@@ -87,29 +87,11 @@ class HttpQuery extends ArraySerializable implements HttpQueryInterface {
 	}
 
 	/**
-	 * Get the pagination data for the current query execution. The return value
-	 * should have the following structure:
-	 *
-	 * - total_items: The total number of items available in the paginated data, or
-	 *                null to disable pagination. When set to null, the values of
-	 *                `next_` and `previous_input_variables` are ignored.
-	 * - next_input_variables: The input variables for the next page of data, or
-	 *                         null if there is no next page.
-	 * - previous_input_variables: The input variables for the previous page of
-	 *                             data, or null if there is no previous page.
-	 *
-	 * @param mixed $response_data The deserialized response data for the current query execution.
-	 * @param array $input_variables The input variables for the current query execution.
-	 * @return array<string, null|array> An array containing the pagination input variables.
+	 * Get the pagination schema for this query. If null, pagination will be
+	 * disabled.
 	 */
-	public function get_pagination_data( mixed $response_data, array $input_variables ): array {
-		$default_pagination_data = [
-			'total_items' => null,
-			'next_input_variables' => null,
-			'previous_input_variables' => null,
-		];
-
-		return $this->get_or_call_from_config( 'pagination_data', $response_data, $input_variables ) ?? $default_pagination_data;
+	public function get_pagination_schema(): ?array {
+		return $this->config['pagination_schema'];
 	}
 
 	/**
