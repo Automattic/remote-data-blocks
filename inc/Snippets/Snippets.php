@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Snippets;
 
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
+use RemoteDataBlocks\Integrations\Airtable\AirtableIntegration;
 use RemoteDataBlocks\Integrations\Shopify\ShopifyIntegration;
 use WP_Error;
 
@@ -20,6 +21,9 @@ class Snippets {
 		switch ( $service ) {
 			case 'shopify':
 				$snippets = ShopifyIntegration::get_block_registration_snippets( $data_source_config );
+				break;
+			case 'airtable':
+				$snippets = AirtableIntegration::get_block_registration_snippets( $data_source_config );
 				break;
 			default:
 				return new WP_Error( 'invalid_service', __( 'Invalid service', 'remote-data-blocks' ) );
