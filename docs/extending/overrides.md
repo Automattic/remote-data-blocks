@@ -25,7 +25,7 @@ register_remote_data_block( [
     ],
 ] );
 
-add_rewrite_rule( '^product/([0-9]+)/?', 'index.php?pagename=products&acme_product_id=$matches[1]', 'top' );
+add_rewrite_rule( '^products/([0-9]+)/?', 'index.php?pagename=products&acme_product_id=$matches[1]', 'top' );
 
 add_filter( 'query_vars', function ( array $query_vars ): array {
     $query_vars[] = 'acme_product_id';
