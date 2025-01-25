@@ -1,6 +1,6 @@
 # Query `output_schema` property
 
-The `output_schema` property is where your data shape definition happens. It should be created with care and requires updates any time the incoming response changes.
+The `output_schema` property is where your data shape definition happens. It should be created with care and requires updates whenever the incoming response changes.
 
 Unless your API returns a single value, `type` will be constructed of an associative array of nested output schemas that eventually resolve to one of the accepted primitive types:
 
@@ -98,7 +98,6 @@ An example of collection JSON can be found in the [Chicago Institue of Art examp
 			"timestamp": "2025-01-14T22:26:21-06:00"
 		},
 		{
-
 			"_score": 152.35487,
 			"thumbnail": {
 				"alt_text": "Impressionist painting of woman wearing green dress trying on hats.",
