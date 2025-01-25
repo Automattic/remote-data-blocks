@@ -45,7 +45,7 @@ add_filter( 'remote_data_blocks_query_input_variables', function ( array $input_
 }, 10, 2 );
 ```
 
-As you can see the `remote_data_blocks_query_input_variables` filter is passed a list of enabled overrides. You need to add logic to identify which filters are enabled and act accordingly.
+As you can see, the `remote_data_blocks_query_input_variables` filter is passed a list of enabled overrides. You need to add logic to identify which filters are enabled and act accordingly.
 
 The `overrides` property in the block registration array enables a panel in the block settings that allows content authors to enable or disable the override:
 
