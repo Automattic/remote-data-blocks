@@ -8,7 +8,7 @@ Here is an example of an override that modifies the query input variables based 
 
 You would use this to build a one "single product page" in the WordPress admin that would be able to display any product, based on the product id at a url like: https://example.com/product/123456
 
-The example takes advantage of the [`add_rewrite_rule`](https://developer.wordpress.org/reference/functions/add_rewrite_rule/) method and [`query_vars`](https://developer.wordpress.org/reference/hooks/query_vars/) filter that are built into WordPress.
+The example takes advantage of the [`add_rewrite_rule`](https://developer.wordpress.org/reference/functions/add_rewrite_rule/) function and the [`query_vars`](https://developer.wordpress.org/reference/hooks/query_vars/) filter that are built into WordPress.
 
 ```php
 register_remote_data_block( [
