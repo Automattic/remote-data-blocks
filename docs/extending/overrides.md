@@ -4,7 +4,7 @@ Overrides provide a way to customize the behavior of remote data blocks on a per
 
 If you have multiple instances of the same remote data block in a piece of content, each instance can have different overrides enabled. By default, no overrides are enabled.
 
-Here is an example of an override that modifies usesthe query input variables based on the URL. 
+Here is an example of an override that modifies the query input variables based on the URL. 
 
 You would use this to build a one "single product page" in the WordPress admin that would be able to display any product, based on the product id at a url like: https://example.com/product/123456
 
