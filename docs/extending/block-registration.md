@@ -142,4 +142,4 @@ Here you can see the input variable of `search_terms` is used in the endpoint me
 ### `patterns`: array (optional)
 
 [Block patterns](./block-patterns.md) allow you to customize the display of your remote data.
-````
+```
