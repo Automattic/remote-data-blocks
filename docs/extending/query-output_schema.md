@@ -1,4 +1,4 @@
-# The Query `output_schema` Property
+# Query `output_schema` property
 
 The `output_schema` property is where your data shape definition happens. It should be created with care and requires updates any time the incoming response changes.
 

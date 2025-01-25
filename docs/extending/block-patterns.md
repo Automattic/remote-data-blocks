@@ -1,4 +1,4 @@
-# Block Patterns
+# Block patterns
 
 Patterns allow you to represent your remote data in different ways. The plugin registers an unstyled block pattern anytime you register a remote data block either in the WordPress admin or with `register_remote_data_block`. You can create additional patterns in the WordPress Site Editor or programmatically by passing a `patterns` property to your block options.
 

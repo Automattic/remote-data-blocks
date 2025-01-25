@@ -1,4 +1,4 @@
-# Block Registration
+# Block registration
 
 Use the `register_remote_data_block` function to register your block and associate it with your query and data source. This example:
 
