@@ -6,7 +6,7 @@ A common approach is to define a data source on the settings screen and then com
 
 ## HttpQuery
 
-Most HTTP-powered APIs can be queried using an `HttpQuery`. Here's an example of a query for US ZIP
+Most HTTP-powered APIs can be queried using an `HttpQuery`. Here's an example of a query for US ZIP code data. This examples assumes you have configured the data source in the UI, and have the UUID.
 
 ```php
 if ( ! defined( 'REMOTE_DATA_BLOCKS_EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID' ) ) {
