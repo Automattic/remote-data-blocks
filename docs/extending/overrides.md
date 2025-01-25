@@ -2,7 +2,7 @@
 
 Overrides provide a way to customize the behavior of remote data blocks on a per-block basis. You can use them to modify the underlying query input variables, adjust the query response, or change the caching behavior. Overrides are defined when you register a remote data block and can be enabled or disabled via the block settings in the WordPress editor. 
 
-If you have multiple instances of the same remote data block in a piece of content, each instance can have a different number of overrides enabled. The default behavior is no overrides.
+If you have multiple instances of the same remote data block in a piece of content, each instance can have different overrides enabled. By default, no overrides are enabled.
 
 Here is an example of an override that modifies usesthe query input variables based on the URL. 
 
