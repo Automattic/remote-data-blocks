@@ -16,6 +16,8 @@ import { info } from '@wordpress/icons';
 
 import CodeSnippet from './components/CodeSnippet';
 import { SUPPORTED_SERVICES, SUPPORTED_SERVICES_LABELS } from './constants';
+import { BaseModal } from '@/blocks/remote-data-container/components/modals/BaseModal';
+import { useModalState } from '@/blocks/remote-data-container/hooks/useModalState';
 import DataSourceMetaTags from '@/data-sources/DataSourceMetaTags';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig } from '@/data-sources/types';
@@ -40,6 +42,8 @@ const DataSourceList = () => {
 	const [ dataSourceToDelete, setDataSourceToDelete ] = useState<
 		DataSourceConfig | DataSourceConfig[] | null
 	>( null );
+	const [ snippet, setSnippet ] = useState< string >( '' );
+	const { close, isOpen, open } = useModalState();
 	const { pushState } = useSettingsContext();
 
 	const onCancelDeleteDialog = () => {
@@ -228,15 +232,21 @@ const DataSourceList = () => {
 		{
 			id: 'view-code',
 			label: __( 'View Code', 'remote-data-blocks' ),
-			isEligible: ( item: DataSourceConfig ) => {
-				return Boolean( item?.uuid );
+			isEligible: ( item: DataSourceConfig ) => Boolean( item?.uuid ),
+			callback: ( [ item ]: DataSourceConfig[] ) => {
+				if ( item?.uuid ) {
+					getDataSourceSnippet( item.uuid )
+						.then( snippets => {
+							if ( snippets?.[ 0 ] ) {
+								setSnippet( snippets[ 0 ] );
+								open();
+							}
+						} )
+						.catch( () => {
+							showSnackbar( 'error', __( 'Failed to load code snippets.', 'remote-data-blocks' ) );
+						} );
+				}
 			},
-			RenderModal: ( { items } ) => {
-				// TODO
-				// const snippets = getDataSourceSnippet( items[ 0 ].uuid );
-				return <CodeSnippet code="" />;
-			},
-			modalHeader: __( 'Data Source Code', 'remote-data-blocks' ),
 		},
 	];
 
@@ -285,6 +295,14 @@ const DataSourceList = () => {
 								dataSourceToDelete.service_config.display_name
 						  ) }
 				</ConfirmDialog>
+			) }
+			{ snippet && isOpen && (
+				<BaseModal
+					title={ __( 'Data Source Code Snippet', 'remote-data-blocks' ) }
+					onClose={ () => close() }
+				>
+					<CodeSnippet code={ snippet } />
+				</BaseModal>
 			) }
 		</>
 	);

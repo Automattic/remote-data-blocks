@@ -149,19 +149,23 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 		);
 	}
 
-	async function getDataSourceSnippet( source: DataSourceConfig ) {
-		let result;
+	async function getDataSourceSnippet( uuid: DataSourceConfig[ 'uuid' ] ) {
 		try {
-			result = await apiFetch( {
-				path: `${ REST_BASE_DATA_SOURCES }/snippets/${ source.uuid }`,
+			const response = await apiFetch( {
+				path: `${ REST_BASE_DATA_SOURCES }/snippets/${ uuid }`,
 				method: 'GET',
 			} );
+			const result = response as { snippets: string[] };
+			return result.snippets;
 		} catch ( error ) {
-			showSnackbar( 'error', __( `Failed to get code snippet.`, 'remote-data-blocks' ) );
+			if ( error instanceof Error ) {
+				showSnackbar(
+					'error',
+					sprintf( __( 'Failed to get code snippet: %s', 'remote-data-blocks' ), error.message )
+				);
+			}
 			throw error;
 		}
-
-		return result;
 	}
 
 	async function onSave( config: SourceConfig, mode: 'add' | 'edit' ): Promise< void > {
