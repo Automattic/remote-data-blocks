@@ -98,7 +98,6 @@ An example of collection JSON can be found in the [Chicago Institue of Art examp
 			"timestamp": "2025-01-14T22:26:21-06:00"
 		},
 		{
-
 			"_score": 152.35487,
 			"thumbnail": {
 				"alt_text": "Impressionist painting of woman wearing green dress trying on hats.",
