@@ -6,7 +6,7 @@ If you have multiple instances of the same remote data block in a piece of conte
 
 Here is an example of an override that modifies usesthe query input variables based on the URL. 
 
-You would use this to build a one "single product page" in the WordPress admin that would be able to display any product, based on the product id at a url like: https://example.com/product/123456
+You could use this to build a "product page" in the WordPress admin that would be able to display any product, using an ID from the URL, e.g.: https://example.com/product/123456
 
 The example takes advantage of the [`add_rewrite_rule`](https://developer.wordpress.org/reference/functions/add_rewrite_rule/) method and [`query_vars`](https://developer.wordpress.org/reference/hooks/query_vars/) filter that are built into WordPress.
 
