@@ -16,4 +16,5 @@ interface QueryInterface extends ArraySerializableInterface {
 	public function get_image_url(): ?string;
 	public function get_input_schema(): array;
 	public function get_output_schema(): array;
+	public function get_pagination_schema(): ?array;
 }

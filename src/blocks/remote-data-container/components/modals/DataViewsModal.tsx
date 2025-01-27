@@ -1,9 +1,9 @@
 import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { ModalWithButtonTrigger } from './BaseModal';
-import { useModalState } from '../../hooks/useModalState';
-import { ItemList } from '../item-list/ItemList';
+import { ItemList } from '@/blocks/remote-data-container/components/item-list/ItemList';
+import { ModalWithButtonTrigger } from '@/blocks/remote-data-container/components/modals//BaseModal';
+import { useModalState } from '@/blocks/remote-data-container/hooks/useModalState';
 import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteData';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
 import { getBlockDataSourceType } from '@/utils/localized-block-data';
@@ -21,7 +21,18 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 	const { blockName, inputVariables, onSelect, queryKey, title } = props;
 
 	const { close, isOpen, open } = useModalState();
-	const { data, fetch, loading, searchInput, setSearchInput } = useRemoteData( {
+	const {
+		data,
+		fetch,
+		loading,
+		page,
+		searchInput,
+		setPage,
+		setSearchInput,
+		supportsSearch,
+		totalItems,
+		totalPages,
+	} = useRemoteData( {
 		blockName,
 		inputVariables,
 		queryKey,
@@ -54,9 +65,14 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 				blockName={ props.blockName }
 				loading={ loading }
 				onSelect={ onSelectItem }
+				page={ page }
 				results={ data?.results }
-				searchTerms={ searchInput }
-				setSearchTerms={ setSearchInput }
+				searchInput={ searchInput }
+				setPage={ setPage }
+				setSearchInput={ setSearchInput }
+				supportsSearch={ supportsSearch }
+				totalItems={ totalItems }
+				totalPages={ totalPages }
 			/>
 		</ModalWithButtonTrigger>
 	);
