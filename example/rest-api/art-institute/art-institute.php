@@ -69,15 +69,22 @@ function register_aic_block(): void {
 	$search_art_query = HttpQuery::from_array([
 		'data_source' => $aic_data_source,
 		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
-			$query = $input_variables['search_terms'];
-			$endpoint = $aic_data_source->get_endpoint() . '/search';
+			$endpoint = $aic_data_source->get_endpoint();
+			$search_terms = $input_variables['search'] ?? '';
 
-			return add_query_arg( [ 'q' => $query ], $endpoint );
+			if ( ! empty( $search_terms ) ) {
+				$endpoint = add_query_arg( [ 'q' => $search_terms ], $endpoint . '/search' );
+			}
+
+			return add_query_arg( [
+				'limit' => $input_variables['limit'],
+				'page' => $input_variables['page'],
+			], $endpoint );
 		},
 		'input_schema' => [
-			'search_terms' => [
-				'name' => 'Search Terms',
-				'type' => 'string',
+			'search' => [
+				'name' => 'Search terms',
+				'type' => 'ui:search_input',
 			],
 		],
 		'output_schema' => [
