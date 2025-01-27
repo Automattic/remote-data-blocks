@@ -11,8 +11,8 @@ We are assuming `https://api.example.com/` returns JSON that has a shape like:
 
 ```json
 {
-    "id": 12345,
-    "title": "An awesome title"
+	"id": 12345,
+	"title": "An awesome title"
 }
 ```
 
@@ -142,4 +142,3 @@ Here you can see the input variable of `search_terms` is used in the endpoint me
 ### `patterns`: array (optional)
 
 [Block patterns](./block-patterns.md) allow you to customize the display of your remote data.
-```

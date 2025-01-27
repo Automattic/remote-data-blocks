@@ -1,8 +1,8 @@
 # Block patterns
 
-Patterns allow you to represent your remote data in different ways. 
+Patterns allow you to represent your remote data in different ways.
 
-The plugin registers an unstyled block pattern any time you register a remote data block either in the WordPress admin or with `register_remote_data_block`. 
+The plugin registers an unstyled block pattern any time you register a remote data block either in the WordPress admin or with `register_remote_data_block`.
 
 You can create additional patterns in the WordPress Site Editor or programmatically by passing a `patterns` property to your block options.
 
@@ -17,21 +17,21 @@ If you want to make the pattern uneditable in the Site Editor, you can copy the 
 ```html
 <!-- wp:group {"layout":{"type":"constrained"}} -->
 <div class="wp-block-group">
-    <!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"title"}}}}} -->
-    <h2 class="wp-block-heading"></h2>
-    <!-- /wp:heading -->
-    <!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"description"}}}}} -->
-    <p></p>
-    <!-- /wp:paragraph -->
+	<!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"title"}}}}} -->
+	<h2 class="wp-block-heading"></h2>
+	<!-- /wp:heading -->
+	<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"description"}}}}} -->
+	<p></p>
+	<!-- /wp:paragraph -->
 </div>
 <!-- /wp:group -->
- ```
+```
 
 You could save this file as `my-pattern.html` in the same directory as the code that registers your block.
 
 ```php
 register_remote_data_block( [
-    'title' => 'My Remote Data Block', 
+    'title' => 'My Remote Data Block',
     'render_query' => [ /* ... */ ],
     'patterns' => [
         [

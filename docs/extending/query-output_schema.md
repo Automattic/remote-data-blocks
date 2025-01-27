@@ -25,18 +25,18 @@ Using the [Zip Code example](../../example/rest-api/zip-code/README.md), the JSO
 
 ```json
 {
-    "post code": "17057",
-    "country": "United States",
-    "country abbreviation": "US",
-    "places": [
-        {
-            "place name": "Middletown",
-            "longitude": "-76.7331",
-            "state": "Pennsylvania",
-            "state abbreviation": "PA",
-            "latitude": "40.2041"
-        }
-    ]
+	"post code": "17057",
+	"country": "United States",
+	"country abbreviation": "US",
+	"places": [
+		{
+			"place name": "Middletown",
+			"longitude": "-76.7331",
+			"state": "Pennsylvania",
+			"state abbreviation": "PA",
+			"latitude": "40.2041"
+		}
+	]
 }
 ```
 
