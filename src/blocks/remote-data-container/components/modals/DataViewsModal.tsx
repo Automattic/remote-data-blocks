@@ -1,32 +1,38 @@
+import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { ModalWithButtonTrigger } from './BaseModal';
 import { useModalState } from '../../hooks/useModalState';
 import { ItemList } from '../item-list/ItemList';
-import { useSearchResults } from '@/blocks/remote-data-container/hooks/useSearchResults';
+import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteData';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
 import { getBlockDataSourceType } from '@/utils/localized-block-data';
 
 interface DataViewsModalProps {
 	blockName: string;
 	headerImage?: string;
+	inputVariables: InputVariable[];
 	onSelect: ( data: RemoteDataQueryInput ) => void;
 	queryKey: string;
 	title: string;
 }
 
 export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
-	const { blockName, onSelect, queryKey, title } = props;
+	const { blockName, inputVariables, onSelect, queryKey, title } = props;
 
-	const { loading, results, searchTerms, setSearchTerms } = useSearchResults( {
+	const { close, isOpen, open } = useModalState();
+	const { data, fetch, loading, searchInput, setSearchInput } = useRemoteData( {
 		blockName,
+		inputVariables,
 		queryKey,
 	} );
 
-	const { close, isOpen, open } = useModalState();
+	useEffect( () => {
+		void fetch( {} );
+	}, [] );
 
-	function onSelectItem( data: RemoteDataQueryInput ): void {
-		onSelect( data );
+	function onSelectItem( input: RemoteDataQueryInput ): void {
+		onSelect( input );
 		sendTracksEvent( 'remotedatablocks_add_block', {
 			action: 'select_item',
 			selected_option: 'search_from_list',
@@ -48,9 +54,9 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 				blockName={ props.blockName }
 				loading={ loading }
 				onSelect={ onSelectItem }
-				results={ results }
-				searchTerms={ searchTerms }
-				setSearchTerms={ setSearchTerms }
+				results={ data?.results }
+				searchTerms={ searchInput }
+				setSearchTerms={ setSearchInput }
 			/>
 		</ModalWithButtonTrigger>
 	);

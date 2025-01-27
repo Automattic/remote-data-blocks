@@ -1,7 +1,8 @@
 import apiFetch from '@wordpress/api-fetch';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 import { REMOTE_DATA_REST_API_URL } from '@/blocks/remote-data-container/config/constants';
+import { useSearchVariables } from '@/blocks/remote-data-container/hooks/useSearchVariables';
 
 async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< RemoteData | null > {
 	const { body } = await apiFetch< RemoteDataApiResponse >( {
@@ -37,6 +38,10 @@ interface UseRemoteData {
 	fetch: ( queryInput: RemoteDataQueryInput ) => Promise< void >;
 	loading: boolean;
 	reset: () => void;
+	searchAllowsEmptyInput: boolean;
+	searchInput: string;
+	setSearchInput: ( searchInput: string ) => void;
+	supportsSearch: boolean;
 }
 
 interface UseRemoteDataInput {
@@ -44,6 +49,8 @@ interface UseRemoteDataInput {
 	enabledOverrides?: string[];
 	externallyManagedRemoteData?: RemoteData;
 	externallyManagedUpdateRemoteData?: ( remoteData?: RemoteData ) => void;
+	initialSearchInput?: string;
+	inputVariables?: InputVariable[];
 	onSuccess?: () => void;
 	queryKey: string;
 }
@@ -61,6 +68,8 @@ export function useRemoteData( {
 	enabledOverrides = [],
 	externallyManagedRemoteData,
 	externallyManagedUpdateRemoteData,
+	initialSearchInput,
+	inputVariables = [],
 	onSuccess,
 	queryKey,
 }: UseRemoteDataInput ): UseRemoteData {
@@ -69,6 +78,20 @@ export function useRemoteData( {
 
 	const resolvedData = externallyManagedRemoteData ?? data;
 	const resolvedUpdater = externallyManagedUpdateRemoteData ?? setData;
+	const hasResolvedData = Boolean( resolvedData );
+	const { searchQueryInput, searchAllowsEmptyInput, searchInput, setSearchInput, supportsSearch } =
+		useSearchVariables( {
+			initialSearchInput,
+			inputVariables,
+		} );
+
+	useEffect( () => {
+		if ( ! hasResolvedData ) {
+			return;
+		}
+
+		void fetch( resolvedData?.queryInput ?? {} );
+	}, [ hasResolvedData, searchInput ] );
 
 	async function fetch( queryInput: RemoteDataQueryInput ): Promise< void > {
 		setLoading( true );
@@ -76,7 +99,10 @@ export function useRemoteData( {
 		const requestData: RemoteDataApiRequest = {
 			block_name: blockName,
 			query_key: queryKey,
-			query_input: queryInput,
+			query_input: {
+				...queryInput,
+				...searchQueryInput,
+			},
 		};
 
 		const remoteData = await fetchRemoteData( requestData ).catch( () => null );
@@ -101,5 +127,9 @@ export function useRemoteData( {
 		fetch,
 		loading,
 		reset,
+		searchAllowsEmptyInput,
+		searchInput,
+		setSearchInput,
+		supportsSearch,
 	};
 }
