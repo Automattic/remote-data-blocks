@@ -5,7 +5,7 @@
 
 Data sources and queries can be configured in the plugin UI, but sometimes, you need to extend the plugin to implement custom functionality. Remote Data Blocks provides extendable classes, global functions, hooks, and filters to help you connect to any data source, parse responses, and customize the display of data.
 
-## Data flow
+## Data Flow
 
 Here's a short overview of how data flows through the plugin when a post with a remote data block is rendered:
 
@@ -23,7 +23,7 @@ Providing a custom data source, query, or query runner gives you complete contro
 
 Here are some detailed overviews of these classes with notes on how and why to extend them:
 
-- [Data source](data-source.md)
+- [Data Source](data-source.md)
 - [Query](query.md)
 
 Once you've defined your data source and queries, you can [register a remote data block](block-registration.md) that uses them. That block can use a [pattern](block-patterns.md) for display. You can also use [overrides](./overrides.md) to dynamically select the displayed content.

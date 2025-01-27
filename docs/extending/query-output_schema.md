@@ -1,6 +1,6 @@
-# The Query `output_schema` property
+# Query `output_schema` property
 
-The `output_schema` property is where your data shape definition happens. It should be created with care and requires updates anytime the incoming response changes.
+The `output_schema` property is where your data shape definition happens. It should be created with care and requires updates whenever the incoming response changes.
 
 Unless your API returns a single value, `type` will be constructed of an associative array of nested output schemas that eventually resolve to one of the accepted primitive types:
 
