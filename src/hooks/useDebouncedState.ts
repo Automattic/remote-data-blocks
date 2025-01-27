@@ -1,21 +1,19 @@
-import { useCallback, useRef, useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 export function useDebouncedState< T >(
+	callback: ( value: T ) => void,
 	delayInMs: number,
 	initialValue: T
 ): [ T, ( value: T ) => void ] {
-	const timer = useRef< NodeJS.Timeout | null >( null );
 	const [ value, setValue ] = useState< T >( initialValue );
 
-	const debouncedSetValue = useCallback( ( newValue: T ) => {
-		if ( timer.current ) {
-			clearTimeout( timer.current );
-		}
-
-		timer.current = setTimeout( () => {
-			setValue( newValue );
+	useEffect( () => {
+		const timeoutId = setTimeout( () => {
+			callback( value );
 		}, delayInMs );
-	}, [] );
 
-	return [ value, debouncedSetValue ];
+		return () => clearTimeout( timeoutId );
+	}, [ callback, delayInMs, value ] );
+
+	return [ value, setValue ];
 }
