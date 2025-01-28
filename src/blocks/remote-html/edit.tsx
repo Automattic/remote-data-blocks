@@ -46,6 +46,9 @@ export function Edit( props: BlockEditProps< RemoteHtmlAttributes > ): JSX.Eleme
 	// but the Save component does not receive the same augmented attributes. In order to
 	// persist fallback content during save, we need to store the content in an attribute
 	// (saveContent) and call setAttributes to expose it to Save.
+	//
+	// This should be removed once we replace mergedAttributes/getMismatchedAttributes()
+	// with a getValues() implementation.
 	const { content } = attributes;
 	useEffect( () => {
 		if ( content !== undefined ) {
