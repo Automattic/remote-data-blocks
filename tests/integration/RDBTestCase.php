@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-use PHPUnit\Framework\TestCase;
+use WP_UnitTestCase;
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Config\Query\HttpQueryInterface;
@@ -8,7 +8,7 @@ use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\Editor\BlockManagement\BlockRegistration;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 
-class RDBTestCase extends TestCase {
+class RDBTestCase extends WP_UnitTestCase {
 	// Query mocking
 
 	protected function register_mocked_data_block( string $block_title, array $api_response, array $output_schema ): void {
