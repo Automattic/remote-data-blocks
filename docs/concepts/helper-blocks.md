@@ -4,7 +4,7 @@ Remote Data Blocks adds some accessory blocks for bindings, listed below.
 
 ## Remote HTML Block
 
-Use this block to bind to HTML from a remote data source.
+Use this block to bind to HTML from a remote data source. This block only works when placed inside a remote data block container and bound to an attribute.
 
 ![Screen recording showing the insertion and binding of a Remote HTML Block in the editor](./block-insert-remote-html.gif)
 
@@ -39,4 +39,3 @@ register_remote_data_block( [
 ] );
 ```
 
-This block only works when placed inside a remote data block container and bound to an attribute.
