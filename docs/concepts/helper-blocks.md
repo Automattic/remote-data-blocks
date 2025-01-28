@@ -38,4 +38,3 @@ register_remote_data_block( [
     ],
 ] );
 ```
-
