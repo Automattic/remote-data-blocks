@@ -40,9 +40,9 @@ Headers will be set according to the properties of the array. When providing aut
 
 ## Additional parameters
 
-You can add any additional parameters that are necessary for your data source. In our [Airtable example](../../example/airtable/events/register.php), you can see that we are setting values for the Airtable `base` and `table`.
+You can add any additional parameters that are necessary for your data source. In our [Airtable example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/airtable/events/register.php), you can see that we are setting values for the Airtable `base` and `table`.
 
-Consider adding whatever configuration would be useful to queries. As an example, queries have an `endpoint` property. Our [Zip code example](../../example/rest-api/zip-code/register.php) sets the endpoint with a function:
+Consider adding whatever configuration would be useful to queries. As an example, queries have an `endpoint` property. Our [Zip code example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/zip-code/zip-code.php) sets the endpoint with a function:
 
 ```php
 $zipcode_query = HttpQuery::from_array( [
@@ -102,9 +102,9 @@ Headers will be set according to the properties of the array. When providing aut
 
 ## Additional parameters
 
-You can add any additional parameters that are necessary for your data source. In our [Airtable example](../../example/airtable/events/register.php), you can see that we are setting values for the Airtable `base` and `table`.
+You can add any additional parameters that are necessary for your data source. In our [Airtable example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/airtable/events/register.php), you can see that we are setting values for the Airtable `base` and `table`.
 
-Consider adding whatever configuration would be useful to queries. As an example, queries have an `endpoint` property. Our [Zip code example](../../example/rest-api/zip-code/register.php) sets the endpoint with a function:
+Consider adding whatever configuration would be useful to queries. As an example, queries have an `endpoint` property. Our [Zip code example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/zip-code/zip-code.php) sets the endpoint with a function:
 
 ```php
 $zipcode_query = HttpQuery::from_array( [

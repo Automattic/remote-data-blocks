@@ -18,7 +18,7 @@ Back on the data source list, click the three dots on the right of the row for y
 
 ## Step 3: Copy the zip code data source example
 
-Copy the [zip code data source example](../example/rest-api/zip-code/zip-code.php) into your `/plugins` directory, set `EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID` to the UUID copied above and then activate the plugin titled `Zip Code RDB Example`.
+Copy the [zip code data source example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/zip-code/zip-code.php) into your `/plugins` directory, set `EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID` to the UUID copied above and then activate the plugin titled `Zip Code RDB Example`.
 
 ## Step 4: Customize the configuration
 
