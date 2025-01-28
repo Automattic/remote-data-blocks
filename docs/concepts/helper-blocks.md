@@ -6,7 +6,7 @@ Remote Data Blocks adds some accessory blocks for bindings, listed below.
 
 Use this block to bind to HTML from a remote data source.
 
-![Screen recording showing the insertion and binding of a Remote HTML Block in the editor](https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/docs/concepts/patterns-right-panel.png)
+![Screen recording showing the insertion and binding of a Remote HTML Block in the editor](https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/docs/concepts/block-insert-remote-html.gif)
 
 Bindings in the `output_schema` of a remote data container must have type `html` in order to be rendered by the Remote HTML block:
 
