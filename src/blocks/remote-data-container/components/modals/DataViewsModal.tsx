@@ -5,7 +5,7 @@ import { useModalState } from '../../hooks/useModalState';
 import { ItemList } from '../item-list/ItemList';
 import { useSearchResults } from '@/blocks/remote-data-container/hooks/useSearchResults';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
-import { getBlockDataSourceType } from '@/utils/localized-block-data';
+import { getBlockAvailableBindings, getBlockDataSourceType } from '@/utils/localized-block-data';
 
 interface DataViewsModalProps {
 	blockName: string;
@@ -17,6 +17,7 @@ interface DataViewsModalProps {
 
 export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 	const { blockName, onSelect, queryKey, title } = props;
+	const availableBindings = getBlockAvailableBindings( blockName );
 
 	const { loading, results, searchTerms, setSearchTerms } = useSearchResults( {
 		blockName,
@@ -45,6 +46,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 			title={ title }
 		>
 			<ItemList
+				availableBindings={ availableBindings }
 				blockName={ props.blockName }
 				loading={ loading }
 				onSelect={ onSelectItem }
