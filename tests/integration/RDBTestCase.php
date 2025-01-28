@@ -1,5 +1,6 @@
 <?php declare(strict_types = 1);
 
+use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Config\Query\HttpQueryInterface;
@@ -7,12 +8,9 @@ use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\Editor\BlockManagement\BlockRegistration;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 
-class RDBTestCase extends WP_UnitTestCase {
+class RDBTestCase extends TestCase {
 	// Query mocking
 
-	/**
-	 * @psalm-suppress PossiblyUnusedParam
-	 */
 	protected function register_mocked_data_block( string $block_title, array $api_response, array $output_schema ): void {
 		$test_query_runner = $this->get_query_runner_with_response( $api_response );
 
@@ -47,9 +45,6 @@ class RDBTestCase extends WP_UnitTestCase {
 		BlockRegistration::register_block_configuration( $block_config );
 	}
 
-	/**
-	 * @psalm-suppress PossiblyUnusedParam
-	 */
 	protected function register_failed_query_data_block( string $block_title ): void {
 		$test_query_runner = $this->get_query_runner_with_response( [], 500 );
 
@@ -98,9 +93,6 @@ class RDBTestCase extends WP_UnitTestCase {
 		BlockRegistration::register_block_configuration( $block_config );
 	}
 
-	/**
-	 * @psalm-suppress PossiblyUnusedParam
-	 */
 	protected function get_query_runner_with_response( array $response_data, int $status_code = 200 ): QueryRunner {
 		return new class($response_data, $status_code) extends QueryRunner {
 			private $response_data;
@@ -125,9 +117,6 @@ class RDBTestCase extends WP_UnitTestCase {
 
 	// DOM testing
 
-	/**
-	 * @psalm-suppress PossiblyUnusedParam
-	 */
 	protected function load_html( string $html ): DOMDocument {
 		$dom = new DOMDocument();
 
@@ -140,9 +129,6 @@ class RDBTestCase extends WP_UnitTestCase {
 		return $dom;
 	}
 
-	/**
-	 * @psalm-suppress PossiblyUnusedParam
-	 */
 	public function assertDomIdHasTextContent( DOMDocument $dom, string $html_id, string $expected_content ): void {
 		$xpath = new DOMXPath( $dom );
 		$id_nodes = $xpath->query( sprintf( "//*[@id='%s']", $html_id ) );
@@ -151,9 +137,6 @@ class RDBTestCase extends WP_UnitTestCase {
 		$this->assertEquals( $expected_content, $id_nodes[0]->textContent, sprintf( "Expected '%s' in node with HTML ID '%s', but found '%s' instead.", $expected_content, $html_id, $id_nodes[0]->textContent ) );
 	}
 
-	/**
-	 * @psalm-suppress PossiblyUnusedParam
-	 */
 	protected function assertDomIdHasHtmlContent( DOMDocument $dom, string $html_id, string $expected_content ): void {
 		$xpath = new DOMXPath( $dom );
 		$id_nodes = $xpath->query( sprintf( "//*[@id='%s']", $html_id ) );
