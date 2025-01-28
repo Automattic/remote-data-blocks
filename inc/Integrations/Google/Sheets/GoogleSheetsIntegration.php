@@ -4,6 +4,8 @@ namespace RemoteDataBlocks\Integrations\Google\Sheets;
 
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use RemoteDataBlocks\Config\Query\HttpQuery;
+use RemoteDataBlocks\Formatting\StringFormatter;
+use Symfony\Component\VarExporter\VarExporter;
 use WP_Error;
 
 class GoogleSheetsIntegration {
@@ -90,23 +92,8 @@ class GoogleSheetsIntegration {
 
 		$output_schema = [
 			'is_collection' => false,
-			'type' => [
-				'row_id' => [
-					'name' => 'Row ID',
-					'path' => '$.RowId',
-					'type' => 'id',
-				],
-			],
+			'type' => self::get_output_schema_mappings( $sheet ),
 		];
-
-		foreach ( $sheet['output_query_mappings'] as $mapping ) {
-			$mapping_key = $mapping['key'];
-			$output_schema['type'][ $mapping_key ] = [
-				'name' => $mapping['name'] ?? $mapping_key,
-				'path' => $mapping['path'] ?? '$.fields["' . $mapping_key . '"]',
-				'type' => $mapping['type'] ?? 'string',
-			];
-		}
 
 		return HttpQuery::from_array( [
 			'data_source' => $data_source,
@@ -126,23 +113,8 @@ class GoogleSheetsIntegration {
 		$output_schema = [
 			'is_collection' => true,
 			'path' => '$.values[*]',
-			'type' => [
-				'row_id' => [
-					'name' => 'Row ID',
-					'path' => '$.RowId',
-					'type' => 'id',
-				],
-			],
+			'type' => self::get_output_schema_mappings( $sheet ),
 		];
-
-		foreach ( $sheet['output_query_mappings'] as $mapping ) {
-			$mapping_key = $mapping['key'];
-			$output_schema['type'][ $mapping_key ] = [
-				'name' => $mapping['name'] ?? $mapping_key,
-				'path' => $mapping['path'] ?? '$.fields["' . $mapping_key . '"]',
-				'type' => $mapping['type'] ?? 'string',
-			];
-		}
 
 		return HttpQuery::from_array( [
 			'data_source' => $data_source,
@@ -153,5 +125,61 @@ class GoogleSheetsIntegration {
 				return GoogleSheetsDataSource::preprocess_list_response( $response_data );
 			},
 		] );
+	}
+
+	private static function get_output_schema_mappings( array $sheet ): array {
+		$output_schema = [
+			'row_id' => [
+				'name' => 'Row ID',
+				'path' => '$.RowId',
+				'type' => 'id',
+			],
+		];
+
+		foreach ( $sheet['output_query_mappings'] as $mapping ) {
+			$mapping_key = $mapping['key'];
+			$output_schema[ $mapping_key ] = [
+				'name' => $mapping['name'] ?? $mapping_key,
+				'path' => $mapping['path'] ?? '$.fields["' . $mapping_key . '"]',
+				'type' => $mapping['type'] ?? 'string',
+			];
+		}
+
+		return $output_schema;
+	}
+
+	private static function get_output_schema_mappings_snippet( array $sheet ): string {
+		$output_schema_mappings = self::get_output_schema_mappings( $sheet );
+		$exported_output_schema_mappings = VarExporter::export( $output_schema_mappings );
+		return StringFormatter::indent_string( $exported_output_schema_mappings, [
+			'indent_count' => 3,
+			'indent_char' => "\t",
+			'skip_first_line' => true,
+		] );
+	}
+
+	/**
+	 * Get the block registration snippets for the Google Sheets integration.
+	 *
+	 * @param array $data_source_config The data source configuration.
+	 * @return array The block registration snippets.
+	 */
+	public static function get_block_registration_snippets( array $data_source_config ): array {
+		$snippets = [];
+		$raw_snippet = file_get_contents( __DIR__ . '/templates/block_registration.template' );
+
+		$sheets = $data_source_config['service_config']['sheets'];
+
+		foreach ( $sheets as $sheet ) {
+			$snippet = strtr( $raw_snippet, [
+				'{{DATA_SOURCE_UUID}}' => $data_source_config['uuid'],
+				'{{SHEET_NAME}}' => $sheet['name'],
+				'{{SHEETS_OUTPUT_SCHEMA_MAPPINGS}}' => self::get_output_schema_mappings_snippet( $sheet ),
+			] );
+
+			$snippets[] = $snippet;
+		}
+
+		return $snippets;
 	}
 }
