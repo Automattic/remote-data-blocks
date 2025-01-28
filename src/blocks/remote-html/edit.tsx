@@ -33,14 +33,24 @@ const DEFAULT_STYLES = `
 	}
 `;
 
-export function Edit( props: BlockEditProps< RemoteDataInnerBlockAttributes > ): JSX.Element {
+interface RemoteHtmlAttributes extends RemoteDataInnerBlockAttributes {
+	saveContent?: string;
+}
+
+export function Edit( props: BlockEditProps< RemoteHtmlAttributes > ): JSX.Element {
 	const { attributes, setAttributes, isSelected } = props;
 	const blockProps = useBlockProps();
 
-	// Pass the content provided by bindings to save() via setAttributes with changed content
+	// HACK:
+	// The remote data binding passes merged remote attributes into the Edit component,
+	// but the Save component does not receive the same augmented attributes. In order to
+	// persist fallback content during save, we need to store the content in an attribute
+	// (saveContent) and call setAttributes to expose it to Save.
 	const { content } = attributes;
 	useEffect( () => {
-		setAttributes( { content } );
+		if ( content !== undefined ) {
+			setAttributes( { saveContent: content.toString() } );
+		}
 	}, [ content, setAttributes ] );
 
 	const settingStyles = useSelect< BlockEditorStoreSelectors, EditorStyle[] >(
