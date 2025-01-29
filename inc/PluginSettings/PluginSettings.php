@@ -179,7 +179,7 @@ class PluginSettings {
 
 	private static function show_decryption_error(): void {
 		// Check that we have add_settings_error() available. This can be unavailable during wp-env startup.
-		if ( is_admin() ) {
+		if ( is_admin() && function_exists( 'add_settings_error' ) ) {
 			add_settings_error(
 				'remote_data_blocks_settings',
 				'decryption_error',
