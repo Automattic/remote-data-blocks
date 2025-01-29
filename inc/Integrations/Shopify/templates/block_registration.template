@@ -25,20 +25,7 @@ function register_shopify_block(): void {
 		return;
 	}
 
-	$service_config = $data_source_config['service_config'];
-
-	$access_token = $service_config['access_token'];
-	$store_slug = $service_config['store_name'];
-	$display_name = $service_config['display_name'];
-
-	$shopify_data_source = ShopifyDataSource::from_array( [
-		'service_config' => [
-			'__version' => 1,
-			'access_token' => $access_token,
-			'display_name' => $display_name,
-			'store_name' => $store_slug,
-		],
-	] );
+	$shopify_data_source = ShopifyDataSource::from_array( $data_source_config );
 
 	ShopifyIntegration::register_blocks_for_shopify_data_source( $shopify_data_source );
 }
