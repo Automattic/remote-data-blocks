@@ -64,7 +64,7 @@ Remote data blocks are custom blocks, but they are created and registered by our
 
 ## Data fetching
 
-The plugin handles data fetching and wraps[`wp_remote_request`](https://developer.wordpress.org/reference/functions/wp_remote_request/).
+The plugin handles data fetching and wraps [`wp_remote_request`](https://developer.wordpress.org/reference/functions/wp_remote_request/).
 
 When a request to your site renders one or more remote data blocks, our plugin will fetch and potentially cache the remote data. Multiple requests for the same data within a single page load will be deduped, even if the requests are not cacheable.
 

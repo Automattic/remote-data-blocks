@@ -1,8 +1,14 @@
 # Overrides
 
-Overrides provide a way to customize the behavior of remote data blocks on a per-block basis. You can use them to modify the underlying query input variables, adjust the query response, or change the caching behavior. Overrides are defined when you register a remote data block and can be enabled or disabled via the block settings in the editor.
+Overrides provide a way to customize the behavior of remote data blocks on a per-block basis. You can use them to modify the underlying query input variables, adjust the query response, or change the caching behavior. Overrides are defined when you register a remote data block and can be enabled or disabled via the block settings in the WordPress editor.
 
-The actual implementation of overrides is left to you. Here is an example of an override that modifies the query input variables based on a query variable (supplied by a rewrite rule):
+If you have multiple instances of the same remote data block in a piece of content, each instance can have different overrides enabled. By default, no overrides are enabled.
+
+Here is an example of an override that modifies the query input variables based on the URL.
+
+You could use this to build a "product page" in the WordPress admin that would be able to display any product, using an ID from the URL, e.g.: https://example.com/product/123456
+
+The example takes advantage of the [`add_rewrite_rule`](https://developer.wordpress.org/reference/functions/add_rewrite_rule/) function and the [`query_vars`](https://developer.wordpress.org/reference/hooks/query_vars/) filter that are built into WordPress.
 
 ```php
 register_remote_data_block( [
@@ -38,6 +44,8 @@ add_filter( 'remote_data_blocks_query_input_variables', function ( array $input_
     return $input_variables;
 }, 10, 2 );
 ```
+
+As you can see, the `remote_data_blocks_query_input_variables` filter is passed a list of enabled overrides. You need to add logic to identify which filters are enabled and act accordingly.
 
 The `overrides` property in the block registration array enables a panel in the block settings that allows content authors to enable or disable the override:
 

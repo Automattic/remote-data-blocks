@@ -6,7 +6,7 @@ import { ModalWithButtonTrigger } from '@/blocks/remote-data-container/component
 import { useModalState } from '@/blocks/remote-data-container/hooks/useModalState';
 import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteData';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
-import { getBlockDataSourceType } from '@/utils/localized-block-data';
+import { getBlockAvailableBindings, getBlockDataSourceType } from '@/utils/localized-block-data';
 
 interface DataViewsModalProps {
 	blockName: string;
@@ -19,6 +19,7 @@ interface DataViewsModalProps {
 
 export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 	const { blockName, inputVariables, onSelect, queryKey, title } = props;
+	const availableBindings = getBlockAvailableBindings( blockName );
 
 	const { close, isOpen, open } = useModalState();
 	const {
@@ -62,6 +63,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 			title={ title }
 		>
 			<ItemList
+				availableBindings={ availableBindings }
 				blockName={ props.blockName }
 				loading={ loading }
 				onSelect={ onSelectItem }

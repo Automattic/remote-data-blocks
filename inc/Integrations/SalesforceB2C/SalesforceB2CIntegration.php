@@ -116,18 +116,18 @@ class SalesforceB2CIntegration {
 					'type' => [
 						'product_id' => [
 							'name' => 'product id',
-							'path' => '$.productid',
+							'path' => '$.productId',
 							'type' => 'id',
 						],
 						'name' => [
 							'name' => 'product name',
-							'path' => '$.productname',
+							'path' => '$.productName',
 							'type' => 'string',
 						],
 						'price' => [
 							'name' => 'item price',
 							'path' => '$.price',
-							'type' => 'price',
+							'type' => 'string',
 						],
 						'image_url' => [
 							'name' => 'item image url',
