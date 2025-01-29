@@ -131,7 +131,7 @@ class GoogleSheetsIntegration {
 		$output_schema = [
 			'row_id' => [
 				'name' => 'Row ID',
-				'path' => '$.RowId',
+				'path' => '$["RowId"]',
 				'type' => 'id',
 			],
 		];

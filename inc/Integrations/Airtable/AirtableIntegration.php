@@ -106,7 +106,7 @@ class AirtableIntegration {
 		$output_schema = [
 			'record_id' => [
 				'name' => 'Record ID',
-				'path' => '$.id',
+				'path' => '$["id"]',
 				'type' => 'id',
 			],
 		];
