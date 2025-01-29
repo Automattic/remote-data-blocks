@@ -38,6 +38,7 @@ declare module '@wordpress/block-editor' {
 
 	interface BlockEditorStoreActions {
 		replaceInnerBlocks: ( clientId: string, blocks: BlockInstance[] ) => Promise< void >;
+		selectBlock: ( clientId: string, initialPosition?: number? ) => Promise< void >;
 	}
 
 	interface BlockEditorStoreSelectors {
@@ -46,5 +47,6 @@ declare module '@wordpress/block-editor' {
 		getBlocksByClientId: < T extends BlockAttributes >( clientId: string ) => BlockInstance< T >[];
 		getBlocksByName: ( name: string ) => string[];
 		getPatternsByBlockTypes: ( name: string | string[], clientId?: string ) => BlockPattern[];
+		getSettings: () => EditorSettings;
 	}
 }
