@@ -35,7 +35,7 @@ Once you've defined your data source and queries, you can [register a remote dat
 
 ## Examples
 
-The [examples](../../example/README.md) provide detailed code samples of interacting with the plugin various methods of extending the plugin.
+The [examples](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/README.md) provide detailed code samples of interacting with the plugin various methods of extending the plugin.
 
 ## Create a local development environment
 

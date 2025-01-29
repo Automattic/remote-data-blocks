@@ -21,7 +21,7 @@ Unless your API returns a single value, `type` will be constructed of an associa
 
 ## Single Entry Example
 
-Using the [Zip Code example](../../example/rest-api/zip-code/README.md), the JSON response returned by the API looks like this:
+Using the [Zip Code example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/zip-code/README.md), the JSON response returned by the API looks like this:
 
 ```json
 {
@@ -69,7 +69,7 @@ Where `city_state` uses the genrate function to combine two elements from inside
 
 ## Collection Example
 
-An example of collection JSON can be found in the [Chicago Institue of Art example](../../example/rest-api/art-institute/README.md). That API returns (in part):
+An example of collection JSON can be found in the [Chicago Institue of Art example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/art-institute/README.md). That API returns (in part):
 
 ```json
 {
