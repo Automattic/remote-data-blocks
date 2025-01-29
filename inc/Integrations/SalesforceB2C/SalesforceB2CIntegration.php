@@ -182,4 +182,18 @@ class SalesforceB2CIntegration {
 			return $input_variables;
 		}, 10, 2 );
 	}
+
+	/**
+	 * Get the block registration snippets for the Salesforce B2C integration.
+	 *
+	 * @param array $data_source_config The data source configuration.
+	 * @return array The block registration snippets.
+	 */
+	public static function get_block_registration_snippets( array $data_source_config ): array {
+		$raw_snippet = file_get_contents( __DIR__ . '/templates/block_registration.template' );
+		$snippet = strtr( $raw_snippet, [
+			'{{DATA_SOURCE_UUID}}' => $data_source_config['uuid'],
+		] );
+		return [ $snippet ];
+	}
 }
