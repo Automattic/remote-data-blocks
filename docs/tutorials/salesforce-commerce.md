@@ -12,7 +12,7 @@ This tutorial will walk you through connecting a [Salesforce Commerce B2C](https
 4. Name the data source. This name is only used for display purposes.
 5. Provide the merchant short code. This is the region-specific merchant identifier.
 6. Provide the organization ID. This is the organization idenitifer.
-7. Provide the client ID and the client Secret. Ensure these are correct or else authentication will fail.
+7. Provide the client ID and the client secret. Ensure these are correct or else authentication will fail.
 
 ## Insert the block
 
