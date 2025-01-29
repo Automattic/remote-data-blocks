@@ -8,6 +8,7 @@ For plugin overview and getting started guide, see [README](../README.md).
 - [Core Concepts](concepts/index.md)
 
   - [Block Bindings](concepts/block-bindings.md)
+  - [Helper Blocks](concepts/helper-blocks.md)
   - [Field Shortcodes](concepts/field-shortcodes.md)
 
 - [Extending](extending/index.md)
