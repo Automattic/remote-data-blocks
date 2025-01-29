@@ -5,7 +5,6 @@ namespace RemoteDataBlocks\Integrations\Airtable;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Formatting\StringFormatter;
-use Symfony\Component\VarExporter\VarExporter;
 use WP_Error;
 
 class AirtableIntegration {
@@ -140,12 +139,7 @@ class AirtableIntegration {
 
 	private static function get_output_schema_mappings_snippet( array $table ): string {
 		$output_schema_mappings = self::get_airtable_output_schema_mappings( $table );
-		$exported_output_schema_mappings = VarExporter::export( $output_schema_mappings );
-		return StringFormatter::indent_string( $exported_output_schema_mappings, [
-			'indent_count' => 3,
-			'indent_char' => "\t",
-			'skip_first_line' => true,
-		] );
+		return StringFormatter::export_array_as_code( $output_schema_mappings, 3 );
 	}
 
 	/**

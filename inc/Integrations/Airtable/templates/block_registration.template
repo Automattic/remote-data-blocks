@@ -12,9 +12,6 @@
  * - AIRTABLE_: The fields of the table to make available for the block.
  */
 
-/**
- * Update to the actual namespace which would used for the block registration.
- */
 namespace RemoteDataBlocks\Snippets\Airtable;
 
 use RemoteDataBlocks\Integrations\Airtable\AirtableDataSource;
@@ -29,12 +26,12 @@ function register_airtable_events_block(): void {
 	}
 
 	$data_source = AirtableDataSource::from_array( $data_source_config );
-	$block_title = $data_source->get_display_name() . '/' . '{{TABLE_NAME}}';
+	$block_title = $data_source->get_display_name() . '/{{TABLE_NAME}}';
 
 	$get_query = HttpQuery::from_array( [
 		'data_source' => $data_source,
 		'endpoint' => function ( array $input_variables ) use ( $data_source ): string {
-			return $data_source->get_endpoint() . '/' . '{{TABLE_ID}}' . '/' . $input_variables['record_id'];
+			return $data_source->get_endpoint() . '/{{TABLE_ID}}/' . $input_variables['record_id'];
 		},
 		'input_schema' => [
 			'record_id' => [
@@ -45,11 +42,12 @@ function register_airtable_events_block(): void {
 		'output_schema' => [
 			'is_collection' => false,
 			'type' => {{AIRTABLE_OUTPUT_SCHEMA_MAPPINGS}},
+		],
 	] );
 
 	$list_query = HttpQuery::from_array( [
 		'data_source' => $data_source,
-		'endpoint' => $data_source->get_endpoint() . '/' . '{{TABLE_ID}}',
+		'endpoint' => $data_source->get_endpoint() . '/{{TABLE_ID}}',
 		'input_schema' => [],
 		'output_schema' => [
 			'is_collection' => true,

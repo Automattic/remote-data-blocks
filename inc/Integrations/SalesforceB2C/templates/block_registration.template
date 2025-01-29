@@ -9,9 +9,6 @@
  * - DATA_SOURCE_UUID: The UUID of the data source to register the block for.
  */
 
-/**
- * Update to the actual namespace which would used for the block registration.
- */
 namespace RemoteDataBlocks\Snippets\SalesforceB2C;
 
 use RemoteDataBlocks\Integrations\SalesforceB2C\SalesforceB2CDataSource;

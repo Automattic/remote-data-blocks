@@ -11,9 +11,6 @@
  * - SHEETS_OUTPUT_SCHEMA_MAPPINGS: The field mappings for the sheet data.
  */
 
-/**
- * Update to the actual namespace which would used for the block registration.
- */
 namespace RemoteDataBlocks\Snippets\Google;
 
 use RemoteDataBlocks\Config\Query\HttpQuery;
@@ -28,7 +25,7 @@ function register_google_sheets_blocks(): void {
 	}
 
 	$data_source = GoogleSheetsDataSource::from_array( $data_source_config );
-	$block_title = $data_source->get_display_name() . '/' . '{{SHEET_NAME}}';
+	$block_title = $data_source->get_display_name() . '/{{SHEET_NAME}}';
 
 	$list_query = HttpQuery::from_array( [
 		'data_source' => $data_source,
