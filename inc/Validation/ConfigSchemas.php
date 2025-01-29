@@ -190,16 +190,16 @@ final class ConfigSchemas {
 							// results. Providing this input variable enables offset-based
 							// pagination.
 							//
-							// Note that a `ui:pagination_total_items` output variable is also
-							// required for pagination to be enabled.
+							// Note that a `total_items` pagination variable is also required
+							// for pagination to be enabled.
 							'ui:pagination_offset',
 							//
 							// An integer that represents the requested page of paginated
 							// results. Providing this input variable enables page-based
 							// pagination.
 							//
-							// Note that a `ui:pagination_total_items` output variable is also
-							// required for pagination to be enabled.
+							// Note that a `total_items` pagination variable is also required
+							// for pagination to be enabled.
 							'ui:pagination_page',
 							//
 							// An integer that represents the number of items to request in
@@ -292,7 +292,7 @@ final class ConfigSchemas {
 						Types::object( [
 							'name' => Types::nullable( Types::string() ),
 							'path' => Types::json_path(),
-							'type' => Types::string(),
+							'type' => Types::enum( 'string' ),
 						] ),
 					),
 					// This field provides a pagination cursor for the previous page of
@@ -302,7 +302,7 @@ final class ConfigSchemas {
 						Types::object( [
 							'name' => Types::nullable( Types::string() ),
 							'path' => Types::json_path(),
-							'type' => Types::string(),
+							'type' => Types::enum( 'string' ),
 						] ),
 					),
 				] )
