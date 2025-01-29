@@ -16,12 +16,12 @@ export const CONTAINER_CLASS_NAME = getClassName( 'container' );
 
 export const BUTTON_TEXT_FIELD_TYPES = [ 'button_text' ];
 export const BUTTON_URL_FIELD_TYPES = [ 'button_url' ];
+export const HTML_FIELD_TYPES = [ 'html' ];
 export const IMAGE_ALT_FIELD_TYPES = [ 'image_alt' ];
 export const IMAGE_URL_FIELD_TYPES = [ 'image_url' ];
 export const TEXT_FIELD_TYPES = [
 	'currency_in_current_locale',
 	'email_address',
-	'html',
 	'integer',
 	'markdown',
 	'number',
