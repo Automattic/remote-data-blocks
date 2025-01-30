@@ -71,33 +71,26 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 	const steps = Children.toArray( children );
 	const singleStep = steps.length === 1 || screen === 'editDataSource';
 
-	const getStepHeadings = () => {
-		const headings = [ __( 'Setup' ) ]; // First step is always Setup
+	const stepHeadings = [ __( 'Setup' ) ]; // First step is always Setup
 
-		if (
-			steps.some(
-				child =>
-					isValidElement( child ) &&
-					( child.type === DataSourceForm.Scope || child.type === 'Scope' )
-			)
-		) {
-			headings.push( __( 'Scope' ) );
-		}
+	if (
+		steps.some(
+			child =>
+				isValidElement( child ) && ( child.type === DataSourceForm.Scope || child.type === 'Scope' )
+		)
+	) {
+		stepHeadings.push( __( 'Scope' ) );
+	}
 
-		if (
-			steps.some(
-				child =>
-					isValidElement( child ) &&
-					( child.type === DataSourceForm.Blocks || child.type === 'Blocks' )
-			)
-		) {
-			headings.push( __( 'Blocks' ) );
-		}
-
-		return headings;
-	};
-
-	const stepHeadings = getStepHeadings();
+	if (
+		steps.some(
+			child =>
+				isValidElement( child ) &&
+				( child.type === DataSourceForm.Blocks || child.type === 'Blocks' )
+		)
+	) {
+		stepHeadings.push( __( 'Blocks' ) );
+	}
 
 	const canProceedToNextStep = () => {
 		const step = steps[ currentStep - 1 ];
@@ -364,11 +357,8 @@ const DataSourceFormBlocks = ( {
 	handleOnChange: ( key: string, value: boolean ) => void;
 	hasEnabledBlocks: boolean;
 } ) => {
-	const [ enableBlocks, setEnableBlocks ] = useState( hasEnabledBlocks );
-
 	const handleToggle = () => {
-		setEnableBlocks( ! enableBlocks );
-		handleOnChange( 'enable_blocks', ! enableBlocks );
+		handleOnChange( 'enable_blocks', ! hasEnabledBlocks );
 	};
 	return (
 		<DataSourceFormStep
@@ -383,9 +373,9 @@ const DataSourceFormBlocks = ( {
 			}
 		>
 			<ToggleControl
-				checked={ enableBlocks }
+				checked={ hasEnabledBlocks }
 				help={
-					enableBlocks
+					hasEnabledBlocks
 						? __(
 								'Turning this off will require you to implement your own configuration code in your site.',
 								'remote-data-blocks'
