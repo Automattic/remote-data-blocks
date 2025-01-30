@@ -50,6 +50,7 @@ const DataSourceList = () => {
 			code: string;
 		}[]
 	>( [] );
+	const [ currentSource, setCurrentSource ] = useState< DataSourceConfig | null >( null );
 	const { close, isOpen, open } = useModalState();
 	const { pushState } = useSettingsContext();
 
@@ -242,6 +243,7 @@ const DataSourceList = () => {
 			isEligible: ( item: DataSourceConfig ) => Boolean( item?.uuid ),
 			callback: ( [ item ]: DataSourceConfig[] ) => {
 				if ( item?.uuid ) {
+					setCurrentSource( item );
 					getDataSourceSnippet( item.uuid )
 						.then( snippets => {
 							if ( snippets ) {
@@ -305,16 +307,21 @@ const DataSourceList = () => {
 			) }
 			{ codeSnippets && isOpen && (
 				<BaseModal
-					title={ __( 'Data Source Code Snippet', 'remote-data-blocks' ) }
+					className="rdb-settings-page_data-source-code-snippet-modal"
+					icon={ getServiceIcon( currentSource?.service ?? 'generic-http' ) }
+					title={ __(
+						`${ currentSource?.service_config.display_name }: Data Source Code`,
+						'remote-data-blocks'
+					) }
 					onClose={ () => {
 						close();
 						setCodeSnippets( [] ); // Clear snippets when closing
 					} }
 				>
 					<>
-						<p style={ { marginBottom: '16px' } }>
+						<p style={ { marginBottom: '16px', padding: '0 8px' } }>
 							{ __(
-								"Below, you'll find the code used to register the block for this data source, which can be used as a reference for extending the data source.\nTo get started, copy the code below and add it to your plugin directory. "
+								"Below, you'll find the code used to register the block(s) for this data source, which can be used as a reference for extending the data source.\nTo get started, copy the code below and add it to your plugin directory. "
 							) }
 							<ExternalLink href="https://remotedatablocks.com/docs/extending/index/">
 								{ __( 'Learn more about extending', 'remote-data-blocks' ) }
