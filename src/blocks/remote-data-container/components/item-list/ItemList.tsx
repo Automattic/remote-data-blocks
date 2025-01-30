@@ -149,7 +149,7 @@ export function ItemList( props: ItemListProps ) {
 			defaultLayouts={ defaultLayouts }
 			fields={ fields }
 			getItemId={ ( item: { id?: string } ) => item.id || '' }
-			isLoading={ loading || ! pattern || ! results || results.length === 0 }
+			isLoading={ loading || ! pattern || ! results }
 			isItemClickable={ () => true }
 			onClickItem={ item => onSelect( item ) }
 			onChangeView={ setView }
