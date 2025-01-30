@@ -75,7 +75,7 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 		const headings = [ __( 'Setup' ) ]; // First step is always Setup
 
 		if (
-			Children.toArray( children ).some(
+			steps.some(
 				child =>
 					isValidElement( child ) &&
 					( child.type === DataSourceForm.Scope || child.type === 'Scope' )
@@ -85,7 +85,7 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 		}
 
 		if (
-			Children.toArray( children ).some(
+			steps.some(
 				child =>
 					isValidElement( child ) &&
 					( child.type === DataSourceForm.Blocks || child.type === 'Blocks' )
