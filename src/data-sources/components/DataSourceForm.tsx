@@ -99,9 +99,9 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 		}
 		const { canProceed, displayName, uuid } = step.props;
 		const isBlocksStep = step.type === DataSourceForm.Blocks;
-		const noConflicts = Boolean( canProceed ) &&
-			( currentStep !== 1 || canUseDisplayName( displayName, uuid ) );
-		
+		const noConflicts =
+			Boolean( canProceed ) && ( currentStep !== 1 || canUseDisplayName( displayName, uuid ) );
+
 		return isBlocksStep || noConflicts;
 	};
 
