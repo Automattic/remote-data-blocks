@@ -85,3 +85,18 @@ table.data-source-list {
 	}
 }
 
+.rdb-settings-page_data-source-code-snippet {
+
+	.components-tab-panel__tabs {
+		border-bottom: 1px solid var(--Alias-border-border-input, #aeaeae);
+		// to match tab panel in editor sidebar
+		height: 48px;
+	}
+
+	.components-tab-panel__tab-content {
+		border: 1px solid var(--Alias-border-border-input, #aeaeae);
+		border-top: none;
+
+	}
+}
+

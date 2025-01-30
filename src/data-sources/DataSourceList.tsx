@@ -1,7 +1,9 @@
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
+	ExternalLink,
 	Icon,
 	Placeholder,
+	TabPanel,
 } from '@wordpress/components';
 import {
 	Action,
@@ -42,7 +44,12 @@ const DataSourceList = () => {
 	const [ dataSourceToDelete, setDataSourceToDelete ] = useState<
 		DataSourceConfig | DataSourceConfig[] | null
 	>( null );
-	const [ snippet, setSnippet ] = useState< string >( '' );
+	const [ codeSnippets, setCodeSnippets ] = useState<
+		{
+			name: string;
+			code: string;
+		}[]
+	>( [] );
 	const { close, isOpen, open } = useModalState();
 	const { pushState } = useSettingsContext();
 
@@ -237,8 +244,8 @@ const DataSourceList = () => {
 				if ( item?.uuid ) {
 					getDataSourceSnippet( item.uuid )
 						.then( snippets => {
-							if ( snippets?.[ 0 ] ) {
-								setSnippet( snippets[ 0 ] );
+							if ( snippets ) {
+								setCodeSnippets( snippets );
 								open();
 							}
 						} )
@@ -296,12 +303,39 @@ const DataSourceList = () => {
 						  ) }
 				</ConfirmDialog>
 			) }
-			{ snippet && isOpen && (
+			{ codeSnippets && isOpen && (
 				<BaseModal
 					title={ __( 'Data Source Code Snippet', 'remote-data-blocks' ) }
-					onClose={ () => close() }
+					onClose={ () => {
+						close();
+						setCodeSnippets( [] ); // Clear snippets when closing
+					} }
 				>
-					<CodeSnippet code={ snippet } />
+					<>
+						<p style={ { marginBottom: '16px' } }>
+							{ __(
+								"Below, you'll find the code used to register the block for this data source, which can be used as a reference for extending the data source.\nTo get started, copy the code below and add it to your plugin directory. "
+							) }
+							<ExternalLink href="https://remotedatablocks.com/docs/extending/index/">
+								{ __( 'Learn more about extending', 'remote-data-blocks' ) }
+							</ExternalLink>
+						</p>
+						<TabPanel
+							className="rdb-settings-page_data-source-code-snippet"
+							tabs={ codeSnippets.map( ( { name } ) => ( {
+								name,
+								title: name,
+							} ) ) }
+						>
+							{ tab => {
+								return (
+									<CodeSnippet
+										code={ codeSnippets.find( snippet => snippet.name === tab.name )?.code ?? '' }
+									/>
+								);
+							} }
+						</TabPanel>
+					</>
 				</BaseModal>
 			) }
 		</>

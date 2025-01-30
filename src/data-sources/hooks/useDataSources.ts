@@ -155,7 +155,12 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 				path: `${ REST_BASE_DATA_SOURCES }/snippets/${ uuid }`,
 				method: 'GET',
 			} );
-			const result = response as { snippets: string[] };
+			const result = response as {
+				snippets: {
+					name: string;
+					code: string;
+				}[];
+			};
 			return result.snippets;
 		} catch ( error ) {
 			if ( error instanceof Error ) {
