@@ -19,7 +19,7 @@ class AirtableIntegration {
 		foreach ( $data_source_configs as $config ) {
 			$data_source = AirtableDataSource::from_array( $config );
 
-			if ( false === $config['service_config']['enable_blocks'] ) {
+			if ( false === $config['service_config']['enable_blocks'] ?? true ) {
 				continue;
 			}
 			
