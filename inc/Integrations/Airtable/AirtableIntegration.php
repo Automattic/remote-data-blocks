@@ -16,7 +16,7 @@ class AirtableIntegration {
 			REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE
 		);
 
-		foreach ( $data_source_configs as $config ) {       
+		foreach ( $data_source_configs as $config ) {
 			$data_source = AirtableDataSource::from_array( $config );
 
 			if ( false === $config['service_config']['enable_blocks'] ) {
