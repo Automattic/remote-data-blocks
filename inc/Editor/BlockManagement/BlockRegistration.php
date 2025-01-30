@@ -103,15 +103,10 @@ class BlockRegistration {
 
 		$script_handle = $block_type->editor_script_handles[0] ?? '';
 
-		// Only proceed with pattern registration and config if we have a valid script handle.
-		if ( ! empty( $script_handle ) ) {
-			// Register a default pattern that simply displays the available data.
-			$default_pattern_name = BlockPatterns::register_default_block_pattern( $block_name, $config['title'], $config['queries'][ ConfigRegistry::DISPLAY_QUERY_KEY ] );
-			$block_config['patterns']['default'] = $default_pattern_name;
+		// Register a default pattern that simply displays the available data.
+		$default_pattern_name = BlockPatterns::register_default_block_pattern( $block_name, $config['title'], $config['queries'][ ConfigRegistry::DISPLAY_QUERY_KEY ] );
+		$block_config['patterns']['default'] = $default_pattern_name;
 
-			return [ $block_config, $script_handle ];
-		}
-
-		return [ $block_config, '' ];
+		return [ $block_config, $script_handle ];
 	}
 }
