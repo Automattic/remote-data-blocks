@@ -98,11 +98,11 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 			return false;
 		}
 		const { canProceed, displayName, uuid } = step.props;
-		return (
-			( Boolean( canProceed ) &&
-				( currentStep !== 1 || canUseDisplayName( displayName, uuid ) ) ) ||
-			step.type === DataSourceForm.Blocks
-		);
+		const isBlocksStep = step.type === DataSourceForm.Blocks;
+		const noConflicts = Boolean( canProceed ) &&
+			( currentStep !== 1 || canUseDisplayName( displayName, uuid ) );
+		
+		return isBlocksStep || noConflicts;
 	};
 
 	const handleNextStep = () => {
