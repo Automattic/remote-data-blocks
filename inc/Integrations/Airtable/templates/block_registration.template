@@ -18,7 +18,7 @@ use RemoteDataBlocks\Integrations\Airtable\AirtableDataSource;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 
-function register_airtable_events_block(): void {
+function register_airtable_block(): void {
 	$data_source_config = DataSourceCrud::get_config_by_uuid( '{{DATA_SOURCE_UUID}}' );
 	
 	if ( is_wp_error( $data_source_config ) ) {
