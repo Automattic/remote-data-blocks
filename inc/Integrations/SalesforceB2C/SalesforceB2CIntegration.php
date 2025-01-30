@@ -5,6 +5,7 @@ namespace RemoteDataBlocks\Integrations\SalesforceB2C;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use RemoteDataBlocks\Integrations\SalesforceB2C\Auth\SalesforceB2CAuth;
+use RemoteDataBlocks\Formatting\StringFormatter;
 use WP_Error;
 
 class SalesforceB2CIntegration {
@@ -193,6 +194,9 @@ class SalesforceB2CIntegration {
 		$raw_snippet = file_get_contents( __DIR__ . '/templates/block_registration.template' );
 		$snippet = strtr( $raw_snippet, [
 			'{{DATA_SOURCE_UUID}}' => $data_source_config['uuid'],
+			'{{BLOCK_REG_FN_SLUG}}' => StringFormatter::normalize_function_name( [
+				$data_source_config['service_config']['display_name'],
+			] ),
 		] );
 		return [ $snippet ];
 	}

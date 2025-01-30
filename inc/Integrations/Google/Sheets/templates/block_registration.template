@@ -7,6 +7,7 @@
  * 
  * Template variables:
  * - DATA_SOURCE_UUID: The UUID of the data source to register the block for.
+ * - BLOCK_REG_FN_SLUG: The slug of the data source to register the block for.
  * - SHEET_NAME: The name of the sheet.
  * - SHEETS_OUTPUT_SCHEMA_MAPPINGS: The field mappings for the sheet data.
  */
@@ -17,7 +18,7 @@ use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Integrations\Google\Sheets\GoogleSheetsDataSource;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 
-function register_google_sheets_blocks(): void {
+function register_google_sheets__{{BLOCK_REG_FN_SLUG}}__blocks(): void {
 	$data_source_config = DataSourceCrud::get_config_by_uuid( '{{DATA_SOURCE_UUID}}' );
 	
 	if ( is_wp_error( $data_source_config ) ) {
@@ -79,4 +80,4 @@ function register_google_sheets_blocks(): void {
 	] );
 }
 
-add_action( 'init', __NAMESPACE__ . '\\register_google_sheets_blocks' );
+add_action( 'init', __NAMESPACE__ . '\\register_google_sheets__{{BLOCK_REG_FN_SLUG}}__blocks' );

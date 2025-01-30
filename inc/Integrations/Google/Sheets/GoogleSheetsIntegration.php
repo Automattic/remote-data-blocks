@@ -162,11 +162,18 @@ class GoogleSheetsIntegration {
 		$snippets = [];
 		$raw_snippet = file_get_contents( __DIR__ . '/templates/block_registration.template' );
 
-		$sheets = $data_source_config['service_config']['sheets'];
+		$service_config = $data_source_config['service_config'];
+		$display_name = $service_config['display_name'];
 
-		foreach ( $sheets as $sheet ) {
+		foreach ( $service_config['sheets'] as $sheet ) {
+			$block_reg_fn_slug = StringFormatter::normalize_function_name( [
+				$display_name,
+				$sheet['name'],
+			] );
+
 			$snippet = strtr( $raw_snippet, [
 				'{{DATA_SOURCE_UUID}}' => $data_source_config['uuid'],
+				'{{BLOCK_REG_FN_SLUG}}' => $block_reg_fn_slug,
 				'{{SHEET_NAME}}' => $sheet['name'],
 				'{{SHEETS_OUTPUT_SCHEMA_MAPPINGS}}' => self::get_output_schema_mappings_snippet( $sheet ),
 			] );

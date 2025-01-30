@@ -152,11 +152,18 @@ class AirtableIntegration {
 		$snippets = [];
 		$raw_snippet = file_get_contents( __DIR__ . '/templates/block_registration.template' );
 
-		$tables = $data_source_config['service_config']['tables'];
+		$service_config = $data_source_config['service_config'];
+		$display_name = $service_config['display_name'];
 
-		foreach ( $tables as $table ) {
+		foreach ( $service_config['tables'] as $table ) {
+			$block_reg_fn_slug = StringFormatter::normalize_function_name( [
+				$display_name,
+				$table['name'],
+			] );
+
 			$snippet = strtr( $raw_snippet, [
 				'{{DATA_SOURCE_UUID}}' => $data_source_config['uuid'],
+				'{{BLOCK_REG_FN_SLUG}}' => $block_reg_fn_slug,
 				'{{TABLE_ID}}' => $table['id'],
 				'{{TABLE_NAME}}' => $table['name'],
 				'{{AIRTABLE_OUTPUT_SCHEMA_MAPPINGS}}' => self::get_output_schema_mappings_snippet( $table ),

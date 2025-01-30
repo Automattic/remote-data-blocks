@@ -4,6 +4,7 @@ namespace RemoteDataBlocks\Integrations\Shopify;
 
 use RemoteDataBlocks\Config\Query\GraphqlQuery;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
+use RemoteDataBlocks\Formatting\StringFormatter;
 
 use function register_remote_data_block;
 
@@ -147,6 +148,9 @@ class ShopifyIntegration {
 		$raw_snippet = file_get_contents( __DIR__ . '/templates/block_registration.template' );
 		$snippet = strtr( $raw_snippet, [
 			'{{DATA_SOURCE_UUID}}' => $data_source_config['uuid'],
+			'{{BLOCK_REG_FN_SLUG}}' => StringFormatter::normalize_function_name( [
+				$data_source_config['service_config']['display_name'],
+			] ),
 		] );
 		return [ $snippet ];
 	}

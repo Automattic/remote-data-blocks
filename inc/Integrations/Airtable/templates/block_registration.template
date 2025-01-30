@@ -7,9 +7,10 @@
  * 
  * Template variables:
  * - DATA_SOURCE_UUID: The UUID of the data source to register the block for.
+ * - BLOCK_REG_FN_SLUG: The slug of the data source to register the block for.
  * - TABLE_ID: The ID of the table to register the block for.
  * - TABLE_NAME: The name of the table to register the block for.
- * - AIRTABLE_: The fields of the table to make available for the block.
+ * - AIRTABLE_OUTPUT_SCHEMA_MAPPINGS: The fields of the table to make available for the block.
  */
 
 namespace RemoteDataBlocks\Snippets\Airtable;
@@ -18,7 +19,7 @@ use RemoteDataBlocks\Integrations\Airtable\AirtableDataSource;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 
-function register_airtable_block(): void {
+function register_airtable__{{BLOCK_REG_FN_SLUG}}__block(): void {
 	$data_source_config = DataSourceCrud::get_config_by_uuid( '{{DATA_SOURCE_UUID}}' );
 	
 	if ( is_wp_error( $data_source_config ) ) {
@@ -78,4 +79,4 @@ function register_airtable_block(): void {
 	] );
 }
 
-add_action( 'init', __NAMESPACE__ . '\\register_airtable_block' );
+add_action( 'init', __NAMESPACE__ . '\\register_airtable__{{BLOCK_REG_FN_SLUG}}__block' );

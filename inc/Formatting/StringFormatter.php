@@ -78,4 +78,31 @@ final class StringFormatter {
 			$exported_array
 		);
 	}
+
+	/**
+	 * Converts an array of strings into a valid PHP function name.
+	 * 
+	 * @param array<string> $parts Array of strings to convert.
+	 * @return string A valid PHP function name.
+	 */
+	public static function normalize_function_name( array $parts ): string {
+		// Filter out empty strings and trim whitespace
+		$parts = array_filter( array_map( 'trim', $parts ) );
+		
+		// Join parts with underscore and convert to lowercase
+		$name = strtolower( implode( '__', $parts ) );
+		
+		// Replace spaces with underscores
+		$name = str_replace( ' ', '_', $name );
+		
+		// Replace any non-alphanumeric characters (except underscores) with empty string
+		$name = preg_replace( '/[^a-z0-9_ ]/', '', $name );
+		
+		// Ensure the function name starts with a letter or underscore
+		if ( preg_match( '/^[0-9]/', $name ) ) {
+			$name = '_' . $name;
+		}
+		
+		return $name;
+	}
 }
