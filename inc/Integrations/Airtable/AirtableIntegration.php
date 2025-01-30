@@ -5,6 +5,7 @@ namespace RemoteDataBlocks\Integrations\Airtable;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Formatting\StringFormatter;
+use RemoteDataBlocks\Snippet\Snippet;
 use WP_Error;
 
 class AirtableIntegration {
@@ -146,7 +147,7 @@ class AirtableIntegration {
 	 * Get the block registration snippets for the Airtable integration.
 	 *
 	 * @param array $data_source_config The data source configuration.
-	 * @return array The block registration snippets.
+	 * @return array<Snippet> The block registration snippets.
 	 */
 	public static function get_block_registration_snippets( array $data_source_config ): array {
 		$snippets = [];
@@ -161,7 +162,7 @@ class AirtableIntegration {
 				$table['name'],
 			] );
 
-			$snippet = strtr( $raw_snippet, [
+			$code = strtr( $raw_snippet, [
 				'{{DATA_SOURCE_UUID}}' => $data_source_config['uuid'],
 				'{{BLOCK_REG_FN_SLUG}}' => $block_reg_fn_slug,
 				'{{TABLE_ID}}' => $table['id'],
@@ -169,7 +170,7 @@ class AirtableIntegration {
 				'{{AIRTABLE_OUTPUT_SCHEMA_MAPPINGS}}' => self::get_output_schema_mappings_snippet( $table ),
 			] );
 
-			$snippets[] = $snippet;
+			$snippets[] = new Snippet( $table['name'], $code );
 		}
 
 		return $snippets;

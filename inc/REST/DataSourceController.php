@@ -5,7 +5,7 @@ namespace RemoteDataBlocks\REST;
 use RemoteDataBlocks\Analytics\TracksAnalytics;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
-use RemoteDataBlocks\Snippets\Snippets;
+use RemoteDataBlocks\Snippet\Snippet;
 use WP_REST_Controller;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -214,8 +214,8 @@ class DataSourceController extends WP_REST_Controller {
 	}
 
 	public function get_snippets( mixed $request ): WP_REST_Response|WP_Error {
-		$code_snippets = Snippets::get_snippets( $request->get_param( 'uuid' ) );
-		return rest_ensure_response( [ 'snippets' => $code_snippets ] );
+		$snippets = Snippet::generate_snippets( $request->get_param( 'uuid' ) );
+		return rest_ensure_response( [ 'snippets' => $snippets ] );
 	}
 
 	/**

@@ -1,7 +1,8 @@
 <?php declare(strict_types = 1);
 
-namespace RemoteDataBlocks\Snippets;
+namespace RemoteDataBlocks\Snippet;
 
+use JsonSerializable;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use RemoteDataBlocks\Integrations\Airtable\AirtableIntegration;
 use RemoteDataBlocks\Integrations\Google\Sheets\GoogleSheetsIntegration;
@@ -9,8 +10,26 @@ use RemoteDataBlocks\Integrations\Shopify\ShopifyIntegration;
 use RemoteDataBlocks\Integrations\SalesforceB2C\SalesforceB2CIntegration;
 use WP_Error;
 
-class Snippets {
-	public static function get_snippets( string $uuid ): array|WP_Error {
+class Snippet implements JsonSerializable {
+	public function __construct(
+		private string $name,
+		private string $code,
+	) {}
+
+	public function jsonSerialize(): array {
+		return [
+			'name' => $this->name,
+			'code' => $this->code,
+		];
+	}
+
+	/**
+	 * Generate snippets for a data source.
+	 *
+	 * @param string $uuid The UUID of the data source.
+	 * @return array<Snippet>|WP_Error The snippets.
+	 */
+	public static function generate_snippets( string $uuid ): array|WP_Error {
 		$data_source = DataSourceCrud::get_inflated_config_by_uuid( $uuid );
 
 		if ( is_wp_error( $data_source ) ) {
@@ -40,12 +59,14 @@ class Snippets {
 		return array_map( [ __CLASS__, 'strip_template_comments' ], $snippets );
 	}
 
-	protected static function strip_template_comments( string $content ): string {
+	protected static function strip_template_comments( Snippet $snippet ): Snippet {
 		// Match PHPDoc blocks that contain @template tags and any preceding blank lines
-		return preg_replace(
+		$updated_code = preg_replace(
 			'/\n*\/\*\*\s*\n\s*\*\s*@template-.*?\*\/\n*/s',
 			"\n\n",
-			$content
+			$snippet->code
 		);
+
+		return new Snippet( $snippet->name, $updated_code );
 	}
 }

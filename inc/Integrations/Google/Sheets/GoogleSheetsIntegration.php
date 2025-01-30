@@ -5,6 +5,7 @@ namespace RemoteDataBlocks\Integrations\Google\Sheets;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Formatting\StringFormatter;
+use RemoteDataBlocks\Snippet\Snippet;
 use WP_Error;
 
 class GoogleSheetsIntegration {
@@ -156,7 +157,7 @@ class GoogleSheetsIntegration {
 	 * Get the block registration snippets for the Google Sheets integration.
 	 *
 	 * @param array $data_source_config The data source configuration.
-	 * @return array The block registration snippets.
+	 * @return array<Snippet> The block registration snippets.
 	 */
 	public static function get_block_registration_snippets( array $data_source_config ): array {
 		$snippets = [];
@@ -171,14 +172,14 @@ class GoogleSheetsIntegration {
 				$sheet['name'],
 			] );
 
-			$snippet = strtr( $raw_snippet, [
+			$code = strtr( $raw_snippet, [
 				'{{DATA_SOURCE_UUID}}' => $data_source_config['uuid'],
 				'{{BLOCK_REG_FN_SLUG}}' => $block_reg_fn_slug,
 				'{{SHEET_NAME}}' => $sheet['name'],
 				'{{SHEETS_OUTPUT_SCHEMA_MAPPINGS}}' => self::get_output_schema_mappings_snippet( $sheet ),
 			] );
 
-			$snippets[] = $snippet;
+			$snippets[] = new Snippet( $sheet['name'], $code );
 		}
 
 		return $snippets;
