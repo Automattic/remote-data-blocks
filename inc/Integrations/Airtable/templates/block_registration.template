@@ -78,4 +78,4 @@ function register_airtable_block(): void {
 	] );
 }
 
-add_action( 'init', __NAMESPACE__ . '\\register_airtable_events_block' );
+add_action( 'init', __NAMESPACE__ . '\\register_airtable_block' );
