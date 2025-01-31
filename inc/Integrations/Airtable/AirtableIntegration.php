@@ -4,6 +4,8 @@ namespace RemoteDataBlocks\Integrations\Airtable;
 
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use RemoteDataBlocks\Config\Query\HttpQuery;
+use RemoteDataBlocks\Formatting\StringFormatter;
+use RemoteDataBlocks\Snippet\Snippet;
 use WP_Error;
 
 class AirtableIntegration {
@@ -92,23 +94,8 @@ class AirtableIntegration {
 
 		$output_schema = [
 			'is_collection' => false,
-			'type' => [
-				'id' => [
-					'name' => 'Record ID',
-					'path' => '$.id',
-					'type' => 'id',
-				],
-			],
+			'type' => self::get_airtable_output_schema_mappings( $table ),
 		];
-
-		foreach ( $table['output_query_mappings'] as $mapping ) {
-			$mapping_key = $mapping['key'];
-			$output_schema['type'][ $mapping_key ] = [
-				'name' => $mapping['name'] ?? $mapping_key,
-				'path' => $mapping['path'] ?? '$.fields["' . $mapping_key . '"]',
-				'type' => $mapping['type'] ?? 'string',
-			];
-		}
 
 		return HttpQuery::from_array( [
 			'data_source' => $data_source,
@@ -120,27 +107,33 @@ class AirtableIntegration {
 		] );
 	}
 
-	public static function get_list_query( AirtableDataSource $data_source, array $table ): HttpQuery|WP_Error {
+	private static function get_airtable_output_schema_mappings( array $table ): array {
 		$output_schema = [
-			'is_collection' => true,
-			'path' => '$.records[*]',
-			'type' => [
-				'record_id' => [
-					'name' => 'Record ID',
-					'path' => '$.id',
-					'type' => 'id',
-				],
+			'record_id' => [
+				'name' => 'Record ID',
+				'path' => '$["id"]',
+				'type' => 'id',
 			],
 		];
 
 		foreach ( $table['output_query_mappings'] as $mapping ) {
 			$mapping_key = $mapping['key'];
-			$output_schema['type'][ $mapping_key ] = [
+			$output_schema[ $mapping_key ] = [
 				'name' => $mapping['name'] ?? $mapping_key,
 				'path' => $mapping['path'] ?? '$.fields["' . $mapping_key . '"]',
 				'type' => $mapping['type'] ?? 'string',
 			];
 		}
+
+		return $output_schema;
+	}
+
+	public static function get_list_query( AirtableDataSource $data_source, array $table ): HttpQuery|WP_Error {
+		$output_schema = [
+			'is_collection' => true,
+			'path' => '$.records[*]',
+			'type' => self::get_airtable_output_schema_mappings( $table ),
+		];
 
 		return HttpQuery::from_array( [
 			'data_source' => $data_source,
@@ -148,5 +141,43 @@ class AirtableIntegration {
 			'input_schema' => [],
 			'output_schema' => $output_schema,
 		] );
+	}
+
+	private static function get_output_schema_mappings_snippet( array $table ): string {
+		$output_schema_mappings = self::get_airtable_output_schema_mappings( $table );
+		return StringFormatter::export_array_as_code( $output_schema_mappings, 3 );
+	}
+
+	/**
+	 * Get the block registration snippets for the Airtable integration.
+	 *
+	 * @param array $data_source_config The data source configuration.
+	 * @return array<Snippet> The block registration snippets.
+	 */
+	public static function get_block_registration_snippets( array $data_source_config ): array {
+		$snippets = [];
+		$raw_snippet = file_get_contents( __DIR__ . '/templates/block_registration.template' );
+
+		$service_config = $data_source_config['service_config'];
+		$display_name = $service_config['display_name'];
+
+		foreach ( $service_config['tables'] as $table ) {
+			$block_reg_fn_slug = StringFormatter::normalize_function_name( [
+				$display_name,
+				$table['name'],
+			] );
+
+			$code = strtr( $raw_snippet, [
+				'{{DATA_SOURCE_UUID}}' => $data_source_config['uuid'],
+				'{{BLOCK_REG_FN_SLUG}}' => $block_reg_fn_slug,
+				'{{TABLE_ID}}' => $table['id'],
+				'{{TABLE_NAME}}' => $table['name'],
+				'{{AIRTABLE_OUTPUT_SCHEMA_MAPPINGS}}' => self::get_output_schema_mappings_snippet( $table ),
+			] );
+
+			$snippets[] = new Snippet( $table['name'], $code );
+		}
+
+		return $snippets;
 	}
 }
