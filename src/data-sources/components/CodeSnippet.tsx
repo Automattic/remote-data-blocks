@@ -1,10 +1,13 @@
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { copy } from '@wordpress/icons';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { coy } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
+import php from 'react-syntax-highlighter/dist/esm/languages/prism/php';
+import coy from 'react-syntax-highlighter/dist/esm/styles/prism/coy';
 
 import { useDataSources } from '../hooks/useDataSources';
+
+SyntaxHighlighter.registerLanguage( 'php', php );
 
 const CodeSnippet = ( { code }: { code: string } ) => {
 	const { showSnackbar } = useDataSources();
