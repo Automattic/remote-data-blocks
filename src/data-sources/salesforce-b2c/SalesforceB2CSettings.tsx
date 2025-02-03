@@ -23,7 +23,10 @@ export const SalesforceB2CSettings = ( {
 	const { onSave } = useDataSources< SalesforceB2CConfig >( false );
 
 	const { state, handleOnChange, validState } = useForm< SalesforceB2CServiceConfig >( {
-		initialValues: config?.service_config ?? { __version: SERVICE_CONFIG_VERSION },
+		initialValues: config?.service_config ?? {
+			__version: SERVICE_CONFIG_VERSION,
+			enable_blocks: true,
+		},
 	} );
 
 	const shouldAllowSubmit = useMemo( () => {
@@ -103,6 +106,10 @@ export const SalesforceB2CSettings = ( {
 					value={ state.client_secret }
 				/>
 			</DataSourceForm.Setup>
+			<DataSourceForm.Blocks
+				handleOnChange={ handleOnChange }
+				hasEnabledBlocks={ state.enable_blocks ?? true }
+			/>
 		</DataSourceForm>
 	);
 };

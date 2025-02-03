@@ -27,6 +27,7 @@ class GoogleSheetsDataSource extends HttpDataSource {
 				'universe_domain' => Types::string(),
 			] ),
 			'display_name' => Types::string(),
+			'enable_blocks' => Types::nullable( Types::boolean() ),
 			'spreadsheet' => Types::object( [
 				'id' => Types::id(),
 				'name' => Types::nullable( Types::string() ),

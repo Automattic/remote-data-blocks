@@ -146,11 +146,8 @@ class PluginSettings {
 		try {
 			return $encryptor->encrypt( wp_json_encode( $new_value ) );
 		} catch ( \Exception $e ) {
-			add_settings_error(
-				'remote_data_blocks_settings',
-				'encryption_error',
-				__( 'Error encrypting remote-data-blocks settings.', 'remote-data-blocks' )
-			);
+			self::show_settings_error( __( 'Error encrypting remote-data-blocks settings.', 'remote-data-blocks' ) );
+
 			return $old_value;
 		}
 	}
@@ -170,20 +167,20 @@ class PluginSettings {
 		}
 
 		if ( $is_error ) {
-			self::show_decryption_error();
+			self::show_settings_error( __( 'Error decrypting remote-data-blocks settings.', 'remote-data-blocks' ) );
 			return [];
 		} else {
 			return json_decode( $decrypted, true );
 		}
 	}
 
-	private static function show_decryption_error(): void {
+	private static function show_settings_error( string $message ): void {
 		// Check that we have add_settings_error() available. This can be unavailable during wp-env startup.
-		if ( is_admin() ) {
+		if ( is_admin() && function_exists( 'add_settings_error' ) ) {
 			add_settings_error(
 				'remote_data_blocks_settings',
 				'decryption_error',
-				__( 'Error decrypting remote-data-blocks settings.', 'remote-data-blocks' )
+				$message
 			);
 		}
 	}

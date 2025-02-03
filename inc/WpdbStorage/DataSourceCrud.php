@@ -72,6 +72,15 @@ class DataSourceCrud {
 		return $data_source_class::from_array( $config );
 	}
 
+	public static function get_inflated_config_by_uuid( string $uuid ): DataSourceInterface|WP_Error {
+		$config = self::get_config_by_uuid( $uuid );
+		if ( is_wp_error( $config ) ) {
+			return $config;
+		}
+
+		return self::inflate_config( $config );
+	}
+
 	private static function save_config( array $config ): array|WP_Error {
 		// Update metadata.
 		$now = gmdate( 'Y-m-d H:i:s' );

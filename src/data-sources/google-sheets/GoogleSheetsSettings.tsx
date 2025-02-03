@@ -60,7 +60,10 @@ export const GoogleSheetsSettings = ( {
 	const { onSave } = useDataSources< GoogleSheetsConfig >( false );
 
 	const { state, errors, handleOnChange, validState } = useForm< GoogleSheetsServiceConfig >( {
-		initialValues: config?.service_config ?? { __version: SERVICE_CONFIG_VERSION },
+		initialValues: config?.service_config ?? {
+			__version: SERVICE_CONFIG_VERSION,
+			enable_blocks: true,
+		},
 		validationRules,
 	} );
 
@@ -269,6 +272,10 @@ export const GoogleSheetsSettings = ( {
 					customHelpText={ getSheetsHelpText() }
 				/>
 			</DataSourceForm.Scope>
+			<DataSourceForm.Blocks
+				handleOnChange={ handleOnChange }
+				hasEnabledBlocks={ state.enable_blocks ?? true }
+			/>
 		</DataSourceForm>
 	);
 };

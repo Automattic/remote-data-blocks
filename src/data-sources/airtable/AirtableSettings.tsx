@@ -41,7 +41,10 @@ export const AirtableSettings = ( {
 	const { onSave } = useDataSources< AirtableConfig >( false );
 
 	const { state, handleOnChange, validState } = useForm< AirtableServiceConfig >( {
-		initialValues: config?.service_config ?? { __version: SERVICE_CONFIG_VERSION },
+		initialValues: config?.service_config ?? {
+			__version: SERVICE_CONFIG_VERSION,
+			enable_blocks: true,
+		},
 	} );
 	const { fetchingUserId, userId, userIdError } = useAirtableApiUserId( state.access_token ?? '' );
 	const { bases, basesError, fetchingBases } = useAirtableApiBases(
@@ -209,6 +212,10 @@ export const AirtableSettings = ( {
 						onFieldsChange={ onTablesChange }
 					/>
 				</DataSourceForm.Scope>
+				<DataSourceForm.Blocks
+					handleOnChange={ handleOnChange }
+					hasEnabledBlocks={ state.enable_blocks ?? true }
+				/>
 			</DataSourceForm>
 		</>
 	);

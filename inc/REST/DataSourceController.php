@@ -5,6 +5,7 @@ namespace RemoteDataBlocks\REST;
 use RemoteDataBlocks\Analytics\TracksAnalytics;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
+use RemoteDataBlocks\Snippet\Snippet;
 use WP_REST_Controller;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -37,6 +38,23 @@ class DataSourceController extends WP_REST_Controller {
 			[
 				'methods' => 'GET',
 				'callback' => [ $this, 'get_item' ],
+				'permission_callback' => [ $this, 'get_item_permissions_check' ],
+				'args' => [
+					'uuid' => [
+						'type' => 'string',
+						'required' => true,
+					],
+				],
+			]
+		);
+
+		// get_snippet
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/snippets/(?P<uuid>[\w-]+)',
+			[
+				'methods' => 'GET',
+				'callback' => [ $this, 'get_snippets' ],
 				'permission_callback' => [ $this, 'get_item_permissions_check' ],
 				'args' => [
 					'uuid' => [
@@ -193,6 +211,11 @@ class DataSourceController extends WP_REST_Controller {
 	public function get_item( mixed $request ): WP_REST_Response|WP_Error {
 		$response = DataSourceCrud::get_config_by_uuid( $request->get_param( 'uuid' ) );
 		return rest_ensure_response( $response );
+	}
+
+	public function get_snippets( mixed $request ): WP_REST_Response|WP_Error {
+		$snippets = Snippet::generate_snippets( $request->get_param( 'uuid' ) );
+		return rest_ensure_response( [ 'snippets' => $snippets ] );
 	}
 
 	/**

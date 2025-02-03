@@ -10,6 +10,9 @@ This tutorial will walk you through connecting a [Salesforce Commerce B2C](https
 2. Click on the "Connect new" button.
 3. Choose "Salesforce Commerce B2C" from the dropdown menu as the data source type.
 4. Name the data source. This name is only used for display purposes.
+5. Provide the merchant short code. This is the region-specific merchant identifier.
+6. Provide the organization ID.
+7. Provide the client ID and the client secret. Ensure these are correct or else authentication will fail.
 
 ## Insert the block
 

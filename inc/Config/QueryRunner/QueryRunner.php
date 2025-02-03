@@ -197,6 +197,14 @@ class QueryRunner implements QueryRunnerInterface {
 	 * @inheritDoc
 	 */
 	public function execute( HttpQueryInterface $query, array $input_variables ): array|WP_Error {
+		// Set default input variables.
+		$input_schema = $query->get_input_schema();
+		foreach ( $input_schema as $key => $schema ) {
+			if ( ! array_key_exists( $key, $input_variables ) && isset( $schema['default_value'] ) ) {
+				$input_variables[ $key ] = $schema['default_value'];
+			}
+		}
+
 		$raw_response_data = $this->get_raw_response_data( $query, $input_variables );
 
 		if ( is_wp_error( $raw_response_data ) ) {
@@ -207,14 +215,14 @@ class QueryRunner implements QueryRunnerInterface {
 		$response_data = $this->preprocess_response( $query, $raw_response_data['response_data'], $input_variables );
 
 		// Determine if the response data is expected to be a collection.
-		$schema = $query->get_output_schema();
-		$is_collection = $schema['is_collection'] ?? false;
+		$output_schema = $query->get_output_schema();
+		$is_collection = $output_schema['is_collection'] ?? false;
 
 		// The parser always returns an array, even if it's a single item. This
 		// ensures a consistent response shape. The requestor is expected to inspect
 		// is_collection and unwrap if necessary.
 		$parser = new QueryResponseParser();
-		$results = $parser->parse( $response_data, $schema );
+		$results = $parser->parse( $response_data, $output_schema );
 		$results = $is_collection ? $results : [ $results ];
 		$metadata = $this->get_response_metadata( $query, $raw_response_data['metadata'], $results );
 
