@@ -60,14 +60,16 @@ jobs:
 
           CURRENT_VERSION="$CURRENT_VERSION-$VERSUFFIX"
 
-          sed -i -e 's/Version: .*$/Version: '"$CURRENT_VERSION"'/' "$GITHUB_WORKSPACE/plugins/remote-data-blocks/remote-data-blocks.php"
-          echo "$CURRENT_VERSION" > "$GITHUB_WORKSPACE/plugins/remote-data-blocks/version.txt"
+          sed -i -e 's/Version: .*$/Version: '"$CURRENT_VERSION"'/' "$GITHUB_WORKSPACE/remote-data-blocks.php"
+          echo "$CURRENT_VERSION" > "$GITHUB_WORKSPACE/version.txt"
 
-          cd "$GITHUB_WORKSPACE/plugins/remote-data-blocks"
-          PLUGIN_SLUG='remote-data-blocks' bash bin/build-zip.sh
-
+          echo "Generating zip file..."
+          cd "$GITHUB_WORKSPACE" || exit
+          ls -la
+          cd ../
+          zip -q -r -9 "remote-data-blocks.zip" "remote-data-blocks/"
           mkdir "$GITHUB_WORKSPACE/zips"
-          mv "$GITHUB_WORKSPACE/plugins/remote-data-blocks/remote-data-blocks.zip" "$GITHUB_WORKSPACE/zips/remote-data-blocks.zip"
+          mv "remote-data-blocks.zip" "$GITHUB_WORKSPACE/zips/remote-data-blocks.zip"
 
           mkdir -p "$GITHUB_WORKSPACE/unzips/remote-data-blocks"
           cd "$GITHUB_WORKSPACE/zips"
