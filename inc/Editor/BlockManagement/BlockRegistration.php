@@ -21,7 +21,8 @@ class BlockRegistration {
 	];
 
 	public static function init(): void {
-		add_action( 'init', [ __CLASS__, 'register_blocks' ], 50, 0 );
+		add_action( 'init', [ __CLASS__, 'register_helper_blocks' ], 10, 0 );
+		add_action( 'init', [ __CLASS__, 'register_container_blocks' ], 50, 0 );
 		add_filter( 'block_categories_all', [ __CLASS__, 'add_block_category' ], 10, 1 );
 	}
 
@@ -31,7 +32,13 @@ class BlockRegistration {
 		return $block_categories;
 	}
 
-	public static function register_blocks(): void {
+	public static function register_helper_blocks(): void {
+		// Remote data HTML block - used to render HTML content in the absence of a proper binding.
+		$remote_data_html_block_path = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-html';
+		register_block_type( $remote_data_html_block_path );
+	}
+
+	public static function register_container_blocks(): void {
 		$all_remote_block_configs = [];
 		$scripts_to_localize = [];
 
@@ -94,7 +101,7 @@ class BlockRegistration {
 
 		$block_type = register_block_type( $block_path, $block_options );
 
-		$script_handle = $block_type->editor_script_handles[0];
+		$script_handle = $block_type->editor_script_handles[0] ?? '';
 
 		// Register a default pattern that simply displays the available data.
 		$default_pattern_name = BlockPatterns::register_default_block_pattern( $block_name, $config['title'], $config['queries'][ ConfigRegistry::DISPLAY_QUERY_KEY ] );

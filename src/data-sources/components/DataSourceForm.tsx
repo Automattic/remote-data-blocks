@@ -6,6 +6,7 @@ import {
 	VisuallyHidden,
 	__experimentalInputControl as InputControl,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	ToggleControl,
 } from '@wordpress/components';
 import { Children, createPortal, isValidElement, useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -70,7 +71,26 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 	const steps = Children.toArray( children );
 	const singleStep = steps.length === 1 || screen === 'editDataSource';
 
-	const stepHeadings = [ 'Setup', 'Scope' ];
+	const stepHeadings = [ __( 'Setup' ) ]; // First step is always Setup
+
+	if (
+		steps.some(
+			child =>
+				isValidElement( child ) && ( child.type === DataSourceForm.Scope || child.type === 'Scope' )
+		)
+	) {
+		stepHeadings.push( __( 'Scope' ) );
+	}
+
+	if (
+		steps.some(
+			child =>
+				isValidElement( child ) &&
+				( child.type === DataSourceForm.Blocks || child.type === 'Blocks' )
+		)
+	) {
+		stepHeadings.push( __( 'Blocks' ) );
+	}
 
 	const canProceedToNextStep = () => {
 		const step = steps[ currentStep - 1 ];
@@ -78,7 +98,11 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 			return false;
 		}
 		const { canProceed, displayName, uuid } = step.props;
-		return Boolean( canProceed ) && ( currentStep !== 1 || canUseDisplayName( displayName, uuid ) );
+		const isBlocksStep = step.type === DataSourceForm.Blocks;
+		const noConflicts =
+			Boolean( canProceed ) && ( currentStep !== 1 || canUseDisplayName( displayName, uuid ) );
+
+		return isBlocksStep || noConflicts;
 	};
 
 	const handleNextStep = () => {
@@ -146,42 +170,36 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 			{ screen === 'addDataSource' && (
 				<div className="rdb-settings-page_data-source-form-footer">
 					<div className="rdb-settings-page_data-source-form-setup-actions">
-						<>
-							{ currentStep === 1 && (
-								<Button
-									onClick={ () => goToMainScreen() }
-									variant="secondary"
-									__next40pxDefaultSize
-								>
-									Cancel
-								</Button>
-							) }
-							{ currentStep > 1 && (
-								<Button
-									onClick={ () => setCurrentStep( currentStep - 1 ) }
-									variant="secondary"
-									__next40pxDefaultSize
-								>
-									Go back
-								</Button>
-							) }
-							{ currentStep < steps.length && (
-								<Button
-									onClick={ handleNextStep }
-									variant="primary"
-									__next40pxDefaultSize
-									disabled={ ! canProceedToNextStep() }
-								>
-									Continue
-								</Button>
-							) }
-							{ currentStep === steps.length && (
-								<DataSourceFormActions
-									onSave={ onSave }
-									isSaveDisabled={ ! canProceedToNextStep() }
-								/>
-							) }
-						</>
+						{ currentStep === 1 && (
+							<Button onClick={ () => goToMainScreen() } variant="secondary" __next40pxDefaultSize>
+								Cancel
+							</Button>
+						) }
+						{ currentStep > 1 && (
+							<Button
+								onClick={ () => setCurrentStep( currentStep - 1 ) }
+								variant="secondary"
+								__next40pxDefaultSize
+							>
+								Go back
+							</Button>
+						) }
+						{ currentStep < steps.length && (
+							<Button
+								onClick={ handleNextStep }
+								variant="primary"
+								__next40pxDefaultSize
+								disabled={ ! canProceedToNextStep() }
+							>
+								Continue
+							</Button>
+						) }
+						{ currentStep === steps.length && (
+							<DataSourceFormActions
+								onSave={ onSave }
+								isSaveDisabled={ ! canProceedToNextStep() }
+							/>
+						) }
 					</div>
 				</div>
 			) }
@@ -321,7 +339,7 @@ const DataSourceFormScope = ( {
 	const { service } = useSettingsContext();
 	return (
 		<DataSourceFormStep
-			heading="Scope"
+			heading={ __( 'Scope' ) }
 			subheading={ __(
 				`Choose what data should be pulled from ${ service ?? 'your data source' } to your site.`
 			) }
@@ -332,7 +350,50 @@ const DataSourceFormScope = ( {
 	);
 };
 
+const DataSourceFormBlocks = ( {
+	handleOnChange,
+	hasEnabledBlocks,
+}: {
+	handleOnChange: ( key: string, value: boolean ) => void;
+	hasEnabledBlocks: boolean;
+} ) => {
+	const handleToggle = () => {
+		handleOnChange( 'enable_blocks', ! hasEnabledBlocks );
+	};
+	return (
+		<DataSourceFormStep
+			heading={ __( 'Set up blocks' ) }
+			subheading={
+				<>
+					{ __( 'Enable or disable the auto-generation of remote data container blocks. ' ) }
+					<ExternalLink href="https://remotedatablocks.com/docs/extending/block-registration/">
+						{ __( 'Learn more', 'remote-data-blocks' ) }
+					</ExternalLink>
+				</>
+			}
+		>
+			<ToggleControl
+				checked={ hasEnabledBlocks }
+				help={
+					hasEnabledBlocks
+						? __(
+								'Turning this off will require you to implement your own configuration code in your site.',
+								'remote-data-blocks'
+						  )
+						: __(
+								'Turning this on will automatically generate blocks for your site.',
+								'remote-data-blocks'
+						  )
+				}
+				label={ __( 'Auto-generate blocks' ) }
+				onChange={ handleToggle }
+			/>
+		</DataSourceFormStep>
+	);
+};
+
 DataSourceForm.Setup = DataSourceFormSetup;
 DataSourceForm.Scope = DataSourceFormScope;
+DataSourceForm.Blocks = DataSourceFormBlocks;
 
 export { DataSourceForm };

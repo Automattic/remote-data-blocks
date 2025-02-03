@@ -18,6 +18,7 @@ class SalesforceB2CDataSource extends HttpDataSource {
 			'display_name' => Types::string(),
 			'client_id' => Types::string(),
 			'client_secret' => Types::string(),
+			'enable_blocks' => Types::nullable( Types::boolean() ),
 			'organization_id' => Types::string(),
 			'shortcode' => Types::string(),
 		] );

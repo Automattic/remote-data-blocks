@@ -20,7 +20,10 @@ export const ShopifySettings = ( {
 	const { onSave } = useDataSources< ShopifyConfig >( false );
 
 	const { state, handleOnChange, validState } = useForm< ShopifyServiceConfig >( {
-		initialValues: config?.service_config ?? { __version: SERVICE_CONFIG_VERSION },
+		initialValues: config?.service_config ?? {
+			__version: SERVICE_CONFIG_VERSION,
+			enable_blocks: true,
+		},
 	} );
 
 	const { shopName, connectionMessage } = useShopifyShopName(
@@ -105,6 +108,10 @@ export const ShopifySettings = ( {
 					__nextHasNoMarginBottom
 				/>
 			</DataSourceForm.Setup>
+			<DataSourceForm.Blocks
+				handleOnChange={ handleOnChange }
+				hasEnabledBlocks={ state.enable_blocks ?? true }
+			/>
 		</DataSourceForm>
 	);
 };

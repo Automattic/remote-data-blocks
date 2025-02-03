@@ -4,6 +4,8 @@ namespace RemoteDataBlocks\Integrations\Shopify;
 
 use RemoteDataBlocks\Config\Query\GraphqlQuery;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
+use RemoteDataBlocks\Formatting\StringFormatter;
+use RemoteDataBlocks\Snippet\Snippet;
 
 use function register_remote_data_block;
 
@@ -17,6 +19,11 @@ class ShopifyIntegration {
 
 		foreach ( $data_source_configs as $config ) {
 			$data_source = ShopifyDataSource::from_array( $config );
+
+			if ( false === ( $config['service_config']['enable_blocks'] ?? true ) ) {
+				continue;
+			}
+				
 			self::register_blocks_for_shopify_data_source( $data_source );
 		}
 	}
@@ -135,5 +142,23 @@ class ShopifyIntegration {
 				],
 			],
 		] );
+	}
+
+	/**
+	 * Get the block registration snippets for the Shopify integration.
+	 *
+	 * @param array $data_source_config The data source configuration.
+	 * @return array<Snippet> The block registration snippets.
+	 */
+	public static function get_block_registration_snippets( array $data_source_config ): array {
+		$raw_template = file_get_contents( __DIR__ . '/templates/block_registration.template' );
+		$display_name = $data_source_config['service_config']['display_name'];
+		$code = strtr( $raw_template, [
+			'{{DATA_SOURCE_UUID}}' => $data_source_config['uuid'],
+			'{{BLOCK_REG_FN_SLUG}}' => StringFormatter::normalize_function_name( [
+				$display_name,
+			] ),
+		] );
+		return [ new Snippet( $display_name, $code ) ];
 	}
 }

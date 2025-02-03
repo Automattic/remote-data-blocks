@@ -5,6 +5,7 @@ namespace RemoteDataBlocks\Integrations\SalesforceB2C;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use RemoteDataBlocks\Integrations\SalesforceB2C\Auth\SalesforceB2CAuth;
+use RemoteDataBlocks\Formatting\StringFormatter;
 use WP_Error;
 
 class SalesforceB2CIntegration {
@@ -17,6 +18,11 @@ class SalesforceB2CIntegration {
 
 		foreach ( $data_source_configs as $config ) {
 			$data_source = SalesforceB2CDataSource::from_array( $config );
+	
+			if ( false === ( $config['service_config']['enable_blocks'] ?? true ) ) {
+				continue;
+			}
+			
 			self::register_blocks_for_salesforce_data_source( $data_source );
 		}
 	}
@@ -116,18 +122,18 @@ class SalesforceB2CIntegration {
 					'type' => [
 						'product_id' => [
 							'name' => 'product id',
-							'path' => '$.productid',
+							'path' => '$.productId',
 							'type' => 'id',
 						],
 						'name' => [
 							'name' => 'product name',
-							'path' => '$.productname',
+							'path' => '$.productName',
 							'type' => 'string',
 						],
 						'price' => [
 							'name' => 'item price',
 							'path' => '$.price',
-							'type' => 'price',
+							'type' => 'string',
 						],
 						'image_url' => [
 							'name' => 'item image url',
@@ -181,5 +187,22 @@ class SalesforceB2CIntegration {
 
 			return $input_variables;
 		}, 10, 2 );
+	}
+
+	/**
+	 * Get the block registration snippets for the Salesforce B2C integration.
+	 *
+	 * @param array $data_source_config The data source configuration.
+	 * @return array The block registration snippets.
+	 */
+	public static function get_block_registration_snippets( array $data_source_config ): array {
+		$raw_snippet = file_get_contents( __DIR__ . '/templates/block_registration.template' );
+		$snippet = strtr( $raw_snippet, [
+			'{{DATA_SOURCE_UUID}}' => $data_source_config['uuid'],
+			'{{BLOCK_REG_FN_SLUG}}' => StringFormatter::normalize_function_name( [
+				$data_source_config['service_config']['display_name'],
+			] ),
+		] );
+		return [ $snippet ];
 	}
 }

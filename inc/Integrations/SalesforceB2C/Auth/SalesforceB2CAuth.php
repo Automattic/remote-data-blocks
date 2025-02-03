@@ -80,7 +80,7 @@ class SalesforceB2CAuth {
 		$response_body = wp_remote_retrieve_body( $client_auth_response );
 		$response_data = json_decode( $response_body, true );
 
-		if ( 400 === $response_code ) {
+		if ( 400 === $response_code || 401 === $response_code ) {
 			return new WP_Error(
 				'salesforce_b2c_auth_error_client_credentials',
 				/* translators: %s: Technical error message from API containing failure reason */

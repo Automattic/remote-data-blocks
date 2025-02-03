@@ -8,6 +8,7 @@ export type DataSourceType = ( typeof SUPPORTED_SERVICES )[ number ];
 interface BaseServiceConfig extends Record< string, unknown > {
 	__version: number;
 	display_name: string;
+	enable_blocks: boolean;
 }
 
 interface BaseDataSourceConfig<

@@ -26,6 +26,7 @@ class BlockPatterns {
 		self::$templates['heading'] = file_get_contents( __DIR__ . '/templates/heading.html', false );
 		self::$templates['image'] = file_get_contents( __DIR__ . '/templates/image.html', false );
 		self::$templates['paragraph'] = file_get_contents( __DIR__ . '/templates/paragraph.html', false );
+		self::$templates['html'] = file_get_contents( __DIR__ . '/templates/html.html', false );
 	}
 
 	private static function generate_attribute_bindings( string $block_name, array $bindings ): array {
@@ -88,6 +89,7 @@ class BlockPatterns {
 				'url' => null,
 			],
 			'paragraphs' => [],
+			'htmls' => [],
 		];
 
 		$output_schema = $display_query->get_output_schema();
@@ -123,6 +125,11 @@ class BlockPatterns {
 				case 'image_url':
 					$bindings['image']['url'] = [ $field, $name ];
 					break;
+
+				case 'html':
+					$bindings['htmls'][] = [
+						'content' => [ $field, $name ],
+					];
 			}
 		}
 
@@ -139,6 +146,10 @@ class BlockPatterns {
 
 		foreach ( $bindings['paragraphs'] as $paragraph ) {
 			$content .= self::populate_template( 'paragraph', self::generate_attribute_bindings( $block_name, $paragraph ) );
+		}
+
+		foreach ( $bindings['htmls'] as $html ) {
+			$content .= self::populate_template( 'html', self::generate_attribute_bindings( $block_name, $html ) );
 		}
 
 		// If there is an image URL, create two-column layout with left-aligned image.
