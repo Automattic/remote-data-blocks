@@ -2,8 +2,6 @@ const https = require( 'https' );
 
 const generateWordpressPlaygroundBlueprint = ( runId, prNumber ) => {
 	const defaultSchema = {
-		schema: 'https://playground.wordpress.net/blueprint-schema.json',
-
 		meta: {
 			title: 'Remote Data Blocks (PR)',
 			description: 'Installs a remote-data-blocks plugin PR to WordPress Playground',
@@ -40,9 +38,10 @@ const generateWordpressPlaygroundBlueprint = ( runId, prNumber ) => {
 			},
 			{
 				step: 'installPlugin',
-				pluginZipFile: {
+				pluginData: {
+					caption: 'Installing Remote Data Blocks',
 					resource: 'url',
-					url: `https://playground.wordpress.net/plugin-proxy.php?org=Automattice&repo=remote-data-blocks&workflow=Build%20Live%20Branch&artifact=plugins-${ runId }&pr=${ prNumber }`,
+					url: `https://playground.wordpress.net/plugin-proxy.php?org=Automattic&repo=remote-data-blocks&workflow=Build%20Live%20Branch&artifact=remote-data-blocks-${ runId }&pr=${ prNumber }`,
 				},
 				options: {
 					activate: true,
