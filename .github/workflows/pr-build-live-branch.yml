@@ -65,7 +65,6 @@ jobs:
 
           echo "Generating zip file..."
           cd "$GITHUB_WORKSPACE" || exit
-          ls -la
           cd ../
           zip -q -r -9 "remote-data-blocks.zip" "remote-data-blocks/"
           mkdir "$GITHUB_WORKSPACE/zips"
@@ -85,7 +84,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: steps.prepare.outputs.plugin-data != '{}'
         with:
-          name: plugins
+          name: remote-data-blocks
           path: zips
           # Only need to retain for a day since the beta builder slurps it up to distribute.
           retention-days: 1
@@ -94,7 +93,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: steps.prepare.outputs.plugin-data != '{}'
         with:
-          name: plugins-${{ github.run_id }}
+          name: remote-data-blocks-${{ github.run_id }}
           path: unzips/remote-data-blocks
           retention-days: 30
 
