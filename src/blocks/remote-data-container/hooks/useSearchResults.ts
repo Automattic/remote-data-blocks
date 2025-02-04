@@ -45,7 +45,7 @@ export function useSearchResults( {
 	return {
 		loading,
 		onKeyDown,
-		results: data?.results,
+		data,
 		searchTerms,
 		setSearchTerms,
 	};

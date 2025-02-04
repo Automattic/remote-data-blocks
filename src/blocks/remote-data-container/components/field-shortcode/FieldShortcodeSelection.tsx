@@ -1,4 +1,4 @@
-import { Spinner } from '@wordpress/components';
+import { BaseControl, MenuItem, Spinner } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 
@@ -30,28 +30,25 @@ export function FieldSelection( props: FieldSelectionProps ) {
 				};
 
 				return (
-					<div key={ index } className="remote-data-blocks-inline-field-choice">
-						{ fieldDetails.name }:{ ' ' }
-						<span
-							role="button"
-							tabIndex={ 0 }
-							className="remote-data-blocks-inline-field-choice-link"
-							onClick={ evt => {
-								evt.preventDefault();
+					<MenuItem
+						className="remote-data-blocks-inline-field"
+						key={ index }
+						icon={ props.selectedField === fieldName ? check : null }
+						onClick={ evt => {
+							evt.preventDefault();
+							props.onSelectField( fieldSelection, fieldDetails.value );
+						} }
+						onKeyDown={ evt => {
+							if ( evt.key.toLowerCase() === 'enter' ) {
 								props.onSelectField( fieldSelection, fieldDetails.value );
-							} }
-							onKeyDown={ evt => {
-								if ( evt.key.toLowerCase() === 'enter' ) {
-									props.onSelectField( fieldSelection, fieldDetails.value );
-								}
-							} }
-						>
+							}
+						} }
+					>
+						<BaseControl className="remote-data-blocks-inline-field-choice" __nextHasNoMarginBottom>
+							<BaseControl.VisualLabel>{ fieldDetails.name }: </BaseControl.VisualLabel>
 							{ fieldDetails.value }
-							{ props.selectedField === fieldName && (
-								<span className="remote-data-blocks-inline-field-selected-icon">{ check }</span>
-							) }
-						</span>
-					</div>
+						</BaseControl>
+					</MenuItem>
 				);
 			} ) }
 		</>

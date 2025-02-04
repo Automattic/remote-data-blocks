@@ -1,59 +1,73 @@
+import { Button, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-import { ModalWithButtonTrigger } from './BaseModal';
 import { useModalState } from '../../hooks/useModalState';
 import { ItemList } from '../item-list/ItemList';
 import { useSearchResults } from '@/blocks/remote-data-container/hooks/useSearchResults';
-import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
-import { getBlockAvailableBindings, getBlockDataSourceType } from '@/utils/localized-block-data';
+import { getBlockAvailableBindings, getBlockConfig } from '@/utils/localized-block-data';
 
 interface DataViewsModalProps {
 	blockName: string;
 	headerImage?: string;
-	onSelect: ( data: RemoteDataQueryInput ) => void;
+	onSelect?: ( data: RemoteDataQueryInput ) => void;
+	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
 	queryKey: string;
-	title: string;
+	renderTrigger?: ( props: { onClick: () => void } ) => React.ReactNode;
+	title?: string;
 }
 
 export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
-	const { blockName, onSelect, queryKey, title } = props;
+	const { blockName, onSelect, onSelectField, queryKey, renderTrigger, title } = props;
+
+	const blockConfig = getBlockConfig( blockName );
+
 	const availableBindings = getBlockAvailableBindings( blockName );
 
-	const { loading, results, searchTerms, setSearchTerms } = useSearchResults( {
+	const {
+		loading,
+		data: remoteData,
+		searchTerms,
+		setSearchTerms,
+	} = useSearchResults( {
 		blockName,
 		queryKey,
 	} );
 
 	const { close, isOpen, open } = useModalState();
 
-	function onSelectItem( data: RemoteDataQueryInput ): void {
-		onSelect( data );
-		sendTracksEvent( 'remotedatablocks_add_block', {
-			action: 'select_item',
-			selected_option: 'search_from_list',
-			data_source_type: getBlockDataSourceType( blockName ),
-		} );
-		close();
-	}
+	const handleSelect = ( data: RemoteDataQueryInput ): void => {
+		onSelect?.( data );
+	};
 
+	const triggerElement = renderTrigger ? (
+		renderTrigger( { onClick: open } )
+	) : (
+		<Button variant="primary" onClick={ open }>
+			{ __( 'Choose' ) }
+		</Button>
+	);
 	return (
-		<ModalWithButtonTrigger
-			buttonText={ __( 'Choose' ) }
-			className="rdb-editor_data-views-modal"
-			isOpen={ isOpen }
-			onClose={ close }
-			onOpen={ open }
-			title={ title }
-		>
-			<ItemList
-				availableBindings={ availableBindings }
-				blockName={ props.blockName }
-				loading={ loading }
-				onSelect={ onSelectItem }
-				results={ results }
-				searchTerms={ searchTerms }
-				setSearchTerms={ setSearchTerms }
-			/>
-		</ModalWithButtonTrigger>
+		<>
+			{ triggerElement }
+			{ isOpen && (
+				<Modal
+					className="rdb-editor_data-views-modal"
+					isFullScreen
+					onRequestClose={ close }
+					title={ title ?? blockConfig?.settings?.title }
+				>
+					<ItemList
+						availableBindings={ availableBindings }
+						blockName={ blockName }
+						loading={ loading }
+						onSelect={ handleSelect }
+						onSelectField={ onSelectField }
+						remoteData={ remoteData ?? undefined }
+						searchTerms={ searchTerms }
+						setSearchTerms={ setSearchTerms }
+					/>
+				</Modal>
+			) }
+		</>
 	);
 };
