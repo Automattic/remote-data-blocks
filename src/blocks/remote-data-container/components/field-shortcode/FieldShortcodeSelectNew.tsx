@@ -28,11 +28,14 @@ export function FieldShortcodeSelectNew( props: FieldShortcodeSelectNewProps ) {
 
 	return (
 		<DropdownMenu
-			className="remote-data-blocks-select-new"
 			icon={ chevronRightSmall }
 			label=""
 			text={ __( 'Select an item', 'remote-data-blocks' ) }
-			popoverProps={ { placement: 'right-start', offset: 0 } }
+			popoverProps={ {
+				className: 'remote-data-blocks-field-shortcode-dropdown remote-data-blocks-select-new',
+				placement: 'right-start',
+				offset: 0,
+			} }
 			{ ...restProps }
 		>
 			{ () =>

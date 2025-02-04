@@ -45,7 +45,9 @@ export function FieldSelection( props: FieldSelectionProps ) {
 						} }
 					>
 						<BaseControl className="remote-data-blocks-inline-field-choice" __nextHasNoMarginBottom>
-							<BaseControl.VisualLabel>{ fieldDetails.name }: </BaseControl.VisualLabel>
+							<BaseControl.VisualLabel style={ { marginBottom: 0 } }>
+								{ fieldDetails.name }:
+							</BaseControl.VisualLabel>
 							{ fieldDetails.value }
 						</BaseControl>
 					</MenuItem>

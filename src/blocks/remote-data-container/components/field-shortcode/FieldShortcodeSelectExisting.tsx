@@ -18,11 +18,14 @@ export function FieldShortcodeSelectExisting( props: FieldShortcodeSelectExistin
 
 	return remoteDatas.length > 0 ? (
 		<DropdownMenu
-			className="remote-data-blocks-select-existing"
 			icon={ chevronRightSmall }
 			label=""
 			text={ __( 'Existing items', 'remote-data-blocks' ) }
-			popoverProps={ { placement: 'right-start', offset: 0 } }
+			popoverProps={ {
+				className: 'remote-data-blocks-field-shortcode-dropdown remote-data-blocks-select-existing',
+				placement: 'right-start',
+				offset: 0,
+			} }
 		>
 			{ () =>
 				remoteDatas.map( remoteData => (
