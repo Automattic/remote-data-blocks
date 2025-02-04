@@ -1,10 +1,10 @@
 const https = require( 'https' );
 
-const generateWordpressPlaygroundBlueprint = ( runId, prNumber ) => {
+const generateWordpressPlaygroundBlueprint = ( prNumber ) => {
 	const defaultSchema = {
 		meta: {
-			title: 'Remote Data Blocks (PR)',
-			description: 'Installs a remote-data-blocks plugin PR to WordPress Playground',
+			title: `Remote Data Blocks - PR #${ prNumber }`,
+			description: `Installs remote-data-blocks plugin PR #${ prNumber } to WordPress Playground`,
 			author: 'WordPress VIP',
 			categories: [ 'Content' ],
 		},
@@ -26,8 +26,8 @@ const generateWordpressPlaygroundBlueprint = ( runId, prNumber ) => {
 			{
 				step: 'setSiteOptions',
 				options: {
-					blogname: 'Remote Data Blocks (PR)',
-					blogdescription: 'Explore the Remote Data Blocks plugin in a WordPress Playground',
+					blogname: `Remote Data Blocks - PR #${ prNumber }`,
+					blogdescription: `Explore the remote-data-blocks plugin PR #${ prNumber } in a WordPress Playground`,
 				},
 			},
 			{
@@ -41,7 +41,7 @@ const generateWordpressPlaygroundBlueprint = ( runId, prNumber ) => {
 				pluginData: {
 					caption: 'Installing Remote Data Blocks',
 					resource: 'url',
-					url: `https://playground.wordpress.net/plugin-proxy.php?org=Automattic&repo=remote-data-blocks&workflow=Build%20Live%20Branch&artifact=remote-data-blocks-${ runId }&pr=${ prNumber }`,
+					url: `https://github-proxy.com/proxy/?repo=Automattic/remote-data-blocks&artifact=remote-data-blocks-${ prNumber }.zip`,
 				},
 				options: {
 					activate: true,
@@ -75,10 +75,7 @@ async function run( { github, context, core } ) {
 		}
 	}
 
-	const defaultSchema = generateWordpressPlaygroundBlueprint(
-		context.runId,
-		context.issue.number
-	);
+	const defaultSchema = generateWordpressPlaygroundBlueprint( context.issue.number );
 
 	const url = `https://playground.wordpress.net/#${ JSON.stringify(
 		defaultSchema
