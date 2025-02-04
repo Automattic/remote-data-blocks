@@ -1,4 +1,4 @@
-import { BaseControl, MenuItem, Spinner } from '@wordpress/components';
+import { BaseControl, Icon, MenuItem, Spinner } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 
@@ -33,7 +33,6 @@ export function FieldSelection( props: FieldSelectionProps ) {
 					<MenuItem
 						className="remote-data-blocks-inline-field"
 						key={ index }
-						icon={ props.selectedField === fieldName ? check : null }
 						onClick={ evt => {
 							evt.preventDefault();
 							props.onSelectField( fieldSelection, fieldDetails.value );
@@ -43,9 +42,24 @@ export function FieldSelection( props: FieldSelectionProps ) {
 								props.onSelectField( fieldSelection, fieldDetails.value );
 							}
 						} }
+						suffix={
+							props.selectedField === fieldName ? (
+								<Icon
+									icon={ check }
+									size={ 24 }
+									style={ {
+										color: '#4ab866',
+									} }
+								/>
+							) : undefined
+						}
 					>
 						<BaseControl className="remote-data-blocks-inline-field-choice" __nextHasNoMarginBottom>
-							<BaseControl.VisualLabel style={ { marginBottom: 0 } }>
+							<BaseControl.VisualLabel
+								style={ {
+									marginBottom: 0,
+								} }
+							>
 								{ fieldDetails.name }:
 							</BaseControl.VisualLabel>
 							{ fieldDetails.value }
