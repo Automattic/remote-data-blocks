@@ -50,22 +50,18 @@ jobs:
 
       - name: Prepare plugin zips
         id: prepare
-        env:
-          ZIP_NAME: remote-data-blocks-${{ github.event.pull_request.number }}.zip
-          ZIP_FOLDER_NAME: remote-data-blocks-${{ github.event.pull_request.number }}
         run: |
           echo "Generating zip file..."
           cd "$GITHUB_WORKSPACE" || exit
           npm run plugin-zip
-          mv remote-data-blocks.zip "$ZIP_NAME"
-          mkdir "zips"
-          mv "$ZIP_NAME" "zips/"
-          mkdir -p "unzips/remote-data-blocks"
-          cd "zips"
-          unzip -qq "$ZIP_NAME"
-          mv "$ZIP_FOLDER_NAME" "remote-data-blocks"
-          cd ../
-          mv "$GITHUB_WORKSPACE/zips/remote-data-blocks" "$GITHUB_WORKSPACE/unzips/remote-data-blocks/remote-data-blocks"
+          echo "Generated zip file..."
+          mkdir "$GITHUB_WORKSPACE/zips"
+          mv remote-data-blocks.zip "$GITHUB_WORKSPACE/zips/remote-data-blocks.zip"
+          echo "Moved zip file to zips directory..."
+          mkdir "$GITHUB_WORKSPACE/unzips"
+          echo "Created unzips directory..."
+          unzip "$GITHUB_WORKSPACE/zips/remote-data-blocks.zip" -d "$GITHUB_WORKSPACE/unzips/remote-data-blocks"
+          echo "Unzipped zip file..."
 
       - name: Create playground artifact
         id: create-playground-artifact-step
