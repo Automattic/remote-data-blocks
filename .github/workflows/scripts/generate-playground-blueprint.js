@@ -1,6 +1,6 @@
 const https = require( 'https' );
 
-const generateWordpressPlaygroundBlueprint = ( prNumber ) => {
+const generateWordpressPlaygroundBlueprint = ( prNumber, artifactUrl ) => {
 	const defaultSchema = {
 		meta: {
 			title: `Remote Data Blocks - PR #${ prNumber }`,
@@ -41,7 +41,7 @@ const generateWordpressPlaygroundBlueprint = ( prNumber ) => {
 				pluginData: {
 					caption: 'Installing Remote Data Blocks',
 					resource: 'url',
-					url: `https://github-proxy.com/proxy/?repo=Automattic/remote-data-blocks&artifact=remote-data-blocks-${ prNumber }.zip`,
+					url: `${ artifactUrl }`,
 				},
 				options: {
 					activate: true,
@@ -54,7 +54,7 @@ const generateWordpressPlaygroundBlueprint = ( prNumber ) => {
 	return defaultSchema;
 };
 
-async function run( { github, context, core } ) {
+async function run( { github, context, core, artifactUrl } ) {
 	const commentInfo = {
 		owner: context.repo.owner,
 		repo: context.repo.repo,
@@ -75,7 +75,7 @@ async function run( { github, context, core } ) {
 		}
 	}
 
-	const defaultSchema = generateWordpressPlaygroundBlueprint( context.issue.number );
+	const defaultSchema = generateWordpressPlaygroundBlueprint( context.issue.number, artifactUrl );
 
 	const url = `https://playground.wordpress.net/#${ JSON.stringify(
 		defaultSchema

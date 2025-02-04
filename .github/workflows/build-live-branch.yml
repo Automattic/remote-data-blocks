@@ -46,30 +46,28 @@ jobs:
         run: |
           echo "Generating zip file..."
           cd "$GITHUB_WORKSPACE" || exit
-          cd ../
-          zip -q -r -9 "$ZIP_NAME" "remote-data-blocks/"
-          mkdir "$GITHUB_WORKSPACE/zips"
-          mv "$ZIP_NAME" "$GITHUB_WORKSPACE/zips/"
-
-          mkdir -p "$GITHUB_WORKSPACE/unzips/remote-data-blocks"
-          cd "$GITHUB_WORKSPACE/zips"
+          npm run plugin-zip
+          mv remote-data-blocks.zip "$ZIP_NAME"
+          mkdir "zips"
+          mv "$ZIP_NAME" "zips/"
+          mkdir -p "unzips/remote-data-blocks"
+          cd "zips"
           unzip -qq "$ZIP_NAME"
+          mv "$ZIP_NAME" "remote-data-blocks"
           mv "$GITHUB_WORKSPACE/zips/remote-data-blocks" "$GITHUB_WORKSPACE/unzips/remote-data-blocks/remote-data-blocks"
 
-      - name: Create plugins artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: remote-data-blocks-${{ github.event.pull_request.number }}
-          path: zips
-          # Only need to retain for a day since the beta builder slurps it up to distribute.
-          retention-days: 1
-
       - name: Create playground artifact
+        id: create-playground-artifact-step
         uses: actions/upload-artifact@v4
         with:
           name: remote-data-blocks-${{ github.event.pull_request.number }}
           path: unzips/remote-data-blocks
-          retention-days: 30
+          retention-days: 2
+          if-no-files-found: 'error'
+          overwrite: true
+
+      - name: Output artifact ID
+        run: echo 'Artifact ID is ${{ steps.create-playground-artifact-step.outputs.artifact-url }}'
 
       - name: Comment on PR with WordPress Playground details
         uses: actions/github-script@v7
@@ -77,4 +75,4 @@ jobs:
         with:
           script: |
             const { run } = require('./.github/workflows/scripts/generate-playground-blueprint');
-            run({ github, context, core });
+            run({ github, context, core, artifactUrl: ${{ steps.create-playground-artifact-step.outputs.artifact-url }} });
