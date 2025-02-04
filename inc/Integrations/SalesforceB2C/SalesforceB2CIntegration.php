@@ -18,11 +18,11 @@ class SalesforceB2CIntegration {
 
 		foreach ( $data_source_configs as $config ) {
 			$data_source = SalesforceB2CDataSource::from_array( $config );
-	
+
 			if ( false === ( $config['service_config']['enable_blocks'] ?? true ) ) {
 				continue;
 			}
-			
+
 			self::register_blocks_for_salesforce_data_source( $data_source );
 		}
 	}
@@ -36,7 +36,8 @@ class SalesforceB2CIntegration {
 				$base_endpoint,
 				$service_config['organization_id'],
 				$service_config['client_id'],
-				$service_config['client_secret']
+				$service_config['client_secret'],
+				$service_config['site_id']
 			);
 			$request_headers = [ 'Content-Type' => 'application/json' ];
 
@@ -52,10 +53,11 @@ class SalesforceB2CIntegration {
 				'data_source' => $data_source,
 				'endpoint' => function ( array $input_variables ) use ( $base_endpoint, $service_config ): string {
 					return sprintf(
-						'%s/product/shopper-products/v1/organizations/%s/products/%s?siteId=RefArchGlobal',
+						'%s/product/shopper-products/v1/organizations/%s/products/%s?siteId=%s',
 						$base_endpoint,
 						$service_config['organization_id'],
-						$input_variables['product_id']
+						$input_variables['product_id'],
+						$service_config['site_id']
 					);
 				},
 				'input_schema' => [
@@ -105,9 +107,10 @@ class SalesforceB2CIntegration {
 				'data_source' => $data_source,
 				'endpoint' => function ( array $input_variables ) use ( $base_endpoint, $service_config ): string {
 					return sprintf(
-						'%s/search/shopper-search/v1/organizations/%s/product-search?siteId=RefArchGlobal&q=%s',
+						'%s/search/shopper-search/v1/organizations/%s/product-search?siteId=%s&q=%s',
 						$base_endpoint,
 						$service_config['organization_id'],
+						$service_config['site_id'],
 						urlencode( $input_variables['search_terms'] )
 					);
 				},

@@ -2,13 +2,13 @@ import { TextControl } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { DataSourceForm } from '../components/DataSourceForm';
+import { DataSourceForm } from '@/data-sources/components/DataSourceForm';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import {
-	SettingsComponentProps,
 	SalesforceB2CConfig,
 	SalesforceB2CServiceConfig,
+	SettingsComponentProps,
 } from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
 import SalesforceCommerceB2CIcon from '@/settings/icons/SalesforceCommerceB2CIcon';
@@ -30,8 +30,20 @@ export const SalesforceB2CSettings = ( {
 	} );
 
 	const shouldAllowSubmit = useMemo( () => {
-		return state.shortcode && state.organization_id && state.client_id && state.client_secret;
-	}, [ state.shortcode, state.organization_id, state.client_id, state.client_secret ] );
+		return (
+			state.site_id &&
+			state.shortcode &&
+			state.organization_id &&
+			state.client_id &&
+			state.client_secret
+		);
+	}, [
+		state.site_id,
+		state.shortcode,
+		state.organization_id,
+		state.client_id,
+		state.client_secret,
+	] );
 
 	const onSaveClick = async () => {
 		if ( ! validState ) {
@@ -82,6 +94,18 @@ export const SalesforceB2CSettings = ( {
 					} }
 					value={ state.organization_id ?? '' }
 					help={ __( 'The organization ID. Example: f_ecom_mirl_012' ) }
+					autoComplete="off"
+					__next40pxDefaultSize
+				/>
+
+				<TextControl
+					type="text"
+					label={ __( 'Site ID', 'remote-data-blocks' ) }
+					onChange={ siteId => {
+						handleOnChange( 'site_id', siteId ?? '' );
+					} }
+					value={ state.site_id ?? 'RefArchGlobal' }
+					help={ __( 'The site ID. Example: RefArchGlobal' ) }
 					autoComplete="off"
 					__next40pxDefaultSize
 				/>

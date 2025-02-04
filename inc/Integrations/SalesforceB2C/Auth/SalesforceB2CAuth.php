@@ -18,15 +18,17 @@ class SalesforceB2CAuth {
 	 * @param string $organization_id The organization ID for the data source.
 	 * @param string $client_id The client ID (a version 4 UUID).
 	 * @param string $client_secret The client secret.
+	 * @param string $site_id The storefront site ID.
 	 * @return string|WP_Error The token or an error.
 	 */
 	public static function generate_token(
 		string $endpoint,
 		string $organization_id,
 		string $client_id,
-		string $client_secret
+		string $client_secret,
+		string $site_id,
 	): string|WP_Error {
-		$saved_access_token = self::get_saved_access_token( $organization_id, $client_id );
+		$saved_access_token = self::get_saved_access_token( $organization_id, $client_id, $site_id );
 
 		if ( null !== $saved_access_token ) {
 			return $saved_access_token;
@@ -34,16 +36,16 @@ class SalesforceB2CAuth {
 
 		$access_token = null;
 
-		$saved_refresh_token = self::get_saved_refresh_token( $organization_id, $client_id );
+		$saved_refresh_token = self::get_saved_refresh_token( $organization_id, $client_id, $site_id );
 		if ( null !== $saved_refresh_token ) {
-			$access_token = self::get_token_using_refresh_token( $saved_refresh_token, $client_id, $client_secret, $endpoint, $organization_id );
+			$access_token = self::get_token_using_refresh_token( $saved_refresh_token, $client_id, $client_secret, $endpoint, $organization_id, $site_id );
 		}
 
 		if ( null !== $access_token && ! is_wp_error( $access_token ) ) {
 			return $access_token;
 		}
 
-		$access_token = self::get_token_using_client_credentials( $client_id, $client_secret, $endpoint, $organization_id );
+		$access_token = self::get_token_using_client_credentials( $client_id, $client_secret, $endpoint, $organization_id, $site_id );
 		return $access_token;
 	}
 
@@ -54,6 +56,7 @@ class SalesforceB2CAuth {
 		string $client_secret,
 		string $endpoint,
 		string $organization_id,
+		string $site_id,
 	): WP_Error|string {
 		$client_auth_url = sprintf( '%s/shopper/auth/v1/organizations/%s/oauth2/token', $endpoint, $organization_id );
 		$client_credentials = base64_encode( sprintf( '%s:%s', $client_id, $client_secret ) );
@@ -61,7 +64,7 @@ class SalesforceB2CAuth {
 		$client_auth_response = wp_remote_post($client_auth_url, [
 			'body' => [
 				'grant_type' => 'client_credentials',
-				'channel_id' => 'RefArch',
+				'channel_id' => $site_id,
 			],
 			'headers' => [
 				'Content-Type' => 'application/x-www-form-urlencoded',
@@ -107,6 +110,7 @@ class SalesforceB2CAuth {
 		string $client_secret,
 		string $endpoint,
 		string $organization_id,
+		string $site_id,
 	): string|WP_Error {
 		$client_auth_url = sprintf( '%s/shopper/auth/v1/organizations/%s/oauth2/token', $endpoint, $organization_id );
 
@@ -117,7 +121,7 @@ class SalesforceB2CAuth {
 			'body' => [
 				'grant_type' => 'refresh_token',
 				'refresh_token' => $refresh_token,
-				'channel_id' => 'RefArch',
+				'channel_id' => $site_id,
 			],
 			'headers' => [
 				'Content-Type' => 'application/x-www-form-urlencoded',
@@ -153,7 +157,7 @@ class SalesforceB2CAuth {
 
 	// Access token cache management
 
-	private static function save_access_token( string $access_token, int $expires_in, string $organization_id, string $client_id ): void {
+	private static function save_access_token( string $access_token, int $expires_in, string $organization_id, string $client_id, string $site_id ): void {
 		// Expires 10 seconds early as a buffer for request time and drift
 		$access_token_expires_in = $expires_in - 10;
 
@@ -162,7 +166,7 @@ class SalesforceB2CAuth {
 			'expires_at' => time() + $access_token_expires_in,
 		];
 
-		$access_token_cache_key = self::get_access_token_key( $organization_id, $client_id );
+		$access_token_cache_key = self::get_access_token_key( $organization_id, $client_id, $site_id );
 
 		wp_cache_set(
 			$access_token_cache_key,
@@ -173,8 +177,8 @@ class SalesforceB2CAuth {
 		);
 	}
 
-	private static function get_saved_access_token( string $organization_id, string $client_id ): ?string {
-		$access_token_cache_key = self::get_access_token_key( $organization_id, $client_id );
+	private static function get_saved_access_token( string $organization_id, string $client_id, string $site_id ): ?string {
+		$access_token_cache_key = self::get_access_token_key( $organization_id, $client_id, $site_id );
 
 		$saved_access_token = wp_cache_get( $access_token_cache_key, 'oauth-tokens' );
 
@@ -193,14 +197,14 @@ class SalesforceB2CAuth {
 		return $access_token;
 	}
 
-	private static function get_access_token_key( string $organization_id, string $client_id ): string {
-		$cache_key_suffix = hash( 'sha256', sprintf( '%s-%s', $organization_id, $client_id ) );
+	private static function get_access_token_key( string $organization_id, string $client_id, string $site_id ): string {
+		$cache_key_suffix = hash( 'sha256', sprintf( '%s-%s-%s', $organization_id, $client_id, $site_id ) );
 		return sprintf( 'salesforce_b2c_access_token_%s', $cache_key_suffix );
 	}
 
 	// Refresh token cache management
 
-	private static function save_refresh_token( string $refresh_token, int $expires_in, string $organization_id, string $client_id ): void {
+	private static function save_refresh_token( string $refresh_token, int $expires_in, string $organization_id, string $client_id, string $site_id ): void {
 		// Expires 10 seconds early as a buffer for request time and drift
 		$refresh_token_expires_in = $expires_in - 10;
 
@@ -209,7 +213,7 @@ class SalesforceB2CAuth {
 			'expires_at' => time() + $refresh_token_expires_in,
 		];
 
-		$refresh_token_cache_key = self::get_refresh_token_cache_key( $organization_id, $client_id );
+		$refresh_token_cache_key = self::get_refresh_token_cache_key( $organization_id, $client_id, $site_id );
 
 		wp_cache_set(
 			$refresh_token_cache_key,
@@ -220,8 +224,8 @@ class SalesforceB2CAuth {
 		);
 	}
 
-	private static function get_saved_refresh_token( string $organization_id, string $client_id ): ?string {
-		$refresh_token_cache_key = self::get_refresh_token_cache_key( $organization_id, $client_id );
+	private static function get_saved_refresh_token( string $organization_id, string $client_id, string $site_id ): ?string {
+		$refresh_token_cache_key = self::get_refresh_token_cache_key( $organization_id, $client_id, $site_id );
 
 		$saved_refresh_token = wp_cache_get( $refresh_token_cache_key, 'oauth-tokens' );
 
@@ -240,8 +244,8 @@ class SalesforceB2CAuth {
 		return $refresh_token;
 	}
 
-	private static function get_refresh_token_cache_key( string $organization_id, string $client_id ): string {
-		$cache_key_suffix = hash( 'sha256', sprintf( '%s-%s', $organization_id, $client_id ) );
+	private static function get_refresh_token_cache_key( string $organization_id, string $client_id, string $site_id ): string {
+		$cache_key_suffix = hash( 'sha256', sprintf( '%s-%s-%s', $organization_id, $client_id, $site_id ) );
 		return sprintf( 'salesforce_b2c_refresh_token_%s', $cache_key_suffix );
 	}
 }
