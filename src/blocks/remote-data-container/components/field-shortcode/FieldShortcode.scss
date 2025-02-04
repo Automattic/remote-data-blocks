@@ -8,9 +8,10 @@
 
 .rdb-field-shortcode_dropdown {
 
-       div[role="group"]:first-child {
+    .components-toolbar-group {
             display: flex;
 			flex-direction: column;
+            border-right: none;
 
 			.components-dropdown-menu{
 				.components-dropdown-menu__toggle {

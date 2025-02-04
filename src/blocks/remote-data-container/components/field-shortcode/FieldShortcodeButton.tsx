@@ -1,5 +1,5 @@
 import { BlockControls } from '@wordpress/block-editor';
-import { DropdownMenu, MenuGroup, ToolbarGroup } from '@wordpress/components';
+import { ToolbarDropdownMenu, ToolbarGroup } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { RichTextFormat, insertObject, WPFormatEditProps } from '@wordpress/rich-text';
@@ -88,21 +88,20 @@ export function FieldShortcodeButton( props: WPFormatEditProps ) {
 			<BlockControls>
 				<ToolbarGroup>
 					{ remoteData.length > 0 ? (
-						<DropdownMenu
+						<ToolbarDropdownMenu
 							className="remote-data-blocks-select-new"
 							icon="shortcode"
 							label={ __( 'Select block bindings', 'remote-data-blocks' ) }
 							popoverProps={ { className: 'rdb-field-shortcode_dropdown', offset: 8 } }
-							variant="toolbar"
 						>
 							{ () => (
-								<MenuGroup>
+								<ToolbarGroup>
 									<FieldShortcodeSelectNew onSelectField={ onSelectField } />
 									<FieldShortcodeSelectExisting onSelectField={ onSelectField } />
 									<FieldShortcodeSelectMeta onSelectField={ onSelectField } />
-								</MenuGroup>
+								</ToolbarGroup>
 							) }
-						</DropdownMenu>
+						</ToolbarDropdownMenu>
 					) : (
 						<FieldShortcodeSelectNew
 							onSelectField={ onSelectField }
