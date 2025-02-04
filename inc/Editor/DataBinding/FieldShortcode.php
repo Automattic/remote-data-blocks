@@ -9,7 +9,7 @@ class FieldShortcode {
 		add_action( 'the_content', [ __CLASS__, 'render_frontend_fields' ] );
 	}
 
-	private static function get_meta_field_value( array $context, string $field ): string|null {
+	private static function get_meta_field_value( array $context, string $field ): string|int|null {
 		$query_results = BlockBindings::execute_query( $context, $field );
 
 		if ( isset( $query_results['metadata'][ $field ]['value'] ) ) {
@@ -48,10 +48,10 @@ class FieldShortcode {
 			} else {
 				$block = [
 					'context' => [
-						BlockBindings::$context_name => [
-							'blockName' => $query_data['remoteData']['blockName'],
-							'queryInput' => $query_data['remoteData']['queryInput'],
-						],
+					
+						'blockName' => $query_data['remoteData']['blockName'],
+						'queryInput' => $query_data['remoteData']['queryInput'],
+					
 					],
 				];
 				$field = $query_data['selectedField'];
