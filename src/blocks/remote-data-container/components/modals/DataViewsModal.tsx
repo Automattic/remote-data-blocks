@@ -7,6 +7,7 @@ import { useSearchResults } from '@/blocks/remote-data-container/hooks/useSearch
 import { getBlockAvailableBindings, getBlockConfig } from '@/utils/localized-block-data';
 
 interface DataViewsModalProps {
+	className?: string;
 	blockName: string;
 	headerImage?: string;
 	onSelect?: ( data: RemoteDataQueryInput ) => void;
@@ -17,7 +18,7 @@ interface DataViewsModalProps {
 }
 
 export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
-	const { blockName, onSelect, onSelectField, queryKey, renderTrigger, title } = props;
+	const { className, blockName, onSelect, onSelectField, queryKey, renderTrigger, title } = props;
 
 	const blockConfig = getBlockConfig( blockName );
 
@@ -51,7 +52,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 			{ triggerElement }
 			{ isOpen && (
 				<Modal
-					className="rdb-editor_data-views-modal"
+					className={ className }
 					isFullScreen
 					onRequestClose={ close }
 					title={ title ?? blockConfig?.settings?.title }
