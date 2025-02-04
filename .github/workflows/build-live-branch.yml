@@ -39,67 +39,41 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get current version
-        id: version
-        uses: actions/github-script@v6.3.3
-        with:
-          script:
-            const { getVersion } = require( './.github/workflows/scripts/get-plugin-version' );
-            const version = await getVersion( 'remote-data-blocks' );
-            core.setOutput( 'version', version );
-
       - name: Prepare plugin zips
         id: prepare
         env:
-          CURRENT_VERSION: ${{ steps.version.outputs.version }}
+          ZIP_NAME: remote-data-blocks-${{ github.event.pull_request.number }}.zip
         run: |
-
-          # Current version must compare greater than any previously used current version for this PR.
-          # Assume GH run IDs are monotonic.
-          VERSUFFIX="${GITHUB_RUN_ID}-g$(git rev-parse --short HEAD)"
-
-          CURRENT_VERSION="$CURRENT_VERSION-$VERSUFFIX"
-
-          sed -i -e 's/Version: .*$/Version: '"$CURRENT_VERSION"'/' "$GITHUB_WORKSPACE/remote-data-blocks.php"
-          echo "$CURRENT_VERSION" > "$GITHUB_WORKSPACE/version.txt"
-
           echo "Generating zip file..."
           cd "$GITHUB_WORKSPACE" || exit
           cd ../
-          zip -q -r -9 "remote-data-blocks.zip" "remote-data-blocks/"
+          zip -q -r -9 "$ZIP_NAME" "remote-data-blocks/"
           mkdir "$GITHUB_WORKSPACE/zips"
-          mv "remote-data-blocks.zip" "$GITHUB_WORKSPACE/zips/remote-data-blocks.zip"
+          mv "$ZIP_NAME" "$GITHUB_WORKSPACE/zips/"
 
           mkdir -p "$GITHUB_WORKSPACE/unzips/remote-data-blocks"
           cd "$GITHUB_WORKSPACE/zips"
-          unzip -qq remote-data-blocks.zip
+          unzip -qq "$ZIP_NAME"
           mv "$GITHUB_WORKSPACE/zips/remote-data-blocks" "$GITHUB_WORKSPACE/unzips/remote-data-blocks/remote-data-blocks"
-
-          # Plugin data is passed as a JSON object.
-          PLUGIN_DATA="{}"
-          PLUGIN_DATA=$( jq -c --arg slug "remote-data-blocks" --arg ver "$CURRENT_VERSION" '.[ $slug ] = { version: $ver }' <<<"$PLUGIN_DATA" )
-          echo "plugin-data=$PLUGIN_DATA" >> $GITHUB_OUTPUT
 
       - name: Create plugins artifact
         uses: actions/upload-artifact@v4
-        if: steps.prepare.outputs.plugin-data != '{}'
         with:
-          name: remote-data-blocks
+          name: remote-data-blocks-${{ github.event.pull_request.number }}
           path: zips
           # Only need to retain for a day since the beta builder slurps it up to distribute.
           retention-days: 1
 
       - name: Create playground artifact
         uses: actions/upload-artifact@v4
-        if: steps.prepare.outputs.plugin-data != '{}'
         with:
-          name: remote-data-blocks-${{ github.run_id }}
+          name: remote-data-blocks-${{ github.event.pull_request.number }}
           path: unzips/remote-data-blocks
           retention-days: 30
 
       - name: Comment on PR with WordPress Playground details
         uses: actions/github-script@v7
-        if: steps.prepare.outputs.plugin-data != '{}' && ! github.event.pull_request.head.repo.fork
+        if: ! github.event.pull_request.head.repo.fork
         with:
           script: |
             const { run } = require('./.github/workflows/scripts/generate-playground-blueprint');
