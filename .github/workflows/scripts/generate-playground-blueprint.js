@@ -61,8 +61,7 @@ async function run( { github, context, core, artifactUrl } ) {
 		issue_number: context.issue.number,
 	};
 
-	const comments = ( await github.rest.issues.listComments( commentInfo ) )
-		.data;
+	const comments = ( await github.rest.issues.listComments( commentInfo ) ).data;
 	let existingCommentId = null;
 
 	for ( const currentComment of comments ) {
@@ -77,9 +76,7 @@ async function run( { github, context, core, artifactUrl } ) {
 
 	const defaultSchema = generateWordpressPlaygroundBlueprint( context.issue.number, artifactUrl );
 
-	const url = `https://playground.wordpress.net/#${ JSON.stringify(
-		defaultSchema
-	) }`;
+	const url = `https://playground.wordpress.net/#${ JSON.stringify( defaultSchema ) }`;
 
 	const body = `
 ## Test using WordPress Playground
