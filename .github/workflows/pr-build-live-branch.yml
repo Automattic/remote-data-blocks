@@ -83,4 +83,5 @@ jobs:
         with:
           script: |
             const { run } = require('./.github/workflows/scripts/generate-playground-blueprint');
-            run({ github, context, core, ${{ steps.create-playground-artifact-step.outputs.artifact-url }} });
+            const artifactUrl = ${{ steps.create-playground-artifact-step.outputs.artifact-url }}
+            run({ github, context, core, artifactUrl });
