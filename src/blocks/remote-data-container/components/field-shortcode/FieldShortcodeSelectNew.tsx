@@ -1,16 +1,18 @@
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+import { DropdownMenuProps } from '@wordpress/components/build-types/dropdown-menu/types';
 import { __ } from '@wordpress/i18n';
 import { chevronRightSmall } from '@wordpress/icons';
 
 import { DataViewsModal } from '../modals/DataViewsModal';
 import { getBlocksConfig } from '@/utils/localized-block-data';
 
-interface FieldShortcodeSelectNewProps {
+type FieldShortcodeSelectNewProps = Omit< DropdownMenuProps, 'label' > & {
 	onSelectField: ( data: FieldSelection, fieldValue: string ) => void;
-}
+	label?: string;
+};
 
 export function FieldShortcodeSelectNew( props: FieldShortcodeSelectNewProps ) {
-	const { onSelectField } = props;
+	const { onSelectField, ...restProps } = props;
 	const blockConfigs = getBlocksConfig();
 	const nonLoopBlocks = Object.values( blockConfigs ).filter( ( { loop } ) => ! loop );
 	const blocksByType = nonLoopBlocks.reduce<
@@ -31,6 +33,7 @@ export function FieldShortcodeSelectNew( props: FieldShortcodeSelectNewProps ) {
 			label=""
 			text={ __( 'Select an item', 'remote-data-blocks' ) }
 			popoverProps={ { placement: 'right-start', offset: 0 } }
+			{ ...restProps }
 		>
 			{ () =>
 				Object.entries( blocksByType ).map( ( [ dataSourceType, configs ] ) => (

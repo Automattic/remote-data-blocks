@@ -7,6 +7,7 @@ import { RichTextFormat, insertObject, WPFormatEditProps } from '@wordpress/rich
 import { FieldShortcodeSelectExisting } from './FieldShortcodeSelectExisting';
 import { FieldShortcodeSelectMeta } from './FieldShortcodeSelectMeta';
 import { FieldShortcodeSelectNew } from './FieldShortcodeSelectNew';
+import { useExistingRemoteData } from '../../hooks/useExistingRemoteData';
 import {
 	formatName,
 	formatTypeSettings,
@@ -80,25 +81,37 @@ export function FieldShortcodeButton( props: WPFormatEditProps ) {
 		} );
 	};
 
+	const remoteData = useExistingRemoteData();
+
 	return (
 		<>
 			<BlockControls>
 				<ToolbarGroup>
-					<DropdownMenu
-						className="remote-data-blocks-select-new"
-						icon="shortcode"
-						label={ __( 'Select block bindings', 'remote-data-blocks' ) }
-						popoverProps={ { className: 'rdb-field-shortcode_dropdown', offset: 8 } }
-						variant="toolbar"
-					>
-						{ () => (
-							<MenuGroup>
-								<FieldShortcodeSelectNew onSelectField={ onSelectField } />
-								<FieldShortcodeSelectExisting onSelectField={ onSelectField } />
-								<FieldShortcodeSelectMeta onSelectField={ onSelectField } />
-							</MenuGroup>
-						) }
-					</DropdownMenu>
+					{ remoteData.length > 0 ? (
+						<DropdownMenu
+							className="remote-data-blocks-select-new"
+							icon="shortcode"
+							label={ __( 'Select block bindings', 'remote-data-blocks' ) }
+							popoverProps={ { className: 'rdb-field-shortcode_dropdown', offset: 8 } }
+							variant="toolbar"
+						>
+							{ () => (
+								<MenuGroup>
+									<FieldShortcodeSelectNew onSelectField={ onSelectField } />
+									<FieldShortcodeSelectExisting onSelectField={ onSelectField } />
+									<FieldShortcodeSelectMeta onSelectField={ onSelectField } />
+								</MenuGroup>
+							) }
+						</DropdownMenu>
+					) : (
+						<FieldShortcodeSelectNew
+							onSelectField={ onSelectField }
+							icon="shortcode"
+							label={ __( 'Select block bindings', 'remote-data-blocks' ) }
+							popoverProps={ { offset: 8, placement: 'bottom-start' } }
+							text={ undefined }
+						/>
+					) }
 				</ToolbarGroup>
 			</BlockControls>
 
