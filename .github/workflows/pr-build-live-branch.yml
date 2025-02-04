@@ -1,11 +1,8 @@
 name: Build Live Branch
 on:
   pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
-      - ready_for_review
+    branches:
+      - trunk
     paths-ignore:
       - 'docs/**'
       - 'examples/**'
