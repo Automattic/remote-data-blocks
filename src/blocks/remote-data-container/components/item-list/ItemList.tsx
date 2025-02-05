@@ -109,7 +109,10 @@ export function ItemList( props: ItemListProps ) {
 			};
 		} );
 
-		return { fields: fieldObject, tableFields: getFields, titleField: title, mediaField: media };
+		// hide media and title fields from table view if defined to avoid duplication
+		const filtered = getFields.filter( field => field !== media && field !== title );
+
+		return { fields: fieldObject, tableFields: filtered, titleField: title, mediaField: media };
 	}, [ availableBindings, data ] );
 
 	const [ view, setView ] = useState< View >( {
@@ -117,7 +120,7 @@ export function ItemList( props: ItemListProps ) {
 		perPage: perPage ?? data.length,
 		page,
 		search: searchInput,
-		fields: [],
+		fields: tableFields,
 		filters: [],
 		layout: {},
 		titleField,
@@ -128,11 +131,7 @@ export function ItemList( props: ItemListProps ) {
 		setPage( newView.page ?? 1 );
 		setSearchInput( newView.search ?? '' );
 
-		setView( {
-			...newView,
-			// hide media and title fields from table view if defined to avoid duplication
-			fields: tableFields.filter( field => field !== mediaField && field !== titleField ),
-		} );
+		setView( newView );
 	}
 
 	const defaultLayouts = mediaField
