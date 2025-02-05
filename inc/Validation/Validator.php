@@ -196,12 +196,14 @@ final class Validator implements ValidatorInterface {
 			case 'email_address':
 				return false !== is_email( $value );
 
-			case 'button_text':
 			case 'html':
-			case 'id':
 			case 'image_alt':
 			case 'markdown':
 				return is_string( $value );
+
+			case 'button_text':
+			case 'id':
+				return is_string( $value ) && ! empty( $value );
 
 			case 'json_path':
 				return is_string( $value ) && str_starts_with( $value, '$' );
