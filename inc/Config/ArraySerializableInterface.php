@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Config;
 
 use RemoteDataBlocks\Validation\ValidatorInterface;
+use WP_Error;
 
 interface ArraySerializableInterface {
 	/**
@@ -16,7 +17,25 @@ interface ArraySerializableInterface {
 	 * @param ValidatorInterface|null $validator An optional validator instance to use for validating the configuration.
 	 * @return mixed Returns a new instance of the implementing class.
 	 */
-	public static function from_array( array $config, ?ValidatorInterface $validator ): mixed;
+	public static function from_array( array $config, ?ValidatorInterface $validator ): static|WP_Error;
+
+	/**
+	 * This method will be called by ::from_array() to prior to validating the
+	 * config. This allows you to modify the config before it's validated, perhaps
+	 * because you want to inflate it with additional or computed values.
+	 *
+	 * @param array<string, mixed> $config The configuration to process.
+	 * @return array<string, mixed> The processed configuration.
+	 */
+	public static function preprocess_config( array $config ): array|WP_Error;
+
+	/**
+	 * Provides the schema that will be use the validate the config passed to
+	 * from_array().
+	 *
+	 * @return array An associative array representing the configuration schema.
+	 */
+	public static function get_config_schema(): array;
 
 	/**
 	 * Converts the current object to an array representation.

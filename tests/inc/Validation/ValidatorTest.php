@@ -3,6 +3,8 @@
 namespace RemoteDataBlocks\Tests\Validation;
 
 use PHPUnit\Framework\TestCase;
+use RemoteDataBlocks\Tests\Mocks\MockSerializableClass;
+use RemoteDataBlocks\Tests\Mocks\MockSerializableSubclass;
 use RemoteDataBlocks\Validation\Types;
 use RemoteDataBlocks\Validation\Validator;
 use stdClass;
@@ -581,6 +583,89 @@ class ValidatorTest extends TestCase {
 
 		$this->assertInstanceOf( WP_Error::class, $result );
 		$this->assertSame( 'Object must have valid property: bar', $result->get_error_message() );
+	}
+
+	public function testSerializedConfigFor(): void {
+		$schema = Types::object( [
+			'config' => Types::serialized_config_for( MockSerializableClass::class ),
+		] );
+
+		$validator = new Validator( $schema );
+
+		$this->assertTrue( $validator->validate( [
+			'config' => [
+				'boolean_value' => true,
+				'enum_value' => 'foo',
+				'string_value' => 'hello, world!',
+			],
+		] ) );
+
+		$result = $validator->validate( [
+			'config' => [
+				'boolean_value' => 'NOT A BOOLEAN',
+				'enum_value' => 'foo',
+				'string_value' => 'hello, world!',
+			],
+		] );
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertSame( 'Object must have valid property: config', $result->get_error_message() );
+		$this->assertSame( 'Object must have valid property: boolean_value', $result->get_error_data()['child']->get_error_message() );
+
+		$result = $validator->validate( [
+			'config' => null,
+		] );
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertSame( 'Object must have valid property: config', $result->get_error_message() );
+		$this->assertSame( 'Value must be an associative array: null', $result->get_error_data()['child']->get_error_message() );
+
+		$result = $validator->validate( [
+			'config' => new stdClass(),
+		] );
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertSame( 'Object must have valid property: config', $result->get_error_message() );
+		$this->assertSame( 'Value must be an associative array: {}', $result->get_error_data()['child']->get_error_message() );
+
+		$result = $validator->validate( [
+			'config' => [],
+		] );
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertSame( 'Object must have valid property: config', $result->get_error_message() );
+		$this->assertSame( 'Object must have valid property: boolean_value', $result->get_error_data()['child']->get_error_message() );
+	}
+
+	public function testSerializedConfigForSubclass(): void {
+		$schema = Types::object( [
+			'config' => Types::serialized_config_for( MockSerializableClass::class ),
+		] );
+
+		$validator = new Validator( $schema );
+
+		$this->assertTrue( $validator->validate( [
+			'config' => [
+				'__subclass' => MockSerializableSubclass::class,
+				'boolean_value' => true,
+				'enum_value' => 'foo',
+				'string_value' => 'hello, world!',
+				'extra_value' => 'required for subclass',
+			],
+		] ) );
+
+		$result = $validator->validate( [
+			'config' => [
+				'__subclass' => MockSerializableSubclass::class,
+				'boolean_value' => true,
+				'enum_value' => 'foo',
+				'string_value' => 'hello, world!',
+			],
+		] );
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertSame( 'Object must have valid property: config', $result->get_error_message() );
+		$this->assertSame( 'Object must have valid property: extra_value', $result->get_error_data()['child']->get_error_message() );
 	}
 
 	public function testStringMatching(): void {

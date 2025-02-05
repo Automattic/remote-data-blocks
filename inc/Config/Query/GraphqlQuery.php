@@ -31,7 +31,7 @@ class GraphqlQuery extends HttpQuery {
 	/**
 	 * @inheritDoc
 	 */
-	protected static function get_config_schema(): array {
+	public static function get_config_schema(): array {
 		return ConfigSchemas::get_graphql_query_config_schema();
 	}
 }

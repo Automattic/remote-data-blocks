@@ -184,6 +184,7 @@ final class Types {
 				'object',
 				'record',
 				'ref',
+				'serialized_config_for',
 				'string_matching',
 			];
 			$is_primitive = self::is_primitive( $member_type );
@@ -208,6 +209,12 @@ final class Types {
 		}
 
 		return self::generate_non_primitive_type( 'record', [ $key_type, $value_type ] );
+	}
+
+	// This type indicates that the value is a serialized array that can be used
+	// to inflate a class instance, e.g., HttpQuery::from_array( $value ).
+	public static function serialized_config_for( string $class_ref ): array {
+		return self::generate_non_primitive_type( 'serialized_config_for', $class_ref );
 	}
 
 	public static function string_matching( string $regex ): array {
