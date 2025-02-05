@@ -97,7 +97,7 @@ final class Types {
 	}
 
 	public static function markdown(): array {
-		return self::generate_primitive_type( 'json_path' );
+		return self::generate_primitive_type( 'markdown' );
 	}
 
 	public static function url(): array {
