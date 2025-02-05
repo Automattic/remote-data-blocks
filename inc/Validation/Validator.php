@@ -229,7 +229,7 @@ final class Validator implements ValidatorInterface {
 	}
 
 	private function create_error( string $message, mixed $value, ?WP_Error $child_error = null ): WP_Error {
-		$serialized_value = is_string( $value ) ? $value : wp_json_encode( $value );
+		$serialized_value = is_string( $value ) || is_numeric( $value ) ? strval( $value ) : wp_json_encode( $value );
 		$message = sprintf( '%s: %s', esc_html( $message ), $serialized_value );
 		return new WP_Error( 'invalid_type', $message, [ 'child' => $child_error ] );
 	}
