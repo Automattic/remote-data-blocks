@@ -1,24 +1,42 @@
+import { Button, Modal } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { ItemList } from '@/blocks/remote-data-container/components/item-list/ItemList';
-import { ModalWithButtonTrigger } from '@/blocks/remote-data-container/components/modals//BaseModal';
 import { useModalState } from '@/blocks/remote-data-container/hooks/useModalState';
 import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteData';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
-import { getBlockAvailableBindings, getBlockDataSourceType } from '@/utils/localized-block-data';
+import {
+	getBlockAvailableBindings,
+	getBlockConfig,
+	getBlockDataSourceType,
+} from '@/utils/localized-block-data';
 
 interface DataViewsModalProps {
+	className?: string;
 	blockName: string;
 	headerImage?: string;
 	inputVariables: InputVariable[];
-	onSelect: ( data: RemoteDataQueryInput ) => void;
+	onSelect?: ( data: RemoteDataQueryInput ) => void;
+	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
 	queryKey: string;
-	title: string;
+	renderTrigger?: ( props: { onClick: () => void } ) => React.ReactNode;
+	title?: string;
 }
 
 export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
-	const { blockName, inputVariables, onSelect, queryKey, title } = props;
+	const {
+		className,
+		blockName,
+		inputVariables,
+		onSelect,
+		onSelectField,
+		queryKey,
+		renderTrigger,
+		title,
+	} = props;
+
+	const blockConfig = getBlockConfig( blockName );
 	const availableBindings = getBlockAvailableBindings( blockName );
 
 	const { close, isOpen, open } = useModalState();
@@ -44,7 +62,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 	}, [] );
 
 	function onSelectItem( input: RemoteDataQueryInput ): void {
-		onSelect( input );
+		onSelect?.( input );
 		sendTracksEvent( 'remotedatablocks_add_block', {
 			action: 'select_item',
 			selected_option: 'search_from_list',
@@ -53,29 +71,41 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 		close();
 	}
 
+	const triggerElement = renderTrigger ? (
+		renderTrigger( { onClick: open } )
+	) : (
+		<Button variant="primary" onClick={ open }>
+			{ __( 'Choose' ) }
+		</Button>
+	);
+
 	return (
-		<ModalWithButtonTrigger
-			buttonText={ __( 'Choose' ) }
-			className="rdb-editor_data-views-modal"
-			isOpen={ isOpen }
-			onClose={ close }
-			onOpen={ open }
-			title={ title }
-		>
-			<ItemList
-				availableBindings={ availableBindings }
-				blockName={ props.blockName }
-				loading={ loading }
-				onSelect={ onSelectItem }
-				page={ page }
-				results={ data?.results }
-				searchInput={ searchInput }
-				setPage={ setPage }
-				setSearchInput={ setSearchInput }
-				supportsSearch={ supportsSearch }
-				totalItems={ totalItems }
-				totalPages={ totalPages }
-			/>
-		</ModalWithButtonTrigger>
+		<>
+			{ triggerElement }
+			{ isOpen && (
+				<Modal
+					className={ className }
+					isFullScreen
+					onRequestClose={ close }
+					title={ title ?? blockConfig?.settings?.title }
+				>
+					<ItemList
+						availableBindings={ availableBindings }
+						blockName={ blockName }
+						loading={ loading }
+						onSelect={ onSelect ? onSelectItem : close }
+						onSelectField={ onSelectField }
+						page={ page }
+						remoteData={ data }
+						searchInput={ searchInput }
+						setPage={ setPage }
+						setSearchInput={ setSearchInput }
+						supportsSearch={ supportsSearch }
+						totalItems={ totalItems }
+						totalPages={ totalPages }
+					/>
+				</Modal>
+			) }
+		</>
 	);
 };
