@@ -23,6 +23,11 @@ class SalesforceB2CIntegration {
 				continue;
 			}
 
+			// ToDo: Remove this once all existing data sources have been migrated.
+			if ( empty( $config['service_config']['site_id'] ) ) {
+				$config['service_config']['site_id'] = 'refArchGlobal';
+			}
+
 			self::register_blocks_for_salesforce_data_source( $data_source );
 		}
 	}
