@@ -41,19 +41,33 @@ export function FieldShortcodeSelectNew( props: FieldShortcodeSelectNewProps ) {
 			{ () =>
 				Object.entries( blocksByType ).map( ( [ dataSourceType, configs ] ) => (
 					<MenuGroup key={ dataSourceType } label={ dataSourceType }>
-						{ configs.map( blockConfig => (
-							<DataViewsModal
-								key={ blockConfig.name }
-								blockName={ blockConfig.name }
-								onSelectField={ onSelectField }
-								queryKey={ blockConfig.selectors[ 0 ]?.query_key ?? '' }
-								renderTrigger={ ( { onClick } ) => (
-									<MenuItem onClick={ onClick }>
-										{ blockConfig.settings?.title ?? blockConfig.name }
-									</MenuItem>
-								) }
-							/>
-						) ) }
+						{ configs.map( blockConfig => {
+							// For now, we will use the first compatible selector, but this
+							// should be improved.
+							const compatibleSelector = blockConfig.selectors.find( selector =>
+								[ 'list', 'search' ].includes( selector.type )
+							);
+
+							if ( ! compatibleSelector ) {
+								return null;
+							}
+
+							return (
+								<DataViewsModal
+									key={ blockConfig.name }
+									blockName={ blockConfig.name }
+									headerImage={ compatibleSelector.image_url }
+									inputVariables={ compatibleSelector.inputs }
+									onSelectField={ onSelectField }
+									queryKey={ compatibleSelector.query_key }
+									renderTrigger={ ( { onClick } ) => (
+										<MenuItem onClick={ onClick }>
+											{ blockConfig.settings?.title ?? blockConfig.name }
+										</MenuItem>
+									) }
+								/>
+							);
+						} ) }
 					</MenuGroup>
 				) )
 			}
