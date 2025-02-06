@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit();
 
 class SalesforceB2CDataSource extends HttpDataSource {
 	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_SALESFORCE_B2C_SERVICE;
-	protected const SERVICE_SCHEMA_VERSION = 2;
+	protected const SERVICE_SCHEMA_VERSION = 1;
 
 	protected static function get_service_config_schema(): array {
 		return Types::object( [
@@ -21,7 +21,7 @@ class SalesforceB2CDataSource extends HttpDataSource {
 			'enable_blocks' => Types::nullable( Types::boolean() ),
 			'organization_id' => Types::string(),
 			'shortcode' => Types::string(),
-			// ToDo: Remove the nullable after all existing data sources have been migrated.
+			// ToDo: Remove the nullable existing SFCC data sources have been migrated.
 			'site_id' => Types::nullable( Types::string() ),
 		] );
 	}
