@@ -81,23 +81,21 @@ export function ItemList( props: ItemListProps ) {
 		( [ _, binding ] ) => binding.type === 'image_url'
 	)?.[ 0 ];
 
-	const fields = fieldNames.map( field => {
-		return {
-			id: field,
-			label: availableBindings[ field ]?.name ?? field,
-			enableGlobalSearch: true,
-			getValue: ( { item }: { item: RemoteDataResult } ) => item[ field ] as string,
-			render:
-				field === mediaField
-					? ( { item }: { item: RemoteDataResult } ) => {
-							return (
-								<img alt={ ( item.image_alt as string ) ?? '' } src={ item[ field ] as string } />
-							);
-					  }
-					: undefined,
-			enableSorting: field !== mediaField,
-		};
-	} );
+	const fields = fieldNames.map( field => ( {
+		id: field,
+		label: availableBindings[ field ]?.name ?? field,
+		enableGlobalSearch: true,
+		getValue: ( { item }: { item: RemoteDataResult } ) => item[ field ] as string,
+		render:
+			field === mediaField
+				? ( { item }: { item: RemoteDataResult } ) => {
+						return (
+							<img alt={ ( item.image_alt as string ) ?? '' } src={ item[ field ] as string } />
+						);
+				  }
+				: undefined,
+		enableSorting: field !== mediaField,
+	} ) );
 
 	// hide media and title fields from table view if defined to avoid duplication
 	const tableFields = fieldNames.filter( field => field !== mediaField && field !== titleField );
