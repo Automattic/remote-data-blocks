@@ -1,3 +1,4 @@
+import { Button } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { DataViews, filterSortAndPaginate, View } from '@wordpress/dataviews/wp';
 import { useEffect, useMemo, useState } from '@wordpress/element';
@@ -10,14 +11,49 @@ interface ItemListProps {
 	blockName: string;
 	loading: boolean;
 	onSelect: ( data: RemoteDataQueryInput ) => void;
-	results?: RemoteDataResult[];
+	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
+	remoteData?: RemoteData;
 	searchTerms: string;
 	setSearchTerms: ( newValue: string ) => void;
 }
 
+const createFieldSelection = (
+	field: string,
+	item: RemoteDataResult,
+	blockName: string,
+	remoteData: RemoteData
+): FieldSelection => ( {
+	action: 'add_field_shortcode',
+	remoteData: {
+		...remoteData,
+		blockName,
+		queryInput: {
+			...item,
+			field: {
+				field,
+				value: item[ field ] as string,
+			},
+		},
+		resultId: item.id?.toString() ?? '',
+		results: [ item ],
+	},
+	selectedField: field,
+	selectionPath: 'select_new_tab',
+	type: 'field',
+} );
+
 export function ItemList( props: ItemListProps ) {
-	const { availableBindings, blockName, loading, onSelect, results, searchTerms, setSearchTerms } =
-		props;
+	const {
+		availableBindings,
+		blockName,
+		loading,
+		onSelect,
+		onSelectField,
+		remoteData,
+		searchTerms,
+		setSearchTerms,
+	} = props;
+	const results = remoteData?.results ?? [];
 	const { defaultPattern: pattern } = usePatterns( blockName );
 
 	const instanceId = useInstanceId( ItemList, blockName );
@@ -68,26 +104,50 @@ export function ItemList( props: ItemListProps ) {
 			( [ _, binding ] ) => binding.type === 'image_url'
 		)?.[ 0 ];
 
-		const fieldObject = getFields.map( field => {
-			return {
-				id: field,
-				label: availableBindings[ field ]?.name ?? field,
-				enableGlobalSearch: true,
-				getValue: ( { item }: { item: RemoteDataResult } ) => item[ field ] as string,
-				render:
-					field === media
-						? ( { item }: { item: RemoteDataResult } ) => {
-								return (
-									<img alt={ ( item.image_alt as string ) ?? '' } src={ item[ field ] as string } />
-								);
-						  }
-						: undefined,
-				enableSorting: field !== media,
-			};
-		} );
+		const renderField = ( field: string, item: RemoteDataResult ) => {
+			if ( field === media ) {
+				return <img alt={ ( item.image_alt as string ) ?? '' } src={ item[ field ] as string } />;
+			}
+
+			if ( onSelectField && remoteData ) {
+				const queryInput: RemoteDataQueryInput = {
+					...item,
+					field: {
+						field,
+						value: item[ field ] as string,
+					},
+				};
+
+				return (
+					<Button
+						onClick={ () => {
+							onSelectField(
+								createFieldSelection( field, item, blockName, remoteData ),
+								item[ field ] as string
+							);
+							onSelect( queryInput );
+						} }
+						variant="link"
+					>
+						{ item[ field ] as string }
+					</Button>
+				);
+			}
+
+			return item[ field ] as string;
+		};
+
+		const fieldObject = getFields.map( field => ( {
+			id: field,
+			label: availableBindings[ field ]?.name ?? field,
+			enableGlobalSearch: true,
+			getValue: ( { item }: { item: RemoteDataResult } ) => item[ field ] as string,
+			render: ( { item }: { item: RemoteDataResult } ) => renderField( field, item ),
+			enableSorting: field !== media,
+		} ) );
 
 		return { fields: fieldObject, tableFields: getFields, titleField: title, mediaField: media };
-	}, [ availableBindings, data ] );
+	}, [ availableBindings, data, onSelectField, remoteData ] );
 
 	const [ view, setView ] = useState< View >( {
 		type: 'table' as const,
@@ -130,17 +190,20 @@ export function ItemList( props: ItemListProps ) {
 		return filterSortAndPaginate( data ?? [], view, fields );
 	}, [ data, view ] );
 
-	const actions = [
-		{
-			id: 'choose',
-			icon: <>{ __( 'Choose' ) }</>,
-			isPrimary: true,
-			label: '',
-			callback: ( items: RemoteDataResult[] ) => {
-				items.map( item => onSelect( item ) );
-			},
-		},
-	];
+	// Hide actions for field shortcode selection
+	const actions = ! onSelectField
+		? [
+				{
+					id: 'choose',
+					icon: <>{ __( 'Choose' ) }</>,
+					isPrimary: true,
+					label: '',
+					callback: ( items: RemoteDataResult[] ) => {
+						items.map( item => onSelect( item ) );
+					},
+				},
+		  ]
+		: [];
 
 	return (
 		<DataViews
