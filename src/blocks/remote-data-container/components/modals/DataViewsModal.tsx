@@ -40,7 +40,18 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 	const availableBindings = getBlockAvailableBindings( blockName );
 
 	const { close, isOpen, open } = useModalState();
-	const { data, fetch, loading, searchInput, setSearchInput } = useRemoteData( {
+	const {
+		data,
+		fetch,
+		loading,
+		page,
+		searchInput,
+		setPage,
+		setSearchInput,
+		supportsSearch,
+		totalItems,
+		totalPages,
+	} = useRemoteData( {
 		blockName,
 		inputVariables,
 		queryKey,
@@ -84,9 +95,14 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 						loading={ loading }
 						onSelect={ onSelect ? onSelectItem : close }
 						onSelectField={ onSelectField }
+						page={ page }
 						remoteData={ data }
-						searchTerms={ searchInput }
-						setSearchTerms={ setSearchInput }
+						searchInput={ searchInput }
+						setPage={ setPage }
+						setSearchInput={ setSearchInput }
+						supportsSearch={ supportsSearch }
+						totalItems={ totalItems }
+						totalPages={ totalPages }
 					/>
 				</Modal>
 			) }

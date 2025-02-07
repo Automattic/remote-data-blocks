@@ -95,7 +95,7 @@ Example:
 
 #### Search queries
 
-Search queries must return a collection and must accept an input variable with the special type `ui:search_input`. The [Art Institute of Chicago](../../example/rest-api/art-institute/README.md) example looks like this:
+Search queries must return a collection and must accept one input variable with the special type `ui:search_input`. The [Art Institute of Chicago](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/art-institute/README.md) example looks like this:
 
 ```php
 $search_art_query = HttpQuery::from_array([
