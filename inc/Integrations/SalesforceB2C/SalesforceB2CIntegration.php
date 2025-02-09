@@ -36,6 +36,11 @@ class SalesforceB2CIntegration {
 		$base_endpoint = $data_source->get_endpoint();
 		$service_config = $data_source->to_array()['service_config'];
 
+		// ToDo: Remove this once existing SFCC data sources have been migrated.
+		if ( empty( $service_config['site_id'] ) ) {
+			$service_config['site_id'] = 'RefArchGlobal';
+		}
+
 		$get_request_headers = function () use ( $base_endpoint, $service_config ): array|WP_Error {
 			$access_token = SalesforceB2CAuth::generate_token(
 				$base_endpoint,

@@ -21,7 +21,7 @@ class SalesforceB2CDataSource extends HttpDataSource {
 			'enable_blocks' => Types::nullable( Types::boolean() ),
 			'organization_id' => Types::string(),
 			'shortcode' => Types::string(),
-			// ToDo: Remove the nullable existing SFCC data sources have been migrated.
+			// ToDo: Remove the nullable, once existing SFCC data sources have been migrated.
 			'site_id' => Types::nullable( Types::string() ),
 		] );
 	}

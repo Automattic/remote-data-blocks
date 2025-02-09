@@ -26,7 +26,8 @@ class SalesforceB2CAuth {
 		string $organization_id,
 		string $client_id,
 		string $client_secret,
-		string $site_id,
+		// ToDo: Remove the optional value once existing SFCC data sources have been migrated.
+		?string $site_id = 'RefArchGlobal',
 	): string|WP_Error {
 		$saved_access_token = self::get_saved_access_token( $organization_id, $client_id, $site_id );
 
@@ -56,7 +57,8 @@ class SalesforceB2CAuth {
 		string $client_secret,
 		string $endpoint,
 		string $organization_id,
-		string $site_id,
+		// ToDo: Remove the optional value once existing SFCC data sources have been migrated.
+		?string $site_id = 'RefArchGlobal',
 	): WP_Error|string {
 		$client_auth_url = sprintf( '%s/shopper/auth/v1/organizations/%s/oauth2/token', $endpoint, $organization_id );
 		$client_credentials = base64_encode( sprintf( '%s:%s', $client_id, $client_secret ) );
@@ -110,7 +112,8 @@ class SalesforceB2CAuth {
 		string $client_secret,
 		string $endpoint,
 		string $organization_id,
-		string $site_id,
+		// ToDo: Remove the optional value once existing SFCC data sources have been migrated.
+		?string $site_id = 'RefArchGlobal',
 	): string|WP_Error {
 		$client_auth_url = sprintf( '%s/shopper/auth/v1/organizations/%s/oauth2/token', $endpoint, $organization_id );
 
