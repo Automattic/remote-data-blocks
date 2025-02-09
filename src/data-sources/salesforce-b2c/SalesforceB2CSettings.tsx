@@ -104,7 +104,7 @@ export const SalesforceB2CSettings = ( {
 					onChange={ siteId => {
 						handleOnChange( 'site_id', siteId ?? '' );
 					} }
-					value={ state.site_id ?? '' }
+					value={ state.site_id ?? 'RefArchGlobal' }
 					help={ __( 'The site ID. Example: RefArchGlobal' ) }
 					autoComplete="off"
 					__next40pxDefaultSize
