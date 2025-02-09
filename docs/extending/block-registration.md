@@ -95,21 +95,21 @@ Example:
 
 #### Search queries
 
-Search queries must return a collection and must accept a string input variable of `search_terms`. The [Art Institute of Chicago](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/art-institute/README.md) example looks like this:
+Search queries must return a collection and must accept one input variable with the special type `ui:search_input`. The [Art Institute of Chicago](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/art-institute/README.md) example looks like this:
 
 ```php
 $search_art_query = HttpQuery::from_array([
 	'data_source' => $aic_data_source,
 	'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
-		$query = $input_variables['search_terms'];
+		$query = $input_variables['search'];
 		$endpoint = $aic_data_source->get_endpoint() . '/search';
 
 		return add_query_arg( [ 'q' => $query ], $endpoint );
 	},
 	'input_schema' => [
-		'search_terms' => [
-			'name' => 'Search Terms',
-			'type' => 'string',
+		'search' => [
+			'name' => 'Search terms',
+			'type' => 'ui:search_input',
 		],
 	],
 	'output_schema' => [
@@ -129,7 +129,7 @@ $search_art_query = HttpQuery::from_array([
 ]);
 ```
 
-Here you can see the input variable of `search_terms` is used in the endpoint method to populate a query string. You can read more about [queries](./query.md) and how to construct them. End users enter the search term to find the specific item.
+Here you can see the `search` input variable has a special type of `ui:search_input` and is used in the endpoint method to populate a query string. You can read more about [queries](./query.md) and how to construct them. End users enter the search term to find the specific item.
 
 ![Screenshot showing the search inputin the WordPress Editor](https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/docs/extending/search-input.png)
 

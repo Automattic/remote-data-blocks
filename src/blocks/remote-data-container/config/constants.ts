@@ -14,6 +14,13 @@ export const REMOTE_DATA_REST_API_URL = getRestUrl();
 
 export const CONTAINER_CLASS_NAME = getClassName( 'container' );
 
+export const PAGINATION_CURSOR_NEXT_VARIABLE_TYPE = 'ui:pagination_cursor_next';
+export const PAGINATION_CURSOR_PREVIOUS_VARIABLE_TYPE = 'ui:pagination_cursor_previous';
+export const PAGINATION_OFFSET_VARIABLE_TYPE = 'ui:pagination_offset';
+export const PAGINATION_PAGE_VARIABLE_TYPE = 'ui:pagination_page';
+export const PAGINATION_PER_PAGE_VARIABLE_TYPE = 'ui:pagination_per_page';
+export const SEARCH_INPUT_VARIABLE_TYPE = 'ui:search_input';
+
 export const BUTTON_TEXT_FIELD_TYPES = [ 'button_text' ];
 export const BUTTON_URL_FIELD_TYPES = [ 'button_url' ];
 export const HTML_FIELD_TYPES = [ 'html' ];

@@ -83,6 +83,11 @@ final class QueryResponseParser {
 
 			// Loop over the defined fields in the schema type and extract the values from the object.
 			foreach ( $type as $field_name => $mapping ) {
+				// Skip null values.
+				if ( null === $mapping ) {
+					continue;
+				}
+
 				// A generate function accepts the current object and returns the field value.
 				if ( isset( $mapping['generate'] ) && is_callable( $mapping['generate'] ) ) {
 					$field_value = call_user_func( $mapping['generate'], json_decode( $json_obj->getJson(), true ) );

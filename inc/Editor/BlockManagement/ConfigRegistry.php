@@ -98,8 +98,14 @@ class ConfigRegistry {
 				}
 			}
 
-			if ( self::SEARCH_QUERY_KEY === $from_query_type && ! isset( $from_input_schema['search_terms'] ) ) {
-				return self::create_error( $block_title, 'A search query must have a "search_terms" input variable' );
+			if ( self::SEARCH_QUERY_KEY === $from_query_type ) {
+				$search_input_count = count( array_filter( $from_input_schema, function ( array $input_var ): bool {
+					return 'ui:search_input' === $input_var['type'];
+				} ) );
+
+				if ( 1 !== $search_input_count ) {
+					return self::create_error( $block_title, 'A search query must have one input variable with type "ui:search_input"' );
+				}
 			}
 
 			// Add the selector to the configuration.
@@ -107,7 +113,14 @@ class ConfigRegistry {
 				$config['selectors'],
 				[
 					'image_url' => $from_query->get_image_url(),
-					'inputs' => [],
+					'inputs' => array_map( function ( $slug, $input_var ) {
+						return [
+							'name' => $input_var['name'] ?? $slug,
+							'required' => $input_var['required'] ?? false,
+							'slug' => $slug,
+							'type' => $input_var['type'] ?? 'string',
+						];
+					}, array_keys( $from_input_schema ), array_values( $from_input_schema ) ),
 					'name' => $selection_query['display_name'] ?? ucfirst( $from_query_type ),
 					'query_key' => $from_query::class,
 					'type' => $from_query_type,

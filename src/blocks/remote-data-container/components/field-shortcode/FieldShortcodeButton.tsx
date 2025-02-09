@@ -1,18 +1,21 @@
 import { BlockControls } from '@wordpress/block-editor';
-import { Modal, ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import { ToolbarDropdownMenu, ToolbarGroup } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { RichTextFormat, insertObject, WPFormatEditProps } from '@wordpress/rich-text';
 
+import { FieldShortcodeSelectExisting } from './FieldShortcodeSelectExisting';
+import { FieldShortcodeSelectMeta } from './FieldShortcodeSelectMeta';
+import { FieldShortcodeSelectNew } from './FieldShortcodeSelectNew';
+import { useExistingRemoteData } from '../../hooks/useExistingRemoteData';
 import {
 	formatName,
 	formatTypeSettings,
 } from '@/blocks/remote-data-container/components/field-shortcode';
 import { FieldShortcodeSelectFieldPopover } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelectFieldPopover';
-import { FieldShortcodeSelectTabs } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelectTabs';
-import { FieldShortcodeSelectField } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelection';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
 import { getBlockDataSourceType } from '@/utils/localized-block-data';
+import './FieldShortcode.scss';
 
 function parseDataQuery( dataQuery?: string ): FieldSelection | null {
 	if ( ! dataQuery ) {
@@ -26,36 +29,18 @@ function parseDataQuery( dataQuery?: string ): FieldSelection | null {
 	}
 }
 
-interface QueryInput {
-	blockName: string;
-	queryInput: RemoteDataQueryInput;
-}
-
 export function FieldShortcodeButton( props: WPFormatEditProps ) {
 	const { onChange, onFocus, value, isObjectActive, activeObjectAttributes, contentRef } = props;
 	const fieldSelection = parseDataQuery( activeObjectAttributes?.[ 'data-query' ] );
-
-	const [ queryInput, setQueryInput ] = useState< QueryInput | null >( null );
 	const [ showUI, setShowUI ] = useState< boolean >( false );
 
-	function onClick() {
-		setShowUI( ! showUI );
-		sendTracksEvent( 'remotedatablocks_field_shortcode', { action: 'toolbar_icon_clicked' } );
-	}
+	useEffect( () => {
+		if ( isObjectActive ) {
+			setShowUI( true );
+		}
+	}, [ isObjectActive ] );
 
-	function onClose() {
-		setShowUI( false );
-		onFocus();
-	}
-
-	function onSelectItem( config: BlockConfig, data: RemoteDataQueryInput ) {
-		setQueryInput( {
-			blockName: config.name,
-			queryInput: data,
-		} );
-	}
-
-	function updateOrInsertField( data: FieldSelection | null, fieldValue: string ) {
+	const updateOrInsertField = ( data: FieldSelection | null, fieldValue: string ) => {
 		const format: RichTextFormat = {
 			attributes: {
 				...activeObjectAttributes,
@@ -65,86 +50,79 @@ export function FieldShortcodeButton( props: WPFormatEditProps ) {
 			type: formatName,
 		};
 
-		if ( Object.keys( activeObjectAttributes ).length ) {
-			const replacements = value.replacements.slice();
-			replacements[ value.start ] = format;
+		onChange(
+			Object.keys( activeObjectAttributes ).length
+				? {
+						...value,
+						replacements: value.replacements.map( ( replacement, index ) =>
+							index === value.start ? format : replacement
+						),
+				  }
+				: insertObject( value, format )
+		);
+	};
 
-			onChange( { ...value, replacements } );
-			return;
-		}
-
-		onChange( insertObject( value, format ) );
-	}
-
-	function onSelectField( data: FieldSelection, fieldValue: string ) {
+	const onSelectField = ( data: FieldSelection, fieldValue: string ) => {
 		updateOrInsertField( data, fieldValue );
-		onClose();
+		setShowUI( false );
+		onFocus();
 		sendTracksEvent( 'remotedatablocks_field_shortcode', {
 			action: data.action,
 			data_source_type: getBlockDataSourceType( data.remoteData?.blockName ),
 			selection_path: data.selectionPath,
 		} );
-	}
+	};
 
-	function resetField( blockName?: string ): void {
+	const resetField = ( blockName?: string ): void => {
 		updateOrInsertField( null, 'Unbound field' );
-		setQueryInput( null );
 		sendTracksEvent( 'remotedatablocks_field_shortcode', {
 			action: 'reset_field_shortcode',
 			data_source_type: getBlockDataSourceType( blockName ),
 		} );
-	}
+	};
 
-	useEffect( () => {
-		if ( isObjectActive ) {
-			setShowUI( true );
-		}
-	}, [ isObjectActive ] );
+	const remoteData = useExistingRemoteData();
 
 	return (
 		<>
 			<BlockControls>
 				<ToolbarGroup>
-					<ToolbarButton
-						icon="shortcode"
-						isActive={ isObjectActive }
-						onClick={ onClick }
-						title="Field shortcode"
-					/>
+					{ remoteData.length > 0 ? (
+						<ToolbarDropdownMenu
+							className="remote-data-blocks-select-new"
+							icon="shortcode"
+							label={ __( 'Select block bindings', 'remote-data-blocks' ) }
+							popoverProps={ { className: 'rdb-field-shortcode_dropdown', offset: 8 } }
+						>
+							{ () => (
+								<ToolbarGroup>
+									<FieldShortcodeSelectNew onSelectField={ onSelectField } />
+									<FieldShortcodeSelectExisting onSelectField={ onSelectField } />
+									<FieldShortcodeSelectMeta onSelectField={ onSelectField } />
+								</ToolbarGroup>
+							) }
+						</ToolbarDropdownMenu>
+					) : (
+						<FieldShortcodeSelectNew
+							onSelectField={ onSelectField }
+							icon="shortcode"
+							label={ __( 'Select block bindings', 'remote-data-blocks' ) }
+							popoverProps={ { offset: 8, placement: 'bottom-start' } }
+							text={ undefined }
+						/>
+					) }
 				</ToolbarGroup>
 			</BlockControls>
 
-			{ showUI && ! fieldSelection && (
-				<Modal
-					overlayClassName="remote-data-blocks-pattern__selection-modal"
-					title={ __( 'Field shortcode' ) }
-					onRequestClose={ onClose }
-					isFullScreen
-				>
-					{ ! queryInput && (
-						<FieldShortcodeSelectTabs
-							onSelectField={ onSelectField }
-							onSelectItem={ onSelectItem }
-						/>
-					) }
-					{ queryInput && (
-						<FieldShortcodeSelectField
-							blockName={ queryInput.blockName }
-							onSelectField={ ( data, fieldValue ) =>
-								onSelectField( { ...data, selectionPath: 'select_new_tab' }, fieldValue )
-							}
-							queryInput={ queryInput.queryInput }
-							fieldType="field"
-						/>
-					) }
-				</Modal>
-			) }
 			{ showUI && fieldSelection && (
 				<FieldShortcodeSelectFieldPopover
 					contentRef={ contentRef }
 					fieldSelection={ fieldSelection }
 					formatTypeSettings={ formatTypeSettings }
-					onClose={ onClose }
+					onClose={ () => {
+						setShowUI( false );
+						onFocus();
+					} }
 					onSelectField={ ( data, fieldValue ) =>
 						onSelectField( { ...data, selectionPath: 'popover' }, fieldValue )
 					}

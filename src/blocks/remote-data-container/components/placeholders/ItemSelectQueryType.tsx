@@ -21,6 +21,7 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 				const selectorProps = {
 					blockName,
 					headerImage: selector.image_url,
+					inputVariables: selector.inputs,
 					onSelect,
 					queryKey: selector.query_key,
 					title,
@@ -29,7 +30,13 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 				switch ( selector.type ) {
 					case 'search':
 					case 'list':
-						return <DataViewsModal key={ title } { ...selectorProps } />;
+						return (
+							<DataViewsModal
+								className="rdb-editor_dataviews-modal-item-select"
+								key={ title }
+								{ ...selectorProps }
+							/>
+						);
 					case 'input':
 						return <InputModal key={ title } inputs={ selector.inputs } { ...selectorProps } />;
 				}

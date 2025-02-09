@@ -1,105 +1,129 @@
 import { useInstanceId } from '@wordpress/compose';
-import { DataViews, filterSortAndPaginate, View } from '@wordpress/dataviews/wp';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { Action, DataViews, View } from '@wordpress/dataviews/wp';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
+import { ItemListField } from '@/blocks/remote-data-container/components/item-list/ItemListField';
 import { usePatterns } from '@/blocks/remote-data-container/hooks/usePatterns';
+import { removeNullValuesFromObject } from '@/utils/type-narrowing';
+
+function getResultsWithId( results: RemoteDataResult[], instanceId: string ): RemoteDataResult[] {
+	return ( results ?? [] ).map( ( result: RemoteDataResult ) => {
+		const parsedItem = removeNullValuesFromObject( result );
+
+		if ( parsedItem.id ) {
+			return parsedItem;
+		}
+
+		// ensure each result has an 'id' key
+		const idKey = Object.keys( parsedItem ).find( key => /(^|_)(id)$/i.test( key ) );
+		return {
+			...parsedItem,
+			id: idKey ? parsedItem[ idKey ] : instanceId,
+		};
+	} );
+}
 
 interface ItemListProps {
 	availableBindings: Record< string, RemoteDataBinding >;
 	blockName: string;
 	loading: boolean;
 	onSelect: ( data: RemoteDataQueryInput ) => void;
-	results?: RemoteDataResult[];
-	searchTerms: string;
-	setSearchTerms: ( newValue: string ) => void;
+	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
+	page: number;
+	perPage?: number;
+	remoteData?: RemoteData;
+	searchInput: string;
+	setPage: ( newPage: number ) => void;
+	setSearchInput: ( newValue: string ) => void;
+	supportsSearch: boolean;
+	totalItems?: number;
+	totalPages?: number;
 }
 
 export function ItemList( props: ItemListProps ) {
-	const { availableBindings, blockName, loading, onSelect, results, searchTerms, setSearchTerms } =
-		props;
+	const {
+		availableBindings,
+		blockName,
+		loading,
+		onSelect,
+		onSelectField,
+		page,
+		perPage,
+		remoteData,
+		searchInput,
+		setPage,
+		setSearchInput,
+		supportsSearch,
+		totalItems,
+		totalPages,
+	} = props;
 	const { defaultPattern: pattern } = usePatterns( blockName );
-
 	const instanceId = useInstanceId( ItemList, blockName );
 
-	const data = useMemo( () => {
-		// remove null values from the data to prevent errors in filterSortAndPaginate
-		const removeNullValues = ( obj: Record< string, unknown > ): Record< string, unknown > => {
-			return Object.fromEntries(
-				Object.entries( obj ).filter( ( [ _, value ] ) => value !== null )
-			);
-		};
-
-		return ( results ?? [] ).map( ( item: Record< string, unknown > ) => {
-			const parsedItem = removeNullValues( item );
-
-			if ( parsedItem.id ) {
-				return parsedItem;
-			}
-
-			// ensure each result has an 'id' key
-			const idKey = Object.keys( parsedItem ).find( key => /(^|_)(id)$/i.test( key ) );
-			return {
-				...parsedItem,
-				id: idKey ? parsedItem[ idKey ] : instanceId,
-			};
-		} ) as RemoteDataResult[];
-	}, [ results ] );
+	const results = remoteData?.results ?? [];
+	const data = loading ? [] : getResultsWithId( results ?? [], instanceId );
 
 	// get fields from results data to use as columns
-	const { fields, mediaField, tableFields, titleField } = useMemo( () => {
-		const getFields: string[] = Array.from(
-			new Set(
-				data
-					?.flatMap( item => Object.keys( item ) )
-					.filter(
-						key => key in availableBindings && availableBindings[ key ]?.type !== 'id' // filter out ID fields to hide from table
-					)
-			)
-		);
+	const fieldNames: string[] = Array.from(
+		new Set(
+			data
+				?.flatMap( item => Object.keys( item ) )
+				.filter(
+					key => key in availableBindings && availableBindings[ key ]?.type !== 'id' // filter out ID fields to hide from table
+				)
+		)
+	);
 
-		// Find title field from availableBindings by checking type
-		const title = Object.entries( availableBindings ).find(
-			( [ _, binding ] ) => binding.type === 'string' && binding.name.toLowerCase() === 'title'
-		)?.[ 0 ];
+	// Find title field from availableBindings by checking type
+	const titleField = Object.entries( availableBindings ).find(
+		( [ _, binding ] ) => binding.type === 'string' && binding.name.toLowerCase() === 'title'
+	)?.[ 0 ];
 
-		// Find media field from availableBindings by checking type
-		const media = Object.entries( availableBindings ).find(
-			( [ _, binding ] ) => binding.type === 'image_url'
-		)?.[ 0 ];
+	// Find media field from availableBindings by checking type
+	const mediaField = Object.entries( availableBindings ).find(
+		( [ _, binding ] ) => binding.type === 'image_url'
+	)?.[ 0 ];
 
-		const fieldObject = getFields.map( field => {
-			return {
-				id: field,
-				label: availableBindings[ field ]?.name ?? field,
-				enableGlobalSearch: true,
-				getValue: ( { item }: { item: RemoteDataResult } ) => item[ field ] as string,
-				render:
-					field === media
-						? ( { item }: { item: RemoteDataResult } ) => {
-								return (
-									<img alt={ ( item.image_alt as string ) ?? '' } src={ item[ field ] as string } />
-								);
-						  }
-						: undefined,
-				enableSorting: field !== media,
-			};
-		} );
+	const fields = fieldNames.map( field => ( {
+		id: field,
+		label: availableBindings[ field ]?.name ?? field,
+		enableGlobalSearch: true,
+		getValue: ( { item }: { item: RemoteDataResult } ) => item[ field ]?.toString() ?? '',
+		render: ( { item }: { item: RemoteDataResult } ) => (
+			<ItemListField
+				blockName={ blockName }
+				field={ field }
+				item={ item }
+				mediaField={ mediaField }
+				onSelect={ onSelect }
+				onSelectField={ onSelectField }
+				remoteData={ remoteData }
+			/>
+		),
+		enableSorting: field !== mediaField,
+	} ) );
 
-		return { fields: fieldObject, tableFields: getFields, titleField: title, mediaField: media };
-	}, [ availableBindings, data ] );
+	// hide media and title fields from table view if defined to avoid duplication
+	const tableFields = fieldNames.filter( field => field !== mediaField && field !== titleField );
 
 	const [ view, setView ] = useState< View >( {
 		type: 'table' as const,
-		perPage: 8,
-		page: 1,
-		search: '',
-		fields: [],
+		perPage: perPage ?? data.length,
+		page,
+		search: searchInput,
+		fields: tableFields,
 		filters: [],
 		layout: {},
 		titleField,
 		mediaField,
 	} );
+
+	function onChangeView( newView: View ) {
+		setPage( newView.page ?? 1 );
+		setSearchInput( newView.search ?? '' );
+		setView( newView );
+	}
 
 	const defaultLayouts = mediaField
 		? {
@@ -108,52 +132,34 @@ export function ItemList( props: ItemListProps ) {
 		  }
 		: { table: {} };
 
-	// this prevents just an empty table rendering
-	useEffect( () => {
-		if ( tableFields.length > 0 ) {
-			setView( prevView => ( {
-				...prevView,
-				// hide media and title fields from table view if defined to avoid duplication
-				fields: tableFields.filter( field => field !== mediaField && field !== titleField ),
-			} ) );
-		}
-	}, [ mediaField, tableFields, titleField ] );
-
-	useEffect( () => {
-		if ( view.search !== searchTerms ) {
-			setSearchTerms( view.search ?? '' );
-		}
-	}, [ view, searchTerms ] );
-
-	// filter, sort and paginate data
-	const { data: filteredData, paginationInfo } = useMemo( () => {
-		return filterSortAndPaginate( data ?? [], view, fields );
-	}, [ data, view ] );
-
-	const actions = [
-		{
-			id: 'choose',
-			icon: <>{ __( 'Choose' ) }</>,
-			isPrimary: true,
-			label: '',
-			callback: ( items: RemoteDataResult[] ) => {
-				items.map( item => onSelect( item ) );
-			},
+	// Hide actions for field shortcode selection
+	const chooseItemAction = {
+		id: 'choose',
+		icon: <>{ __( 'Choose' ) }</>,
+		isPrimary: true,
+		label: '',
+		callback: ( items: RemoteDataResult[] ) => {
+			items.map( item => onSelect( item ) );
 		},
-	];
+	};
+	const actions: Action< RemoteDataResult >[] = onSelectField ? [] : [ chooseItemAction ];
 
 	return (
-		<DataViews
+		<DataViews< RemoteDataResult >
 			actions={ actions }
-			data={ filteredData }
+			data={ data }
 			defaultLayouts={ defaultLayouts }
 			fields={ fields }
 			getItemId={ ( item: { id?: string } ) => item.id || '' }
 			isLoading={ loading || ! pattern || ! results }
 			isItemClickable={ () => true }
 			onClickItem={ item => onSelect( item ) }
-			onChangeView={ setView }
-			paginationInfo={ paginationInfo }
+			onChangeView={ onChangeView }
+			paginationInfo={ {
+				totalItems: totalItems ?? data.length,
+				totalPages: totalPages ?? 1,
+			} }
+			search={ supportsSearch }
 			view={ view }
 		/>
 	);

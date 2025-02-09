@@ -121,12 +121,12 @@ class SalesforceB2CIntegration {
 						$base_endpoint,
 						$service_config['organization_id'],
 						$service_config['site_id'],
-						urlencode( $input_variables['search_terms'] )
+						urlencode( $input_variables['search'] )
 					);
 				},
 				'input_schema' => [
-					'search_terms' => [
-						'type' => 'string',
+					'search' => [
+						'type' => 'ui:search_input',
 					],
 				],
 				'output_schema' => [
