@@ -69,17 +69,13 @@ jobs:
         with:
           name: remote-data-blocks-${{ github.event.pull_request.number }}
           path: unzips/remote-data-blocks
-          retention-days: 2
+          retention-days: 7
           if-no-files-found: 'error'
           overwrite: true
-
-      - name: Output artifact ID
-        run: echo 'Artifact ID is ${{ steps.create-playground-artifact-step.outputs.artifact-url }}'
 
       - name: Comment on PR with WordPress Playground details
         uses: actions/github-script@v7
         with:
           script: |
             const { run } = require('./.github/workflows/scripts/generate-playground-blueprint');
-            const artifactUrl = '${{ steps.create-playground-artifact-step.outputs.artifact-url }}';
-            run({ github, context, core, artifactUrl });
+            run({ github, context });
