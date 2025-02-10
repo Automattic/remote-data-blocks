@@ -84,8 +84,8 @@ class ShopifyIntegration {
 			'shopify_search_products' => GraphqlQuery::from_array( [
 				'data_source' => $data_source,
 				'input_schema' => [
-					'search_terms' => [
-						'type' => 'string',
+					'search' => [
+						'type' => 'ui:search_input',
 					],
 				],
 				'output_schema' => [

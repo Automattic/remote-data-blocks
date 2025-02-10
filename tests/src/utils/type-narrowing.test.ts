@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { isObjectWithStringKeys } from '@/utils/type-narrowing';
+import { isObjectWithStringKeys, removeNullValuesFromObject } from '@/utils/type-narrowing';
 
 describe( 'type-narrowing utils', () => {
 	describe( 'isObjectWithStringKeys', () => {
@@ -33,6 +33,19 @@ describe( 'type-narrowing utils', () => {
 		it( 'should return true for objects with symbol keys', () => {
 			const obj = { [ Symbol( 'test' ) ]: 'value' };
 			expect( isObjectWithStringKeys( obj ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'removeNullValuesFromObject', () => {
+		it( 'should remove null values from object', () => {
+			const obj = {
+				aaa: 1,
+				bbb: null,
+				ccc: 'three',
+				ddd: null,
+			};
+
+			expect( removeNullValuesFromObject( obj ) ).toEqual( { aaa: 1, ccc: 'three' } );
 		} );
 	} );
 } );

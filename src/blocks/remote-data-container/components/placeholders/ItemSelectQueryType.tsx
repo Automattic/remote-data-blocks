@@ -22,6 +22,7 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 				const selectorProps = {
 					blockName,
 					headerImage: selector.image_url,
+					inputVariables: selector.inputs,
 					onSelect,
 					queryKey: selector.query_key,
 					title,
