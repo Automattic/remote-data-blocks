@@ -87,6 +87,14 @@ class HttpQuery extends ArraySerializable implements HttpQueryInterface {
 	}
 
 	/**
+	 * Get the pagination schema for this query. If null, pagination will be
+	 * disabled.
+	 */
+	public function get_pagination_schema(): ?array {
+		return $this->config['pagination_schema'];
+	}
+
+	/**
 	 * Get the request body for the current query execution. Any non-null result
 	 * will be converted to JSON using `wp_json_encode`.
 	 *

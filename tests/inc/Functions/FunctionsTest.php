@@ -28,7 +28,7 @@ class FunctionsTest extends TestCase {
 		] );
 		$this->mock_search_query = MockQuery::from_array( [
 			'input_schema' => [
-				'search_terms' => [ 'type' => 'string' ],
+				'search' => [ 'type' => 'ui:search_input' ],
 			],
 		] );
 
@@ -165,6 +165,6 @@ class FunctionsTest extends TestCase {
 
 		$this->assertTrue( $this->mock_logger->hasLoggedLevel( LogLevel::ERROR ) );
 		$error_logs = $this->mock_logger->getLogsByLevel( LogLevel::ERROR );
-		$this->assertStringContainsString( 'search_terms', $error_logs[0]['message'] );
+		$this->assertStringContainsString( 'ui:search_input', $error_logs[0]['message'] );
 	}
 }

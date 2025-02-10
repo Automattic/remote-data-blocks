@@ -1,7 +1,9 @@
 import apiFetch from '@wordpress/api-fetch';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 import { REMOTE_DATA_REST_API_URL } from '@/blocks/remote-data-container/config/constants';
+import { usePaginationVariables } from '@/blocks/remote-data-container/hooks/usePaginationVariables';
+import { useSearchVariables } from '@/blocks/remote-data-container/hooks/useSearchVariables';
 
 async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< RemoteData | null > {
 	const { body } = await apiFetch< RemoteDataApiResponse >( {
@@ -18,6 +20,11 @@ async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< Re
 		blockName: body.block_name,
 		isCollection: body.is_collection,
 		metadata: body.metadata,
+		pagination: body.pagination && {
+			cursorNext: body.pagination.cursor_next,
+			cursorPrevious: body.pagination.cursor_previous,
+			totalItems: body.pagination.total_items,
+		},
 		queryInput: body.query_input,
 		resultId: body.result_id,
 		results: body.results.map( result =>
@@ -35,8 +42,25 @@ async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< Re
 interface UseRemoteData {
 	data?: RemoteData;
 	fetch: ( queryInput: RemoteDataQueryInput ) => Promise< void >;
+	hasNextPage: boolean;
+	hasPreviousPage: boolean;
 	loading: boolean;
+	page: number;
+	perPage?: number;
 	reset: () => void;
+	searchAllowsEmptyInput: boolean;
+	searchInput: string;
+	setPage: ( page: number ) => void;
+	setPerPage: ( perPage: number ) => void;
+	setSearchInput: ( searchInput: string ) => void;
+	supportsCursorPagination: boolean;
+	supportsOffsetPagination: boolean;
+	supportsPagePagination: boolean;
+	supportsPagination: boolean;
+	supportsPerPage: boolean;
+	supportsSearch: boolean;
+	totalItems?: number;
+	totalPages?: number;
 }
 
 interface UseRemoteDataInput {
@@ -44,6 +68,10 @@ interface UseRemoteDataInput {
 	enabledOverrides?: string[];
 	externallyManagedRemoteData?: RemoteData;
 	externallyManagedUpdateRemoteData?: ( remoteData?: RemoteData ) => void;
+	initialPage?: number;
+	initialPerPage?: number;
+	initialSearchInput?: string;
+	inputVariables?: InputVariable[];
 	onSuccess?: () => void;
 	queryKey: string;
 }
@@ -61,6 +89,10 @@ export function useRemoteData( {
 	enabledOverrides = [],
 	externallyManagedRemoteData,
 	externallyManagedUpdateRemoteData,
+	initialPage,
+	initialPerPage,
+	initialSearchInput,
+	inputVariables = [],
 	onSuccess,
 	queryKey,
 }: UseRemoteDataInput ): UseRemoteData {
@@ -69,6 +101,35 @@ export function useRemoteData( {
 
 	const resolvedData = externallyManagedRemoteData ?? data;
 	const resolvedUpdater = externallyManagedUpdateRemoteData ?? setData;
+	const hasResolvedData = Boolean( resolvedData );
+
+	const {
+		onFetch: onFetchForPagination,
+		page,
+		perPage,
+		paginationQueryInput,
+		supportsPagination,
+		totalItems,
+		totalPages,
+		...paginationVariables
+	} = usePaginationVariables( {
+		initialPage,
+		initialPerPage,
+		inputVariables,
+	} );
+	const { searchQueryInput, searchAllowsEmptyInput, searchInput, setSearchInput, supportsSearch } =
+		useSearchVariables( {
+			initialSearchInput,
+			inputVariables,
+		} );
+
+	useEffect( () => {
+		if ( ! hasResolvedData ) {
+			return;
+		}
+
+		void fetch( resolvedData?.queryInput ?? {} );
+	}, [ hasResolvedData, page, perPage, searchInput ] );
 
 	async function fetch( queryInput: RemoteDataQueryInput ): Promise< void > {
 		setLoading( true );
@@ -76,7 +137,11 @@ export function useRemoteData( {
 		const requestData: RemoteDataApiRequest = {
 			block_name: blockName,
 			query_key: queryKey,
-			query_input: queryInput,
+			query_input: {
+				...queryInput,
+				...paginationQueryInput,
+				...searchQueryInput,
+			},
 		};
 
 		const remoteData = await fetchRemoteData( requestData ).catch( () => null );
@@ -87,6 +152,7 @@ export function useRemoteData( {
 			return;
 		}
 
+		onFetchForPagination( remoteData );
 		resolvedUpdater( { enabledOverrides, ...remoteData } );
 		setLoading( false );
 		onSuccess?.();
@@ -99,7 +165,19 @@ export function useRemoteData( {
 	return {
 		data: resolvedData,
 		fetch,
+		hasNextPage: totalPages ? page < totalPages : supportsPagination,
+		hasPreviousPage: page > 1,
 		loading,
+		page,
+		perPage,
 		reset,
+		searchAllowsEmptyInput,
+		searchInput,
+		setSearchInput,
+		supportsPagination,
+		supportsSearch,
+		totalItems: resolvedData?.pagination?.totalItems,
+		totalPages,
+		...paginationVariables,
 	};
 }
