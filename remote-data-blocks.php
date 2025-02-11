@@ -42,6 +42,9 @@ ExampleApi\ExampleApi::init();
 // Load Settings Page
 PluginSettings\PluginSettings::init();
 
+// Migrations
+MigrationService\MigrationService::init();
+
 // Integrations
 Integrations\Airtable\AirtableIntegration::init();
 Integrations\Google\Sheets\GoogleSheetsIntegration::init();
@@ -51,9 +54,6 @@ Integrations\VipBlockDataApi\VipBlockDataApi::init();
 
 // REST endpoints
 REST\RemoteDataController::init();
-
-// Migrations
-MigrationService\MigrationService::init();
 
 // Plugin developers: If you need to register additional code for testing, you
 // can do so here, e.g.:

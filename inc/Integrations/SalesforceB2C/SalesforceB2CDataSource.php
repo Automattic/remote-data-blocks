@@ -11,7 +11,7 @@ defined( 'ABSPATH' ) || exit();
 
 class SalesforceB2CDataSource extends HttpDataSource {
 	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_SALESFORCE_B2C_SERVICE;
-	protected const SERVICE_SCHEMA_VERSION = 2;
+	protected const SERVICE_SCHEMA_VERSION = 1;
 
 	protected static function get_service_config_schema(): array {
 		return Types::object( [
