@@ -28,4 +28,14 @@ interface ArraySerializableInterface {
 	 * @return array<string, mixed> An associative array representing the object's current state.
 	 */
 	public function to_array(): array;
+
+	/**
+	 * Creates an instance of the class from an array representation for migrations only.
+	 *
+	 * Note that, no other operations will be allowed.
+	 *
+	 * @param array<string, mixed> $config An associative array containing the configuration or data needed to create an instance of the class.
+	 * @return mixed Returns a new instance of the implementing class.
+	 */
+	public static function from_array_for_migrations( array $config ): mixed;
 }

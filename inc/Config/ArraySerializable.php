@@ -13,7 +13,11 @@ defined( 'ABSPATH' ) || exit();
  * ArraySerializable class
  */
 abstract class ArraySerializable implements ArraySerializableInterface {
-	final private function __construct( protected array $config ) {}
+	public readonly bool $perform_migrations_only;
+
+	final private function __construct( protected array $config, bool $perform_migrations_only = false ) {
+		$this->perform_migrations_only = $perform_migrations_only;
+	}
 
 	protected function get_or_call_from_config( string $property_name, mixed ...$callable_args ): mixed {
 		$config_value = $this->config[ $property_name ] ?? null;
@@ -42,6 +46,13 @@ abstract class ArraySerializable implements ArraySerializableInterface {
 		$sanitized = $sanitizer->sanitize( $config );
 
 		return new static( $sanitized );
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public static function from_array_for_migrations( array $config ): self {
+		return new static( $config, true );
 	}
 
 	/**

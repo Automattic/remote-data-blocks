@@ -78,6 +78,25 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 
 	/**
 	 * @inheritDoc
+	 */
+	public static function from_array_for_migrations( array $config ): self {
+		$service_config = $config['service_config'] ?? [];
+
+		return parent::from_array_for_migrations(
+			array_merge(
+				static::map_service_config( $service_config ),
+				[
+					// Store the exact data used to create the instance to preserve determinism.
+					'service' => static::SERVICE_NAME,
+					'service_config' => $service_config,
+					'uuid' => $config['uuid'] ?? null,
+				]
+			)
+		);
+	}
+
+	/**
+	 * @inheritDoc
 	 *
 	 * TODO: Do we need to sanitize this to prevent leaking sensitive data?
 	 */
@@ -87,6 +106,38 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 			'service_config' => $this->config['service_config'],
 			'uuid' => $this->config['uuid'],
 		];
+	}
+
+	/**
+	 * Performs a migration if the config is out of date.
+	 */
+	final public function perform_migration( array $service_config ): array {
+		// By default, we want to have an active data source.
+		if ( ! isset( $service_config['active'] ) ) {
+			$service_config['active'] = true;
+		}
+
+		// By default, we want to have no error.
+		if ( ! isset( $service_config['error'] ) ) {
+			$service_config['error'] = null;
+		}
+
+		if ( static::SERVICE_SCHEMA_VERSION === $service_config['__version'] ) {
+			return $service_config;
+		}
+
+		$migrated_service_config = $this->migrate_config( $service_config );
+
+		if ( is_wp_error( $migrated_service_config ) ) {
+			$service_config['active'] = false;
+			$service_config['error'] = $migrated_service_config->get_error_message();
+		} else {
+			$service_config['__version'] = static::SERVICE_SCHEMA_VERSION;
+			$service_config['active'] = true;
+			$service_config['error'] = null;
+		}
+
+		return $service_config;
 	}
 
 	/**
@@ -106,5 +157,13 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 			'endpoint' => $service_config['endpoint'] ?? null, // Invalid, but we won't guess it.
 			'request_headers' => $service_config['request_headers'] ?? [],
 		];
+	}
+
+	/**
+	 * Migrates the config to the current schema version.
+	 * Can be overridden by child classes to perform custom migrations.
+	 */
+	protected function migrate_config( array $service_config ): array|WP_Error {
+		return $service_config;
 	}
 }
