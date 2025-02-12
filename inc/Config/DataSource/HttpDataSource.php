@@ -112,6 +112,10 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 	 * Performs a migration if the config is out of date.
 	 */
 	final public function perform_migration( array $service_config ): array {
+		if ( ! $this->perform_migrations_only ) {
+			return new WP_Error( 'migration_not_allowed', 'Migrations are not allowed for this data source.' );
+		}
+
 		// By default, we want to have an active data source.
 		if ( ! isset( $service_config['active'] ) ) {
 			$service_config['active'] = true;

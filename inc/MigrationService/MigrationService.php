@@ -62,8 +62,8 @@ class MigrationService {
 		return true;
 	}
 
-	private static function set_migration_version(): bool|WP_Error {
-		return update_option( self::MIGRATION_OPTION_NAME, PluginSettings::get_version() );
+	private static function set_migration_version(): void {
+		update_option( self::MIGRATION_OPTION_NAME, PluginSettings::get_version() );
 	}
 
 	private static function get_migration_version(): string {
