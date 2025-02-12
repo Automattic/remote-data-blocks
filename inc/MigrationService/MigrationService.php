@@ -17,7 +17,7 @@ class MigrationService {
 		add_action( 'init', [ __CLASS__, 'migrate_data_source_configs' ] );
 	}
 
-	public static function migrate_data_source_configs( ): WP_Error|bool {
+	public static function migrate_data_source_configs(): WP_Error|bool {
 		$migration_version = self::get_migration_version();
 
 		if ( $migration_version === PluginSettings::get_version() ) {
