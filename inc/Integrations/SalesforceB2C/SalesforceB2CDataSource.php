@@ -4,14 +4,13 @@ namespace RemoteDataBlocks\Integrations\SalesforceB2C;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Validation\Types;
-use WP_Error;
 use function plugins_url;
 
 defined( 'ABSPATH' ) || exit();
 
 class SalesforceB2CDataSource extends HttpDataSource {
 	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_SALESFORCE_B2C_SERVICE;
-	protected const SERVICE_SCHEMA_VERSION = 1;
+	protected const SERVICE_SCHEMA_VERSION = 2;
 
 	protected static function get_service_config_schema(): array {
 		return Types::object( [
@@ -22,6 +21,7 @@ class SalesforceB2CDataSource extends HttpDataSource {
 			'enable_blocks' => Types::nullable( Types::boolean() ),
 			'organization_id' => Types::string(),
 			'shortcode' => Types::string(),
+			'site_id' => Types::string(),
 		] );
 	}
 
@@ -36,11 +36,11 @@ class SalesforceB2CDataSource extends HttpDataSource {
 		];
 	}
 
-	protected function migrate_config( array $service_config ): array|WP_Error {
-		if ( ! isset( $service_config['site_id'] ) ) {
-			$service_config['site_id'] = 'RefArchGlobal';
+	protected static function migrate_config( array $config ): array {
+		if ( ! isset( $config['service_config']['site_id'] ) ) {
+			$config['service_config']['site_id'] = 'RefArchGlobal';
 		}
 
-		return $service_config;
+		return $config;
 	}
 }

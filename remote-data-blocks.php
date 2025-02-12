@@ -42,9 +42,6 @@ ExampleApi\ExampleApi::init();
 // Load Settings Page
 PluginSettings\PluginSettings::init();
 
-// Migrations
-MigrationService\MigrationService::init();
-
 // Integrations
 Integrations\Airtable\AirtableIntegration::init();
 Integrations\Google\Sheets\GoogleSheetsIntegration::init();
