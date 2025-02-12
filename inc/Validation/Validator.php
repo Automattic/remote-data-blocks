@@ -113,13 +113,23 @@ final class Validator implements ValidatorInterface {
 				return true;
 
 			case 'one_of':
+				// Keep track of all failed validations. Since one_of is a union type,
+				// if none of the types match, we will return all of the errors so that
+				// the caller can inspect each of them.
+				$errors = [];
+
 				foreach ( Types::get_type_args( $type ) as $member_type ) {
-					if ( true === $this->check_type( $member_type, $value ) ) {
+					$validated = $this->check_type( $member_type, $value );
+					if ( true === $validated ) {
 						return true;
 					}
+
+					$errors[] = $validated;
 				}
 
-				return $this->create_error( 'Value must be one of the specified types', $value );
+				$error = new WP_Error( 'invalid_one_of_type', 'Validation errors for each of the specified types', [ 'errors' => $errors ] );
+
+				return $this->create_error( 'Value must be one of the specified types', $value, $error );
 
 			case 'object':
 				if ( ! self::check_iterable_object( $value ) ) {
