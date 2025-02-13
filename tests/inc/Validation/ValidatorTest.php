@@ -17,13 +17,16 @@ class ValidatorTest extends TestCase {
 			'number' => Types::number(),
 			'string' => Types::string(),
 
+			'button_text' => Types::button_text(),
+			'button_url' => Types::button_url(),
+			'currency_in_current_locale' => Types::currency_in_current_locale(),
 			'email_address' => Types::email_address(),
 			'html' => Types::html(),
 			'id' => Types::id(),
 			'image_alt' => Types::image_alt(),
 			'image_url' => Types::image_url(),
 			'json_path' => Types::json_path(),
-			'markdown' => Types::html(),
+			'markdown' => Types::markdown(),
 			'url' => Types::url(),
 			'uuid' => Types::uuid(),
 		] );
@@ -37,6 +40,9 @@ class ValidatorTest extends TestCase {
 			'number' => 3.14,
 			'string' => 'foo',
 
+			'button_text' => 'Click me',
+			'button_url' => 'https://example.com/action',
+			'currency_in_current_locale' => '$42.00',
 			'email_address' => 'me@example.com',
 			'html' => '<p>Hello, world!</p>',
 			'id' => '123',
@@ -49,133 +55,300 @@ class ValidatorTest extends TestCase {
 		] ) );
 	}
 
-	public function testInvalidBooleans(): void {
-		$invalid_booleans = [
-			null,
-			42,
-			3.14,
-			'',
-			'foo',
-			[],
-			(object) [],
+	public static function provideBooleans(): array {
+		return [
+			[ true ],
+			[ false ],
 		];
+	}
 
+	public static function provideBooleanLikeStrings(): array {
+		return [
+			[ 'true' ],
+			[ 'false' ],
+		];
+	}
+
+	public static function provideEmptyStrings(): array {
+		return [
+			[ '' ],
+		];
+	}
+
+	public static function provideFloats(): array {
+		return [
+			[ 3.14 ],
+			[ -3.14 ],
+			[ 0.0 ],
+			[ INF ],
+			[ -INF ],
+			[ NAN ],
+		];
+	}
+
+	public static function provideInvalidEmailAddresses(): array {
+		return [
+			[ 'me@example' ],
+			[ '@example.com' ],
+			[ 'me@.com' ],
+			[ 'me@example.' ],
+			[ 'me@.example.com' ],
+			[ 'me@ex ample.com' ],
+			[ 'me@ex' . str_repeat( 'a', 64 ) . '.com' ],
+		];
+	}
+
+	public static function provideInvalidUrls(): array {
+		return [
+			[ 'example.com' ],
+			[ '127.0.0.1' ],
+			[ 'http:\\\\example.com' ],
+			[ 'http:///example.com' ],
+			[ 'http:://example.com' ],
+			[ 'tel:5551234567' ],
+		];
+	}
+
+	public static function provideIntegers(): array {
+		return [
+			[ 0 ],
+			[ -1 ],
+			[ 42 ],
+			[ PHP_INT_MAX ],
+			[ PHP_INT_MIN ],
+			[ 0x7FFFFFFF ],
+			[ 0x80000000 ],
+			[ 0x7FFFFFFFFFFFFFFF ],
+			[ 0x8000000000000000 ],
+		];
+	}
+
+	public static function provideNulls(): array {
+		return [
+			[ null ],
+		];
+	}
+
+	public static function provideNumericStrings(): array {
+		return [
+			[ '-1' ],
+			[ '0' ],
+			[ '1' ],
+			[ '3.14' ],
+		];
+	}
+
+	public static function provideObjectLikes(): array {
+		return [
+			[ [] ],
+			[ [ 'foo' => 'bar' ] ],
+			[ (object) [] ],
+			[ (object) [ 'foo' => 'bar' ] ],
+		];
+	}
+
+	public static function provideStrings(): array {
+		return [
+			[ 'foo' ],
+			[ '<p>Hello, world!</p>' ],
+			[ 'https://example.com/foo' ],
+			[ 'alice@example.com' ],
+			[ '123e4567-e89b-12d3-a456-426614174000' ],
+		];
+	}
+
+	/**
+	 * @dataProvider provideBooleanLikeStrings
+	 * @dataProvider provideEmptyStrings
+	 * @dataProvider provideFloats
+	 * @dataProvider provideIntegers
+	 * @dataProvider provideInvalidEmailAddresses
+	 * @dataProvider provideInvalidUrls
+	 * @dataProvider provideNulls
+	 * @dataProvider provideNumericStrings
+	 * @dataProvider provideObjectLikes
+	 * @dataProvider provideStrings
+	 */
+	public function testInvalidBooleans( mixed $invalid_value ): void {
 		$validator = new Validator( Types::boolean() );
 
-		foreach ( $invalid_booleans as $invalid_boolean ) {
-			$result = $validator->validate( $invalid_boolean );
-			$this->assertInstanceOf( WP_Error::class, $result );
-			$this->assertStringStartsWith( 'Value must be a boolean:', $result->get_error_message() );
-		}
+		$result = $validator->validate( $invalid_value );
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertStringStartsWith( 'Value must be a boolean:', $result->get_error_message() );
 	}
 
-	public function testInvalidIntegers(): void {
-		$invalid_integers = [
-			null,
-			true,
-			3.14,
-			'',
-			'foo',
-			[],
-			(object) [],
-		];
-
+	/**
+	 * @dataProvider provideBooleanLikeStrings
+	 * @dataProvider provideBooleans
+	 * @dataProvider provideEmptyStrings
+	 * @dataProvider provideFloats
+	 * @dataProvider provideInvalidEmailAddresses
+	 * @dataProvider provideInvalidUrls
+	 * @dataProvider provideNulls
+	 * @dataProvider provideNumericStrings
+	 * @dataProvider provideObjectLikes
+	 * @dataProvider provideStrings
+	 */
+	public function testInvalidIntegers( mixed $invalid_value ): void {
 		$validator = new Validator( Types::integer() );
 
-		foreach ( $invalid_integers as $invalid_integer ) {
-			$result = $validator->validate( $invalid_integer );
-			$this->assertInstanceOf( WP_Error::class, $result );
-			$this->assertStringStartsWith( 'Value must be a integer:', $result->get_error_message() );
-		}
+		$result = $validator->validate( $invalid_value );
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertStringStartsWith( 'Value must be a integer:', $result->get_error_message() );
 	}
 
-	public function testInvalidNulls(): void {
-		$invalid_nulls = [
-			true,
-			42,
-			3.14,
-			'',
-			'foo',
-			[],
-			(object) [],
-		];
-
+	/**
+	 * @dataProvider provideBooleanLikeStrings
+	 * @dataProvider provideBooleans
+	 * @dataProvider provideEmptyStrings
+	 * @dataProvider provideFloats
+	 * @dataProvider provideIntegers
+	 * @dataProvider provideInvalidEmailAddresses
+	 * @dataProvider provideInvalidUrls
+	 * @dataProvider provideNumericStrings
+	 * @dataProvider provideObjectLikes
+	 * @dataProvider provideStrings
+	 */
+	public function testInvalidNulls( mixed $invalid_value ): void {
 		$validator = new Validator( Types::null() );
 
-		foreach ( $invalid_nulls as $invalid_null ) {
-			$result = $validator->validate( $invalid_null );
-			$this->assertInstanceOf( WP_Error::class, $result );
-			$this->assertStringStartsWith( 'Value must be a null:', $result->get_error_message() );
-		}
+		$result = $validator->validate( $invalid_value );
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertStringStartsWith( 'Value must be a null:', $result->get_error_message() );
 	}
 
-	public function testInvalidNumbers(): void {
-		$invalid_numbers = [
-			null,
-			true,
-			'',
-			'foo',
-			[],
-			(object) [],
-		];
-
+	/**
+	 * @dataProvider provideBooleanLikeStrings
+	 * @dataProvider provideBooleans
+	 * @dataProvider provideEmptyStrings
+	 * @dataProvider provideInvalidEmailAddresses
+	 * @dataProvider provideInvalidUrls
+	 * @dataProvider provideNulls
+	 * @dataProvider provideObjectLikes
+	 * @dataProvider provideStrings
+	 */
+	public function testInvalidNumbers( mixed $invalid_value ): void {
 		$validator = new Validator( Types::number() );
 
-		foreach ( $invalid_numbers as $invalid_number ) {
-			$result = $validator->validate( $invalid_number );
-			$this->assertInstanceOf( WP_Error::class, $result );
-			$this->assertStringStartsWith( 'Value must be a number:', $result->get_error_message() );
-		}
+		$result = $validator->validate( $invalid_value );
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertStringStartsWith( 'Value must be a number:', $result->get_error_message() );
 	}
 
-	public function testInvalidStrings(): void {
-		$invalid_strings = [
-			null,
-			true,
-			42,
-			3.14,
-			[ 'foo' ],
-			(object) [],
-		];
-
+	/**
+	 * @dataProvider provideBooleans
+	 * @dataProvider provideFloats
+	 * @dataProvider provideIntegers
+	 * @dataProvider provideNulls
+	 * @dataProvider provideObjectLikes
+	 */
+	public function testInvalidStrings( mixed $invalid_value ): void {
 		$validator = new Validator( Types::string() );
 
-		foreach ( $invalid_strings as $invalid_string ) {
-			$result = $validator->validate( $invalid_string );
-			$this->assertInstanceOf( WP_Error::class, $result );
-			$this->assertStringStartsWith( 'Value must be a string:', $result->get_error_message() );
-		}
+		$result = $validator->validate( $invalid_value );
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertStringStartsWith( 'Value must be a string:', $result->get_error_message() );
 	}
 
-	public function testInvalidEmailAddresses(): void {
-		$invalid_email_addresses = [
-			null,
-			true,
-			42,
-			3.14,
-			'',
-			'foo',
-			[],
-			(object) [],
-			'me@example',
-			'@example.com',
-			'me@.com',
-			'me@example.',
-			'me@.example.com',
-			'me@ex ample.com',
-			'me@ex' . str_repeat( 'a', 64 ) . '.com',
-		];
+	/**
+	 * @dataProvider provideBooleans
+	 * @dataProvider provideEmptyStrings
+	 * @dataProvider provideFloats
+	 * @dataProvider provideIntegers
+	 * @dataProvider provideNulls
+	 * @dataProvider provideObjectLikes
+	 */
+	public function testInvalidButtonTexts( mixed $invalid_value ): void {
+		$validator = new Validator( Types::button_text() );
 
+		$result = $validator->validate( $invalid_value );
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertStringStartsWith( 'Value must be a button_text:', $result->get_error_message() );
+	}
+
+	/**
+	 * @dataProvider provideBooleanLikeStrings
+	 * @dataProvider provideBooleans
+	 * @dataProvider provideEmptyStrings
+	 * @dataProvider provideFloats
+	 * @dataProvider provideIntegers
+	 * @dataProvider provideInvalidEmailAddresses
+	 * @dataProvider provideInvalidUrls
+	 * @dataProvider provideNulls
+	 * @dataProvider provideNumericStrings
+	 * @dataProvider provideObjectLikes
+	 */
+	public function testInvalidButtonUrls( mixed $invalid_value ): void {
+		$validator = new Validator( Types::button_url() );
+
+		$result = $validator->validate( $invalid_value );
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertStringStartsWith( 'Value must be a button_url:', $result->get_error_message() );
+	}
+
+	/**
+	 * @dataProvider provideBooleans
+	 * @dataProvider provideNulls
+	 * @dataProvider provideObjectLikes
+	 */
+	public function testInvalidCurrencyInCurrentLocales( mixed $invalid_value ): void {
+		$validator = new Validator( Types::currency_in_current_locale() );
+
+		$result = $validator->validate( $invalid_value );
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertStringStartsWith( 'Value must be a currency_in_current_locale:', $result->get_error_message() );
+	}
+
+	/**
+	 * @dataProvider provideBooleanLikeStrings
+	 * @dataProvider provideBooleans
+	 * @dataProvider provideEmptyStrings
+	 * @dataProvider provideFloats
+	 * @dataProvider provideIntegers
+	 * @dataProvider provideInvalidEmailAddresses
+	 * @dataProvider provideInvalidUrls
+	 * @dataProvider provideNulls
+	 * @dataProvider provideNumericStrings
+	 * @dataProvider provideObjectLikes
+	 */
+	public function testInvalidEmailAddresses( mixed $invalid_value ): void {
 		$validator = new Validator( Types::email_address() );
 
-		foreach ( $invalid_email_addresses as $invalid_email_address ) {
-			$result = $validator->validate( $invalid_email_address );
-			$this->assertInstanceOf( WP_Error::class, $result );
-			$this->assertStringStartsWith( 'Value must be a email_address:', $result->get_error_message() );
-		}
+		$result = $validator->validate( $invalid_value );
+		$this->assertinstanceof( wp_error::class, $result );
+		$this->assertstringstartswith( 'Value must be a email_address:', $result->get_error_message() );
 	}
 
-	// TODO additional invalid primitive tests
+	/**
+	 * @dataProvider provideBooleans
+	 * @dataProvider provideFloats
+	 * @dataProvider provideIntegers
+	 * @dataProvider provideNulls
+	 * @dataProvider provideObjectLikes
+	 */
+	public function testInvalidHtmls( mixed $invalid_value ): void {
+		$validator = new Validator( Types::html() );
+
+		$result = $validator->validate( $invalid_value );
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertStringStartsWith( 'Value must be a html:', $result->get_error_message() );
+	}
+
+	/**
+	 * @dataProvider provideBooleans
+	 * @dataProvider provideEmptyStrings
+	 * @dataProvider provideFloats
+	 * @dataProvider provideIntegers
+	 * @dataProvider provideNulls
+	 * @dataProvider provideObjectLikes
+	 */
+	public function testInvalidIds( mixed $invalid_value ): void {
+		$validator = new Validator( Types::id() );
+
+		$result = $validator->validate( $invalid_value );
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertStringStartsWith( 'Value must be a id:', $result->get_error_message() );
+	}
 
 	public function testCallable(): void {
 		$schema = Types::callable();
@@ -375,7 +548,7 @@ class ValidatorTest extends TestCase {
 		$this->assertSame( 'Record must have valid value: 123', $result->get_error_message() );
 	}
 
-	public function testRef(): void {
+	public function testObjectRef(): void {
 		$schema = Types::object( [
 			'foo' => Types::create_ref(
 				'my-ref',
@@ -395,6 +568,7 @@ class ValidatorTest extends TestCase {
 
 		$result = $validator->validate( [
 			'foo' => [ 'a_string' => 'foo' ],
+			// Missing 'bar'
 		] );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
