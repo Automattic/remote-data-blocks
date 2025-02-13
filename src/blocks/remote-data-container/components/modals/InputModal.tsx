@@ -34,7 +34,7 @@ export function InputModal( props: InputModalProps ) {
 	}
 
 	function onSelectItem(): void {
-		props.onSelect( inputState );
+		props.onSelect( [ inputState ] );
 		close();
 		sendTracksEvent( 'remotedatablocks_add_block', {
 			action: 'select_item',

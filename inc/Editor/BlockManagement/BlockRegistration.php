@@ -91,13 +91,8 @@ class BlockRegistration {
 		$block_options = [
 			'name' => $block_name,
 			'title' => $config['title'],
+			'render_callback' => [ BlockBindings::class, 'loop_block_render_callback' ],
 		];
-
-		// Loop queries are dynamic blocks that render a list of items using the
-		// inner blocks as a template.
-		if ( $config['loop'] ) {
-			$block_options['render_callback'] = [ BlockBindings::class, 'loop_block_render_callback' ];
-		}
 
 		$block_type = register_block_type( $block_path, $block_options );
 

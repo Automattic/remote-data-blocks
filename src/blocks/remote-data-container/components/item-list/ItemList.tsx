@@ -139,8 +139,9 @@ export function ItemList( props: ItemListProps ) {
 		isPrimary: true,
 		label: '',
 		callback: ( items: RemoteDataResult[] ) => {
-			items.map( item => onSelect( item ) );
+			onSelect( items );
 		},
+		supportsBulk: true,
 	};
 	const actions: Action< RemoteDataResult >[] = onSelectField ? [] : [ chooseItemAction ];
 

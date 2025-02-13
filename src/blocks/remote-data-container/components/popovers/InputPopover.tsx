@@ -37,7 +37,7 @@ export function InputPopover( props: InputPopoverProps ) {
 	}
 
 	function onSelectItem(): void {
-		onSelect( inputState );
+		onSelect( [ inputState ] );
 		close();
 		sendTracksEvent( 'remotedatablocks_add_block', {
 			action: 'select_item',
