@@ -28,7 +28,7 @@ abstract class ArraySerializable implements ArraySerializableInterface {
 	/**
 	 * @inheritDoc
 	 */
-	public static function from_array( array $config, ?ValidatorInterface $validator = null ): static|WP_Error {
+	final public static function from_array( array $config, ?ValidatorInterface $validator = null ): static|WP_Error {
 		$subclass = static::get_implementor( $config );
 		if ( null !== $subclass ) {
 			return $subclass::from_array( $config, $validator );

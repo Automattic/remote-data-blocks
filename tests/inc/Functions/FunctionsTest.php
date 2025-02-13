@@ -20,13 +20,13 @@ class FunctionsTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->mock_logger = new MockLogger();
-		$this->mock_query = MockQuery::from_array();
-		$this->mock_list_query = MockQuery::from_array( [
+		$this->mock_query = MockQuery::create();
+		$this->mock_list_query = MockQuery::create( [
 			'output_schema' => [
 				'is_collection' => true,
 			],
 		] );
-		$this->mock_search_query = MockQuery::from_array( [
+		$this->mock_search_query = MockQuery::create( [
 			'input_schema' => [
 				'search' => [ 'type' => 'ui:search_input' ],
 			],

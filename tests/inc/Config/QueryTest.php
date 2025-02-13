@@ -11,7 +11,7 @@ class QueryTest extends TestCase {
 	private HttpQuery $query_context;
 
 	protected function setUp(): void {
-		$this->data_source = MockDataSource::from_array();
+		$this->data_source = MockDataSource::create();
 		$this->query_context = HttpQuery::from_array( [
 			'data_source' => $this->data_source,
 			'output_schema' => [ 'type' => 'null' ],
