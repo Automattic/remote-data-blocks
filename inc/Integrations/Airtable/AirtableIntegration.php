@@ -37,27 +37,26 @@ class AirtableIntegration {
 		$tables = $data_source->to_array()['service_config']['tables'];
 
 		foreach ( $tables as $table ) {
-				// $query = self::get_query( $data_source, $table );
-				$query = self::get_multiple_records_query( $data_source, $table );
-				$list_query = self::get_list_query( $data_source, $table );
+			$query = self::get_query( $data_source, $table );
+			$list_query = self::get_list_query( $data_source, $table );
 
-				register_remote_data_block(
-					array_merge(
-						[
-							'title' => $data_source->get_display_name() . '/' . $table['name'],
-							'render_query' => [
-								'query' => $query,
-							],
-							'selection_queries' => [
-								[
-									'query' => $list_query,
-									'type' => 'list',
-								],
+			register_remote_data_block(
+				array_merge(
+					[
+						'title' => $data_source->get_display_name() . '/' . $table['name'],
+						'render_query' => [
+							'query' => $query,
+						],
+						'selection_queries' => [
+							[
+								'query' => $list_query,
+								'type' => 'list',
 							],
 						],
-						$block_overrides
-					)
-				);
+					],
+					$block_overrides
+				)
+			);
 		}
 	}
 
@@ -94,29 +93,6 @@ class AirtableIntegration {
 		];
 
 		$output_schema = [
-			'is_collection' => false,
-			'type' => self::get_airtable_output_schema_mappings( $table ),
-		];
-
-		return HttpQuery::from_array( [
-			'data_source' => $data_source,
-			'endpoint' => function ( array $input_variables ) use ( $data_source, $table ): string {
-				return $data_source->get_endpoint() . '/' . $table['id'] . '/' . $input_variables['record_id'];
-			},
-			'input_schema' => $input_schema,
-			'output_schema' => $output_schema,
-		] );
-	}
-
-	public static function get_multiple_records_query( AirtableDataSource $data_source, array $table ): HttpQuery|WP_Error {
-		$input_schema = [
-			'record_id' => [
-				'name' => 'Record ID',
-				'type' => 'id',
-			],
-		];
-
-		$output_schema = [
 			'is_collection' => true,
 			'path' => '$.records[*]',
 			'type' => self::get_airtable_output_schema_mappings( $table ),
@@ -125,34 +101,41 @@ class AirtableIntegration {
 		return HttpQuery::from_array( [
 			'data_source' => $data_source,
 			'endpoint' => function ( array $input_variables ) use ( $data_source, $table ): string {
-				if ( empty( $input_variables ) ) {
-					return new WP_Error( 'invalid_request', 'No record IDs provided.' );
+				// Normalize input variables to ensure consistent structure
+				$record_ids = [];
+				
+				// Handle both direct record_id and array of record_ids
+				if (isset($input_variables['record_id'])) {
+					// Single record case
+					$record_ids[] = $input_variables['record_id'];
+				} else {
+					// Multiple records or array case
+					foreach ($input_variables as $input) {
+						if (isset($input['record_id'])) {
+							$record_id = $input['record_id'];
+							if (is_array($record_id)) {
+								$record_ids[] = reset($record_id);
+							} else {
+								$record_ids[] = $record_id;
+							}
+						}
+					}
 				}
 
-				// Extract record_ids from the array of objects
-				$record_ids = array_map( function ( $item ) {
-					$record_id = $item['record_id'] ?? null;
-					// Ensure we have a string
-					return is_array( $record_id ) ? reset( $record_id ) : $record_id;
-				}, $input_variables );
+				// Filter out empty values and ensure strings
+				$record_ids = array_filter($record_ids, 'strlen');
+				$record_ids = array_map('strval', $record_ids);
 
-				// Remove any null values and ensure strings
-				$record_ids = array_filter( $record_ids, function ( $id ) {
-					return !empty( $id ) && ( is_string( $id ) || is_numeric( $id ) );
-				});
+				// Build the formula
+				$formula_parts = array_map(function($id) {
+					return sprintf('RECORD_ID()="%s"', addslashes($id));
+				}, $record_ids);
 
-				if ( empty( $record_ids ) ) {
-					return new WP_Error( 'invalid_request', 'No valid record IDs found.' );
-				}
+				$formula = count($formula_parts) === 1 
+					? $formula_parts[0] 
+					: 'OR(' . implode(',', $formula_parts) . ')';
 
-				// Build the formula with escaped record IDs
-				$formula_parts = array_map( function ( $id ) {
-					return sprintf( 'RECORD_ID()="%s"', addslashes( (string) $id ) );
-				}, $record_ids );
-
-				$filter_formula = 'filterByFormula=OR(' . implode( ',', $formula_parts ) . ')';
-
-				return $data_source->get_endpoint() . '/' . $table['id'] . '?' . $filter_formula;
+				return $data_source->get_endpoint() . '/' . $table['id'] . '?filterByFormula=' . urlencode($formula);
 			},
 			'input_schema' => $input_schema,
 			'output_schema' => $output_schema,

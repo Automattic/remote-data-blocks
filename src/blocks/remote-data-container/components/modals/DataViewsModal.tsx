@@ -17,7 +17,7 @@ interface DataViewsModalProps {
 	blockName: string;
 	headerImage?: string;
 	inputVariables: InputVariable[];
-	onSelect?: ( data: RemoteDataQueryInput ) => void;
+	onSelect?: ( data: RemoteDataQueryInput[] ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
 	queryKey: string;
 	renderTrigger?: ( props: { onClick: () => void } ) => React.ReactNode;

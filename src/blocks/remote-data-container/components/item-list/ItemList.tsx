@@ -28,7 +28,7 @@ interface ItemListProps {
 	availableBindings: Record< string, RemoteDataBinding >;
 	blockName: string;
 	loading: boolean;
-	onSelect: ( data: RemoteDataQueryInput ) => void;
+	onSelect: ( data: RemoteDataQueryInput[] ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
 	page: number;
 	perPage?: number;
