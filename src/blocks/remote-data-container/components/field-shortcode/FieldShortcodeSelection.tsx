@@ -58,6 +58,7 @@ export function FieldSelection( props: FieldSelectionProps ) {
 							<BaseControl.VisualLabel
 								style={ {
 									marginBottom: 0,
+									whiteSpace: 'normal',
 								} }
 							>
 								{ fieldDetails.name }:
