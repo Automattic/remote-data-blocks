@@ -6,7 +6,7 @@ defined( 'ABSPATH' ) || exit();
 
 use RemoteDataBlocks\Logging\LoggerManager;
 use Psr\Log\LoggerInterface;
-use RemoteDataBlocks\Config\Query\HttpQuery;
+use RemoteDataBlocks\Config\ArraySerializable;
 use RemoteDataBlocks\Config\Query\QueryInterface;
 use RemoteDataBlocks\Editor\BlockPatterns\BlockPatterns;
 use RemoteDataBlocks\Validation\ConfigSchemas;
@@ -178,7 +178,7 @@ class ConfigRegistry {
 
 	private static function inflate_query( array|QueryInterface $config ): QueryInterface {
 		if ( is_array( $config ) ) {
-			return HttpQuery::from_array( $config );
+			return ArraySerializable::from_array( $config );
 		}
 
 		return $config;

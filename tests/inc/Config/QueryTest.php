@@ -5,6 +5,8 @@ namespace RemoteDataBlocks\Tests\Config;
 use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Tests\Mocks\MockDataSource;
+use RemoteDataBlocks\Tests\Mocks\MockQuery;
+use RemoteDataBlocks\Tests\Mocks\MockQueryRunner;
 
 class QueryTest extends TestCase {
 	private MockDataSource $data_source;
@@ -76,5 +78,25 @@ class QueryTest extends TestCase {
 		$expected_json = '{"title":"Test Page","content":["Paragraph 1","Paragraph 2"]}';
 
 		$this->assertSame( $expected_json, $custom_query_context->preprocess_response( $html_data, [] ) );
+	}
+
+	public function testQueryAsDataSource(): void {
+		$mock_qr = new MockQueryRunner();
+		$mock_qr->addResult( 'foo', 'bar' );
+
+		$query_with_query_as_data_source = HttpQuery::from_array( [
+			'data_source' => MockQuery::create( [ 'query_runner' => $mock_qr ] ),
+			'output_schema' => [
+				'type' => [
+					'nested_foo' => [
+						'path' => '$.results[0].result.foo.value',
+						'type' => 'string',
+					],
+				],
+			],
+		] );
+
+		$result = $query_with_query_as_data_source->execute( [] )['results'][0]['result']['nested_foo'];
+		$this->assertSame( 'bar', $result['value'] );
 	}
 }

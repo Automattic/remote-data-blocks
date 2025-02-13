@@ -115,6 +115,12 @@ class QueryRunner implements QueryRunnerInterface {
 	 * }
 	 */
 	protected function get_raw_response_data( HttpQueryInterface $query, array $input_variables ): array|WP_Error {
+		// If the data source is itself a query, execute it and return the results.
+		$data_source = $query->get_data_source();
+		if ( $data_source instanceof HttpQueryInterface ) {
+			return $data_source->execute( $input_variables );
+		}
+
 		$request_details = $this->get_request_details( $query, $input_variables );
 
 		if ( is_wp_error( $request_details ) ) {
@@ -212,7 +218,7 @@ class QueryRunner implements QueryRunnerInterface {
 		}
 
 		// Preprocess the response data.
-		$response_data = $this->preprocess_response( $query, $raw_response_data['response_data'], $input_variables );
+		$response_data = $this->preprocess_response( $query, $raw_response_data['response_data'] ?? $raw_response_data, $input_variables );
 
 		// Determine if the response data is expected to be a collection.
 		$output_schema = $query->get_output_schema();
@@ -224,7 +230,7 @@ class QueryRunner implements QueryRunnerInterface {
 		$parser = new QueryResponseParser();
 		$results = $parser->parse( $response_data, $output_schema );
 		$results = $is_collection ? $results : [ $results ];
-		$metadata = $this->get_response_metadata( $query, $raw_response_data['metadata'], $results );
+		$metadata = $this->get_response_metadata( $query, $raw_response_data['metadata'] ?? [], $results );
 
 		// Pagination schema defines how to extract pagination data from the response.
 		$pagination = null;
