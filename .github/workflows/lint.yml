@@ -64,6 +64,7 @@ jobs:
         uses: docker://ghcr.io/psalm/psalm-github-actions
         with:
           composer_require_dev: true
+          php-version: '8.1'
 
   dependaban:
     name: Dependaban
