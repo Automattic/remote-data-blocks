@@ -11,7 +11,7 @@ use WP_Error;
 class MockQuery extends HttpQuery {
 	private mixed $response_data = null;
 
-	public static function from_array( array $config = [], ?ValidatorInterface $validator = null ): self|WP_Error {
+	public static function from_array( array $config = [], ?ValidatorInterface $validator = null ): static|WP_Error {
 		return parent::from_array( [
 			'data_source' => $config['data_source'] ?? MockDataSource::from_array(),
 			'display_name' => 'Mock Query',

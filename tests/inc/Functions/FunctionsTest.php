@@ -70,6 +70,37 @@ class FunctionsTest extends TestCase {
 		$this->assertTrue( $config['loop'] );
 	}
 
+	public function testRegisterBlockWithNestedConfig(): void {
+		register_remote_data_block( [
+			'title' => 'Test Block with Nested Config',
+			'render_query' => [
+				'query' => [
+					'__subclass' => 'RemoteDataBlocks\Tests\Mocks\MockQuery',
+					'data_source' => [
+						'__subclass' => 'RemoteDataBlocks\Tests\Mocks\MockDataSource',
+						'service_config' => [
+							'__version' => 1,
+							'display_name' => 'Mock Data Source',
+							'endpoint' => 'https://example.com/api',
+						],
+					],
+					'display_name' => 'Mock Query',
+					'input_schema' => [],
+					'output_schema' => [ 'type' => 'string' ],
+				],
+			],
+		] );
+
+		$block_name = 'remote-data-blocks/test-block-with-nested-config';
+		$this->assertTrue( ConfigStore::is_registered_block( $block_name ) );
+
+		$config = ConfigStore::get_block_configuration( $block_name );
+		$this->assertIsArray( $config );
+		$this->assertSame( $block_name, $config['name'] );
+		$this->assertSame( 'Test Block with Nested Config', $config['title'] );
+		$this->assertFalse( $config['loop'] );
+	}
+
 	public function testRegisterListQuery(): void {
 		register_remote_data_block( [
 			'title' => 'Test Block with List Query',
