@@ -31,7 +31,32 @@ function register_aic_block(): void {
 	$get_art_query = HttpQuery::from_array([
 		'data_source' => $aic_data_source,
 		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
-			return sprintf( '%s/%s', $aic_data_source->get_endpoint(), $input_variables['id'] ?? '' );
+			$endpoint = $aic_data_source->get_endpoint();
+			$ids = [];
+				
+			if (isset($input_variables['id'])) {
+				$ids[] = $input_variables['id'];
+			} else {
+				foreach ($input_variables as $input) {
+					if (isset($input['id'])) {
+						$id = $input['id'];
+						if (is_array($id)) {
+							$ids[] = reset($id);
+						} else {
+							$ids[] = $id;
+						}
+					}
+				}
+			}
+
+			if (!empty($ids)) {
+				return add_query_arg([
+					'ids' => implode(',', $ids),
+					'fields' => 'id,title,image_id,artist_title',
+				], $endpoint);
+			}
+
+			return $endpoint;
 		},
 		'input_schema' => [
 			'id' => [
@@ -40,20 +65,28 @@ function register_aic_block(): void {
 			],
 		],
 		'output_schema' => [
-			'is_collection' => false,
-			'path' => '$.data',
+			'is_collection' => true,
+			'path' => '$.data[*]',
 			'type' => [
 				'id' => [
 					'name' => 'Art ID',
 					'type' => 'id',
+					'path' => '$.id',
+				],
+				'artist_title' => [
+					'name' => 'Artist Title',
+					'type' => 'string',
+					'path' => '$.artist_title',
 				],
 				'title' => [
 					'name' => 'Title',
 					'type' => 'string',
+					'path' => '$.title',
 				],
 				'image_id' => [
 					'name' => 'Image ID',
 					'type' => 'id',
+					'path' => '$.image_id',
 				],
 				'image_url' => [
 					'name' => 'Image URL',
@@ -105,9 +138,15 @@ function register_aic_block(): void {
 					'name' => 'Art ID',
 					'type' => 'id',
 				],
+				'artist_title' => [
+					'name' => 'Artist Title',
+					'type' => 'string',
+					'path' => '$.artist_title',
+				],
 				'title' => [
 					'name' => 'Title',
 					'type' => 'string',
+					'path' => '$.title',
 				],
 			],
 		],
