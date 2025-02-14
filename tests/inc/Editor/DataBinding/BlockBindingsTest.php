@@ -105,7 +105,7 @@ class BlockBindingsTest extends TestCase {
 
 		$mock_block_config = [
 			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::from_array( [
+				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
 					'input_schema' => self::MOCK_INPUT_SCHEMA,
 					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
 					'query_runner' => $mock_qr,
@@ -154,7 +154,7 @@ class BlockBindingsTest extends TestCase {
 
 		$mock_block_config = [
 			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::from_array( [
+				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
 					'input_schema' => $input_schema,
 					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
 					'query_runner' => $mock_qr,
@@ -218,7 +218,7 @@ class BlockBindingsTest extends TestCase {
 
 		$mock_block_config = [
 			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::from_array( [
+				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
 					'input_schema' => $input_schema,
 					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
 					'query_runner' => $mock_qr,
@@ -280,7 +280,7 @@ class BlockBindingsTest extends TestCase {
 
 		$mock_block_config = [
 			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::from_array( [
+				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
 					'input_schema' => $input_schema,
 					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
 					'query_runner' => $mock_qr,
@@ -334,7 +334,7 @@ class BlockBindingsTest extends TestCase {
 
 		$mock_block_config = [
 			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::from_array( [
+				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
 					'input_schema' => $input_schema,
 					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
 					'query_runner' => $mock_qr,
@@ -389,7 +389,7 @@ class BlockBindingsTest extends TestCase {
 
 		$mock_block_config = [
 			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::from_array( [
+				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
 					'input_schema' => $input_schema,
 					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
 					'query_runner' => $mock_qr,

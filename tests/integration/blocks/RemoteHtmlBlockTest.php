@@ -4,7 +4,7 @@ namespace RemoteDataBlocks\IntegrationTests\Blocks;
 
 use RDBTestCase;
 
-class RemoteHtmlTest extends RDBTestCase {
+class RemoteHtmlBlockTest extends RDBTestCase {
 	public function testRemoteHtmlBlockRenders(): void {
 		$test_title = 'My Product';
 

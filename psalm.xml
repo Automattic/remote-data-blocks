@@ -3,6 +3,8 @@
     errorLevel="7"
     resolveFromConfigFile="true"
     phpVersion="8.1"
+    allConstantsGlobal="true"
+    allFunctionsGlobal="true"
     findUnusedCode="true"
     findUnusedBaselineEntry="true"
     findUnusedPsalmSuppress="true"

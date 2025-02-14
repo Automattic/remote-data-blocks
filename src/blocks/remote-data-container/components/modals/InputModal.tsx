@@ -1,4 +1,9 @@
-import { Button, TextControl } from '@wordpress/components';
+import {
+	Button,
+	TextControl,
+	__experimentalHStack as HStack,
+	__experimentalSpacer as Spacer,
+} from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 import { ModalWithButtonTrigger } from '@/blocks/remote-data-container/components/modals/BaseModal';
@@ -42,11 +47,11 @@ export function InputModal( props: InputModalProps ) {
 		<ModalWithButtonTrigger
 			buttonText="Provide manual input"
 			buttonVariant="secondary"
-			headerImage={ props.headerImage }
 			isOpen={ isOpen }
 			onClose={ close }
 			onOpen={ open }
 			title={ props.title }
+			size="medium"
 		>
 			<form
 				style={ { marginTop: '1rem' } }
@@ -63,12 +68,16 @@ export function InputModal( props: InputModalProps ) {
 						value={ inputState[ input.slug ] ?? '' }
 						onChange={ ( value: string ) => onChange( input.slug, value ) }
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						style={ { marginBottom: '8px' } }
 					/>
 				) ) }
-				<Button variant="primary" type="submit">
-					{ __( 'Save' ) }
-				</Button>
+				<Spacer marginTop={ 4 } />
+				<HStack justify="flex-end">
+					<Button variant="primary" type="submit" __next40pxDefaultSize>
+						{ __( 'Save' ) }
+					</Button>
+				</HStack>
 			</form>
 		</ModalWithButtonTrigger>
 	);

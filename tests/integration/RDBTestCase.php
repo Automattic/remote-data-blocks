@@ -38,11 +38,7 @@ class RDBTestCase extends WP_UnitTestCase {
 		] );
 
 		$this->assertTrue( $registration_result );
-
-		// Register block configuration with WordPress, normally done during the 'init' filter
-		$block_config = ConfigStore::get_block_configuration( ConfigStore::get_block_name( $block_title ) );
-		$this->assertTrue( is_array( $block_config ) && [] !== $block_config );
-		BlockRegistration::register_block_configuration( $block_config );
+		$this->register_remote_data_block_from_block_title( $block_title );
 	}
 
 	protected function register_failed_query_data_block( string $block_title ): void {
@@ -86,8 +82,15 @@ class RDBTestCase extends WP_UnitTestCase {
 		] );
 
 		$this->assertTrue( $registration_result );
+		$this->register_remote_data_block_from_block_title( $block_title );
+	}
 
-		// Register block configuration with WordPress, normally done during the 'init' filter
+	/**
+	 * Register block configuration with WordPress, normally done during the 'init' filter
+	 *
+	 * @param string $block_title The block title.
+	 */
+	protected function register_remote_data_block_from_block_title( string $block_title ): void {
 		$block_config = ConfigStore::get_block_configuration( ConfigStore::get_block_name( $block_title ) );
 		$this->assertTrue( is_array( $block_config ) && [] !== $block_config );
 		BlockRegistration::register_block_configuration( $block_config );
@@ -129,17 +132,22 @@ class RDBTestCase extends WP_UnitTestCase {
 		return $dom;
 	}
 
-	public function assertDomIdHasTextContent( DOMDocument $dom, string $html_id, string $expected_content ): void {
+	protected function get_dom_element_by_html_id( DOMDocument $dom, string $html_id ): DOMNodeList|false {
 		$xpath = new DOMXPath( $dom );
-		$id_nodes = $xpath->query( sprintf( "//*[@id='%s']", $html_id ) );
+		$nodes = $xpath->query( sprintf( "//*[@id='%s']", $html_id ) );
+
+		return $nodes;
+	}
+
+	protected function assertDomIdHasTextContent( DOMDocument $dom, string $html_id, string $expected_content ): void {
+		$id_nodes = $this->get_dom_element_by_html_id( $dom, $html_id );
 
 		$this->assertCount( 1, $id_nodes, sprintf( "Should be 1 matching node with HTML ID '%s' but %d found.", $html_id, count( $id_nodes ) ) );
 		$this->assertEquals( $expected_content, $id_nodes[0]->textContent, sprintf( "Expected '%s' in node with HTML ID '%s', but found '%s' instead.", $expected_content, $html_id, $id_nodes[0]->textContent ) );
 	}
 
 	protected function assertDomIdHasHtmlContent( DOMDocument $dom, string $html_id, string $expected_content ): void {
-		$xpath = new DOMXPath( $dom );
-		$id_nodes = $xpath->query( sprintf( "//*[@id='%s']", $html_id ) );
+		$id_nodes = $this->get_dom_element_by_html_id( $dom, $html_id );
 
 		$this->assertCount( 1, $id_nodes, sprintf( "Should be 1 matching node with HTML ID '%s' but %d found.", $html_id, count( $id_nodes ) ) );
 
