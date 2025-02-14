@@ -17,7 +17,7 @@ interface DataViewsModalProps {
 	blockName: string;
 	headerImage?: string;
 	inputVariables: InputVariable[];
-	onSelect?: ( data: RemoteDataQueryInput[] ) => void;
+	onSelect?: ( data: RemoteDataQueryInput | RemoteDataQueryInput[] ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
 	queryKey: string;
 	renderTrigger?: ( props: { onClick: () => void } ) => React.ReactNode;
@@ -38,6 +38,8 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 
 	const blockConfig = getBlockConfig( blockName );
 	const availableBindings = getBlockAvailableBindings( blockName );
+
+	const supportsBulk = blockConfig?.selectors?.some( selector => selector.supports_bulk ) ?? false;
 
 	const { close, isOpen, open } = useModalState();
 	const {
@@ -100,6 +102,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 						searchInput={ searchInput }
 						setPage={ setPage }
 						setSearchInput={ setSearchInput }
+						supportsBulk={ supportsBulk }
 						supportsSearch={ supportsSearch }
 						totalItems={ totalItems }
 						totalPages={ totalPages }

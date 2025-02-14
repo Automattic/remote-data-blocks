@@ -168,6 +168,7 @@ function register_aic_block(): void {
 			[
 				'query' => $search_art_query,
 				'type' => 'search',
+				'supports_bulk' => true,
 			],
 		],
 	]);

@@ -51,6 +51,7 @@ class AirtableIntegration {
 							[
 								'query' => $list_query,
 								'type' => 'list',
+								'supports_bulk' => true,
 							],
 						],
 					],

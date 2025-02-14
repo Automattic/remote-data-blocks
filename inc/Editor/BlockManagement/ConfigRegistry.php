@@ -125,6 +125,7 @@ class ConfigRegistry {
 					}, array_keys( $from_input_schema ), array_values( $from_input_schema ) ),
 					'name' => $selection_query['display_name'] ?? ucfirst( $from_query_type ),
 					'query_key' => $from_query::class,
+					'supports_bulk' => $selection_query['supports_bulk'] ?? false,
 					'type' => $from_query_type,
 				]
 			);

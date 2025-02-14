@@ -28,7 +28,7 @@ interface ItemListProps {
 	availableBindings: Record< string, RemoteDataBinding >;
 	blockName: string;
 	loading: boolean;
-	onSelect: ( data: RemoteDataQueryInput[] ) => void;
+	onSelect: ( data: RemoteDataQueryInput | RemoteDataQueryInput[] ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
 	page: number;
 	perPage?: number;
@@ -36,6 +36,7 @@ interface ItemListProps {
 	searchInput: string;
 	setPage: ( newPage: number ) => void;
 	setSearchInput: ( newValue: string ) => void;
+	supportsBulk: boolean;
 	supportsSearch: boolean;
 	totalItems?: number;
 	totalPages?: number;
@@ -54,6 +55,7 @@ export function ItemList( props: ItemListProps ) {
 		searchInput,
 		setPage,
 		setSearchInput,
+		supportsBulk,
 		supportsSearch,
 		totalItems,
 		totalPages,
@@ -139,9 +141,9 @@ export function ItemList( props: ItemListProps ) {
 		isPrimary: true,
 		label: '',
 		callback: ( items: RemoteDataResult[] ) => {
-			onSelect( items );
+			return supportsBulk ? onSelect( items ) : items.map( item => onSelect( item ) );
 		},
-		supportsBulk: true,
+		supportsBulk,
 	};
 	const actions: Action< RemoteDataResult >[] = onSelectField ? [] : [ chooseItemAction ];
 
