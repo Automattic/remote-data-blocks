@@ -19,9 +19,9 @@ class QueryRunnerTest extends TestCase {
 		parent::setUp();
 
 		$this->http_client = $this->createMock( HttpClient::class );
-		$this->http_data_source = MockDataSource::from_array();
+		$this->http_data_source = MockDataSource::create();
 
-		$this->query = MockQuery::from_array( [
+		$this->query = MockQuery::create( [
 			'data_source' => $this->http_data_source,
 			'query_runner' => new QueryRunner( $this->http_client ),
 		] );
@@ -349,7 +349,7 @@ class QueryRunnerTest extends TestCase {
 	}
 
 	public function testQueryRunnerAppliesDefaultInputVariables(): void {
-		$query = MockQuery::from_array( [
+		$query = MockQuery::create( [
 			'data_source' => $this->http_data_source,
 			'endpoint' => function ( array $input_variables ): string {
 				return sprintf(

@@ -594,6 +594,7 @@ class ValidatorTest extends TestCase {
 
 		$this->assertTrue( $validator->validate( [
 			'config' => [
+				'__class' => MockSerializableClass::class,
 				'boolean_value' => true,
 				'enum_value' => 'foo',
 				'string_value' => 'hello, world!',
@@ -602,6 +603,7 @@ class ValidatorTest extends TestCase {
 
 		$result = $validator->validate( [
 			'config' => [
+				'__class' => MockSerializableClass::class,
 				'boolean_value' => 'NOT A BOOLEAN',
 				'enum_value' => 'foo',
 				'string_value' => 'hello, world!',
@@ -629,7 +631,9 @@ class ValidatorTest extends TestCase {
 		$this->assertSame( 'Value must be an associative array: {}', $result->get_error_data()['child']->get_error_message() );
 
 		$result = $validator->validate( [
-			'config' => [],
+			'config' => [
+				'__class' => MockSerializableClass::class,
+			],
 		] );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
@@ -646,7 +650,7 @@ class ValidatorTest extends TestCase {
 
 		$this->assertTrue( $validator->validate( [
 			'config' => [
-				'__subclass' => MockSerializableSubclass::class,
+				'__class' => MockSerializableSubclass::class,
 				'boolean_value' => true,
 				'enum_value' => 'foo',
 				'string_value' => 'hello, world!',
@@ -656,7 +660,7 @@ class ValidatorTest extends TestCase {
 
 		$result = $validator->validate( [
 			'config' => [
-				'__subclass' => MockSerializableSubclass::class,
+				'__class' => MockSerializableSubclass::class,
 				'boolean_value' => true,
 				'enum_value' => 'foo',
 				'string_value' => 'hello, world!',
