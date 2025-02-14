@@ -2,27 +2,27 @@ import { TextControl } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { DataSourceForm } from '../components/DataSourceForm';
+import { DataSourceForm } from '@/data-sources/components/DataSourceForm';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import {
+	SalesforceD2CConfig,
+	SalesforceD2CServiceConfig,
 	SettingsComponentProps,
-	SalesforceB2CConfig,
-	SalesforceB2CServiceConfig,
 } from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
-import SalesforceCommerceB2CIcon from '@/settings/icons/SalesforceCommerceB2CIcon';
+import SalesforceCommerceD2CIcon from '@/settings/icons/SalesforceCommerceD2CIcon';
 
 const SERVICE_CONFIG_VERSION = 1;
 
-export const SalesforceB2CSettings = ( {
+export const SalesforceD2CSettings = ( {
 	mode,
 	uuid,
 	config,
-}: SettingsComponentProps< SalesforceB2CConfig > ) => {
-	const { onSave } = useDataSources< SalesforceB2CConfig >( false );
+}: SettingsComponentProps< SalesforceD2CConfig > ) => {
+	const { onSave } = useDataSources< SalesforceD2CConfig >( false );
 
-	const { state, handleOnChange, validState } = useForm< SalesforceB2CServiceConfig >( {
+	const { state, handleOnChange, validState } = useForm< SalesforceD2CServiceConfig >( {
 		initialValues: config?.service_config ?? {
 			__version: SERVICE_CONFIG_VERSION,
 			enable_blocks: true,
@@ -30,16 +30,16 @@ export const SalesforceB2CSettings = ( {
 	} );
 
 	const shouldAllowSubmit = useMemo( () => {
-		return state.shortcode && state.organization_id && state.client_id && state.client_secret;
-	}, [ state.shortcode, state.organization_id, state.client_id, state.client_secret ] );
+		return state.store_id && state.client_id && state.client_secret;
+	}, [ state.store_id, state.client_id, state.client_secret ] );
 
 	const onSaveClick = async () => {
 		if ( ! validState ) {
 			return;
 		}
 
-		const data: SalesforceB2CConfig = {
-			service: 'salesforce-b2c',
+		const data: SalesforceD2CConfig = {
+			service: 'salesforce-d2c',
 			service_config: validState,
 			uuid: uuid ?? null,
 		};
@@ -54,34 +54,22 @@ export const SalesforceB2CSettings = ( {
 				displayName={ state.display_name ?? '' }
 				handleOnChange={ handleOnChange }
 				heading={ {
-					icon: SalesforceCommerceB2CIcon,
+					icon: SalesforceCommerceD2CIcon,
 					width: '100px',
 					height: '75px',
 					verticalAlign: 'middle',
 				} }
-				inputIcon={ SalesforceCommerceB2CIcon }
+				inputIcon={ SalesforceCommerceD2CIcon }
 				uuid={ uuid }
 			>
 				<TextControl
 					type="text"
-					label={ __( 'Merchant shortCode', 'remote-data-blocks' ) }
-					onChange={ shortCode => {
-						handleOnChange( 'shortcode', shortCode ?? '' );
+					label={ __( 'Store ID', 'remote-data-blocks' ) }
+					onChange={ storeId => {
+						handleOnChange( 'store_id', storeId ?? '' );
 					} }
-					value={ state.shortcode ?? '' }
-					help={ __( 'The region-specific merchant identifier. Example: 0dnz6ope' ) }
-					autoComplete="off"
-					__next40pxDefaultSize
-				/>
-
-				<TextControl
-					type="text"
-					label={ __( 'Organization ID', 'remote-data-blocks' ) }
-					onChange={ shortCode => {
-						handleOnChange( 'organization_id', shortCode ?? '' );
-					} }
-					value={ state.organization_id ?? '' }
-					help={ __( 'The organization ID. Example: f_ecom_mirl_012' ) }
+					value={ state.store_id ?? '' }
+					help={ __( 'The store identifier. Example: 0YFWs0000010fRfURF' ) }
 					autoComplete="off"
 					__next40pxDefaultSize
 				/>
@@ -100,8 +88,8 @@ export const SalesforceB2CSettings = ( {
 
 				<PasswordInputControl
 					label={ __( 'Client Secret', 'remote-data-blocks' ) }
-					onChange={ shortCode => {
-						handleOnChange( 'client_secret', shortCode ?? '' );
+					onChange={ clientSecret => {
+						handleOnChange( 'client_secret', clientSecret ?? '' );
 					} }
 					value={ state.client_secret }
 				/>
