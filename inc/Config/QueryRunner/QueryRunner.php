@@ -205,6 +205,18 @@ class QueryRunner implements QueryRunnerInterface {
 			}
 		}
 
+		// If the query is a search query and the search term is empty, return a
+		// collection with no results. This is to exit early and avoid making an
+		// unnecessary API call.
+		if ( 'search' === $key && empty( $input_variables['search'] ) ) {
+			return [
+				'is_collection' => true,
+				'metadata' => [],
+				'pagination' => [],
+				'results' => [],
+			];
+		}
+
 		$raw_response_data = $this->get_raw_response_data( $query, $input_variables );
 
 		if ( is_wp_error( $raw_response_data ) ) {

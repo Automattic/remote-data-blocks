@@ -121,7 +121,7 @@ class SalesforceD2CIntegration {
 						],
 						'name' => [
 							'name' => 'Name',
-							'path' => '$.fields.Name',
+							'path' => '$.name',
 							'type' => 'string',
 						],
 						'image_url' => [
