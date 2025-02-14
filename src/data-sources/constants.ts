@@ -49,4 +49,5 @@ export const HTTP_SOURCE_ADD_TO_SELECT_OPTIONS: SelectOption< HttpApiKeyDestinat
 export enum ConfigSource {
 	CODE = 'code',
 	STORAGE = 'storage',
+	CONSTANTS = 'constant',
 }
