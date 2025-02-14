@@ -2,8 +2,8 @@
 
 namespace RemoteDataBlocks\Integrations\SalesforceB2C;
 
+use RemoteDataBlocks\Config\DataSource\DataSourceConfigManager;
 use RemoteDataBlocks\Config\Query\HttpQuery;
-use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use RemoteDataBlocks\Integrations\SalesforceB2C\Auth\SalesforceB2CAuth;
 use RemoteDataBlocks\Formatting\StringFormatter;
 use WP_Error;
@@ -14,7 +14,9 @@ class SalesforceB2CIntegration {
 	}
 
 	public static function register_blocks(): void {
-		$data_source_configs = DataSourceCrud::get_configs_by_service( REMOTE_DATA_BLOCKS_SALESFORCE_B2C_SERVICE );
+		$data_source_configs = DataSourceConfigManager::get_all_configured_by_service(
+			REMOTE_DATA_BLOCKS_SALESFORCE_B2C_SERVICE
+		);
 
 		foreach ( $data_source_configs as $config ) {
 			$data_source = SalesforceB2CDataSource::from_array( $config );

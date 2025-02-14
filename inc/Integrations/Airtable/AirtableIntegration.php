@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Integrations\Airtable;
 
-use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
+use RemoteDataBlocks\Config\DataSource\DataSourceConfigManager;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Formatting\StringFormatter;
 use RemoteDataBlocks\Snippet\Snippet;
@@ -14,7 +14,7 @@ class AirtableIntegration {
 	}
 
 	public static function register_blocks(): void {
-		$data_source_configs = DataSourceCrud::get_configs_by_service(
+		$data_source_configs = DataSourceConfigManager::get_all_configured_by_service(
 			REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE
 		);
 
