@@ -57,6 +57,7 @@ export interface SalesforceD2CServiceConfig extends BaseServiceConfig {
 	client_id: string;
 	client_secret: string;
 	store_id: string;
+	instance_url: string;
 }
 
 export interface ShopifyServiceConfig extends BaseServiceConfig {

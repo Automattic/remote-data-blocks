@@ -30,8 +30,8 @@ export const SalesforceD2CSettings = ( {
 	} );
 
 	const shouldAllowSubmit = useMemo( () => {
-		return state.store_id && state.client_id && state.client_secret;
-	}, [ state.store_id, state.client_id, state.client_secret ] );
+		return state.instance_url && state.store_id && state.client_id && state.client_secret;
+	}, [ state.instance_url, state.store_id, state.client_id, state.client_secret ] );
 
 	const onSaveClick = async () => {
 		if ( ! validState ) {
@@ -62,6 +62,20 @@ export const SalesforceD2CSettings = ( {
 				inputIcon={ SalesforceCommerceD2CIcon }
 				uuid={ uuid }
 			>
+				<TextControl
+					type="text"
+					label={ __( 'Instance URL', 'remote-data-blocks' ) }
+					onChange={ instanceUrl => {
+						handleOnChange( 'instance_url', instanceUrl ?? '' );
+					} }
+					value={ state.instance_url ?? '' }
+					help={ __(
+						'The instance URL. Example: https://scomhello123usa456org.my.salesforce.com'
+					) }
+					autoComplete="off"
+					__next40pxDefaultSize
+				/>
+
 				<TextControl
 					type="text"
 					label={ __( 'Store ID', 'remote-data-blocks' ) }

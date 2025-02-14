@@ -114,7 +114,7 @@ class SalesforceD2CIntegration {
 					'path' => '$.productsPage.products[*]',
 					'is_collection' => true,
 					'type' => [
-						'id' => [
+						'product_id' => [
 							'name' => 'Product ID',
 							'path' => '$.id',
 							'type' => 'id',
