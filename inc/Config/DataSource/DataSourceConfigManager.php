@@ -4,17 +4,26 @@ namespace RemoteDataBlocks\Config\DataSource;
 
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
+use RemoteDataBlocks\Config\DataSource\ConstantConfigStore;
 use WP_Error;
 
 class DataSourceConfigManager {
 	public const CONFIG_SOURCE_CODE = 'code';
 	public const CONFIG_SOURCE_STORAGE = 'storage';
+	public const CONFIG_SOURCE_CONSTANT = 'constant';
 	public const MUTABLE_CONFIG_SOURCES = [ self::CONFIG_SOURCE_STORAGE ];
 
 	private static function get_all_from_storage(): array {
 		return array_map(
 			fn ( array $config ) => array_merge( $config, [ 'config_source' => self::CONFIG_SOURCE_STORAGE ] ),
 			DataSourceCrud::get_configs()
+		);
+	}
+
+	private static function get_all_from_constant(): array {
+		return array_map(
+			fn ( array $config ) => array_merge( $config, [ 'config_source' => self::CONFIG_SOURCE_CONSTANT ] ),
+			ConstantConfigStore::get_configs()
 		);
 	}
 
@@ -42,7 +51,7 @@ class DataSourceConfigManager {
 	public static function get_all(): array {
 		$code_configured = self::get_all_from_code();
 		$storage_configured = self::get_all_from_storage();
-
+		$constant_configured = self::get_all_from_constant();
 		/**
 		 * Quick and dirty de-duplication of data sources. If the data source does
 		 * not have a UUID (because it is registered in code), we generate an
@@ -52,9 +61,11 @@ class DataSourceConfigManager {
 		 * here due to the ordering of the two arrays passed to array_reduce.
 		 */
 		return array_values( array_reduce(
-			array_merge( $code_configured, $storage_configured ),
+			array_merge( $code_configured, $storage_configured, $constant_configured ),
 			function ( array $acc, array $item ) {
-				$identifier = $item['uuid'] ?? md5( sprintf( '%s_%s', $item['service_config']['display_name'], $item['service'] ) );
+				$identifier = $item['uuid'] ?? md5(
+					sprintf( '%s_%s', $item['service_config']['display_name'], $item['service'] )
+				);
 				$acc[ $identifier ] = $item;
 				return $acc;
 			},
@@ -78,18 +89,27 @@ class DataSourceConfigManager {
 	 * }|WP_Error
 	 */
 	public static function get( string $uuid ): array|WP_Error {
-		// Currently only storage-configured data sources are supported.
-		$from_storage = DataSourceCrud::get_config_by_uuid( $uuid );
-
-		if ( is_wp_error( $from_storage ) ) {
-			return new WP_Error(
-				'data_source_not_found',
-				__( 'Data source not found', 'remote-data-blocks' ),
-				[ 'status' => 404 ]
+		$from_constant = ConstantConfigStore::get_config_by_uuid( $uuid );
+		if ( ! is_wp_error( $from_constant ) ) {
+			return array_merge( 
+				$from_constant, 
+				[ 'config_source' => self::CONFIG_SOURCE_CONSTANT ] 
 			);
 		}
 
-		return array_merge( $from_storage, [ 'config_source' => self::CONFIG_SOURCE_STORAGE ] );
+		$from_storage = DataSourceCrud::get_config_by_uuid( $uuid );
+		if ( ! is_wp_error( $from_storage ) ) {
+			return array_merge(
+				$from_storage,
+				[ 'config_source' => self::CONFIG_SOURCE_STORAGE ]
+			);
+		}
+
+		return new WP_Error(
+			'data_source_not_found',
+			__( 'Data source not found', 'remote-data-blocks' ),
+			[ 'status' => 404 ]
+		);
 	}
 
 	/**
@@ -133,7 +153,10 @@ class DataSourceConfigManager {
 	 * }|WP_Error
 	 */
 	public static function update( string $uuid, array $config ): array|WP_Error {
-		if ( isset( $config['config_source'] ) && ! in_array( $config['config_source'], self::MUTABLE_CONFIG_SOURCES, true ) ) {
+		if (
+			isset( $config['config_source'] ) && 
+			! in_array( $config['config_source'], self::MUTABLE_CONFIG_SOURCES, true ) 
+		) {
 			/**
 			 * Only storage-configured data sources are mutable.
 			 */
