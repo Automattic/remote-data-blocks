@@ -1,7 +1,8 @@
 import { ButtonGroup } from '@wordpress/components';
 
+import { InputModal } from '../modals/InputModal';
+import { InputPopover } from '../popovers/InputPopover';
 import { DataViewsModal } from '@/blocks/remote-data-container/components/modals/DataViewsModal';
-import { InputModal } from '@/blocks/remote-data-container/components/modals/InputModal';
 
 interface ItemSelectQueryTypeProps {
 	blockConfig: BlockConfig;
@@ -38,7 +39,11 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 							/>
 						);
 					case 'input':
-						return <InputModal key={ title } inputs={ selector.inputs } { ...selectorProps } />;
+						return selector.inputs.length === 1 && selector.inputs[ 0 ] ? (
+							<InputPopover key={ title } input={ selector.inputs[ 0 ] } { ...selectorProps } />
+						) : (
+							<InputModal key={ title } inputs={ selector.inputs } { ...selectorProps } />
+						);
 				}
 
 				return null;
