@@ -5,6 +5,7 @@ namespace RemoteDataBlocks\Config\QueryRunner;
 use Exception;
 use GuzzleHttp\RequestOptions;
 use RemoteDataBlocks\Config\Query\HttpQueryInterface;
+use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\HttpClient\HttpClient;
 use WP_Error;
 
@@ -208,7 +209,7 @@ class QueryRunner implements QueryRunnerInterface {
 		// If the query is a search query and the search term is empty, return a
 		// collection with no results. This is to exit early and avoid making an
 		// unnecessary API call.
-		if ( 'search' === $key && empty( $input_variables['search'] ) ) {
+		if ( ConfigRegistry::SEARCH_QUERY_KEY === $key && empty( $input_variables[ ConfigRegistry::SEARCH_QUERY_KEY ] ) ) {
 			return [
 				'is_collection' => true,
 				'metadata' => [],
