@@ -197,12 +197,14 @@ final class Validator implements ValidatorInterface {
 					return $this->create_error( 'Value does not provide a __class property', $class_ref );
 				}
 
+				$class_description = sprintf( 'Class %s specified by %s property', $subclass, ArraySerializableInterface::CLASS_REF_ATTRIBUTE );
+
 				if ( ! class_exists( $subclass ) ) {
-					return $this->create_error( 'Class specified by __class property does not exist', $subclass );
+					return $this->create_error( $class_description . ' does not exist', $subclass );
 				}
 
 				if ( $subclass !== $class_ref && ! is_subclass_of( $subclass, $class_ref, true ) ) {
-					return $this->create_error( 'Class specified by __class property must match or be a subclass of the target class', $subclass );
+					return $this->create_error( $class_description . ' must match or be a subclass of the target class', $subclass );
 				}
 
 				// Done with type validation, update the target class so we can validate

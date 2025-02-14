@@ -1,11 +1,11 @@
 <?php declare(strict_types = 1);
 
-namespace RemoteDataBlocks\IntegrationTests\Render;
+namespace RemoteDataBlocks\IntegrationTests\Blocks;
 
 use RDBTestCase;
 
-class RenderTest extends RDBTestCase {
-	public function testRenderQueryBlockBindingsRender(): void {
+class ZipCodeBlockTest extends RDBTestCase {
+	public function testZipCodeBlockRenders(): void {
 		$test_api_response = [
 			'post code' => 12345,
 			'places' => [
