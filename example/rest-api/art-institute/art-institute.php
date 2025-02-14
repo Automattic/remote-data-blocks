@@ -34,14 +34,14 @@ function register_aic_block(): void {
 			$endpoint = $aic_data_source->get_endpoint();
 			$ids = [];
 				
-			if (isset($input_variables['id'])) {
+			if ( isset( $input_variables['id'] ) ) {
 				$ids[] = $input_variables['id'];
 			} else {
-				foreach ($input_variables as $input) {
-					if (isset($input['id'])) {
+				foreach ( $input_variables as $input ) {
+					if ( isset( $input['id'] ) ) {
 						$id = $input['id'];
-						if (is_array($id)) {
-							$ids[] = reset($id);
+						if ( is_array( $id ) ) {
+							$ids[] = reset( $id );
 						} else {
 							$ids[] = $id;
 						}
@@ -49,9 +49,9 @@ function register_aic_block(): void {
 				}
 			}
 
-			if (!empty($ids)) {
+			if ( !empty( $ids ) ) {
 				return add_query_arg([
-					'ids' => implode(',', $ids),
+					'ids' => implode( ',', $ids ),
 					'fields' => 'id,title,image_id,artist_title',
 				], $endpoint);
 			}

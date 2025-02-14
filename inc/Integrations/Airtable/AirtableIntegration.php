@@ -106,16 +106,16 @@ class AirtableIntegration {
 				$record_ids = [];
 				
 				// Handle both direct record_id and array of record_ids
-				if (isset($input_variables['record_id'])) {
+				if ( isset( $input_variables['record_id'] ) ) {
 					// Single record case
 					$record_ids[] = $input_variables['record_id'];
 				} else {
 					// Multiple records or array case
-					foreach ($input_variables as $input) {
-						if (isset($input['record_id'])) {
+					foreach ( $input_variables as $input ) {
+						if ( isset( $input['record_id'] ) ) {
 							$record_id = $input['record_id'];
-							if (is_array($record_id)) {
-								$record_ids[] = reset($record_id);
+							if ( is_array( $record_id ) ) {
+								$record_ids[] = reset( $record_id );
 							} else {
 								$record_ids[] = $record_id;
 							}
@@ -124,19 +124,17 @@ class AirtableIntegration {
 				}
 
 				// Filter out empty values and ensure strings
-				$record_ids = array_filter($record_ids, 'strlen');
-				$record_ids = array_map('strval', $record_ids);
+				$record_ids = array_filter( $record_ids, 'strlen' );
+				$record_ids = array_map( 'strval', $record_ids );
 
 				// Build the formula
-				$formula_parts = array_map(function($id) {
-					return sprintf('RECORD_ID()="%s"', addslashes($id));
+				$formula_parts = array_map(function ( $id ) {
+					return sprintf( 'RECORD_ID()="%s"', addslashes( $id ) );
 				}, $record_ids);
 
-				$formula = count($formula_parts) === 1 
-					? $formula_parts[0] 
-					: 'OR(' . implode(',', $formula_parts) . ')';
+				$formula = count( $formula_parts ) === 1 ? $formula_parts[0] : 'OR(' . implode( ',', $formula_parts ) . ')';
 
-				return $data_source->get_endpoint() . '/' . $table['id'] . '?filterByFormula=' . urlencode($formula);
+				return $data_source->get_endpoint() . '/' . $table['id'] . '?filterByFormula=' . urlencode( $formula );
 			},
 			'input_schema' => $input_schema,
 			'output_schema' => $output_schema,
