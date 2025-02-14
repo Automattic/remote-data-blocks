@@ -2,6 +2,7 @@
 
 namespace RemoteDataBlocks\Validation;
 
+use RemoteDataBlocks\Config\ArraySerializableInterface;
 use RemoteDataBlocks\Validation\Types;
 use RemoteDataBlocks\Logging\LoggerManager;
 use WP_Error;
@@ -112,13 +113,23 @@ final class Validator implements ValidatorInterface {
 				return true;
 
 			case 'one_of':
+				// Keep track of all failed validations. Since one_of is a union type,
+				// if none of the types match, we will return all of the errors so that
+				// the caller can inspect each of them.
+				$errors = [];
+
 				foreach ( Types::get_type_args( $type ) as $member_type ) {
-					if ( true === $this->check_type( $member_type, $value ) ) {
+					$validated = $this->check_type( $member_type, $value );
+					if ( true === $validated ) {
 						return true;
 					}
+
+					$errors[] = $validated;
 				}
 
-				return $this->create_error( 'Value must be one of the specified types', $value );
+				$error = new WP_Error( 'invalid_one_of_type', 'Validation errors for each of the specified types', [ 'errors' => $errors ] );
+
+				return $this->create_error( 'Value must be one of the specified types', $value, $error );
 
 			case 'object':
 				if ( ! self::check_iterable_object( $value ) ) {
@@ -160,6 +171,40 @@ final class Validator implements ValidatorInterface {
 
 			case 'ref':
 				return $this->check_type( Types::load_ref_type( $type ), $value );
+
+			case 'serialized_config_for':
+				if ( ! self::check_iterable_object( $value ) ) {
+					return $this->create_error( 'Value must be an associative array', $value );
+				}
+
+				$class_ref = Types::get_type_args( $type );
+
+				if ( ! class_exists( $class_ref ) && ! interface_exists( $class_ref ) ) {
+					return $this->create_error( 'Class does not exist', $class_ref );
+				}
+
+				$implements = class_implements( $class_ref );
+				if ( ! in_array( ArraySerializableInterface::class, $implements, true ) ) {
+					return $this->create_error( 'Class does not implement ArraySerializableInterface', $class_ref );
+				}
+
+				// The config can provide a `__subclass` property that indicates that we
+				// should inflate using a subclass of the specified class.
+				$subclass = $value['__subclass'] ?? null;
+				if ( null !== $subclass ) {
+					if ( ! is_subclass_of( $subclass, $class_ref, true ) ) {
+						return $this->create_error( 'Class specified by __subclass must be a subclass of the specified class', $subclass );
+					}
+
+					$class_ref = $subclass;
+				}
+
+				// Validate the schema for the class we want to instantiate. Call the
+				// config prepocessor since some classes inflate their own config.
+				$config_validator = new Validator( $class_ref::get_config_schema(), $class_ref );
+				$config = $class_ref::preprocess_config( $value );
+
+				return $config_validator->validate( $config );
 
 			case 'string_matching':
 				$regex = Types::get_type_args( $type );
@@ -236,7 +281,7 @@ final class Validator implements ValidatorInterface {
 		return new WP_Error( 'invalid_type', $message, [ 'child' => $child_error ] );
 	}
 
-	private function get_object_key( mixed $data, string $key ): mixed {
+	private function get_object_key( mixed $data, string|int $key ): mixed {
 		return is_array( $data ) && array_key_exists( $key, $data ) ? $data[ $key ] : null;
 	}
 }

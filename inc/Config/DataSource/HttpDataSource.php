@@ -5,7 +5,6 @@ namespace RemoteDataBlocks\Config\DataSource;
 use RemoteDataBlocks\Config\ArraySerializable;
 use RemoteDataBlocks\Validation\ConfigSchemas;
 use RemoteDataBlocks\Validation\Validator;
-use RemoteDataBlocks\Validation\ValidatorInterface;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use WP_Error;
 
@@ -44,25 +43,23 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 	 * NOTE: This method uses late static bindings to allow child classes to
 	 * define their own validation schema.
 	 */
-	public static function from_array( array $config, ?ValidatorInterface $validator = null ): self|WP_Error {
+	public static function preprocess_config( array $config ): array|WP_Error {
 		$service_config = $config['service_config'] ?? [];
-		$validator = $validator ?? new Validator( static::get_service_config_schema() );
+		$validator = new Validator( static::get_service_config_schema() );
 		$validated = $validator->validate( $service_config );
 
 		if ( is_wp_error( $validated ) ) {
 			return $validated;
 		}
 
-		return parent::from_array(
-			array_merge(
-				static::map_service_config( $service_config ),
-				[
-					// Store the exact data used to create the instance to preserve determinism.
-					'service' => static::SERVICE_NAME,
-					'service_config' => $service_config,
-					'uuid' => $config['uuid'] ?? null,
-				]
-			)
+		return array_merge(
+			static::map_service_config( $service_config ),
+			[
+				// Store the exact data used to create the instance to preserve determinism.
+				'service' => static::SERVICE_NAME,
+				'service_config' => $service_config,
+				'uuid' => $config['uuid'] ?? null,
+			]
 		);
 	}
 
@@ -92,7 +89,7 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 	/**
 	 * @inheritDoc
 	 */
-	protected static function get_config_schema(): array {
+	public static function get_config_schema(): array {
 		return ConfigSchemas::get_http_data_source_config_schema();
 	}
 
