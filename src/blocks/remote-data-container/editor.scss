@@ -82,6 +82,10 @@ remote-data-blocks-inline-field {
 	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
 
+.rdb-editor_dataviews-modal-item-select .dataviews-view-table {
+	margin-bottom: 100px;
+}
+
 .rdb-editor_dataviews-modal-item-select .dataviews-view-table tbody .dataviews-view-table__row:not(.has-bulk-actions) .dataviews-view-table__cell-content-wrapper:not(.dataviews-column-primary__media) {
 	white-space: normal;
 	width: 250px;
@@ -112,7 +116,7 @@ remote-data-blocks-inline-field {
 	vertical-align: middle;
 }
 
-.rdb-editor_data-views-modal .components-modal__content {
+.rdb-editor_dataviews-modal-item-select .components-modal__content {
 	padding: 0;
 
 	> :nth-child(2) {
@@ -145,4 +149,78 @@ td.dataviews-view-table__actions-column::before {
 	height: 100%;
 	background-color: #f0f0f0;
 	z-index: 2;
+}
+
+
+.dataviews-footer {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background: #fff;
+
+	&:has(.dataviews-bulk-actions-footer__action-buttons:not(:empty)) {
+		padding-bottom: 72px;
+	}
+
+	.dataviews-bulk-actions-footer__container  .dataviews-bulk-actions-footer__action-buttons:not(:empty) {
+
+		flex-direction: row-reverse;
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		padding: 0 24px 24px;
+		background: #fff;
+		z-index: 1;
+
+		.components-button {
+			height: 40px;
+			padding: 6px 12px;
+			border-radius: 2px;
+			flex: 1 1 0;
+
+			// Hide the 'x' icon
+			svg {
+				display: none;
+			}
+
+			// Cancel button
+			&:nth-child(2) {
+				box-shadow: inset 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+				color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+				position: relative;
+			}
+
+			// Choose button
+			&:nth-child(1) {
+				background: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+				color: var(--wp-components-color-accent-inverted, #fff);
+
+				&:hover {
+					background: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
+				}
+			}
+
+			// Adding Cancel button text
+			&::after {
+				content: attr(aria-label);
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+				font-size: 12px;
+				padding: 4px 8px;
+				border-radius: 4px;
+				white-space: nowrap;
+				text-align: center;
+				pointer-events: none;
+				transition: opacity 0.2s ease-in-out;
+			}
+
+
+		}
+	}
+
 }
