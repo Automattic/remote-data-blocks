@@ -63,7 +63,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 		void fetch( {} );
 	}, [] );
 
-	function onSelectItem( input: RemoteDataQueryInput ): void {
+	function onSelectItem( input: RemoteDataQueryInput | RemoteDataQueryInput[] ): void {
 		onSelect?.( input );
 		sendTracksEvent( 'remotedatablocks_add_block', {
 			action: 'select_item',
