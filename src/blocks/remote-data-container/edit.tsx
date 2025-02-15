@@ -64,9 +64,8 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 		insertPatternBlocks( pattern );
 		setShowPatternSelection( false );
 	}
-
-	function onSelectRemoteData( queryInput: RemoteDataQueryInput ): void {
-		void fetch( queryInput ).then( () => {
+	function onSelectRemoteData( queryInput: RemoteDataQueryInput | RemoteDataQueryInput[] ): void {
+		void fetch( queryInput as RemoteDataQueryInput ).then( () => {
 			if ( innerBlocksPattern ) {
 				insertPatternBlocks( innerBlocksPattern );
 				return;
