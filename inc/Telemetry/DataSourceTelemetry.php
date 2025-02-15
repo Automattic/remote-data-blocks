@@ -1,13 +1,13 @@
 <?php declare(strict_types = 1);
 
-namespace RemoteDataBlocks\Analytics;
+namespace RemoteDataBlocks\Telemetry;
 
-use RemoteDataBlocks\Analytics\TracksAnalytics;
+use RemoteDataBlocks\Telemetry\TracksTelemetry;
 use RemoteDataBlocks\Config\DataSource\DataSourceConfigManager;
 
 defined( 'ABSPATH' ) || exit();
 
-class DataSourceAnalytics {
+class DataSourceTelemetry {
 	const DATA_SOURCE_INTERACTION_EVENT_NAME = 'remotedatablocks_data_source_interaction';
 	const DATA_SOURCE_VIEW_EVENT_NAME = 'remotedatablocks_view_data_sources';
 	const DATA_SOURCE_VIEW_TRACK_TRANSIENT_KEY = 'remotedatablocks_view_data_sources_tracked';
@@ -25,7 +25,7 @@ class DataSourceAnalytics {
 	}
 
 	private static function track_interaction( array $config, string $action ): void {
-		TracksAnalytics::record_event( self::DATA_SOURCE_INTERACTION_EVENT_NAME, array_merge( [
+		TracksTelemetry::record_event( self::DATA_SOURCE_INTERACTION_EVENT_NAME, array_merge( [
 			'data_source_type' => $config['service'],
 			'action' => $action,
 		], self::get_interaction_track_props( $config ) ) );
@@ -45,7 +45,7 @@ class DataSourceAnalytics {
 
 	public static function track_view( array $configs ): void {
 		/**
-		 * Tracks Analytics. Only once per day to reduce noise.
+		 * Tracks Telemetry. Only once per day to reduce noise.
 		 */
 		if ( ! get_transient( self::DATA_SOURCE_VIEW_TRACK_TRANSIENT_KEY ) ) {
 			$code_configured_count = count( array_filter(
@@ -57,7 +57,7 @@ class DataSourceAnalytics {
 				fn ( $config ) => DataSourceConfigManager::CONFIG_SOURCE_STORAGE === $config['config_source']
 			) );
 
-			TracksAnalytics::record_event( self::DATA_SOURCE_VIEW_EVENT_NAME, [
+			TracksTelemetry::record_event( self::DATA_SOURCE_VIEW_EVENT_NAME, [
 				'total_data_sources_count' => count( $configs ),
 				'code_configured_data_sources_count' => $code_configured_count,
 				'ui_configured_data_sources_count' => $storage_configured_count,

@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\REST;
 
-use RemoteDataBlocks\Analytics\DataSourceAnalytics;
+use RemoteDataBlocks\Telemetry\DataSourceTelemetry;
 use RemoteDataBlocks\Config\DataSource\DataSourceConfigManager;
 use RemoteDataBlocks\Snippet\Snippet;
 use WP_REST_Controller;
@@ -148,7 +148,7 @@ class DataSourceController extends WP_REST_Controller {
 		$data_source_properties = $request->get_json_params();
 		$item = DataSourceConfigManager::create( $data_source_properties );
 
-		DataSourceAnalytics::track_add( $data_source_properties );
+		DataSourceTelemetry::track_add( $data_source_properties );
 
 		return rest_ensure_response( $item );
 	}
@@ -162,7 +162,7 @@ class DataSourceController extends WP_REST_Controller {
 	public function get_items( mixed $request ): WP_REST_Response|WP_Error {
 		$data_sources = DataSourceConfigManager::get_all();
 
-		DataSourceAnalytics::track_view( $data_sources );
+		DataSourceTelemetry::track_view( $data_sources );
 
 		return rest_ensure_response( $data_sources );
 	}
@@ -197,7 +197,7 @@ class DataSourceController extends WP_REST_Controller {
 			return $item; // Return WP_Error if update fails
 		}
 
-		DataSourceAnalytics::track_update( $data_source_properties );
+		DataSourceTelemetry::track_update( $data_source_properties );
 
 		return rest_ensure_response( $item );
 	}
@@ -212,7 +212,7 @@ class DataSourceController extends WP_REST_Controller {
 		$data_source_properties = $request->get_json_params();
 		$result = DataSourceConfigManager::delete( $request->get_param( 'uuid' ) );
 
-		DataSourceAnalytics::track_delete( $data_source_properties );
+		DataSourceTelemetry::track_delete( $data_source_properties );
 
 		return rest_ensure_response( $result );
 	}

@@ -1,15 +1,15 @@
 <?php declare(strict_types = 1);
 
-namespace RemoteDataBlocks\Analytics;
+namespace RemoteDataBlocks\Telemetry;
 
 defined( 'ABSPATH' ) || exit();
 
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 
 /**
- * Class to implement Tracks Analytics.
+ * Class to implement Tracks Telemetry.
  */
-class TracksAnalytics {
+class TracksTelemetry {
 	/**
 	 * The tracks instance (not using Tracks as type because it is present in MU Plugins codebase).
 	 */
@@ -21,7 +21,7 @@ class TracksAnalytics {
 	private static ?EnvironmentConfig $env_config = null;
 
 	/**
-	 * Initialize Tracks Analytics based on the environment configuration.
+	 * Initialize Tracks Telemetry based on the environment configuration.
 	 *
 	 * @param EnvironmentConfig $env_config Environment configuration.
 	 */
