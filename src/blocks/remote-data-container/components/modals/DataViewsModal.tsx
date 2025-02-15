@@ -89,7 +89,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 					className={ className }
 					isFullScreen
 					onRequestClose={ close }
-					title={ title ?? blockConfig?.settings?.title }
+					title={ blockConfig?.settings?.title ?? title }
 				>
 					<ItemList
 						availableBindings={ availableBindings }
