@@ -99,9 +99,7 @@ class SalesforceD2CAuth {
 			return null;
 		}
 
-		$access_token = $saved_access_token['token'];
-
-		return $access_token;
+		return $saved_access_token['token'] ?? null;
 	}
 
 	private static function get_access_token_key( string $client_id ): string {
