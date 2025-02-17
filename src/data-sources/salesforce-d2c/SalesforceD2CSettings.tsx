@@ -1,5 +1,4 @@
 import { TextControl } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { DataSourceForm } from '@/data-sources/components/DataSourceForm';
@@ -29,9 +28,8 @@ export const SalesforceD2CSettings = ( {
 		},
 	} );
 
-	const shouldAllowSubmit = useMemo( () => {
-		return state.instance_url && state.store_id && state.client_id && state.client_secret;
-	}, [ state.instance_url, state.store_id, state.client_id, state.client_secret ] );
+	const shouldAllowSubmit =
+		state.instance_url && state.store_id && state.client_id && state.client_secret;
 
 	const onSaveClick = async () => {
 		if ( ! validState ) {
