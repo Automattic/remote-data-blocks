@@ -107,6 +107,7 @@ class SalesforceD2CIntegration {
 				},
 				'input_schema' => [
 					'search' => [
+						'required' => true,
 						'type' => 'ui:search_input',
 					],
 				],

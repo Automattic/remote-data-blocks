@@ -70,7 +70,7 @@ The render query is executed when the block is rendered and fetches the data tha
 
 ### `selection_queries`: array (optional)
 
-Selection queries are used by content creators to select or curate remote data in the block editor. For example, you may wish to provide a list of products to users and allow them to select one to incled, or you may want to allow a user to search for a specific item. Selection queries are an array of objects with the following properties:
+Selection queries are used by content creators to select or curate remote data in the block editor. For example, you may wish to provide a list of products to users and allow them to select one to include in their post, or you may want to allow a user to search for a specific item. Selection queries are an array of objects with the following properties:
 
 - `display_name`: A human-friendly name for the selection query.
 - `query` (required): An instance of `QueryInterface` that fetches the data.

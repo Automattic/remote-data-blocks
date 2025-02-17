@@ -4,6 +4,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { REMOTE_DATA_REST_API_URL } from '@/blocks/remote-data-container/config/constants';
 import { usePaginationVariables } from '@/blocks/remote-data-container/hooks/usePaginationVariables';
 import { useSearchVariables } from '@/blocks/remote-data-container/hooks/useSearchVariables';
+import { getBlockConfig } from '@/utils/localized-block-data';
 
 async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< RemoteData | null > {
 	const { body } = await apiFetch< RemoteDataApiResponse >( {
@@ -133,6 +134,24 @@ export function useRemoteData( {
 
 	async function fetch( queryInput: RemoteDataQueryInput ): Promise< void > {
 		setLoading( true );
+
+		const blockConfig = getBlockConfig( blockName );
+
+		const selector = blockConfig?.selectors?.find(
+			querySelector => querySelector.query_key === queryKey
+		);
+
+		if ( selector ) {
+			const requiredFields = selector.inputs.filter(
+				input => input.required && ! queryInput[ input.name ]
+			);
+
+			if ( requiredFields.length > 0 ) {
+				resolvedUpdater( undefined );
+				setLoading( false );
+				return;
+			}
+		}
 
 		const requestData: RemoteDataApiRequest = {
 			block_name: blockName,

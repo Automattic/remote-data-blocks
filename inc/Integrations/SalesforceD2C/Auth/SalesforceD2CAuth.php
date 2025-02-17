@@ -35,8 +35,14 @@ class SalesforceD2CAuth {
 		return $access_token;
 	}
 
-	// Access token request using top-level credentials
-
+	/**
+	 * Get a token using client credentials.
+	 *
+	 * @param string $client_id The client ID.
+	 * @param string $client_secret The client secret.
+	 * @param string $endpoint The endpoint prefix URL for the data source.
+	 * @return WP_Error|string The token or an error.
+	 */
 	public static function get_token_using_client_credentials(
 		string $client_id,
 		string $client_secret,
@@ -80,8 +86,6 @@ class SalesforceD2CAuth {
 
 		return $access_token;
 	}
-
-	// Access token cache management
 
 	private static function save_access_token( string $access_token, string $client_id ): void {
 		$access_token_data = [

@@ -5,7 +5,6 @@ namespace RemoteDataBlocks\Config\QueryRunner;
 use Exception;
 use GuzzleHttp\RequestOptions;
 use RemoteDataBlocks\Config\Query\HttpQueryInterface;
-use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\HttpClient\HttpClient;
 use WP_Error;
 
@@ -204,18 +203,11 @@ class QueryRunner implements QueryRunnerInterface {
 			if ( ! array_key_exists( $key, $input_variables ) && isset( $schema['default_value'] ) ) {
 				$input_variables[ $key ] = $schema['default_value'];
 			}
-		}
 
-		// If the query is a search query and the search term is empty, return a
-		// collection with no results. This is to exit early and avoid making an
-		// unnecessary API call.
-		if ( ConfigRegistry::SEARCH_QUERY_KEY === $key && empty( $input_variables[ ConfigRegistry::SEARCH_QUERY_KEY ] ) ) {
-			return [
-				'is_collection' => true,
-				'metadata' => [],
-				'pagination' => [],
-				'results' => [],
-			];
+			// If the input variable is required and not provided, return an error.
+			if ( ! array_key_exists( $key, $input_variables ) && isset( $schema['required'] ) && $schema['required'] ) {
+				return new WP_Error( 'remote-data-blocks-missing-required-input-variable', sprintf( 'Missing required input variable: %s', $key ) );
+			}
 		}
 
 		$raw_response_data = $this->get_raw_response_data( $query, $input_variables );
