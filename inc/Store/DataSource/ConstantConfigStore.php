@@ -87,7 +87,7 @@ class ConstantConfigStore {
 	 * @return bool Whether the constant configuration is available and valid.
 	 */
 	public static function is_available(): bool {
-		if ( ! defined( self::CONFIG_CONSTANT_NAME ) || '' === constant( self::CONFIG_CONSTANT_NAME ) ) {
+		if ( ! defined( self::CONFIG_CONSTANT_NAME ) ) {
 			return false;
 		}
 
