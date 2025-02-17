@@ -50,11 +50,15 @@ class DataSourceTelemetry {
 		if ( ! get_transient( self::DATA_SOURCE_VIEW_TRACK_TRANSIENT_KEY ) ) {
 			$code_configured_count = count( array_filter(
 				$configs,
-				fn ( $config ) => DataSourceConfigManager::CONFIG_SOURCE_CODE === $config['config_source']
+				function ( $config ) {
+					return DataSourceConfigManager::CONFIG_SOURCE_CODE === $config['config_source'];
+				}
 			) );
 			$storage_configured_count = count( array_filter(
 				$configs,
-				fn ( $config ) => DataSourceConfigManager::CONFIG_SOURCE_STORAGE === $config['config_source']
+				function ( $config ) {
+					return DataSourceConfigManager::CONFIG_SOURCE_STORAGE === $config['config_source'];
+				}
 			) );
 
 			TracksTelemetry::record_event( self::DATA_SOURCE_VIEW_EVENT_NAME, [

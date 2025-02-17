@@ -15,21 +15,27 @@ class DataSourceConfigManager {
 
 	private static function get_all_from_storage(): array {
 		return array_map(
-			fn ( array $config ) => array_merge( $config, [ 'config_source' => self::CONFIG_SOURCE_STORAGE ] ),
+			function ( array $config ) {
+				return array_merge( $config, [ 'config_source' => self::CONFIG_SOURCE_STORAGE ] );
+			},
 			DataSourceCrud::get_configs()
 		);
 	}
 
 	private static function get_all_from_constant(): array {
 		return array_map(
-			fn ( array $config ) => array_merge( $config, [ 'config_source' => self::CONFIG_SOURCE_CONSTANT ] ),
+			function ( array $config ) {
+				return array_merge( $config, [ 'config_source' => self::CONFIG_SOURCE_CONSTANT ] );
+			},
 			ConstantConfigStore::get_configs()
 		);
 	}
 
 	private static function get_all_from_code(): array {
 		return array_map(
-			fn ( array $config ) => array_merge( $config, [ 'config_source' => self::CONFIG_SOURCE_CODE ] ),
+			function ( array $config ) {
+				return array_merge( $config, [ 'config_source' => self::CONFIG_SOURCE_CODE ] );
+			},
 			ConfigStore::get_data_sources_as_array()
 		);
 	}
@@ -228,6 +234,8 @@ class DataSourceConfigManager {
 		 */
 		$de_duplicated_configs = self::de_duplicate_configs( $all_configs );
 
-		return array_filter( $de_duplicated_configs, fn ( array $config ) => $config['service'] === $service );
+		return array_filter( $de_duplicated_configs, function ( array $config ) use ( $service ) {
+			return $config['service'] === $service;
+		} );
 	}
 }

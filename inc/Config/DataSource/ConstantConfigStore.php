@@ -47,7 +47,9 @@ class ConstantConfigStore {
 
 	public static function get_config_by_uuid( string $uuid ): array|WP_Error {
 		$configs = constant( self::CONFIG_CONSTANT_NAME );
-		$found = array_filter( $configs, fn ( $config ) => $config['uuid'] === $uuid );
+		$found = array_filter( $configs, function ( $config ) use ( $uuid ) {
+			return $config['uuid'] === $uuid;
+		} );
 		
 		if ( empty( $found ) ) {
 			return new WP_Error(
