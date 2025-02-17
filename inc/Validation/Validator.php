@@ -188,16 +188,28 @@ final class Validator implements ValidatorInterface {
 					return $this->create_error( 'Class does not implement ArraySerializableInterface', $class_ref );
 				}
 
-				// The config can provide a `__subclass` property that indicates that we
-				// should inflate using a subclass of the specified class.
-				$subclass = $value['__subclass'] ?? null;
-				if ( null !== $subclass ) {
-					if ( ! is_subclass_of( $subclass, $class_ref, true ) ) {
-						return $this->create_error( 'Class specified by __subclass must be a subclass of the specified class', $subclass );
-					}
-
-					$class_ref = $subclass;
+				// The config must provide a `__class` property so that we know which
+				// class to inflate. This allows values to target subclasses of the
+				// specified class and also provides disambiguation when the type is
+				// used in a union type (one_of).
+				$subclass = $value[ ArraySerializableInterface::CLASS_REF_ATTRIBUTE ] ?? null;
+				if ( null === $subclass ) {
+					return $this->create_error( 'Value does not provide a __class property', $class_ref );
 				}
+
+				$class_description = sprintf( 'Class %s specified by %s property', $subclass, ArraySerializableInterface::CLASS_REF_ATTRIBUTE );
+
+				if ( ! class_exists( $subclass ) ) {
+					return $this->create_error( $class_description . ' does not exist', $subclass );
+				}
+
+				if ( $subclass !== $class_ref && ! is_subclass_of( $subclass, $class_ref, true ) ) {
+					return $this->create_error( $class_description . ' must match or be a subclass of the target class', $subclass );
+				}
+
+				// Done with type validation, update the target class so we can validate
+				// the value / config.
+				$class_ref = $subclass;
 
 				// Validate the schema for the class we want to instantiate. Call the
 				// config prepocessor since some classes inflate their own config.

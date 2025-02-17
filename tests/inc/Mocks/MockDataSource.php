@@ -20,8 +20,8 @@ class MockDataSource extends HttpDataSource {
 		],
 	];
 
-	public static function from_array( ?array $config = self::MOCK_CONFIG, ?ValidatorInterface $validator = null ): static|WP_Error {
-		return parent::from_array( $config, $validator ?? new MockValidator() );
+	public static function create( ?array $config = self::MOCK_CONFIG, ?ValidatorInterface $validator = null ): static|WP_Error {
+		return self::from_array( $config, $validator ?? new MockValidator() );
 	}
 
 	/**

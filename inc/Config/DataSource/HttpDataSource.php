@@ -80,6 +80,7 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 	 */
 	final public function to_array(): array {
 		return [
+			'__class' => static::class,
 			'service' => static::SERVICE_NAME,
 			'service_config' => $this->config['service_config'],
 			'uuid' => $this->config['uuid'],

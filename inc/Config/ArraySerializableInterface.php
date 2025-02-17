@@ -6,6 +6,8 @@ use RemoteDataBlocks\Validation\ValidatorInterface;
 use WP_Error;
 
 interface ArraySerializableInterface {
+	final public const CLASS_REF_ATTRIBUTE = '__class';
+
 	/**
 	 * Creates an instance of the class from an array representation.
 	 *
