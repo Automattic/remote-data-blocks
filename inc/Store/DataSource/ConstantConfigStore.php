@@ -69,7 +69,7 @@ class ConstantConfigStore {
 		return $config;
 	}
 
-	public static function validate_config( array $config ): DataSourceInterface|WP_Error {
+	private static function validate_config( array $config ): DataSourceInterface|WP_Error {
 		$data_source_class = REMOTE_DATA_BLOCKS__DATA_SOURCE_CLASSMAP[ $config['service'] ] ?? null;
 		if ( null === $data_source_class ) {
 			return new WP_Error(
@@ -86,7 +86,7 @@ class ConstantConfigStore {
 	 *
 	 * @return bool Whether the constant configuration is available and valid.
 	 */
-	public static function is_available(): bool {
+	private static function is_available(): bool {
 		if ( ! defined( self::CONFIG_CONSTANT_NAME ) ) {
 			return false;
 		}

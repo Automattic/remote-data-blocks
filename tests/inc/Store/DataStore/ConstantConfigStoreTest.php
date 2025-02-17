@@ -65,20 +65,6 @@ class ConstantConfigStoreTest extends TestCase {
 		}
 	}
 
-	public function testIsAvailableReturnsFalseWhenConstantNotDefined(): void {
-		$this->assertFalse( ConstantConfigStore::is_available() );
-	}
-
-	public function testIsAvailableReturnsFalseWhenConstantIsEmptyString(): void {
-		$this->defineConfigs( '' );
-		$this->assertFalse( ConstantConfigStore::is_available() );
-	}
-
-	public function testIsAvailableReturnsTrueWhenConstantIsArray(): void {
-		$this->defineConfigs( [ [ 'test' => 'value' ] ] );
-		$this->assertTrue( ConstantConfigStore::is_available() );
-	}
-
 	public function testGetConfigsReturnsEmptyArrayWhenConstantNotDefined(): void {
 		$this->assertSame( [], ConstantConfigStore::get_configs() );
 	}
@@ -119,22 +105,5 @@ class ConstantConfigStoreTest extends TestCase {
 		$result = ConstantConfigStore::get_config_by_uuid( self::TEST_UUID );
 		$this->assertIsArray( $result );
 		$this->assertSame( $this->valid_config, $result );
-	}
-
-	public function testValidateConfigReturnsErrorForUnsupportedService(): void {
-		$config = [
-			'uuid' => self::TEST_UUID,
-			'service' => self::INVALID_SERVICE,
-			'service_config' => [],
-		];
-
-		$result = ConstantConfigStore::validate_config( $config );
-		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'unsupported_data_source', $result->get_error_code() );
-	}
-
-	public function testValidateConfigReturnsInstanceForValidConfig(): void {
-		$result = ConstantConfigStore::validate_config( $this->valid_config );
-		$this->assertInstanceOf( DataSourceInterface::class, $result );
 	}
 }
