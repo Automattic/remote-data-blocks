@@ -3,7 +3,7 @@
 namespace RemoteDataBlocks\REST;
 
 use RemoteDataBlocks\Telemetry\DataSourceTelemetry;
-use RemoteDataBlocks\Config\DataSource\DataSourceConfigManager;
+use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
 use RemoteDataBlocks\Snippet\Snippet;
 use WP_REST_Controller;
 use WP_REST_Request;

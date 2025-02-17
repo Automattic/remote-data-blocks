@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Integrations\SalesforceB2C;
 
-use RemoteDataBlocks\Config\DataSource\DataSourceConfigManager;
+use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Integrations\SalesforceB2C\Auth\SalesforceB2CAuth;
 use RemoteDataBlocks\Formatting\StringFormatter;

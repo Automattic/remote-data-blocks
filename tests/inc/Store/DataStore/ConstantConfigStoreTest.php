@@ -1,11 +1,11 @@
 <?php declare(strict_types = 1);
 
-namespace RemoteDataBlocks\Tests\Config\DataSource;
+namespace RemoteDataBlocks\Tests\Store\DataSource;
 
 use PHPUnit\Framework\TestCase;
-use RemoteDataBlocks\Config\DataSource\ConstantConfigStore;
 use RemoteDataBlocks\Config\DataSource\DataSourceInterface;
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use RemoteDataBlocks\Store\DataSource\ConstantConfigStore;
 use WP_Error;
 use Mockery;
 

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace RemoteDataBlocks\Config\DataSource;
+namespace RemoteDataBlocks\Store\DataSource;
 
 use RemoteDataBlocks\Config\DataSource\DataSourceInterface;
 use RemoteDataBlocks\Logging\LoggerManager;

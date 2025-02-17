@@ -1,10 +1,9 @@
 <?php declare(strict_types = 1);
 
-namespace RemoteDataBlocks\Config\DataSource;
+namespace RemoteDataBlocks\Store\DataSource;
 
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
-use RemoteDataBlocks\Config\DataSource\ConstantConfigStore;
 use WP_Error;
 
 class DataSourceConfigManager {

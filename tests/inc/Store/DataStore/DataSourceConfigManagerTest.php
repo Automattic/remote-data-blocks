@@ -1,10 +1,10 @@
 <?php declare(strict_types = 1);
 
-namespace RemoteDataBlocks\Tests\Config\DataSource;
+namespace RemoteDataBlocks\Tests\Store\DataSource;
 
 use PHPUnit\Framework\TestCase;
-use RemoteDataBlocks\Config\DataSource\DataSourceConfigManager;
-use RemoteDataBlocks\Config\DataSource\ConstantConfigStore;
+use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
+use RemoteDataBlocks\Store\DataSource\ConstantConfigStore;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use WP_Error;
