@@ -25,14 +25,7 @@ class SalesforceD2CAuth {
 		string $client_id,
 		string $client_secret
 	): string|WP_Error {
-		$saved_access_token = self::get_saved_access_token( $client_id );
-
-		if ( null !== $saved_access_token ) {
-			return $saved_access_token;
-		}
-
-		$access_token = self::get_token_using_client_credentials( $client_id, $client_secret, $endpoint );
-		return $access_token;
+		return self::get_saved_access_token( $client_id ) ?? self::get_token_using_client_credentials( $client_id, $client_secret, $endpoint );
 	}
 
 	/**
@@ -110,9 +103,7 @@ class SalesforceD2CAuth {
 			return null;
 		}
 
-		$access_token = $saved_access_token['token'];
-
-		return $access_token;
+		return $saved_access_token['token'] ?? null;
 	}
 
 	private static function get_access_token_key( string $client_id ): string {
