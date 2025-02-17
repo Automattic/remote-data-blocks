@@ -12,13 +12,14 @@ import {
 	filterSortAndPaginate,
 	type View,
 } from '@wordpress/dataviews/wp';
-import { useState } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { info } from '@wordpress/icons';
 
 import CodeSnippet from './components/CodeSnippet';
 import { BaseModal } from '@/blocks/remote-data-container/components/modals/BaseModal';
 import { useModalState } from '@/blocks/remote-data-container/hooks/useModalState';
+import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
 import DataSourceMetaTags from '@/data-sources/DataSourceMetaTags';
 import {
 	SUPPORTED_SERVICES,
@@ -28,11 +29,12 @@ import {
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
-import './DataSourceList.scss';
 import { AirtableIcon } from '@/settings/icons/AirtableIcon';
 import { GoogleSheetsIcon } from '@/settings/icons/GoogleSheetsIcon';
 import HttpIcon from '@/settings/icons/HttpIcon';
 import { ShopifyIcon } from '@/settings/icons/ShopifyIcon';
+
+import './DataSourceList.scss';
 
 const DataSourceList = () => {
 	const {
@@ -57,6 +59,7 @@ const DataSourceList = () => {
 	const [ currentSource, setCurrentSource ] = useState< DataSourceConfig | null >( null );
 	const { close, isOpen, open } = useModalState();
 	const { pushState } = useSettingsContext();
+	const wasLoading = useRef< boolean >( false );
 
 	const onCancelDeleteDialog = () => {
 		setDataSourceToDelete( null );
@@ -70,6 +73,28 @@ const DataSourceList = () => {
 		newUrl.searchParams.set( 'editDataSource', uuidToEdit );
 		pushState( newUrl );
 	};
+
+	useEffect( () => {
+		/**
+		 * Track view when transitioning from loading to loaded state.
+		 */
+		if ( wasLoading.current && ! loadingDataSources ) {
+			sendTracksEvent( 'view_data_sources', {
+				total_data_sources_count: dataSources.length,
+				code_configured_data_sources_count: dataSources.filter(
+					ds => ds.config_source === ConfigSource.CODE
+				).length,
+				ui_configured_data_sources_count: dataSources.filter(
+					ds => ds.config_source === ConfigSource.STORAGE
+				).length,
+				constants_configured_data_sources_count: dataSources.filter(
+					ds => ds.config_source === ConfigSource.CONSTANTS
+				).length,
+			} );
+		}
+
+		wasLoading.current = loadingDataSources;
+	}, [ dataSources, loadingDataSources ] );
 
 	const onConfirmDeleteDataSource = async ( source: DataSourceConfig | DataSourceConfig[] ) => {
 		if ( Array.isArray( source ) ) {
@@ -265,7 +290,7 @@ const DataSourceList = () => {
 				icon={ info }
 				label={ __( 'No data source found.', 'remote-data-blocks' ) }
 				instructions={ __(
-					'Use the “Connect New” button to add a data source.',
+					'Use the "Connect New" button to add a data source.',
 					'remote-data-blocks'
 				) }
 			/>

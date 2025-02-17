@@ -28,6 +28,12 @@ interface TRACKS_EVENTS {
 		data_source_type: string;
 		is_pattern_synced: boolean;
 	};
+	view_data_sources: {
+		total_data_sources_count: number;
+		code_configured_data_sources_count: number;
+		ui_configured_data_sources_count: number;
+		constants_configured_data_sources_count: number;
+	};
 }
 
 const TRACKS_EVENT_PREFIX = 'remotedatablocks_';

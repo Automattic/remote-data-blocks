@@ -162,8 +162,6 @@ class DataSourceController extends WP_REST_Controller {
 	public function get_items( mixed $request ): WP_REST_Response|WP_Error {
 		$data_sources = DataSourceConfigManager::get_all();
 
-		DataSourceTelemetry::track_view( $data_sources );
-
 		return rest_ensure_response( $data_sources );
 	}
 
