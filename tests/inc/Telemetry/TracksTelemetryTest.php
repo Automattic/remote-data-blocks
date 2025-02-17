@@ -256,7 +256,7 @@ class TracksTelemetryTest extends TestCase {
 
 	public function testRecordEventTracksTheEventIfInstanceIsSet(): void {
 		$mock_tracks = $this->getMockBuilder( MockTracks::class )->onlyMethods( [ 'record_event' ] )->getMock();
-		$mock_tracks->expects( $this->exactly( 1 ) )->method( 'record_event' )->with( 'event_name', [ 'event_props' ] );
+		$mock_tracks->expects( $this->exactly( 1 ) )->method( 'record_event' )->with( 'remotedatablocks_event_name', [ 'event_props' ] );
 		/** @var TracksTelemetry|MockObject */
 		$obj = new TracksTelemetry();
 		set_private_property( TracksTelemetry::class, $obj, 'instance', $mock_tracks );

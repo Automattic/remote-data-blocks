@@ -8,8 +8,8 @@ use RemoteDataBlocks\Config\DataSource\DataSourceConfigManager;
 defined( 'ABSPATH' ) || exit();
 
 class DataSourceTelemetry {
-	const DATA_SOURCE_INTERACTION_EVENT_NAME = 'remotedatablocks_data_source_interaction';
-	const DATA_SOURCE_VIEW_EVENT_NAME = 'remotedatablocks_view_data_sources';
+	const DATA_SOURCE_INTERACTION_EVENT_NAME = 'data_source_interaction';
+	const DATA_SOURCE_VIEW_EVENT_NAME = 'view_data_sources';
 	const DATA_SOURCE_VIEW_TRACK_TRANSIENT_KEY = 'remotedatablocks_view_data_sources_tracked';
 
 	private static function get_interaction_track_props( array $config ): array {

@@ -39,13 +39,13 @@ describe( 'sendTracksEvent', () => {
 	it( 'should not record event if Tracks global properties is not defined', () => {
 		window.REMOTE_DATA_BLOCKS = { config: {}, rest_url: '', tracks_global_properties: undefined };
 
-		sendTracksEvent( 'remotedatablocks_field_shortcode', { action: 'value' } );
+		sendTracksEvent( 'field_shortcode', { action: 'value' } );
 
 		expect( recordTracksEvent ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should not track if vip_env is local', () => {
-		sendTracksEvent( 'remotedatablocks_field_shortcode', { action: 'value' } );
+		sendTracksEvent( 'field_shortcode', { action: 'value' } );
 
 		expect( recordTracksEvent ).not.toHaveBeenCalled();
 	} );
@@ -56,7 +56,7 @@ describe( 'sendTracksEvent', () => {
 			vip_env: 'production',
 		} );
 
-		sendTracksEvent( 'remotedatablocks_field_shortcode', { action: 'actionName' } );
+		sendTracksEvent( 'field_shortcode', { action: 'actionName' } );
 
 		expect( recordTracksEvent ).toHaveBeenCalledTimes( 1 );
 		expect( recordTracksEvent ).toHaveBeenCalledWith( 'remotedatablocks_field_shortcode', {

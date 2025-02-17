@@ -10,6 +10,8 @@ use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
  * Class to implement Tracks Telemetry.
  */
 class TracksTelemetry {
+	private const TRACKS_EVENT_PREFIX = 'remotedatablocks_';
+
 	/**
 	 * The tracks instance (not using Tracks as type because it is present in MU Plugins codebase).
 	 */
@@ -69,7 +71,7 @@ class TracksTelemetry {
 			return;
 		}
 
-		self::record_event( 'remotedatablocks_plugin_toggle', [ 'action' => 'activate' ] );
+		self::record_event( 'plugin_toggle', [ 'action' => 'activate' ] );
 	}
 
 	/**
@@ -82,7 +84,7 @@ class TracksTelemetry {
 			return;
 		}
 
-		self::record_event( 'remotedatablocks_plugin_toggle', [ 'action' => 'deactivate' ] );
+		self::record_event( 'plugin_toggle', [ 'action' => 'deactivate' ] );
 	}
 
 	/**
@@ -125,7 +127,7 @@ class TracksTelemetry {
 			$track_props['remote_data_blocks_total_count'] = ( $track_props['remote_data_blocks_total_count'] ?? 0 ) + 1;
 		}
 
-		self::record_event( 'remotedatablocks_blocks_usage_stats', $track_props );
+		self::record_event( 'blocks_usage_stats', $track_props );
 	}
 
 	/**
@@ -140,6 +142,8 @@ class TracksTelemetry {
 		if ( ! isset( self::$instance ) ) {
 			return false;
 		}
+
+		$event_name = self::TRACKS_EVENT_PREFIX . $event_name;
 
 		self::$instance->record_event( $event_name, $props );
 
