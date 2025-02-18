@@ -465,7 +465,7 @@ class DataSourceConfigManagerTest extends TestCase {
 		$this->assertEmpty( $result );
 	}
 
-	public function testGetAllIgnoresUnsupportedFilters(): void {
+	public function testGetAllThrowsErrorForUnsupportedFilters(): void {
 		$mock_storage_crud = Mockery::mock( 'alias:' . DataSourceCrud::class );
 		$mock_storage_crud->shouldReceive( 'get_configs' )
 			->andReturn( [ $this->airtable_storage_config ] );
@@ -478,15 +478,42 @@ class DataSourceConfigManagerTest extends TestCase {
 		$mock_config_store->shouldReceive( 'get_data_sources_as_array' )
 			->andReturn( [] );
 
-		// Filter by display_name (unsupported) and service (supported)
+		// Test that an unsupported filter key throws an error
+		$result = DataSourceConfigManager::get_all( [
+			'display_name' => 'Test Airtable',
+		] );
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		/** @var WP_Error $result */
+		$this->assertSame( 'invalid_filter', $result->get_error_code() );
+		$this->assertSame( 'Invalid filter key: display_name', $result->get_error_message() );
+		$this->assertSame( 400, $result->get_error_data()['status'] );
+	}
+
+	public function testGetAllWithMultipleFiltersIncludingInvalid(): void {
+		$mock_storage_crud = Mockery::mock( 'alias:' . DataSourceCrud::class );
+		$mock_storage_crud->shouldReceive( 'get_configs' )
+			->andReturn( [ $this->airtable_storage_config ] );
+
+		$mock_constant = Mockery::mock( 'alias:' . ConstantConfigStore::class );
+		$mock_constant->shouldReceive( 'get_configs' )
+			->andReturn( [] );
+
+		$mock_config_store = Mockery::mock( 'alias:' . ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_data_sources_as_array' )
+			->andReturn( [] );
+
+		// Test that even with a valid filter, an invalid one still causes an error
 		$result = DataSourceConfigManager::get_all( [
 			'service' => self::AIRTABLE_SERVICE,
 			'display_name' => 'Test Airtable',
 		] );
-		
-		// Should still return the config since display_name filter is ignored
-		$this->assertCount( 1, $result );
-		$this->assertContains( $this->airtable_storage_config, $result );
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		/** @var WP_Error $result */
+		$this->assertSame( 'invalid_filter', $result->get_error_code() );
+		$this->assertSame( 'Invalid filter key: display_name', $result->get_error_message() );
+		$this->assertSame( 400, $result->get_error_data()['status'] );
 	}
 
 	public function testGetAllHandlesNullEnableBlocksValue(): void {

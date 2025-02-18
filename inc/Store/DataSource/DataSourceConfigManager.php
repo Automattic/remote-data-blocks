@@ -82,7 +82,7 @@ class DataSourceConfigManager {
 	 *   }
 	 * }>
 	 */
-	public static function get_all( array $filters = [] ): array {
+	public static function get_all( array $filters = [] ): array|WP_Error {
 		$code_configured = self::get_all_from_code();
 		$constant_configured = self::get_all_from_constant();
 		$storage_configured = self::get_all_from_storage();
@@ -99,7 +99,7 @@ class DataSourceConfigManager {
 			array_merge( $code_configured, $constant_configured, $storage_configured )
 		);
 
-		return self::apply_filters( $configs, $filters );
+		return self::apply_config_array_filters( $configs, $filters );
 	}
 
 	/**
@@ -110,28 +110,43 @@ class DataSourceConfigManager {
 	 *   service?: string,
 	 *   enable_blocks?: bool
 	 * } $filters The filters to apply.
-	 * @return array The filtered configs.
+	 * @return array|WP_Error The filtered configs or WP_Error if invalid filter.
 	 */
-	private static function apply_filters( array $configs, array $filters ): array {
+	private static function apply_config_array_filters( array $configs, array $filters ): array|WP_Error {
 		if ( empty( $filters ) ) {
 			return $configs;
 		}
 
-		return array_filter( $configs, function ( array $config ) use ( $filters ): bool {
-			foreach ( $filters as $key => $value ) {
-				$passes_filter = match ( $key ) {
-					'service' => $config['service'] === $value,
-					'enable_blocks' => ( $config['service_config']['enable_blocks'] ?? false ) === $value,
-					default => true,
-				};
-
-				if ( ! $passes_filter ) {
-					return false;
-				}
+		/**
+		 * Validate all filter keys.
+		 */
+		foreach ( $filters as $key => $value ) {
+			if ( ! in_array( $key, [ 'service', 'enable_blocks' ], true ) ) {
+				return new WP_Error(
+					'invalid_filter',
+					sprintf( 'Invalid filter key: %s', $key ),
+					[ 'status' => 400 ]
+				);
 			}
+		}
 
-			return true;
-		} );
+		return array_filter(
+			$configs,
+			function ( array $config ) use ( $filters ): bool {
+				foreach ( $filters as $key => $value ) {
+					$passes_filter = match ( $key ) {
+						'service' => $config['service'] === $value,
+						'enable_blocks' => ( $config['service_config']['enable_blocks'] ?? false ) === $value,
+						default => true, // Should never reach here due to validation above
+					};
+
+					if ( ! $passes_filter ) {
+						return false;
+					}
+				}
+				return true;
+			}
+		);
 	}
 
 	/**
