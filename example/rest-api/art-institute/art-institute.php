@@ -35,16 +35,12 @@ function register_aic_block(): void {
 			// Extract artwork IDs from input variables:
 			// - If a single input is provided directly, wrap the id in an array
 			// - Otherwise, process an array of inputs to extract the id fields
-			$ids = [];
-			if ( isset( $input_variables['id'] ) ) {
-				$ids[] = $input_variables['id'];
-			} else {
-				foreach ( $input_variables as $input ) {
-					if ( isset( $input['id'] ) ) {
-						$ids[] = is_array( $input['id'] ) ? reset( $input['id'] ) : $input['id'];
-					}
-				}
-			}
+			$ids = isset($input_variables['id']) 
+				? [$input_variables['id']]
+				: array_map(
+					fn($input) => is_array($input['id']) ? reset($input['id']) : $input['id'],
+					array_filter($input_variables, fn($input) => is_array($input) && isset($input['id']))
+				);
 
 			if ( !empty( $ids ) ) {
 				return add_query_arg([
