@@ -4,7 +4,6 @@ import { useEffect, useState } from '@wordpress/element';
 import { REMOTE_DATA_REST_API_URL } from '@/blocks/remote-data-container/config/constants';
 import { usePaginationVariables } from '@/blocks/remote-data-container/hooks/usePaginationVariables';
 import { useSearchVariables } from '@/blocks/remote-data-container/hooks/useSearchVariables';
-import { getBlockConfig } from '@/utils/localized-block-data';
 
 async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< RemoteData | null > {
 	const { body } = await apiFetch< RemoteDataApiResponse >( {
@@ -134,44 +133,6 @@ export function useRemoteData( {
 
 	async function fetch( queryInput: RemoteDataQueryInput ): Promise< void > {
 		setLoading( true );
-
-		const blockConfig = getBlockConfig( blockName );
-
-		// Currently, it's matching against one selector only but there could be multiple selectors.
-		const selector = blockConfig?.selectors?.find(
-			querySelector => querySelector.query_key === queryKey
-		);
-
-		if ( selector ) {
-			const requiredFields = selector.inputs.filter( input => {
-				// input is not required, so it's not a problem if it's not provided.
-				if ( ! input.required ) {
-					return false;
-				}
-
-				// if the input required is search, then we need to only give back true if the searchInput is empty.
-				if ( input.slug === 'search' ) {
-					return searchInput.length === 0;
-				}
-
-				// input required should exist in the queryInput.
-				return ! queryInput[ input.slug ];
-			} );
-
-			if ( requiredFields.length > 0 ) {
-				const resolvedDataNew = {
-					blockName,
-					isCollection: true,
-					metadata: {},
-					queryInput,
-					resultId: '',
-					results: [],
-				};
-				resolvedUpdater( resolvedDataNew );
-				setLoading( false );
-				return;
-			}
-		}
 
 		const requestData: RemoteDataApiRequest = {
 			block_name: blockName,

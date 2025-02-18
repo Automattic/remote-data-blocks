@@ -25,7 +25,7 @@ class SalesforceD2CAuth {
 		string $client_id,
 		string $client_secret
 	): string|WP_Error {
-		return self::get_saved_access_token( $client_id ) ?? self::get_token_using_client_credentials( $client_id, $client_secret, $endpoint );
+		return /* self::get_saved_access_token( $client_id ) ?? */ self::get_token_using_client_credentials( $client_id, $client_secret, $endpoint );
 	}
 
 	/**
