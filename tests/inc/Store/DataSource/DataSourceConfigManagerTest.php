@@ -124,61 +124,6 @@ class DataSourceConfigManagerTest extends TestCase {
 		parent::tearDown();
 	}
 
-	public function testGetAllConfiguredByServiceReturnsEmptyArrayWhenNoConfigsExist(): void {
-		$mock_storage_crud = Mockery::mock( 'alias:' . DataSourceCrud::class );
-		$mock_storage_crud->shouldReceive( 'get_configs' )
-			->andReturn( [] );
-
-		$mock_constant = Mockery::mock( 'alias:' . ConstantConfigStore::class );
-		$mock_constant->shouldReceive( 'get_configs' )
-			->andReturn( [] );
-
-		$result = DataSourceConfigManager::get_all_configured_by_service( self::AIRTABLE_SERVICE );
-		$this->assertEmpty( $result );
-	}
-
-	public function testGetAllConfiguredByServiceFiltersConfigsByService(): void {
-		$sheets_storage_config = array_merge( $this->airtable_storage_config, [
-			'uuid' => '12345678-1234-1234-1234-123456789012',
-			'service' => self::SHEETS_SERVICE,
-		] );
-
-		$shopify_constant_config = array_merge( $this->sheets_constant_config, [
-			'uuid' => '98765432-9876-9876-9876-987654321098',
-			'service' => self::SHOPIFY_SERVICE,
-		] );
-
-		$mock_storage_crud = Mockery::mock( 'alias:' . DataSourceCrud::class );
-		$mock_storage_crud->shouldReceive( 'get_configs' )
-			->andReturn( [ $this->airtable_storage_config, $sheets_storage_config ] );
-
-		$mock_constant = Mockery::mock( 'alias:' . ConstantConfigStore::class );
-		$mock_constant->shouldReceive( 'get_configs' )
-			->andReturn( [ $this->sheets_constant_config, $shopify_constant_config ] );
-
-		// Test filtering Sheets service
-		$sheets_result = DataSourceConfigManager::get_all_configured_by_service( self::SHEETS_SERVICE );
-		$this->assertCount( 2, $sheets_result );
-		$this->assertContains( $sheets_storage_config, $sheets_result );
-		$this->assertContains( $this->sheets_constant_config, $sheets_result );
-		$this->assertNotContains( $this->airtable_storage_config, $sheets_result );
-		$this->assertNotContains( $shopify_constant_config, $sheets_result );
-
-		// Test filtering Airtable service
-		$airtable_result = DataSourceConfigManager::get_all_configured_by_service( self::AIRTABLE_SERVICE );
-		$this->assertCount( 1, $airtable_result );
-		$this->assertContains( $this->airtable_storage_config, $airtable_result );
-		$this->assertNotContains( $sheets_storage_config, $airtable_result );
-		$this->assertNotContains( $this->sheets_constant_config, $airtable_result );
-
-		// Test filtering Shopify service
-		$shopify_result = DataSourceConfigManager::get_all_configured_by_service( self::SHOPIFY_SERVICE );
-		$this->assertCount( 1, $shopify_result );
-		$this->assertContains( $shopify_constant_config, $shopify_result );
-		$this->assertNotContains( $this->airtable_storage_config, $shopify_result );
-		$this->assertNotContains( $sheets_storage_config, $shopify_result );
-	}
-
 	public function testGetAllReturnsConfigsFromAllSources(): void {
 		$mock_storage_crud = Mockery::mock( 'alias:' . DataSourceCrud::class );
 		$mock_storage_crud->shouldReceive( 'get_configs' )
@@ -358,32 +303,218 @@ class DataSourceConfigManagerTest extends TestCase {
 		$this->assertNotContains( $code_sheets, $result );
 	}
 
-	public function testGetAllConfiguredByServiceHandlesPrecedenceCorrectly(): void {
-		// Create storage config with same UUID as constant config
-		$storage_sheets = array_merge( $this->sheets_constant_config, [
-			'service_config' => array_merge( $this->sheets_constant_config['service_config'], [
-				'display_name' => 'Storage Sheets',
-			] ),
-			'config_source' => DataSourceConfigManager::CONFIG_SOURCE_STORAGE,
+	public function testGetAllWithServiceFilter(): void {
+		$mock_storage_crud = Mockery::mock( 'alias:' . DataSourceCrud::class );
+		$mock_storage_crud->shouldReceive( 'get_configs' )
+			->andReturn( [ $this->airtable_storage_config ] );
+
+		$mock_constant = Mockery::mock( 'alias:' . ConstantConfigStore::class );
+		$mock_constant->shouldReceive( 'get_configs' )
+			->andReturn( [ $this->sheets_constant_config ] );
+
+		$mock_config_store = Mockery::mock( 'alias:' . ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_data_sources_as_array' )
+			->andReturn( [ $this->shopify_code_config ] );
+
+		$result = DataSourceConfigManager::get_all( [ 'service' => self::AIRTABLE_SERVICE ] );
+		
+		$this->assertCount( 1, $result );
+		$this->assertContains( $this->airtable_storage_config, $result );
+	}
+
+	public function testGetAllWithEnableBlocksFilterTrue(): void {
+		// Modify one config to have enable_blocks false
+		$sheets_config_blocks_disabled = array_merge_recursive( $this->sheets_constant_config, [
+			'service_config' => [ 'enable_blocks' => false ],
 		] );
 
 		$mock_storage_crud = Mockery::mock( 'alias:' . DataSourceCrud::class );
 		$mock_storage_crud->shouldReceive( 'get_configs' )
-			->once()
-			->andReturn( [ $storage_sheets ] );
+			->andReturn( [ $this->airtable_storage_config ] );
 
 		$mock_constant = Mockery::mock( 'alias:' . ConstantConfigStore::class );
 		$mock_constant->shouldReceive( 'get_configs' )
-			->once()
+			->andReturn( [ $sheets_config_blocks_disabled ] );
+
+		$mock_config_store = Mockery::mock( 'alias:' . ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_data_sources_as_array' )
+			->andReturn( [ $this->shopify_code_config ] );
+
+		$result = DataSourceConfigManager::get_all( [ 'enable_blocks' => true ] );
+		
+		$this->assertCount( 2, $result );
+		$this->assertContains( $this->airtable_storage_config, $result );
+		$this->assertContains( $this->shopify_code_config, $result );
+		$this->assertNotContains( $sheets_config_blocks_disabled, $result );
+	}
+
+	public function testGetAllWithEnableBlocksFilterFalse(): void {
+		// Create config with enable_blocks not set
+		$shopify_config_blocks_unset = $this->shopify_code_config;
+		unset( $shopify_config_blocks_unset['service_config']['enable_blocks'] );
+
+		$mock_storage_crud = Mockery::mock( 'alias:' . DataSourceCrud::class );
+		$mock_storage_crud->shouldReceive( 'get_configs' )
+			->andReturn( [ $this->airtable_storage_config ] );
+
+		$mock_constant = Mockery::mock( 'alias:' . ConstantConfigStore::class );
+		$mock_constant->shouldReceive( 'get_configs' )
 			->andReturn( [ $this->sheets_constant_config ] );
 
-		$result = DataSourceConfigManager::get_all_configured_by_service( self::SHEETS_SERVICE );
+		$mock_config_store = Mockery::mock( 'alias:' . ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_data_sources_as_array' )
+			->andReturn( [ $shopify_config_blocks_unset ] );
 
-		// Should only get one config since they share the same UUID
-		$this->assertCount( 1, $result );
+		$result = DataSourceConfigManager::get_all( [ 'enable_blocks' => false ] );
 		
-		// Storage should win due to highest precedence
-		$this->assertContains( $storage_sheets, $result );
-		$this->assertNotContains( $this->sheets_constant_config, $result );
+		$this->assertCount( 1, $result );
+		$this->assertContains( $shopify_config_blocks_unset, $result );
+	}
+
+	public function testGetAllWithMultipleFilters(): void {
+		$mock_storage_crud = Mockery::mock( 'alias:' . DataSourceCrud::class );
+		$mock_storage_crud->shouldReceive( 'get_configs' )
+			->andReturn( [ $this->airtable_storage_config ] );
+
+		$mock_constant = Mockery::mock( 'alias:' . ConstantConfigStore::class );
+		$mock_constant->shouldReceive( 'get_configs' )
+			->andReturn( [ $this->sheets_constant_config ] );
+
+		$mock_config_store = Mockery::mock( 'alias:' . ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_data_sources_as_array' )
+			->andReturn( [ $this->shopify_code_config ] );
+
+		$result = DataSourceConfigManager::get_all( [
+			'service' => self::AIRTABLE_SERVICE,
+			'enable_blocks' => true,
+		] );
+		
+		$this->assertCount( 1, $result );
+		$this->assertContains( $this->airtable_storage_config, $result );
+	}
+
+	public function testGetAllReturnsEmptyWhenServiceDoesNotMatch(): void {
+		// Only return configs for sheets and shopify, but search for airtable
+		$mock_storage_crud = Mockery::mock( 'alias:' . DataSourceCrud::class );
+		$mock_storage_crud->shouldReceive( 'get_configs' )
+			->andReturn( [ $this->sheets_constant_config ] );
+
+		$mock_constant = Mockery::mock( 'alias:' . ConstantConfigStore::class );
+		$mock_constant->shouldReceive( 'get_configs' )
+			->andReturn( [ $this->shopify_code_config ] );
+
+		$mock_config_store = Mockery::mock( 'alias:' . ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_data_sources_as_array' )
+			->andReturn( [] );
+
+		$result = DataSourceConfigManager::get_all( [ 'service' => self::AIRTABLE_SERVICE ] );
+		
+		$this->assertCount( 0, $result );
+		$this->assertEmpty( $result );
+	}
+
+	public function testGetAllReturnsEmptyWhenEnableBlocksDoesNotMatch(): void {
+		// Set all configs to have enable_blocks = true
+		$airtable_config = array_merge_recursive( $this->airtable_storage_config, [
+			'service_config' => [ 'enable_blocks' => true ],
+		] );
+		$sheets_config = array_merge_recursive( $this->sheets_constant_config, [
+			'service_config' => [ 'enable_blocks' => true ],
+		] );
+		$shopify_config = array_merge_recursive( $this->shopify_code_config, [
+			'service_config' => [ 'enable_blocks' => true ],
+		] );
+
+		$mock_storage_crud = Mockery::mock( 'alias:' . DataSourceCrud::class );
+		$mock_storage_crud->shouldReceive( 'get_configs' )
+			->andReturn( [ $airtable_config ] );
+
+		$mock_constant = Mockery::mock( 'alias:' . ConstantConfigStore::class );
+		$mock_constant->shouldReceive( 'get_configs' )
+			->andReturn( [ $sheets_config ] );
+
+		$mock_config_store = Mockery::mock( 'alias:' . ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_data_sources_as_array' )
+			->andReturn( [ $shopify_config ] );
+
+		$result = DataSourceConfigManager::get_all( [ 'enable_blocks' => false ] );
+		
+		$this->assertCount( 0, $result );
+		$this->assertEmpty( $result );
+	}
+
+	public function testGetAllReturnsEmptyWhenMultipleFiltersDoNotMatch(): void {
+		$mock_storage_crud = Mockery::mock( 'alias:' . DataSourceCrud::class );
+		$mock_storage_crud->shouldReceive( 'get_configs' )
+			->andReturn( [ $this->airtable_storage_config ] );
+
+		$mock_constant = Mockery::mock( 'alias:' . ConstantConfigStore::class );
+		$mock_constant->shouldReceive( 'get_configs' )
+			->andReturn( [ $this->sheets_constant_config ] );
+
+		$mock_config_store = Mockery::mock( 'alias:' . ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_data_sources_as_array' )
+			->andReturn( [ $this->shopify_code_config ] );
+
+		$result = DataSourceConfigManager::get_all( [
+			'service' => self::AIRTABLE_SERVICE,
+			'enable_blocks' => false,
+		] );
+		
+		$this->assertCount( 0, $result );
+		$this->assertEmpty( $result );
+	}
+
+	public function testGetAllIgnoresUnsupportedFilters(): void {
+		$mock_storage_crud = Mockery::mock( 'alias:' . DataSourceCrud::class );
+		$mock_storage_crud->shouldReceive( 'get_configs' )
+			->andReturn( [ $this->airtable_storage_config ] );
+
+		$mock_constant = Mockery::mock( 'alias:' . ConstantConfigStore::class );
+		$mock_constant->shouldReceive( 'get_configs' )
+			->andReturn( [] );
+
+		$mock_config_store = Mockery::mock( 'alias:' . ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_data_sources_as_array' )
+			->andReturn( [] );
+
+		// Filter by display_name (unsupported) and service (supported)
+		$result = DataSourceConfigManager::get_all( [
+			'service' => self::AIRTABLE_SERVICE,
+			'display_name' => 'Test Airtable',
+		] );
+		
+		// Should still return the config since display_name filter is ignored
+		$this->assertCount( 1, $result );
+		$this->assertContains( $this->airtable_storage_config, $result );
+	}
+
+	public function testGetAllHandlesNullEnableBlocksValue(): void {
+		// Create config with enable_blocks explicitly set to null
+		$config_with_null_blocks = array_replace_recursive( $this->airtable_storage_config, [
+			'service_config' => [ 'enable_blocks' => null ],
+		] );
+
+		$mock_storage_crud = Mockery::mock( 'alias:' . DataSourceCrud::class );
+		$mock_storage_crud->shouldReceive( 'get_configs' )
+			->andReturn( [ $config_with_null_blocks ] );
+
+		$mock_constant = Mockery::mock( 'alias:' . ConstantConfigStore::class );
+		$mock_constant->shouldReceive( 'get_configs' )
+			->andReturn( [] );
+
+		$mock_config_store = Mockery::mock( 'alias:' . ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_data_sources_as_array' )
+			->andReturn( [] );
+
+		// Should match when filtering for enable_blocks = false
+		$result_false = DataSourceConfigManager::get_all( [ 'enable_blocks' => false ] );
+		$this->assertCount( 1, $result_false );
+		$this->assertContains( $config_with_null_blocks, $result_false );
+
+		// Should not match when filtering for enable_blocks = true
+		$result_true = DataSourceConfigManager::get_all( [ 'enable_blocks' => true ] );
+		$this->assertCount( 0, $result_true );
+		$this->assertEmpty( $result_true );
 	}
 }

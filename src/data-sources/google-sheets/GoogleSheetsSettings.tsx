@@ -275,7 +275,7 @@ export const GoogleSheetsSettings = ( {
 			</DataSourceForm.Scope>
 			<DataSourceForm.Blocks
 				handleOnChange={ handleOnChange }
-				hasEnabledBlocks={ state.enable_blocks ?? true }
+				hasEnabledBlocks={ Boolean( state.enable_blocks ) }
 			/>
 		</DataSourceForm>
 	);

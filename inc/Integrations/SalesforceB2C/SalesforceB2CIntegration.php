@@ -14,17 +14,14 @@ class SalesforceB2CIntegration {
 	}
 
 	public static function register_blocks(): void {
-		$data_source_configs = DataSourceConfigManager::get_all_configured_by_service(
-			REMOTE_DATA_BLOCKS_SALESFORCE_B2C_SERVICE
-		);
+		$data_source_configs = DataSourceConfigManager::get_all( [
+			'service' => REMOTE_DATA_BLOCKS_SALESFORCE_B2C_SERVICE,
+			'enable_blocks' => true,
+		] );
 
 		foreach ( $data_source_configs as $config ) {
 			$data_source = SalesforceB2CDataSource::from_array( $config );
-	
-			if ( false === ( $config['service_config']['enable_blocks'] ?? true ) ) {
-				continue;
-			}
-			
+
 			self::register_blocks_for_salesforce_data_source( $data_source );
 		}
 	}

@@ -110,7 +110,7 @@ export const SalesforceB2CSettings = ( {
 			</DataSourceForm.Setup>
 			<DataSourceForm.Blocks
 				handleOnChange={ handleOnChange }
-				hasEnabledBlocks={ state.enable_blocks ?? true }
+				hasEnabledBlocks={ Boolean( state.enable_blocks ) }
 			/>
 		</DataSourceForm>
 	);

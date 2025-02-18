@@ -59,8 +59,18 @@ class DataSourceConfigManager {
 	}
 
 	/**
-	 * Get all data sources from all origins.
+	 * Get all data sources from all origins with optional filters.
 	 * 
+	 * Supported filters:
+	 * - service: Filter by service name (e.g. 'airtable', 'google-sheets', 'shopify')
+	 * - enable_blocks: Filter by blocks enabled status (false matches with null/false and true matches with true)
+	 * 
+	 * Any unsupported filter keys will be ignored.
+	 * 
+	 * @param array{
+	 *   service?: string,
+	 *   enable_blocks?: bool
+	 * } $filters Optional filters to apply to the results.
 	 * @return array<array{
 	 *   uuid?: string,
 	 *   service: string,
@@ -72,7 +82,7 @@ class DataSourceConfigManager {
 	 *   }
 	 * }>
 	 */
-	public static function get_all(): array {
+	public static function get_all( array $filters = [] ): array {
 		$code_configured = self::get_all_from_code();
 		$constant_configured = self::get_all_from_constant();
 		$storage_configured = self::get_all_from_storage();
@@ -85,9 +95,43 @@ class DataSourceConfigManager {
 		 * - Constant-configured data sources
 		 * - Storage-configured data sources
 		 */
-		return self::de_duplicate_configs(
+		$configs = self::de_duplicate_configs(
 			array_merge( $code_configured, $constant_configured, $storage_configured )
 		);
+
+		return self::apply_filters( $configs, $filters );
+	}
+
+	/**
+	 * Apply filters to an array of configs.
+	 *
+	 * @param array $configs The configs to filter.
+	 * @param array{
+	 *   service?: string,
+	 *   enable_blocks?: bool
+	 * } $filters The filters to apply.
+	 * @return array The filtered configs.
+	 */
+	private static function apply_filters( array $configs, array $filters ): array {
+		if ( empty( $filters ) ) {
+			return $configs;
+		}
+
+		return array_filter( $configs, function ( array $config ) use ( $filters ): bool {
+			foreach ( $filters as $key => $value ) {
+				$passes_filter = match ( $key ) {
+					'service' => $config['service'] === $value,
+					'enable_blocks' => ( $config['service_config']['enable_blocks'] ?? false ) === $value,
+					default => true,
+				};
+
+				if ( ! $passes_filter ) {
+					return false;
+				}
+			}
+
+			return true;
+		} );
 	}
 
 	/**
@@ -200,41 +244,5 @@ class DataSourceConfigManager {
 	 */
 	public static function delete( string $uuid ): bool|WP_Error {
 		return DataSourceCrud::delete_config_by_uuid( $uuid );
-	}
-
-	/**
-	 * Get all configured data sources for a specific service from both storage and constants.
-	 * This includes sources configured via storage and constants, but not those defined in code.
-	 * 
-	 * @param string $service The service identifier to filter by.
-	 * @return array<array{
-	 *   uuid?: string,
-	 *   service: string,
-	 *   service_config: array<string, mixed>,
-	 *   config_source: string,
-	 *   __metadata?: array{
-	 *     created_at: string,
-	 *     updated_at: string
-	 *   }
-	 * }>
-	 */
-	public static function get_all_configured_by_service( string $service ): array {
-		$storage_configs = self::get_all_from_storage();
-		$constant_configs = self::get_all_from_constant();
-
-		$all_configs = array_merge( $constant_configs, $storage_configs );
-
-		/**
-		 * De-duplicate configs.
-		 * 
-		 * Precedence (lowest to highest):
-		 * - Constant-configured data sources
-		 * - Storage-configured data sources
-		 */
-		$de_duplicated_configs = self::de_duplicate_configs( $all_configs );
-
-		return array_filter( $de_duplicated_configs, function ( array $config ) use ( $service ) {
-			return $config['service'] === $service;
-		} );
 	}
 }
