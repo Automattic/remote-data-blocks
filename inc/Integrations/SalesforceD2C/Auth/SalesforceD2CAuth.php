@@ -25,7 +25,7 @@ class SalesforceD2CAuth {
 		string $client_id,
 		string $client_secret
 	): string|WP_Error {
-		return /* self::get_saved_access_token( $client_id ) ??  */self::get_token_using_client_credentials( $client_id, $client_secret, $endpoint );
+		return self::get_saved_access_token( $client_id ) ?? self::get_token_using_client_credentials( $client_id, $client_secret, $endpoint );
 	}
 
 	/**
@@ -75,14 +75,54 @@ class SalesforceD2CAuth {
 		}
 
 		$access_token = $response_data['access_token'];
-		self::save_access_token( $access_token, $client_id );
+
+		$client_introspect_url = sprintf( '%s/services/oauth2/introspect', $endpoint );
+		$client_credentials = base64_encode( sprintf( '%s:%s', $client_id, $client_secret ) );
+
+
+		$client_introspect_response = wp_remote_post($client_introspect_url, [
+			'body' => [
+				'token' => $access_token,
+			],
+			'headers' => [
+				'Content-Type' => 'application/x-www-form-urlencoded',
+				'Authorization' => 'Basic ' . $client_credentials,
+			],
+		]);
+
+		if ( is_wp_error( $client_introspect_response ) ) {
+			return new WP_Error(
+				'salesforce_d2c_auth_error_client_credentials',
+				__( 'Failed to introspect token', 'remote-data-blocks' )
+			);
+		}
+
+		$response_code = wp_remote_retrieve_response_code( $client_introspect_response );
+		$response_body = wp_remote_retrieve_body( $client_introspect_response );
+		$response_data = json_decode( $response_body, true );
+
+		if ( 400 === $response_code || 401 === $response_code ) {
+			return new WP_Error(
+				'salesforce_d2c_auth_error_client_credentials',
+				/* translators: %s: Technical error message from API containing failure reason */
+				sprintf( __( 'Failed to introspect token: "%s"', 'remote-data-blocks' ), $response_data['message'] )
+			);
+		}
+
+		$expiry_time = $response_data['exp'];
+
+		self::save_access_token( $access_token, $client_id, $expiry_time );
 
 		return $access_token;
 	}
 
-	private static function save_access_token( string $access_token, string $client_id ): void {
+	private static function save_access_token( string $access_token, string $client_id, int $expiry_time ): void {
+		// Expires 10 seconds early as a buffer for request time and drift
+		$access_token_expires_in = $expiry_time - 10;
+
 		$access_token_data = [
 			'token' => $access_token,
+			'expires_at' => time() + $access_token_expires_in,
 		];
 
 		$access_token_cache_key = self::get_access_token_key( $client_id );
@@ -91,7 +131,8 @@ class SalesforceD2CAuth {
 			$access_token_cache_key,
 			$access_token_data,
 			'oauth-tokens',
-			60 * 60 * 24 * 1, // 1 day by default as there's no expiration time in the response
+			// phpcs:ignore WordPressVIPMinimum.Performance.LowExpiryCacheTime.CacheTimeUndetermined -- 'expires_in' defaults to 30 minutes for access tokens.
+			$access_token_expires_in,
 		);
 	}
 
