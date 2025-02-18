@@ -143,22 +143,27 @@ export function useRemoteData( {
 		);
 
 		if ( selector ) {
-			const requiredFields = selector.inputs.filter(
-				input => input.required && ! queryInput[ input.slug ]
-			);
+			const requiredFields = selector.inputs.filter( input => {
+				// input is not required, so it's not a problem if it's not provided.
+				if ( ! input.required ) {
+					return false;
+				}
+
+				// if the input required is search, then we need to only give back true if the searchInput is empty.
+				if ( input.slug === 'search' ) {
+					return searchInput.length === 0;
+				}
+
+				// input required should exist in the queryInput.
+				return ! queryInput[ input.slug ];
+			} );
 
 			if ( requiredFields.length > 0 ) {
-				// This is necessary so that subsequent requests work. But, this creates a bug where the first search doesn't work.
-				// So, we need to find a way to make the first search work.
 				const resolvedDataNew = {
 					blockName,
 					isCollection: true,
 					metadata: {},
-					queryInput: {
-						...queryInput,
-						...paginationQueryInput,
-						...searchQueryInput,
-					},
+					queryInput,
 					resultId: '',
 					results: [],
 				};
