@@ -134,10 +134,12 @@ class DataSourceConfigManager {
 			$configs,
 			function ( array $config ) use ( $filters ): bool {
 				foreach ( $filters as $key => $value ) {
+					/** @var string $key Either 'service' or 'enable_blocks' */
+					/** @var string|bool $value String for service, bool for enable_blocks */
+					/** @var bool $passes_filter The result of the match expression */
 					$passes_filter = match ( $key ) {
 						'service' => $config['service'] === $value,
 						'enable_blocks' => ( $config['service_config']['enable_blocks'] ?? false ) === $value,
-						default => true, // Should never reach here due to validation above
 					};
 
 					if ( ! $passes_filter ) {
