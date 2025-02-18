@@ -137,17 +137,32 @@ export function useRemoteData( {
 
 		const blockConfig = getBlockConfig( blockName );
 
+		// Currently, it's matching against one selector only but there could be multiple selectors.
 		const selector = blockConfig?.selectors?.find(
 			querySelector => querySelector.query_key === queryKey
 		);
 
 		if ( selector ) {
 			const requiredFields = selector.inputs.filter(
-				input => input.required && ! queryInput[ input.name ]
+				input => input.required && ! queryInput[ input.slug ]
 			);
 
 			if ( requiredFields.length > 0 ) {
-				resolvedUpdater( undefined );
+				// This is necessary so that subsequent requests work. But, this creates a bug where the first search doesn't work.
+				// So, we need to find a way to make the first search work.
+				const resolvedDataNew = {
+					blockName,
+					isCollection: true,
+					metadata: {},
+					queryInput: {
+						...queryInput,
+						...paginationQueryInput,
+						...searchQueryInput,
+					},
+					resultId: '',
+					results: [],
+				};
+				resolvedUpdater( resolvedDataNew );
 				setLoading( false );
 				return;
 			}
