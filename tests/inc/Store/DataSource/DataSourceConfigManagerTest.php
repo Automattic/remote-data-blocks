@@ -478,13 +478,11 @@ class DataSourceConfigManagerTest extends TestCase {
 		$mock_config_store->shouldReceive( 'get_data_sources_as_array' )
 			->andReturn( [] );
 
-		// Test that an unsupported filter key throws an error
 		$result = DataSourceConfigManager::get_all( [
 			'display_name' => 'Test Airtable',
 		] );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		/** @var WP_Error $result */
 		$this->assertSame( 'invalid_filter', $result->get_error_code() );
 		$this->assertSame( 'Invalid filter key: display_name', $result->get_error_message() );
 		$this->assertSame( 400, $result->get_error_data()['status'] );
@@ -503,14 +501,12 @@ class DataSourceConfigManagerTest extends TestCase {
 		$mock_config_store->shouldReceive( 'get_data_sources_as_array' )
 			->andReturn( [] );
 
-		// Test that even with a valid filter, an invalid one still causes an error
 		$result = DataSourceConfigManager::get_all( [
 			'service' => self::AIRTABLE_SERVICE,
 			'display_name' => 'Test Airtable',
 		] );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		/** @var WP_Error $result */
 		$this->assertSame( 'invalid_filter', $result->get_error_code() );
 		$this->assertSame( 'Invalid filter key: display_name', $result->get_error_message() );
 		$this->assertSame( 400, $result->get_error_data()['status'] );

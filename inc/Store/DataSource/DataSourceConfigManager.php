@@ -120,11 +120,12 @@ class DataSourceConfigManager {
 		/**
 		 * Validate all filter keys.
 		 */
-		foreach ( $filters as $key => $value ) {
+		foreach ( array_keys( $filters ) as $key ) {
+			/** @var non-empty-string $key */
 			if ( ! in_array( $key, [ 'service', 'enable_blocks' ], true ) ) {
 				return new WP_Error(
 					'invalid_filter',
-					sprintf( 'Invalid filter key: %s', $key ),
+					sprintf( 'Invalid filter key: %s', (string) $key ),
 					[ 'status' => 400 ]
 				);
 			}
@@ -135,8 +136,6 @@ class DataSourceConfigManager {
 			function ( array $config ) use ( $filters ): bool {
 				foreach ( $filters as $key => $value ) {
 					/** @var string $key Either 'service' or 'enable_blocks' */
-					/** @var string|bool $value String for service, bool for enable_blocks */
-					/** @var bool $passes_filter The result of the match expression */
 					$passes_filter = match ( $key ) {
 						'service' => $config['service'] === $value,
 						'enable_blocks' => ( $config['service_config']['enable_blocks'] ?? false ) === $value,
