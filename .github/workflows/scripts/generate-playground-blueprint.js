@@ -76,9 +76,7 @@ async function run( { github, context } ) {
 
 	const defaultSchema = generateWordpressPlaygroundBlueprint( context.issue.number );
 
-	const url = `https://wordpress-playground.atomicsites.blog/#${ encodeURIComponent(
-		JSON.stringify( defaultSchema )
-	) }`;
+	const url = `https://wordpress-playground.atomicsites.blog/#${ JSON.stringify( defaultSchema ) }`;
 
 	const body = `
 ## Test using WordPress Playground
