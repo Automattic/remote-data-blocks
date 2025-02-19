@@ -65,7 +65,7 @@ class DataSourceConfigManager {
 	 * - service: Filter by service name (e.g. 'airtable', 'google-sheets', 'shopify')
 	 * - enable_blocks: Filter by blocks enabled status (false matches with null/false and true matches with true)
 	 * 
-	 * Any unsupported filter keys will be ignored.
+	 * Passing an unsupported filter key will return an error.
 	 * 
 	 * @param array{
 	 *   service?: string,
