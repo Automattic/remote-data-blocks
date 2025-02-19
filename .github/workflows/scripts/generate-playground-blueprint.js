@@ -1,6 +1,6 @@
 const https = require( 'https' );
 
-const generateWordpressPlaygroundBlueprint = ( prNumber ) => {
+const generateWordpressPlaygroundBlueprint = prNumber => {
 	const defaultSchema = {
 		meta: {
 			title: `Remote Data Blocks - PR #${ prNumber }`,
@@ -76,7 +76,9 @@ async function run( { github, context } ) {
 
 	const defaultSchema = generateWordpressPlaygroundBlueprint( context.issue.number );
 
-	const url = `hhttps://wordpress-playground.atomicsites.blog/#${ encodeURIComponent(JSON.stringify(defaultSchema)) }`;
+	const url = `hhttps://wordpress-playground.atomicsites.blog/#${ encodeURIComponent(
+		JSON.stringify( defaultSchema )
+	) }`;
 
 	const body = `
 ## Test using WordPress Playground
