@@ -3,11 +3,12 @@
 namespace RemoteDataBlocks\Telemetry;
 
 use RemoteDataBlocks\Telemetry\TracksTelemetry;
-
+use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
 defined( 'ABSPATH' ) || exit();
 
 class DataSourceTelemetry {
 	const DATA_SOURCE_INTERACTION_EVENT_NAME = 'data_source_interaction';
+	const DATA_SOURCE_VIEW_EVENT_NAME = 'view_data_sources';
 
 	private static function get_interaction_track_props( array $config ): array {
 		$props = [];
@@ -38,5 +39,33 @@ class DataSourceTelemetry {
 
 	public static function track_delete( array $config ): void {
 		self::track_interaction( $config, 'delete' );
+	}
+
+	public static function track_view( array $configs ): void {
+		$code_configured_count = count( array_filter(
+			$configs,
+			function ( $config ) {
+				return DataSourceConfigManager::CONFIG_SOURCE_CODE === $config['config_source'];
+			}
+		) );
+		$storage_configured_count = count( array_filter(
+			$configs,
+			function ( $config ) {
+				return DataSourceConfigManager::CONFIG_SOURCE_STORAGE === $config['config_source'];
+			}
+		) );
+		$constant_configured_count = count( array_filter(
+			$configs,
+			function ( $config ) {
+				return DataSourceConfigManager::CONFIG_SOURCE_CONSTANT === $config['config_source'];
+			}
+		) );
+
+		TracksTelemetry::record_event( self::DATA_SOURCE_VIEW_EVENT_NAME, [
+			'total_data_sources_count' => count( $configs ),
+			'code_configured_data_sources_count' => $code_configured_count,
+			'ui_configured_data_sources_count' => $storage_configured_count,
+			'constant_configured_data_sources_count' => $constant_configured_count,
+		] );
 	}
 }
