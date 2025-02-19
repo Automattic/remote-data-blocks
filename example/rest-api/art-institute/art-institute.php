@@ -32,15 +32,11 @@ function register_aic_block(): void {
 		'data_source' => $aic_data_source,
 		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
 			$endpoint = $aic_data_source->get_endpoint();
-			// Extract artwork IDs from input variables:
-			// - If a single input is provided directly, wrap the id in an array
-			// - Otherwise, process an array of inputs to extract the id fields
-			$ids = isset($input_variables['id']) 
-				? [$input_variables['id']]
-				: array_map(
-					fn($input) => is_array($input['id']) ? reset($input['id']) : $input['id'],
-					array_filter($input_variables, fn($input) => is_array($input) && isset($input['id']))
-				);
+			// Handle both single ID and array of objects with IDs
+			$ids = is_array( $input_variables ) && isset( $input_variables[0] ) ? array_map(
+				fn( $item ) => $item['id'],
+				$input_variables
+			) : ( isset( $input_variables['id'] ) ? [ $input_variables['id'] ] : [] );
 
 			if ( !empty( $ids ) ) {
 				return add_query_arg([
