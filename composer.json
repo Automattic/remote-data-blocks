@@ -42,10 +42,10 @@
     "phpunit/phpunit": "^9",
     "slevomat/coding-standard": "^8.15",
     "php-stubs/wordpress-stubs": "^6.6",
-    "psalm/phar": "^6.0",
+    "psalm/phar": "^6.5",
     "mockery/mockery": "^1.6",
     "wp-phpunit/wp-phpunit": "^6.7",
-    "yoast/phpunit-polyfills": "^3.1",
+    "yoast/phpunit-polyfills": "^4.0",
     "php-stubs/wordpress-globals": "^0.2.0",
     "php-stubs/wordpress-tests-stubs": "^6.7"
   },

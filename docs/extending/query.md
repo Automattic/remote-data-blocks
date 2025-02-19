@@ -84,7 +84,7 @@ The `endpoint` property defines the query endpoint. It can be a string or a call
 
 ### input_schema: array
 
-The `input_schema` property defines the input variables expected by the query. The method should return an associative array of input variable definitions. The keys of the array are machine-friendly input variable names, and the values are associative arrays with the following structure:
+The `input_schema` property defines the input variables expected by the query. The property should be an associative array of input variable definitions. The keys of the array are machine-friendly input variable names, and the values are associative arrays with the following structure:
 
 - `name` (optional): The human-friendly display name of the input variable
 - `default_value` (optional): The default value for the input variable.
@@ -107,11 +107,40 @@ The `input_schema` property defines the input variables expected by the query. T
 ],
 ```
 
-If omitted, it defaults to an empty array.
+There are also some special input variable types:
+
+- `ui:search_input`: A variable with this type indicates that the query supports searching. It must accept a `string` containing search terms.
+- `ui:pagination_offset`: A variable with this type indicates that the query supports offset pagination. It must accept an `integer` containing the requested offset. See `pagination_schema` for additional information and requirements.
+- `ui:pagination_page`: A variable with this type indicates that the query supports page-based pagination. It must accept an `integer` containing the requested results page. See `pagination_schema` for additional information and requirements.
+- `ui:pagination_per_page`: A variable with this type indicates that the query supports controlling the number of resultsper page. It must accept an `integer` containing the number of requested results.
+- `ui:pagination_cursor_next` and `ui_pagination_cursor_previous`: Variables with these types indicate that the query supports cursor pagination. They accept `strings` containing the requested cursor. See `pagination_schema` for additional information and requirements.
+
+#### Example with search and pagination input variables
+
+```php
+'input_schema' => [
+	'search' => [
+		'name' => 'Search terms',
+		'type' => 'ui:search_input',
+	],
+	'limit' => [
+		'default_value' => 10,
+		'name' => 'Pagination limit',
+		'type' => 'ui:pagination_per_page',
+	],
+	'page' => [
+		'default_value' => 1,
+		'name' => 'Pagination page',
+		'type' => 'ui:pagination_page',
+	],
+],
+```
+
+If omitted, `input_schema` defaults to an empty array.
 
 ### output_schema: array (required)
 
-The `output_schema` property defines how to extract data from the API response. The method should return an associative array with the following structure:
+The `output_schema` property defines how to extract data from the API response. The property should be an associative array with the following structure:
 
 - `format` (optional): A callable function that formats the output variable value.
 - `generate` (optional): A callable function that generates or extracts the output variable value from the response, as an alternative to `path`.
@@ -162,6 +191,38 @@ Accepted primitive types are:
 ```
 
 We have more in-depth [`output_schema`](./query-output_schema.md) examples.
+
+### pagination_schema: array
+
+If your query supports pagination, the `pagination_schema` property defines how to extract pagination-related values from the query response. If defined, the property should be an associative array with the following structure:
+
+- `total_items` (required): A variable definition that extracts the total number of items across every page of results.
+- `cursor_next`: If your query supports cursor pagination, a variable definition that extracts the cursor for the next page of results.
+- `cursor_previous`: If your query supports cursor pagination, a variable definition that extracts the cursor for the previous page of results.
+
+Note that the `total_items` variable is required for all types of pagination.
+
+#### Example
+
+```php
+'pagination_schema' => [
+	'total_items' => [
+		'name' => 'Total items',
+		'path' => '$.pagination.totalItems',
+		'type' => 'integer',
+	],
+	'cursor_next' => [
+		'name' => 'Next page cursor',
+		'path' => '$.pagination.nextCursor',
+		'type' => 'string',
+	],
+	'cursor_previous' => [
+		'name' => 'Previous page cursor',
+		'path' => '$.pagination.previousCursor',
+		'type' => 'string',
+	],
+],
+```
 
 ### request_method: string
 

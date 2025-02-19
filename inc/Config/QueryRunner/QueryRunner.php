@@ -226,9 +226,25 @@ class QueryRunner implements QueryRunnerInterface {
 		$results = $is_collection ? $results : [ $results ];
 		$metadata = $this->get_response_metadata( $query, $raw_response_data['metadata'], $results );
 
+		// Pagination schema defines how to extract pagination data from the response.
+		$pagination = null;
+		$pagination_schema = $query->get_pagination_schema();
+
+		if ( is_array( $pagination_schema ) ) {
+			$pagination_data = $parser->parse( $response_data, [ 'type' => $pagination_schema ] )['result'] ?? null;
+
+			if ( is_array( $pagination_data ) ) {
+				$pagination = [];
+				foreach ( $pagination_data as $key => $value ) {
+					$pagination[ $key ] = $value['value'];
+				}
+			}
+		}
+
 		return [
 			'is_collection' => $is_collection,
 			'metadata' => $metadata,
+			'pagination' => $pagination,
 			'results' => $results,
 		];
 	}
