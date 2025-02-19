@@ -124,6 +124,12 @@ export function useRemoteData( {
 		} );
 
 	useEffect( () => {
+		// If the search does not allow empty input and the search input is empty, then we shouldn't fetch.
+		// This blocks the initial fetches of display queries that could fail as well.
+		if ( ! searchAllowsEmptyInput && ! searchInput ) {
+			return;
+		}
+
 		void fetch( resolvedData?.queryInput ?? {} );
 	}, [ hasResolvedData, page, perPage, searchInput ] );
 
