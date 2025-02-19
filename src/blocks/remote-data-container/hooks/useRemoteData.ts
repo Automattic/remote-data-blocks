@@ -4,6 +4,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { REMOTE_DATA_REST_API_URL } from '@/blocks/remote-data-container/config/constants';
 import { usePaginationVariables } from '@/blocks/remote-data-container/hooks/usePaginationVariables';
 import { useSearchVariables } from '@/blocks/remote-data-container/hooks/useSearchVariables';
+import { getBlockConfig } from '@/utils/localized-block-data';
 
 async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< RemoteData | null > {
 	const { body } = await apiFetch< RemoteDataApiResponse >( {
@@ -48,7 +49,7 @@ interface UseRemoteData {
 	page: number;
 	perPage?: number;
 	reset: () => void;
-	searchAllowsEmptyInput: boolean;
+	requiredInputVariables: InputVariable[];
 	searchInput: string;
 	setPage: ( page: number ) => void;
 	setPerPage: ( perPage: number ) => void;
@@ -71,7 +72,6 @@ interface UseRemoteDataInput {
 	initialPage?: number;
 	initialPerPage?: number;
 	initialSearchInput?: string;
-	inputVariables?: InputVariable[];
 	onSuccess?: () => void;
 	queryKey: string;
 }
@@ -92,10 +92,21 @@ export function useRemoteData( {
 	initialPage,
 	initialPerPage,
 	initialSearchInput,
-	inputVariables = [],
 	onSuccess,
 	queryKey,
 }: UseRemoteDataInput ): UseRemoteData {
+	const blockConfig = getBlockConfig( blockName );
+
+	const query = blockConfig?.selectors?.find( selector => selector.query_key === queryKey );
+
+	if ( ! query ) {
+		throw new Error( `Selector not found for query key: ${ queryKey }` );
+	}
+
+	const inputVariables = query.inputs;
+
+	const requiredInputVariables = inputVariables.filter( input => input.required );
+
 	const [ data, setData ] = useState< RemoteData >();
 	const [ loading, setLoading ] = useState< boolean >( false );
 
@@ -117,25 +128,18 @@ export function useRemoteData( {
 		initialPerPage,
 		inputVariables,
 	} );
-	const { searchQueryInput, searchAllowsEmptyInput, searchInput, setSearchInput, supportsSearch } =
-		useSearchVariables( {
-			initialSearchInput,
-			inputVariables,
-		} );
+	const { searchQueryInput, searchInput, setSearchInput, supportsSearch } = useSearchVariables( {
+		initialSearchInput,
+		inputVariables,
+	} );
 
+	// The purpose of this effect is to automatically execute this query anytime when the managed query
+	// input variables (pagination, and search) is changed.
 	useEffect( () => {
-		// If the search does not allow empty input and the search input is empty, then we shouldn't fetch.
-		// This blocks the initial fetches of display queries that could fail as well.
-		if ( ! searchAllowsEmptyInput && ! searchInput ) {
-			return;
-		}
-
 		void fetch( resolvedData?.queryInput ?? {} );
 	}, [ hasResolvedData, page, perPage, searchInput ] );
 
 	async function fetch( queryInput: RemoteDataQueryInput ): Promise< void > {
-		setLoading( true );
-
 		const requestData: RemoteDataApiRequest = {
 			block_name: blockName,
 			query_key: queryKey,
@@ -145,6 +149,17 @@ export function useRemoteData( {
 				...searchQueryInput,
 			},
 		};
+
+		// If the query input is missing any required variables, then we should not fetch.
+		// This is within the fetch, and not within the effect to ensure this check happens
+		// anytime the fetch function is called.
+		// ToDo: This should really be setting an error state.
+		if ( requiredInputVariables.some( input => ! requestData.query_input[ input.slug ] ) ) {
+			resolvedUpdater( undefined );
+			return;
+		}
+
+		setLoading( true );
 
 		const remoteData = await fetchRemoteData( requestData ).catch( () => null );
 
@@ -173,7 +188,7 @@ export function useRemoteData( {
 		page,
 		perPage,
 		reset,
-		searchAllowsEmptyInput,
+		requiredInputVariables,
 		searchInput,
 		setSearchInput,
 		supportsPagination,

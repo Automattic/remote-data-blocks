@@ -2,7 +2,6 @@ import { SEARCH_INPUT_VARIABLE_TYPE } from '@/blocks/remote-data-container/confi
 import { useDebouncedState } from '@/hooks/useDebouncedState';
 
 interface UseSearchVariables {
-	searchAllowsEmptyInput: boolean;
 	searchInput: string;
 	searchQueryInput: RemoteDataQueryInput;
 	setSearchInput: ( searchInput: string ) => void;
@@ -31,10 +30,10 @@ export function useSearchVariables( {
 	const hasSearchInput = supportsSearch && ( searchInput || searchAllowsEmptyInput );
 
 	return {
-		searchAllowsEmptyInput,
 		searchInput,
-		searchQueryInput:
-			hasSearchInput && inputVariable ? { [ inputVariable.slug ]: searchInput } : {},
+		searchQueryInput: inputVariable
+			? { [ inputVariable?.slug ?? '' ]: hasSearchInput ? searchInput : '' }
+			: {},
 		setSearchInput: supportsSearch ? setSearchInput : () => {},
 		supportsSearch,
 	};

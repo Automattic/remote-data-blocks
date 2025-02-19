@@ -61,6 +61,7 @@ class SalesforceD2CIntegration {
 					'product_id' => [
 						'name' => 'Product ID',
 						'type' => 'id',
+						'required' => true,
 					],
 				],
 				'output_schema' => [

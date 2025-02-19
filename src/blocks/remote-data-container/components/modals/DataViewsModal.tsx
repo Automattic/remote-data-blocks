@@ -16,7 +16,6 @@ interface DataViewsModalProps {
 	className?: string;
 	blockName: string;
 	headerImage?: string;
-	inputVariables: InputVariable[];
 	onSelect?: ( data: RemoteDataQueryInput ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
 	queryKey: string;
@@ -25,16 +24,7 @@ interface DataViewsModalProps {
 }
 
 export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
-	const {
-		className,
-		blockName,
-		inputVariables,
-		onSelect,
-		onSelectField,
-		queryKey,
-		renderTrigger,
-		title,
-	} = props;
+	const { className, blockName, onSelect, onSelectField, queryKey, renderTrigger, title } = props;
 
 	const blockConfig = getBlockConfig( blockName );
 	const availableBindings = getBlockAvailableBindings( blockName );
@@ -47,25 +37,25 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 		page,
 		searchInput,
 		setPage,
+		requiredInputVariables,
 		setSearchInput,
 		supportsSearch,
 		totalItems,
 		totalPages,
 	} = useRemoteData( {
 		blockName,
-		inputVariables,
 		queryKey,
 	} );
 
 	// This is an optimistic query to get the data primed and ready for the user to select.
 	useEffect( () => {
 		// If there are required fields, then we shouldn't prime the data as the query could fail.
-		if ( inputVariables.length > 0 && inputVariables.some( input => input.required ) ) {
+		if ( requiredInputVariables.length > 0 ) {
 			return;
 		}
 
 		void fetch( {} );
-	}, [ inputVariables ] );
+	}, [ requiredInputVariables ] );
 
 	function onSelectItem( input: RemoteDataQueryInput ): void {
 		onSelect?.( input );

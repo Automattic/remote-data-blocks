@@ -57,7 +57,6 @@ export function FieldShortcodeSelectNew( props: FieldShortcodeSelectNewProps ) {
 									key={ blockConfig.name }
 									blockName={ blockConfig.name }
 									headerImage={ compatibleSelector.image_url }
-									inputVariables={ compatibleSelector.inputs }
 									onSelectField={ onSelectField }
 									queryKey={ compatibleSelector.query_key }
 									renderTrigger={ ( { onClick } ) => (
