@@ -12,7 +12,7 @@ class DataSourceTelemetry {
 	private static function get_interaction_track_props( array $config ): array {
 		$props = [];
 
-		if ( 'generic-http' === $config['service'] ) {
+		if ( REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE === $config['service'] ) {
 			$auth = $config['service_config']['auth'] ?? [];
 			$props['authentication_type'] = $auth['type'] ?? '';
 			$props['api_key_location'] = $auth['addTo'] ?? '';
