@@ -124,10 +124,6 @@ export function useRemoteData( {
 		} );
 
 	useEffect( () => {
-		if ( ! hasResolvedData ) {
-			return;
-		}
-
 		void fetch( resolvedData?.queryInput ?? {} );
 	}, [ hasResolvedData, page, perPage, searchInput ] );
 

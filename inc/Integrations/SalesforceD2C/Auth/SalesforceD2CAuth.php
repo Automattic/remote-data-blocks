@@ -25,7 +25,7 @@ class SalesforceD2CAuth {
 		string $client_id,
 		string $client_secret
 	): string|WP_Error {
-		return /* self::get_saved_access_token( $client_id ) ?? */ self::get_token_using_client_credentials( $client_id, $client_secret, $endpoint );
+		return self::get_saved_access_token( $client_id ) ?? self::get_token_using_client_credentials( $client_id, $client_secret, $endpoint );
 	}
 
 	/**
@@ -117,12 +117,12 @@ class SalesforceD2CAuth {
 	}
 
 	private static function save_access_token( string $access_token, string $client_id, int $expiry_time ): void {
-		// Expires 10 seconds early as a buffer for request time and drift
-		$access_token_expires_in = $expiry_time - 10;
+		// Get the time 10 seconds before the token expires.
+		// Note that, the expiry time is a unix timestamp and so we need to subtract the current time from it.
+		$access_token_expiry_time = $expiry_time - time() - 10;
 
 		$access_token_data = [
 			'token' => $access_token,
-			'expires_at' => time() + $access_token_expires_in,
 		];
 
 		$access_token_cache_key = self::get_access_token_key( $client_id );
@@ -132,7 +132,7 @@ class SalesforceD2CAuth {
 			$access_token_data,
 			'oauth-tokens',
 			// phpcs:ignore WordPressVIPMinimum.Performance.LowExpiryCacheTime.CacheTimeUndetermined -- 'expires_in' defaults to 30 minutes for access tokens.
-			$access_token_expires_in,
+			$access_token_expiry_time,
 		);
 	}
 

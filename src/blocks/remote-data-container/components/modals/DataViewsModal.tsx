@@ -46,7 +46,6 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 		loading,
 		page,
 		searchInput,
-		searchAllowsEmptyInput,
 		setPage,
 		setSearchInput,
 		supportsSearch,
@@ -60,39 +59,13 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 
 	// This is an optimistic query to get the data primed and ready for the user to select.
 	useEffect( () => {
-		// If the search does not allow empty input, then we don't need to prime the data.
-		if ( ! searchAllowsEmptyInput ) {
+		// If there are required fields, then we shouldn't prime the data as the query could fail.
+		if ( inputVariables.length > 0 && inputVariables.some( input => input.required ) ) {
 			return;
 		}
 
-		// Get the block config.
-		const theBlockConfig = getBlockConfig( blockName );
-
-		// Currently, it's matching against one selector only but there could be multiple selectors.
-		const selector = theBlockConfig?.selectors?.find(
-			querySelector => querySelector.query_key === queryKey
-		);
-
-		// If the selector is found, then we need to check if the required fields are provided.
-		if ( selector ) {
-			const requiredFields = selector.inputs.filter( input => {
-				// input is not required, so it's not a problem if it's not provided.
-				if ( ! input.required ) {
-					return false;
-				}
-
-				// If the input is required, then we need to mark it as to be provided.
-				return true;
-			} );
-
-			// There's no point in priming the data if the required fields are not provided.
-			if ( requiredFields.length > 0 ) {
-				return;
-			}
-		}
-
 		void fetch( {} );
-	}, [ searchAllowsEmptyInput ] );
+	}, [ inputVariables ] );
 
 	function onSelectItem( input: RemoteDataQueryInput ): void {
 		onSelect?.( input );
