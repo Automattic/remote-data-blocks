@@ -41,7 +41,7 @@ const generateWordpressPlaygroundBlueprint = ( prNumber ) => {
 				pluginData: {
 					caption: 'Installing Remote Data Blocks',
 					resource: 'url',
-					url: `https://playground.wordpress.net/plugin-proxy.php?org=Automattic&repo=remote-data-blocks&workflow=Build%20Live%20Branch&artifact=remote-data-blocks-${ prNumber }&pr=${ prNumber }`,
+					url: `https://wordpress-playground.atomicsites.blog/plugin-proxy.php?org=Automattic&repo=remote-data-blocks&workflow=Build%20Live%20Branch&artifact=remote-data-blocks-${ prNumber }&pr=${ prNumber }`,
 				},
 				options: {
 					activate: true,
@@ -76,7 +76,7 @@ async function run( { github, context } ) {
 
 	const defaultSchema = generateWordpressPlaygroundBlueprint( context.issue.number );
 
-	const url = `https://playground.wordpress.net/#${ encodeURIComponent(JSON.stringify(defaultSchema)) }`;
+	const url = `hhttps://wordpress-playground.atomicsites.blog/#${ encodeURIComponent(JSON.stringify(defaultSchema)) }`;
 
 	const body = `
 ## Test using WordPress Playground
