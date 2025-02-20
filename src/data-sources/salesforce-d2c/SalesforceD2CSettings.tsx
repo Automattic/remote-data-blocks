@@ -4,7 +4,6 @@ import { __ } from '@wordpress/i18n';
 
 import { DataSourceForm } from '@/data-sources/components/DataSourceForm';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
-import { useSalesforceD2CWebstoresOptions } from '@/data-sources/hooks/useSalesforceD2CAPI';
 import { useSalesforceD2CAuth } from '@/data-sources/hooks/useSalesforceD2CAuth';
 import {
 	SalesforceD2CConfig,
@@ -81,15 +80,10 @@ export const SalesforceD2CSettings = ( {
 		},
 	] );
 
-	const { token, fetchingToken, tokenError } = useSalesforceD2CAuth(
+	const { stores, fetchingStores, storesError } = useSalesforceD2CAuth(
 		state.domain ?? '',
 		state.client_id ?? '',
 		state.client_secret ?? ''
-	);
-
-	const { webstores, isLoadingWebstores, errorWebstores } = useSalesforceD2CWebstoresOptions(
-		token,
-		state.domain ?? ''
 	);
 
 	const onSaveClick = async () => {
@@ -106,73 +100,53 @@ export const SalesforceD2CSettings = ( {
 		return onSave( data, mode );
 	};
 
+	const onDomainChange = ( value: string ) => {
+		setDomain( value );
+		handleOnChange( 'domain', value );
+		handleOnChange( 'store_id', '' );
+	};
+
 	const onClientIDChange = ( value: string ) => {
 		setClientID( value );
 		handleOnChange( 'client_id', value );
 		handleOnChange( 'store_id', '' );
-		handleOnChange( 'stores', [] );
 	};
 
 	const onClientSecretChange = ( value: string ) => {
 		setClientSecret( value );
 		handleOnChange( 'client_secret', value );
 		handleOnChange( 'store_id', '' );
-		handleOnChange( 'stores', [] );
 	};
 
 	const onStoreIDChange = ( value: string ) => {
-		const selectedStore = webstores?.find( store => store.value === value );
-		handleOnChange( 'store_id', selectedStore?.value ?? '' );
-		handleOnChange( 'stores', [] );
-	};
-
-	const onDomainChange = ( value: string ) => {
-		setDomain( value );
-		handleOnChange( 'client_id', '' );
-		handleOnChange( 'client_secret', '' );
-		handleOnChange( 'store_id', '' );
-		handleOnChange( 'stores', [] );
+		const selectedStore = stores?.find( store => store.id === value );
+		handleOnChange( 'store_id', selectedStore?.id ?? '' );
 	};
 
 	const credentialsHelpText = useMemo( () => {
-		if ( fetchingToken ) {
+		if ( fetchingStores ) {
 			return __( 'Checking credentials...', 'remote-data-blocks' );
-		} else if ( tokenError ) {
-			const errorMessage = tokenError.message ?? __( 'Unknown error', 'remote-data-blocks' );
+		} else if ( storesError ) {
+			const errorMessage = storesError.message ?? __( 'Unknown error', 'remote-data-blocks' );
 			return getConnectionMessage(
 				'error',
 				__( 'Failed to generate token using provided credentials: ', 'remote-data-blocks' ) +
 					' ' +
 					errorMessage
 			);
-		} else if ( token ) {
+		} else if ( stores ) {
 			return getConnectionMessage(
 				'success',
-				__( 'Credentials are valid. Token generated successfully.', 'remote-data-blocks' )
+				__( 'Credentials are valid. Stores fetched successfully.', 'remote-data-blocks' )
 			);
 		}
 		return __( 'Please provide credentials to connect to Salesforce D2C.', 'remote-data-blocks' );
-	}, [ fetchingToken, token, tokenError ] );
+	}, [ fetchingStores, stores, storesError ] );
 
 	const shouldAllowSubmit = state.store_id && state.store_id !== '';
 
-	const storeHelpText = useMemo( () => {
-		if ( token ) {
-			if ( errorWebstores ) {
-				const errorMessage = errorWebstores?.message ?? __( 'Unknown error', 'remote-data-blocks' );
-				return __( 'Failed to fetch stores.', 'remote-data-blocks' ) + ' ' + errorMessage;
-			} else if ( isLoadingWebstores ) {
-				return __( 'Fetching stores...', 'remote-data-blocks' );
-			} else if ( webstores?.length === 0 ) {
-				return __( 'No stores found', 'remote-data-blocks' );
-			}
-		}
-
-		return __( 'Select a store.', 'remote-data-blocks' );
-	}, [ token, errorWebstores, isLoadingWebstores, webstores ] );
-
 	useEffect( () => {
-		if ( ! webstores?.length ) {
+		if ( ! stores?.length ) {
 			return;
 		}
 
@@ -181,14 +155,17 @@ export const SalesforceD2CSettings = ( {
 				...defaultSelectOption,
 				label: __( 'Select a store', 'remote-data-blocks' ),
 			},
-			...( webstores ?? [] ).map( ( { label, value } ) => ( { label, value } ) ),
+			...( stores ?? [] ).map( ( { name, id } ) => ( {
+				label: name,
+				value: id,
+			} ) ),
 		] );
-	}, [ webstores ] );
+	}, [ stores ] );
 
 	return (
 		<DataSourceForm onSave={ onSaveClick }>
 			<DataSourceForm.Setup
-				canProceed={ Boolean( token ) }
+				canProceed={ Boolean( stores && stores.length > 0 ) }
 				displayName={ state.display_name ?? '' }
 				handleOnChange={ handleOnChange }
 				heading={ {
@@ -237,8 +214,8 @@ export const SalesforceD2CSettings = ( {
 					value={ state.store_id ?? '' }
 					onChange={ onStoreIDChange }
 					options={ storeOptions }
-					help={ storeHelpText }
-					disabled={ fetchingToken || ! storeOptions?.length }
+					help={ __( 'Select a store', 'remote-data-blocks' ) }
+					disabled={ fetchingStores || ! storeOptions?.length }
 					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 				/>

@@ -40,14 +40,15 @@ class AuthController extends WP_REST_Controller {
 		);
 
 		/**
-		 * API to get Salesforce D2C Access Token using the client_credentials grant type.
+		 * API to get Salesforce D2C Stores using the client_credentials grant type
+		 * This is also meant to test the credentials provided by the user.
 		 */
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/salesforce-d2c/token',
+			'/' . $this->rest_base . '/salesforce-d2c/stores',
 			[
 				'methods' => 'POST',
-				'callback' => [ $this, 'get_salesforce_d2c_auth_token' ],
+				'callback' => [ $this, 'get_salesforce_d2c_stores' ],
 				'permission_callback' => [ $this, 'permissions_check' ],
 			]
 		);
@@ -82,10 +83,10 @@ class AuthController extends WP_REST_Controller {
 		);
 	}
 
-	public function get_salesforce_d2c_auth_token( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+	public function get_salesforce_d2c_stores( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$params = $request->get_json_params();
-		$client_id = $params['client_id'] ?? null;
-		$client_secret = $params['client_secret'] ?? null;
+		$client_id = $params['clientId'] ?? null;
+		$client_secret = $params['clientSecret'] ?? null;
 		$domain = $params['domain'] ?? null;
 
 		if ( ! $client_id || ! $client_secret || ! $domain ) {
@@ -102,7 +103,17 @@ class AuthController extends WP_REST_Controller {
 		if ( is_wp_error( $token ) ) {
 			return rest_ensure_response( $token );
 		}
-		return rest_ensure_response( [ 'token' => $token ] );
+
+		$webstores = SalesforceD2CAuth::get_webstores( $endpoint, $token );
+		if ( is_wp_error( $webstores ) ) {
+			return rest_ensure_response( $webstores );
+		}
+
+		return rest_ensure_response(
+			[
+				'webstores' => $webstores,
+			]
+		);
 	}
 
 	/**

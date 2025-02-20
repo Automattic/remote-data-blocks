@@ -29,6 +29,51 @@ class SalesforceD2CAuth {
 	}
 
 	/**
+	 * Get the webstores using the given endpoint, and token.
+	 *
+	 * @param string $endpoint The endpoint prefix URL for the data source.
+	 * @param string $token The token.
+	 * @return array|WP_Error The webstores or an error.
+	 */
+	public static function get_webstores(
+		string $endpoint,
+		string $token,
+	): array|WP_Error {
+		$webstores_url = sprintf( '%s/services/data/v63.0/query/?q=SELECT+name,id+from+webstore', $endpoint );
+
+		$response = wp_remote_get( $webstores_url, [
+			'headers' => [
+				'Authorization' => 'Bearer ' . $token,
+			],
+		] );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+
+		if ( 200 !== $response_code ) {
+			return new WP_Error(
+				'salesforce_d2c_auth_error_webstores',
+				__( 'Failed to retrieve webstores', 'remote-data-blocks' )
+			);
+		}
+
+		$response_body = wp_remote_retrieve_body( $response );
+		$response_data = json_decode( $response_body, true );
+
+		$records = $response_data['records'] ?? [];
+
+		return array_map( function ( $record ) {
+			return [
+				'id' => $record['Id'],
+				'name' => $record['Name'],
+			];
+		}, $records );
+	}
+
+	/**
 	 * Get a token using client credentials.
 	 *
 	 * @param string $client_id The client ID.
@@ -66,7 +111,7 @@ class SalesforceD2CAuth {
 		$response_body = wp_remote_retrieve_body( $client_auth_response );
 		$response_data = json_decode( $response_body, true );
 
-		if ( 400 === $response_code || 401 === $response_code ) {
+		if ( 200 !== $response_code ) {
 			return new WP_Error(
 				'salesforce_d2c_auth_error_client_credentials',
 				/* translators: %s: Technical error message from API containing failure reason */

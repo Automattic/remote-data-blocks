@@ -1,24 +1,28 @@
 import { useDebounce } from '@wordpress/compose';
 import { useCallback, useEffect } from '@wordpress/element';
 
-import { getSalesforceD2CAuthToken } from '@/data-sources/api-clients/auth';
+import { getSalesforceD2CStores } from '@/data-sources/api-clients/auth';
 import { useQuery } from '@/hooks/useQuery';
 
 export const useSalesforceD2CAuth = ( domain: string, clientId: string, clientSecret: string ) => {
 	const queryFn = useCallback( async () => {
-		return getSalesforceD2CAuthToken( domain, clientId, clientSecret );
+		if ( ! domain || ! clientId || ! clientSecret ) {
+			return null;
+		}
+
+		return getSalesforceD2CStores( domain, clientId, clientSecret );
 	}, [ domain, clientId, clientSecret ] );
 
 	const {
-		data: token,
-		isLoading: fetchingToken,
-		error: tokenError,
-		refetch: fetchToken,
+		data: stores,
+		isLoading: fetchingStores,
+		error: storesError,
+		refetch: fetchStores,
 	} = useQuery( queryFn, { manualFetchOnly: true } );
 
-	const debouncedFetchToken = useDebounce( fetchToken, 500 );
+	const debouncedFetchStores = useDebounce( fetchStores, 500 );
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	useEffect( debouncedFetchToken, [ domain, clientId, clientSecret ] );
+	useEffect( debouncedFetchStores, [ domain, clientId, clientSecret ] );
 
-	return { token, fetchingToken, fetchToken, tokenError };
+	return { stores, fetchingStores, fetchStores, storesError };
 };

@@ -62,7 +62,17 @@ export interface SalesforceD2CServiceConfig extends BaseServiceConfig {
 	client_secret: string;
 	store_id: string;
 	domain: string;
-	stores: SalesforceD2CStoreConfig[];
+}
+
+export interface SalesforceD2CWebStoreRecord {
+	/** The name of the WebStore */
+	name: string;
+	/** The unique identifier for the WebStore */
+	id: string;
+}
+
+export interface SalesforceD2CWebStoresResponse {
+	webstores: SalesforceD2CWebStoreRecord[];
 }
 
 export interface ShopifyServiceConfig extends BaseServiceConfig {
