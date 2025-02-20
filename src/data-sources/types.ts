@@ -1,4 +1,4 @@
-import { SUPPORTED_SERVICES } from '@/data-sources/constants';
+import { SUPPORTED_SERVICES, ConfigSource } from '@/data-sources/constants';
 import { HttpAuth } from '@/data-sources/http/types';
 import { StringIdName } from '@/types/common';
 import { GoogleServiceAccountKey } from '@/types/google';
@@ -10,7 +10,6 @@ interface BaseServiceConfig extends Record< string, unknown > {
 	display_name: string;
 	enable_blocks: boolean;
 }
-
 interface BaseDataSourceConfig<
 	ServiceName extends DataSourceType,
 	ServiceConfig extends BaseServiceConfig
@@ -18,6 +17,7 @@ interface BaseDataSourceConfig<
 	service: ServiceName;
 	service_config: ServiceConfig;
 	uuid: string | null;
+	config_source: ConfigSource;
 }
 
 export interface DataSourceQueryMappingValue {

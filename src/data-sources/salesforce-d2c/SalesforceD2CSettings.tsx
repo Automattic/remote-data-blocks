@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { DataSourceForm } from '@/data-sources/components/DataSourceForm';
+import { ConfigSource } from '@/data-sources/constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { useSalesforceD2CAuth } from '@/data-sources/hooks/useSalesforceD2CAuth';
 import {
@@ -95,6 +96,7 @@ export const SalesforceD2CSettings = ( {
 			service: 'salesforce-d2c',
 			service_config: validState,
 			uuid: uuid ?? null,
+			config_source: ConfigSource.STORAGE,
 		};
 
 		return onSave( data, mode );
@@ -222,7 +224,7 @@ export const SalesforceD2CSettings = ( {
 			</DataSourceForm.Scope>
 			<DataSourceForm.Blocks
 				handleOnChange={ handleOnChange }
-				hasEnabledBlocks={ state.enable_blocks ?? true }
+				hasEnabledBlocks={ Boolean( state.enable_blocks ) }
 			/>
 		</DataSourceForm>
 	);

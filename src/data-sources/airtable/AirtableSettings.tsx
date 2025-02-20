@@ -7,6 +7,7 @@ import { getAirtableOutputQueryMappingValues } from '@/data-sources/airtable/uti
 import { DataSourceForm } from '@/data-sources/components/DataSourceForm';
 import { FieldsSelection } from '@/data-sources/components/FieldsSelection';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
+import { ConfigSource } from '@/data-sources/constants';
 import {
 	useAirtableApiBases,
 	useAirtableApiTables,
@@ -76,6 +77,7 @@ export const AirtableSettings = ( {
 			service: 'airtable',
 			service_config: validState,
 			uuid: uuid ?? null,
+			config_source: ConfigSource.STORAGE,
 		};
 
 		return onSave( airtableConfig, mode );
@@ -214,7 +216,7 @@ export const AirtableSettings = ( {
 				</DataSourceForm.Scope>
 				<DataSourceForm.Blocks
 					handleOnChange={ handleOnChange }
-					hasEnabledBlocks={ state.enable_blocks ?? true }
+					hasEnabledBlocks={ Boolean( state.enable_blocks ) }
 				/>
 			</DataSourceForm>
 		</>

@@ -33,8 +33,8 @@ Editor\BlockManagement\BlockRegistration::init();
 Editor\BlockManagement\ConfigRegistry::init();
 Editor\PatternEditor\PatternEditor::init();
 
-// Analytics
-Analytics\TracksAnalytics::init( new Analytics\EnvironmentConfig() );
+// Telemetry
+Telemetry\TracksTelemetry::init( new Telemetry\EnvironmentConfig() );
 
 // Example API
 ExampleApi\ExampleApi::init();

@@ -2,6 +2,7 @@
 
 namespace RemoteDataBlocks\Integrations\SalesforceD2C;
 
+use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use RemoteDataBlocks\Integrations\SalesforceD2C\Auth\SalesforceD2CAuth;
@@ -14,14 +15,13 @@ class SalesforceD2CIntegration {
 	}
 
 	public static function register_blocks(): void {
-		$data_source_configs = DataSourceCrud::get_configs_by_service( REMOTE_DATA_BLOCKS_SALESFORCE_D2C_SERVICE );
+		$data_source_configs = DataSourceConfigManager::get_all( [
+			'service' => REMOTE_DATA_BLOCKS_SALESFORCE_D2C_SERVICE,
+			'enable_blocks' => true,
+		] );
 
 		foreach ( $data_source_configs as $config ) {
 			$data_source = SalesforceD2CDataSource::from_array( $config );
-
-			if ( false === ( $config['service_config']['enable_blocks'] ?? true ) ) {
-				continue;
-			}
 
 			self::register_blocks_for_salesforce_data_source( $data_source );
 		}

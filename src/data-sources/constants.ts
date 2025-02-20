@@ -45,3 +45,9 @@ export const HTTP_SOURCE_ADD_TO_SELECT_OPTIONS: SelectOption< HttpApiKeyDestinat
 	{ label: __( 'Header', 'remote-data-blocks' ), value: 'header' },
 	{ label: __( 'Query Params', 'remote-data-blocks' ), value: 'queryparams' },
 ];
+
+export enum ConfigSource {
+	CODE = 'code',
+	STORAGE = 'storage',
+	CONSTANTS = 'constant',
+}

@@ -5,6 +5,8 @@ namespace RemoteDataBlocks\PluginSettings;
 use RemoteDataBlocks\REST\DataSourceController;
 use RemoteDataBlocks\REST\AuthController;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
+use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
+use RemoteDataBlocks\Telemetry\DataSourceTelemetry;
 use function wp_get_environment_type;
 use function wp_is_development_mode;
 use function add_settings_error;
@@ -37,6 +39,12 @@ class PluginSettings {
 			</div>',
 			esc_html__( 'Loading…', 'remote-data-blocks' )
 		);
+
+		/**
+		 * Track the view event.
+		 */
+		$configs = DataSourceConfigManager::get_all();
+		DataSourceTelemetry::track_view( $configs );
 	}
 
 	public static function init_rest_routes(): void {
