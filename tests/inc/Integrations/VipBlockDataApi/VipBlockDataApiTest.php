@@ -147,7 +147,7 @@ class VipBlockDataApiTest extends TestCase {
 		$mock_qr->addResult( 'title', $expected1 );
 		$mock_qr->addResult( 'location', $expected2 );
 
-		$mock_query = MockQuery::from_array( [ 'query_runner' => $mock_qr ] );
+		$mock_query = MockQuery::create( [ 'query_runner' => $mock_qr ] );
 		register_remote_data_block( [
 			'title' => 'Events',
 			'render_query' => [
@@ -171,7 +171,7 @@ class VipBlockDataApiTest extends TestCase {
 		$mock_qr->addResult( 'title', 'Happy happy hour! No networking!' );
 		$mock_qr->addResult( 'location', new \WP_Error( 'rdb-uh-oh', 'uh-oh!' ) );
 
-		$mock_query = MockQuery::from_array( [ 'query_runner' => $mock_qr ] );
+		$mock_query = MockQuery::create( [ 'query_runner' => $mock_qr ] );
 		register_remote_data_block( [
 			'title' => 'Events',
 			'render_query' => [

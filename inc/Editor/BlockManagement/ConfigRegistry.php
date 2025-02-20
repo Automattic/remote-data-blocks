@@ -6,6 +6,8 @@ defined( 'ABSPATH' ) || exit();
 
 use RemoteDataBlocks\Logging\LoggerManager;
 use Psr\Log\LoggerInterface;
+use RemoteDataBlocks\Config\Query\HttpQuery;
+use RemoteDataBlocks\Config\Query\QueryInterface;
 use RemoteDataBlocks\Editor\BlockPatterns\BlockPatterns;
 use RemoteDataBlocks\Validation\ConfigSchemas;
 use RemoteDataBlocks\Validation\Validator;
@@ -46,7 +48,7 @@ class ConfigRegistry {
 			return self::create_error( $block_title, sprintf( 'Block %s has already been registered', $block_name ) );
 		}
 
-		$display_query = $user_config[ self::RENDER_QUERY_KEY ]['query'];
+		$display_query = self::inflate_query( $user_config[ self::RENDER_QUERY_KEY ]['query'] );
 		$input_schema = $display_query->get_input_schema();
 
 		// Build the base configuration for the block. This is our own internal
@@ -83,7 +85,7 @@ class ConfigRegistry {
 		// Register "selectors" which allow the user to use a query to assist in
 		// selecting data for display by the block.
 		foreach ( $user_config[ self::SELECTION_QUERIES_KEY ] ?? [] as $selection_query ) {
-			$from_query = $selection_query['query'];
+			$from_query = self::inflate_query( $selection_query['query'] );
 			$from_query_type = $selection_query['type'];
 			$to_query = $display_query;
 
@@ -172,5 +174,13 @@ class ConfigRegistry {
 		$error_message = sprintf( 'Error registering block %s: %s', esc_html( $block_title ), esc_html( $message ) );
 		self::$logger->error( $error_message );
 		return new WP_Error( 'block_registration_error', $error_message );
+	}
+
+	private static function inflate_query( array|QueryInterface $config ): QueryInterface {
+		if ( is_array( $config ) ) {
+			return HttpQuery::from_array( $config );
+		}
+
+		return $config;
 	}
 }

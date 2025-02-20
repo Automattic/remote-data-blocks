@@ -17,18 +17,23 @@ import { __, sprintf } from '@wordpress/i18n';
 import { info } from '@wordpress/icons';
 
 import CodeSnippet from './components/CodeSnippet';
-import { SUPPORTED_SERVICES, SUPPORTED_SERVICES_LABELS } from './constants';
 import { BaseModal } from '@/blocks/remote-data-container/components/modals/BaseModal';
 import { useModalState } from '@/blocks/remote-data-container/hooks/useModalState';
 import DataSourceMetaTags from '@/data-sources/DataSourceMetaTags';
+import {
+	SUPPORTED_SERVICES,
+	SUPPORTED_SERVICES_LABELS,
+	ConfigSource,
+} from '@/data-sources/constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
-import './DataSourceList.scss';
 import { AirtableIcon } from '@/settings/icons/AirtableIcon';
 import { GoogleSheetsIcon } from '@/settings/icons/GoogleSheetsIcon';
 import HttpIcon from '@/settings/icons/HttpIcon';
 import { ShopifyIcon } from '@/settings/icons/ShopifyIcon';
+
+import './DataSourceList.scss';
 
 const DataSourceList = () => {
 	const {
@@ -148,15 +153,17 @@ const DataSourceList = () => {
 		table: {},
 	};
 
+	const isItemEligibleForActions = ( item: DataSourceConfig ) => {
+		return item.config_source === ConfigSource.STORAGE;
+	};
+
 	const actions: Action< DataSourceConfig >[] = [
 		{
 			id: 'edit',
 			label: __( 'Edit', 'remote-data-blocks' ),
 			icon: 'edit',
 			isPrimary: true,
-			isEligible: ( item: DataSourceConfig ) => {
-				return Boolean( item?.uuid );
-			},
+			isEligible: isItemEligibleForActions,
 			callback: ( [ item ]: DataSourceConfig[] ) => {
 				if ( item?.uuid ) {
 					onEditDataSource( item.uuid );
@@ -167,9 +174,7 @@ const DataSourceList = () => {
 			id: 'copy',
 			label: __( 'Copy UUID', 'remote-data-blocks' ),
 			icon: 'copy',
-			isEligible: ( item: DataSourceConfig ) => {
-				return Boolean( item?.uuid );
-			},
+			isEligible: isItemEligibleForActions,
 			callback: ( [ item ]: DataSourceConfig[] ) => {
 				if ( item && item.uuid ) {
 					navigator.clipboard
@@ -191,9 +196,7 @@ const DataSourceList = () => {
 			label: __( 'Delete', 'remote-data-blocks' ),
 			icon: 'trash',
 			isDestructive: true,
-			isEligible: ( item: DataSourceConfig ) => {
-				return Boolean( item?.uuid );
-			},
+			isEligible: isItemEligibleForActions,
 			callback: ( items: DataSourceConfig[] ) => {
 				if ( items.length === 1 ) {
 					if ( items[ 0 ] ) {
@@ -208,9 +211,7 @@ const DataSourceList = () => {
 		{
 			id: 'duplicate',
 			label: __( 'Duplicate', 'remote-data-blocks' ),
-			isEligible: ( item: DataSourceConfig ) => {
-				return Boolean( item?.uuid );
-			},
+			isEligible: isItemEligibleForActions,
 			callback: ( [ item ]: DataSourceConfig[] ) => {
 				if ( item ) {
 					const duplicatedSource = {
@@ -240,7 +241,7 @@ const DataSourceList = () => {
 		{
 			id: 'view-code',
 			label: __( 'View Code', 'remote-data-blocks' ),
-			isEligible: ( item: DataSourceConfig ) => Boolean( item?.uuid ),
+			isEligible: isItemEligibleForActions,
 			callback: ( [ item ]: DataSourceConfig[] ) => {
 				if ( item?.uuid ) {
 					setCurrentSource( item );
@@ -265,7 +266,7 @@ const DataSourceList = () => {
 				icon={ info }
 				label={ __( 'No data source found.', 'remote-data-blocks' ) }
 				instructions={ __(
-					'Use the “Connect New” button to add a data source.',
+					'Use the "Connect New" button to add a data source.',
 					'remote-data-blocks'
 				) }
 			/>

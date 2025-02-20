@@ -23,7 +23,7 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 	function updateOverrides( overrideName: string, enabled: boolean ) {
 		if ( enabled ) {
 			enabledOverrides.add( overrideName );
-			sendTracksEvent( 'remotedatablocks_remote_data_container_override', {
+			sendTracksEvent( 'remote_data_container_override', {
 				data_source_type: getBlockDataSourceType( remoteData.blockName ),
 				override_type: 'unknown', // We no longer know the override type since the implementation is delegated.
 				override_target: 'unknown',

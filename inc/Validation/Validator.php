@@ -2,6 +2,7 @@
 
 namespace RemoteDataBlocks\Validation;
 
+use RemoteDataBlocks\Config\ArraySerializableInterface;
 use RemoteDataBlocks\Validation\Types;
 use RemoteDataBlocks\Logging\LoggerManager;
 use WP_Error;
@@ -112,13 +113,23 @@ final class Validator implements ValidatorInterface {
 				return true;
 
 			case 'one_of':
+				// Keep track of all failed validations. Since one_of is a union type,
+				// if none of the types match, we will return all of the errors so that
+				// the caller can inspect each of them.
+				$errors = [];
+
 				foreach ( Types::get_type_args( $type ) as $member_type ) {
-					if ( true === $this->check_type( $member_type, $value ) ) {
+					$validated = $this->check_type( $member_type, $value );
+					if ( true === $validated ) {
 						return true;
 					}
+
+					$errors[] = $validated;
 				}
 
-				return $this->create_error( 'Value must be one of the specified types', $value );
+				$error = new WP_Error( 'invalid_one_of_type', 'Validation errors for each of the specified types', [ 'errors' => $errors ] );
+
+				return $this->create_error( 'Value must be one of the specified types', $value, $error );
 
 			case 'object':
 				if ( ! self::check_iterable_object( $value ) ) {
@@ -161,6 +172,52 @@ final class Validator implements ValidatorInterface {
 			case 'ref':
 				return $this->check_type( Types::load_ref_type( $type ), $value );
 
+			case 'serialized_config_for':
+				if ( ! self::check_iterable_object( $value ) ) {
+					return $this->create_error( 'Value must be an associative array', $value );
+				}
+
+				$class_ref = Types::get_type_args( $type );
+
+				if ( ! class_exists( $class_ref ) && ! interface_exists( $class_ref ) ) {
+					return $this->create_error( 'Class does not exist', $class_ref );
+				}
+
+				$implements = class_implements( $class_ref );
+				if ( ! in_array( ArraySerializableInterface::class, $implements, true ) ) {
+					return $this->create_error( 'Class does not implement ArraySerializableInterface', $class_ref );
+				}
+
+				// The config must provide a `__class` property so that we know which
+				// class to inflate. This allows values to target subclasses of the
+				// specified class and also provides disambiguation when the type is
+				// used in a union type (one_of).
+				$subclass = $value[ ArraySerializableInterface::CLASS_REF_ATTRIBUTE ] ?? null;
+				if ( null === $subclass ) {
+					return $this->create_error( 'Value does not provide a __class property', $class_ref );
+				}
+
+				$class_description = sprintf( 'Class %s specified by %s property', $subclass, ArraySerializableInterface::CLASS_REF_ATTRIBUTE );
+
+				if ( ! class_exists( $subclass ) ) {
+					return $this->create_error( $class_description . ' does not exist', $subclass );
+				}
+
+				if ( $subclass !== $class_ref && ! is_subclass_of( $subclass, $class_ref, true ) ) {
+					return $this->create_error( $class_description . ' must match or be a subclass of the target class', $subclass );
+				}
+
+				// Done with type validation, update the target class so we can validate
+				// the value / config.
+				$class_ref = $subclass;
+
+				// Validate the schema for the class we want to instantiate. Call the
+				// config prepocessor since some classes inflate their own config.
+				$config_validator = new Validator( $class_ref::get_config_schema(), $class_ref );
+				$config = $class_ref::preprocess_config( $value );
+
+				return $config_validator->validate( $config );
+
 			case 'string_matching':
 				$regex = Types::get_type_args( $type );
 
@@ -196,12 +253,14 @@ final class Validator implements ValidatorInterface {
 			case 'email_address':
 				return false !== is_email( $value );
 
-			case 'button_text':
 			case 'html':
-			case 'id':
 			case 'image_alt':
 			case 'markdown':
 				return is_string( $value );
+
+			case 'button_text':
+			case 'id':
+				return is_string( $value ) && ! empty( $value );
 
 			case 'json_path':
 				return is_string( $value ) && str_starts_with( $value, '$' );
@@ -229,12 +288,12 @@ final class Validator implements ValidatorInterface {
 	}
 
 	private function create_error( string $message, mixed $value, ?WP_Error $child_error = null ): WP_Error {
-		$serialized_value = is_string( $value ) ? $value : wp_json_encode( $value );
+		$serialized_value = is_string( $value ) || is_numeric( $value ) ? strval( $value ) : wp_json_encode( $value );
 		$message = sprintf( '%s: %s', esc_html( $message ), $serialized_value );
 		return new WP_Error( 'invalid_type', $message, [ 'child' => $child_error ] );
 	}
 
-	private function get_object_key( mixed $data, string $key ): mixed {
+	private function get_object_key( mixed $data, string|int $key ): mixed {
 		return is_array( $data ) && array_key_exists( $key, $data ) ? $data[ $key ] : null;
 	}
 }

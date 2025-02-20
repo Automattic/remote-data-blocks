@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Config\Query;
 
 use RemoteDataBlocks\Config\ArraySerializable;
+use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Config\DataSource\HttpDataSourceInterface;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\Validation\ConfigSchemas;
@@ -54,6 +55,10 @@ class HttpQuery extends ArraySerializable implements HttpQueryInterface {
 	 * Get the data source associated with this query.
 	 */
 	public function get_data_source(): HttpDataSourceInterface {
+		if ( is_array( $this->config['data_source'] ) ) {
+			$this->config['data_source'] = HttpDataSource::from_array( $this->config['data_source'] );
+		}
+
 		return $this->config['data_source'];
 	}
 
@@ -123,7 +128,7 @@ class HttpQuery extends ArraySerializable implements HttpQueryInterface {
 	/**
 	 * @inheritDoc
 	 */
-	protected static function get_config_schema(): array {
+	public static function get_config_schema(): array {
 		return ConfigSchemas::get_http_query_config_schema();
 	}
 
