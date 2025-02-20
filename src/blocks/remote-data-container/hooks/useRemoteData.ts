@@ -176,9 +176,9 @@ export function useRemoteData( {
 	// choose from if the query supports it. This is implemented in a separate
 	// effect to avoid entangling the logic of initial fetch and refetch.
 	//
-	// This fetch may fail if the query input is invalid and incomplete, but as an
+	// This fetch may fail if the query input is invalid or incomplete, but as an
 	// "optimistic" fetch, we don't want to surface that error to the user. So we
-	// pass `false` to the fetch function to suppress error reporting.
+	// do a pre-validation and bail if we see that validation will not pass.
 	//
 	// The dependency array is empty because we only want to run this effect once.
 	useEffect( () => {
