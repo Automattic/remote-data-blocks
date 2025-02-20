@@ -20,13 +20,13 @@ class FunctionsTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->mock_logger = new MockLogger();
-		$this->mock_query = MockQuery::from_array();
-		$this->mock_list_query = MockQuery::from_array( [
+		$this->mock_query = MockQuery::create();
+		$this->mock_list_query = MockQuery::create( [
 			'output_schema' => [
 				'is_collection' => true,
 			],
 		] );
-		$this->mock_search_query = MockQuery::from_array( [
+		$this->mock_search_query = MockQuery::create( [
 			'input_schema' => [
 				'search' => [ 'type' => 'ui:search_input' ],
 			],
@@ -75,9 +75,9 @@ class FunctionsTest extends TestCase {
 			'title' => 'Test Block with Nested Config',
 			'render_query' => [
 				'query' => [
-					'__subclass' => 'RemoteDataBlocks\Tests\Mocks\MockQuery',
+					'__class' => 'RemoteDataBlocks\Tests\Mocks\MockQuery',
 					'data_source' => [
-						'__subclass' => 'RemoteDataBlocks\Tests\Mocks\MockDataSource',
+						'__class' => 'RemoteDataBlocks\Tests\Mocks\MockDataSource',
 						'service_config' => [
 							'__version' => 1,
 							'display_name' => 'Mock Data Source',

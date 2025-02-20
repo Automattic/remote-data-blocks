@@ -61,7 +61,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Psalm
-        uses: docker://ghcr.io/psalm/psalm-github-actions
+        uses: docker://ghcr.io/psalm/psalm-github-actions:6.5.1
         with:
           composer_require_dev: true
           php-version: '8.1'

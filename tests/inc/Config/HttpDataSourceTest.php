@@ -16,13 +16,13 @@ class HttpDataSourceTest extends TestCase {
 				'endpoint' => 'http://example.com',
 			],
 		];
-		$this->http_data_source = MockDataSource::from_array( $config );
+		$this->http_data_source = MockDataSource::create( $config );
 
 		$this->assertSame( 'generic-http', $this->http_data_source->get_service_name() );
 	}
 
 	public function testGetServiceMethodReturnsCorrectValue(): void {
-		$this->http_data_source = MockDataSource::from_array();
+		$this->http_data_source = MockDataSource::create();
 
 		$this->assertEquals( 'generic-http', $this->http_data_source->get_service_name() );
 	}
