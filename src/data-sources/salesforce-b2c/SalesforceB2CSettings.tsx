@@ -4,6 +4,7 @@ import { __ } from '@wordpress/i18n';
 
 import { DataSourceForm } from '../components/DataSourceForm';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
+import { ConfigSource } from '@/data-sources/constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import {
 	SettingsComponentProps,
@@ -42,6 +43,7 @@ export const SalesforceB2CSettings = ( {
 			service: 'salesforce-b2c',
 			service_config: validState,
 			uuid: uuid ?? null,
+			config_source: ConfigSource.STORAGE,
 		};
 
 		return onSave( data, mode );
@@ -108,7 +110,7 @@ export const SalesforceB2CSettings = ( {
 			</DataSourceForm.Setup>
 			<DataSourceForm.Blocks
 				handleOnChange={ handleOnChange }
-				hasEnabledBlocks={ state.enable_blocks ?? true }
+				hasEnabledBlocks={ Boolean( state.enable_blocks ) }
 			/>
 		</DataSourceForm>
 	);

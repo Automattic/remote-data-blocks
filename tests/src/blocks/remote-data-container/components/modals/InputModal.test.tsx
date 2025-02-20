@@ -66,7 +66,7 @@ describe( 'InputModal', () => {
 			input1: 'Test Value 1',
 			input2: 'Test Value 2',
 		} );
-		expect( sendTracksEvent ).toHaveBeenCalledWith( 'remotedatablocks_add_block', {
+		expect( sendTracksEvent ).toHaveBeenCalledWith( 'add_block', {
 			action: 'select_item',
 			data_source_type: '',
 			selected_option: 'manual_input',

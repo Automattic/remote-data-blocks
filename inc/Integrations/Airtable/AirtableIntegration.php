@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Integrations\Airtable;
 
-use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
+use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Formatting\StringFormatter;
 use RemoteDataBlocks\Snippet\Snippet;
@@ -14,17 +14,14 @@ class AirtableIntegration {
 	}
 
 	public static function register_blocks(): void {
-		$data_source_configs = DataSourceCrud::get_configs_by_service(
-			REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE
-		);
+		$data_source_configs = DataSourceConfigManager::get_all( [
+			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
+			'enable_blocks' => true,
+		] );
 
 		foreach ( $data_source_configs as $config ) {
 			$data_source = AirtableDataSource::from_array( $config );
 
-			if ( false === ( $config['service_config']['enable_blocks'] ?? true ) ) {
-				continue;
-			}
-			
 			self::register_blocks_for_airtable_data_source( $data_source );
 			self::register_loop_blocks_for_airtable_data_source( $data_source );
 		}

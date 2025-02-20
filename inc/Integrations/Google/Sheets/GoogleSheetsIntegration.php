@@ -2,7 +2,7 @@
 
 namespace RemoteDataBlocks\Integrations\Google\Sheets;
 
-use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
+use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Formatting\StringFormatter;
 use RemoteDataBlocks\Snippet\Snippet;
@@ -14,17 +14,14 @@ class GoogleSheetsIntegration {
 	}
 
 	public static function register_blocks(): void {
-		$data_source_configs = DataSourceCrud::get_configs_by_service(
-			REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE
-		);
+		$data_source_configs = DataSourceConfigManager::get_all( [
+			'service' => REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE,
+			'enable_blocks' => true,
+		] );
 
 		foreach ( $data_source_configs as $config ) {
 			$data_source = GoogleSheetsDataSource::from_array( $config );
-	
-			if ( false === ( $config['service_config']['enable_blocks'] ?? true ) ) {
-				continue;
-			}
-			
+
 			self::register_blocks_for_google_sheets_data_source( $data_source );
 			self::register_loop_blocks_for_google_sheets_data_source( $data_source );
 		}

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace RemoteDataBlocks\Analytics;
+namespace RemoteDataBlocks\Telemetry;
 
 defined( 'ABSPATH' ) || exit();
 
@@ -8,14 +8,14 @@ use Automattic\VIP\Telemetry\Tracks;
 use function Automattic\VIP\Telemetry\Tracks\get_tracks_core_properties;
 
 /**
- * Class for environment configuration.
+ * Class to handle environment configuration for telemetry.
  *
  * This class abstracts WordPress-specific functions for easy mocking.
  */
 class EnvironmentConfig {
 
 	public function is_enabled_via_filter(): bool {
-		return apply_filters( 'remote_data_blocks_enable_tracks_analytics', false ) ?? false;
+		return apply_filters( 'remote_data_blocks_enable_tracks_telemetry', false ) ?? false;
 	}
 
 	public function get_tracks_lib_class(): ?string {

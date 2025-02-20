@@ -65,7 +65,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 
 	function onSelectItem( input: RemoteDataQueryInput | RemoteDataQueryInput[] ): void {
 		onSelect?.( input );
-		sendTracksEvent( 'remotedatablocks_add_block', {
+		sendTracksEvent( 'add_block', {
 			action: 'select_item',
 			selected_option: 'search_from_list',
 			data_source_type: getBlockDataSourceType( blockName ),

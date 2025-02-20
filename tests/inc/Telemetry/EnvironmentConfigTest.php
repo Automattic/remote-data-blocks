@@ -1,10 +1,10 @@
 <?php declare(strict_types = 1);
 
-namespace RemoteDataBlocks\Tests\Analytics;
+namespace RemoteDataBlocks\Tests\Telemetry;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
-use RemoteDataBlocks\Analytics\EnvironmentConfig;
+use RemoteDataBlocks\Telemetry\EnvironmentConfig;
 use RemoteDataBlocks\Tests\Mocks\MockWordPressFunctions;
 
 class EnvironmentConfigTest extends TestCase {
@@ -19,7 +19,7 @@ class EnvironmentConfigTest extends TestCase {
 	}
 
 	public function testIsEnabledViaFilterReturnsTrue(): void {
-		MockWordPressFunctions::add_mock_filter( 'remote_data_blocks_enable_tracks_analytics', true );
+		MockWordPressFunctions::add_mock_filter( 'remote_data_blocks_enable_tracks_telemetry', true );
 
 		$obj = new EnvironmentConfig();
 

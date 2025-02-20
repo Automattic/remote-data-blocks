@@ -17,6 +17,10 @@ function esc_html( string $text ): string {
 	return $text;
 }
 
+function esc_html__( string $text ): string {
+	return apply_filters( 'esc_html__', $text );
+}
+
 function register_block_pattern( string $_name, array $_options ): void {
 	// Do nothing
 }
