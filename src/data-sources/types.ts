@@ -53,11 +53,16 @@ export interface HttpServiceConfig extends BaseServiceConfig {
 	endpoint: string;
 }
 
+export interface SalesforceD2CStoreConfig extends StringIdName {
+	output_query_mappings: DataSourceQueryMappingValue[];
+}
+
 export interface SalesforceD2CServiceConfig extends BaseServiceConfig {
 	client_id: string;
 	client_secret: string;
 	store_id: string;
-	instance_url: string;
+	domain: string;
+	stores: SalesforceD2CStoreConfig[];
 }
 
 export interface ShopifyServiceConfig extends BaseServiceConfig {

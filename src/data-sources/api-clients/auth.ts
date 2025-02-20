@@ -21,3 +21,23 @@ export async function getGoogleAuthTokenFromServiceAccount(
 
 	return response.token;
 }
+
+export async function getSalesforceD2CAuthToken(
+	domain: string,
+	clientId: string,
+	clientSecret: string
+): Promise< string > {
+	const requestBody = {
+		domain,
+		clientId,
+		clientSecret,
+	};
+
+	const response = await apiFetch< { token: string } >( {
+		path: `${ REST_BASE_AUTH }/salesforce-d2c/token`,
+		method: 'POST',
+		data: requestBody,
+	} );
+
+	return response.token;
+}

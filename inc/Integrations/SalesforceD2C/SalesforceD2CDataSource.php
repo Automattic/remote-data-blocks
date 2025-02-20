@@ -19,15 +19,32 @@ class SalesforceD2CDataSource extends HttpDataSource {
 			'client_id' => Types::string(),
 			'client_secret' => Types::string(),
 			'enable_blocks' => Types::nullable( Types::boolean() ),
-			'instance_url' => Types::string(),
-			'store_id' => Types::string(),
+			'domain' => Types::string(),
+			'store' => Types::object( [
+				'id' => Types::id(),
+				'name' => Types::nullable( Types::string() ),
+			] ),
+			'stores' => Types::list_of(
+				Types::object( [
+					'id' => Types::string(),
+					'name' => Types::string(),
+					'output_query_mappings' => Types::list_of(
+						Types::object( [
+							'key' => Types::string(),
+							'name' => Types::nullable( Types::string() ),
+							'path' => Types::nullable( Types::json_path() ),
+							'type' => Types::nullable( Types::string() ),
+						] )
+					),
+				] )
+			),
 		] );
 	}
 
 	protected static function map_service_config( array $service_config ): array {
 		return [
 			'display_name' => $service_config['display_name'],
-			'endpoint' => $service_config['instance_url'],
+			'endpoint' => 'https://' . $service_config['domain'] . '.my.salesforce.com',
 			'image_url' => plugins_url( './assets/salesforce_commerce_cloud_logo.png', __FILE__ ),
 			'request_headers' => [
 				'Content-Type' => 'application/json',

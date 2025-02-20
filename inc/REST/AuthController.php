@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\REST;
 
 use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
+use RemoteDataBlocks\Integrations\SalesforceD2C\Auth\SalesforceD2CAuth;
 use WP_REST_Controller;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -34,7 +35,20 @@ class AuthController extends WP_REST_Controller {
 			[
 				'methods' => 'POST',
 				'callback' => [ $this, 'get_google_auth_token' ],
-				'permission_callback' => [ $this, 'get_google_auth_token_permissions_check' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+			]
+		);
+
+		/**
+		 * API to get Salesforce D2C Access Token using the client_credentials grant type.
+		 */
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/salesforce-d2c/token',
+			[
+				'methods' => 'POST',
+				'callback' => [ $this, 'get_salesforce_d2c_auth_token' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
 			]
 		);
 	}
@@ -68,11 +82,34 @@ class AuthController extends WP_REST_Controller {
 		);
 	}
 
+	public function get_salesforce_d2c_auth_token( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$params = $request->get_json_params();
+		$client_id = $params['client_id'] ?? null;
+		$client_secret = $params['client_secret'] ?? null;
+		$domain = $params['domain'] ?? null;
+
+		if ( ! $client_id || ! $client_secret || ! $domain ) {
+			return new \WP_Error(
+				'missing_parameters',
+				__( 'Client ID, client secret and domain are required.', 'remote-data-blocks' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		$endpoint = 'https://' . $domain . '.my.salesforce.com';
+
+		$token = SalesforceD2CAuth::generate_token( $endpoint, $client_id, $client_secret );
+		if ( is_wp_error( $token ) ) {
+			return rest_ensure_response( $token );
+		}
+		return rest_ensure_response( [ 'token' => $token ] );
+	}
+
 	/**
 	 * These all require manage_options for now, but we can adjust as needed.
 	 * Taken from /inc/REST/DataSourceController.php
 	 */
-	public function get_google_auth_token_permissions_check(): bool {
+	public function permissions_check(): bool {
 		return current_user_can( 'manage_options' );
 	}
 }
