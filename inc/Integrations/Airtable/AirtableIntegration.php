@@ -47,8 +47,7 @@ class AirtableIntegration {
 						'selection_queries' => [
 							[
 								'query' => $list_query,
-								'type' => 'list',
-								'supports_bulk' => true,
+								'type' => 'list', 
 							],
 						],
 					],
@@ -87,6 +86,7 @@ class AirtableIntegration {
 			'record_id' => [
 				'name' => 'Record ID',
 				'type' => 'id',
+				'supports_bulk' => true,
 			],
 		];
 

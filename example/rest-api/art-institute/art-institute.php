@@ -37,7 +37,7 @@ function register_aic_block(): void {
 				fn( $item ) => $item['id'],
 				$input_variables
 			) : ( isset( $input_variables['id'] ) ? [ $input_variables['id'] ] : [] );
-
+			
 			if ( !empty( $ids ) ) {
 				return add_query_arg([
 					'ids' => implode( ',', $ids ),
@@ -51,6 +51,7 @@ function register_aic_block(): void {
 			'id' => [
 				'name' => 'Art ID',
 				'type' => 'id',
+				'supports_bulk' => true,
 			],
 		],
 		'output_schema' => [
@@ -157,7 +158,6 @@ function register_aic_block(): void {
 			[
 				'query' => $search_art_query,
 				'type' => 'search',
-				'supports_bulk' => true,
 			],
 		],
 	]);
