@@ -4,6 +4,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { REMOTE_DATA_REST_API_URL } from '@/blocks/remote-data-container/config/constants';
 import { usePaginationVariables } from '@/blocks/remote-data-container/hooks/usePaginationVariables';
 import { useSearchVariables } from '@/blocks/remote-data-container/hooks/useSearchVariables';
+import { validateQueryInput } from '@/utils/input-validation';
 import { getBlockConfig } from '@/utils/localized-block-data';
 
 async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< RemoteData | null > {
@@ -42,6 +43,7 @@ async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< Re
 
 interface UseRemoteData {
 	data?: RemoteData;
+	error?: Error;
 	fetch: ( queryInput: RemoteDataQueryInput ) => Promise< void >;
 	hasNextPage: boolean;
 	hasPreviousPage: boolean;
@@ -49,7 +51,6 @@ interface UseRemoteData {
 	page: number;
 	perPage?: number;
 	reset: () => void;
-	requiredInputVariables: InputVariable[];
 	searchInput: string;
 	setPage: ( page: number ) => void;
 	setPerPage: ( perPage: number ) => void;
@@ -69,6 +70,7 @@ interface UseRemoteDataInput {
 	enabledOverrides?: string[];
 	externallyManagedRemoteData?: RemoteData;
 	externallyManagedUpdateRemoteData?: ( remoteData?: RemoteData ) => void;
+	fetchOnMount?: boolean;
 	initialPage?: number;
 	initialPerPage?: number;
 	initialSearchInput?: string;
@@ -89,30 +91,32 @@ export function useRemoteData( {
 	enabledOverrides = [],
 	externallyManagedRemoteData,
 	externallyManagedUpdateRemoteData,
+	fetchOnMount = false,
 	initialPage,
 	initialPerPage,
 	initialSearchInput,
 	onSuccess,
 	queryKey,
 }: UseRemoteDataInput ): UseRemoteData {
-	const blockConfig = getBlockConfig( blockName );
-
-	const query = blockConfig?.selectors?.find( selector => selector.query_key === queryKey );
-
-	if ( ! query ) {
-		throw new Error( `Selector not found for query key: ${ queryKey }` );
-	}
-
-	const inputVariables = query.inputs;
-
-	const requiredInputVariables = inputVariables.filter( input => input.required );
-
 	const [ data, setData ] = useState< RemoteData >();
+	const [ error, setError ] = useState< Error >();
 	const [ loading, setLoading ] = useState< boolean >( false );
 
 	const resolvedData = externallyManagedRemoteData ?? data;
 	const resolvedUpdater = externallyManagedUpdateRemoteData ?? setData;
 	const hasResolvedData = Boolean( resolvedData );
+
+	const blockConfig = getBlockConfig( blockName );
+	const query = blockConfig?.selectors?.find( selector => selector.query_key === queryKey );
+
+	if ( ! query ) {
+		// Here we intentionally throw an error instead of calling setError, because
+		// this indicates a misconfiguration somewhere in our code, not a runtime /
+		// query error.
+		throw new Error( `Query not found for block "${ blockName }" and key "${ queryKey }".` );
+	}
+
+	const inputVariables = query.inputs;
 
 	const {
 		onFetch: onFetchForPagination,
@@ -133,11 +137,30 @@ export function useRemoteData( {
 		inputVariables,
 	} );
 
-	// The purpose of this effect is to automatically execute this query anytime when the managed query
-	// input variables (pagination, and search) is changed.
+	// Search and pagination are  a "managed" input variable (this hook manages its state), so if
+	// there is valid search input, then we should consider the query ready to
+	// execute. Note that this query might fail if the overall search input is
+	// invalid; if so, the QueryInputValidationError will be returned by this hook
+	// and can be inspected by the caller to determine if or how to surface it to
+	// the user.
+	//
+	// If we add additional managed input variables (like filters), we'll need to
+	// include them here.
+	//
+	// We also want to respond to changes in our managed pagination
+	// variables, so we include them in the dependency array of the effect.
+	//
+	// Otherwise, if there are no managed input variables to react to, we will wait
+	// for the caller of this hook to manually `fetch`.
+	const shouldFetchForManagedVariables = ! error && ( hasResolvedData || fetchOnMount );
+
 	useEffect( () => {
+		if ( ! shouldFetchForManagedVariables ) {
+			return;
+		}
+
 		void fetch( resolvedData?.queryInput ?? {} );
-	}, [ hasResolvedData, page, perPage, searchInput ] );
+	}, [ shouldFetchForManagedVariables, page, perPage, searchInput ] );
 
 	async function fetch( queryInput: RemoteDataQueryInput ): Promise< void > {
 		const requestData: RemoteDataApiRequest = {
@@ -150,12 +173,11 @@ export function useRemoteData( {
 			},
 		};
 
-		// If the query input is missing any required variables, then we should not fetch.
-		// This is within the fetch, and not within the effect to ensure this check happens
-		// anytime the fetch function is called.
-		// ToDo: This should really be setting an error state.
-		if ( requiredInputVariables.some( input => ! requestData.query_input[ input.slug ] ) ) {
+		try {
+			validateQueryInput( requestData.query_input, inputVariables );
+		} catch ( err: unknown ) {
 			resolvedUpdater( undefined );
+			setError( err instanceof Error ? err : new Error( 'Query input is invalid' ) );
 			return;
 		}
 
@@ -177,10 +199,13 @@ export function useRemoteData( {
 
 	function reset(): void {
 		resolvedUpdater( undefined );
+		setError( undefined );
+		setLoading( false );
 	}
 
 	return {
 		data: resolvedData,
+		error,
 		fetch,
 		hasNextPage: totalPages ? page < totalPages : supportsPagination,
 		hasPreviousPage: page > 1,
@@ -188,7 +213,6 @@ export function useRemoteData( {
 		page,
 		perPage,
 		reset,
-		requiredInputVariables,
 		searchInput,
 		setSearchInput,
 		supportsPagination,

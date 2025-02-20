@@ -1,5 +1,4 @@
 import { Button, Modal } from '@wordpress/components';
-import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { ItemList } from '@/blocks/remote-data-container/components/item-list/ItemList';
@@ -32,30 +31,15 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 	const { close, isOpen, open } = useModalState();
 	const {
 		data,
-		fetch,
 		loading,
 		page,
 		searchInput,
 		setPage,
-		requiredInputVariables,
 		setSearchInput,
 		supportsSearch,
 		totalItems,
 		totalPages,
-	} = useRemoteData( {
-		blockName,
-		queryKey,
-	} );
-
-	// This is an optimistic query to get the data primed and ready for the user to select.
-	useEffect( () => {
-		// If there are required fields, then we shouldn't prime the data as the query could fail.
-		if ( requiredInputVariables.length > 0 ) {
-			return;
-		}
-
-		void fetch( {} );
-	}, [ requiredInputVariables ] );
+	} = useRemoteData( { blockName, fetchOnMount: true, queryKey } );
 
 	function onSelectItem( input: RemoteDataQueryInput ): void {
 		onSelect?.( input );
