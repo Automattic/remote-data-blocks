@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { validateQueryInput } from '@/utils/input-validation';
+import { isQueryInputValid, validateQueryInput } from '@/utils/input-validation';
 
 describe( 'validateQueryInput', () => {
 	it( 'should validate query input', () => {
@@ -15,6 +15,7 @@ describe( 'validateQueryInput', () => {
 		];
 
 		expect( () => validateQueryInput( queryInput, inputVariables ) ).not.toThrow();
+		expect( isQueryInputValid( queryInput, inputVariables ) ).toBe( true );
 	} );
 
 	it( 'should throw an error if query input is missing required variables', () => {
@@ -29,6 +30,7 @@ describe( 'validateQueryInput', () => {
 		expect( () => validateQueryInput( queryInput, inputVariables ) ).toThrowError(
 			'Missing required query input variables'
 		);
+		expect( isQueryInputValid( queryInput, inputVariables ) ).toBe( false );
 	} );
 
 	it( 'should not throw an error for non-nullish but falsy values', () => {
@@ -42,5 +44,6 @@ describe( 'validateQueryInput', () => {
 		];
 
 		expect( validateQueryInput( queryInput, inputVariables ) ).toBe( true );
+		expect( isQueryInputValid( queryInput, inputVariables ) ).toBe( true );
 	} );
 } );

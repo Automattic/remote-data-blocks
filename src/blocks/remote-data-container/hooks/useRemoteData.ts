@@ -4,8 +4,14 @@ import { useEffect, useState } from '@wordpress/element';
 import { REMOTE_DATA_REST_API_URL } from '@/blocks/remote-data-container/config/constants';
 import { usePaginationVariables } from '@/blocks/remote-data-container/hooks/usePaginationVariables';
 import { useSearchVariables } from '@/blocks/remote-data-container/hooks/useSearchVariables';
-import { validateQueryInput } from '@/utils/input-validation';
+import { isQueryInputValid, validateQueryInput } from '@/utils/input-validation';
 import { getBlockConfig } from '@/utils/localized-block-data';
+
+export class RemoteDataFetchError extends Error {
+	constructor( message: string, public cause: unknown ) {
+		super( message );
+	}
+}
 
 async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< RemoteData | null > {
 	const { body } = await apiFetch< RemoteDataApiResponse >( {
@@ -132,35 +138,56 @@ export function useRemoteData( {
 		initialPerPage,
 		inputVariables,
 	} );
-	const { searchQueryInput, searchInput, setSearchInput, supportsSearch } = useSearchVariables( {
-		initialSearchInput,
-		inputVariables,
-	} );
+	const { hasSearchInput, searchQueryInput, searchInput, setSearchInput, supportsSearch } =
+		useSearchVariables( {
+			initialSearchInput,
+			inputVariables,
+		} );
+	const managedQueryInput = { ...paginationQueryInput, ...searchQueryInput };
 
-	// Search and pagination are  a "managed" input variable (this hook manages its state), so if
-	// there is valid search input, then we should consider the query ready to
-	// execute. Note that this query might fail if the overall search input is
-	// invalid; if so, the QueryInputValidationError will be returned by this hook
-	// and can be inspected by the caller to determine if or how to surface it to
-	// the user.
+	// Search and pagination are "managed" input variables (this hook manages their
+	// state), so we should refetch if those variables change. If the query fails,
+	// the resulting error will be returned by this hook if there is valid search
+	// input, then we should consider the query and can be inspected by the caller
+	// to determine if or how to surface it to the user.
 	//
 	// If we add additional managed input variables (like filters), we'll need to
 	// include them here.
 	//
-	// We also want to respond to changes in our managed pagination
-	// variables, so we include them in the dependency array of the effect.
-	//
-	// Otherwise, if there are no managed input variables to react to, we will wait
-	// for the caller of this hook to manually `fetch`.
-	const shouldFetchForManagedVariables = ! error && ( hasResolvedData || fetchOnMount );
+	// We only want to refetch if there was a previous successful fetch.
+	const shouldFetchForManagedVariables = ! error && ( hasResolvedData || hasSearchInput );
+	const shouldClearResolvedData = hasResolvedData && supportsSearch && ! hasSearchInput;
 
 	useEffect( () => {
+		if ( shouldClearResolvedData ) {
+			resolvedUpdater( undefined );
+			return;
+		}
+
 		if ( ! shouldFetchForManagedVariables ) {
 			return;
 		}
 
 		void fetch( resolvedData?.queryInput ?? {} );
-	}, [ shouldFetchForManagedVariables, page, perPage, searchInput ] );
+	}, [ shouldClearResolvedData, shouldFetchForManagedVariables, page, perPage, searchInput ] );
+
+	// Separately, some callers request an "optimistic" initial fetch. An example
+	// would be DataViewsModal, which will display an initial list of items to
+	// choose from if the query supports it. This is implemented in a separate
+	// effect to avoid entangling the logic of initial fetch and refetch.
+	//
+	// This fetch may fail if the query input is invalid and incomplete, but as an
+	// "optimistic" fetch, we don't want to surface that error to the user. So we
+	// pass `false` to the fetch function to suppress error reporting.
+	//
+	// The dependency array is empty because we only want to run this effect once.
+	useEffect( () => {
+		if ( ! fetchOnMount || ! isQueryInputValid( managedQueryInput, inputVariables ) ) {
+			return;
+		}
+
+		void fetch( {} );
+	}, [] );
 
 	async function fetch( queryInput: RemoteDataQueryInput ): Promise< void > {
 		const requestData: RemoteDataApiRequest = {
@@ -168,8 +195,7 @@ export function useRemoteData( {
 			query_key: queryKey,
 			query_input: {
 				...queryInput,
-				...paginationQueryInput,
-				...searchQueryInput,
+				...managedQueryInput,
 			},
 		};
 
@@ -177,13 +203,16 @@ export function useRemoteData( {
 			validateQueryInput( requestData.query_input, inputVariables );
 		} catch ( err: unknown ) {
 			resolvedUpdater( undefined );
-			setError( err instanceof Error ? err : new Error( 'Query input is invalid' ) );
+			setError( new RemoteDataFetchError( 'Query input is invalid', err ) );
 			return;
 		}
 
 		setLoading( true );
 
-		const remoteData = await fetchRemoteData( requestData ).catch( () => null );
+		const remoteData = await fetchRemoteData( requestData ).catch( ( err: unknown ) => {
+			setError( new RemoteDataFetchError( 'Request for remote data failed', err ) );
+			return null;
+		} );
 
 		if ( ! remoteData ) {
 			resolvedUpdater( undefined );

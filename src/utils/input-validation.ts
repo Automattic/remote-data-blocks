@@ -42,3 +42,19 @@ export function validateQueryInput(
 
 	return true;
 }
+
+/**
+ * Wrapper around `validateQueryInput` that returns a boolean instead of throwing
+ * an error.
+ */
+export function isQueryInputValid(
+	queryInput: RemoteDataQueryInput,
+	inputVariables: InputVariable[]
+): boolean {
+	try {
+		validateQueryInput( queryInput, inputVariables );
+		return true;
+	} catch ( error ) {
+		return false;
+	}
+}
