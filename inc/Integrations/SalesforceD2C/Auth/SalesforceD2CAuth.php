@@ -15,7 +15,6 @@ class SalesforceD2CAuth {
 	 * Generate a token from a client ID and secret, or use an existing token if available.
 	 *
 	 * @param string $endpoint The endpoint prefix URL for the data source,
-	 * @param string $organization_id The organization ID for the data source.
 	 * @param string $client_id The client ID (a version 4 UUID).
 	 * @param string $client_secret The client secret.
 	 * @return string|WP_Error The token or an error.
@@ -41,6 +40,7 @@ class SalesforceD2CAuth {
 	): array|WP_Error {
 		$webstores_url = sprintf( '%s/services/data/v63.0/query/?q=SELECT+name,id+from+webstore', $endpoint );
 
+		/* phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.wp_remote_get_wp_remote_get -- We don't only work on VIP so we can't rely on that. That said, we should safely implement a wrapper that uses it when it's available. */
 		$response = wp_remote_get( $webstores_url, [
 			'headers' => [
 				'Authorization' => 'Bearer ' . $token,
