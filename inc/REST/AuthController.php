@@ -101,12 +101,20 @@ class AuthController extends WP_REST_Controller {
 
 		$token = SalesforceD2CAuth::generate_token( $endpoint, $client_id, $client_secret );
 		if ( is_wp_error( $token ) ) {
-			return rest_ensure_response( $token );
+			return new \WP_Error(
+				'failed-to-generate-token',
+				__( 'Failed to generate token', 'remote-data-blocks' ),
+				array( 'status' => 400 )
+			);
 		}
 
 		$webstores = SalesforceD2CAuth::get_webstores( $endpoint, $token );
 		if ( is_wp_error( $webstores ) ) {
-			return rest_ensure_response( $webstores );
+			return new \WP_Error(
+				'failed-to-retrieve-webstores',
+				__( 'Failed to retrieve webstores', 'remote-data-blocks' ),
+				array( 'status' => 400 )
+			);
 		}
 
 		return rest_ensure_response(

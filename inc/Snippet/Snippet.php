@@ -40,16 +40,16 @@ class Snippet implements JsonSerializable {
 		$service = $data_source_config['service'];
 
 		switch ( $service ) {
-			case 'shopify':
+			case REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE:
 				$snippets = ShopifyIntegration::get_block_registration_snippets( $data_source_config );
 				break;
-			case 'airtable':
+			case REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE:
 				$snippets = AirtableIntegration::get_block_registration_snippets( $data_source_config );
 				break;
-			case 'google-sheets':
+			case REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE:
 				$snippets = GoogleSheetsIntegration::get_block_registration_snippets( $data_source_config );
 				break;
-			case 'salesforce-d2c':
+			case REMOTE_DATA_BLOCKS_SALESFORCE_D2C_SERVICE:
 				$snippets = SalesforceD2CIntegration::get_block_registration_snippets( $data_source_config );
 				break;
 			default:
