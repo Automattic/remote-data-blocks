@@ -6,7 +6,7 @@ type AvailableBindings = Record< string, RemoteDataBinding >;
  */
 interface InputVariable {
 	/** The display friendly name of the variable */
-	name: string;
+	name?: string;
 	/** Whether the variable is required */
 	required: boolean;
 	/** The slug of the variable */
