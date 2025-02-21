@@ -21,7 +21,7 @@ export function PatternSelection( props: PatternSelectionProps ) {
 	function onClickPattern( pattern: BlockPattern ) {
 		props.onSelectPattern( pattern );
 		setShowModal( false );
-		sendTracksEvent( 'remotedatablocks_add_block', {
+		sendTracksEvent( 'add_block', {
 			action: 'select_pattern',
 			selected_option: 'select_from_list',
 			data_source_type: getBlockDataSourceType( props.blockName ),
@@ -34,7 +34,7 @@ export function PatternSelection( props: PatternSelectionProps ) {
 
 	function onClickManualEdit(): void {
 		props.onCancel();
-		sendTracksEvent( 'remotedatablocks_add_block', {
+		sendTracksEvent( 'add_block', {
 			action: 'select_pattern',
 			selected_option: 'manual_edit',
 			data_source_type: getBlockDataSourceType( props.blockName ),

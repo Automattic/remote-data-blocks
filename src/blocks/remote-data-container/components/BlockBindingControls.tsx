@@ -62,7 +62,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 	function updateFieldBinding( target: string, field: string ): void {
 		if ( ! field ) {
 			removeBinding( target );
-			sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
+			sendTracksEvent( 'remote_data_container_actions', {
 				action: 'remove_binding',
 				data_source_type: getBlockDataSourceType( remoteDataName ),
 				block_target_attribute: target,
@@ -73,7 +73,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 
 		const args = attributes.metadata?.bindings?.[ target ]?.args ?? {};
 		updateBinding( target, { ...args, field } );
-		sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
+		sendTracksEvent( 'remote_data_container_actions', {
 			action: 'update_binding',
 			data_source_type: getBlockDataSourceType( remoteDataName ),
 			remote_data_field: field,
@@ -91,7 +91,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 			? Object.entries( availableBindings ).find( ( [ key ] ) => key === contentField )?.[ 1 ]?.name
 			: undefined;
 		updateBinding( 'content', { ...contentArgs, field: contentField, label } );
-		sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
+		sendTracksEvent( 'remote_data_container_actions', {
 			action: showLabel ? 'show_label' : 'hide_label',
 			data_source_type: getBlockDataSourceType( remoteDataName ),
 		} );

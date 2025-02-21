@@ -4,7 +4,7 @@ import { AirtableSettings } from '@/data-sources/airtable/AirtableSettings';
 import { GoogleSheetsSettings } from '@/data-sources/google-sheets/GoogleSheetsSettings';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { HttpSettings } from '@/data-sources/http/HttpSettings';
-import { SalesforceB2CSettings } from '@/data-sources/salesforce-b2c/SalesforceB2CSettings';
+import { SalesforceD2CSettings } from '@/data-sources/salesforce-d2c/SalesforceD2CSettings';
 import { ShopifySettings } from '@/data-sources/shopify/ShopifySettings';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
@@ -33,8 +33,8 @@ const DataSourceEditSettings = ( { uuid }: DataSourceEditSettings ) => {
 		return <GoogleSheetsSettings mode="edit" uuid={ uuid } config={ dataSource } />;
 	} else if ( 'shopify' === dataSource.service ) {
 		return <ShopifySettings mode="edit" uuid={ uuid } config={ dataSource } />;
-	} else if ( 'salesforce-b2c' === dataSource.service ) {
-		return <SalesforceB2CSettings mode="edit" uuid={ uuid } config={ dataSource } />;
+	} else if ( 'salesforce-d2c' === dataSource.service ) {
+		return <SalesforceD2CSettings mode="edit" uuid={ uuid } config={ dataSource } />;
 	}
 
 	return <>{ __( 'Service not (yet) supported.', 'remote-data-blocks' ) }</>;
@@ -53,8 +53,8 @@ const DataSourceSettings = () => {
 			return <GoogleSheetsSettings mode="add" />;
 		} else if ( 'shopify' === service ) {
 			return <ShopifySettings mode="add" />;
-		} else if ( 'salesforce-b2c' === service ) {
-			return <SalesforceB2CSettings mode="add" />;
+		} else if ( 'salesforce-d2c' === service ) {
+			return <SalesforceD2CSettings mode="add" />;
 		}
 		return <>{ __( 'Service not (yet) supported.', 'remote-data-blocks' ) }</>;
 	}

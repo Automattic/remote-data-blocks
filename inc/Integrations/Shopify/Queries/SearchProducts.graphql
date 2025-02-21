@@ -1,5 +1,5 @@
-query SearchProducts($search_terms: String) {
-	products(first: 10, query: $search_terms, sortKey: BEST_SELLING) {
+query SearchProducts($search: String) {
+	products(first: 10, query: $search, sortKey: BEST_SELLING) {
 		edges {
 			node {
 				id

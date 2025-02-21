@@ -1439,16 +1439,16 @@
 		},
 		{
 			"name": "php-stubs/wordpress-tests-stubs",
-			"version": "v6.7.1",
+			"version": "v6.7.2",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/php-stubs/wordpress-tests-stubs.git",
-				"reference": "37cc3f2136034cc239149151933e1c5be6ce6103"
+				"reference": "8aa4346a54022a6f3823a5621213e96862bb8fb0"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/php-stubs/wordpress-tests-stubs/zipball/37cc3f2136034cc239149151933e1c5be6ce6103",
-				"reference": "37cc3f2136034cc239149151933e1c5be6ce6103",
+				"url": "https://api.github.com/repos/php-stubs/wordpress-tests-stubs/zipball/8aa4346a54022a6f3823a5621213e96862bb8fb0",
+				"reference": "8aa4346a54022a6f3823a5621213e96862bb8fb0",
 				"shasum": ""
 			},
 			"require-dev": {
@@ -1467,9 +1467,9 @@
 			"keywords": [ "PHPStan", "static analysis", "wordpress" ],
 			"support": {
 				"issues": "https://github.com/php-stubs/wordpress-tests-stubs/issues",
-				"source": "https://github.com/php-stubs/wordpress-tests-stubs/tree/v6.7.1"
+				"source": "https://github.com/php-stubs/wordpress-tests-stubs/tree/v6.7.2"
 			},
-			"time": "2024-11-23T22:07:27+00:00"
+			"time": "2025-02-11T16:45:49+00:00"
 		},
 		{
 			"name": "phpcompatibility/php-compatibility",
@@ -2241,16 +2241,16 @@
 		},
 		{
 			"name": "psalm/phar",
-			"version": "6.5.1",
+			"version": "6.6.1",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/psalm/phar.git",
-				"reference": "f7ecaf8740f32d58695cee5ac11663e02b44b223"
+				"reference": "6bd3007a43c220e6fa7774f07784e849cef828e8"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/psalm/phar/zipball/f7ecaf8740f32d58695cee5ac11663e02b44b223",
-				"reference": "f7ecaf8740f32d58695cee5ac11663e02b44b223",
+				"url": "https://api.github.com/repos/psalm/phar/zipball/6bd3007a43c220e6fa7774f07784e849cef828e8",
+				"reference": "6bd3007a43c220e6fa7774f07784e849cef828e8",
 				"shasum": ""
 			},
 			"require": {
@@ -2266,9 +2266,9 @@
 			"description": "Composer-based Psalm Phar",
 			"support": {
 				"issues": "https://github.com/psalm/phar/issues",
-				"source": "https://github.com/psalm/phar/tree/6.5.1"
+				"source": "https://github.com/psalm/phar/tree/6.6.1"
 			},
-			"time": "2025-02-10T10:05:10+00:00"
+			"time": "2025-02-16T17:19:57+00:00"
 		},
 		{
 			"name": "sebastian/cli-parser",
@@ -3153,16 +3153,16 @@
 		},
 		{
 			"name": "sirbrillig/phpcs-variable-analysis",
-			"version": "v2.11.22",
+			"version": "v2.11.21",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/sirbrillig/phpcs-variable-analysis.git",
-				"reference": "ffb6f16c6033ec61ed84446b479a31d6529f0eb7"
+				"reference": "eb2b351927098c24860daa7484e290d3eed693be"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/sirbrillig/phpcs-variable-analysis/zipball/ffb6f16c6033ec61ed84446b479a31d6529f0eb7",
-				"reference": "ffb6f16c6033ec61ed84446b479a31d6529f0eb7",
+				"url": "https://api.github.com/repos/sirbrillig/phpcs-variable-analysis/zipball/eb2b351927098c24860daa7484e290d3eed693be",
+				"reference": "eb2b351927098c24860daa7484e290d3eed693be",
 				"shasum": ""
 			},
 			"require": {
@@ -3174,6 +3174,7 @@
 				"phpcsstandards/phpcsdevcs": "^1.1",
 				"phpstan/phpstan": "^1.7",
 				"phpunit/phpunit": "^4.8.36 || ^5.7.21 || ^6.5 || ^7.0 || ^8.0 || ^9.0 || ^10.5.32 || ^11.3.3",
+				"sirbrillig/phpcs-import-detection": "^1.1",
 				"vimeo/psalm": "^0.2 || ^0.3 || ^1.1 || ^4.24 || ^5.0"
 			},
 			"type": "phpcodesniffer-standard",
@@ -3201,7 +3202,7 @@
 				"source": "https://github.com/sirbrillig/phpcs-variable-analysis",
 				"wiki": "https://github.com/sirbrillig/phpcs-variable-analysis/wiki"
 			},
-			"time": "2025-01-06T17:54:24+00:00"
+			"time": "2024-12-02T16:37:49+00:00"
 		},
 		{
 			"name": "slevomat/coding-standard",
@@ -3265,16 +3266,16 @@
 		},
 		{
 			"name": "squizlabs/php_codesniffer",
-			"version": "3.11.3",
+			"version": "3.11.2",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
-				"reference": "ba05f990e79cbe69b9f35c8c1ac8dca7eecc3a10"
+				"reference": "1368f4a58c3c52114b86b1abe8f4098869cb0079"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/ba05f990e79cbe69b9f35c8c1ac8dca7eecc3a10",
-				"reference": "ba05f990e79cbe69b9f35c8c1ac8dca7eecc3a10",
+				"url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/1368f4a58c3c52114b86b1abe8f4098869cb0079",
+				"reference": "1368f4a58c3c52114b86b1abe8f4098869cb0079",
 				"shasum": ""
 			},
 			"require": {
@@ -3330,13 +3331,9 @@
 				{
 					"url": "https://opencollective.com/php_codesniffer",
 					"type": "open_collective"
-				},
-				{
-					"url": "https://thanks.dev/phpcsstandards",
-					"type": "thanks_dev"
 				}
 			],
-			"time": "2025-01-23T17:04:15+00:00"
+			"time": "2024-12-11T16:04:26+00:00"
 		},
 		{
 			"name": "theseer/tokenizer",
@@ -3445,16 +3442,16 @@
 		},
 		{
 			"name": "wp-phpunit/wp-phpunit",
-			"version": "6.7.1",
+			"version": "6.7.2",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/wp-phpunit/wp-phpunit.git",
-				"reference": "e63eb1c0980839853c569d3f04ff70263b7795e3"
+				"reference": "e2bb06bacc92a8e9e405e83f56989e8ed9359db1"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/wp-phpunit/wp-phpunit/zipball/e63eb1c0980839853c569d3f04ff70263b7795e3",
-				"reference": "e63eb1c0980839853c569d3f04ff70263b7795e3",
+				"url": "https://api.github.com/repos/wp-phpunit/wp-phpunit/zipball/e2bb06bacc92a8e9e405e83f56989e8ed9359db1",
+				"reference": "e2bb06bacc92a8e9e405e83f56989e8ed9359db1",
 				"shasum": ""
 			},
 			"type": "library",
@@ -3481,7 +3478,7 @@
 				"issues": "https://github.com/wp-phpunit/issues",
 				"source": "https://github.com/wp-phpunit/wp-phpunit"
 			},
-			"time": "2024-11-22T01:27:46+00:00"
+			"time": "2025-02-12T01:22:52+00:00"
 		},
 		{
 			"name": "yoast/phpunit-polyfills",
@@ -3547,6 +3544,6 @@
 	"platform": {
 		"php": ">=8.1"
 	},
-	"platform-dev": {},
-	"plugin-api-version": "2.6.0"
+	"platform-dev": [],
+	"plugin-api-version": "2.3.0"
 }
