@@ -131,9 +131,7 @@ export function useRemoteData( {
 		void fetch( resolvedData?.queryInput ?? {} );
 	}, [ hasResolvedData, page, perPage, searchInput ] );
 
-	async function fetch(
-		queryInput: RemoteDataQueryInput | RemoteDataQueryInput[]
-	): Promise< void > {
+	async function fetch( queryInput: RemoteDataQueryInput ): Promise< void > {
 		setLoading( true );
 
 		const requestData: RemoteDataApiRequest = {

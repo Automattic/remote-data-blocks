@@ -99,35 +99,16 @@ class AirtableIntegration {
 		return HttpQuery::from_array( [
 			'data_source' => $data_source,
 			'endpoint' => function ( array $input_variables ) use ( $data_source, $table ): string {
-				// Normalize input variables to ensure consistent structure
-				$record_ids = [];
-				
-				// Handle both direct record_id and array of record_ids
-				if ( isset( $input_variables['record_id'] ) ) {
-					// Single record case
-					$record_ids[] = $input_variables['record_id'];
-				} else {
-					// Multiple records or array case
-					foreach ( $input_variables as $input ) {
-						if ( isset( $input['record_id'] ) ) {
-							$record_id = $input['record_id'];
-							if ( is_array( $record_id ) ) {
-								$record_ids[] = reset( $record_id );
-							} else {
-								$record_ids[] = $record_id;
-							}
-						}
-					}
-				}
-
-				// Filter out empty values and ensure strings
-				$record_ids = array_filter( $record_ids, 'strlen' );
-				$record_ids = array_map( 'strval', $record_ids );
+				// Get and clean record IDs from comma-separated string
+				$record_ids = array_filter(
+					array_map( 'trim', explode( ',', (string) $input_variables['record_id'] ) ),
+					'strlen'
+				);
 
 				// Build the formula
-				$formula_parts = array_map(function ( $id ) {
+				$formula_parts = array_map( function ( $id ) {
 					return sprintf( 'RECORD_ID()="%s"', addslashes( $id ) );
-				}, $record_ids);
+				}, $record_ids );
 
 				$formula = count( $formula_parts ) === 1 ? $formula_parts[0] : 'OR(' . implode( ',', $formula_parts ) . ')';
 

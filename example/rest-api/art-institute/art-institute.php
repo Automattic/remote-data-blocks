@@ -32,11 +32,12 @@ function register_aic_block(): void {
 		'data_source' => $aic_data_source,
 		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
 			$endpoint = $aic_data_source->get_endpoint();
-			// Handle both single ID and array of objects with IDs
-			$ids = is_array( $input_variables ) && isset( $input_variables[0] ) ? array_map(
-				fn( $item ) => $item['id'],
-				$input_variables
-			) : ( isset( $input_variables['id'] ) ? [ $input_variables['id'] ] : [] );
+			
+			// Get and clean IDs from comma-separated string
+			$ids = array_filter(
+				array_map( 'trim', explode( ',', (string) $input_variables['id'] ) ),
+				'strlen'
+			);
 			
 			if ( !empty( $ids ) ) {
 				return add_query_arg([

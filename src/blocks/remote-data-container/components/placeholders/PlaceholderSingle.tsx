@@ -6,7 +6,7 @@ import { ItemSelectQueryType } from '@/blocks/remote-data-container/components/p
 
 interface PlaceholderSingleProps {
 	blockConfig: BlockConfig;
-	onSelect: ( data: RemoteDataQueryInput | RemoteDataQueryInput[] ) => void;
+	onSelect: ( data: RemoteDataQueryInput ) => void;
 }
 
 export function PlaceholderSingle( props: PlaceholderSingleProps ) {

@@ -17,7 +17,7 @@ interface DataViewsModalProps {
 	blockName: string;
 	headerImage?: string;
 	inputVariables: InputVariable[];
-	onSelect?: ( data: RemoteDataQueryInput | RemoteDataQueryInput[] ) => void;
+	onSelect?: ( data: RemoteDataQueryInput ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
 	queryKey: string;
 	renderTrigger?: ( props: { onClick: () => void } ) => React.ReactNode;
@@ -63,7 +63,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 		void fetch( {} );
 	}, [] );
 
-	function onSelectItem( input: RemoteDataQueryInput | RemoteDataQueryInput[] ): void {
+	function onSelectItem( input: RemoteDataQueryInput ): void {
 		onSelect?.( input );
 		sendTracksEvent( 'add_block', {
 			action: 'select_item',

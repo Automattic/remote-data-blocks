@@ -28,7 +28,7 @@ interface ItemListProps {
 	availableBindings: Record< string, RemoteDataBinding >;
 	blockName: string;
 	loading: boolean;
-	onSelect: ( data: RemoteDataQueryInput | RemoteDataQueryInput[] ) => void;
+	onSelect: ( data: RemoteDataQueryInput ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
 	page: number;
 	perPage?: number;
@@ -87,6 +87,12 @@ export function ItemList( props: ItemListProps ) {
 		( [ _, binding ] ) => binding.type === 'image_url'
 	)?.[ 0 ];
 
+	// Find the ID field from availableBindings
+	const idField =
+		Object.entries( availableBindings ).find(
+			( [ _, binding ] ) => binding.type === 'id'
+		)?.[ 0 ] ?? 'id';
+
 	const fields = fieldNames.map( field => ( {
 		id: field,
 		label: availableBindings[ field ]?.name ?? field,
@@ -141,7 +147,8 @@ export function ItemList( props: ItemListProps ) {
 		isPrimary: true,
 		label: '',
 		callback: ( items: RemoteDataResult[] ) => {
-			return supportsBulk ? onSelect( items ) : items.map( item => onSelect( item ) );
+			const ids = items.map( item => item.id ).join( ',' );
+			return onSelect( { [ idField ]: ids } );
 		},
 		supportsBulk,
 	};

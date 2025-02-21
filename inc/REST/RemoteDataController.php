@@ -63,18 +63,9 @@ class RemoteDataController {
 		
 		// The frontend might send more input variables than the query needs or
 		// expects, so only include those defined by the query.
-		$valid_input_schema_keys = array_keys( $query->get_input_schema() );
+		$query_input = array_intersect_key( $query_input, $query->get_input_schema() );
 
-		// Normalize and filter input values
-		$filtered_query_input = array_map(
-			fn( $item ) => array_intersect_key( $item, array_flip( $valid_input_schema_keys ) ),
-			( is_array( $query_input ) && isset( $query_input[0] ) ) ? $query_input : [ $query_input ]
-		);
-
-		// If the input was not originally an array of items, unwrap it
-		$filtered_query_input = isset( $query_input[0] ) ? $filtered_query_input : $filtered_query_input[0];
-
-		$query_result = $query->execute( $filtered_query_input );
+		$query_result = $query->execute( $query_input );
 
 		if ( is_wp_error( $query_result ) ) {
 			$logger = LoggerManager::instance();
@@ -87,7 +78,7 @@ class RemoteDataController {
 				'block_name' => $block_name,
 				'result_id' => wp_generate_uuid4(),
 				'query_key' => $query_key,
-				'query_input' => $filtered_query_input,
+				'query_input' => $query_input,
 			],
 			$query_result
 		);
