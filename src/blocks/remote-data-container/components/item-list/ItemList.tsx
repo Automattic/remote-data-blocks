@@ -1,4 +1,3 @@
-import { BaseControl, Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { Action, DataViews, View } from '@wordpress/dataviews/wp';
 import { useState } from '@wordpress/element';
@@ -28,6 +27,7 @@ function getResultsWithId( results: RemoteDataResult[], instanceId: string ): Re
 interface ItemListProps {
 	availableBindings: Record< string, RemoteDataBinding >;
 	blockName: string;
+	idField: string;
 	loading: boolean;
 	onSelect: ( data: RemoteDataQueryInput ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
@@ -35,8 +35,10 @@ interface ItemListProps {
 	perPage?: number;
 	remoteData?: RemoteData;
 	searchInput: string;
+	selectedItems: string[];
 	setPage: ( newPage: number ) => void;
 	setSearchInput: ( newValue: string ) => void;
+	setSelectedItems: ( newSelectedItems: string[] ) => void;
 	supportsBulk: boolean;
 	supportsSearch: boolean;
 	totalItems?: number;
@@ -47,6 +49,7 @@ export function ItemList( props: ItemListProps ) {
 	const {
 		availableBindings,
 		blockName,
+		idField,
 		loading,
 		onSelect,
 		onSelectField,
@@ -54,8 +57,10 @@ export function ItemList( props: ItemListProps ) {
 		perPage,
 		remoteData,
 		searchInput,
+		selectedItems,
 		setPage,
 		setSearchInput,
+		setSelectedItems,
 		supportsBulk,
 		supportsSearch,
 		totalItems,
@@ -63,7 +68,6 @@ export function ItemList( props: ItemListProps ) {
 	} = props;
 	const { defaultPattern: pattern } = usePatterns( blockName );
 	const instanceId = useInstanceId( ItemList, blockName );
-	const [ selectedItems, setSelectedItems ] = useState< string[] >( [] );
 
 	const results = remoteData?.results ?? [];
 	const data = loading ? [] : getResultsWithId( results ?? [], instanceId );
@@ -88,12 +92,6 @@ export function ItemList( props: ItemListProps ) {
 	const mediaField = Object.entries( availableBindings ).find(
 		( [ _, binding ] ) => binding.type === 'image_url'
 	)?.[ 0 ];
-
-	// Find the ID field from availableBindings
-	const idField =
-		Object.entries( availableBindings ).find(
-			( [ _, binding ] ) => binding.type === 'id'
-		)?.[ 0 ] ?? 'id';
 
 	const fields = fieldNames.map( field => ( {
 		id: field,
@@ -139,11 +137,9 @@ export function ItemList( props: ItemListProps ) {
 	// Temporary helper to handle pagination and bulk selection
 	const onChangeSelection = ( newIds: string[] ) => {
 		// Get all currently selected IDs from the view
-		const currentPageIds = data.map( item => item.id.toString() );
-
+		const currentPageIds = data.map( item => item.id );
 		// Keep selections from other pages that aren't in the current view
 		const otherPageSelections = selectedItems.filter( id => ! currentPageIds.includes( id ) );
-
 		// Combine selections from other pages with new selections
 		setSelectedItems( [ ...otherPageSelections, ...newIds ] );
 	};
@@ -153,16 +149,16 @@ export function ItemList( props: ItemListProps ) {
 		icon: <>{ __( 'Choose' ) }</>,
 		isPrimary: true,
 		label: '',
-		callback: () => {
-			const ids = selectedItems.join( ',' );
-			return onSelect( { [ idField ]: ids } );
+		callback: ( items: RemoteDataResult[] ) => {
+			if ( supportsBulk && selectedItems.length > 0 ) {
+				const ids = selectedItems.join( ',' );
+				return onSelect( { [ idField ]: ids } );
+			}
+			items.map( item => onSelect( item ) );
 		},
 		supportsBulk,
 	};
 	const actions: Action< RemoteDataResult >[] = onSelectField ? [] : [ chooseItemAction ];
-
-	const itemCountLabel =
-		selectedItems.length > 1 ? __( 'items selected in total' ) : __( 'item selected in total' );
 
 	return (
 		<>
@@ -170,31 +166,6 @@ export function ItemList( props: ItemListProps ) {
 				actions={ actions }
 				data={ data }
 				defaultLayouts={ { table: {} } }
-				header={
-					supportsBulk &&
-					selectedItems.length > 0 &&
-					! loading && (
-						<HStack justify="start" style={ { marginRight: '16px' } }>
-							<BaseControl
-								className="rdb-dataviews-bulk-actions-footer__item-count-total"
-								__nextHasNoMarginBottom
-							>
-								<BaseControl.VisualLabel style={ { marginBottom: '0' } }>
-									{ selectedItems.length } { itemCountLabel }
-								</BaseControl.VisualLabel>
-							</BaseControl>
-							<Button onClick={ () => setSelectedItems( [] ) } variant="tertiary">
-								{ __( 'Cancel All' ) }
-							</Button>
-							<Button
-								onClick={ () => onSelect( { [ idField ]: selectedItems.join( ',' ) } ) }
-								variant="tertiary"
-							>
-								{ __( 'Choose' ) }
-							</Button>
-						</HStack>
-					)
-				}
 				fields={ fields }
 				getItemId={ ( item: { id?: string } ) => item.id || '' }
 				isLoading={ loading || ! pattern || ! results }
