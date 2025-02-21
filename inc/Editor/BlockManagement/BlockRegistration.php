@@ -93,23 +93,9 @@ class BlockRegistration {
 			'title' => $config['title'],
 		];
 
-		// Check if any input schema has supports_bulk
-		$supports_bulk = false;
-		if (isset($config['queries'])) {
-			foreach ($config['queries'] as $query) {
-				$input_schema = $query->get_input_schema();
-				foreach ($input_schema as $field) {
-					if (!empty($field['supports_bulk'])) {
-						$supports_bulk = true;
-						break 2;
-					}
-				}
-			}
-		}
-
 		// Loop queries are dynamic blocks that render a list of items using the
 		// inner blocks as a template.
-		if ( $config['loop'] || $config['selectors'] || $supports_bulk ) {
+		if ( $config['loop'] || self::has_bulk_support($config) ) {
 			$block_options['render_callback'] = [ BlockBindings::class, 'loop_block_render_callback' ];
 		}
 
@@ -122,5 +108,21 @@ class BlockRegistration {
 		$block_config['patterns']['default'] = $default_pattern_name;
 
 		return [ $block_config, $script_handle ];
+	}
+
+	// Check if any input schema has supports_bulk
+	private static function has_bulk_support(array $config): bool {
+		if (!isset($config['queries'])) {
+			return false;
+		}
+
+		foreach ($config['queries'] as $query) {
+			foreach ($query->get_input_schema() as $field) {
+				if (!empty($field['supports_bulk'])) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }
