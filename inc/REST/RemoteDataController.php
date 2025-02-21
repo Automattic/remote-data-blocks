@@ -60,7 +60,6 @@ class RemoteDataController {
 
 		$block_config = ConfigStore::get_block_configuration( $block_name );
 		$query = $block_config['queries'][ $query_key ];
-		
 		// The frontend might send more input variables than the query needs or
 		// expects, so only include those defined by the query.
 		$query_input = array_intersect_key( $query_input, $query->get_input_schema() );
