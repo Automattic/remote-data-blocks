@@ -139,6 +139,13 @@ function register_aic_block(): void {
 					'type' => 'string',
 					'path' => '$.title',
 				],
+				'image_url' => [
+					'name' => 'Image URL',
+					'generate' => function ( $data ): string {
+						return 'https://www.artic.edu/iiif/2/' . $data['image_id'] . '/full/843,/0/default.jpg';
+					},
+					'type' => 'image_url',
+				],
 			],
 		],
 		'pagination_schema' => [
