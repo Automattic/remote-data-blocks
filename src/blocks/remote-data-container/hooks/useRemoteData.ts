@@ -73,7 +73,6 @@ interface UseRemoteData {
 
 interface UseRemoteDataInput {
 	blockName: string;
-	enabledOverrides?: string[];
 	externallyManagedRemoteData?: RemoteData;
 	externallyManagedUpdateRemoteData?: ( remoteData?: RemoteData ) => void;
 	fetchOnMount?: boolean;
