@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 
 import { DataSourceForm } from '../components/DataSourceForm';
 import { HttpAuthSettingsInput } from '@/data-sources/components/HttpAuthSettingsInput';
+import { ConfigSource } from '@/data-sources/constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { HttpAuth } from '@/data-sources/http/types';
 import { HttpConfig, HttpServiceConfig, SettingsComponentProps } from '@/data-sources/types';
@@ -63,6 +64,7 @@ export const HttpSettings = ( { mode, uuid, config }: SettingsComponentProps< Ht
 			service: 'generic-http',
 			service_config: validState,
 			uuid: uuid ?? null,
+			config_source: ConfigSource.STORAGE,
 		};
 
 		return onSave( httpConfig, mode );

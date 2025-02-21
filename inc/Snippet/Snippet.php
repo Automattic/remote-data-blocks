@@ -7,7 +7,7 @@ use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use RemoteDataBlocks\Integrations\Airtable\AirtableIntegration;
 use RemoteDataBlocks\Integrations\Google\Sheets\GoogleSheetsIntegration;
 use RemoteDataBlocks\Integrations\Shopify\ShopifyIntegration;
-use RemoteDataBlocks\Integrations\SalesforceB2C\SalesforceB2CIntegration;
+use RemoteDataBlocks\Integrations\SalesforceD2C\SalesforceD2CIntegration;
 use WP_Error;
 
 class Snippet implements JsonSerializable {
@@ -40,17 +40,17 @@ class Snippet implements JsonSerializable {
 		$service = $data_source_config['service'];
 
 		switch ( $service ) {
-			case 'shopify':
+			case REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE:
 				$snippets = ShopifyIntegration::get_block_registration_snippets( $data_source_config );
 				break;
-			case 'airtable':
+			case REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE:
 				$snippets = AirtableIntegration::get_block_registration_snippets( $data_source_config );
 				break;
-			case 'google-sheets':
+			case REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE:
 				$snippets = GoogleSheetsIntegration::get_block_registration_snippets( $data_source_config );
 				break;
-			case 'salesforce-b2c':
-				$snippets = SalesforceB2CIntegration::get_block_registration_snippets( $data_source_config );
+			case REMOTE_DATA_BLOCKS_SALESFORCE_D2C_SERVICE:
+				$snippets = SalesforceD2CIntegration::get_block_registration_snippets( $data_source_config );
 				break;
 			default:
 				return new WP_Error( 'invalid_service', __( 'Invalid service', 'remote-data-blocks' ) );

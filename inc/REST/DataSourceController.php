@@ -2,9 +2,8 @@
 
 namespace RemoteDataBlocks\REST;
 
-use RemoteDataBlocks\Analytics\TracksAnalytics;
-use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
-use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
+use RemoteDataBlocks\Telemetry\DataSourceTelemetry;
+use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
 use RemoteDataBlocks\Snippet\Snippet;
 use WP_REST_Controller;
 use WP_REST_Request;
@@ -127,7 +126,7 @@ class DataSourceController extends WP_REST_Controller {
 			'/' . $this->rest_base . '/(?P<uuids>[a-zA-Z0-9,-]+)',
 			[
 				'methods' => 'DELETE',
-				'callback' => [ $this, 'delete_multiple_items' ], 
+				'callback' => [ $this, 'delete_multiple_items' ],
 				'permission_callback' => [ $this, 'delete_item_permissions_check' ],
 				'args' => [
 					'uuids' => [
@@ -147,12 +146,9 @@ class DataSourceController extends WP_REST_Controller {
 	 */
 	public function create_item( mixed $request ): WP_REST_Response|WP_Error {
 		$data_source_properties = $request->get_json_params();
-		$item = DataSourceCrud::create_config( $data_source_properties );
+		$item = DataSourceConfigManager::create( $data_source_properties );
 
-		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', array_merge( [
-			'data_source_type' => $data_source_properties['service'],
-			'action' => 'add',
-		], $this->get_data_source_interaction_track_props( $data_source_properties ) ) );
+		DataSourceTelemetry::track_add( $data_source_properties );
 
 		return rest_ensure_response( $item );
 	}
@@ -164,40 +160,7 @@ class DataSourceController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( mixed $request ): WP_REST_Response|WP_Error {
-		$code_configured_data_sources = ConfigStore::get_data_sources_as_array();
-		$ui_configured_data_sources = DataSourceCrud::get_configs();
-
-		/**
-		 * Quick and dirty de-duplication of data sources. If the data source does
-		 * not have a UUID (because it is registered in code), we generate an
-		 * identifier based on the display name and service name.
-		 *
-		 * UI configured data sources take precedence over code configured ones
-		 * here due to the ordering of the two arrays passed to array_reduce.
-		 */
-		$data_sources = array_values( array_reduce(
-			array_merge( $code_configured_data_sources, $ui_configured_data_sources ),
-			function ( $acc, $item ) {
-				$identifier = $item['uuid'] ?? md5( sprintf( '%s_%s', $item['service_config']['display_name'], $item['service'] ) );
-				$acc[ $identifier ] = $item;
-				return $acc;
-			},
-			[]
-		) );
-
-		// Tracks Analytics. Only once per day to reduce noise.
-		$track_transient_key = 'remotedatablocks_view_data_sources_tracked';
-		if ( ! get_transient( $track_transient_key ) ) {
-			$code_configured_data_sources_count = count( $code_configured_data_sources );
-			$ui_configured_data_sources_count = count( $ui_configured_data_sources );
-
-			TracksAnalytics::record_event( 'remotedatablocks_view_data_sources', [
-				'total_data_sources_count' => $code_configured_data_sources_count + $ui_configured_data_sources_count,
-				'code_configured_data_sources_count' => $code_configured_data_sources_count,
-				'ui_configured_data_sources_count' => $ui_configured_data_sources_count,
-			] );
-			set_transient( $track_transient_key, true, DAY_IN_SECONDS );
-		}
+		$data_sources = DataSourceConfigManager::get_all();
 
 		return rest_ensure_response( $data_sources );
 	}
@@ -209,7 +172,7 @@ class DataSourceController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_item( mixed $request ): WP_REST_Response|WP_Error {
-		$response = DataSourceCrud::get_config_by_uuid( $request->get_param( 'uuid' ) );
+		$response = DataSourceConfigManager::get( $request->get_param( 'uuid' ) );
 		return rest_ensure_response( $response );
 	}
 
@@ -226,16 +189,13 @@ class DataSourceController extends WP_REST_Controller {
 	 */
 	public function update_item( mixed $request ): WP_REST_Response|WP_Error {
 		$data_source_properties = $request->get_json_params();
-		$item = DataSourceCrud::update_config_by_uuid( $request->get_param( 'uuid' ), $data_source_properties );
+		$item = DataSourceConfigManager::update( $request->get_param( 'uuid' ), $data_source_properties );
 
 		if ( is_wp_error( $item ) ) {
 			return $item; // Return WP_Error if update fails
 		}
 
-		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', array_merge( [
-			'data_source_type' => $item['service'],
-			'action' => 'update',
-		], $this->get_data_source_interaction_track_props( $item ) ) );
+		DataSourceTelemetry::track_update( $data_source_properties );
 
 		return rest_ensure_response( $item );
 	}
@@ -248,13 +208,9 @@ class DataSourceController extends WP_REST_Controller {
 	 */
 	public function delete_item( mixed $request ): WP_REST_Response|WP_Error {
 		$data_source_properties = $request->get_json_params();
-		$result = DataSourceCrud::delete_config_by_uuid( $request->get_param( 'uuid' ) );
+		$result = DataSourceConfigManager::delete( $request->get_param( 'uuid' ) );
 
-		// Tracks Analytics.
-		TracksAnalytics::record_event( 'remotedatablocks_data_source_interaction', [
-			'data_source_type' => $data_source_properties['service'],
-			'action' => 'delete',
-		] );
+		DataSourceTelemetry::track_delete( $data_source_properties );
 
 		return rest_ensure_response( $result );
 	}
@@ -278,7 +234,7 @@ class DataSourceController extends WP_REST_Controller {
 
 		$failed = [];
 		foreach ( $uuids as $uuid ) {
-			$result = DataSourceCrud::delete_config_by_uuid( $uuid );
+			$result = DataSourceConfigManager::delete( $uuid );
 			if ( is_wp_error( $result ) ) {
 				$failed[] = [
 					'uuid' => $uuid,
@@ -301,7 +257,6 @@ class DataSourceController extends WP_REST_Controller {
 		]);
 	}
 
-
 	// These all require manage_options for now, but we can adjust as needed
 
 	public function get_item_permissions_check( mixed $request ): bool|WP_Error {
@@ -322,17 +277,5 @@ class DataSourceController extends WP_REST_Controller {
 
 	public function delete_item_permissions_check( mixed $request ): bool|WP_Error {
 		return current_user_can( 'manage_options' );
-	}
-
-	private function get_data_source_interaction_track_props( array $data_source_properties ): array {
-		$props = [];
-
-		if ( 'generic-http' === $data_source_properties['service'] ) {
-			$auth = $data_source_properties['service_config']['auth'] ?? [];
-			$props['authentication_type'] = $auth['type'] ?? '';
-			$props['api_key_location'] = $auth['addTo'] ?? '';
-		}
-
-		return $props;
 	}
 }

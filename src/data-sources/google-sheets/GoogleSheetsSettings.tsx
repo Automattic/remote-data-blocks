@@ -1,22 +1,22 @@
-import { TextareaControl, SelectControl } from '@wordpress/components';
+import { SelectControl, TextareaControl } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { DataSourceForm } from '@/data-sources/components/DataSourceForm';
 import { FieldsSelection } from '@/data-sources/components/FieldsSelection';
-import { GOOGLE_SHEETS_API_SCOPES } from '@/data-sources/constants';
+import { GOOGLE_SHEETS_API_SCOPES, ConfigSource } from '@/data-sources/constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import {
-	useGoogleSpreadsheetsOptions,
 	useGoogleSheetsWithFields,
+	useGoogleSpreadsheetsOptions,
 } from '@/data-sources/hooks/useGoogleApi';
 import { useGoogleAuth } from '@/data-sources/hooks/useGoogleAuth';
 import {
+	DataSourceQueryMappingValue,
 	GoogleSheetsConfig,
 	GoogleSheetsServiceConfig,
 	GoogleSheetsSheetConfig,
 	SettingsComponentProps,
-	DataSourceQueryMappingValue,
 } from '@/data-sources/types';
 import { getConnectionMessage } from '@/data-sources/utils';
 import { useForm, ValidationRules } from '@/hooks/useForm';
@@ -97,6 +97,7 @@ export const GoogleSheetsSettings = ( {
 			service: 'google-sheets',
 			service_config: validState,
 			uuid: uuid ?? null,
+			config_source: ConfigSource.STORAGE,
 		};
 
 		return onSave( data, mode );
@@ -274,7 +275,7 @@ export const GoogleSheetsSettings = ( {
 			</DataSourceForm.Scope>
 			<DataSourceForm.Blocks
 				handleOnChange={ handleOnChange }
-				hasEnabledBlocks={ state.enable_blocks ?? true }
+				hasEnabledBlocks={ Boolean( state.enable_blocks ) }
 			/>
 		</DataSourceForm>
 	);

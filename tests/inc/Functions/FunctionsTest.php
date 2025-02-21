@@ -20,13 +20,13 @@ class FunctionsTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->mock_logger = new MockLogger();
-		$this->mock_query = MockQuery::from_array();
-		$this->mock_list_query = MockQuery::from_array( [
+		$this->mock_query = MockQuery::create();
+		$this->mock_list_query = MockQuery::create( [
 			'output_schema' => [
 				'is_collection' => true,
 			],
 		] );
-		$this->mock_search_query = MockQuery::from_array( [
+		$this->mock_search_query = MockQuery::create( [
 			'input_schema' => [
 				'search' => [ 'type' => 'ui:search_input' ],
 			],
@@ -68,6 +68,37 @@ class FunctionsTest extends TestCase {
 		$config = ConfigStore::get_block_configuration( $block_name );
 		$this->assertIsArray( $config );
 		$this->assertTrue( $config['loop'] );
+	}
+
+	public function testRegisterBlockWithNestedConfig(): void {
+		register_remote_data_block( [
+			'title' => 'Test Block with Nested Config',
+			'render_query' => [
+				'query' => [
+					'__class' => 'RemoteDataBlocks\Tests\Mocks\MockQuery',
+					'data_source' => [
+						'__class' => 'RemoteDataBlocks\Tests\Mocks\MockDataSource',
+						'service_config' => [
+							'__version' => 1,
+							'display_name' => 'Mock Data Source',
+							'endpoint' => 'https://example.com/api',
+						],
+					],
+					'display_name' => 'Mock Query',
+					'input_schema' => [],
+					'output_schema' => [ 'type' => 'string' ],
+				],
+			],
+		] );
+
+		$block_name = 'remote-data-blocks/test-block-with-nested-config';
+		$this->assertTrue( ConfigStore::is_registered_block( $block_name ) );
+
+		$config = ConfigStore::get_block_configuration( $block_name );
+		$this->assertIsArray( $config );
+		$this->assertSame( $block_name, $config['name'] );
+		$this->assertSame( 'Test Block with Nested Config', $config['title'] );
+		$this->assertFalse( $config['loop'] );
 	}
 
 	public function testRegisterListQuery(): void {

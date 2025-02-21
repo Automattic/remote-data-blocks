@@ -1,13 +1,13 @@
 import { __, sprintf } from '@wordpress/i18n';
 
 import {
-	GoogleSpreadsheet,
-	GoogleDriveFileList,
 	GoogleDriveFile,
-	GoogleSheetsValueRange,
-	GoogleSpreadsheetFields,
-	GoogleSheetWithFields,
+	GoogleDriveFileList,
 	GoogleSheetIdName,
+	GoogleSheetsValueRange,
+	GoogleSheetWithFields,
+	GoogleSpreadsheet,
+	GoogleSpreadsheetFields,
 } from '@/types/google';
 import { SelectOption } from '@/types/input';
 

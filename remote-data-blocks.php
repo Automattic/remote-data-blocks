@@ -33,8 +33,8 @@ Editor\BlockManagement\BlockRegistration::init();
 Editor\BlockManagement\ConfigRegistry::init();
 Editor\PatternEditor\PatternEditor::init();
 
-// Analytics
-Analytics\TracksAnalytics::init( new Analytics\EnvironmentConfig() );
+// Telemetry
+Telemetry\TracksTelemetry::init( new Telemetry\EnvironmentConfig() );
 
 // Example API
 ExampleApi\ExampleApi::init();
@@ -46,7 +46,7 @@ PluginSettings\PluginSettings::init();
 Integrations\Airtable\AirtableIntegration::init();
 Integrations\Google\Sheets\GoogleSheetsIntegration::init();
 Integrations\Shopify\ShopifyIntegration::init();
-Integrations\SalesforceB2C\SalesforceB2CIntegration::init();
+Integrations\SalesforceD2C\SalesforceD2CIntegration::init();
 Integrations\VipBlockDataApi\VipBlockDataApi::init();
 
 // REST endpoints
