@@ -10,6 +10,12 @@ export const useSalesforceD2CAuth = ( domain: string, clientId: string, clientSe
 			return null;
 		}
 
+		// Only proceed if the domain is valid, which is that it should not be a full url.
+		const invalidDomainPattern = /^(https?:\/\/|www\.)|[\\/\\]/;
+		if ( invalidDomainPattern.test( domain ) ) {
+			throw new Error( 'Invalid domain provided' );
+		}
+
 		return getSalesforceD2CStores( domain, clientId, clientSecret );
 	}, [ domain, clientId, clientSecret ] );
 

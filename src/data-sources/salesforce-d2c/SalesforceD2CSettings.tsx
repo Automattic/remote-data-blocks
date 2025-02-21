@@ -44,7 +44,7 @@ const validationRules: ValidationRules< SalesforceD2CServiceConfig > = {
 	domain: ( state: Partial< SalesforceD2CServiceConfig > ) => {
 		if ( ! state.domain ) {
 			return __(
-				'Please provide a valid domain. Example: For https://scomhello123usa456org.lightning.force.com, the domain will be scomhello123usa456org.',
+				'Please provide a valid domain. Example: https://scomhello123usa456org.lightning.force.com will have a valid domain of scomhello123usa456org.',
 				'remote-data-blocks'
 			);
 		}
@@ -58,12 +58,6 @@ export const SalesforceD2CSettings = ( {
 	uuid,
 	config,
 }: SettingsComponentProps< SalesforceD2CConfig > ) => {
-	const [ clientID, setClientID ] = useState< string >( config?.service_config?.client_id ?? '' );
-	const [ clientSecret, setClientSecret ] = useState< string >(
-		config?.service_config?.client_secret ?? ''
-	);
-	const [ domain, setDomain ] = useState< string >( config?.service_config?.domain ?? '' );
-
 	const { onSave } = useDataSources< SalesforceD2CConfig >( false );
 
 	const { state, handleOnChange, validState } = useForm< SalesforceD2CServiceConfig >( {
@@ -103,19 +97,41 @@ export const SalesforceD2CSettings = ( {
 	};
 
 	const onDomainChange = ( value: string ) => {
-		setDomain( value );
+		if ( ! value ) {
+			handleOnChange( 'domain', '' );
+			handleOnChange( 'store_id', '' );
+			return;
+		}
+
+		const lighteningUrlPattern = /^https?:\/\/([^.]+)\.lightning\.force\.com$/;
+
+		const lighteningMatch = value.match( lighteningUrlPattern );
+
+		if ( lighteningMatch ) {
+			handleOnChange( 'domain', lighteningMatch[ 1 ] );
+			handleOnChange( 'store_id', '' );
+			return;
+		}
+
+		const salesforceUrlPattern = /^https?:\/\/([^.]+)\.my\.salesforce\.com$/;
+		const salesforceMatch = value.match( salesforceUrlPattern );
+
+		if ( salesforceMatch ) {
+			handleOnChange( 'domain', salesforceMatch[ 1 ] );
+			handleOnChange( 'store_id', '' );
+			return;
+		}
+
 		handleOnChange( 'domain', value );
 		handleOnChange( 'store_id', '' );
 	};
 
 	const onClientIDChange = ( value: string ) => {
-		setClientID( value );
 		handleOnChange( 'client_id', value );
 		handleOnChange( 'store_id', '' );
 	};
 
 	const onClientSecretChange = ( value: string ) => {
-		setClientSecret( value );
 		handleOnChange( 'client_secret', value );
 		handleOnChange( 'store_id', '' );
 	};
@@ -142,7 +158,7 @@ export const SalesforceD2CSettings = ( {
 				__( 'Credentials are valid. Stores fetched successfully.', 'remote-data-blocks' )
 			);
 		}
-		return __( 'Please provide credentials to connect to Salesforce D2C.', 'remote-data-blocks' );
+		return __( 'The client secret for your Salesforce D2C instance.', 'remote-data-blocks' );
 	}, [ fetchingStores, stores, storesError ] );
 
 	const shouldAllowSubmit = state.store_id && state.store_id !== '';
@@ -183,30 +199,38 @@ export const SalesforceD2CSettings = ( {
 					type="text"
 					label={ __( 'Domain', 'remote-data-blocks' ) }
 					onChange={ onDomainChange }
-					value={ domain }
-					help={ __(
-						'The domain of the Salesforce D2C instance. Example: The domain for https://scomhello123usa456org.lightning.force.com is scomhello123usa456org.'
-					) }
+					value={ state.domain ?? '' }
+					help={
+						<>
+							{ __( 'Example: https://' ) }
+							<strong>{ __( 'your-domain' ) }</strong>
+							{ __( '.lightning.force.com' ) }
+							{ __( ' or ' ) }
+							{ __( 'https://' ) }
+							<strong>{ __( 'your-domain' ) }</strong>
+							{ __( '.my.salesforce.com' ) }
+						</>
+					}
 					autoComplete="off"
-					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				/>
 
 				<TextControl
 					label={ __( 'Client ID', 'remote-data-blocks' ) }
 					onChange={ onClientIDChange }
-					value={ clientID }
-					help={ credentialsHelpText }
+					value={ state.client_id ?? '' }
+					help={ __( 'The client ID for your Salesforce D2C instance.', 'remote-data-blocks' ) }
 					autoComplete="off"
-					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				/>
 
 				<TextControl
 					label={ __( 'Client Secret', 'remote-data-blocks' ) }
 					onChange={ onClientSecretChange }
-					value={ clientSecret }
+					value={ state.client_secret ?? '' }
 					help={ credentialsHelpText }
 					autoComplete="off"
-					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				/>
 			</DataSourceForm.Setup>
 			<DataSourceForm.Scope canProceed={ Boolean( shouldAllowSubmit ) }>
@@ -218,7 +242,6 @@ export const SalesforceD2CSettings = ( {
 					options={ storeOptions }
 					help={ __( 'Select a store', 'remote-data-blocks' ) }
 					disabled={ fetchingStores || ! storeOptions?.length }
-					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 				/>
 			</DataSourceForm.Scope>

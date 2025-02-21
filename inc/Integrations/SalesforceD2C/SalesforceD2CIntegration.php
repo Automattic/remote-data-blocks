@@ -4,7 +4,6 @@ namespace RemoteDataBlocks\Integrations\SalesforceD2C;
 
 use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
 use RemoteDataBlocks\Config\Query\HttpQuery;
-use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use RemoteDataBlocks\Integrations\SalesforceD2C\Auth\SalesforceD2CAuth;
 use RemoteDataBlocks\Formatting\StringFormatter;
 use WP_Error;
