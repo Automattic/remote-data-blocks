@@ -1,3 +1,4 @@
+import { BaseControl, Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { Action, DataViews, View } from '@wordpress/dataviews/wp';
 import { useState } from '@wordpress/element';
@@ -62,6 +63,7 @@ export function ItemList( props: ItemListProps ) {
 	} = props;
 	const { defaultPattern: pattern } = usePatterns( blockName );
 	const instanceId = useInstanceId( ItemList, blockName );
+	const [ selectedItems, setSelectedItems ] = useState< string[] >( [] );
 
 	const results = remoteData?.results ?? [];
 	const data = loading ? [] : getResultsWithId( results ?? [], instanceId );
@@ -115,7 +117,7 @@ export function ItemList( props: ItemListProps ) {
 	// hide media and title fields from table view if defined to avoid duplication
 	const tableFields = fieldNames.filter( field => field !== mediaField && field !== titleField );
 
-	const [ view, setView ] = useState< View >( {
+	const [ view, setView ] = useState< View & { selection: string[] } >( {
 		type: 'table' as const,
 		perPage: perPage ?? data.length,
 		page,
@@ -125,52 +127,89 @@ export function ItemList( props: ItemListProps ) {
 		layout: {},
 		titleField,
 		mediaField,
+		selection: selectedItems,
 	} );
 
 	function onChangeView( newView: View ) {
 		setPage( newView.page ?? 1 );
 		setSearchInput( newView.search ?? '' );
-		setView( newView );
+		setView( { ...newView, selection: selectedItems } );
 	}
 
-	const defaultLayouts = mediaField
-		? {
-				table: {},
-				grid: {},
-		  }
-		: { table: {} };
+	// Temporary helper to handle pagination and bulk selection
+	const onChangeSelection = ( newIds: string[] ) => {
+		// Get all currently selected IDs from the view
+		const currentPageIds = data.map( item => item.id.toString() );
 
-	// Hide actions for field shortcode selection
+		// Keep selections from other pages that aren't in the current view
+		const otherPageSelections = selectedItems.filter( id => ! currentPageIds.includes( id ) );
+
+		// Combine selections from other pages with new selections
+		setSelectedItems( [ ...otherPageSelections, ...newIds ] );
+	};
+
 	const chooseItemAction = {
 		id: 'choose',
 		icon: <>{ __( 'Choose' ) }</>,
 		isPrimary: true,
 		label: '',
-		callback: ( items: RemoteDataResult[] ) => {
-			const ids = items.map( item => item.id ).join( ',' );
+		callback: () => {
+			const ids = selectedItems.join( ',' );
 			return onSelect( { [ idField ]: ids } );
 		},
 		supportsBulk,
 	};
 	const actions: Action< RemoteDataResult >[] = onSelectField ? [] : [ chooseItemAction ];
 
+	const itemCountLabel =
+		selectedItems.length > 1 ? __( 'items selected in total' ) : __( 'item selected in total' );
+
 	return (
-		<DataViews< RemoteDataResult >
-			actions={ actions }
-			data={ data }
-			defaultLayouts={ defaultLayouts }
-			fields={ fields }
-			getItemId={ ( item: { id?: string } ) => item.id || '' }
-			isLoading={ loading || ! pattern || ! results }
-			isItemClickable={ () => true }
-			onClickItem={ item => onSelect( item ) }
-			onChangeView={ onChangeView }
-			paginationInfo={ {
-				totalItems: totalItems ?? data.length,
-				totalPages: totalPages ?? 1,
-			} }
-			search={ supportsSearch }
-			view={ view }
-		/>
+		<>
+			<DataViews< RemoteDataResult >
+				actions={ actions }
+				data={ data }
+				defaultLayouts={ { table: {} } }
+				header={
+					supportsBulk &&
+					selectedItems.length > 0 &&
+					! loading && (
+						<HStack justify="start" style={ { marginRight: '16px' } }>
+							<BaseControl
+								className="rdb-dataviews-bulk-actions-footer__item-count-total"
+								__nextHasNoMarginBottom
+							>
+								<BaseControl.VisualLabel style={ { marginBottom: '0' } }>
+									{ selectedItems.length } { itemCountLabel }
+								</BaseControl.VisualLabel>
+							</BaseControl>
+							<Button onClick={ () => setSelectedItems( [] ) } variant="tertiary">
+								{ __( 'Cancel All' ) }
+							</Button>
+							<Button
+								onClick={ () => onSelect( { [ idField ]: selectedItems.join( ',' ) } ) }
+								variant="tertiary"
+							>
+								{ __( 'Choose' ) }
+							</Button>
+						</HStack>
+					)
+				}
+				fields={ fields }
+				getItemId={ ( item: { id?: string } ) => item.id || '' }
+				isLoading={ loading || ! pattern || ! results }
+				isItemClickable={ () => true }
+				onClickItem={ item => onSelect( item ) }
+				onChangeSelection={ onChangeSelection }
+				onChangeView={ onChangeView }
+				paginationInfo={ {
+					totalItems: totalItems ?? data.length,
+					totalPages: totalPages ?? 1,
+				} }
+				search={ supportsSearch }
+				selection={ selectedItems }
+				view={ view }
+			/>
+		</>
 	);
 }

@@ -224,3 +224,8 @@ td.dataviews-view-table__actions-column::before {
 	}
 
 }
+
+.dataviews__view-actions > .components-h-stack:nth-child(2) {
+	flex-direction: row-reverse;
+}
+
