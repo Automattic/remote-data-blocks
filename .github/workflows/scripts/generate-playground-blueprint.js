@@ -74,7 +74,7 @@ async function run( { github, context } ) {
 		}
 	}
 
-	const defaultSchema = generateWordpressPlaygroundBlueprint(context.issue.number);
+	const defaultSchema = generateWordpressPlaygroundBlueprint( context.issue.number );
 
 	const uriComponent = encodeURIComponent( JSON.stringify( defaultSchema ) );
 
