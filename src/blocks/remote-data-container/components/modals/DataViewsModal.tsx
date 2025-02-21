@@ -1,10 +1,4 @@
-import {
-	BaseControl,
-	Button,
-	Modal,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { BaseControl, Button, Modal, __experimentalHStack as HStack } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -112,11 +106,8 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 							totalPages={ totalPages }
 						/>
 						{ supportsBulk && ! loading && (
-							<VStack
-								className="rdb-dataviews-bulk-actions-footer__selection-total"
-								alignment="center"
-							>
-								{ selectedItems.length > 0 && (
+							<>
+								{ selectedItems.length > 1 && (
 									<BaseControl
 										className="rdb-dataviews-bulk-actions-footer__item-count-total"
 										__nextHasNoMarginBottom
@@ -126,7 +117,8 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 										</BaseControl.VisualLabel>
 									</BaseControl>
 								) }
-								<HStack>
+
+								<HStack className="rdb-dataviews-bulk-actions-footer__selection-total">
 									<Button
 										disabled={ selectedItems.length === 0 }
 										onClick={ () => setSelectedItems( [] ) }
@@ -142,7 +134,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 										{ __( 'Save' ) }
 									</Button>
 								</HStack>
-							</VStack>
+							</>
 						) }
 					</>
 				</Modal>

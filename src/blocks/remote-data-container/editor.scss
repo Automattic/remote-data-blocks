@@ -157,30 +157,40 @@ td.dataviews-view-table__actions-column::before {
 	bottom: 60px;
 	left: 0;
 	right: 0;
-	background-color: transparent;
+	background: #fff;
 
 	.dataviews-bulk-actions-footer__container  .dataviews-bulk-actions-footer__action-buttons {
 		display: none;
 	}
 }
 
-.components-modal__content .rdb-dataviews-bulk-actions-footer__selection-total {
-	background: #fff;
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	padding: 24px;
-	gap: 20px;
-	z-index: 1;
-
-	.components-button {
-		width: 100%;
-		display: block;
-		text-align: center;
-	}
+.components-modal__content {
 
 	.rdb-dataviews-bulk-actions-footer__item-count-total {
+		position: fixed;
+		bottom: 80px;
+		left: 50%;
+		transform: translate(-50%);
+		width: max-content;
+		text-align: center;
+		color: #1e1e1e;
+		z-index: 4;
+	}
+
+	.rdb-dataviews-bulk-actions-footer__selection-total {
+		background: #fff;
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		padding: 0 24px 24px;
+		gap: 20px;
 		z-index: 3;
+
+		.components-button {
+			width: 100%;
+			display: block;
+			text-align: center;
+		}
 	}
 }
