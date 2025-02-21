@@ -134,6 +134,13 @@ export function ItemList( props: ItemListProps ) {
 		setView( { ...newView, selection: selectedItems } );
 	}
 
+	const defaultLayouts = mediaField
+		? {
+				table: {},
+				grid: {},
+		  }
+		: { table: {} };
+
 	// Temporary helper to handle pagination and bulk selection
 	const onChangeSelection = ( newIds: string[] ) => {
 		// Get all currently selected IDs from the view
@@ -165,7 +172,7 @@ export function ItemList( props: ItemListProps ) {
 			<DataViews< RemoteDataResult >
 				actions={ actions }
 				data={ data }
-				defaultLayouts={ { table: {} } }
+				defaultLayouts={ defaultLayouts }
 				fields={ fields }
 				getItemId={ ( item: { id?: string } ) => item.id || '' }
 				isLoading={ loading || ! pattern || ! results }

@@ -73,8 +73,6 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 		</Button>
 	);
 
-	console.log( { loading, selectedItems, supportsBulk } );
-
 	return (
 		<>
 			{ triggerElement }
