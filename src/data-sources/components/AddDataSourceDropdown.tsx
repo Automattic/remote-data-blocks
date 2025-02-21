@@ -1,12 +1,12 @@
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-import { SUPPORTED_SERVICES_LABELS } from '../constants';
+import { SUPPORTED_SERVICES_LABELS } from '@/data-sources/constants';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import { AirtableIcon } from '@/settings/icons/AirtableIcon';
 import { GoogleSheetsIcon } from '@/settings/icons/GoogleSheetsIcon';
 import HttpIcon from '@/settings/icons/HttpIcon';
-import SalesforceCommerceB2CIcon from '@/settings/icons/SalesforceCommerceB2CIcon';
+import SalesforceCommerceD2CIcon from '@/settings/icons/SalesforceCommerceD2CIcon';
 import { ShopifyIcon } from '@/settings/icons/ShopifyIcon';
 
 import '../DataSourceList.scss';
@@ -54,9 +54,9 @@ export const AddDataSourceDropdown = () => {
 							value: 'shopify',
 						},
 						{
-							icon: SalesforceCommerceB2CIcon,
-							label: SUPPORTED_SERVICES_LABELS[ 'salesforce-b2c' ],
-							value: 'salesforce-b2c',
+							icon: SalesforceCommerceD2CIcon,
+							label: SUPPORTED_SERVICES_LABELS[ 'salesforce-d2c' ],
+							value: 'salesforce-d2c',
 						},
 						{
 							icon: HttpIcon,

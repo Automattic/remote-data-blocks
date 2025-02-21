@@ -1,39 +1,38 @@
 <?php declare(strict_types = 1);
 
-namespace RemoteDataBlocks\Integrations\SalesforceB2C;
+namespace RemoteDataBlocks\Integrations\SalesforceD2C;
 
 use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
 use RemoteDataBlocks\Config\Query\HttpQuery;
-use RemoteDataBlocks\Integrations\SalesforceB2C\Auth\SalesforceB2CAuth;
+use RemoteDataBlocks\Integrations\SalesforceD2C\Auth\SalesforceD2CAuth;
 use RemoteDataBlocks\Formatting\StringFormatter;
 use WP_Error;
 
-class SalesforceB2CIntegration {
+class SalesforceD2CIntegration {
 	public static function init(): void {
 		add_action( 'init', [ __CLASS__, 'register_blocks' ], 10, 0 );
 	}
 
 	public static function register_blocks(): void {
 		$data_source_configs = DataSourceConfigManager::get_all( [
-			'service' => REMOTE_DATA_BLOCKS_SALESFORCE_B2C_SERVICE,
+			'service' => REMOTE_DATA_BLOCKS_SALESFORCE_D2C_SERVICE,
 			'enable_blocks' => true,
 		] );
 
 		foreach ( $data_source_configs as $config ) {
-			$data_source = SalesforceB2CDataSource::from_array( $config );
+			$data_source = SalesforceD2CDataSource::from_array( $config );
 
 			self::register_blocks_for_salesforce_data_source( $data_source );
 		}
 	}
 
-	private static function get_queries( SalesforceB2CDataSource $data_source ): array {
+	private static function get_queries( SalesforceD2CDataSource $data_source ): array {
 		$base_endpoint = $data_source->get_endpoint();
 		$service_config = $data_source->to_array()['service_config'];
 
 		$get_request_headers = function () use ( $base_endpoint, $service_config ): array|WP_Error {
-			$access_token = SalesforceB2CAuth::generate_token(
+			$access_token = SalesforceD2CAuth::generate_token(
 				$base_endpoint,
-				$service_config['organization_id'],
 				$service_config['client_id'],
 				$service_config['client_secret']
 			);
@@ -51,9 +50,9 @@ class SalesforceB2CIntegration {
 				'data_source' => $data_source,
 				'endpoint' => function ( array $input_variables ) use ( $base_endpoint, $service_config ): string {
 					return sprintf(
-						'%s/product/shopper-products/v1/organizations/%s/products/%s?siteId=RefArchGlobal',
+						'%s/services/data/v63.0/commerce/webstores/%s/products/%s',
 						$base_endpoint,
-						$service_config['organization_id'],
+						$service_config['store_id'],
 						$input_variables['product_id']
 					);
 				},
@@ -61,6 +60,7 @@ class SalesforceB2CIntegration {
 					'product_id' => [
 						'name' => 'Product ID',
 						'type' => 'id',
+						'required' => true,
 					],
 				],
 				'output_schema' => [
@@ -73,27 +73,22 @@ class SalesforceB2CIntegration {
 						],
 						'name' => [
 							'name' => 'Name',
-							'path' => '$.name',
+							'path' => '$.fields.Name',
 							'type' => 'string',
 						],
-						'longDescription' => [
-							'name' => 'Long Description',
-							'path' => '$.longDescription',
-							'type' => 'string',
-						],
-						'price' => [
-							'name' => 'Price',
-							'path' => '$.price',
+						'description' => [
+							'name' => 'Description',
+							'path' => '$.fields.Description',
 							'type' => 'string',
 						],
 						'image_url' => [
 							'name' => 'Image URL',
-							'path' => '$.imageGroups[0].images[0].link',
+							'path' => '$.defaultImage.url',
 							'type' => 'image_url',
 						],
 						'image_alt_text' => [
 							'name' => 'Image Alt Text',
-							'path' => '$.imageGroups[0].images[0].alt',
+							'path' => '$.defaultImage.alternateText',
 							'type' => 'image_alt',
 						],
 					],
@@ -104,39 +99,35 @@ class SalesforceB2CIntegration {
 				'data_source' => $data_source,
 				'endpoint' => function ( array $input_variables ) use ( $base_endpoint, $service_config ): string {
 					return sprintf(
-						'%s/search/shopper-search/v1/organizations/%s/product-search?siteId=RefArchGlobal&q=%s',
+						'%s/services/data/v63.0/commerce/webstores/%s/search/products?searchTerm=%s',
 						$base_endpoint,
-						$service_config['organization_id'],
+						$service_config['store_id'],
 						urlencode( $input_variables['search'] )
 					);
 				},
 				'input_schema' => [
 					'search' => [
+						'required' => true,
 						'type' => 'ui:search_input',
 					],
 				],
 				'output_schema' => [
-					'path' => '$.hits[*]',
+					'path' => '$.productsPage.products[*]',
 					'is_collection' => true,
 					'type' => [
 						'product_id' => [
-							'name' => 'product id',
-							'path' => '$.productId',
+							'name' => 'Product ID',
+							'path' => '$.id',
 							'type' => 'id',
 						],
 						'name' => [
-							'name' => 'product name',
-							'path' => '$.productName',
-							'type' => 'string',
-						],
-						'price' => [
-							'name' => 'item price',
-							'path' => '$.price',
+							'name' => 'Name',
+							'path' => '$.name',
 							'type' => 'string',
 						],
 						'image_url' => [
-							'name' => 'item image url',
-							'path' => '$.image.link',
+							'name' => 'Image URL',
+							'path' => '$.defaultImage.url',
 							'type' => 'image_url',
 						],
 					],
@@ -146,7 +137,7 @@ class SalesforceB2CIntegration {
 		];
 	}
 
-	public static function register_blocks_for_salesforce_data_source( SalesforceB2CDataSource $data_source ): void {
+	public static function register_blocks_for_salesforce_data_source( SalesforceD2CDataSource $data_source ): void {
 		$queries = self::get_queries( $data_source );
 
 		register_remote_data_block(
@@ -189,7 +180,7 @@ class SalesforceB2CIntegration {
 	}
 
 	/**
-	 * Get the block registration snippets for the Salesforce B2C integration.
+	 * Get the block registration snippets for the Salesforce D2C integration.
 	 *
 	 * @param array $data_source_config The data source configuration.
 	 * @return array The block registration snippets.

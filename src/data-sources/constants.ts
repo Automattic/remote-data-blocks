@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 
-import { HttpAuthTypes, HttpApiKeyDestination } from '@/data-sources/http/types';
+import { HttpApiKeyDestination, HttpAuthTypes } from '@/data-sources/http/types';
 import { SelectOption } from '@/types/input';
 
 export const SUPPORTED_SERVICES = [
@@ -8,7 +8,7 @@ export const SUPPORTED_SERVICES = [
 	'example-api',
 	'generic-http',
 	'google-sheets',
-	'salesforce-b2c',
+	'salesforce-d2c',
 	'shopify',
 ] as const;
 export const SUPPORTED_SERVICES_LABELS: Record< ( typeof SUPPORTED_SERVICES )[ number ], string > =
@@ -17,7 +17,7 @@ export const SUPPORTED_SERVICES_LABELS: Record< ( typeof SUPPORTED_SERVICES )[ n
 		'example-api': __( 'Conference Events Example API', 'remote-data-blocks' ),
 		'generic-http': __( 'HTTP', 'remote-data-blocks' ),
 		'google-sheets': __( 'Google Sheets', 'remote-data-blocks' ),
-		'salesforce-b2c': __( 'Salesforce Commerce B2C', 'remote-data-blocks' ),
+		'salesforce-d2c': __( 'Salesforce D2C', 'remote-data-blocks' ),
 		shopify: __( 'Shopify', 'remote-data-blocks' ),
 	} as const;
 export const OPTIONS_PAGE_SLUG = 'remote-data-blocks-settings';

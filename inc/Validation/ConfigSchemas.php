@@ -229,6 +229,7 @@ final class ConfigSchemas {
 							'ui:pagination_cursor_next',
 							'ui:pagination_cursor_previous',
 						),
+						'required' => Types::nullable( Types::boolean() ),
 					] ),
 				)
 			),

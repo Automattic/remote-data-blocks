@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace RemoteDataBlocks\Integrations\SalesforceB2C;
+namespace RemoteDataBlocks\Integrations\SalesforceD2C;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Validation\Types;
@@ -8,8 +8,8 @@ use function plugins_url;
 
 defined( 'ABSPATH' ) || exit();
 
-class SalesforceB2CDataSource extends HttpDataSource {
-	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_SALESFORCE_B2C_SERVICE;
+class SalesforceD2CDataSource extends HttpDataSource {
+	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_SALESFORCE_D2C_SERVICE;
 	protected const SERVICE_SCHEMA_VERSION = 1;
 
 	protected static function get_service_config_schema(): array {
@@ -19,15 +19,15 @@ class SalesforceB2CDataSource extends HttpDataSource {
 			'client_id' => Types::string(),
 			'client_secret' => Types::string(),
 			'enable_blocks' => Types::nullable( Types::boolean() ),
-			'organization_id' => Types::string(),
-			'shortcode' => Types::string(),
+			'domain' => Types::string(),
+			'store_id' => Types::string(),
 		] );
 	}
 
 	protected static function map_service_config( array $service_config ): array {
 		return [
 			'display_name' => $service_config['display_name'],
-			'endpoint' => sprintf( 'https://%s.api.commercecloud.salesforce.com', $service_config['shortcode'] ),
+			'endpoint' => 'https://' . $service_config['domain'] . '.my.salesforce.com',
 			'image_url' => plugins_url( './assets/salesforce_commerce_cloud_logo.png', __FILE__ ),
 			'request_headers' => [
 				'Content-Type' => 'application/json',

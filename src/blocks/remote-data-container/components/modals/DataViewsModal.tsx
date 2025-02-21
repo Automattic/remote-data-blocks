@@ -1,5 +1,4 @@
 import { Button, Modal } from '@wordpress/components';
-import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { ItemList } from '@/blocks/remote-data-container/components/item-list/ItemList';
@@ -16,7 +15,6 @@ interface DataViewsModalProps {
 	className?: string;
 	blockName: string;
 	headerImage?: string;
-	inputVariables: InputVariable[];
 	onSelect?: ( data: RemoteDataQueryInput ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
 	queryKey: string;
@@ -25,16 +23,7 @@ interface DataViewsModalProps {
 }
 
 export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
-	const {
-		className,
-		blockName,
-		inputVariables,
-		onSelect,
-		onSelectField,
-		queryKey,
-		renderTrigger,
-		title,
-	} = props;
+	const { className, blockName, onSelect, onSelectField, queryKey, renderTrigger, title } = props;
 
 	const blockConfig = getBlockConfig( blockName );
 	const availableBindings = getBlockAvailableBindings( blockName );
@@ -44,7 +33,6 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 	const { close, isOpen, open } = useModalState();
 	const {
 		data,
-		fetch,
 		loading,
 		page,
 		searchInput,
@@ -53,15 +41,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 		supportsSearch,
 		totalItems,
 		totalPages,
-	} = useRemoteData( {
-		blockName,
-		inputVariables,
-		queryKey,
-	} );
-
-	useEffect( () => {
-		void fetch( {} );
-	}, [] );
+	} = useRemoteData( { blockName, fetchOnMount: true, queryKey } );
 
 	function onSelectItem( input: RemoteDataQueryInput ): void {
 		onSelect?.( input );

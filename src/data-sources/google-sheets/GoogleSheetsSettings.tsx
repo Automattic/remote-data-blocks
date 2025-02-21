@@ -1,4 +1,4 @@
-import { TextareaControl, SelectControl } from '@wordpress/components';
+import { SelectControl, TextareaControl } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -7,16 +7,16 @@ import { FieldsSelection } from '@/data-sources/components/FieldsSelection';
 import { GOOGLE_SHEETS_API_SCOPES, ConfigSource } from '@/data-sources/constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import {
-	useGoogleSpreadsheetsOptions,
 	useGoogleSheetsWithFields,
+	useGoogleSpreadsheetsOptions,
 } from '@/data-sources/hooks/useGoogleApi';
 import { useGoogleAuth } from '@/data-sources/hooks/useGoogleAuth';
 import {
+	DataSourceQueryMappingValue,
 	GoogleSheetsConfig,
 	GoogleSheetsServiceConfig,
 	GoogleSheetsSheetConfig,
 	SettingsComponentProps,
-	DataSourceQueryMappingValue,
 } from '@/data-sources/types';
 import { getConnectionMessage } from '@/data-sources/utils';
 import { useForm, ValidationRules } from '@/hooks/useForm';

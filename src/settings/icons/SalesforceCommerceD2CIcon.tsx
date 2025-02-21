@@ -1,6 +1,6 @@
 import { SVG } from '@wordpress/primitives';
 
-const SalesforceCommerceB2CIcon = (
+const SalesforceCommerceD2CIcon = (
 	<SVG xmlns="http://www.w3.org/2000/svg" width="2500" height="1750" viewBox="0.5 0.5 999 699.242">
 		<path
 			fill="#00A1E0"
@@ -17,4 +17,4 @@ const SalesforceCommerceB2CIcon = (
 	</SVG>
 );
 
-export default SalesforceCommerceB2CIcon;
+export default SalesforceCommerceD2CIcon;
