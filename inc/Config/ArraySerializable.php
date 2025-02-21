@@ -13,8 +13,7 @@ defined( 'ABSPATH' ) || exit();
  * ArraySerializable class
  */
 abstract class ArraySerializable implements ArraySerializableInterface {
-	final private function __construct( protected array $config ) {
-	}
+	final private function __construct( protected array $config ) {}
 
 	protected function get_or_call_from_config( string $property_name, mixed ...$callable_args ): mixed {
 		$config_value = $this->config[ $property_name ] ?? null;

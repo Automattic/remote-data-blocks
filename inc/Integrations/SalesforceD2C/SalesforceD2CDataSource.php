@@ -34,12 +34,4 @@ class SalesforceD2CDataSource extends HttpDataSource {
 			],
 		];
 	}
-
-	protected static function migrate_config( array $config ): array {
-		if ( ! isset( $config['service_config']['site_id'] ) ) {
-			$config['service_config']['site_id'] = 'RefArchGlobal';
-		}
-
-		return $config;
-	}
 }
