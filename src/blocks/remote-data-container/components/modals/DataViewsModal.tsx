@@ -78,63 +78,61 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 			{ triggerElement }
 			{ isOpen && (
 				<Modal
-					className={ className }
+					className={ supportsBulk ? `${ className } rdb-dataviews-bulk-actions-modal` : className }
 					isFullScreen
 					onRequestClose={ close }
 					title={ blockConfig?.settings?.title ?? title }
 				>
-					<>
-						<ItemList
-							availableBindings={ availableBindings }
-							blockName={ blockName }
-							idField={ idField }
-							loading={ loading }
-							onSelect={ onSelect ? onSelectItem : close }
-							onSelectField={ onSelectField }
-							page={ page }
-							remoteData={ data }
-							searchInput={ searchInput }
-							selectedItems={ selectedItems }
-							setPage={ setPage }
-							setSearchInput={ setSearchInput }
-							setSelectedItems={ setSelectedItems }
-							supportsBulk={ supportsBulk }
-							supportsSearch={ supportsSearch }
-							totalItems={ totalItems }
-							totalPages={ totalPages }
-						/>
-						{ supportsBulk && ! loading && (
-							<>
-								{ selectedItems.length > 1 && (
-									<BaseControl
-										className="rdb-dataviews-bulk-actions-footer__item-count-total"
-										__nextHasNoMarginBottom
-									>
-										<BaseControl.VisualLabel style={ { marginBottom: '0' } }>
-											{ selectedItems.length } { itemCountLabel }
-										</BaseControl.VisualLabel>
-									</BaseControl>
-								) }
+					<ItemList
+						availableBindings={ availableBindings }
+						blockName={ blockName }
+						idField={ idField }
+						loading={ loading }
+						onSelect={ onSelect ? onSelectItem : close }
+						onSelectField={ onSelectField }
+						page={ page }
+						remoteData={ data }
+						searchInput={ searchInput }
+						selectedItems={ selectedItems }
+						setPage={ setPage }
+						setSearchInput={ setSearchInput }
+						setSelectedItems={ setSelectedItems }
+						supportsBulk={ supportsBulk }
+						supportsSearch={ supportsSearch }
+						totalItems={ totalItems }
+						totalPages={ totalPages }
+					/>
+					{ supportsBulk && ! loading && (
+						<>
+							{ selectedItems.length > 1 && (
+								<BaseControl
+									className="rdb-dataviews-bulk-actions-footer__item-count-total"
+									__nextHasNoMarginBottom
+								>
+									<BaseControl.VisualLabel style={ { marginBottom: '0' } }>
+										{ selectedItems.length } { itemCountLabel }
+									</BaseControl.VisualLabel>
+								</BaseControl>
+							) }
 
-								<HStack className="rdb-dataviews-bulk-actions-footer__selection-total">
-									<Button
-										disabled={ selectedItems.length === 0 }
-										onClick={ () => setSelectedItems( [] ) }
-										variant="secondary"
-									>
-										{ __( 'Cancel' ) }
-									</Button>
-									<Button
-										disabled={ selectedItems.length === 0 }
-										onClick={ () => onSelectItem( { [ idField ]: selectedItems.join( ',' ) } ) }
-										variant="primary"
-									>
-										{ __( 'Save' ) }
-									</Button>
-								</HStack>
-							</>
-						) }
-					</>
+							<HStack className="rdb-dataviews-bulk-actions-footer__selection-total">
+								<Button
+									disabled={ selectedItems.length === 0 }
+									onClick={ () => setSelectedItems( [] ) }
+									variant="secondary"
+								>
+									{ __( 'Cancel' ) }
+								</Button>
+								<Button
+									disabled={ selectedItems.length === 0 }
+									onClick={ () => onSelectItem( { [ idField ]: selectedItems.join( ',' ) } ) }
+									variant="primary"
+								>
+									{ __( 'Save' ) }
+								</Button>
+							</HStack>
+						</>
+					) }
 				</Modal>
 			) }
 		</>
