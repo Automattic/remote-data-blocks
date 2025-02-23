@@ -1,10 +1,9 @@
 name: Generate AI Documentation
 
 on:
-  pull_request:
-    paths:
-      - 'docs/**'
-      - 'example/**'
+  push:
+    branches:
+      - 'trunk'
 
 jobs:
   generate-ai-docs:
