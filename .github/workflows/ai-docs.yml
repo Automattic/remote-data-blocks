@@ -28,7 +28,7 @@ jobs:
         run: npm install -g repomix
 
       - name: Generate AI documentation
-        run: repomix --style=markdown docs/ example/ > docs/ai.md
+        run: repomix --style=markdown docs/ example/ -o docs/ai.md
 
       - name: Check for changes
         id: git-check
