@@ -35,6 +35,7 @@ For plugin overview and getting started guide, see [README](../README.md).
 
 ## Additional Documentation
 
+- [AI Documentation](ai.md)
 - [Contributing Guidelines](../CONTRIBUTING.md)
 - [Security Policy](../SECURITY.md)
 - [Code of Conduct](https://make.wordpress.org/handbook/community-code-of-conduct/)

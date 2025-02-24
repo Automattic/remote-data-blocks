@@ -117,7 +117,7 @@ class ConfigRegistry {
 
 			foreach ( array_keys( $to_query->get_input_schema() ) as $to ) {
 				if ( ! isset( $from_output_schema['type'][ $to ] ) ) {
-					return self::create_error( $block_title, sprintf( 'Cannot map key "%s" from %s query', esc_html( $to ), $from_query_type ) );
+					return self::create_error( $block_title, sprintf( 'Cannot map key "%1$s" from %2$s query. The display query for this block requires a "%1$s" key as an input, but it is not present in the output schema for the %2$s query. Try adding a "%1$s" mapping to the output schema for the %2$s query.', esc_html( $to ), $from_query_type ) );
 				}
 			}
 
