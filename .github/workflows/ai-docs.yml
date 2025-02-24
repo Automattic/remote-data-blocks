@@ -1,9 +1,6 @@
 name: Generate AI Documentation
 
-on:
-  pull_request:
-    types:
-      - closed
+on: workflow_dispatch
 
 jobs:
   generate-ai-docs:
