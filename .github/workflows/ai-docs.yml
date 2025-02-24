@@ -4,7 +4,6 @@ on: workflow_dispatch
 
 jobs:
   generate-ai-docs:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       contents: write
