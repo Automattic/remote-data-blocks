@@ -1,12 +1,13 @@
 name: Generate AI Documentation
 
 on:
-  push:
-    branches:
-      - 'trunk'
+  pull_request:
+    types:
+      - closed
 
 jobs:
   generate-ai-docs:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -24,7 +25,7 @@ jobs:
           node-version: '20'
 
       - name: Install repomix
-        run: npm install -g repomix
+        run: npm install -g repomix@v0.2
 
       - name: Generate AI documentation
         run: repomix --style=markdown docs/ example/ -o docs/ai.md
