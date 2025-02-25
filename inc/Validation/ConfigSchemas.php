@@ -289,7 +289,7 @@ final class ConfigSchemas {
 				Types::object( [
 					// This field provides an integer representing the total number of
 					// items available in paginated results. Either this field or
-					// `has_next_page` must be defined in order to enable
+					// `has_next_page` must be defined in order to enable pagination.
 					'total_items' => Types::nullable(
 						Types::object( [
 							'name' => Types::nullable( Types::string() ),
