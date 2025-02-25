@@ -72,7 +72,8 @@ export class GoogleApi {
 		sheetTitle: string,
 		cellRange: string
 	): Promise< GoogleSheetsValueRange > {
-		const url = `${ GoogleApi.SHEETS_BASE_URL }/spreadsheets/${ spreadsheetId }/values/${ sheetTitle }!${ cellRange }`;
+		const range = encodeURIComponent( `${ sheetTitle }!${ cellRange }` );
+		const url = `${ GoogleApi.SHEETS_BASE_URL }/spreadsheets/${ spreadsheetId }/values/${ range }`;
 		const result = await this.fetchApi< GoogleSheetsValueRange >( url );
 		return result;
 	}
