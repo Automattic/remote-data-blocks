@@ -36,7 +36,7 @@ export function usePaginationVariables( {
 	initialPerPage,
 	inputVariables,
 }: UsePaginationVariablesInput ): UsePaginationVariables {
-	const [ paginationData, setPaginationData ] = useState< RemoteDataPagination >( {} );
+	const [ paginationData, setPaginationData ] = useState< RemoteDataPagination >();
 	const [ page, setPage ] = useState< number >( initialPage );
 	const [ perPage, setPerPage ] = useState< number | null >( initialPerPage ?? null );
 
