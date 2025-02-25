@@ -1,5 +1,16 @@
-query SearchProducts($search: String) {
-	products(first: 10, query: $search, sortKey: BEST_SELLING) {
+query SearchProducts($search: String!, $limit: Int!, $cursor_next: String) {
+	products(
+		first: $limit
+		after: $cursor_next
+		query: $search
+		sortKey: BEST_SELLING
+	) {
+		pageInfo {
+			hasNextPage
+			hasPreviousPage
+			startCursor
+			endCursor
+		}
 		edges {
 			node {
 				id

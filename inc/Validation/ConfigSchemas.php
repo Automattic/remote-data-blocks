@@ -291,11 +291,13 @@ final class ConfigSchemas {
 					// items available in paginated results. This field must be defined
 					// in order present to enable pagination support of any type,
 					// including cursor-based pagination.
-					'total_items' => Types::object( [
+					'total_items' => Types::nullable(
+						Types::object( [
 						'name' => Types::nullable( Types::string() ),
 						'path' => Types::json_path(),
 						'type' => Types::enum( 'integer' ),
 					] ),
+					),
 					// This field provides a pagination cursor for the next page of
 					// paginated results, or a null value if there is no next page. This
 					// field must be defined in order to enable cursor-based pagination.
