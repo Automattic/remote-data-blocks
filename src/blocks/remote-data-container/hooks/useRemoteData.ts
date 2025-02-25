@@ -53,6 +53,7 @@ interface UseRemoteData {
 	error?: Error;
 	fetch: ( queryInput: RemoteDataQueryInput ) => Promise< void >;
 	hasNextPage?: boolean;
+	hasPreviousPage: boolean;
 	loading: boolean;
 	page: number;
 	perPage?: number;

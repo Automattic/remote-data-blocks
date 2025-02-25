@@ -3,8 +3,8 @@ interface InnerBlockContext {
 }
 
 interface RemoteDataPagination {
-    cursorNext?: string;
-    cursorPrevious?: string;
+	cursorNext?: string;
+	cursorPrevious?: string;
 	hasNextPage?: boolean;
 	totalItems?: number;
 }
