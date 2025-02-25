@@ -27,11 +27,6 @@ jobs:
   build:
     if: github.repository_owner == 'Automattic' && github.event.pull_request.draft == false && github.event.pull_request.user.login != 'github-actions[bot]'
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-      repository-projects: write
-      id-token: write
     steps:
       - uses: actions/checkout@v4
         with:
