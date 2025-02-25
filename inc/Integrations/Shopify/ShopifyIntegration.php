@@ -137,6 +137,11 @@ class ShopifyIntegration {
 						'path' => '$.data.products.pageInfo.startCursor',
 						'type' => 'string',
 					],
+					'has_next_page' => [
+						'name' => 'Has next page',
+						'path' => '$.data.products.pageInfo.hasNextPage',
+						'type' => 'boolean',
+					],
 				],
 				'graphql_query' => file_get_contents( __DIR__ . '/Queries/SearchProducts.graphql' ),
 			] ),

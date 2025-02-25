@@ -293,10 +293,10 @@ final class ConfigSchemas {
 					// including cursor-based pagination.
 					'total_items' => Types::nullable(
 						Types::object( [
-						'name' => Types::nullable( Types::string() ),
-						'path' => Types::json_path(),
-						'type' => Types::enum( 'integer' ),
-					] ),
+							'name' => Types::nullable( Types::string() ),
+							'path' => Types::json_path(),
+							'type' => Types::enum( 'integer' ),
+						] ),
 					),
 					// This field provides a pagination cursor for the next page of
 					// paginated results, or a null value if there is no next page. This
@@ -317,6 +317,16 @@ final class ConfigSchemas {
 							'path' => Types::json_path(),
 							'type' => Types::enum( 'string' ),
 						] ),
+					),
+					// This field provides a boolean indicating if there is a next page of
+					// paginated results. This is helpful if the API does not provide a
+					// total number of items. 
+					'has_next_page' => Types::nullable(
+						Types::object( [
+							'name' => Types::nullable( Types::string() ),
+							'path' => Types::json_path(),
+							'type' => Types::enum( 'boolean' ),
+						] )
 					),
 				] )
 			),

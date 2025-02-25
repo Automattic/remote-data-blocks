@@ -9,6 +9,7 @@ import {
 } from '@/blocks/remote-data-container/config/constants';
 
 interface UsePaginationVariables {
+	hasNextPage?: boolean;
 	onFetch: ( remoteData: RemoteData ) => void;
 	page: number;
 	paginationQueryInput: RemoteDataQueryInput;
@@ -35,7 +36,7 @@ export function usePaginationVariables( {
 	initialPerPage,
 	inputVariables,
 }: UsePaginationVariablesInput ): UsePaginationVariables {
-	const [ paginationData, setPaginationData ] = useState< RemoteDataPagination >();
+	const [ paginationData, setPaginationData ] = useState< RemoteDataPagination >( {} );
 	const [ page, setPage ] = useState< number >( initialPage );
 	const [ perPage, setPerPage ] = useState< number | null >( initialPerPage ?? null );
 
@@ -88,6 +89,7 @@ export function usePaginationVariables( {
 		supportsCursorPagination || supportsPagePagination || supportsOffsetPagination;
 	const totalItems = paginationData?.totalItems;
 	const totalPages = totalItems && perPage ? Math.ceil( totalItems / perPage ) : undefined;
+	const hasNextPage = paginationData?.hasNextPage;
 
 	function onFetch( remoteData: RemoteData ): void {
 		if ( ! supportsPagination ) {
@@ -120,6 +122,7 @@ export function usePaginationVariables( {
 	}
 
 	return {
+		hasNextPage,
 		onFetch,
 		page,
 		paginationQueryInput,

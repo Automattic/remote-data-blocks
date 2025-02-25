@@ -31,10 +31,12 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 	const { close, isOpen, open } = useModalState();
 	const {
 		data,
+		hasNextPage,
 		loading,
 		page,
 		searchInput,
 		setPage,
+		setPerPage,
 		setSearchInput,
 		supportsSearch,
 		totalItems,
@@ -72,6 +74,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 					<ItemList
 						availableBindings={ availableBindings }
 						blockName={ blockName }
+						hasNextPage={ hasNextPage }
 						loading={ loading }
 						onSelect={ onSelect ? onSelectItem : close }
 						onSelectField={ onSelectField }
@@ -79,6 +82,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 						remoteData={ data }
 						searchInput={ searchInput }
 						setPage={ setPage }
+						setPerPage={ setPerPage }
 						setSearchInput={ setSearchInput }
 						supportsSearch={ supportsSearch }
 						totalItems={ totalItems }

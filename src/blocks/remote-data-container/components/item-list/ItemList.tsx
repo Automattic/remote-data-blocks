@@ -27,6 +27,7 @@ function getResultsWithId( results: RemoteDataResult[], instanceId: string ): Re
 interface ItemListProps {
 	availableBindings: Record< string, RemoteDataBinding >;
 	blockName: string;
+	hasNextPage: boolean;
 	loading: boolean;
 	onSelect: ( data: RemoteDataQueryInput ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
@@ -35,6 +36,7 @@ interface ItemListProps {
 	remoteData?: RemoteData;
 	searchInput: string;
 	setPage: ( newPage: number ) => void;
+	setPerPage: ( newPerPage: number ) => void;
 	setSearchInput: ( newValue: string ) => void;
 	supportsSearch: boolean;
 	totalItems?: number;
@@ -45,6 +47,7 @@ export function ItemList( props: ItemListProps ) {
 	const {
 		availableBindings,
 		blockName,
+		hasNextPage,
 		loading,
 		onSelect,
 		onSelectField,
@@ -53,6 +56,7 @@ export function ItemList( props: ItemListProps ) {
 		remoteData,
 		searchInput,
 		setPage,
+		setPerPage,
 		setSearchInput,
 		supportsSearch,
 		totalItems,
@@ -121,6 +125,7 @@ export function ItemList( props: ItemListProps ) {
 
 	function onChangeView( newView: View ) {
 		setPage( newView.page ?? 1 );
+		setPerPage( newView.perPage ?? perPage ?? data.length );
 		setSearchInput( newView.search ?? '' );
 		setView( newView );
 	}
@@ -157,7 +162,7 @@ export function ItemList( props: ItemListProps ) {
 			onChangeView={ onChangeView }
 			paginationInfo={ {
 				totalItems: totalItems ?? data.length,
-				totalPages: totalPages ?? 1,
+				totalPages: totalPages ?? ( hasNextPage ? page + 1 : page - 1 ),
 			} }
 			search={ supportsSearch }
 			view={ view }
