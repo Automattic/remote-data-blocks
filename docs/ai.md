@@ -106,6 +106,8 @@ theme/
   style.css
   theme.json
 tutorials/
+  bruno-collections/
+    Salesforce D2C APIs.json
   airtable.md
   google-sheets.md
   http.md
@@ -1429,6 +1431,378 @@ If you need to pre-process the response in some way before the output variables 
 Use the `query_runner` property to provide a custom [query runner](./query-runner.md) for the query. If omitted, the query will use the default query runner, which works well with most HTTP-powered APIs.
 ````
 
+## File: tutorials/bruno-collections/Salesforce D2C APIs.json
+````json
+{
+  "name": "Salesforce D2C APIs",
+  "version": "1",
+  "items": [
+    {
+      "type": "http",
+      "name": "Auth",
+      "seq": 2,
+      "request": {
+        "url": "https://<salesforce-url>.my.salesforce.com/services/oauth2/token?grant_type=client_credentials&client_id=<client-id>&client_secret=<client-secret>",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/x-www-form-urlencoded",
+            "enabled": true
+          }
+        ],
+        "params": [
+          {
+            "name": "grant_type",
+            "value": "client_credentials",
+            "type": "query",
+            "enabled": true
+          },
+          {
+            "name": "client_id",
+            "value": "<client-id>",
+            "type": "query",
+            "enabled": true
+          },
+          {
+            "name": "client_secret",
+            "value": "<client-secret>",
+            "type": "query",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "none"
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Products",
+      "seq": 3,
+      "request": {
+        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/products?skus=6010009",
+        "method": "GET",
+        "headers": [],
+        "params": [
+          {
+            "name": "skus",
+            "value": "6010009",
+            "type": "query",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": ""
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Product",
+      "seq": 4,
+      "request": {
+        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/products?skus=6010053",
+        "method": "GET",
+        "headers": [],
+        "params": [
+          {
+            "name": "skus",
+            "value": "6010053",
+            "type": "query",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": ""
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Search",
+      "seq": 5,
+      "request": {
+        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/search/products?searchTerm=Energy",
+        "method": "GET",
+        "headers": [],
+        "params": [
+          {
+            "name": "searchTerm",
+            "value": "Energy",
+            "type": "query",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": ""
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Check Token",
+      "seq": 6,
+      "request": {
+        "url": "https://<salesforce-url>.my.salesforce.com/services/oauth2/introspect",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/x-www-form-urlencoded",
+            "enabled": true
+          }
+        ],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "json": "token=<token>&client_id=<client-id>&client_secret=<client-secret>",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "none"
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "StoreLookup",
+      "seq": 7,
+      "request": {
+        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/query/?q=SELECT name,id from webstore",
+        "method": "GET",
+        "headers": [],
+        "params": [
+          {
+            "name": "q",
+            "value": "SELECT name,id from webstore",
+            "type": "query",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": ""
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Start Cart",
+      "seq": 8,
+      "request": {
+        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/carts/current",
+        "method": "GET",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": ""
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Add to Cart",
+      "seq": 9,
+      "request": {
+        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/carts/0a6Ws000001MUGbIAO/cart-items",
+        "method": "POST",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "json": "{\n  \"quantity\": 2,\n  \"type\": \"Product\",\n  \"productId\":\"01tWs000005QwjpIAC\"\n}",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": ""
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Update Cart",
+      "seq": 10,
+      "request": {
+        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/carts/0a6Ws000001MUGbIAO/cart-items/0a9Ws000002aFx3IAE",
+        "method": "PATCH",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "json": "{\n  \"quantity\": 1\n}",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": ""
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Get Cart Items",
+      "seq": 11,
+      "request": {
+        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/carts/0a6Ws000001MUGbIAO/cart-items",
+        "method": "GET",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "json": "",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": ""
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Delete Cart Item",
+      "seq": 12,
+      "request": {
+        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/carts/0a6Ws000001MUGbIAO/cart-items/0a9Ws000002aFx3IAE",
+        "method": "DELETE",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "json": "",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": ""
+          }
+        }
+      }
+    }
+  ],
+  "environments": [],
+  "brunoConfig": {
+    "version": "1",
+    "name": "Salesforce D2C APIs",
+    "type": "collection",
+    "ignore": [ "node_modules", ".git" ]
+  }
+}
+````
+
 ## File: tutorials/airtable.md
 ````markdown
 # Create an Airtable remote data block
@@ -1606,27 +1980,38 @@ This section will guide you through configuring data sources in the plugin UI an
 - [Airtable](airtable.md)
 - [Google Sheets integration](google-sheets.md)
 - [HTTP](http.md)
-- [Salesforce Commerce B2C](salesforce-commerce.md)
+- [Salesforce Commerce D2C](salesforce-commerce.md)
 - [Shopify](shopify.md)
 ````
 
 ## File: tutorials/salesforce-commerce.md
 ````markdown
-# Create a Salesforce Commerce B2C remote data block
+# Create a Salesforce Commerce D2C remote data block
 
-This tutorial will walk you through connecting a [Salesforce Commerce B2C](https://developer.salesforce.com/docs/commerce/b2c-commerce/overview) data source and how to use the automatically created block in the WordPress editor.
+This tutorial will walk you through connecting a [Salesforce Commerce D2C](https://developer.salesforce.com/docs/commerce/salesforce-commerce/guide) data source and how to use the automatically created block in the WordPress editor.
 
-## Salesforce Commerce B2C API Access
+## Salesforce Commerce D2C API Access
+
+We have provided a pre-configured Bruno Collection for interacting with the Salesforce Commerce D2C APIs. These are located [here](../bruno-collections/Salesforce D2C APIs.json). These can be imported into the [Bruno API Client](https://www.usebruno.com/docs/api-client/introduction) to interact with the APIs.
+
+In order to use the collection, you will need to provide the following variables:
+
+- `salesforce domain`
+- `client_id`
+- `client_secret`
 
 ## Create the data source
 
 1. Go to Settings > Remote Data Blocks in your WordPress admin.
 2. Click on the "Connect new" button.
-3. Choose "Salesforce Commerce B2C" from the dropdown menu as the data source type.
+3. Choose "Salesforce Commerce D2C" from the dropdown menu as the data source type.
 4. Name the data source. This name is only used for display purposes.
-5. Provide the merchant short code. This is the region-specific merchant identifier.
-6. Provide the organization ID.
-7. Provide the client ID and the client secret. Ensure these are correct or else authentication will fail.
+5. Provide the Salesforce Commerce domain.
+6. Provide the client ID and the client secret. Ensure these are correct or else authentication will fail.
+7. Click Continue.
+8. The stores for the provided domain will be listed. Select the store you wish to use.
+9. Click Continue.
+10. If you wish to have the blocks automatically be registered, ensure the `Auto-generate blocks` checkbox is checked.
 
 ## Insert the block
 
@@ -1722,7 +2107,7 @@ For plugin overview and getting started guide, see [README](../README.md).
   - [Airtable](tutorials/airtable.md)
   - [Google Sheets integration](tutorials/google-sheets.md)
   - [HTTP](tutorials/http.md)
-  - [Salesforce Commerce B2C](tutorials/salesforce-commerce.md)
+  - [Salesforce Commerce D2C](tutorials/salesforce-commerce.md)
   - [Shopify](tutorials/shopify.md)
 
 - [Development](local-development.md)

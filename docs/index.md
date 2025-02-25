@@ -26,7 +26,7 @@ For plugin overview and getting started guide, see [README](../README.md).
   - [Airtable](tutorials/airtable.md)
   - [Google Sheets integration](tutorials/google-sheets.md)
   - [HTTP](tutorials/http.md)
-  - [Salesforce Commerce B2C](tutorials/salesforce-commerce.md)
+  - [Salesforce Commerce D2C](tutorials/salesforce-commerce.md)
   - [Shopify](tutorials/shopify.md)
 
 - [Development](local-development.md)
