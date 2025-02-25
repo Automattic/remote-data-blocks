@@ -1,4 +1,5 @@
 name: Build Live Branch
+
 on:
   pull_request:
     branches:
@@ -21,12 +22,12 @@ concurrency:
 env:
   FORCE_COLOR: 1
 
-permissions: {}
-
 jobs:
   build:
     if: github.repository_owner == 'Automattic' && github.event.pull_request.draft == false && github.event.pull_request.user.login != 'github-actions[bot]'
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
         with:
