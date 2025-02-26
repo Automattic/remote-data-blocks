@@ -44,7 +44,7 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 	 * define their own validation schema.
 	 */
 	public static function preprocess_config( array $config ): array|WP_Error {
-		$config = static::perform_migration( $config );
+		$config = static::migrate_config( $config );
 
 		$service_config = $config['service_config'] ?? [];
 		$validator = new Validator( static::get_service_config_schema() );
@@ -63,31 +63,6 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 				'uuid' => $config['uuid'] ?? null,
 			]
 		);
-	}
-
-	/**
-	 * Performs a migration if the config is out of date.
-	 */
-	private static function perform_migration( array $config ): array {
-		// By default, we want to have an active data source.
-		if ( ! isset( $config['active'] ) ) {
-			$config['active'] = true;
-		}
-
-		if ( static::SERVICE_SCHEMA_VERSION === $config['service_config']['__version'] ) {
-			return $config;
-		}
-
-		$migrated_config = static::migrate_config( $config );
-
-		if ( is_wp_error( $migrated_config ) ) {
-			$config['active'] = false;
-		} else {
-			$config['service_config']['__version'] = static::SERVICE_SCHEMA_VERSION;
-			$config['active'] = true;
-		}
-
-		return $config;
 	}
 
 	public static function from_uuid( string $uuid ): DataSourceInterface|WP_Error {
@@ -134,10 +109,10 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 	}
 
 	/**
-	 * Migrates the config to the current schema version.
-	 * Can be overridden by child classes to perform custom migrations.
+	 * @inheritDoc
 	 */
-	protected static function migrate_config( array $config ): array {
-		return $config;
+	protected static function migrate_config( array $config ): array|WP_Error {
+		return static::migrate_config( $config );
 	}
+
 }

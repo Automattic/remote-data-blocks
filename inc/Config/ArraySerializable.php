@@ -91,4 +91,15 @@ abstract class ArraySerializable implements ArraySerializableInterface {
 	 * @inheritDoc
 	 */
 	abstract public static function get_config_schema(): array;
+
+	/**
+	 * Migrates the config to the current schema version.
+	 * Can be overridden by child classes to perform custom migrations.
+	 *
+	 * @param array<string, mixed> $config The config to migrate.
+	 * @return array<string, mixed> The migrated config.
+	 */
+	protected static function migrate_config( array $config ): array|WP_Error {
+		return $config;
+	}
 }
