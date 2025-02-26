@@ -34,6 +34,11 @@ abstract class ArraySerializable implements ArraySerializableInterface {
 			return $subclass::from_array( $config, $validator );
 		}
 
+		$config = static::migrate_config( $config );
+		if ( is_wp_error( $config ) ) {
+			return $config;
+		}
+
 		$config = static::preprocess_config( $config );
 		if ( is_wp_error( $config ) ) {
 			return $config;
@@ -99,7 +104,7 @@ abstract class ArraySerializable implements ArraySerializableInterface {
 	 * @param array<string, mixed> $config The config to migrate.
 	 * @return array<string, mixed> The migrated config.
 	 */
-	protected static function migrate_config( array $config ): array|WP_Error {
+	public static function migrate_config( array $config ): array|WP_Error {
 		return $config;
 	}
 }

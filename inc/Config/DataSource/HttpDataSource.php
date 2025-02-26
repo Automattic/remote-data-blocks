@@ -44,8 +44,6 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 	 * define their own validation schema.
 	 */
 	public static function preprocess_config( array $config ): array|WP_Error {
-		$config = static::migrate_config( $config );
-
 		$service_config = $config['service_config'] ?? [];
 		$validator = new Validator( static::get_service_config_schema() );
 		$validated = $validator->validate( $service_config );
@@ -111,7 +109,7 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 	/**
 	 * @inheritDoc
 	 */
-	protected static function migrate_config( array $config ): array|WP_Error {
+	public static function migrate_config( array $config ): array|WP_Error {
 		return $config;
 	}
 }

@@ -40,6 +40,14 @@ interface ArraySerializableInterface {
 	public static function get_config_schema(): array;
 
 	/**
+	 * Migrates the config to the current schema version.
+	 *
+	 * @param array<string, mixed> $config The config to migrate.
+	 * @return array<string, mixed> The migrated config.
+	 */
+	public static function migrate_config( array $config ): array|WP_Error;
+
+	/**
 	 * Converts the current object to an array representation.
 	 *
 	 * This method serializes the object's state into an array format. It's useful
