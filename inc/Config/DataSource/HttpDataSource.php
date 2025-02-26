@@ -112,6 +112,6 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 	 * @inheritDoc
 	 */
 	protected static function migrate_config( array $config ): array|WP_Error {
-		return static::migrate_config( $config );
+		return $config;
 	}
 }
