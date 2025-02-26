@@ -34,4 +34,16 @@ class GraphqlQuery extends HttpQuery {
 	public static function get_config_schema(): array {
 		return ConfigSchemas::get_graphql_query_config_schema();
 	}
+
+	/**
+	 * GraphQL queries are typically made with POST requests, however, we do
+	 * want to cache the response to queries. Override the default HTTP behavior
+	 * for POST requests and allow caching.
+	 *
+	 * Caching policy for GraphQL mutations is separately handled and disabled.
+	 */
+	public function get_cache_ttl( array $input_variables ): int|null {
+		// Return null for default cache TTL.
+		return null;
+	}
 }
