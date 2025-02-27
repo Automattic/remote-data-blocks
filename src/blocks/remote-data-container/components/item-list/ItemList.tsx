@@ -1,6 +1,6 @@
 import { useInstanceId } from '@wordpress/compose';
 import { Action, DataViews, View } from '@wordpress/dataviews/wp';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { ItemListField } from '@/blocks/remote-data-container/components/item-list/ItemListField';
@@ -128,10 +128,24 @@ export function ItemList( props: ItemListProps ) {
 		selection: selectedItems,
 	} );
 
+	// Only update if tableFields has content and view.fields is empty
+	useEffect( () => {
+		if ( tableFields.length > 0 && view.fields.length === 0 ) {
+			setView( currentView => ( {
+				...currentView,
+				fields: tableFields,
+			} ) );
+		}
+	}, [ tableFields ] );
+
 	function onChangeView( newView: View ) {
 		setPage( newView.page ?? 1 );
 		setSearchInput( newView.search ?? '' );
-		setView( { ...newView, selection: selectedItems } );
+		setView( {
+			...newView,
+			fields: newView.fields ?? tableFields,
+			selection: selectedItems,
+		} );
 	}
 
 	const defaultLayouts = mediaField
