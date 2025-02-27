@@ -119,6 +119,9 @@ class Sanitizer implements SanitizerInterface {
 			case 'string':
 				return sanitize_text_field( strval( $value ) );
 
+			case 'title':
+				return sanitize_text_field( strval( $value ) );
+
 			case 'button_text':
 			case 'html':
 			case 'id':

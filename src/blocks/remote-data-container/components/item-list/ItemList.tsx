@@ -85,7 +85,7 @@ export function ItemList( props: ItemListProps ) {
 
 	// Find title field from availableBindings by checking type
 	const titleField = Object.entries( availableBindings ).find(
-		( [ _, binding ] ) => binding.type === 'string' && binding.name.toLowerCase() === 'title'
+		( [ _, binding ] ) => binding.type === 'title'
 	)?.[ 0 ];
 
 	// Find media field from availableBindings by checking type

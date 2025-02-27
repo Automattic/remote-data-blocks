@@ -275,6 +275,7 @@ final class ConfigSchemas {
 							'image_alt',
 							'image_url',
 							'markdown',
+							'title',
 							// 'json_path' is omitted since it likely has no user utility.
 							'url',
 							'uuid',

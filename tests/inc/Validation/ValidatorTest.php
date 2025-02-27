@@ -52,6 +52,7 @@ class ValidatorTest extends TestCase {
 			'image_url' => 'https://example.com/image.jpg',
 			'json_path' => '$.foo.bar',
 			'markdown' => '# Hello, world!',
+			'title' => 'A Title',
 			'url' => 'https://example.com/foo',
 			'uuid' => '123e4567-e89b-12d3-a456-426614174000',
 		] ) );
