@@ -27,6 +27,141 @@ class SalesforceD2CAuth {
 		return self::get_saved_access_token( $client_id ) ?? self::get_token_using_client_credentials( $client_id, $client_secret, $endpoint );
 	}
 
+	public static function generate_buyer_endpoint(
+		string $endpoint,
+		string $token,
+		string $store_id,
+	): string|WP_Error {
+		// First we need to get the base store url.
+		// ToDo: Figure out how we can narrow this based on the store_id rather than using LIMIT 1.
+		$domain_url = self::get_domain_url( $endpoint, $token, $store_id );
+
+		if ( is_wp_error( $domain_url ) ) {
+			return $domain_url;
+		}
+
+		// Then, we need to get the store prefix as well as the site id to use for the buyer cookie.
+		$site_details = self::get_site_details( $endpoint, $token, $store_id );
+
+		if ( is_wp_error( $site_details ) ) {
+			return $site_details;
+		}
+
+		// Generate the buyer url and the cookie that would be used for guest buyer shopping.
+		$buyer_endpoint = sprintf( '%s/%s', $domain_url, $site_details['site_url_path_prefix'] );
+		$buyer_cookie = sprintf( 'guest_uuid_essential_%s=%s', $site_details['site_id'], wp_generate_uuid4() );
+
+		return [
+			'buyer_endpoint' => $buyer_endpoint,
+			'buyer_cookie' => $buyer_cookie,
+		];
+	}
+
+	public static function get_domain_url(
+		string $endpoint,
+		string $token,
+		string $store_id,
+	): string|WP_Error {
+		// First we need to get the base store url.
+		// ToDo: Figure out how we can narrow this based on the store_id rather than using LIMIT 1.
+		$domain_url = sprintf( '%s/services/data/v63.0/query/?q=SELECT+domain+from+domain+LIMIT+1', $endpoint, $store_id );
+
+		$response = wp_remote_get( $domain_url, [
+			'headers' => [
+				'Authorization' => 'Bearer ' . $token,
+			],
+		] );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+
+		if ( 200 !== $response_code ) {
+			return new WP_Error(
+				'salesforce_d2c_auth_error_domain',
+				__( 'Failed to retrieve domain', 'remote-data-blocks' )
+			);
+		}
+
+		$response_body = wp_remote_retrieve_body( $response );
+		$response_data = json_decode( $response_body, true );
+
+		if ( ! isset( $response_data['records'] ) ) {
+			return new WP_Error(
+				'salesforce_d2c_auth_error_domain',
+				__( 'Failed to retrieve domain', 'remote-data-blocks' )
+			);
+		}
+
+		foreach ( $response_data['records'] as $record ) {
+			if ( isset( $record['Domain'] ) ) {
+				$domain = $record['Domain'];
+				return sprintf( 'https://%s', $domain );
+			}
+		}
+
+		return new WP_Error(
+			'salesforce_d2c_auth_error_domain',
+			__( 'Failed to retrieve domain', 'remote-data-blocks' )
+		);
+	}
+
+	public static function get_site_details(
+		string $endpoint,
+		string $token,
+		string $store_id,
+	): array|WP_Error {
+		$site_details_url = sprintf( '%s/services/data/v63.0/query/?q=select+site.id,+site.name,+site.urlPathPrefix+from+WebstoreNetwork+where+webstoreId=%s', $endpoint, $store_id );
+
+		$response = wp_remote_get( $site_details_url, [
+			'headers' => [
+				'Authorization' => 'Bearer ' . $token,
+			],
+		] );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+
+		if ( 200 !== $response_code ) {
+			return new WP_Error(
+				'salesforce_d2c_auth_error_site_details',
+				__( 'Failed to retrieve site details', 'remote-data-blocks' )
+			);
+		}
+
+		$response_body = wp_remote_retrieve_body( $response );
+		$response_data = json_decode( $response_body, true );
+
+		if ( ! isset( $response_data['records'] ) ) {
+			return new WP_Error(
+				'salesforce_d2c_auth_error_site_details',
+				__( 'Failed to retrieve site details', 'remote-data-blocks' )
+			);
+		}
+
+		foreach ( $response_data['records'] as $record ) {
+			if ( isset( $record['Site'] ) && isset( $record['Site']['Id'] ) && isset( $record['Site']['urlPathPrefix'] ) ) {
+				$site_id = $record['Site']['Id'];
+				$site_url_path_prefix = $record['Site']['urlPathPrefix'];
+
+				return [
+					'site_id' => $site_id,
+					'site_url_path_prefix' => $site_url_path_prefix,
+				];
+			}
+		}
+
+		return new WP_Error(
+			'salesforce_d2c_auth_error_site_details',
+			__( 'Failed to retrieve site details', 'remote-data-blocks' )
+		);
+	}
+
 	/**
 	 * Get the webstores using the given endpoint, and token.
 	 *
