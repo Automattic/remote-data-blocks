@@ -6,6 +6,8 @@ defined( 'ABSPATH' ) || exit();
 
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\Logging\LoggerManager;
+use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
+use RemoteDataBlocks\Integrations\SalesforceD2C\Auth\SalesforceD2CAuth;
 use WP_Error;
 use WP_REST_Request;
 use function wp_generate_uuid4;
@@ -51,6 +53,18 @@ class RemoteDataController {
 				],
 			],
 		] );
+
+		register_rest_route( REMOTE_DATA_BLOCKS__REST_NAMESPACE, '/' . self::$slug . '/salesforce-d2c/buyer', [
+			'methods' => 'POST',
+			'callback' => [ __CLASS__, 'execute_salesforce_d2c_buyer_query' ],
+			'permission_callback' => [ __CLASS__, 'permission_callback' ],
+			'args' => [
+				'uuid' => [
+					'type' => 'string',
+					'required' => true,
+				],
+			],
+		] );
 	}
 
 	public static function execute_query( WP_REST_Request $request ): array|WP_Error {
@@ -82,6 +96,38 @@ class RemoteDataController {
 			],
 			$query_result
 		);
+	}
+
+	public static function execute_salesforce_d2c_buyer_query( WP_REST_Request $request ): array|WP_Error {
+		$uuid = $request->get_param( 'uuid' );
+
+		$data_source_config = DataSourceConfigManager::get( $uuid );
+
+		if ( is_wp_error( $data_source_config ) ) {
+			return $data_source_config;
+		}
+
+		if ( REMOTE_DATA_BLOCKS_SALESFORCE_D2C_SERVICE !== $data_source_config['service'] ) {
+			return new WP_Error(
+				'invalid_service',
+				'Invalid service',
+				[ 'status' => 400 ]
+			);
+		}
+
+		$token = SalesforceD2CAuth::generate_token( $data_source_config['service_config']['endpoint'], $data_source_config['service_config']['client_id'], $data_source_config['service_config']['client_secret'] );
+
+		if ( is_wp_error( $token ) ) {
+			return $token;
+		}
+
+		$buyer_endpoint = SalesforceD2CAuth::generate_buyer_endpoint( $data_source_config['service_config']['endpoint'], $token, $data_source_config['service_config']['store_id'] );
+
+		if ( is_wp_error( $buyer_endpoint ) ) {
+			return $buyer_endpoint;
+		}
+
+		return rest_ensure_response( $buyer_endpoint );
 	}
 
 	public static function permission_callback(): bool {
