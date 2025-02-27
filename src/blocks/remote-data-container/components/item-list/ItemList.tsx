@@ -130,7 +130,7 @@ export function ItemList( props: ItemListProps ) {
 
 	// Only update if tableFields has content and view.fields is empty
 	useEffect( () => {
-		if ( tableFields.length > 0 && view.fields.length === 0 ) {
+		if ( tableFields.length > 0 && view.fields?.length === 0 ) {
 			setView( currentView => ( {
 				...currentView,
 				fields: tableFields,
