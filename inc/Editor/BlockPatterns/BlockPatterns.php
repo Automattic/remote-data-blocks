@@ -119,11 +119,11 @@ class BlockPatterns {
 					break;
 
 				case 'image_alt':
-					$bindings['image']['alt'] = [ $field, $name ];
+					$bindings['images']['alt'][] = [ $field, $name ];
 					break;
 
 				case 'image_url':
-					$bindings['image']['url'] = [ $field, $name ];
+					$bindings['images']['url'][] = [ $field, $name ];
 					break;
 
 				case 'html':
@@ -152,9 +152,17 @@ class BlockPatterns {
 			$content .= self::populate_template( 'html', self::generate_attribute_bindings( $block_name, $html ) );
 		}
 
-		// If there is an image URL, create two-column layout with left-aligned image.
-		if ( ! empty( $bindings['image']['url'] ) ) {
-			$image_bindings = self::generate_attribute_bindings( $block_name, $bindings['image'] );
+		// If there is an image URL, create two-column layout with left-aligned image of the first image provided.
+		if ( ! empty( $bindings['images']['url'] ) ) {
+			$first_image_bindings = [
+				'url' => $bindings['images']['url'][0],
+			];
+
+			if ( ! empty( $bindings['images']['alt'] ) ) {
+				$first_image_bindings['alt'] = $bindings['images']['alt'][0];
+			}
+
+			$image_bindings = self::generate_attribute_bindings( $block_name, $first_image_bindings );
 			$image_content = self::populate_template( 'image', $image_bindings );
 			$content = sprintf( self::$templates['columns'], $image_content, $content );
 		}
