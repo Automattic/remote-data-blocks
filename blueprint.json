@@ -26,7 +26,10 @@
     {
       "step": "defineWpConfigConsts",
       "consts": {
-        "USE_PLAYGROUND_CORS_PROXY": true
+        "AUTOMATIC_UPDATER_DISABLED": true,
+        "DISALLOW_FILE_MODS": true,
+        "USE_PLAYGROUND_CORS_PROXY": true,
+        "WP_AUTO_UPDATE_CORE": false
       }
     },
     {
