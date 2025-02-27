@@ -31,7 +31,7 @@ class SalesforceD2CAuth {
 		string $endpoint,
 		string $token,
 		string $store_id,
-	): string|WP_Error {
+	): array|WP_Error {
 		// First we need to get the base store url.
 		// ToDo: Figure out how we can narrow this based on the store_id rather than using LIMIT 1.
 		$domain_url = self::get_domain_url( $endpoint, $token, $store_id );
@@ -48,8 +48,9 @@ class SalesforceD2CAuth {
 		}
 
 		// Generate the buyer url and the cookie that would be used for guest buyer shopping.
+		// ToDo: site_url_path_prefix is not always present, so we need to handle that.
 		$buyer_endpoint = sprintf( '%s/%s', $domain_url, $site_details['site_url_path_prefix'] );
-		$buyer_cookie = sprintf( 'guest_uuid_essential_%s=%s', $site_details['site_id'], wp_generate_uuid4() );
+		$buyer_cookie = sprintf( 'guest_uuid_essential_%s=%s', substr( $site_details['site_id'], 0, 15 ), wp_generate_uuid4() );
 
 		return [
 			'buyer_endpoint' => $buyer_endpoint,
@@ -113,7 +114,7 @@ class SalesforceD2CAuth {
 		string $token,
 		string $store_id,
 	): array|WP_Error {
-		$site_details_url = sprintf( '%s/services/data/v63.0/query/?q=select+site.id,+site.name,+site.urlPathPrefix+from+WebstoreNetwork+where+webstoreId=%s', $endpoint, $store_id );
+		$site_details_url = sprintf( "%s/services/data/v63.0/query/?q=select+site.id,+site.name,+site.urlPathPrefix+from+WebstoreNetwork+where+webstoreId='%s'", $endpoint, $store_id );
 
 		$response = wp_remote_get( $site_details_url, [
 			'headers' => [
@@ -145,9 +146,9 @@ class SalesforceD2CAuth {
 		}
 
 		foreach ( $response_data['records'] as $record ) {
-			if ( isset( $record['Site'] ) && isset( $record['Site']['Id'] ) && isset( $record['Site']['urlPathPrefix'] ) ) {
+			if ( isset( $record['Site'] ) && isset( $record['Site']['Id'] ) && isset( $record['Site']['UrlPathPrefix'] ) ) {
 				$site_id = $record['Site']['Id'];
-				$site_url_path_prefix = $record['Site']['urlPathPrefix'];
+				$site_url_path_prefix = $record['Site']['UrlPathPrefix'];
 
 				return [
 					'site_id' => $site_id,
