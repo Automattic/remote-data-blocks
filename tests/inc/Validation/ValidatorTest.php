@@ -29,6 +29,7 @@ class ValidatorTest extends TestCase {
 			'image_url' => Types::image_url(),
 			'json_path' => Types::json_path(),
 			'markdown' => Types::markdown(),
+			'title' => Types::title(),
 			'url' => Types::url(),
 			'uuid' => Types::uuid(),
 		] );
@@ -351,6 +352,31 @@ class ValidatorTest extends TestCase {
 		$result = $validator->validate( $invalid_value );
 		$this->assertInstanceOf( WP_Error::class, $result );
 		$this->assertStringStartsWith( 'Value must be a id:', $result->get_error_message() );
+	}
+
+	public function testInvalidNonPrimitiveType(): void {
+		$schema = [ '@type' => 'invented' ];
+
+		$validator = new Validator( $schema );
+
+		$result = $validator->validate( 'hello, world!' );
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertSame( 'Unknown type: invented', $result->get_error_message() );
+	}
+
+	public function testInvalidPrimitiveType(): void {
+		$schema = [
+			'@primitive' => true,
+			'@type' => 'invented',
+		];
+
+		$validator = new Validator( $schema );
+
+		$result = $validator->validate( 'hello, world!' );
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertSame( 'Unknown type: invented', $result->get_error_message() );
 	}
 
 	public function testCallable(): void {
