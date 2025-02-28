@@ -34,14 +34,14 @@ class SalesforceD2CAuth {
 	): array|WP_Error {
 		// First we need to get the base store url.
 		// ToDo: Figure out how we can narrow this based on the store_id rather than using LIMIT 1.
-		$domain_url = self::get_domain_url( $endpoint, $token, $store_id );
+		$domain_url = self::get_saved_domain( $store_id ) ?? self::get_domain_url( $endpoint, $token, $store_id );
 
 		if ( is_wp_error( $domain_url ) ) {
 			return $domain_url;
 		}
 
 		// Then, we need to get the store prefix as well as the site id to use for the buyer cookie.
-		$site_details = self::get_site_details( $endpoint, $token, $store_id );
+		$site_details = self::get_saved_site_details( $store_id ) ?? self::get_site_details( $endpoint, $token, $store_id );
 
 		if ( is_wp_error( $site_details ) ) {
 			return $site_details;
@@ -50,7 +50,7 @@ class SalesforceD2CAuth {
 		// Generate the buyer url and the cookie that would be used for guest buyer shopping.
 		// ToDo: site_url_path_prefix is not always present, so we need to handle that.
 		$buyer_endpoint = sprintf( '%s/%s', $domain_url, $site_details['site_url_path_prefix'] );
-		$buyer_cookie = sprintf( 'guest_uuid_essential_%s=%s', substr( $site_details['site_id'], 0, 15 ), wp_generate_uuid4() );
+		$buyer_cookie = sprintf( 'guest_uuid_essential_%s', substr( $site_details['site_id'], 0, 15 ) );
 
 		return [
 			'buyer_endpoint' => $buyer_endpoint,
@@ -99,6 +99,7 @@ class SalesforceD2CAuth {
 		foreach ( $response_data['records'] as $record ) {
 			if ( isset( $record['Domain'] ) ) {
 				$domain = $record['Domain'];
+				self::save_domain( $domain, $store_id );
 				return sprintf( 'https://%s', $domain );
 			}
 		}
@@ -149,6 +150,8 @@ class SalesforceD2CAuth {
 			if ( isset( $record['Site'] ) && isset( $record['Site']['Id'] ) && isset( $record['Site']['UrlPathPrefix'] ) ) {
 				$site_id = $record['Site']['Id'];
 				$site_url_path_prefix = $record['Site']['UrlPathPrefix'];
+
+				self::save_site_details( $site_id, $site_url_path_prefix, $store_id );
 
 				return [
 					'site_id' => $site_id,
@@ -295,6 +298,65 @@ class SalesforceD2CAuth {
 		self::save_access_token( $access_token, $client_id, $expiry_time );
 
 		return $access_token;
+	}
+
+	private static function save_site_details( string $site_id, string $site_url_path_prefix, string $store_id ): void {
+		$cache_key = self::get_site_details_key( $store_id );
+		wp_cache_set(
+			$cache_key,
+			[
+				'site_id' => $site_id,
+				'site_url_path_prefix' => $site_url_path_prefix,
+			],
+			'salesforce-d2c-site-details',
+			// phpcs:ignore WordPressVIPMinimum.Performance.LowExpiryCacheTime.CacheTimeUndetermined -- 'expires_in' defaults to 30 minutes for access tokens.
+			time() + 86400,
+		);
+	}
+
+	private static function save_domain( string $domain, string $store_id ): void {
+		$cache_key = self::get_domain_key( $store_id );
+		wp_cache_set(
+			$cache_key,
+			[
+				'domain' => $domain,
+			],
+			'salesforce-d2c-domain',
+			// phpcs:ignore WordPressVIPMinimum.Performance.LowExpiryCacheTime.CacheTimeUndetermined -- 'expires_in' defaults to 30 minutes for access tokens.
+			time() + 86400,
+		);
+	}
+
+	private static function get_saved_site_details( string $store_id ): ?array {
+		$cache_key = self::get_site_details_key( $store_id );
+		$saved_site_details = wp_cache_get( $cache_key, 'salesforce-d2c-site-details' );
+
+		if ( false === $saved_site_details ) {
+			return null;
+		}
+
+		return $saved_site_details;
+	}
+
+	private static function get_saved_domain( string $store_id ): ?string {
+		$cache_key = self::get_domain_key( $store_id );
+		$saved_domain = wp_cache_get( $cache_key, 'salesforce-d2c-domain' );
+
+		if ( false === $saved_domain ) {
+			return null;
+		}
+
+		return $saved_domain['domain'] ?? null;
+	}
+
+	private static function get_domain_key( string $store_id ): string {
+		$cache_key_suffix = hash( 'sha256', sprintf( '%s', $store_id ) );
+		return sprintf( 'salesforce_d2c_domain_%s', $cache_key_suffix );
+	}
+
+	private static function get_site_details_key( string $store_id ): string {
+		$cache_key_suffix = hash( 'sha256', sprintf( '%s', $store_id ) );
+		return sprintf( 'salesforce_d2c_site_details_%s', $cache_key_suffix );
 	}
 
 	private static function save_access_token( string $access_token, string $client_id, int $expiry_time ): void {
