@@ -188,7 +188,7 @@ class VipBlockDataApiTest extends TestCase {
 				'Error executing query for block binding: uh-oh! remote-data-blocks/remoteData (block: remote-data-blocks/events; operation: location)',
 				[],
 			],
-			MockWordPressFunctions::get_done_action( 'wpcomvip_log' )[0]
+			MockWordPressFunctions::get_done_action( 'wpcomvip_log', 0 )
 		);
 		$this->assertSame( 'Happy happy hour! No networking!', $result['innerBlocks'][0]['attributes']['content'] );
 		$this->assertSame( 'President&#039;s dining hall', $result['innerBlocks'][1]['attributes']['content'] );

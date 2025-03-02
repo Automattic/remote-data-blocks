@@ -9,8 +9,8 @@ function do_action( string $action, mixed ...$args ): void {
 	MockWordPressFunctions::do_action( $action, ...$args );
 }
 
-function apply_filters( string $filter, mixed $thing ): mixed {
-	return MockWordPressFunctions::apply_filters( $filter, $thing );
+function apply_filters( string $filter, mixed $thing, mixed ...$args ): mixed {
+	return MockWordPressFunctions::apply_filters( $filter, $thing, ...$args );
 }
 
 function esc_html( string $text ): string {
