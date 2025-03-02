@@ -4,9 +4,7 @@
     "title": "Remote Data Blocks local playground",
     "description": "Runs Remote Data Blocks plugin in a local WordPress Playground",
     "author": "WordPress VIP",
-    "categories": [
-      "Content"
-    ]
+    "categories": [ "Content" ]
   },
   "features": {
     "networking": true
