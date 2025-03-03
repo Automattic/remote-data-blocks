@@ -49,7 +49,7 @@ class SalesforceD2CAuth {
 
 		// Generate the buyer url and the cookie that would be used for guest buyer shopping.
 		// ToDo: site_url_path_prefix is not always present, so we need to handle that.
-		$buyer_endpoint = sprintf( '%s/%s', $domain_url, $site_details['site_url_path_prefix'] );
+		$buyer_endpoint = sprintf( '%s/%s/webruntime/api/services/data/v63.0/commerce/webstores/%s', $domain_url, $site_details['site_url_path_prefix'], $store_id );
 		$buyer_cookie = sprintf( 'guest_uuid_essential_%s', substr( $site_details['site_id'], 0, 15 ) );
 
 		return [
@@ -98,9 +98,9 @@ class SalesforceD2CAuth {
 
 		foreach ( $response_data['records'] as $record ) {
 			if ( isset( $record['Domain'] ) ) {
-				$domain = $record['Domain'];
+				$domain = sprintf( 'https://%s', $record['Domain'] );
 				self::save_domain( $domain, $store_id );
-				return sprintf( 'https://%s', $domain );
+				return $domain;
 			}
 		}
 
@@ -335,7 +335,7 @@ class SalesforceD2CAuth {
 			return null;
 		}
 
-		return $saved_site_details;
+		return $saved_site_details ?? null;
 	}
 
 	private static function get_saved_domain( string $store_id ): ?string {
