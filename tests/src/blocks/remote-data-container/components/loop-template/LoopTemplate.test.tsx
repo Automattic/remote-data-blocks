@@ -7,7 +7,6 @@ describe( 'LoopTemplate', () => {
 	const mockGetInnerBlocks = () => [];
 	const mockRemoteData: RemoteData = {
 		blockName: 'test/block',
-		isCollection: true,
 		metadata: {},
 		queryInput: {},
 		resultId: 'test-result',
@@ -23,7 +22,6 @@ describe( 'LoopTemplate', () => {
 	it( 'renders "No results found" when there are no results', () => {
 		const emptyRemoteData: RemoteData = {
 			blockName: 'test/block',
-			isCollection: true,
 			metadata: {},
 			queryInput: {},
 			resultId: 'test-result',

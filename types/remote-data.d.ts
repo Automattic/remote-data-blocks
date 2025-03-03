@@ -20,7 +20,6 @@ type RemoteDataQueryInput = Record< string, unknown >;
 interface RemoteData {
 	blockName: string;
 	enabledOverrides?: string[];
-	isCollection: boolean;
 	metadata: Record< string, RemoteDataResultFields >;
 	pagination?: RemoteDataPagination;
 	queryInput: RemoteDataQueryInput;
