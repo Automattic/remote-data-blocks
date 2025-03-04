@@ -37,7 +37,19 @@ export function InputPopover( props: InputPopoverProps ) {
 	}
 
 	function onSelectItem(): void {
-		onSelect( inputState );
+		// Clean up the input value
+		const cleanedInput = Object.fromEntries(
+			Object.entries( inputState ).map( ( [ key, value ] ) => [
+				key,
+				value
+					.split( ',' )
+					.map( id => id.trim() )
+					.filter( Boolean )
+					.join( ',' ),
+			] )
+		);
+
+		onSelect( cleanedInput );
 		close();
 		sendTracksEvent( 'add_block', {
 			action: 'select_item',

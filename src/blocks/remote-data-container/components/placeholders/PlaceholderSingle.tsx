@@ -12,11 +12,17 @@ interface PlaceholderSingleProps {
 export function PlaceholderSingle( props: PlaceholderSingleProps ) {
 	const { blockConfig, onSelect } = props;
 
+	const supportsBulk = blockConfig?.selectors?.some( selector => selector.supports_bulk ) ?? false;
+
 	return (
 		<Placeholder
 			icon={ cloud }
 			label={ blockConfig.settings.title }
-			instructions={ __( 'This block requires selection of a single item for display.' ) }
+			instructions={
+				supportsBulk
+					? __( 'This block requires selection of one or more items for display.' )
+					: __( 'This block requires selection of a single item for display.' )
+			}
 		>
 			<ItemSelectQueryType blockConfig={ blockConfig } onSelect={ onSelect } />
 		</Placeholder>

@@ -199,6 +199,21 @@ class BlockBindings {
 		}
 
 		$query_response = self::execute_query( $block_context, $field_name );
+		
+		if ( null === $query_response || !isset( $query_response['results'] ) ) {
+			self::log_error( 'Cannot resolve query response for block binding', $block_name, $field_name );
+			return $fallback_content;
+		}
+
+		// If we have multiple results and this is not already a loop item (no index specified),
+		// switch to loop rendering
+		if ( count( $query_response['results'] ) > 1 && !isset( $source_args['index'] ) ) {
+			if ( $block instanceof WP_Block ) {
+				return self::loop_block_render_callback( $block_attributes, '', $block );
+			}
+			// For non-WP_Block instances, fallback to single result
+			$index = 0;
+		}
 
 		$value = $query_response['results'][ $index ]['result'][ $field_name ]['value'] ?? null;
 

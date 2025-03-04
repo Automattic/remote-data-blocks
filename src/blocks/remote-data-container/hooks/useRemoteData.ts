@@ -73,7 +73,6 @@ interface UseRemoteData {
 
 interface UseRemoteDataInput {
 	blockName: string;
-	enabledOverrides?: string[];
 	externallyManagedRemoteData?: RemoteData;
 	externallyManagedUpdateRemoteData?: ( remoteData?: RemoteData ) => void;
 	fetchOnMount?: boolean;
@@ -94,7 +93,6 @@ interface UseRemoteDataInput {
 // don't need an intermediate state update / re-render.
 export function useRemoteData( {
 	blockName,
-	enabledOverrides = [],
 	externallyManagedRemoteData,
 	externallyManagedUpdateRemoteData,
 	fetchOnMount = false,
@@ -121,6 +119,9 @@ export function useRemoteData( {
 		// query error.
 		throw new Error( `Query not found for block "${ blockName }" and key "${ queryKey }".` );
 	}
+
+	// Overrides must be provided via externallyManagedRemoteData
+	const enabledOverrides = externallyManagedRemoteData?.enabledOverrides ?? [];
 
 	const inputVariables = query.inputs;
 

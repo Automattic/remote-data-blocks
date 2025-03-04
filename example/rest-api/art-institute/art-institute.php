@@ -31,29 +31,53 @@ function register_aic_block(): void {
 	$get_art_query = HttpQuery::from_array([
 		'data_source' => $aic_data_source,
 		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
-			return sprintf( '%s/%s', $aic_data_source->get_endpoint(), $input_variables['id'] ?? '' );
+			$endpoint = $aic_data_source->get_endpoint();
+			
+			// Get and clean IDs from comma-separated string
+			$ids = array_filter(
+				array_map( 'trim', explode( ',', (string) $input_variables['id'] ) ),
+				'strlen'
+			);
+			
+			if ( !empty( $ids ) ) {
+				return add_query_arg([
+					'ids' => implode( ',', $ids ),
+					'fields' => 'id,title,image_id,artist_title',
+				], $endpoint);
+			}
+
+			return $endpoint;
 		},
 		'input_schema' => [
 			'id' => [
 				'name' => 'Art ID',
 				'type' => 'id',
+				'supports_bulk' => true,
 			],
 		],
 		'output_schema' => [
-			'is_collection' => false,
-			'path' => '$.data',
+			'is_collection' => true,
+			'path' => '$.data[*]',
 			'type' => [
 				'id' => [
 					'name' => 'Art ID',
 					'type' => 'id',
+					'path' => '$.id',
+				],
+				'artist_title' => [
+					'name' => 'Artist Title',
+					'type' => 'string',
+					'path' => '$.artist_title',
 				],
 				'title' => [
 					'name' => 'Title',
 					'type' => 'string',
+					'path' => '$.title',
 				],
 				'image_id' => [
 					'name' => 'Image ID',
 					'type' => 'id',
+					'path' => '$.image_id',
 				],
 				'image_url' => [
 					'name' => 'Image URL',
@@ -105,9 +129,22 @@ function register_aic_block(): void {
 					'name' => 'Art ID',
 					'type' => 'id',
 				],
+				'artist_title' => [
+					'name' => 'Artist Title',
+					'type' => 'string',
+					'path' => '$.artist_title',
+				],
 				'title' => [
 					'name' => 'Title',
 					'type' => 'string',
+					'path' => '$.title',
+				],
+				'image_url' => [
+					'name' => 'Image URL',
+					'generate' => function ( $data ): string {
+						return 'https://www.artic.edu/iiif/2/' . $data['image_id'] . '/full/843,/0/default.jpg';
+					},
+					'type' => 'image_url',
 				],
 			],
 		],

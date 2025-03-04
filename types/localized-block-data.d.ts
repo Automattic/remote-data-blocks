@@ -36,6 +36,7 @@ interface BlockConfig {
 		inputs: InputVariable[];
 		name: string;
 		query_key: string;
+		supports_bulk?: boolean;
 		type: string;
 	}[];
 	settings: {
