@@ -16,7 +16,7 @@ $source_args = $block->attributes['metadata']['bindings']['content']['args'] ?? 
 	 * @psalm-suppress UndefinedGlobalVariable
 	 * $block is provided by WordPress for rendering, see header comments
 	 */
-	$binding_value = BlockBindings::get_value( $source_args, $block );
+	$binding_value = BlockBindings::get_value( $source_args, $block, 'content' );
 
 	if ( null === $binding_value ) {
 		// Similar to actual data bindings, if the binding value is null,

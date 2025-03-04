@@ -68,7 +68,7 @@ class DataSourceCrudTest extends TestCase {
 				],
 				'tables' => [],
 			],
-			'uuid' => wp_generate_uuid4(),
+			'uuid' => '00000000-0000-4000-8000-000000000001',
 		] );
 
 		$source2 = DataSourceCrud::create_config( [
@@ -79,7 +79,7 @@ class DataSourceCrudTest extends TestCase {
 				'display_name' => 'Shopify Source',
 				'store_name' => 'mystore',
 			],
-			'uuid' => wp_generate_uuid4(),
+			'uuid' => '00000000-0000-4000-8000-000000000002',
 		] );
 
 		$all_sources = DataSourceCrud::get_configs();

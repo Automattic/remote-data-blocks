@@ -458,7 +458,9 @@ class BlockBindingsTest extends TestCase {
 					'queryInput' => [],
 					'results' => [
 						[
-							self::MOCK_OUTPUT_FIELD_NAME => 'Stored Output Value',
+							'result' => [
+								self::MOCK_OUTPUT_FIELD_NAME => 'Stored Output Value',
+							],
 						],
 					],
 				],
@@ -477,7 +479,9 @@ class BlockBindingsTest extends TestCase {
 					'queryInput' => [],
 					'results' => [
 						[
-							self::MOCK_OUTPUT_FIELD_NAME => 456,
+							'result' => [
+								self::MOCK_OUTPUT_FIELD_NAME => 456,
+							],
 						],
 					],
 				],
@@ -496,7 +500,9 @@ class BlockBindingsTest extends TestCase {
 					'queryInput' => [],
 					'results' => [
 						[
-							self::MOCK_OUTPUT_FIELD_NAME => null,
+							'result' => [
+								self::MOCK_OUTPUT_FIELD_NAME => null,
+							],
 						],
 					],
 				],

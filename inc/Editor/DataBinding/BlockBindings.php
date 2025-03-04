@@ -106,21 +106,41 @@ class BlockBindings {
 		return $block_type_args;
 	}
 
-	private static function execute_query(
-		string $block_name,
-		array $query_input,
-		string $operation_name,
-		array $enabled_overrides = [],
-		string $query_key = ConfigRegistry::DISPLAY_QUERY_KEY
-	): array|null {
+	private static function execute_queries( array $block_context, array $source_args, string $operation_name ): array|null {
+		// If this binding is inside a remote data block, we should have hydrated
+		// results already present. Use them.
+		if ( isset( $source_args['hydrated_results'] ) ) {
+			return $source_args['hydrated_results'];
+		}
+
+		// Extract block and query information. In cases where the binding has become
+		// disconencted from the ancestor remote data block, allow the binding source
+		// args to override.
+		$block_name = $source_args['block'] ?? $block_context['blockName'] ?? null;
+		$enabled_overrides = $source_args['enabledOverrides'] ?? $block_context['enabledOverrides'] ?? [];
+		$query_key = $source_args['queryKey'] ?? $block_context['queryKey'] ?? ConfigRegistry::DISPLAY_QUERY_KEY;
+
+		// Extract the input variables. Support the previous property name used
+		// before we allowed multiple query inputs.
+		$array_of_input_variables = $source_args['queryInputs'] ?? $block_context['queryInputs'] ?? null;
+		if ( null === $array_of_input_variables ) {
+			$array_of_input_variables = [ $block_context['queryInput'] ?? [] ];
+		}
+
+		if ( null === $block_name ) {
+			self::log_error( sprintf( 'Missing block context for block binding %s', self::$context_name ), 'unknown' );
+			return null;
+		}
+
 		$block_config = ConfigStore::get_block_configuration( $block_name );
 		$query = $block_config['queries'][ $query_key ] ?? null;
 
 		if ( null === $query ) {
+			self::log_error( sprintf( 'Cannot load query %s for block binding', $query_key ), $block_name, $operation_name );
 			return null;
 		}
 
-		try {
+		$array_of_input_variables = array_map( function ( $input_variables ) use ( $enabled_overrides, $block_name ): array {
 			/**
 			 * Filter the query input overrides for a block binding.
 			 *
@@ -129,14 +149,16 @@ class BlockBindings {
 			 * @param string $block_name The current block name.
 			 * @return array The filtered query input variables.
 			 */
-			$query_input = apply_filters(
+			return apply_filters(
 				'remote_data_blocks_query_input_variables',
-				$query_input,
+				$input_variables,
 				$enabled_overrides,
 				$block_name,
 			);
+		}, $array_of_input_variables );
 
-			$query_response = $query->execute( $query_input );
+		try {
+			$query_response = $query->execute_batch( $array_of_input_variables );
 
 			/**
 			 * Filter the query response for a block binding.
@@ -176,39 +198,28 @@ class BlockBindings {
 			$block_attributes = $block['attributes'] ?? [];
 		}
 
-		// Extract block and query information. Allow the binding source args to
-		// override the ancestor block context.
-		$block_name = $source_args['block'] ?? $block_context['blockName'] ?? null;
-		$enabled_overrides = $source_args['enabledOverrides'] ?? $block_context['enabledOverrides'] ?? [];
-		$query_key = $source_args['queryKey'] ?? $block_context['queryKey'] ?? ConfigRegistry::DISPLAY_QUERY_KEY;
-		$query_input = $source_args['queryInput'] ?? $block_context['queryInput'] ?? [];
+		$block_name = $block_context['blockName'] ?? null;
 
 		// Extract field information from the binding source args.
 		$field_label = $source_args['label'] ?? null;
 		$field_name = $source_args['field'] ?? null;
-		$field_type = $source_args['type'] ?? 'result';
+		$field_type = $source_args['type'] ?? 'field';
+		$result_index = $source_args['index'] ?? 0;
 
 		// Query results are serialized and stored in the block context when the
 		// block is created in the block editor.
 		$serialized_results = $block_context['results'] ?? [];
-		$result_index = $source_args['index'] ?? 0; // Index is only set for collection queries.
 
 		// Fallback to the serialized query results or the block content if we don't
 		// have the expected context.
 		$fallback_content = self::get_block_fallback_content( $field_name, $block_attributes, $attribute_name, $serialized_results, $result_index );
 
-		// Fallback to the content if we don't have the expected context.
-		if ( null === $block_name || null === $query_input ) {
-			self::log_error( sprintf( 'Missing block context for block binding %s', self::$context_name ), 'unknown' );
-			return $fallback_content;
-		}
-
 		if ( null === $field_name ) {
-			self::log_error( sprintf( 'Missing field mapping for block binding %s', $block_name ), 'unknown' );
+			self::log_error( 'Missing field mapping for block binding', $block_name, $field_name );
 			return $fallback_content;
 		}
 
-		$query_response = self::execute_query( $block_name, $query_input, $field_name, $enabled_overrides, $query_key );
+		$query_response = self::execute_queries( $block_context, $source_args, $field_name );
 
 		if ( empty( $query_response ) ) {
 			self::log_error( 'Cannot resolve query response for block binding', $block_name, $field_name );
@@ -222,7 +233,7 @@ class BlockBindings {
 		}
 
 		if ( null === $value ) {
-			self::log_error( sprintf( 'Cannot resolve %s for block binding', $field_type ), $block_name, $field_name );
+			self::log_error( sprintf( 'Cannot resolve %s %s for block binding', $field_type, $field_name ), $block_name, $field_name );
 			return $fallback_content;
 		}
 
@@ -239,7 +250,7 @@ class BlockBindings {
 	}
 
 	private static function get_block_fallback_content( string $field_name, array $block_attributes, string $attribute_name, array $serialized_results = [], int $result_index = 0 ): ?string {
-		$fallback_content = $serialized_results[ $result_index ][ $field_name ] ?? $block_attributes[ $attribute_name ] ?? null;
+		$fallback_content = $serialized_results[ $result_index ]['result'][ $field_name ] ?? $block_attributes[ $attribute_name ] ?? null;
 
 		// NOTE: Returning null from get_value() cancels the binding and allows the default saved content to show.
 		if ( null === $fallback_content ) {
@@ -255,43 +266,25 @@ class BlockBindings {
 		// children blocks comes from this block's `remoteData` attribtue (see
 		// block.json#providesContext), so we can access it directly.
 		$block_context = $attributes['remoteData'] ?? [];
+		$block_name = $block_context['blockName'] ?? null;
+		$operation_name = 'remote_data_block_render_callback';
 
-		// Fallback to the content if we don't have the expected context.
-		if ( ! isset( $block_context['blockName'] ) || ! isset( $block_context['queryInput'] ) ) {
-			self::log_error( sprintf( 'Missing block context for block binding %s', self::$context_name ), 'unknown' );
+		$query_response = self::execute_queries( $block_context, [], $operation_name );
+
+		if ( null === $query_response ) {
+			self::log_error( 'Cannot resolve query response for block binding', $block_name, $operation_name );
 			return $content;
 		}
 
-		$block_name = $block_context['blockName'];
+		$source_args_for_each_item = array_map( function ( $index ) use ( $query_response ): array {
+			return [
+				'hydrated_results' => $query_response,
+				'index' => $index,
+			];
+		}, array_keys( $query_response['results'] ) );
+
 		$loop_template = $block->parsed_block['innerBlocks'];
 		$loop_template_content = $block->parsed_block['innerContent'];
-
-		if ( isset( $block_context['queryInputsForCollection'] ) ) {
-			$source_args_for_each_item = array_map( function ( $query_input ) use ( $block_name ): array {
-				return [
-					'block' => $block_name,
-					'queryInput' => $query_input,
-				];
-			}, $block_context['queryInputsForCollection'] );
-		} else {
-			$query_input = $block_context['queryInput'];
-			$query_key = $block_context['queryKey'] ?? ConfigRegistry::DISPLAY_QUERY_KEY;
-			$enabled_overrides = $block_context['enabledOverrides'] ?? [];
-			// Set the updated results in the remote data attribute so that they will be available 
-			$query_response = self::execute_query( $block_name, $query_input, 'remote_data_block_render_callback', $enabled_overrides, $query_key );
-
-			if ( null === $query_response ) {
-				self::log_error( 'Cannot resolve query response for block binding', $block_name, 'remote_data_block_render_callback' );
-				return $content;
-			}
-
-			$source_args_for_each_item = array_map( function ( $index ) use ( $block_name ): array {
-				return [
-					'block' => $block_name,
-					'index' => $index,
-				];
-			}, array_keys( $query_response['results'] ) );
-		}
 
 		$block->parsed_block['innerBlocks'] = [];
 		$block->parsed_block['innerContent'] = [];
@@ -353,7 +346,7 @@ class BlockBindings {
 		return $inner_blocks;
 	}
 
-	public static function log_error( string $message, string $block_name, string $operation_name = 'unknown' ): void {
+	public static function log_error( string $message, ?string $block_name = 'unknown', ?string $operation_name = 'unknown' ): void {
 		$logger = LoggerManager::instance();
 		$logger->error( sprintf( '%s %s (block: %s; operation: %s)', $message, self::$context_name, $block_name, $operation_name ) );
 	}

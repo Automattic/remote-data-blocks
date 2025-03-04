@@ -53,7 +53,7 @@ class RemoteDataController {
 		] );
 	}
 
-	public static function execute_query( WP_REST_Request $request ): array|WP_Error {
+	public static function execute_queries( WP_REST_Request $request ): array|WP_Error {
 		$block_name = $request->get_param( 'block_name' );
 		$query_key = $request->get_param( 'query_key' );
 		$query_inputs = $request->get_param( 'query_inputs' );
@@ -73,7 +73,6 @@ class RemoteDataController {
 				'block_name' => $block_name,
 				'result_id' => wp_generate_uuid4(),
 				'query_key' => $query_key,
-				'query_inputs' => $query_inputs,
 			],
 			$query_response
 		);

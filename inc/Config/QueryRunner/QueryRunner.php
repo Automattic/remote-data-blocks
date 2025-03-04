@@ -254,6 +254,7 @@ class QueryRunner implements QueryRunnerInterface {
 			'metadata' => $metadata,
 			'pagination' => $pagination,
 			'results' => $results,
+			'query_inputs' => [ $input_variables ],
 		];
 	}
 
@@ -266,21 +267,24 @@ class QueryRunner implements QueryRunnerInterface {
 		}
 
 		$merged_results = [];
+		$merged_query_inputs = [];
 
 		foreach ( $array_of_input_variables as $input_variables ) {
 			$query_response = $query->execute( $input_variables );
 
-			if ( ! is_wp_error( $query_response ) ) {
+			if ( is_wp_error( $query_response ) ) {
 				return $query_response;
 			}
 
-			$merged_results = array_merge( $query_response['results'], $merged_results );
+			$merged_results = array_merge( $merged_results, $query_response['results'] );
+			$merged_query_inputs = array_merge( $merged_query_inputs, $query_response['query_inputs'] );
 		}
 
 		return [
 			'metadata' => $this->get_response_metadata( $query, [ 'batch' => true ], $merged_results ),
 			'pagination' => null, // Pagination is always disabled for batch executions.
 			'results' => $merged_results,
+			'query_inputs' => $merged_query_inputs,
 		];
 	}
 

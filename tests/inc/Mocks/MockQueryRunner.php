@@ -3,10 +3,10 @@
 namespace RemoteDataBlocks\Tests\Mocks;
 
 use RemoteDataBlocks\Config\Query\HttpQueryInterface;
-use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
+use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use WP_Error;
 
-class MockQueryRunner implements QueryRunnerInterface {
+class MockQueryRunner extends QueryRunner {
 	/** @var array<array|WP_Error> */
 	private array $query_results = [];
 
@@ -34,10 +34,6 @@ class MockQueryRunner implements QueryRunnerInterface {
 	public function execute( HttpQueryInterface $query, array $input_variables ): array|WP_Error {
 		array_push( $this->execute_call_inputs, $input_variables );
 		return array_shift( $this->query_results ) ?? new WP_Error( 'no-results', 'No results available.' );
-	}
-
-	public function execute_batch( HttpQueryInterface $query, array $array_of_input_variables ): array|WP_Error {
-		return [];
 	}
 
 	public function getLastExecuteCallInput(): array|null {
