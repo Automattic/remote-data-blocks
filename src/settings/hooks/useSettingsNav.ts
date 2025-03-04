@@ -4,7 +4,7 @@ import { SUPPORTED_SERVICES } from '@/data-sources/constants';
 import { DataSourceType } from '@/data-sources/types';
 
 interface DataSourceNavState {
-	screen: 'addDataSource' | 'editDataSource' | 'dataSourceList';
+	screen: 'addDataSource' | 'editDataSource' | 'dataSourceList' | 'addQuery' | 'editQuery';
 	uuid?: string;
 	service?: DataSourceType;
 }
@@ -59,6 +59,29 @@ export const useDataSourceRouter = () => {
 					screen: 'editDataSource',
 					uuid: editUUID,
 				} );
+				return;
+			}
+
+			const addQuery = urlParams.get( 'addQuery' );
+			if ( addQuery ) {
+				setNavState( {
+					screen: 'addQuery'
+				} );
+				return;
+			}
+
+			const editQueryUUID = urlParams.get( 'editQuery' );
+			if ( editQueryUUID ) {
+				setNavState( {
+					screen: 'editQuery',
+					uuid: editQueryUUID
+				} );
+				return;
+			}
+
+			const tab = urlParams.get( 'tab' );
+			if ( tab === 'queries' || tab === 'data-sources' ) {
+				setNavState( { screen: 'dataSourceList' } );
 				return;
 			}
 

@@ -1,6 +1,6 @@
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore, NoticeStoreActions, WPNotice } from '@wordpress/notices';
 
@@ -23,7 +23,22 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 			source => source.uuid === uuid || source.service_config.display_name !== displayName
 		);
 
-	async function fetchDataSources() {
+	function showSnackbar( type: 'success' | 'error', message: string ): void {
+		const SNACKBAR_OPTIONS: Partial< WPNotice > = {
+			isDismissible: true,
+		};
+
+		switch ( type ) {
+			case 'success':
+				createSuccessNotice( message, { ...SNACKBAR_OPTIONS, icon: '✅' } );
+				break;
+			case 'error':
+				createErrorNotice( message, { ...SNACKBAR_OPTIONS, icon: '❌' } );
+				break;
+		}
+	}
+
+	const fetchDataSources = useCallback(async () => {
 		setLoadingDataSources( true );
 		try {
 			const sources = ( await apiFetch( { path: REST_BASE_DATA_SOURCES } ) ) || [];
@@ -32,7 +47,7 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 			showSnackbar( 'error', __( 'Failed to load Data Sources.', 'remote-data-blocks' ) );
 		}
 		setLoadingDataSources( false );
-	}
+	}, [createSuccessNotice, createErrorNotice]);
 
 	async function updateDataSource( sourceConfig: SourceConfig ) {
 		let result: SourceConfig;
@@ -182,26 +197,11 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 		goToMainScreen();
 	}
 
-	function showSnackbar( type: 'success' | 'error', message: string ): void {
-		const SNACKBAR_OPTIONS: Partial< WPNotice > = {
-			isDismissible: true,
-		};
-
-		switch ( type ) {
-			case 'success':
-				createSuccessNotice( message, { ...SNACKBAR_OPTIONS, icon: '✅' } );
-				break;
-			case 'error':
-				createErrorNotice( message, { ...SNACKBAR_OPTIONS, icon: '❌' } );
-				break;
-		}
-	}
-
 	useEffect( () => {
 		if ( loadOnMount ) {
 			fetchDataSources().catch( console.error ); // TODO: Error handling
 		}
-	}, [] );
+	}, [loadOnMount, fetchDataSources] );
 
 	return {
 		addDataSource,

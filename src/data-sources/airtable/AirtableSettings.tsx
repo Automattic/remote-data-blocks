@@ -52,13 +52,18 @@ export const AirtableSettings = ( {
 		state.access_token ?? '',
 		userId ?? ''
 	);
+	const baseId = state.base && typeof state.base === 'object' ? 
+                     (state.base as any).id || '' : '';
+	
 	const { fetchingTables, tables, tablesError } = useAirtableApiTables(
 		state.access_token ?? '',
-		state.base?.id ?? ''
+		baseId
 	);
 
 	const availableTables = tables?.length ? tables?.map( table => table.name ) : [];
-	const selectedTables = state.tables?.map( table => table.name ) ?? [];
+	const selectedTables = state.tables && Array.isArray(state.tables) 
+		? state.tables.map((table: any) => table.name) 
+		: [];
 
 	const baseOptions = [
 		{
@@ -196,7 +201,7 @@ export const AirtableSettings = ( {
 					<SelectControl
 						id="base"
 						label={ __( 'Base', 'remote-data-blocks' ) }
-						value={ state.base?.id ?? '' }
+						value={ baseId }
 						onChange={ onBaseChange }
 						options={ baseOptions }
 						help={ basesHelpText }

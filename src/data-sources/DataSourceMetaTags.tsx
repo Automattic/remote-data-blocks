@@ -21,18 +21,24 @@ const DataSourceDescriptor = ( props: DataSourceMetaTagsProps ) => {
 
 	switch ( props.source.service ) {
 		case 'airtable':
+			const baseName = props.source.service_config.base && 
+                                  typeof props.source.service_config.base === 'object' ? 
+                                  (props.source.service_config.base as any).name : '';
 			tag = {
 				key: 'base',
-				primaryValue: props.source.service_config.base?.name,
+				primaryValue: baseName || '',
 			};
 			break;
 		case 'shopify':
-			tag = { key: 'store', primaryValue: props.source.service_config.store_name };
+			tag = { key: 'store', primaryValue: props.source.service_config.store_name || '' };
 			break;
 		case 'google-sheets':
+			const spreadsheetName = props.source.service_config.spreadsheet && 
+                            typeof props.source.service_config.spreadsheet === 'object' ? 
+                            (props.source.service_config.spreadsheet as any).name : 'Google Sheet';
 			tag = {
 				key: 'spreadsheet',
-				primaryValue: props.source.service_config.spreadsheet.name ?? 'Google Sheet',
+				primaryValue: spreadsheetName,
 			};
 			break;
 	}

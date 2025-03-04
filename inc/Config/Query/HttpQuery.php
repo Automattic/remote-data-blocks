@@ -61,6 +61,13 @@ class HttpQuery extends ArraySerializable implements HttpQueryInterface {
 
 		return $this->config['data_source'];
 	}
+	
+	/**
+	 * Get the data source UUID associated with this query.
+	 */
+	public function get_data_source_uuid(): string {
+		return $this->config['data_source_uuid'] ?? '';
+	}
 
 	/**
 	 * Get the HTTP endpoint for the current query execution.

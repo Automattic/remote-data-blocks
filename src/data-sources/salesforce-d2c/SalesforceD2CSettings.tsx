@@ -237,7 +237,7 @@ export const SalesforceD2CSettings = ( {
 				<SelectControl
 					id="store_id"
 					label={ __( 'Store', 'remote-data-blocks' ) }
-					value={ state.store_id ?? '' }
+					value={ typeof state.store_id === 'string' ? state.store_id : '' }
 					onChange={ onStoreIDChange }
 					options={ storeOptions }
 					help={ __( 'Select a store', 'remote-data-blocks' ) }

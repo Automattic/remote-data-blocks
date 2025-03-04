@@ -4,7 +4,9 @@ namespace RemoteDataBlocks\PluginSettings;
 
 use RemoteDataBlocks\REST\DataSourceController;
 use RemoteDataBlocks\REST\AuthController;
+use RemoteDataBlocks\REST\QueryController;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
+use RemoteDataBlocks\WpdbStorage\QueryCrud;
 use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
 use RemoteDataBlocks\Telemetry\DataSourceTelemetry;
 use function wp_get_environment_type;
@@ -19,6 +21,8 @@ class PluginSettings {
 		add_action( 'admin_enqueue_scripts', [ __CLASS__, 'enqueue_settings_assets' ] );
 		add_action( 'pre_update_option_' . DataSourceCrud::CONFIG_OPTION_NAME, [ __CLASS__, 'encrypt_option' ], 10, 2 );
 		add_action( 'option_' . DataSourceCrud::CONFIG_OPTION_NAME, [ __CLASS__, 'decrypt_option' ], 10, 1 );
+		add_action( 'pre_update_option_' . QueryCrud::CONFIG_OPTION_NAME, [ __CLASS__, 'encrypt_option' ], 10, 2 );
+		add_action( 'option_' . QueryCrud::CONFIG_OPTION_NAME, [ __CLASS__, 'decrypt_option' ], 10, 1 );
 		add_action( 'rest_api_init', [ __CLASS__, 'init_rest_routes' ] );
 	}
 
@@ -53,6 +57,9 @@ class PluginSettings {
 
 		$auth_controller = new AuthController();
 		$auth_controller->register_routes();
+
+		$query_controller = new QueryController();
+		$query_controller->register_routes();
 	}
 
 	public static function enqueue_settings_assets( string $admin_page ): void {

@@ -1,0 +1,56 @@
+.query-form {
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 24px;
+	background: #fff;
+	border-radius: 4px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+
+	&__header {
+		margin-bottom: 24px;
+		padding-bottom: 16px;
+		border-bottom: 1px solid #e0e0e0;
+	}
+
+	&__title {
+		font-size: 20px;
+		margin: 0;
+	}
+
+	&__body {
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+	}
+
+	&__field {
+		margin-bottom: 16px;
+
+		&--data-source {
+			margin-bottom: 24px;
+		}
+	}
+
+	&__data-source-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 8px;
+	}
+
+	&__label {
+		display: block;
+		margin-bottom: 8px;
+		font-weight: 500;
+	}
+
+	&__connect-button {
+		margin-left: 16px;
+	}
+
+	&__actions {
+		margin-top: 32px;
+		display: flex;
+		justify-content: flex-end;
+	}
+}

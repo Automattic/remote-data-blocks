@@ -1,0 +1,21 @@
+.add-data-source-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+    
+    &__button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        height: 60px;
+        text-align: center;
+        
+        &:hover {
+            background-color: #f0f6fc;
+        }
+    }
+}

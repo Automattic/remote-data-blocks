@@ -80,13 +80,15 @@ export const GoogleSheetsSettings = ( {
 	);
 	const { spreadsheets, isLoadingSpreadsheets, errorSpreadsheets } =
 		useGoogleSpreadsheetsOptions( token );
+	const spreadsheetId = state.spreadsheet && typeof state.spreadsheet === 'object' ? 
+                              (state.spreadsheet as any).id : '';
 	const { sheets, sheetsWithFields, isLoadingSheets, errorSheets } = useGoogleSheetsWithFields(
 		token,
-		state.spreadsheet?.id ?? ''
+		spreadsheetId
 	);
 
 	const availableSheets = sheets?.length ? sheets?.map( sheet => sheet.name ) : [];
-	const selectedSheets = state.sheets?.map( sheet => sheet.name ) ?? [];
+	const selectedSheets = state.sheets && Array.isArray(state.sheets) ? state.sheets.map( (sheet: any) => sheet.name ) : [];
 
 	const onSaveClick = async () => {
 		if ( ! validState ) {
@@ -173,7 +175,7 @@ export const GoogleSheetsSettings = ( {
 		);
 	}, [ fetchingToken, token, tokenError, errors.credentials ] );
 
-	const shouldAllowSubmit = state.spreadsheet && state.sheets?.length;
+	const shouldAllowSubmit = Boolean(state.spreadsheet) && state.sheets && Array.isArray(state.sheets) && state.sheets.length > 0;
 
 	const spreadsheetHelpText = useMemo( () => {
 		if ( token ) {
@@ -255,7 +257,7 @@ export const GoogleSheetsSettings = ( {
 				<SelectControl
 					id="spreadsheet"
 					label={ __( 'Spreadsheet', 'remote-data-blocks' ) }
-					value={ state.spreadsheet?.id ?? '' }
+					value={ spreadsheetId }
 					onChange={ onSpreadsheetChange }
 					options={ spreadsheetOptions }
 					help={ spreadsheetHelpText }
