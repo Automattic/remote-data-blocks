@@ -41,7 +41,6 @@ class ExampleApi {
 
 		$data_source = HttpDataSource::from_array( [
 			'service_config' => [
-				'__version' => 1,
 				'display_name' => 'Example API (Conference Event)',
 				'endpoint' => 'https://example.com/api/v1', // dummy URL
 			],

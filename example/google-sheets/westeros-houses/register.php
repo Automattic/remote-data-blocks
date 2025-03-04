@@ -18,7 +18,6 @@ function register_google_sheets_westeros_houses_blocks(): void {
 
 	$westeros_houses_data_source = GoogleSheetsDataSource::from_array( [
 		'service_config' => [
-			'__version' => 1,
 			'credentials' => $credentials,
 			'display_name' => 'Westeros Houses',
 			'spreadsheet' => [

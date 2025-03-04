@@ -15,7 +15,7 @@ use WP_Error;
  */
 class HttpDataSource extends ArraySerializable implements HttpDataSourceInterface {
 	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE;
-	protected const SERVICE_SCHEMA_VERSION = 1;
+	protected const CONFIG_SCHEMA_VERSION = 1;
 
 	final public function get_display_name(): string {
 		return $this->config['display_name'];
@@ -35,6 +35,10 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 
 	final public function get_service_name(): string {
 		return static::SERVICE_NAME;
+	}
+
+	final public function get_config_schema_version(): int {
+		return static::CONFIG_SCHEMA_VERSION;
 	}
 
 	/**
@@ -59,6 +63,7 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 				'service' => static::SERVICE_NAME,
 				'service_config' => $service_config,
 				'uuid' => $config['uuid'] ?? null,
+				'__version' => static::CONFIG_SCHEMA_VERSION,
 			]
 		);
 	}
@@ -84,6 +89,7 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 			'service' => static::SERVICE_NAME,
 			'service_config' => $this->config['service_config'],
 			'uuid' => $this->config['uuid'],
+			'__version' => static::CONFIG_SCHEMA_VERSION,
 		];
 	}
 
@@ -110,6 +116,12 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 	 * @inheritDoc
 	 */
 	public static function migrate_config( array $config ): array|WP_Error {
+		// Migration: Move __version from service_config to the root level.
+		if ( isset( $config['service_config']['__version'] ) ) {
+			$config['__version'] = $config['service_config']['__version'];
+			unset( $config['service_config']['__version'] );
+		}
+
 		return $config;
 	}
 }

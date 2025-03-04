@@ -2,7 +2,6 @@ import { TextControl } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { DataSourceForm } from '../components/DataSourceForm';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import { ConfigSource } from '@/data-sources/constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
@@ -10,6 +9,7 @@ import { useShopifyShopName } from '@/data-sources/hooks/useShopify';
 import { SettingsComponentProps, ShopifyConfig, ShopifyServiceConfig } from '@/data-sources/types';
 import { useForm } from '@/hooks/useForm';
 import { ShopifyIcon, ShopifyIconWithText } from '@/settings/icons/ShopifyIcon';
+import { DataSourceForm } from '../components/DataSourceForm';
 
 const SERVICE_CONFIG_VERSION = 1;
 
@@ -22,7 +22,6 @@ export const ShopifySettings = ( {
 
 	const { state, handleOnChange, validState } = useForm< ShopifyServiceConfig >( {
 		initialValues: config?.service_config ?? {
-			__version: SERVICE_CONFIG_VERSION,
 			enable_blocks: true,
 		},
 	} );
@@ -61,6 +60,7 @@ export const ShopifySettings = ( {
 			service_config: validState,
 			uuid: uuid ?? null,
 			config_source: ConfigSource.STORAGE,
+			__version: SERVICE_CONFIG_VERSION,
 		};
 
 		return onSave( data, mode );

@@ -16,7 +16,6 @@ class DataSourceCrudTest extends TestCase {
 		$valid_source = [
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'service_config' => [
-				'__version' => 1,
 				'access_token' => 'valid_token',
 				'base' => [
 					'id' => 'base_id',
@@ -59,7 +58,6 @@ class DataSourceCrudTest extends TestCase {
 		$source1 = DataSourceCrud::create_config( [
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'service_config' => [
-				'__version' => 1,
 				'access_token' => 'token1',
 				'display_name' => 'Airtable Source',
 				'base' => [
@@ -74,7 +72,6 @@ class DataSourceCrudTest extends TestCase {
 		$source2 = DataSourceCrud::create_config( [
 			'service' => REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE,
 			'service_config' => [
-				'__version' => 1,
 				'access_token' => 'token2',
 				'display_name' => 'Shopify Source',
 				'store_name' => 'mystore',
@@ -100,7 +97,6 @@ class DataSourceCrudTest extends TestCase {
 		$source = DataSourceCrud::create_config( [
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'service_config' => [
-				'__version' => 1,
 				'access_token' => 'token1',
 				'base' => [
 					'id' => 'base_id1',
@@ -128,7 +124,6 @@ class DataSourceCrudTest extends TestCase {
 		$source = DataSourceCrud::create_config( [
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'service_config' => [
-				'__version' => 1,
 				'access_token' => 'token1',
 				'base' => [
 					'id' => 'base_id1',
@@ -158,7 +153,6 @@ class DataSourceCrudTest extends TestCase {
 		$source = DataSourceCrud::create_config( [
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'service_config' => [
-				'__version' => 1,
 				'access_token' => 'token1',
 				'base' => [
 					'id' => 'base_id1',

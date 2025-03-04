@@ -10,11 +10,10 @@ defined( 'ABSPATH' ) || exit();
 
 class ShopifyDataSource extends HttpDataSource {
 	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE;
-	protected const SERVICE_SCHEMA_VERSION = 1;
+	protected const CONFIG_SCHEMA_VERSION = 1;
 
 	protected static function get_service_config_schema(): array {
 		return Types::object( [
-			'__version' => Types::integer(),
 			'access_token' => Types::skip_sanitize( Types::string() ),
 			'display_name' => Types::string(),
 			'enable_blocks' => Types::nullable( Types::boolean() ),

@@ -200,7 +200,6 @@ class TracksTelemetryTest extends TestCase {
 				'display' => HttpQuery::from_array( [
 					'data_source' => ShopifyDataSource::from_array( [
 						'service_config' => [
-							'__version' => 1,
 							'access_token' => 'token',
 							'display_name' => 'Shopify Source',
 							'store_name' => 'B. Walton',
@@ -216,7 +215,6 @@ class TracksTelemetryTest extends TestCase {
 				'display' => HttpQuery::from_array( [
 					'data_source' => HttpDataSource::from_array( [
 						'service_config' => [
-							'__version' => 1,
 							'display_name' => 'HTTP Source',
 							'endpoint' => 'https://example.com/api/v1',
 						],

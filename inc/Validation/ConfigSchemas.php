@@ -121,6 +121,7 @@ final class ConfigSchemas {
 
 	private static function generate_http_data_source_config_schema(): array {
 		return Types::object( [
+			'__version' => Types::integer(),
 			'display_name' => Types::string(),
 			'endpoint' => Types::string(),
 			'image_url' => Types::nullable( Types::image_url() ),
@@ -138,7 +139,6 @@ final class ConfigSchemas {
 
 	private static function generate_http_data_source_service_config_schema(): array {
 		return Types::object( [
-			'__version' => Types::integer(),
 			'auth' => Types::nullable(
 				Types::object( [
 					'add_to' => Types::nullable( Types::enum( 'header', 'query' ) ),

@@ -1,4 +1,4 @@
-import { SUPPORTED_SERVICES, ConfigSource } from '@/data-sources/constants';
+import { ConfigSource, SUPPORTED_SERVICES } from '@/data-sources/constants';
 import { HttpAuth } from '@/data-sources/http/types';
 import { StringIdName } from '@/types/common';
 import { GoogleServiceAccountKey } from '@/types/google';
@@ -6,7 +6,6 @@ import { GoogleServiceAccountKey } from '@/types/google';
 export type DataSourceType = ( typeof SUPPORTED_SERVICES )[ number ];
 
 interface BaseServiceConfig extends Record< string, unknown > {
-	__version: number;
 	display_name: string;
 	enable_blocks: boolean;
 }
@@ -14,6 +13,7 @@ interface BaseDataSourceConfig<
 	ServiceName extends DataSourceType,
 	ServiceConfig extends BaseServiceConfig
 > {
+	__version: number;
 	service: ServiceName;
 	service_config: ServiceConfig;
 	uuid: string | null;

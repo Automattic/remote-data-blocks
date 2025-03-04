@@ -28,7 +28,6 @@ class ConfigStoreTest extends TestCase {
 				'display' => HttpQuery::from_array( [
 					'data_source' => AirtableDataSource::from_array( [
 						'service_config' => [
-							'__version' => 1,
 							'access_token' => 'token',
 							'base' => [
 								'id' => 'foo',

@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
 
 import { DataSourceForm } from '@/data-sources/components/DataSourceForm';
 import { FieldsSelection } from '@/data-sources/components/FieldsSelection';
-import { GOOGLE_SHEETS_API_SCOPES, ConfigSource } from '@/data-sources/constants';
+import { ConfigSource, GOOGLE_SHEETS_API_SCOPES } from '@/data-sources/constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import {
 	useGoogleSheetsWithFields,
@@ -61,7 +61,6 @@ export const GoogleSheetsSettings = ( {
 
 	const { state, errors, handleOnChange, validState } = useForm< GoogleSheetsServiceConfig >( {
 		initialValues: config?.service_config ?? {
-			__version: SERVICE_CONFIG_VERSION,
 			enable_blocks: true,
 		},
 		validationRules,
@@ -98,6 +97,7 @@ export const GoogleSheetsSettings = ( {
 			service_config: validState,
 			uuid: uuid ?? null,
 			config_source: ConfigSource.STORAGE,
+			__version: SERVICE_CONFIG_VERSION,
 		};
 
 		return onSave( data, mode );

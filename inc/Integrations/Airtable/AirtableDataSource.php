@@ -7,11 +7,10 @@ use RemoteDataBlocks\Validation\Types;
 
 class AirtableDataSource extends HttpDataSource {
 	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE;
-	protected const SERVICE_SCHEMA_VERSION = 1;
+	protected const CONFIG_SCHEMA_VERSION = 1;
 
 	protected static function get_service_config_schema(): array {
 		return Types::object( [
-			'__version' => Types::integer(),
 			'access_token' => Types::string(),
 			'base' => Types::object( [
 				'id' => Types::string(),

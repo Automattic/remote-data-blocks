@@ -30,7 +30,6 @@ class ConstantConfigStoreTest extends TestCase {
 			'uuid' => self::TEST_UUID,
 			'service' => self::TEST_SERVICE,
 			'service_config' => [
-				'__version' => 1,
 				'store_name' => 'test-store',
 				'access_token' => 'gy56yrtyrtt',
 				'display_name' => 'Test Store',

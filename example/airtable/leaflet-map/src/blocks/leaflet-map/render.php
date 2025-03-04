@@ -42,7 +42,6 @@ $table = [
 
 $map_data_source = AirtableDataSource::from_array( [
 	'service_config' => [
-		'__version' => 1,
 		'access_token' => $access_token,
 		'base' => [
 			'id' => $base_id,

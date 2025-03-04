@@ -16,7 +16,6 @@ class RDBTestCase extends WP_UnitTestCase {
 
 		$test_data_source = HttpDataSource::from_array( [
 			'service_config' => [
-				'__version' => 1,
 				'display_name' => 'Test API',
 
 				// Mocked query runner will not actually make a request to the endpoint URL.
@@ -46,7 +45,6 @@ class RDBTestCase extends WP_UnitTestCase {
 
 		$test_data_source = HttpDataSource::from_array( [
 			'service_config' => [
-				'__version' => 1,
 				'display_name' => 'Test Failing API',
 
 				// Mocked query runner will not actually make a request to the endpoint URL.

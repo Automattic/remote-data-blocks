@@ -13,7 +13,6 @@ class AirtableDataSourceTest extends TestCase {
 
 		$this->data_source = AirtableDataSource::from_array( [
 			'service_config' => [
-				'__version' => 1,
 				'access_token' => 'test_access_token',
 				'display_name' => 'Airtable Source',
 				'base' => [
