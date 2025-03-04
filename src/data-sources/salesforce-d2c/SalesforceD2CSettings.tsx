@@ -62,6 +62,7 @@ export const SalesforceD2CSettings = ( {
 
 	const { state, handleOnChange, validState } = useForm< SalesforceD2CServiceConfig >( {
 		initialValues: config?.service_config ?? {
+			__version: SERVICE_CONFIG_VERSION,
 			enable_blocks: true,
 		},
 		validationRules,
@@ -90,7 +91,6 @@ export const SalesforceD2CSettings = ( {
 			service_config: validState,
 			uuid: uuid ?? null,
 			config_source: ConfigSource.STORAGE,
-			__version: SERVICE_CONFIG_VERSION,
 		};
 
 		return onSave( data, mode );

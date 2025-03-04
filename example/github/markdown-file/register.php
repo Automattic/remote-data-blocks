@@ -11,6 +11,7 @@ require_once __DIR__ . '/markdown-links.php';
 function register_github_file_as_html_block(): void {
 	// Note: This repository is public, so GitHub's API does not require authorization.
 	$service_config = [
+		'__version' => 1,
 		'display_name' => 'Automattic/remote-data-blocks#trunk',
 		'ref' => 'trunk',
 		'repo_owner' => 'Automattic',

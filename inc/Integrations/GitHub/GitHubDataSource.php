@@ -7,10 +7,11 @@ use RemoteDataBlocks\Validation\Types;
 
 class GitHubDataSource extends HttpDataSource {
 	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_GITHUB_SERVICE;
-	protected const CONFIG_SCHEMA_VERSION = 1;
+	protected const SERVICE_SCHEMA_VERSION = 1;
 
 	protected static function get_service_config_schema(): array {
 		return Types::object( [
+			'__version' => Types::integer(),
 			'display_name' => Types::string(),
 			'repo_owner' => Types::string(),
 			'repo_name' => Types::string(),

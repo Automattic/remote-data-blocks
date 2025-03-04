@@ -33,6 +33,7 @@ class GoogleSheetsDataSourceTest extends TestCase {
 
 		$this->data_source = GoogleSheetsDataSource::from_array( [
 			'service_config' => [
+				'__version' => 1,
 				'display_name' => 'Google Sheets Source',
 				'credentials' => self::MOCK_CREDENTIALS,
 				'spreadsheet' => [

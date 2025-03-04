@@ -33,6 +33,7 @@ class DataSourceConfigManagerTest extends TestCase {
 			'uuid' => self::AIRTABLE_UUID,
 			'service' => self::AIRTABLE_SERVICE,
 			'service_config' => [
+				'__version' => 1,
 				'enable_blocks' => true,
 				'display_name' => 'Test Airtable',
 				'access_token' => 'test.airtable.access-token',
@@ -66,6 +67,7 @@ class DataSourceConfigManagerTest extends TestCase {
 			'uuid' => self::SHEETS_UUID,
 			'service' => self::SHEETS_SERVICE,
 			'service_config' => [
+				'__version' => 1,
 				'enable_blocks' => true,
 				'display_name' => 'Test Google Sheets',
 				'credentials' => [
@@ -107,6 +109,7 @@ class DataSourceConfigManagerTest extends TestCase {
 			'uuid' => self::SHOPIFY_UUID,
 			'service' => self::SHOPIFY_SERVICE,
 			'service_config' => [
+				'__version' => 1,
 				'access_token' => 'shpat_abc123def456ghi789jkl0',
 				'store_name' => 'test-shopify-store',
 				'display_name' => 'Test Shopify Store',
@@ -135,7 +138,7 @@ class DataSourceConfigManagerTest extends TestCase {
 			->andReturn( [ $this->shopify_code_config ] );
 
 		$result = DataSourceConfigManager::get_all();
-
+		
 		$this->assertCount( 3, $result );
 		$this->assertContains( $this->airtable_storage_config, $result );
 		$this->assertContains( $this->sheets_constant_config, $result );
@@ -214,7 +217,7 @@ class DataSourceConfigManagerTest extends TestCase {
 	}
 
 	public function testUpdateReturnsErrorForImmutableConfig(): void {
-		$immutable_config = array_merge(
+		$immutable_config = array_merge( 
 			$this->sheets_constant_config,
 			[ 'config_source' => DataSourceConfigManager::CONFIG_SOURCE_CONSTANT ]
 		);
@@ -293,7 +296,7 @@ class DataSourceConfigManagerTest extends TestCase {
 
 		// Should only get one config since they share the same UUID
 		$this->assertCount( 1, $result );
-
+		
 		// Storage should win due to highest precedence
 		$this->assertContains( $storage_sheets, $result );
 		$this->assertNotContains( $constant_sheets, $result );
@@ -314,7 +317,7 @@ class DataSourceConfigManagerTest extends TestCase {
 			->andReturn( [ $this->shopify_code_config ] );
 
 		$result = DataSourceConfigManager::get_all( [ 'service' => self::AIRTABLE_SERVICE ] );
-
+		
 		$this->assertCount( 1, $result );
 		$this->assertContains( $this->airtable_storage_config, $result );
 	}
@@ -338,7 +341,7 @@ class DataSourceConfigManagerTest extends TestCase {
 			->andReturn( [ $this->shopify_code_config ] );
 
 		$result = DataSourceConfigManager::get_all( [ 'enable_blocks' => true ] );
-
+		
 		$this->assertCount( 2, $result );
 		$this->assertContains( $this->airtable_storage_config, $result );
 		$this->assertContains( $this->shopify_code_config, $result );
@@ -363,7 +366,7 @@ class DataSourceConfigManagerTest extends TestCase {
 			->andReturn( [ $shopify_config_blocks_unset ] );
 
 		$result = DataSourceConfigManager::get_all( [ 'enable_blocks' => false ] );
-
+		
 		$this->assertCount( 1, $result );
 		$this->assertContains( $shopify_config_blocks_unset, $result );
 	}
@@ -385,7 +388,7 @@ class DataSourceConfigManagerTest extends TestCase {
 			'service' => self::AIRTABLE_SERVICE,
 			'enable_blocks' => true,
 		] );
-
+		
 		$this->assertCount( 1, $result );
 		$this->assertContains( $this->airtable_storage_config, $result );
 	}
@@ -405,7 +408,7 @@ class DataSourceConfigManagerTest extends TestCase {
 			->andReturn( [] );
 
 		$result = DataSourceConfigManager::get_all( [ 'service' => self::AIRTABLE_SERVICE ] );
-
+		
 		$this->assertCount( 0, $result );
 		$this->assertEmpty( $result );
 	}
@@ -435,7 +438,7 @@ class DataSourceConfigManagerTest extends TestCase {
 			->andReturn( [ $shopify_config ] );
 
 		$result = DataSourceConfigManager::get_all( [ 'enable_blocks' => false ] );
-
+		
 		$this->assertCount( 0, $result );
 		$this->assertEmpty( $result );
 	}
@@ -457,7 +460,7 @@ class DataSourceConfigManagerTest extends TestCase {
 			'service' => self::AIRTABLE_SERVICE,
 			'enable_blocks' => false,
 		] );
-
+		
 		$this->assertCount( 0, $result );
 		$this->assertEmpty( $result );
 	}

@@ -20,6 +20,7 @@ class BlockWithNestedConfigTest extends RDBTestCase {
 					'data_source' => [
 						'__class' => 'RemoteDataBlocks\\Config\\DataSource\\HttpDataSource',
 						'service_config' => [
+							'__version' => 1,
 							'display_name' => 'Test API',
 							// Mocked query runner will not actually make a request to the endpoint URL.
 							'endpoint' => 'https://example.com/not-a-real-api',

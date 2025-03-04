@@ -35,6 +35,7 @@ function computeAuthState( updatedAuth: Partial< HttpServiceConfig[ 'auth' ] > )
 export const HttpSettings = ( { mode, uuid, config }: SettingsComponentProps< HttpConfig > ) => {
 	const { state, handleOnChange, validState } = useForm< HttpServiceConfig >( {
 		initialValues: config?.service_config ?? {
+			__version: SERVICE_CONFIG_VERSION,
 			auth: computeAuthState( {} ),
 		},
 	} );
@@ -64,7 +65,6 @@ export const HttpSettings = ( { mode, uuid, config }: SettingsComponentProps< Ht
 			service_config: validState,
 			uuid: uuid ?? null,
 			config_source: ConfigSource.STORAGE,
-			__version: SERVICE_CONFIG_VERSION,
 		};
 
 		return onSave( httpConfig, mode );

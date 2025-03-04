@@ -11,6 +11,7 @@ class HttpDataSourceTest extends TestCase {
 	public function testGetServiceMethodCannotBeOverriddenl(): void {
 		$config = [
 			'service_config' => [
+				'__version' => 1,
 				'display_name' => 'Mock Data Source',
 				'endpoint' => 'http://example.com',
 			],

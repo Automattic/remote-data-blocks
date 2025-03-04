@@ -15,6 +15,7 @@ function register_shopify_block(): void {
 
 	$shopify_data_source = ShopifyDataSource::from_array( [
 		'service_config' => [
+			'__version' => 1,
 			'access_token' => $access_token,
 			'display_name' => 'Shopify Example',
 			'store_name' => $store_slug,

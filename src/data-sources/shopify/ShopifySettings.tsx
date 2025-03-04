@@ -22,6 +22,7 @@ export const ShopifySettings = ( {
 
 	const { state, handleOnChange, validState } = useForm< ShopifyServiceConfig >( {
 		initialValues: config?.service_config ?? {
+			__version: SERVICE_CONFIG_VERSION,
 			enable_blocks: true,
 		},
 	} );
@@ -60,7 +61,6 @@ export const ShopifySettings = ( {
 			service_config: validState,
 			uuid: uuid ?? null,
 			config_source: ConfigSource.STORAGE,
-			__version: SERVICE_CONFIG_VERSION,
 		};
 
 		return onSave( data, mode );

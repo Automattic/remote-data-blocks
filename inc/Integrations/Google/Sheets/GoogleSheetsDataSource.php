@@ -8,10 +8,11 @@ use RemoteDataBlocks\Validation\Types;
 
 class GoogleSheetsDataSource extends HttpDataSource {
 	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE;
-	protected const CONFIG_SCHEMA_VERSION = 1;
+	protected const SERVICE_SCHEMA_VERSION = 1;
 
 	protected static function get_service_config_schema(): array {
 		return Types::object( [
+			'__version' => Types::integer(),
 			'credentials' => Types::object( [
 				'type' => Types::string(),
 				'project_id' => Types::string(),

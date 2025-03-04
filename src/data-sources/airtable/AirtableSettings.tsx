@@ -43,6 +43,7 @@ export const AirtableSettings = ( {
 
 	const { state, handleOnChange, validState } = useForm< AirtableServiceConfig >( {
 		initialValues: config?.service_config ?? {
+			__version: SERVICE_CONFIG_VERSION,
 			enable_blocks: true,
 		},
 	} );
@@ -77,7 +78,6 @@ export const AirtableSettings = ( {
 			service_config: validState,
 			uuid: uuid ?? null,
 			config_source: ConfigSource.STORAGE,
-			__version: SERVICE_CONFIG_VERSION,
 		};
 
 		return onSave( airtableConfig, mode );
