@@ -82,7 +82,6 @@ interface RemoteDataApiResult {
 
 interface RemoteDataApiResponseBody {
 	block_name: string;
-	is_collection: boolean;
 	metadata: Record< string, RemoteDataResultFields >;
 	pagination?: {
 		cursor_next?: string;

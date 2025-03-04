@@ -197,8 +197,12 @@ class QueryRunner implements QueryRunnerInterface {
 	 * @inheritDoc
 	 */
 	public function execute( HttpQueryInterface $query, array $input_variables ): array|WP_Error {
-		// Set default input variables.
 		$input_schema = $query->get_input_schema();
+
+		// Only include input variables defined by the query's input schema.
+		$input_variables = array_intersect_key( $input_variables, $input_schema );
+
+		// Set default input variables.
 		foreach ( $input_schema as $key => $schema ) {
 			if ( ! array_key_exists( $key, $input_variables ) && isset( $schema['default_value'] ) ) {
 				$input_variables[ $key ] = $schema['default_value'];
@@ -247,10 +251,36 @@ class QueryRunner implements QueryRunnerInterface {
 		}
 
 		return [
-			'is_collection' => $is_collection,
 			'metadata' => $metadata,
 			'pagination' => $pagination,
 			'results' => $results,
+		];
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function execute_batch( HttpQueryInterface $query, array $array_of_input_variables ): array|WP_Error {
+		if ( 1 === count( $array_of_input_variables ) ) {
+			return $this->execute( $query, $array_of_input_variables[0] );
+		}
+
+		$merged_results = [];
+
+		foreach ( $array_of_input_variables as $input_variables ) {
+			$query_response = $query->execute( $input_variables );
+
+			if ( ! is_wp_error( $query_response ) ) {
+				return $query_response;
+			}
+
+			$merged_results = array_merge( $query_response['results'], $merged_results );
+		}
+
+		return [
+			'metadata' => $this->get_response_metadata( $query, [ 'batch' => true ], $merged_results ),
+			'pagination' => null, // Pagination is always disabled for batch executions.
+			'results' => $merged_results,
 		];
 	}
 

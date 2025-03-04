@@ -89,7 +89,6 @@ class QueryRunnerTest extends TestCase {
 		$result = $this->query->execute( [] );
 
 		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
 	}
 
@@ -189,9 +188,7 @@ class QueryRunnerTest extends TestCase {
 		$result = $this->query->execute( [] );
 
 		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
-		$this->assertFalse( $result['is_collection'] );
 
 		$this->assertArrayHasKey( 'metadata', $result );
 		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
@@ -233,9 +230,7 @@ class QueryRunnerTest extends TestCase {
 		$result = $this->query->execute( [] );
 
 		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
-		$this->assertFalse( $result['is_collection'] );
 
 		$this->assertArrayHasKey( 'metadata', $result );
 		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
@@ -278,9 +273,7 @@ class QueryRunnerTest extends TestCase {
 		$result = $this->query->execute( [] );
 
 		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
-		$this->assertFalse( $result['is_collection'] );
 
 		$this->assertArrayHasKey( 'metadata', $result );
 		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
@@ -325,9 +318,7 @@ class QueryRunnerTest extends TestCase {
 		$result = $this->query->execute( [] );
 
 		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
-		$this->assertFalse( $result['is_collection'] );
 
 		$this->assertArrayHasKey( 'metadata', $result );
 		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
@@ -385,7 +376,6 @@ class QueryRunnerTest extends TestCase {
 		$result = $query->execute( [] );
 
 		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'metadata', $result );
 		$this->assertArrayHasKey( 'results', $result );
 	}
