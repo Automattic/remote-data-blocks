@@ -27,6 +27,7 @@ function getResultsWithId( results: RemoteDataResult[], instanceId: string ): Re
 interface ItemListProps {
 	availableBindings: Record< string, RemoteDataBinding >;
 	blockName: string;
+	idField: string;
 	loading: boolean;
 	onSelect: ( data: RemoteDataQueryInput ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
@@ -34,8 +35,11 @@ interface ItemListProps {
 	perPage?: number;
 	remoteData?: RemoteData;
 	searchInput: string;
+	selectedItems: string[];
 	setPage: ( newPage: number ) => void;
 	setSearchInput: ( newValue: string ) => void;
+	setSelectedItems: ( newSelectedItems: string[] ) => void;
+	supportsBulk: boolean;
 	supportsSearch: boolean;
 	totalItems?: number;
 	totalPages?: number;
@@ -45,6 +49,7 @@ export function ItemList( props: ItemListProps ) {
 	const {
 		availableBindings,
 		blockName,
+		idField,
 		loading,
 		onSelect,
 		onSelectField,
@@ -52,8 +57,11 @@ export function ItemList( props: ItemListProps ) {
 		perPage,
 		remoteData,
 		searchInput,
+		selectedItems,
 		setPage,
 		setSearchInput,
+		setSelectedItems,
+		supportsBulk,
 		supportsSearch,
 		totalItems,
 		totalPages,
@@ -107,7 +115,7 @@ export function ItemList( props: ItemListProps ) {
 	// hide media and title fields from table view if defined to avoid duplication
 	const tableFields = fieldNames.filter( field => field !== mediaField && field !== titleField );
 
-	const [ view, setView ] = useState< View >( {
+	const [ view, setView ] = useState< View & { selection: string[] } >( {
 		type: 'table' as const,
 		perPage: perPage ?? data.length,
 		page,
@@ -117,12 +125,13 @@ export function ItemList( props: ItemListProps ) {
 		layout: {},
 		titleField,
 		mediaField,
+		selection: selectedItems,
 	} );
 
 	function onChangeView( newView: View ) {
 		setPage( newView.page ?? 1 );
 		setSearchInput( newView.search ?? '' );
-		setView( newView );
+		setView( { ...newView, selection: selectedItems } );
 	}
 
 	const defaultLayouts = mediaField
@@ -132,35 +141,53 @@ export function ItemList( props: ItemListProps ) {
 		  }
 		: { table: {} };
 
-	// Hide actions for field shortcode selection
+	// Temporary helper to handle pagination and bulk selection
+	const onChangeSelection = ( newIds: string[] ) => {
+		// Get all currently selected IDs from the view
+		const currentPageIds = data.map( item => item.id );
+		// Keep selections from other pages that aren't in the current view
+		const otherPageSelections = selectedItems.filter( id => ! currentPageIds.includes( id ) );
+		// Combine selections from other pages with new selections
+		setSelectedItems( [ ...otherPageSelections, ...newIds ] );
+	};
+
 	const chooseItemAction = {
 		id: 'choose',
 		icon: <>{ __( 'Choose' ) }</>,
 		isPrimary: true,
 		label: '',
 		callback: ( items: RemoteDataResult[] ) => {
+			if ( supportsBulk && selectedItems.length > 0 ) {
+				const ids = selectedItems.join( ',' );
+				return onSelect( { [ idField ]: ids } );
+			}
 			items.map( item => onSelect( item ) );
 		},
+		supportsBulk,
 	};
 	const actions: Action< RemoteDataResult >[] = onSelectField ? [] : [ chooseItemAction ];
 
 	return (
-		<DataViews< RemoteDataResult >
-			actions={ actions }
-			data={ data }
-			defaultLayouts={ defaultLayouts }
-			fields={ fields }
-			getItemId={ ( item: { id?: string } ) => item.id || '' }
-			isLoading={ loading || ! pattern || ! results }
-			isItemClickable={ () => true }
-			onClickItem={ item => onSelect( item ) }
-			onChangeView={ onChangeView }
-			paginationInfo={ {
-				totalItems: totalItems ?? data.length,
-				totalPages: totalPages ?? 1,
-			} }
-			search={ supportsSearch }
-			view={ view }
-		/>
+		<>
+			<DataViews< RemoteDataResult >
+				actions={ actions }
+				data={ data }
+				defaultLayouts={ defaultLayouts }
+				fields={ fields }
+				getItemId={ ( item: { id?: string } ) => item.id || '' }
+				isLoading={ loading || ! pattern || ! results }
+				isItemClickable={ () => true }
+				onClickItem={ item => onSelect( item ) }
+				onChangeSelection={ onChangeSelection }
+				onChangeView={ onChangeView }
+				paginationInfo={ {
+					totalItems: totalItems ?? data.length,
+					totalPages: totalPages ?? 1,
+				} }
+				search={ supportsSearch }
+				selection={ selectedItems }
+				view={ view }
+			/>
+		</>
 	);
 }

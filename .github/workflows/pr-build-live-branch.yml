@@ -1,0 +1,77 @@
+name: Build Live Branch
+
+on:
+  pull_request:
+    branches:
+      - trunk
+    paths-ignore:
+      - 'docs/**'
+      - 'examples/**'
+      - 'bin/**'
+      - '**/tests/**'
+      - '**/*.md'
+      - '.github/**'
+      - '!.github/workflows/pr-build-live-branch.yml'
+      - '!.github/workflows/scripts/generate-playground-blueprint.js'
+
+concurrency:
+  # Cancel concurrent jobs on pull_request but not push, by including the run_id in the concurrency group for the latter.
+  group: build-${{ github.event_name == 'push' && github.run_id || 'pr' }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FORCE_COLOR: 1
+
+jobs:
+  build:
+    if: github.repository_owner == 'Automattic' && github.event.pull_request.draft == false && github.event.pull_request.user.login != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Setup Node.js
+        uses: Automattic/vip-actions/nodejs-setup@trunk
+        with:
+          node-version-file: .nvmrc
+          ignore-scripts: true
+
+      - name: Prepare plugin zips
+        id: prepare
+        run: |
+          echo "Generating zip file..."
+          cd "$GITHUB_WORKSPACE" || exit
+          npm run plugin-zip
+          echo "Generated zip file..."
+          mkdir "$GITHUB_WORKSPACE/zips"
+          mv remote-data-blocks.zip "$GITHUB_WORKSPACE/zips/remote-data-blocks.zip"
+          echo "Moved zip file to zips directory..."
+          mkdir "$GITHUB_WORKSPACE/unzips"
+          echo "Created unzips directory..."
+          unzip "$GITHUB_WORKSPACE/zips/remote-data-blocks.zip" -d "$GITHUB_WORKSPACE/unzips/remote-data-blocks"
+          echo "Unzipped zip file..."
+
+      - name: Create playground artifact
+        id: create-playground-artifact-step
+        uses: actions/upload-artifact@v4
+        with:
+          name: remote-data-blocks-${{ github.event.pull_request.number }}
+          path: unzips/remote-data-blocks
+          retention-days: 7
+          if-no-files-found: 'error'
+          overwrite: true
+
+      - name: Comment on PR with WordPress Playground details
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { run } = require('./.github/workflows/scripts/generate-playground-blueprint');
+            	run({ github, context });

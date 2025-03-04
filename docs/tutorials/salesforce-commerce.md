@@ -1,18 +1,29 @@
-# Create a Salesforce Commerce B2C remote data block
+# Create a Salesforce Commerce D2C remote data block
 
-This tutorial will walk you through connecting a [Salesforce Commerce B2C](https://developer.salesforce.com/docs/commerce/b2c-commerce/overview) data source and how to use the automatically created block in the WordPress editor.
+This tutorial will walk you through connecting a [Salesforce Commerce D2C](https://developer.salesforce.com/docs/commerce/salesforce-commerce/guide) data source and how to use the automatically created block in the WordPress editor.
 
-## Salesforce Commerce B2C API Access
+## Salesforce Commerce D2C API Access
+
+We have provided a pre-configured Bruno Collection for interacting with the Salesforce Commerce D2C APIs. These are located [here](../bruno-collections/Salesforce D2C APIs.json). These can be imported into the [Bruno API Client](https://www.usebruno.com/docs/api-client/introduction) to interact with the APIs.
+
+In order to use the collection, you will need to provide the following variables:
+
+- `salesforce domain`
+- `client_id`
+- `client_secret`
 
 ## Create the data source
 
 1. Go to Settings > Remote Data Blocks in your WordPress admin.
 2. Click on the "Connect new" button.
-3. Choose "Salesforce Commerce B2C" from the dropdown menu as the data source type.
+3. Choose "Salesforce Commerce D2C" from the dropdown menu as the data source type.
 4. Name the data source. This name is only used for display purposes.
-5. Provide the merchant short code. This is the region-specific merchant identifier.
-6. Provide the organization ID.
-7. Provide the client ID and the client secret. Ensure these are correct or else authentication will fail.
+5. Provide the Salesforce Commerce domain.
+6. Provide the client ID and the client secret. Ensure these are correct or else authentication will fail.
+7. Click Continue.
+8. The stores for the provided domain will be listed. Select the store you wish to use.
+9. Click Continue.
+10. If you wish to have the blocks automatically be registered, ensure the `Auto-generate blocks` checkbox is checked.
 
 ## Insert the block
 

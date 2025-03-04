@@ -38,7 +38,7 @@
     "lint:phpcs:fix": "vendor/bin/phpcbf",
     "lint:psalm": "vendor/bin/psalm.phar",
     "packages-update": "wp-scripts packages-update",
-    "playground": "npx @wp-now/wp-now start --php=8.2 --blueprint=blueprint.local.json",
+    "playground": "npx @wp-playground/cli server --mount=.:/wordpress/wp-content/plugins/remote-data-blocks --php=8.2 --blueprint=blueprint.local.json",
     "playground:reset": "npm run playground -- --reset",
     "plugin-zip": "npm run build && composer install --prefer-dist --optimize-autoloader --no-dev && wp-scripts plugin-zip",
     "postinstall": "composer install",

@@ -50,21 +50,22 @@ class SalesforceD2CIntegration {
 				'data_source' => $data_source,
 				'endpoint' => function ( array $input_variables ) use ( $base_endpoint, $service_config ): string {
 					return sprintf(
-						'%s/services/data/v63.0/commerce/webstores/%s/products/%s',
+						'%s/services/data/v63.0/commerce/webstores/%s/products?skus=%s',
 						$base_endpoint,
 						$service_config['store_id'],
-						$input_variables['product_id']
+						$input_variables['product_sku']
 					);
 				},
 				'input_schema' => [
-					'product_id' => [
-						'name' => 'Product ID',
+					'product_sku' => [
+						'name' => 'Product SKU',
 						'type' => 'id',
 						'required' => true,
 					],
 				],
 				'output_schema' => [
-					'is_collection' => false,
+					'is_collection' => true,
+					'path' => '$.products[*]',
 					'type' => [
 						'id' => [
 							'name' => 'Product ID',
@@ -73,7 +74,12 @@ class SalesforceD2CIntegration {
 						],
 						'name' => [
 							'name' => 'Name',
-							'path' => '$.fields.Name',
+							'path' => '$.name',
+							'type' => 'string',
+						],
+						'sku' => [
+							'name' => 'SKU',
+							'path' => '$.sku',
 							'type' => 'string',
 						],
 						'description' => [
@@ -120,6 +126,11 @@ class SalesforceD2CIntegration {
 							'path' => '$.id',
 							'type' => 'id',
 						],
+						'product_sku' => [
+							'name' => 'Product SKU',
+							'path' => '$.fields.StockKeepingUnit.value',
+							'type' => 'string',
+						],
 						'name' => [
 							'name' => 'Name',
 							'path' => '$.name',
@@ -155,23 +166,23 @@ class SalesforceD2CIntegration {
 				'overrides' => [
 					[
 						'display_name' => 'Use Salesforce product from URL',
-						'name' => 'salesforce_product_id',
+						'name' => 'salesforce_sku',
 					],
 				],
 			]
 		);
 
 		add_filter( 'query_vars', function ( array $query_vars ): array {
-			$query_vars[] = 'utm_content';
+			$query_vars[] = 'sku';
 			return $query_vars;
 		}, 10, 1 );
 
 		add_filter( 'remote_data_blocks_query_input_variables', function ( array $input_variables, array $enabled_overrides ): array {
-			if ( true === in_array( 'salesforce_product_id', $enabled_overrides, true ) ) {
-				$product_id = get_query_var( 'utm_content' );
+			if ( true === in_array( 'salesforce_sku', $enabled_overrides, true ) ) {
+				$product_sku = get_query_var( 'sku' );
 
-				if ( ! empty( $product_id ) ) {
-					$input_variables['product_id'] = $product_id;
+				if ( ! empty( $product_sku ) ) {
+					$input_variables['product_sku'] = $product_sku;
 				}
 			}
 

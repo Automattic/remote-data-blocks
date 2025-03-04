@@ -21,9 +21,9 @@ import { BaseModal } from '@/blocks/remote-data-container/components/modals/Base
 import { useModalState } from '@/blocks/remote-data-container/hooks/useModalState';
 import DataSourceMetaTags from '@/data-sources/DataSourceMetaTags';
 import {
+	ConfigSource,
 	SUPPORTED_SERVICES,
 	SUPPORTED_SERVICES_LABELS,
-	ConfigSource,
 } from '@/data-sources/constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig } from '@/data-sources/types';
@@ -31,6 +31,7 @@ import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import { AirtableIcon } from '@/settings/icons/AirtableIcon';
 import { GoogleSheetsIcon } from '@/settings/icons/GoogleSheetsIcon';
 import HttpIcon from '@/settings/icons/HttpIcon';
+import SalesforceCommerceD2CIcon from '@/settings/icons/SalesforceCommerceD2CIcon';
 import { ShopifyIcon } from '@/settings/icons/ShopifyIcon';
 
 import './DataSourceList.scss';
@@ -97,6 +98,8 @@ const DataSourceList = () => {
 				return ShopifyIcon;
 			case 'google-sheets':
 				return GoogleSheetsIcon;
+			case 'salesforce-d2c':
+				return SalesforceCommerceD2CIcon;
 			default:
 				return HttpIcon;
 		}
