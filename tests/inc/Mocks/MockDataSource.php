@@ -30,4 +30,16 @@ class MockDataSource extends HttpDataSource {
 	public function set_endpoint( string $endpoint ): void {
 		$this->config['endpoint'] = $endpoint;
 	}
+
+	/**
+	 * Override the migrate_config method to adjust the config for testing.
+	 */
+	public static function migrate_config( array $config ): array|WP_Error {
+		// Add a testUserId to the config if it's not already set.
+		if ( ! isset( $config['service_config']['testUserId'] ) ) {
+			$config['service_config']['testUserId'] = '123';
+		}
+
+		return $config;
+	}
 }
