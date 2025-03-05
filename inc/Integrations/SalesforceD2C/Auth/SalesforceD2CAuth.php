@@ -31,7 +31,7 @@ class SalesforceD2CAuth {
 		string $endpoint,
 		string $token,
 		string $store_id,
-	): array|WP_Error {
+	): string|WP_Error {
 		// First we need to get the base store url.
 		// ToDo: Figure out how we can narrow this based on the store_id rather than using LIMIT 1.
 		$domain_url = self::get_saved_domain( $store_id ) ?? self::get_domain_url( $endpoint, $token, $store_id );
@@ -50,6 +50,27 @@ class SalesforceD2CAuth {
 		// Generate the buyer url and the cookie that would be used for guest buyer shopping.
 		// ToDo: site_url_path_prefix is not always present, so we need to handle that.
 		$buyer_endpoint = sprintf( '%s/%s/webruntime/api/services/data/v63.0/commerce/webstores/%s', $domain_url, $site_details['site_url_path_prefix'], $store_id );
+
+		return $buyer_endpoint;
+	}
+
+	public static function generate_guest_checkout_cookies(
+		string $endpoint,
+		string $token,
+		string $store_id,
+	): array|WP_Error {
+		$buyer_endpoint = self::generate_buyer_endpoint( $endpoint, $token, $store_id );
+
+		if ( is_wp_error( $buyer_endpoint ) ) {
+			return $buyer_endpoint;
+		}
+
+		$site_details = self::get_saved_site_details( $store_id ) ?? self::get_site_details( $endpoint, $token, $store_id );
+
+		if ( is_wp_error( $site_details ) ) {
+			return $site_details;
+		}
+
 		$buyer_uuid = wp_generate_uuid4();
 		$buyer_cookie = sprintf( 'guest_uuid_essential_%s=%s;', substr( $site_details['site_id'], 0, 15 ), $buyer_uuid );
 
@@ -61,7 +82,6 @@ class SalesforceD2CAuth {
 		}
 
 		return array_merge( [
-			'buyer_endpoint' => $buyer_endpoint,
 			'buyer_cookie' => $buyer_cookie,
 		], $cart_id_and_session_cookie );
 	}

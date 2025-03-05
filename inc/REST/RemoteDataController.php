@@ -121,13 +121,13 @@ class RemoteDataController {
 			return $token;
 		}
 
-		$buyer_endpoint = SalesforceD2CAuth::generate_buyer_endpoint( $data_source_config['service_config']['endpoint'], $token, $data_source_config['service_config']['store_id'] );
+		$guest_checkout_cookies = SalesforceD2CAuth::generate_guest_checkout_cookies( $data_source_config['service_config']['endpoint'], $token, $data_source_config['service_config']['store_id'] );
 
-		if ( is_wp_error( $buyer_endpoint ) ) {
-			return $buyer_endpoint;
+		if ( is_wp_error( $guest_checkout_cookies ) ) {
+			return $guest_checkout_cookies;
 		}
 
-		return rest_ensure_response( $buyer_endpoint );
+		return rest_ensure_response( $guest_checkout_cookies );
 	}
 
 	public static function permission_callback(): bool {
