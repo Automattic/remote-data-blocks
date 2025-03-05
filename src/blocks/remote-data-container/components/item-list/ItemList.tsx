@@ -3,9 +3,12 @@ import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { ItemListField } from '@/blocks/remote-data-container/components/item-list/ItemListField';
+import {
+	ID_FIELD_TYPES,
+	IMAGE_ALT_FIELD_TYPES,
+} from '@/blocks/remote-data-container/config/constants';
 import { usePatterns } from '@/blocks/remote-data-container/hooks/usePatterns';
 import { getRemoteDataResultValue } from '@/utils/remote-data';
-import { ID_FIELD_TYPES, IMAGE_ALT_FIELD_TYPES } from '../../config/constants';
 
 interface ItemListProps {
 	availableBindings: Record< string, RemoteDataBinding >;
