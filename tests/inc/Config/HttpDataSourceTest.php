@@ -5,6 +5,7 @@ namespace RemoteDataBlocks\Tests\Config;
 use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\Tests\Mocks\MockDataSource;
 use WP_Error;
+
 class HttpDataSourceTest extends TestCase {
 	private MockDataSource|WP_Error $http_data_source;
 

@@ -29,11 +29,15 @@ abstract class ArraySerializable implements ArraySerializableInterface {
 	 * @inheritDoc
 	 */
 	final public static function from_array( array $config, ?ValidatorInterface $validator = null ): static|WP_Error {
+		// The purpose of this is to ensure that when from_array runs, it is statically bound to the correct child class.
+		// This is important for ensuring that the correct child class is used for migrations, preprocess_config, etc.
 		$subclass = static::get_implementor( $config );
 		if ( null !== $subclass ) {
 			return $subclass::from_array( $config, $validator );
 		}
 
+		// If this is above the get_implementor call, it might still be statically bound to ArraySerializable or HttpDataSource
+		// instead of the actual subclass like ShopifyDataSource.
 		$config = static::migrate_config( $config );
 		if ( is_wp_error( $config ) ) {
 			return $config;
