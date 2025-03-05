@@ -31,15 +31,24 @@ export function useRemoteDataContext( context: Record< string, unknown > ): Remo
 				remoteData: {
 					blockName: remoteDataBlockName,
 					metadata: {},
-					queryInput: {},
+					queryInputs: [],
+					queryKey: 'Example Query Key',
 					resultId: '',
 					results: [
-						Object.fromEntries(
-							Object.entries( blockConfig.availableBindings ).map( ( [ key, value ] ) => [
-								key,
-								value.name,
-							] )
-						),
+						{
+							// Example result for patterns.
+							result: Object.fromEntries(
+								Object.entries( blockConfig.availableBindings ).map( ( [ key, value ] ) => [
+									key,
+									{
+										name: value.name,
+										type: value.type,
+										value: value.name,
+									},
+								] )
+							),
+							uuid: 'Example Entity ID',
+						},
 					],
 				},
 			};

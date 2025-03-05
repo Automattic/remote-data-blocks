@@ -50,7 +50,7 @@ export function FieldShortcodeSelectFieldPopover( props: FieldShortcodeSelectFie
 						onSelectField={ ( data, fieldValue ) =>
 							props.onSelectField( { ...data, action: 'update_field_shortcode' }, fieldValue )
 						}
-						queryInput={ remoteData?.queryInput ?? {} }
+						queryInputs={ remoteData?.queryInputs ?? [ {} ] }
 						selectedField={ selectedField }
 					/>
 				</CardBody>

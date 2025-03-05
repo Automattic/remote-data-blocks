@@ -11,12 +11,13 @@ import {
 	getBlockConfig,
 	getBlockDataSourceType,
 } from '@/utils/localized-block-data';
+import { createQueryInputsFromRemoteDataResults } from '@/utils/remote-data';
 
 interface DataViewsModalProps {
 	className?: string;
 	blockName: string;
 	headerImage?: string;
-	onSelect?: ( data: RemoteDataQueryInput ) => void;
+	onSelect?: ( data: RemoteDataQueryInput[] ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
 	queryKey: string;
 	renderTrigger?: ( props: { onClick: () => void } ) => React.ReactNode;
@@ -29,18 +30,12 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 	const blockConfig = getBlockConfig( blockName );
 	const availableBindings = getBlockAvailableBindings( blockName );
 
-	// Supports bulk selection
-	const supportsBulk = blockConfig?.selectors?.some( selector => selector.supports_bulk ) ?? false;
-	// Selected items
-	const [ selectedItems, setSelectedItems ] = useState< string[] >( [] );
-	// Find the ID field from availableBindings
-	const idField =
-		Object.entries( availableBindings ).find(
-			( [ _, binding ] ) => binding.type === 'id'
-		)?.[ 0 ] ?? 'id';
+	// Multi-selected items
+	const [ selection, setSelection ] = useState< RemoteDataApiResult[] >( [] );
+
 	// Total selected items
 	const itemCountLabel =
-		selectedItems.length > 1 ? __( 'items selected in total' ) : __( 'item selected in total' );
+		selection.length > 1 ? __( 'items selected in total' ) : __( 'item selected in total' );
 
 	const { close, isOpen, open } = useModalState();
 	const {
@@ -55,8 +50,26 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 		totalPages,
 	} = useRemoteData( { blockName, fetchOnMount: true, queryKey } );
 
-	function onSelectItem( input: RemoteDataQueryInput ): void {
-		onSelect?.( input );
+	// For selection, DataViews transacts only in IDs, so we provide the UUID from
+	// the API response as a synthetic ID and map them to the full result.
+	function setSelectionIds( uuids: string[] ): void {
+		const newSelection: RemoteDataApiResult[] = uuids
+			.map(
+				uuid =>
+					data?.results?.find( result => uuid === result.uuid ) ??
+					selection.find( result => uuid === result.uuid ) ??
+					null
+			)
+			.filter( ( result ): result is RemoteDataApiResult => result !== null );
+		setSelection( newSelection );
+	}
+
+	function save(): void {
+		if ( ! selection.length ) {
+			return;
+		}
+
+		onSelect?.( createQueryInputsFromRemoteDataResults( selection ) );
 		sendTracksEvent( 'add_block', {
 			action: 'select_item',
 			selected_option: 'search_from_list',
@@ -78,7 +91,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 			{ triggerElement }
 			{ isOpen && (
 				<Modal
-					className={ supportsBulk ? `${ className } rdb-dataviews-bulk-actions-modal` : className }
+					className={ `${ className } rdb-dataviews-bulk-actions-modal` }
 					isFullScreen
 					onRequestClose={ close }
 					title={ blockConfig?.settings?.title ?? title }
@@ -86,48 +99,41 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 					<ItemList
 						availableBindings={ availableBindings }
 						blockName={ blockName }
-						idField={ idField }
 						loading={ loading }
-						onSelect={ onSelect ? onSelectItem : close }
 						onSelectField={ onSelectField }
 						page={ page }
-						remoteData={ data }
+						results={ data?.results }
 						searchInput={ searchInput }
-						selectedItems={ selectedItems }
+						selectionIds={ selection.map( item => item.uuid ) }
 						setPage={ setPage }
 						setSearchInput={ setSearchInput }
-						setSelectedItems={ setSelectedItems }
-						supportsBulk={ supportsBulk }
+						setSelectionIds={ setSelectionIds }
 						supportsSearch={ supportsSearch }
 						totalItems={ totalItems }
 						totalPages={ totalPages }
 					/>
-					{ supportsBulk && ! loading && (
+					{ onSelect && ! loading && (
 						<>
-							{ selectedItems.length > 1 && (
+							{ selection.length > 1 && (
 								<BaseControl
 									className="rdb-dataviews-bulk-actions-footer__item-count-total"
 									__nextHasNoMarginBottom
 								>
 									<BaseControl.VisualLabel style={ { marginBottom: '0' } }>
-										{ selectedItems.length } { itemCountLabel }
+										{ selection.length } { itemCountLabel }
 									</BaseControl.VisualLabel>
 								</BaseControl>
 							) }
 
 							<HStack className="rdb-dataviews-bulk-actions-footer__selection-total">
 								<Button
-									disabled={ selectedItems.length === 0 }
-									onClick={ () => setSelectedItems( [] ) }
+									disabled={ selection.length === 0 }
+									onClick={ () => setSelectionIds( [] ) }
 									variant="secondary"
 								>
 									{ __( 'Cancel' ) }
 								</Button>
-								<Button
-									disabled={ selectedItems.length === 0 }
-									onClick={ () => onSelectItem( { [ idField ]: selectedItems.join( ',' ) } ) }
-									variant="primary"
-								>
+								<Button disabled={ selection.length === 0 } onClick={ save } variant="primary">
 									{ __( 'Save' ) }
 								</Button>
 							</HStack>

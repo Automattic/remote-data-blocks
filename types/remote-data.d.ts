@@ -11,10 +11,9 @@ interface RemoteDataPagination {
 interface RemoteDataResultFields {
 	name: string;
 	type: string;
-	value: string;
+	value: unknown;
 }
 
-type RemoteDataResult = Record< string, unknown >;
 type RemoteDataQueryInput = Record< string, unknown >;
 
 interface RemoteData {
@@ -22,20 +21,24 @@ interface RemoteData {
 	enabledOverrides?: string[];
 	metadata: Record< string, RemoteDataResultFields >;
 	pagination?: RemoteDataPagination;
-	queryInput: RemoteDataQueryInput;
+	/** @deprecated */
+	queryInput?: RemoteDataQueryInput;
+	queryInputs: RemoteDataQueryInput[];
+	queryKey?: string;
 	resultId: string;
-	results: RemoteDataResult[];
+	results: RemoteDataApiResult[];
 }
 
 interface RemoteDataBlockAttributes {
 	remoteData?: RemoteData;
 }
 
-interface FieldSelection extends RemoteDataBlockAttributes {
-	selectedField: string;
+interface FieldSelection {
 	action: 'add_field_shortcode' | 'update_field_shortcode' | 'reset_field_shortcode';
-	type: 'field' | 'meta';
+	remoteData?: Pick< RemoteData, 'blockName' | 'metadata' | 'queryInputs' | 'queryKey' >;
+	selectedField: string;
 	selectionPath: 'select_new_tab' | 'select_existing_tab' | 'select_meta_tab' | 'popover';
+	type: 'field' | 'meta';
 }
 
 interface MetaFieldSelection extends FieldSelection {
@@ -71,12 +74,13 @@ interface RemoteDataInnerBlockAttributes {
 
 interface RemoteDataApiRequest {
 	block_name: string;
+	query_inputs: RemoteDataQueryInput[];
 	query_key: string;
-	query_input: RemoteDataQueryInput;
 }
 
 interface RemoteDataApiResult {
 	result: Record< string, RemoteDataResultFields >;
+	uuid: string;
 }
 
 interface RemoteDataApiResponseBody {
@@ -87,7 +91,8 @@ interface RemoteDataApiResponseBody {
 		cursor_previous?: string;
 		total_items: number;
 	};
-	query_input: RemoteDataQueryInput;
+	query_inputs: RemoteDataQueryInput[];
+	query_key: string;
 	result_id: string;
 	results: RemoteDataApiResult[];
 }

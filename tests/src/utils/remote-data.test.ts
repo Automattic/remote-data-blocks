@@ -5,6 +5,7 @@ import {
 	createQueryInputsFromRemoteDataResults,
 	getRemoteDataResultValue,
 	getFirstRemoteDataResultValueByType,
+	migrateRemoteData,
 } from '@/utils/remote-data';
 
 describe( 'remote-data utils', () => {
@@ -19,13 +20,13 @@ describe( 'remote-data utils', () => {
 					result: {
 						title: { name: 'title', type: 'string', value: 'Title 1' },
 					},
-					uuid: 'test-uuid-0',
+					uuid: '0',
 				},
 				{
 					result: {
 						title: { name: 'title', type: 'string', value: 'Title 2' },
 					},
-					uuid: 'test-uuid-1',
+					uuid: '1',
 				},
 			] );
 		} );
@@ -38,13 +39,13 @@ describe( 'remote-data utils', () => {
 					result: {
 						title: { name: 'title', type: 'string', value: 'Title 1' },
 					},
-					uuid: 'test-uuid-0',
+					uuid: '0',
 				},
 				{
 					result: {
 						title: { name: 'title', type: 'string', value: 'Title 2' },
 					},
-					uuid: 'test-uuid-1',
+					uuid: '1',
 				},
 			];
 
@@ -60,7 +61,7 @@ describe( 'remote-data utils', () => {
 				result: {
 					title: { name: 'title', type: 'string', value: 'Title 1' },
 				},
-				uuid: 'test-uuid-0',
+				uuid: '0',
 			};
 
 			expect( getRemoteDataResultValue( result, 'title' ) ).toBe( 'Title 1' );
@@ -76,7 +77,7 @@ describe( 'remote-data utils', () => {
 					number: { name: 'number', type: 'number', value: 42 },
 					boolean: { name: 'boolean', type: 'boolean', value: true },
 				},
-				uuid: 'test-uuid-0',
+				uuid: '0',
 			};
 
 			expect( getRemoteDataResultValue( result, 'number' ) ).toBe( '42' );
@@ -92,7 +93,7 @@ describe( 'remote-data utils', () => {
 					summary1: { name: 'summary', type: 'string', value: 'Summary 1' },
 					summary2: { name: 'ID', type: 'id', value: 123 },
 				},
-				uuid: 'test-uuid-0',
+				uuid: '0',
 			};
 
 			expect( getFirstRemoteDataResultValueByType( result, 'string' ) ).toBe( 'Title 1' );
@@ -101,6 +102,55 @@ describe( 'remote-data utils', () => {
 			expect( getFirstRemoteDataResultValueByType( result, 'number', 'default value' ) ).toBe(
 				'default value'
 			);
+		} );
+	} );
+
+	describe( 'migrateRemoteData', () => {
+		it( 'should migrate remote data', () => {
+			// @ts-expect-error Coercing invalid data for function that migrates invalid data
+			const remoteData = {
+				queryInput: { title: 'Title 1' },
+				results: [
+					{
+						result: {
+							id: 1,
+							title: 'Title 1',
+						},
+					},
+					{
+						result: {
+							id: 2,
+							title: 'Title 2',
+						},
+					},
+				],
+			} as RemoteData;
+
+			const migrated = migrateRemoteData( remoteData );
+
+			expect( migrated ).toEqual( {
+				queryInputs: [ { title: 'Title 1' } ],
+				results: [
+					{
+						result: {
+							id: { name: 'id', type: 'string', value: 1 },
+							title: { name: 'title', type: 'string', value: 'Title 1' },
+						},
+						uuid: '0',
+					},
+					{
+						result: {
+							id: { name: 'id', type: 'string', value: 2 },
+							title: { name: 'title', type: 'string', value: 'Title 2' },
+						},
+						uuid: '1',
+					},
+				],
+			} );
+		} );
+
+		it( 'should handle undefined remote data', () => {
+			expect( migrateRemoteData( undefined ) ).toBeUndefined();
 		} );
 	} );
 } );

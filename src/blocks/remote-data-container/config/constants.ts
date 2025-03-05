@@ -24,6 +24,7 @@ export const SEARCH_INPUT_VARIABLE_TYPE = 'ui:search_input';
 export const BUTTON_TEXT_FIELD_TYPES = [ 'button_text' ];
 export const BUTTON_URL_FIELD_TYPES = [ 'button_url' ];
 export const HTML_FIELD_TYPES = [ 'html' ];
+export const ID_FIELD_TYPES = [ 'id', 'id:list' ];
 export const IMAGE_ALT_FIELD_TYPES = [ 'image_alt' ];
 export const IMAGE_URL_FIELD_TYPES = [ 'image_url' ];
 export const TEXT_FIELD_TYPES = [

@@ -20,6 +20,13 @@ function createRemoteDataResult(
 	};
 }
 
+function isResultMigrated( result: object ): result is RemoteDataApiResult {
+	return (
+		Object.prototype.hasOwnProperty.call( result, 'result' ) &&
+		Object.prototype.hasOwnProperty.call( result, 'uuid' )
+	);
+}
+
 export function createRemoteDataResults(
 	objs: Record< string, unknown >[]
 ): RemoteDataApiResult[] {
@@ -77,20 +84,21 @@ export function migrateRemoteData( remoteData?: RemoteData ): RemoteData | undef
 		return;
 	}
 
-	const isResultMigrated = ( result: object ): result is RemoteDataApiResult =>
-		Object.prototype.hasOwnProperty.call( result, 'result' ) &&
-		Object.prototype.hasOwnProperty.call( result, 'uuid' );
+	const { queryInput, results, ...rest } = remoteData;
 
-	const results = remoteData.results.map( ( result, num ) => {
+	const migratedResults = results?.map( ( result, num ) => {
+		const resultValue = result.result ?? {};
+
 		if ( isResultMigrated( result ) ) {
 			return result;
 		}
 
-		return createRemoteDataResult( result, `${ num }` );
+		return createRemoteDataResult( resultValue, `${ num }` );
 	} );
 
 	return {
-		...remoteData,
-		results,
+		...rest,
+		queryInputs: remoteData.queryInputs ?? ( queryInput ? [ queryInput ] : [ {} ] ),
+		results: migratedResults,
 	};
 }

@@ -13,7 +13,9 @@ import { LoopTemplateInnerBlocks } from '@/blocks/remote-data-container/componen
 import { LoopIndexContext } from '@/blocks/remote-data-container/context/LoopIndexContext';
 
 interface LoopTemplateProps {
-	getInnerBlocks: ( result: RemoteDataResult ) => BlockInstance< RemoteDataInnerBlockAttributes >[];
+	getInnerBlocks: (
+		result: RemoteDataApiResult
+	) => BlockInstance< RemoteDataInnerBlockAttributes >[];
 	remoteData: RemoteData;
 }
 

@@ -32,24 +32,17 @@ async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< Re
 			cursorPrevious: body.pagination.cursor_previous,
 			totalItems: body.pagination.total_items,
 		},
-		queryInput: body.query_input,
+		queryKey: body.query_key,
+		queryInputs: body.query_inputs,
 		resultId: body.result_id,
-		results: body.results.map( result =>
-			Object.entries( result.result ).reduce(
-				( acc, [ key, value ] ) => ( {
-					...acc,
-					[ key ]: value.value,
-				} ),
-				{}
-			)
-		),
+		results: body.results,
 	};
 }
 
 interface UseRemoteData {
 	data?: RemoteData;
 	error?: Error;
-	fetch: ( queryInput: RemoteDataQueryInput ) => Promise< void >;
+	fetch: ( inputs: RemoteDataQueryInput[] ) => Promise< void >;
 	hasNextPage: boolean;
 	hasPreviousPage: boolean;
 	loading: boolean;
@@ -168,7 +161,7 @@ export function useRemoteData( {
 			return;
 		}
 
-		void fetch( resolvedData?.queryInput ?? {} );
+		void fetch( resolvedData?.queryInputs ?? [ {} ] );
 	}, [ shouldClearResolvedData, shouldFetchForManagedVariables, page, perPage, searchInput ] );
 
 	// Separately, some callers request an "optimistic" initial fetch. An example
@@ -186,21 +179,32 @@ export function useRemoteData( {
 			return;
 		}
 
-		void fetch( {} );
+		void fetch( [ {} ] );
 	}, [] );
 
-	async function fetch( queryInput: RemoteDataQueryInput ): Promise< void > {
+	async function fetch( inputs: RemoteDataQueryInput[] ): Promise< void > {
+		// If there are no inputs, there is nothing to fetch. Empty query inputs
+		// must be represented by an empty object, e.g. `[ {} ]`.
+		if ( 0 === inputs.length ) {
+			resolvedUpdater( undefined );
+			setError( new RemoteDataFetchError( 'Query input is empty', inputs ) );
+			return;
+		}
+
+		// Only merge the managed query input if there is a single query input
+		// (representing a collection query).
+		if ( 1 === inputs.length ) {
+			inputs[ 0 ] = { ...inputs[ 0 ], ...managedQueryInput };
+		}
+
 		const requestData: RemoteDataApiRequest = {
 			block_name: blockName,
 			query_key: queryKey,
-			query_input: {
-				...queryInput,
-				...managedQueryInput,
-			},
+			query_inputs: inputs,
 		};
 
 		try {
-			validateQueryInput( requestData.query_input, inputVariables );
+			inputs.forEach( input => validateQueryInput( input, inputVariables ) );
 		} catch ( err: unknown ) {
 			resolvedUpdater( undefined );
 			setError( new RemoteDataFetchError( 'Query input is invalid', err ) );
