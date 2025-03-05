@@ -154,6 +154,7 @@ class SalesforceD2CIntegration {
 		register_remote_data_block(
 			[
 				'title' => $data_source->get_display_name(),
+				'icon' => 'money-alt',
 				'render_query' => [
 					'query' => $queries['display'],
 				],
