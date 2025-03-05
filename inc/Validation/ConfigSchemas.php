@@ -90,6 +90,7 @@ final class ConfigSchemas {
 							Types::serialized_config_for( HttpQueryInterface::class ),
 						),
 						'type' => Types::enum(
+							ConfigRegistry::COLLECTION_QUERY_KEY,
 							ConfigRegistry::LIST_QUERY_KEY,
 							ConfigRegistry::SEARCH_QUERY_KEY
 						),

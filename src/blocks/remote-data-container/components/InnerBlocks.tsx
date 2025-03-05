@@ -11,12 +11,17 @@ interface InnerBlocksProps {
 
 export function InnerBlocks( props: InnerBlocksProps ) {
 	const {
-		blockConfig: { loop },
+		blockConfig: { loop, selectors },
 		getInnerBlocks,
 		remoteData,
 	} = props;
 
-	if ( loop || remoteData.results.length > 1 ) {
+	// Use loop template for both loop blocks and collections
+	if (
+		loop ||
+		remoteData.results.length > 1 ||
+		selectors.some( selector => selector.type === 'collection' )
+	) {
 		return <LoopTemplate getInnerBlocks={ getInnerBlocks } remoteData={ remoteData } />;
 	}
 

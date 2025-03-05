@@ -53,6 +53,7 @@ function register_aic_block(): void {
 				'name' => 'Art ID',
 				'type' => 'id',
 				'supports_bulk' => true,
+				'required' => false,
 			],
 		],
 		'output_schema' => [
@@ -157,6 +158,44 @@ function register_aic_block(): void {
 		],
 	]);
 
+	$collection_query = HttpQuery::from_array([
+		'data_source' => $aic_data_source,
+		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
+			$endpoint = $aic_data_source->get_endpoint();
+			return add_query_arg( [
+				'limit' => 10,  
+				'fields' => 'id,title,image_id,artist_title',
+			], $endpoint );
+		},
+		'output_schema' => [
+			'is_collection' => true,
+			'path' => '$.data[*]',
+			'type' => [
+				'id' => [
+					'name' => 'Art ID',
+					'type' => 'id',
+				],
+				'artist_title' => [
+					'name' => 'Artist Title',
+					'type' => 'string',
+					'path' => '$.artist_title',
+				],
+				'title' => [
+					'name' => 'Title',
+					'type' => 'string',
+					'path' => '$.title',
+				],
+				'image_url' => [
+					'name' => 'Image URL',
+					'generate' => function ( $data ): string {
+						return 'https://www.artic.edu/iiif/2/' . $data['image_id'] . '/full/843,/0/default.jpg';
+					},
+					'type' => 'image_url',
+				],
+			],
+		],
+	]);
+
 	register_remote_data_block([
 		'title' => 'Art Institute of Chicago',
 		'render_query' => [
@@ -166,6 +205,10 @@ function register_aic_block(): void {
 			[
 				'query' => $search_art_query,
 				'type' => 'search',
+			],
+			[
+				'query' => $collection_query, 
+				'type' => 'collection',
 			],
 		],
 	]);

@@ -25,6 +25,7 @@ class ConfigRegistry {
 	public const DISPLAY_QUERY_KEY = 'display';
 	public const LIST_QUERY_KEY = 'list';
 	public const SEARCH_QUERY_KEY = 'search';
+	public const COLLECTION_QUERY_KEY = 'collection';
 
 	public static function init( ?LoggerInterface $logger = null ): void {
 		self::$logger = $logger ?? LoggerManager::instance();
@@ -89,7 +90,7 @@ class ConfigRegistry {
 					'inputs' => array_map( function ( $slug, $input_var ) {
 						return [
 							'name' => $input_var['name'] ?? $slug,
-							'required' => $input_var['required'] ?? true,
+							'required' => $input_var['required'] ?? false,
 							'slug' => $slug,
 							'type' => $input_var['type'] ?? 'string',
 							'supports_bulk' => $input_var['supports_bulk'] ?? false,
