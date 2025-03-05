@@ -50,11 +50,80 @@ class SalesforceD2CAuth {
 		// Generate the buyer url and the cookie that would be used for guest buyer shopping.
 		// ToDo: site_url_path_prefix is not always present, so we need to handle that.
 		$buyer_endpoint = sprintf( '%s/%s/webruntime/api/services/data/v63.0/commerce/webstores/%s', $domain_url, $site_details['site_url_path_prefix'], $store_id );
-		$buyer_cookie = sprintf( 'guest_uuid_essential_%s', substr( $site_details['site_id'], 0, 15 ) );
+		$buyer_uuid = wp_generate_uuid4();
+		$buyer_cookie = sprintf( 'guest_uuid_essential_%s=%s;', substr( $site_details['site_id'], 0, 15 ), $buyer_uuid );
 
-		return [
+		// Get the cart id and session cookie.
+		$cart_id_and_session_cookie = self::get_cart_id_and_session_cookie( $buyer_endpoint, $buyer_cookie );
+
+		if ( is_wp_error( $cart_id_and_session_cookie ) ) {
+			return $cart_id_and_session_cookie;
+		}
+
+		return array_merge( [
 			'buyer_endpoint' => $buyer_endpoint,
 			'buyer_cookie' => $buyer_cookie,
+		], $cart_id_and_session_cookie );
+	}
+
+	public static function get_cart_id_and_session_cookie(
+		string $endpoint,
+		string $buyer_cookie,
+	): array|WP_Error {
+		// The assumption is that the cart hasn't been created yet, so we need to create it.
+		// ToDo: The language has been assumed. Also, it's assumed that the cart doesn't exist yet but wouldn't hurt to be sure.
+		$cart_id_url = sprintf( '%s/carts/current?language=en-US&asGuest=true&htmlEncode=false', $endpoint );
+
+		$response = wp_remote_post( $cart_id_url, [
+			'method' => 'PUT',
+			'headers' => [
+				'Cookie' => $buyer_cookie,
+			],
+		] );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+
+		if ( 200 !== $response_code ) {
+			return new WP_Error(
+				'salesforce_d2c_auth_error_create_cart',
+				__( 'Failed to create cart', 'remote-data-blocks' )
+			);
+		}
+
+		// Retrieve the set-cookie header
+		$set_cookie_header = wp_remote_retrieve_header( $response, 'set-cookie' );
+
+		// If this isn't present, or doesn't contain the GuestCartSessionId_ cookie, return an error.
+		if ( ! $set_cookie_header || ! str_contains( $set_cookie_header, 'GuestCartSessionId_' ) ) {
+			return new WP_Error(
+				'salesforce_d2c_auth_error_create_cart',
+				__( 'Failed to create cart', 'remote-data-blocks' )
+			);
+		}
+
+		// Cut the string so it starts at the GuestCartSessionId_ cookie.
+		$set_cookie_header = substr( $set_cookie_header, strpos( $set_cookie_header, 'GuestCartSessionId_' ) );
+
+		// Split it using the ; delimiter and get the first part.
+		$set_cookie_header_parts = explode( ';', $set_cookie_header );
+		$session_cookie = $set_cookie_header_parts[0];
+
+		// Get the response body
+		$response_body = wp_remote_retrieve_body( $response );
+
+		// Decode the response body
+		$response_data = json_decode( $response_body, true );
+
+		// Get the cart id from the response
+		$cart_id = $response_data['cartId'];
+
+		return [
+			'cart_id' => $cart_id,
+			'session_cookie' => $session_cookie,
 		];
 	}
 
