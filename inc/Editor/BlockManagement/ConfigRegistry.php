@@ -76,6 +76,7 @@ class ConfigRegistry {
 		// @see BlockRegistration::register_block_type::register_blocks.
 		$config = [
 			'description' => '',
+			'icon' => $user_config['icon'] ?? 'cloud',
 			'name' => $block_name,
 			'loop' => $user_config[ self::RENDER_QUERY_KEY ]['loop'] ?? false,
 			'overrides' => $user_config['overrides'] ?? [],

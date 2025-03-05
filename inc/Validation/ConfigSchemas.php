@@ -65,6 +65,7 @@ final class ConfigSchemas {
 
 	private static function generate_remote_data_block_config_schema(): array {
 		return Types::object( [
+			'icon' => Types::nullable( Types::string() ),
 			'patterns' => Types::nullable(
 				Types::list_of(
 					Types::object( [

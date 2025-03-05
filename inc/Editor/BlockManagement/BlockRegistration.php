@@ -84,6 +84,7 @@ class BlockRegistration {
 			'selectors' => $config['selectors'],
 			'settings' => [
 				'category' => self::$block_category['slug'],
+				'icon' => $config['icon'] ?? 'cloud',
 				'title' => $config['title'],
 			],
 		];
