@@ -176,8 +176,6 @@ final class ConfigSchemas {
 						// input schema.
 						'default_value' => Types::nullable( Types::any() ),
 						'name' => Types::nullable( Types::string() ),
-						// Optional boolean that indicates if the query supports bulk selection.
-						'supports_bulk' => Types::nullable( Types::boolean() ),
 						// NOTE: These values are string references to the "core primitive
 						// types" from our formal schema. Referencing these types allows us
 						// to use the same validation and sanitization logic.
@@ -193,6 +191,10 @@ final class ConfigSchemas {
 							'string',
 							// Special non-primitive types
 							//
+							// An array of IDs, to be handled by the query (e.g., a query can
+							// implode an array of IDs into a comma-separated list and map it
+							// to a query parameter).
+							'id:list',
 							// A string that represents search query input. An input variable
 							// with this type must be present for the query to be considered a
 							// search query.

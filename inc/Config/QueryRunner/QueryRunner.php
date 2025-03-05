@@ -262,6 +262,31 @@ class QueryRunner implements QueryRunnerInterface {
 	 * @inheritDoc
 	 */
 	public function execute_batch( HttpQueryInterface $query, array $array_of_input_variables ): array|WP_Error {
+		// If the query supports a `id:list` input variable and the query inputs
+		// consist entirely of variables that match that variable type, we can
+		// consolidate the queries into a single request.
+		$input_schema = $query->get_input_schema();
+		$id_list_input = array_filter( $input_schema, function ( string $slug ) use ( $input_schema ): bool {
+			return 'id:list' === $input_schema[ $slug ]['type'];
+		}, ARRAY_FILTER_USE_KEY );
+
+		if ( 1 === count( $id_list_input ) ) {
+			$id_list_slug = array_key_first( $id_list_input );
+			$ids = array_reduce(
+				array_column( $array_of_input_variables, $id_list_slug ),
+				function ( array $carry, mixed $item ): array {
+					if ( is_array( $item ) ) {
+						return array_merge( $carry, $item );
+					}
+
+					return array_merge( $carry, [ $item ] );
+				},
+				[]
+			);
+
+			return $this->execute( $query, [ $id_list_slug => $ids ] );
+		}
+
 		if ( 1 === count( $array_of_input_variables ) ) {
 			return $this->execute( $query, $array_of_input_variables[0] );
 		}

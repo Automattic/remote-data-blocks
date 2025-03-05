@@ -32,14 +32,16 @@ class FieldShortcode {
 			$query_data = json_decode( html_entity_decode( $match['query'] ), true /* associative */ );
 			$fallback_value = $match['fallback_value'] ?? '';
 
-			if ( ! isset( $query_data['remoteData']['blockName'], $query_data['remoteData']['queryInput'], $query_data['selectedField'] ) ) {
+			if ( ! isset( $query_data['remoteData']['blockName'], $query_data['selectedField'] ) ) {
 				$status = 'parse-error';
 				$value = $fallback_value;
 			} else {
+				$remote_data = $query_data['remoteData'];
+				$query_inputs = $remote_data['queryInputs'] ?? ( $remote_data['queryInput'] ? [ $remote_data['queryInput'] ] : null );
 				$source_args = [
-					'block' => $query_data['remoteData']['blockName'],
+					'block' => $remote_data['blockName'],
 					'field' => $query_data['selectedField'],
-					'queryInput' => $query_data['remoteData']['queryInput'],
+					'queryInputs' => $query_inputs,
 					'type' => $query_data['type'] ?? 'field',
 				];
 
