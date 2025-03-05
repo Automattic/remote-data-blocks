@@ -52,8 +52,19 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 
 	// For selection, DataViews transacts only in IDs, so we provide the UUID from
 	// the API response as a synthetic ID and map them to the full result.
+	// DataViews is only "aware" of the data it is rendering, so we keep track of
+	// selections from previous result pages in the selection state.
+	const selectionIds = selection.map( item => item.uuid );
+	const allIdsFromCurrentPage = data?.results?.map( result => result.uuid ) ?? [];
+
 	function setSelectionIds( uuids: string[] ): void {
-		const newSelection: RemoteDataApiResult[] = uuids
+		const selectionIdsFromOtherPages = selectionIds.filter(
+			uuid => ! allIdsFromCurrentPage.includes( uuid )
+		);
+		const newSelectionIds = Array.from(
+			new Set< string >( [ ...selectionIdsFromOtherPages, ...uuids ] )
+		);
+		const newSelection = newSelectionIds
 			.map(
 				uuid =>
 					data?.results?.find( result => uuid === result.uuid ) ??
@@ -104,7 +115,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 						page={ page }
 						results={ data?.results }
 						searchInput={ searchInput }
-						selectionIds={ selection.map( item => item.uuid ) }
+						selectionIds={ selectionIds }
 						setPage={ setPage }
 						setSearchInput={ setSearchInput }
 						setSelectionIds={ setSelectionIds }

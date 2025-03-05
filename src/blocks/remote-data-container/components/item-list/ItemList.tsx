@@ -95,7 +95,7 @@ export function ItemList( props: ItemListProps ) {
 	// hide media and title fields from table view if defined to avoid duplication
 	const tableFields = fieldNames.filter( field => field !== mediaField && field !== titleField );
 
-	const [ view, setView ] = useState< View & { selectionIds: string[] } >( {
+	const [ view, setView ] = useState< View >( {
 		type: 'table' as const,
 		perPage: perPage ?? results.length,
 		page,
@@ -105,13 +105,12 @@ export function ItemList( props: ItemListProps ) {
 		layout: {},
 		titleField,
 		mediaField,
-		selectionIds,
 	} );
 
 	function onChangeView( newView: View ) {
 		setPage( newView.page ?? 1 );
 		setSearchInput( newView.search ?? '' );
-		setView( { ...newView, selectionIds } );
+		setView( newView );
 	}
 
 	const defaultLayouts = mediaField
@@ -120,11 +119,6 @@ export function ItemList( props: ItemListProps ) {
 				grid: {},
 		  }
 		: { table: {} };
-
-	// Temporary helper to handle pagination and bulk selection
-	const onChangeSelection = ( newIds: string[] ) => {
-		setSelectionIds( Array.from( new Set< string >( [ ...newIds, ...selectionIds ] ) ) );
-	};
 
 	const chooseItemAction = {
 		id: 'choose',
@@ -148,7 +142,7 @@ export function ItemList( props: ItemListProps ) {
 				getItemId={ ( item: RemoteDataApiResult ) => item.uuid }
 				isLoading={ loading || ! pattern || ! results }
 				isItemClickable={ () => true }
-				onChangeSelection={ onChangeSelection }
+				onChangeSelection={ setSelectionIds }
 				onChangeView={ onChangeView }
 				paginationInfo={ {
 					totalItems: totalItems ?? results.length,
