@@ -12,7 +12,7 @@ use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 use function wp_generate_uuid4;
-
+use WP_Http_Cookie;
 class RemoteDataController {
 	private static string $slug = 'remote-data';
 
@@ -72,6 +72,10 @@ class RemoteDataController {
 			'callback' => [ __CLASS__, 'execute_salesforce_d2c_add_item_to_cart_query' ],
 			'permission_callback' => [ __CLASS__, 'permission_callback' ],
 			'args' => [
+				'uuid' => [
+					'type' => 'string',
+					'required' => true,
+				],
 				'cartId' => [
 					'type' => 'string',
 					'required' => true,
@@ -86,6 +90,23 @@ class RemoteDataController {
 				],
 			],
 		] );
+
+		register_rest_route( REMOTE_DATA_BLOCKS__REST_NAMESPACE, '/' . self::$slug . '/salesforce-d2c/get-cart-items', [
+			'methods' => 'GET',
+			'callback' => [ __CLASS__, 'execute_salesforce_d2c_get_cart_items_query' ],
+			'permission_callback' => [ __CLASS__, 'permission_callback' ],
+			'args' => [
+				'uuid' => [
+					'type' => 'string',
+					'required' => true,
+				],
+				'cartId' => [
+					'type' => 'string',
+					'required' => true,
+				],
+			],
+		] );
+
 	}
 
 	public static function execute_query( WP_REST_Request $request ): array|WP_Error {
@@ -147,21 +168,122 @@ class RemoteDataController {
 		return SalesforceD2CAuth::generate_guest_checkout_cookies( $endpoint, $token, $data_source_config['service_config']['store_id'] );
 	}
 
-	public static function execute_salesforce_d2c_add_item_to_cart_query( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		// Check if the request has the necessary cookies.
-		if ( ! isset( $_COOKIE['guest_uuid_essential_'] ) ) {
-			return new WP_Error(
-				'missing_cookies',
-				'Missing cookies',
-				[ 'status' => 400 ]
-			);
+	public static function execute_salesforce_d2c_add_item_to_cart_query( WP_REST_Request $request ): array|WP_Error {
+		$cookies = [];
+
+		// Iterate over $_COOKIE and ensure there is a cookie that starts with 'guest_uuid_essential_'
+		foreach ( $_COOKIE as $cookie_name => $cookie_value ) {
+			if ( str_starts_with( $cookie_name, 'guest_uuid_essential_' ) || str_starts_with( $cookie_name, 'GuestCartSessionId_' ) ) {
+				$cookies[] = new WP_Http_Cookie( array(
+					'name'  => $cookie_name,
+					'value' => $cookie_value,
+				));
+			}
+		}
+
+		if ( empty( $cookies ) ) {
+			return new WP_Error( 'missing_cookies', 'Missing cookies', [ 'status' => 400 ] );
 		}
 
 		$cartId = $request->get_param( 'cartId' );
 		$productId = $request->get_param( 'productId' );
 		$quantity = $request->get_param( 'quantity' );
 
-		return rest_ensure_response( "done" );
+		$uuid = $request->get_param( 'uuid' );
+
+		$data_source_config = DataSourceConfigManager::get( $uuid );
+
+		if ( is_wp_error( $data_source_config ) ) {
+			return $data_source_config;
+		}
+
+		if ( REMOTE_DATA_BLOCKS_SALESFORCE_D2C_SERVICE !== $data_source_config['service'] ) {
+			return new WP_Error(
+				'invalid_service',
+				'Invalid service',
+				[ 'status' => 400 ]
+			);
+		}
+
+		$endpoint = 'https://' . $data_source_config['service_config']['domain'] . '.my.salesforce.com';
+
+		$token = SalesforceD2CAuth::generate_token( $endpoint, $data_source_config['service_config']['client_id'], $data_source_config['service_config']['client_secret'] );
+
+		if ( is_wp_error( $token ) ) {
+			return $token;
+		}
+
+		$buyer_endpoint = SalesforceD2CAuth::generate_buyer_endpoint( $endpoint, $token, $data_source_config['service_config']['store_id'] );
+
+		if ( is_wp_error( $buyer_endpoint ) ) {
+			return $buyer_endpoint;
+		}
+
+		$response = SalesforceD2CAuth::addOrUpdateCartItem( $buyer_endpoint, $cookies, $cartId, $productId, $quantity );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		return $response;
+	}
+
+	public static function execute_salesforce_d2c_get_cart_items_query( WP_REST_Request $request ): array|WP_Error {
+		$cookies = [];
+
+		// Iterate over $_COOKIE and ensure there is a cookie that starts with 'guest_uuid_essential_'
+		foreach ( $_COOKIE as $cookie_name => $cookie_value ) {
+			if ( str_starts_with( $cookie_name, 'guest_uuid_essential_' ) || str_starts_with( $cookie_name, 'GuestCartSessionId_' ) ) {
+				$cookies[] = new WP_Http_Cookie( array(
+					'name'  => $cookie_name,
+					'value' => $cookie_value,
+				));
+			}
+		}
+
+		if ( empty( $cookies ) ) {
+			return new WP_Error( 'missing_cookies', 'Missing cookies', [ 'status' => 400 ] );
+		}
+
+		$cartId = $request->get_param( 'cartId' );
+
+		$uuid = $request->get_param( 'uuid' );
+
+		$data_source_config = DataSourceConfigManager::get( $uuid );
+
+		if ( is_wp_error( $data_source_config ) ) {
+			return $data_source_config;
+		}
+
+		if ( REMOTE_DATA_BLOCKS_SALESFORCE_D2C_SERVICE !== $data_source_config['service'] ) {
+			return new WP_Error(
+				'invalid_service',
+				'Invalid service',
+				[ 'status' => 400 ]
+			);
+		}
+
+		$endpoint = 'https://' . $data_source_config['service_config']['domain'] . '.my.salesforce.com';
+
+		$token = SalesforceD2CAuth::generate_token( $endpoint, $data_source_config['service_config']['client_id'], $data_source_config['service_config']['client_secret'] );
+
+		if ( is_wp_error( $token ) ) {
+			return $token;
+		}
+
+		$buyer_endpoint = SalesforceD2CAuth::generate_buyer_endpoint( $endpoint, $token, $data_source_config['service_config']['store_id'] );
+
+		if ( is_wp_error( $buyer_endpoint ) ) {
+			return $buyer_endpoint;
+		}
+
+		$response = SalesforceD2CAuth::getCartItems( $buyer_endpoint, $cookies, $cartId );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		return $response;
 	}
 
 	public static function permission_callback(): bool {
