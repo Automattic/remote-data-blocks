@@ -85,11 +85,15 @@ export function usePaginationVariables( {
 		Object.assign( paginationQueryInput, { [ perPageVariable.slug ]: perPage } );
 	}
 
-	const supportsPagination =
-		supportsCursorPagination || supportsPagePagination || supportsOffsetPagination;
 	const totalItems = paginationData?.totalItems;
 	const totalPages = totalItems && perPage ? Math.ceil( totalItems / perPage ) : undefined;
 	const hasNextPage = paginationData?.hasNextPage;
+	const supportsPagination =
+		supportsCursorPagination ||
+		supportsPagePagination ||
+		supportsOffsetPagination ||
+		totalItems ||
+		hasNextPage;
 
 	function onFetch( remoteData: RemoteData ): void {
 		if ( ! supportsPagination ) {
