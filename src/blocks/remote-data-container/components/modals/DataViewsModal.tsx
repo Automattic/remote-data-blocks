@@ -88,7 +88,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 					<ItemList
 						availableBindings={ availableBindings }
 						blockName={ blockName }
-						hasNextPage={ hasNextPage }
+						hasNextPage={ hasNextPage ?? false }
 						idField={ idField }
 						loading={ loading }
 						onSelect={ onSelect ? onSelectItem : close }
