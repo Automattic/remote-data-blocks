@@ -4,6 +4,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { REMOTE_DATA_REST_API_URL } from '@/blocks/remote-data-container/config/constants';
 import { usePaginationVariables } from '@/blocks/remote-data-container/hooks/usePaginationVariables';
 import { useSearchVariables } from '@/blocks/remote-data-container/hooks/useSearchVariables';
+import { memoizeFn } from '@/utils/function';
 import { isQueryInputValid, validateQueryInput } from '@/utils/input-validation';
 import { getBlockConfig } from '@/utils/localized-block-data';
 
@@ -13,7 +14,9 @@ export class RemoteDataFetchError extends Error {
 	}
 }
 
-async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< RemoteData | null > {
+async function unmemoizedfetchRemoteData(
+	requestData: RemoteDataApiRequest
+): Promise< RemoteData | null > {
 	const { body } = await apiFetch< RemoteDataApiResponse >( {
 		url: REMOTE_DATA_REST_API_URL,
 		method: 'POST',
@@ -38,6 +41,8 @@ async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< Re
 		results: body.results,
 	};
 }
+
+const fetchRemoteData = memoizeFn< typeof unmemoizedfetchRemoteData >( unmemoizedfetchRemoteData );
 
 interface UseRemoteData {
 	data?: RemoteData;
