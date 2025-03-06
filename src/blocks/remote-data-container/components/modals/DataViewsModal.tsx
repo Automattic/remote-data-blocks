@@ -6,11 +6,7 @@ import { ItemList } from '@/blocks/remote-data-container/components/item-list/It
 import { useModalState } from '@/blocks/remote-data-container/hooks/useModalState';
 import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteData';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
-import {
-	getBlockAvailableBindings,
-	getBlockConfig,
-	getBlockDataSourceType,
-} from '@/utils/localized-block-data';
+import { getBlockConfig, getBlockDataSourceType } from '@/utils/localized-block-data';
 import { createQueryInputsFromRemoteDataResults } from '@/utils/remote-data';
 
 interface DataViewsModalProps {
@@ -28,7 +24,6 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 	const { className, blockName, onSelect, onSelectField, queryKey, renderTrigger, title } = props;
 
 	const blockConfig = getBlockConfig( blockName );
-	const availableBindings = getBlockAvailableBindings( blockName );
 
 	// Multi-selected items
 	const [ selection, setSelection ] = useState< RemoteDataApiResult[] >( [] );
@@ -108,7 +103,6 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 					title={ blockConfig?.settings?.title ?? title }
 				>
 					<ItemList
-						availableBindings={ availableBindings }
 						blockName={ blockName }
 						loading={ loading }
 						onSelectField={ onSelectField }

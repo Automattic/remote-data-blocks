@@ -1,5 +1,5 @@
 import { Action, DataViews, View } from '@wordpress/dataviews/wp';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { ItemListField } from '@/blocks/remote-data-container/components/item-list/ItemListField';
@@ -11,7 +11,6 @@ import { usePatterns } from '@/blocks/remote-data-container/hooks/usePatterns';
 import { getRemoteDataResultValue } from '@/utils/remote-data';
 
 interface ItemListProps {
-	availableBindings: Record< string, RemoteDataBinding >;
 	blockName: string;
 	loading: boolean;
 	onSelect?: ( ids: string[] ) => void;
@@ -31,7 +30,6 @@ interface ItemListProps {
 
 export function ItemList( props: ItemListProps ) {
 	const {
-		availableBindings,
 		blockName,
 		loading,
 		onSelect,
@@ -50,33 +48,27 @@ export function ItemList( props: ItemListProps ) {
 	} = props;
 	const { defaultPattern: pattern } = usePatterns( blockName );
 
-	// get fields from results data to use as columns
-	const fieldNames: string[] = Array.from(
-		new Set(
-			results
-				.flatMap( item => Object.keys( item.result ) )
-				.filter(
-					// TODO
-					key =>
-						availableBindings[ key ] &&
-						! ID_FIELD_TYPES.includes( availableBindings[ key ]?.type ?? '' ) // filter out ID fields to hide from table
-				)
-		)
-	);
+	// Get fields from the first result, if present.
+	const firstResult = results?.[ 0 ]?.result ?? {};
 
-	// Find title field from availableBindings by checking type
-	const titleField = Object.entries( availableBindings ).find(
-		( [ _, binding ] ) => binding.type === 'title'
+	// Filter out ID fields from columns.
+	const fieldNames: string[] = Object.entries( firstResult )
+		.filter( ( [ _slug, data ] ) => ! ID_FIELD_TYPES.includes( data.type ) )
+		.map( ( [ slug ] ) => slug );
+
+	// Find title field from by checking type
+	const titleField = Object.entries( firstResult ).find(
+		( [ _slug, data ] ) => data.type === 'title'
 	)?.[ 0 ];
 
 	// Find media field from availableBindings by checking type
-	const mediaField = Object.entries( availableBindings ).find( ( [ _, binding ] ) =>
-		IMAGE_URL_FIELD_TYPES.includes( binding.type )
+	const mediaField = Object.entries( firstResult ).find( ( [ _slug, data ] ) =>
+		IMAGE_URL_FIELD_TYPES.includes( data.type )
 	)?.[ 0 ];
 
 	const fields = fieldNames.map( field => ( {
 		id: field,
-		label: availableBindings[ field ]?.name ?? field,
+		label: firstResult[ field ]?.name ?? field,
 		enableGlobalSearch: true,
 		getValue: ( { item }: { item: RemoteDataApiResult } ) =>
 			getRemoteDataResultValue( item, field ),
@@ -106,6 +98,15 @@ export function ItemList( props: ItemListProps ) {
 		titleField,
 		mediaField,
 	} );
+
+	useEffect( () => {
+		setView( currentView => ( {
+			...currentView,
+			fields: tableFields,
+			mediaField,
+			titleField,
+		} ) );
+	}, [ mediaField, titleField, ...tableFields ] );
 
 	function onChangeView( newView: View ) {
 		setPage( newView.page ?? 1 );
