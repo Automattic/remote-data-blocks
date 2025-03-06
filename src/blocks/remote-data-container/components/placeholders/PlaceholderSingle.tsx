@@ -14,8 +14,7 @@ export function PlaceholderSingle( props: PlaceholderSingleProps ) {
 
 	const supportsBulk = blockConfig?.selectors?.some( selector => selector.supports_bulk ) ?? false;
 
-	const { icon } = blockConfig.settings;
-	const iconElement = icon && typeof icon === 'string' ? ( icon as IconType ) : cloud;
+	const iconElement: IconType = ( blockConfig.settings.icon as IconType ) ?? cloud;
 
 	return (
 		<Placeholder
