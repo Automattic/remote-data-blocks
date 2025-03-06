@@ -34,4 +34,5 @@ export const TEXT_FIELD_TYPES = [
 	'markdown',
 	'number',
 	'string',
+	'title',
 ];

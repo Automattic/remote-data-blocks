@@ -112,10 +112,14 @@ class BlockPatterns {
 						$bindings['heading']['content'] = [ $field, $name ];
 						break;
 					}
-
+					
 					$bindings['paragraphs'][] = [
 						'content' => [ $field, $name ],
 					];
+					break;
+
+				case 'title':
+					$bindings['heading']['content'] = [ $field, $name ];
 					break;
 
 				case 'image_alt':

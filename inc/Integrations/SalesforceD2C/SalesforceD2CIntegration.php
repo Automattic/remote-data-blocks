@@ -75,7 +75,7 @@ class SalesforceD2CIntegration {
 						'name' => [
 							'name' => 'Name',
 							'path' => '$.name',
-							'type' => 'string',
+							'type' => 'title',
 						],
 						'sku' => [
 							'name' => 'SKU',
@@ -134,7 +134,7 @@ class SalesforceD2CIntegration {
 						'name' => [
 							'name' => 'Name',
 							'path' => '$.name',
-							'type' => 'string',
+							'type' => 'title',
 						],
 						'image_url' => [
 							'name' => 'Image URL',
