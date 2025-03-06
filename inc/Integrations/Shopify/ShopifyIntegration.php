@@ -124,6 +124,7 @@ class ShopifyIntegration {
 
 		register_remote_data_block( [
 			'title' => $block_title,
+			'icon' => 'cart',
 			'render_query' => [
 				'query' => $queries['shopify_get_product'],
 			],

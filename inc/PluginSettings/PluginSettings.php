@@ -20,6 +20,11 @@ class PluginSettings {
 		add_action( 'pre_update_option_' . DataSourceCrud::CONFIG_OPTION_NAME, [ __CLASS__, 'encrypt_option' ], 10, 2 );
 		add_action( 'option_' . DataSourceCrud::CONFIG_OPTION_NAME, [ __CLASS__, 'decrypt_option' ], 10, 1 );
 		add_action( 'rest_api_init', [ __CLASS__, 'init_rest_routes' ] );
+		// fix for dashicons not being enqueued in the editor:
+		// https://github.com/WordPress/gutenberg/issues/53528#issuecomment-1692717292
+		add_action( 'enqueue_block_assets', function (): void {
+			wp_enqueue_style( 'dashicons' );
+		} );
 	}
 
 	public static function add_options_page(): void {
