@@ -3,7 +3,7 @@
 namespace RemoteDataBlocks\Integrations\SalesforceD2C\Auth;
 
 use WP_Error;
-
+use WP_Http_Cookie;
 /**
  * Salesforce D2C Auth class.
  *
@@ -71,34 +71,42 @@ class SalesforceD2CAuth {
 			return $site_details;
 		}
 
-		$buyer_uuid = wp_generate_uuid4();
-		$buyer_cookie = sprintf( 'guest_uuid_essential_%s=%s;', substr( $site_details['site_id'], 0, 15 ), $buyer_uuid );
+		$buyer_cookie_value = wp_generate_uuid4();
+		$buyer_cookie_name = sprintf( 'guest_uuid_essential_%s', substr( $site_details['site_id'], 0, 15 ) );
 
 		// Get the cart id and session cookie.
-		$cart_id_and_session_cookie = self::get_cart_id_and_session_cookie( $buyer_endpoint, $buyer_cookie );
+		$cart_id_and_session_cookie = self::get_cart_id_and_session_cookie( $buyer_endpoint, $buyer_cookie_name, $buyer_cookie_value );
 
 		if ( is_wp_error( $cart_id_and_session_cookie ) ) {
 			return $cart_id_and_session_cookie;
 		}
 
 		return array_merge( [
-			'buyer_cookie' => $buyer_cookie,
+			'buyer_cookie' => sprintf( '%s=%s; path=/; httponly; secure', $buyer_cookie_name, $buyer_cookie_value ),
 		], $cart_id_and_session_cookie );
 	}
 
 	public static function get_cart_id_and_session_cookie(
 		string $endpoint,
-		string $buyer_cookie,
+		string $buyer_cookie_name,
+		string $buyer_cookie_value,
 	): array|WP_Error {
 		// The assumption is that the cart hasn't been created yet, so we need to create it.
 		// ToDo: The language has been assumed. Also, it's assumed that the cart doesn't exist yet but wouldn't hurt to be sure.
 		$cart_id_url = sprintf( '%s/carts/current?language=en-US&asGuest=true&htmlEncode=false', $endpoint );
 
+		$cookies[] = new WP_Http_Cookie( array(
+			'name'  => $buyer_cookie_name,
+			'value' => $buyer_cookie_value,
+			'path'  => '/',
+			'httponly' => true,
+			'secure' => true,
+		));
+
 		$response = wp_remote_post( $cart_id_url, [
 			'method' => 'PUT',
-			'headers' => [
-				'Cookie' => $buyer_cookie,
-			],
+			'cookies' => $cookies,
+			'body' => '{}',
 		] );
 
 		if ( is_wp_error( $response ) ) {
@@ -114,37 +122,46 @@ class SalesforceD2CAuth {
 			);
 		}
 
-		// Retrieve the set-cookie header
-		$set_cookie_header = wp_remote_retrieve_header( $response, 'set-cookie' );
-
-		// If this isn't present, or doesn't contain the GuestCartSessionId_ cookie, return an error.
-		if ( ! $set_cookie_header || ! str_contains( $set_cookie_header, 'GuestCartSessionId_' ) ) {
-			return new WP_Error(
-				'salesforce_d2c_auth_error_create_cart',
-				__( 'Failed to create cart', 'remote-data-blocks' )
-			);
-		}
-
-		// Cut the string so it starts at the GuestCartSessionId_ cookie.
-		$set_cookie_header = substr( $set_cookie_header, strpos( $set_cookie_header, 'GuestCartSessionId_' ) );
-
-		// Split it using the ; delimiter and get the first part.
-		$set_cookie_header_parts = explode( ';', $set_cookie_header );
-		$session_cookie = $set_cookie_header_parts[0];
-
 		// Get the response body
 		$response_body = wp_remote_retrieve_body( $response );
 
 		// Decode the response body
 		$response_data = json_decode( $response_body, true );
 
+		if ( ! isset( $response_data['cartId'] ) ) {
+			return new WP_Error(
+				'salesforce_d2c_auth_error_create_cart',
+				__( 'Failed to create cart', 'remote-data-blocks' )
+			);
+		}
+
 		// Get the cart id from the response
 		$cart_id = $response_data['cartId'];
 
-		return [
-			'cart_id' => $cart_id,
-			'session_cookie' => $session_cookie,
-		];
+		// Retrieve the set-cookie header
+		$set_cookie_header = wp_remote_retrieve_header( $response, 'set-cookie' );
+
+		// check if the set-cookie-header array is not empty
+		if ( ! $set_cookie_header ) {
+			return new WP_Error(
+				'salesforce_d2c_auth_error_create_cart',
+				__( 'Failed to create cart', 'remote-data-blocks' )
+			);
+		}
+
+		foreach ( $set_cookie_header as $cookie ) {
+			if ( str_starts_with( $cookie, 'GuestCartSessionId_' ) ) {
+				return [
+					'cart_id' => $cart_id,
+					'session_cookie' => $cookie,
+				];
+			}
+		}
+
+		return new WP_Error(
+			'salesforce_d2c_auth_error_create_cart',
+			__( 'Failed to create cart', 'remote-data-blocks' )
+		);
 	}
 
 	public static function get_domain_url(

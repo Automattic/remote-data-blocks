@@ -10,6 +10,7 @@ use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
 use RemoteDataBlocks\Integrations\SalesforceD2C\Auth\SalesforceD2CAuth;
 use WP_Error;
 use WP_REST_Request;
+use WP_REST_Response;
 use function wp_generate_uuid4;
 
 class RemoteDataController {
@@ -65,6 +66,26 @@ class RemoteDataController {
 				],
 			],
 		] );
+
+		register_rest_route( REMOTE_DATA_BLOCKS__REST_NAMESPACE, '/' . self::$slug . '/salesforce-d2c/add-item-to-cart', [
+			'methods' => 'POST',
+			'callback' => [ __CLASS__, 'execute_salesforce_d2c_add_item_to_cart_query' ],
+			'permission_callback' => [ __CLASS__, 'permission_callback' ],
+			'args' => [
+				'cartId' => [
+					'type' => 'string',
+					'required' => true,
+				],
+				'productId' => [
+					'type' => 'string',
+					'required' => true,
+				],
+				'quantity' => [
+					'type' => 'integer',
+					'required' => true,
+				],
+			],
+		] );
 	}
 
 	public static function execute_query( WP_REST_Request $request ): array|WP_Error {
@@ -115,19 +136,32 @@ class RemoteDataController {
 			);
 		}
 
-		$token = SalesforceD2CAuth::generate_token( $data_source_config['service_config']['endpoint'], $data_source_config['service_config']['client_id'], $data_source_config['service_config']['client_secret'] );
+		$endpoint = 'https://' . $data_source_config['service_config']['domain'] . '.my.salesforce.com';
+
+		$token = SalesforceD2CAuth::generate_token( $endpoint, $data_source_config['service_config']['client_id'], $data_source_config['service_config']['client_secret'] );
 
 		if ( is_wp_error( $token ) ) {
 			return $token;
 		}
 
-		$guest_checkout_cookies = SalesforceD2CAuth::generate_guest_checkout_cookies( $data_source_config['service_config']['endpoint'], $token, $data_source_config['service_config']['store_id'] );
+		return SalesforceD2CAuth::generate_guest_checkout_cookies( $endpoint, $token, $data_source_config['service_config']['store_id'] );
+	}
 
-		if ( is_wp_error( $guest_checkout_cookies ) ) {
-			return $guest_checkout_cookies;
+	public static function execute_salesforce_d2c_add_item_to_cart_query( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		// Check if the request has the necessary cookies.
+		if ( ! isset( $_COOKIE['guest_uuid_essential_'] ) ) {
+			return new WP_Error(
+				'missing_cookies',
+				'Missing cookies',
+				[ 'status' => 400 ]
+			);
 		}
 
-		return rest_ensure_response( $guest_checkout_cookies );
+		$cartId = $request->get_param( 'cartId' );
+		$productId = $request->get_param( 'productId' );
+		$quantity = $request->get_param( 'quantity' );
+
+		return rest_ensure_response( "done" );
 	}
 
 	public static function permission_callback(): bool {
