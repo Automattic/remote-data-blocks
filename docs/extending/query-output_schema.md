@@ -16,6 +16,7 @@ Unless your API returns a single value, `type` will be constructed of an associa
 - `null`
 - `number`
 - `string`
+- `title`
 - `url`
 - `uuid`
 

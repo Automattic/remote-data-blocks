@@ -203,6 +203,11 @@ class QueryRunner implements QueryRunnerInterface {
 			if ( ! array_key_exists( $key, $input_variables ) && isset( $schema['default_value'] ) ) {
 				$input_variables[ $key ] = $schema['default_value'];
 			}
+
+			// If the input variable is required and not provided, return an error.
+			if ( ! array_key_exists( $key, $input_variables ) && isset( $schema['required'] ) && $schema['required'] ) {
+				return new WP_Error( 'remote-data-blocks-missing-required-input-variable', sprintf( 'Missing required input variable: %s', $key ) );
+			}
 		}
 
 		$raw_response_data = $this->get_raw_response_data( $query, $input_variables );

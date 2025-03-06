@@ -1,10 +1,17 @@
 type RemoteDataBinding = Pick< RemoteDataResultFields, 'name' | 'type' >;
 type AvailableBindings = Record< string, RemoteDataBinding >;
 
+/**
+ * This corresponds directly to the input schema defined by a query.
+ */
 interface InputVariable {
-	name: string;
+	/** The display friendly name of the variable */
+	name?: string;
+	/** Whether the variable is required, or not in the query */
 	required: boolean;
+	/** The slug of the variable in the query */
 	slug: string;
+	/** The type of the variable in the query */
 	type: string;
 }
 
@@ -29,6 +36,7 @@ interface BlockConfig {
 		inputs: InputVariable[];
 		name: string;
 		query_key: string;
+		supports_bulk?: boolean;
 		type: string;
 	}[];
 	settings: {

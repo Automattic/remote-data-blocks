@@ -104,6 +104,10 @@ final class Types {
 		return self::generate_primitive_type( 'url' );
 	}
 
+	public static function title(): array {
+		return self::generate_primitive_type( 'title' );
+	}
+
 	public static function uuid(): array {
 		return self::generate_primitive_type( 'uuid' );
 	}

@@ -1,13 +1,13 @@
 import { __, sprintf } from '@wordpress/i18n';
 
 import {
-	GoogleSpreadsheet,
-	GoogleDriveFileList,
 	GoogleDriveFile,
-	GoogleSheetsValueRange,
-	GoogleSpreadsheetFields,
-	GoogleSheetWithFields,
+	GoogleDriveFileList,
 	GoogleSheetIdName,
+	GoogleSheetsValueRange,
+	GoogleSheetWithFields,
+	GoogleSpreadsheet,
+	GoogleSpreadsheetFields,
 } from '@/types/google';
 import { SelectOption } from '@/types/input';
 
@@ -72,7 +72,8 @@ export class GoogleApi {
 		sheetTitle: string,
 		cellRange: string
 	): Promise< GoogleSheetsValueRange > {
-		const url = `${ GoogleApi.SHEETS_BASE_URL }/spreadsheets/${ spreadsheetId }/values/${ sheetTitle }!${ cellRange }`;
+		const range = encodeURIComponent( `${ sheetTitle }!${ cellRange }` );
+		const url = `${ GoogleApi.SHEETS_BASE_URL }/spreadsheets/${ spreadsheetId }/values/${ range }`;
 		const result = await this.fetchApi< GoogleSheetsValueRange >( url );
 		return result;
 	}

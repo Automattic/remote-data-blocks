@@ -16,7 +16,7 @@ export function InnerBlocks( props: InnerBlocksProps ) {
 		remoteData,
 	} = props;
 
-	if ( loop ) {
+	if ( loop || remoteData.results.length > 1 ) {
 		return <LoopTemplate getInnerBlocks={ getInnerBlocks } remoteData={ remoteData } />;
 	}
 

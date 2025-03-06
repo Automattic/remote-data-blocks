@@ -176,6 +176,8 @@ final class ConfigSchemas {
 						// input schema.
 						'default_value' => Types::nullable( Types::any() ),
 						'name' => Types::nullable( Types::string() ),
+						// Optional boolean that indicates if the query supports bulk selection.
+						'supports_bulk' => Types::nullable( Types::boolean() ),
 						// NOTE: These values are string references to the "core primitive
 						// types" from our formal schema. Referencing these types allows us
 						// to use the same validation and sanitization logic.
@@ -227,6 +229,7 @@ final class ConfigSchemas {
 							'ui:pagination_cursor_next',
 							'ui:pagination_cursor_previous',
 						),
+						'required' => Types::nullable( Types::boolean() ),
 					] ),
 				)
 			),
@@ -272,6 +275,7 @@ final class ConfigSchemas {
 							'image_alt',
 							'image_url',
 							'markdown',
+							'title',
 							// 'json_path' is omitted since it likely has no user utility.
 							'url',
 							'uuid',

@@ -30,4 +30,21 @@ class MockDataSource extends HttpDataSource {
 	public function set_endpoint( string $endpoint ): void {
 		$this->config['endpoint'] = $endpoint;
 	}
+
+	/**
+	 * Override the migrate_config method to adjust the config for testing.
+	 */
+	public static function migrate_config( array $config ): array|WP_Error {
+		// Add a testUserId to the config if it's not already set.
+		// If it is set, ensure it's an integer.
+		// Throw an error if it's not an integer.
+		// Together, this correctly simulates the behavior of the HttpDataSource::migrate_config method.
+		if ( ! isset( $config['service_config']['testUserId'] ) ) {
+			$config['service_config']['testUserId'] = 1;
+		} elseif ( ! is_int( $config['service_config']['testUserId'] ) ) {
+			return new WP_Error( 'invalid_test_user_id', 'testUserId must be an integer' );
+		}
+
+		return $config;
+	}
 }
