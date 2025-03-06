@@ -187,7 +187,7 @@ export function ItemList( props: ItemListProps ) {
 				onChangeView={ onChangeView }
 				paginationInfo={ {
 					totalItems: totalItems ?? data.length,
-					totalPages: totalPages ?? ( hasNextPage ? page + 1 : page - 1 ) ?? 1,
+					totalPages: totalPages ?? ( hasNextPage ? page + 1 : Math.max( 1, page ) ),
 				} }
 				search={ supportsSearch }
 				selection={ selectedItems }
