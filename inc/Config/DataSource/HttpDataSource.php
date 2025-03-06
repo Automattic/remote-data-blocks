@@ -105,4 +105,11 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 			'request_headers' => $service_config['request_headers'] ?? [],
 		];
 	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public static function migrate_config( array $config ): array|WP_Error {
+		return $config;
+	}
 }

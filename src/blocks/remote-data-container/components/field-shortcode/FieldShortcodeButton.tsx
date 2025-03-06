@@ -97,7 +97,10 @@ export function FieldShortcodeButton( props: WPFormatEditProps ) {
 							{ () => (
 								<ToolbarGroup>
 									<FieldShortcodeSelectNew onSelectField={ onSelectField } />
-									<FieldShortcodeSelectExisting onSelectField={ onSelectField } />
+									<FieldShortcodeSelectExisting
+										onSelectField={ onSelectField }
+										remoteData={ remoteData }
+									/>
 									<FieldShortcodeSelectMeta onSelectField={ onSelectField } />
 								</ToolbarGroup>
 							) }

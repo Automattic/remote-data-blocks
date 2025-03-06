@@ -69,7 +69,7 @@ class ShopifyIntegration {
 						'title' => [
 							'name' => 'Title',
 							'path' => '$.data.product.title',
-							'type' => 'string',
+							'type' => 'title',
 						],
 						'variant_id' => [
 							'name' => 'Variant ID',
@@ -122,7 +122,7 @@ class ShopifyIntegration {
 						'title' => [
 							'name' => 'Product title',
 							'path' => '$.node.title',
-							'type' => 'string',
+							'type' => 'title',
 						],
 					],
 				],

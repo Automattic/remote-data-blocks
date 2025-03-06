@@ -3,18 +3,16 @@ import { __ } from '@wordpress/i18n';
 import { chevronRightSmall } from '@wordpress/icons';
 
 import { FieldSelectionFromAvailableBindings } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelection';
-import { useExistingRemoteData } from '@/blocks/remote-data-container/hooks/useExistingRemoteData';
 import { getBlocksConfig } from '@/utils/localized-block-data';
 
 interface FieldShortcodeSelectExistingProps {
 	onSelectField: ( data: FieldSelection, fieldValue: string ) => void;
+	remoteData: RemoteData[];
 }
 
 export function FieldShortcodeSelectExisting( props: FieldShortcodeSelectExistingProps ) {
 	const blockConfigs = getBlocksConfig();
-	const remoteDatas: RemoteData[] = useExistingRemoteData().filter(
-		remoteData => ! remoteData.isCollection
-	);
+	const { remoteData: remoteDatas } = props;
 
 	return remoteDatas.length > 0 ? (
 		<DropdownMenu
