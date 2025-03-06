@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { ItemListField } from '@/blocks/remote-data-container/components/item-list/ItemListField';
 import {
 	ID_FIELD_TYPES,
-	IMAGE_ALT_FIELD_TYPES,
+	IMAGE_URL_FIELD_TYPES,
 } from '@/blocks/remote-data-container/config/constants';
 import { usePatterns } from '@/blocks/remote-data-container/hooks/usePatterns';
 import { getRemoteDataResultValue } from '@/utils/remote-data';
@@ -71,7 +71,7 @@ export function ItemList( props: ItemListProps ) {
 
 	// Find media field from availableBindings by checking type
 	const mediaField = Object.entries( availableBindings ).find( ( [ _, binding ] ) =>
-		IMAGE_ALT_FIELD_TYPES.includes( binding.type )
+		IMAGE_URL_FIELD_TYPES.includes( binding.type )
 	)?.[ 0 ];
 
 	const fields = fieldNames.map( field => ( {
