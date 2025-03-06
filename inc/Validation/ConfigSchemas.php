@@ -79,6 +79,21 @@ final class ConfigSchemas {
 					Types::instance_of( QueryInterface::class ),
 					Types::serialized_config_for( HttpQueryInterface::class ),
 				),
+				'queries' => Types::nullable(
+					Types::record(
+						Types::string(),
+						Types::object( [
+							'display_name' => Types::nullable( Types::string() ),
+							'query' => Types::one_of(
+								Types::instance_of( QueryInterface::class ),
+								Types::serialized_config_for( HttpQueryInterface::class ),
+							),
+							'type' => Types::enum(
+								ConfigRegistry::COLLECTION_QUERY_KEY,
+							),
+						] )
+					)
+				),
 				'loop' => Types::nullable( Types::boolean() ),
 			] ),
 			'selection_queries' => Types::nullable(
@@ -90,7 +105,6 @@ final class ConfigSchemas {
 							Types::serialized_config_for( HttpQueryInterface::class ),
 						),
 						'type' => Types::enum(
-							ConfigRegistry::COLLECTION_QUERY_KEY,
 							ConfigRegistry::LIST_QUERY_KEY,
 							ConfigRegistry::SEARCH_QUERY_KEY
 						),

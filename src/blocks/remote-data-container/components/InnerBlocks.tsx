@@ -5,7 +5,9 @@ import { LoopTemplate } from '@/blocks/remote-data-container/components/loop-tem
 
 interface InnerBlocksProps {
 	blockConfig: BlockConfig;
-	getInnerBlocks: ( result: RemoteDataResult ) => BlockInstance< RemoteDataInnerBlockAttributes >[];
+	getInnerBlocks: (
+		result: RemoteDataApiResult
+	) => BlockInstance< RemoteDataInnerBlockAttributes >[];
 	remoteData: RemoteData;
 }
 
@@ -16,7 +18,7 @@ export function InnerBlocks( props: InnerBlocksProps ) {
 		remoteData,
 	} = props;
 
-	// Use loop template for both loop blocks and collections
+	// Use loop template for both loop blocks, multi-selection, or collection queries
 	if (
 		loop ||
 		remoteData.results.length > 1 ||

@@ -32,18 +32,18 @@ function register_aic_block(): void {
 		'data_source' => $aic_data_source,
 		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
 			$endpoint = $aic_data_source->get_endpoint();
-			
+
 			// Get and clean IDs from comma-separated string
 			$ids = array_filter(
 				array_map( 'trim', explode( ',', (string) $input_variables['id'] ) ),
 				'strlen'
 			);
-			
-			if ( !empty( $ids ) ) {
+
+			if ( ! empty( $ids ) ) {
 				return add_query_arg([
 					'ids' => implode( ',', $ids ),
 					'fields' => 'id,title,image_id,artist_title',
-				], $endpoint);
+				], $endpoint );
 			}
 
 			return $endpoint;
@@ -200,15 +200,18 @@ function register_aic_block(): void {
 		'title' => 'Art Institute of Chicago',
 		'render_query' => [
 			'query' => $get_art_query,
+			'queries' => [
+				'collection' => [
+					'query' => $collection_query,
+					'type' => 'collection',
+					'display_name' => 'Collection',
+				],
+			],
 		],
 		'selection_queries' => [
 			[
 				'query' => $search_art_query,
 				'type' => 'search',
-			],
-			[
-				'query' => $collection_query, 
-				'type' => 'collection',
 			],
 		],
 	]);
