@@ -92,8 +92,8 @@ export function usePaginationVariables( {
 		supportsCursorPagination ||
 		supportsPagePagination ||
 		supportsOffsetPagination ||
-		totalItems ||
-		hasNextPage;
+		hasNextPage ||
+		Boolean( totalItems );
 
 	function onFetch( remoteData: RemoteData ): void {
 		if ( ! supportsPagination ) {
