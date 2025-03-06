@@ -49,7 +49,21 @@ class ConfigRegistry {
 			return self::create_error( $block_title, sprintf( 'Block %s has already been registered', $block_name ) );
 		}
 
+		// Process default render query first
 		$display_query = self::inflate_query( $user_config[ self::RENDER_QUERY_KEY ]['query'] );
+		
+		// Initialize queries array with display query as default
+		$queries = [
+			self::DISPLAY_QUERY_KEY => $display_query,
+		];
+
+		// Process additional render queries if present
+		if ( isset( $user_config[ self::RENDER_QUERY_KEY ]['additional_queries'] ) ) {
+			foreach ( $user_config[ self::RENDER_QUERY_KEY ]['additional_queries'] as $query_config ) {
+				$queries[ $query_config['type'] ] = self::inflate_query( $query_config['query'] );
+			}
+		}
+
 		$input_schema = $display_query->get_input_schema();
 
 		// Check if render query has any bulk-supporting inputs
@@ -72,109 +86,103 @@ class ConfigRegistry {
 
 		$has_bulk_support = !empty( $bulk_supported_inputs );
 
-			// Initialize queries array with display query as default
-			$queries = [
-				self::DISPLAY_QUERY_KEY => $display_query,
-			];
-	
-			// Process additional render queries if present
-			if ( isset( $user_config[ self::RENDER_QUERY_KEY ]['queries'] ) && is_array( $user_config[ self::RENDER_QUERY_KEY ]['queries'] ) ) {
-				foreach ( $user_config[ self::RENDER_QUERY_KEY ]['queries'] as $query_key => $query_config ) {
-					$queries[ $query_key ] = self::inflate_query( $query_config['query'] );
-				}
-			}
-	
-			// Build the base configuration for the block. This is our own internal
-			// configuration, not what will be passed to WordPress's register_block_type.
-			// @see BlockRegistration::register_block_type::register_blocks.
-			$config = [
-				'description' => '',
-				'name' => $block_name,
-				'loop' => $user_config[ self::RENDER_QUERY_KEY ]['loop'] ?? false,
-				'overrides' => $user_config['overrides'] ?? [],
-				'patterns' => [],
-				'queries' => $queries,
-				'selectors' => [
-					self::create_selector( $display_query, self::DISPLAY_QUERY_KEY, 'input', 'Manual input', $has_bulk_support ),
-				],
-				'title' => $block_title,
-			];
+		// Build the base configuration for the block. This is our own internal
+		// configuration, not what will be passed to WordPress's register_block_type.
+		// @see BlockRegistration::register_block_type::register_blocks.
+		$config = [
+			'description' => '',
+			'name' => $block_name,
+			'loop' => $user_config[ self::RENDER_QUERY_KEY ]['loop'] ?? false,
+			'overrides' => $user_config['overrides'] ?? [],
+			'patterns' => [],
+			'queries' => $queries,
+			'selectors' => [
+				self::create_selector(
+					$display_query,
+					self::DISPLAY_QUERY_KEY,
+					'input',
+					'Manual input',
+					$has_bulk_support
+				),
+			],
+			'title' => $block_title,
+		];
 
-			// Add collection queries to selectors if present
-			if ( isset( $user_config[ self::RENDER_QUERY_KEY ]['queries'] ) && is_array( $user_config[ self::RENDER_QUERY_KEY ]['queries'] ) ) {
-				foreach ( $user_config[ self::RENDER_QUERY_KEY ]['queries'] as $query_key => $query_config ) {
-					array_unshift(
-						$config['selectors'],
-						self::create_selector(
-							$queries[ $query_key ],
-							$query_key,
-							$query_config['type'],
-							$query_config['display_name'] ?? null,
-							$query_config['supports_bulk'] ?? false
-						)
-					);
-				}
-			}
-
-			// Register "selectors" which allow the user to use a query to assist in
-			// selecting data for display by the block.
-			foreach ( $user_config[ self::SELECTION_QUERIES_KEY ] ?? [] as $selection_query ) {
-				$from_query = self::inflate_query( $selection_query['query'] );
-				$from_query_type = $selection_query['type'];
-				$to_query = $display_query;
-
-				$config['queries'][ $from_query::class ] = $from_query;
-
-				$from_input_schema = $from_query->get_input_schema();
-				$from_output_schema = $from_query->get_output_schema();
-
-				foreach ( array_keys( $to_query->get_input_schema() ) as $to ) {
-					if ( ! isset( $from_output_schema['type'][ $to ] ) ) {
-						return self::create_error( $block_title, sprintf( 'Cannot map key "%1$s" from %2$s query. The display query for this block requires a "%1$s" key as an input, but it is not present in the output schema for the %2$s query. Try adding a "%1$s" mapping to the output schema for the %2$s query.', esc_html( $to ), $from_query_type ) );
-					}
-				}
-
-				if ( self::SEARCH_QUERY_KEY === $from_query_type ) {
-					$search_input_count = count( array_filter( $from_input_schema, function ( array $input_var ): bool {
-						return 'ui:search_input' === $input_var['type'];
-					} ) );
-
-					if ( 1 !== $search_input_count ) {
-						return self::create_error( $block_title, 'A search query must have one input variable with type "ui:search_input"' );
-					}
-				}
-
-				// Add the selector to the configuration.
+		// Add collection queries to selectors if present
+		if ( isset( $user_config[ self::RENDER_QUERY_KEY ]['additional_queries'] ) ) {
+			foreach ( $user_config[ self::RENDER_QUERY_KEY ]['additional_queries'] as $query_config ) {
 				array_unshift(
 					$config['selectors'],
 					self::create_selector(
-						$from_query,
-						$from_query::class,
-						$from_query_type,
-						$selection_query['display_name'] ?? null,
+						$queries[ $query_config['type'] ],
+						$query_config['type'],
+						$query_config['type'],
+						$query_config['display_name'] ?? null,
 						$has_bulk_support
 					)
 				);
 			}
+		}
 
-			// Register patterns which can be used with the block.
-			foreach ( $user_config['patterns'] ?? [] as $pattern ) {
-				$parsed_blocks = parse_blocks( $pattern['html'] );
-				$parsed_blocks = BlockPatterns::add_block_arg_to_bindings( $block_name, $parsed_blocks );
-				$pattern_content = serialize_blocks( $parsed_blocks );
+		// Register "selectors" which allow the user to use a query to assist in
+		// selecting data for display by the block.
+		foreach ( $user_config[ self::SELECTION_QUERIES_KEY ] ?? [] as $selection_query ) {
+			$from_query = self::inflate_query( $selection_query['query'] );
+			$from_query_type = $selection_query['type'];
+			$to_query = $display_query;
 
-				$pattern_name = self::register_block_pattern( $block_name, $pattern['title'], $pattern_content );
+			$config['queries'][ $from_query::class ] = $from_query;
 
-				// If the pattern role is specified and recognized, add it to the block configuration.
-				$recognized_roles = [ 'inner_blocks' ];
-				if ( isset( $pattern['role'] ) && in_array( $pattern['role'], $recognized_roles, true ) ) {
-					$config['patterns'][ $pattern['role'] ] = $pattern_name;
+			$from_input_schema = $from_query->get_input_schema();
+			$from_output_schema = $from_query->get_output_schema();
+
+			foreach ( array_keys( $to_query->get_input_schema() ) as $to ) {
+				if ( ! isset( $from_output_schema['type'][ $to ] ) ) {
+					return self::create_error( $block_title, sprintf( 'Cannot map key "%1$s" from %2$s query. The display query for this block requires a "%1$s" key as an input, but it is not present in the output schema for the %2$s query. Try adding a "%1$s" mapping to the output schema for the %2$s query.', esc_html( $to ), $from_query_type ) );
 				}
 			}
 
-			ConfigStore::set_block_configuration( $block_name, $config );
+			if ( self::SEARCH_QUERY_KEY === $from_query_type ) {
+				$search_input_count = count( array_filter( $from_input_schema, function ( array $input_var ): bool {
+					return 'ui:search_input' === $input_var['type'];
+				} ) );
 
-			return true;
+				if ( 1 !== $search_input_count ) {
+					return self::create_error( $block_title, 'A search query must have one input variable with type "ui:search_input"' );
+				}
+			}
+
+			// Add the selector to the configuration.
+			array_unshift(
+				$config['selectors'],
+				self::create_selector(
+					$from_query,
+					$from_query::class,
+					$from_query_type,
+					$selection_query['display_name'] ?? null,
+					$has_bulk_support
+				)
+			);
+		}
+
+		// Register patterns which can be used with the block.
+		foreach ( $user_config['patterns'] ?? [] as $pattern ) {
+			$parsed_blocks = parse_blocks( $pattern['html'] );
+			$parsed_blocks = BlockPatterns::add_block_arg_to_bindings( $block_name, $parsed_blocks );
+			$pattern_content = serialize_blocks( $parsed_blocks );
+
+			$pattern_name = self::register_block_pattern( $block_name, $pattern['title'], $pattern_content );
+
+			// If the pattern role is specified and recognized, add it to the block configuration.
+			$recognized_roles = [ 'inner_blocks' ];
+			if ( isset( $pattern['role'] ) && in_array( $pattern['role'], $recognized_roles, true ) ) {
+				$config['patterns'][ $pattern['role'] ] = $pattern_name;
+			}
+		}
+
+		ConfigStore::set_block_configuration( $block_name, $config );
+
+		return true;
 	}
 
 	private static function register_block_pattern( string $block_name, string $pattern_title, string $pattern_content ): string {

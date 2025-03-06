@@ -79,9 +79,8 @@ final class ConfigSchemas {
 					Types::instance_of( QueryInterface::class ),
 					Types::serialized_config_for( HttpQueryInterface::class ),
 				),
-				'queries' => Types::nullable(
-					Types::record(
-						Types::string(),
+				'additional_queries' => Types::nullable(
+					Types::list_of(
 						Types::object( [
 							'display_name' => Types::nullable( Types::string() ),
 							'query' => Types::one_of(

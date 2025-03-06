@@ -200,8 +200,8 @@ function register_aic_block(): void {
 		'title' => 'Art Institute of Chicago',
 		'render_query' => [
 			'query' => $get_art_query,
-			'queries' => [
-				'collection' => [
+			'additional_queries' => [
+				[
 					'query' => $collection_query,
 					'type' => 'collection',
 					'display_name' => 'Collection',
