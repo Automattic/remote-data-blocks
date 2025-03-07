@@ -27,135 +27,24 @@ class SalesforceD2CAuth {
 		return self::get_saved_access_token( $client_id ) ?? self::get_token_using_client_credentials( $client_id, $client_secret, $endpoint );
 	}
 
-	public static function getCartItems(
-		string $endpoint,
-		array $cookies,
-		string $cart_id,
-	): array|WP_Error {
-		$cart_items_url = sprintf( '%s/carts/%s/cart-items', $endpoint, $cart_id );
-
-		$response = wp_remote_get( $cart_items_url, [
-			'cookies' => $cookies,
-		] );
-
-		if ( is_wp_error( $response ) ) {
-			return $response;
-		}
-
-		$response_code = wp_remote_retrieve_response_code( $response );
-
-		if ( 200 !== $response_code ) {
-			return new WP_Error(
-				'salesforce_d2c_auth_error_get_cart_items',
-				__( 'Failed to get cart items', 'remote-data-blocks' )
-			);
-		}
-
-		$response_body = wp_remote_retrieve_body( $response );
-		$response_data = json_decode( $response_body, true );
-
-		// throw an error if cartItems and cartSummary are not present in the response
-		if ( ! isset( $response_data['cartItems'] ) || ! isset( $response_data['cartSummary'] ) ) {
-			return new WP_Error(
-				'salesforce_d2c_auth_error_get_cart_items',
-				__( 'Failed to get cart items', 'remote-data-blocks' )
-			);
-		}
-
-		$cart_items = [];
-
-		// for each cart item in cartItems, get the productId and quantity
-		foreach ( $response_data['cartItems'] as $cart_item ) {
-			// ensure cartItem is present.
-			if ( ! isset( $cart_item['cartItem'] ) ) {
-				throw new WP_Error(
-					'salesforce_d2c_auth_error_get_cart_items',
-					__( 'Failed to get cart items', 'remote-data-blocks' )
-				);
-			}
-
-			$product_id = $cart_item['cartItem']['productId'];
-			$quantity = $cart_item['cartItem']['quantity'];
-			$total_amount = $cart_item['cartItem']['totalAmount'];
-			$price = $cart_item['cartItem']['salesPrice'];
-
-			$cart_items[] = [
-				'cart_item_id' => $cart_item['cartItem']['cartItemId'],
-				'product_id' => $product_id,
-				'quantity' => $quantity,
-				'total_amount' => $total_amount,
-				'price' => $price,
-			];
-		}
-
-		// Get the totalProductCount and totalProductAmount from the cartSummary
-		$total_product_count = $response_data['cartSummary']['totalProductCount'];
-		$total_product_amount = $response_data['cartSummary']['totalProductAmount'];
-
-		return [
-			'cart_items' => $cart_items,
-			'total_quantity' => $total_product_count,
-			'total_amount' => $total_product_amount,
-		];
-	}
-
-	public static function addOrUpdateCartItem(
-		string $endpoint,
-		array $cookies,
-		string $cart_id,
-		string $product_id,
-		int $quantity,
-	): array|WP_Error {
-		$cart_item_url = sprintf( '%s/carts/%s/cart-items', $endpoint, $cart_id );
-		$body = wp_json_encode( [
-			'productId' => $product_id,
-			'quantity' => $quantity,
-			'type' => 'Product',
-		] );
-
-		$response = wp_remote_post( $cart_item_url, [
-			'method' => 'POST',
-			'cookies' => $cookies,
-			'data_format' => 'body',
-			'body' => $body,
-			'headers' => [
-				'Content-Type' => 'application/json',
-			],
-		] );
-
-		if ( is_wp_error( $response ) ) {
-			return $response;
-		}
-
-		$response_code = wp_remote_retrieve_response_code( $response );
-
-		if ( 200 !== $response_code && 202 !== $response_code ) {
-			return new WP_Error(
-				'salesforce_d2c_auth_error_add_or_update_cart_item',
-				__( 'Failed to add item to cart', 'remote-data-blocks' )
-			);
-		}
-
-		$response_body = wp_remote_retrieve_body( $response );
-		$response_data = json_decode( $response_body, true );
-
-		if ( ! isset( $response_data['cartItemId'] ) ) {
-			return new WP_Error(
-				'salesforce_d2c_auth_error_add_or_update_cart_item',
-				__( 'Failed to add item to cart', 'remote-data-blocks' )
-			);
-		}
-
-		return [
-			'cart_item_id' => $response_data['cartItemId'],
-		];
-	}
-
 	public static function generate_buyer_endpoint(
 		string $endpoint,
-		string $token,
+		string $client_id,
+		string $client_secret,
 		string $store_id,
 	): string|WP_Error {
+		$buyer_endpoint = self::get_saved_buyer_endpoint( $store_id );
+
+		if ( $buyer_endpoint ) {
+			return $buyer_endpoint;
+		}
+
+		$token = self::generate_token( $endpoint, $client_id, $client_secret );
+
+		if ( is_wp_error( $token ) ) {
+			return $token;
+		}
+
 		// First we need to get the base store url.
 		// ToDo: Figure out how we can narrow this based on the store_id rather than using LIMIT 1.
 		$domain_url = self::get_saved_domain( $store_id ) ?? self::get_domain_url( $endpoint, $token, $store_id );
@@ -171,28 +60,37 @@ class SalesforceD2CAuth {
 			return $site_details;
 		}
 
-		// Generate the buyer url and the cookie that would be used for guest buyer shopping.
-		// ToDo: site_url_path_prefix is not always present, so we need to handle that.
-		$buyer_endpoint = sprintf( '%s/%s/webruntime/api/services/data/v63.0/commerce/webstores/%s', $domain_url, $site_details['site_url_path_prefix'], $store_id );
+		// Generate the buyer endpoint.
+		$buyer_endpoint = $site_details['site_url_path_prefix'] ? sprintf( '%s/%s', $domain_url, $site_details['site_url_path_prefix'] ) : $domain_url;
+		$buyer_endpoint = sprintf( '%s/webruntime/api/services/data/v63.0/commerce/webstores/%s', $buyer_endpoint, $store_id );
+
+		self::save_buyer_endpoint( $buyer_endpoint, $store_id );
 
 		return $buyer_endpoint;
 	}
 
 	public static function generate_guest_checkout_cookies(
 		string $endpoint,
-		string $token,
+		string $client_id,
+		string $client_secret,
 		string $store_id,
 	): array|WP_Error {
-		$buyer_endpoint = self::generate_buyer_endpoint( $endpoint, $token, $store_id );
+		$token = self::generate_token( $endpoint, $client_id, $client_secret );
 
-		if ( is_wp_error( $buyer_endpoint ) ) {
-			return $buyer_endpoint;
+		if ( is_wp_error( $token ) ) {
+			return $token;
 		}
 
 		$site_details = self::get_saved_site_details( $store_id ) ?? self::get_site_details( $endpoint, $token, $store_id );
 
 		if ( is_wp_error( $site_details ) ) {
 			return $site_details;
+		}
+
+		$buyer_endpoint = self::generate_buyer_endpoint( $endpoint, $client_id, $client_secret, $store_id );
+
+		if ( is_wp_error( $buyer_endpoint ) ) {
+			return $buyer_endpoint;
 		}
 
 		$buyer_cookie_value = wp_generate_uuid4();
@@ -220,9 +118,9 @@ class SalesforceD2CAuth {
 		$cart_id_url = sprintf( '%s/carts/current?language=en-US&asGuest=true&htmlEncode=false', $endpoint );
 
 		$cookies[] = new WP_Http_Cookie( array(
-			'name'  => $buyer_cookie_name,
+			'name' => $buyer_cookie_name,
 			'value' => $buyer_cookie_value,
-			'path'  => '/',
+			'path' => '/',
 			'httponly' => true,
 			'secure' => true,
 		));
@@ -275,7 +173,7 @@ class SalesforceD2CAuth {
 
 		foreach ( $set_cookie_header as $cookie ) {
 			if ( str_starts_with( $cookie, 'GuestCartSessionId_' ) ) {
-				// remove Secure from the cookie.
+				// ToDo: We shouldn't be doing this. We should figure out why we need to do this.
 				$cookie = str_replace( [ 'secure;', 'SameSite=Strict', 'HttpOnly;', 'HttpOnly' ], '', $cookie );
 
 				return [
@@ -533,6 +431,141 @@ class SalesforceD2CAuth {
 		return $access_token;
 	}
 
+	public static function get_cart_items(
+		string $endpoint,
+		array $cookies,
+		array $payload,
+	): array|WP_Error {
+		if ( ! isset( $payload['cartId'] ) ) {
+			return new WP_Error(
+				'salesforce_d2c_auth_error_get_cart_items',
+				__( 'Failed to get cart items', 'remote-data-blocks' )
+			);
+		}
+
+		$cart_items_url = sprintf( '%s/carts/%s/cart-items', $endpoint, $payload['cartId'] );
+
+		$response = wp_remote_get( $cart_items_url, [
+			'cookies' => $cookies,
+		] );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+
+		if ( 200 !== $response_code ) {
+			return new WP_Error(
+				'salesforce_d2c_auth_error_get_cart_items',
+				__( 'Failed to get cart items', 'remote-data-blocks' )
+			);
+		}
+
+		$response_body = wp_remote_retrieve_body( $response );
+		$response_data = json_decode( $response_body, true );
+
+		// throw an error if cartItems and cartSummary are not present in the response
+		if ( ! isset( $response_data['cartItems'] ) || ! isset( $response_data['cartSummary'] ) ) {
+			return new WP_Error(
+				'salesforce_d2c_auth_error_get_cart_items',
+				__( 'Failed to get cart items', 'remote-data-blocks' )
+			);
+		}
+
+		$cart_items = [];
+
+		// for each cart item in cartItems, get the productId and quantity
+		foreach ( $response_data['cartItems'] as $cart_item ) {
+			// ensure cartItem is present.
+			if ( ! isset( $cart_item['cartItem'] ) ) {
+				return new WP_Error( 'salesforce_d2c_auth_error_get_cart_items', __( 'Failed to get cart items', 'remote-data-blocks' ) );
+			}
+
+			$product_id = $cart_item['cartItem']['productId'];
+			$quantity = $cart_item['cartItem']['quantity'];
+			$total_amount = $cart_item['cartItem']['totalAmount'];
+			$price = $cart_item['cartItem']['salesPrice'];
+
+			$cart_items[] = [
+				'cart_item_id' => $cart_item['cartItem']['cartItemId'],
+				'product_id' => $product_id,
+				'quantity' => $quantity,
+				'total_amount' => $total_amount,
+				'price' => $price,
+			];
+		}
+
+		// Get the totalProductCount and totalProductAmount from the cartSummary
+		$total_product_count = $response_data['cartSummary']['totalProductCount'];
+		$total_product_amount = $response_data['cartSummary']['totalProductAmount'];
+
+		return [
+			'cart_items' => $cart_items,
+			'total_quantity' => $total_product_count,
+			'total_amount' => $total_product_amount,
+		];
+	}
+
+	public static function add_cart_item(
+		string $endpoint,
+		array $cookies,
+		array $payload,
+	): array|WP_Error {
+		if ( ! isset( $payload['cartId'] ) || ! isset( $payload['productId'] ) || ! isset( $payload['quantity'] ) ) {
+			return new WP_Error(
+				'salesforce_d2c_auth_error_add_or_update_cart_item',
+				__( 'Failed to add item to cart', 'remote-data-blocks' )
+			);
+		}
+
+		$cart_item_url = sprintf( '%s/carts/%s/cart-items', $endpoint, $payload['cartId'] );
+		$body = wp_json_encode( [
+			'productId' => $payload['productId'],
+			'quantity' => $payload['quantity'],
+			'type' => 'Product',
+		] );
+
+		$response = wp_remote_post( $cart_item_url, [
+			'method' => 'POST',
+			'cookies' => $cookies,
+			'data_format' => 'body',
+			'body' => $body,
+			'headers' => [
+				'Content-Type' => 'application/json',
+			],
+		] );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+
+		if ( 200 !== $response_code && 202 !== $response_code ) {
+			return new WP_Error(
+				'salesforce_d2c_auth_error_add_or_update_cart_item',
+				__( 'Failed to add item to cart', 'remote-data-blocks' )
+			);
+		}
+
+		$response_body = wp_remote_retrieve_body( $response );
+		$response_data = json_decode( $response_body, true );
+
+		if ( ! isset( $response_data['cartItemId'] ) ) {
+			return new WP_Error(
+				'salesforce_d2c_auth_error_add_or_update_cart_item',
+				__( 'Failed to add item to cart', 'remote-data-blocks' )
+			);
+		}
+
+		return [
+			'cart_item_id' => $response_data['cartItemId'],
+		];
+	}
+
+	// Caching Functions
+
 	private static function save_site_details( string $site_id, string $site_url_path_prefix, string $store_id ): void {
 		$cache_key = self::get_site_details_key( $store_id );
 		wp_cache_set(
@@ -560,6 +593,17 @@ class SalesforceD2CAuth {
 		);
 	}
 
+	private static function save_buyer_endpoint( string $buyer_endpoint, string $store_id ): void {
+		$cache_key = self::get_buyer_endpoint_key( $store_id );
+		wp_cache_set(
+			$cache_key,
+			[ 'buyer_endpoint' => $buyer_endpoint ],
+			'salesforce-d2c-buyer-endpoint',
+			// phpcs:ignore WordPressVIPMinimum.Performance.LowExpiryCacheTime.CacheTimeUndetermined -- 'expires_in' defaults to 30 minutes for access tokens.
+			time() + 86400,
+		);
+	}
+
 	private static function get_saved_site_details( string $store_id ): ?array {
 		$cache_key = self::get_site_details_key( $store_id );
 		$saved_site_details = wp_cache_get( $cache_key, 'salesforce-d2c-site-details' );
@@ -582,6 +626,17 @@ class SalesforceD2CAuth {
 		return $saved_domain['domain'] ?? null;
 	}
 
+	private static function get_saved_buyer_endpoint( string $store_id ): ?string {
+		$cache_key = self::get_buyer_endpoint_key( $store_id );
+		$saved_buyer_endpoint = wp_cache_get( $cache_key, 'salesforce-d2c-buyer-endpoint' );
+
+		if ( false === $saved_buyer_endpoint ) {
+			return null;
+		}
+
+		return $saved_buyer_endpoint['buyer_endpoint'] ?? null;
+	}
+
 	private static function get_domain_key( string $store_id ): string {
 		$cache_key_suffix = hash( 'sha256', sprintf( '%s', $store_id ) );
 		return sprintf( 'salesforce_d2c_domain_%s', $cache_key_suffix );
@@ -590,6 +645,11 @@ class SalesforceD2CAuth {
 	private static function get_site_details_key( string $store_id ): string {
 		$cache_key_suffix = hash( 'sha256', sprintf( '%s', $store_id ) );
 		return sprintf( 'salesforce_d2c_site_details_%s', $cache_key_suffix );
+	}
+
+	private static function get_buyer_endpoint_key( string $store_id ): string {
+		$cache_key_suffix = hash( 'sha256', sprintf( '%s', $store_id ) );
+		return sprintf( 'salesforce_d2c_buyer_endpoint_%s', $cache_key_suffix );
 	}
 
 	private static function save_access_token( string $access_token, string $client_id, int $expiry_time ): void {
