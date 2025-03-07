@@ -33,6 +33,7 @@ async function unmemoizedfetchRemoteData(
 		pagination: body.pagination && {
 			cursorNext: body.pagination.cursor_next,
 			cursorPrevious: body.pagination.cursor_previous,
+			hasNextPage: body.pagination.has_next_page,
 			totalItems: body.pagination.total_items,
 		},
 		queryKey: body.query_key,
@@ -123,6 +124,7 @@ export function useRemoteData( {
 	const inputVariables = query.inputs;
 
 	const {
+		hasNextPage,
 		onFetch: onFetchForPagination,
 		page,
 		perPage,
@@ -245,7 +247,7 @@ export function useRemoteData( {
 		data: resolvedData,
 		error,
 		fetch,
-		hasNextPage: totalPages ? page < totalPages : supportsPagination,
+		hasNextPage: hasNextPage ?? ( totalPages ? page < totalPages : supportsPagination ),
 		hasPreviousPage: page > 1,
 		loading,
 		page,

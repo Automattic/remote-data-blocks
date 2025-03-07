@@ -12,6 +12,7 @@ import { getRemoteDataResultValue } from '@/utils/remote-data';
 
 interface ItemListProps {
 	blockName: string;
+	hasNextPage: boolean;
 	loading: boolean;
 	onSelect?: ( ids: string[] ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
@@ -21,6 +22,7 @@ interface ItemListProps {
 	searchInput: string;
 	selectionIds: string[];
 	setPage: ( newPage: number ) => void;
+	setPerPage: ( newPerPage: number ) => void;
 	setSearchInput: ( newValue: string ) => void;
 	setSelectionIds: ( ids: string[] ) => void;
 	supportsSearch: boolean;
@@ -31,6 +33,7 @@ interface ItemListProps {
 export function ItemList( props: ItemListProps ) {
 	const {
 		blockName,
+		hasNextPage,
 		loading,
 		onSelect,
 		onSelectField,
@@ -40,6 +43,7 @@ export function ItemList( props: ItemListProps ) {
 		searchInput,
 		selectionIds,
 		setPage,
+		setPerPage,
 		setSearchInput,
 		setSelectionIds,
 		supportsSearch,
@@ -110,6 +114,7 @@ export function ItemList( props: ItemListProps ) {
 
 	function onChangeView( newView: View ) {
 		setPage( newView.page ?? 1 );
+		setPerPage( newView.perPage ?? perPage ?? results.length );
 		setSearchInput( newView.search ?? '' );
 		setView( newView );
 	}
@@ -147,7 +152,7 @@ export function ItemList( props: ItemListProps ) {
 				onChangeView={ onChangeView }
 				paginationInfo={ {
 					totalItems: totalItems ?? results.length,
-					totalPages: totalPages ?? 1,
+					totalPages: totalPages ?? ( hasNextPage ? page + 1 : Math.max( 1, page ) ),
 				} }
 				search={ supportsSearch }
 				selection={ selectionIds }
