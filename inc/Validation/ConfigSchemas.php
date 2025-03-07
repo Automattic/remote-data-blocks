@@ -63,6 +63,16 @@ final class ConfigSchemas {
 		return $schema;
 	}
 
+	public static function get_remote_data_block_attribute_config_schema(): array {
+		static $schema = null;
+
+		if ( null === $schema ) {
+			$schema = self::generate_remote_data_block_attribute_config_schema();
+		}
+
+		return $schema;
+	}
+
 	private static function generate_remote_data_block_config_schema(): array {
 		return Types::object( [
 			'icon' => Types::nullable( Types::string() ),
@@ -350,6 +360,43 @@ final class ConfigSchemas {
 				)
 			),
 			'request_method' => Types::nullable( Types::enum( 'GET', 'POST', 'PUT', 'PATCH', 'DELETE' ) ),
+		] );
+	}
+
+	private static function generate_remote_data_block_attribute_config_schema(): array {
+		return Types::object( [
+			'blockName' => Types::string(),
+			'enabledOverrides' => Types::list_of( Types::string() ),
+			'metadata' => Types::record(
+				Types::string(),
+				Types::object( [
+					'name' => Types::string(),
+					'type' => Types::string(),
+					'value' => Types::string(),
+				] )
+			),
+			'pagination' => Types::object( [
+				'cursorNext' => Types::nullable( Types::string() ),
+				'cursorPrevious' => Types::nullable( Types::string() ),
+				'hasNextPage' => Types::nullable( Types::boolean() ),
+				'totalItems' => Types::nullable( Types::integer() ),
+			] ),
+			'queryInputs' => Types::list_of( Types::record( Types::string(), Types::any() ) ),
+			'queryKey' => Types::nullable( Types::string() ),
+			'resultId' => Types::nullable( Types::string() ),
+			'results' => Types::list_of(
+				Types::object( [
+					'result' => Types::record(
+						Types::string(),
+						Types::object( [
+							'name' => Types::string(),
+							'type' => Types::string(),
+							'value' => Types::string(),
+						] )
+					),
+					'uuid' => Types::uuid(),
+				] )
+			),
 		] );
 	}
 }

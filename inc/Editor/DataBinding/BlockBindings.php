@@ -4,6 +4,7 @@ namespace RemoteDataBlocks\Editor\DataBinding;
 
 defined( 'ABSPATH' ) || exit();
 
+use RemoteDataBlocks\Config\BlockAttribute\RemoteDataBlockAttribute;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\Logging\LoggerManager;
@@ -113,24 +114,25 @@ class BlockBindings {
 			return $source_args['hydrated_results'];
 		}
 
+		// Load the attribute data and validate it.
+		$remote_data = RemoteDataBlockAttribute::from_array( $block_context );
+
+		if ( is_wp_error( $remote_data ) ) {
+			self::log_error( sprintf( 'Missing or malformed block context for block binding %s', self::$context_name ), 'unknown' );
+			return null;
+		}
+
 		// Extract block and query information. In cases where the binding has become
 		// disconencted from the ancestor remote data block, allow the binding source
 		// args to override.
-		$block_name = $source_args['block'] ?? $block_context['blockName'] ?? null;
-		$enabled_overrides = $source_args['enabledOverrides'] ?? $block_context['enabledOverrides'] ?? [];
-		$query_key = $source_args['queryKey'] ?? $block_context['queryKey'] ?? ConfigRegistry::DISPLAY_QUERY_KEY;
+		$remote_data = $remote_data->to_array();
+		$block_name = $source_args['block'] ?? $remote_data['blockName'];
+		$enabled_overrides = $source_args['enabledOverrides'] ?? $remote_data['enabledOverrides'];
+		$query_key = $source_args['queryKey'] ?? $remote_data['queryKey'] ?? ConfigRegistry::DISPLAY_QUERY_KEY;
 
 		// Extract the input variables. Support the previous property name used
 		// before we allowed multiple query inputs.
-		$array_of_input_variables = $source_args['queryInputs'] ?? $block_context['queryInputs'] ?? null;
-		if ( null === $array_of_input_variables ) {
-			$array_of_input_variables = [ $block_context['queryInput'] ?? [] ];
-		}
-
-		if ( null === $block_name ) {
-			self::log_error( sprintf( 'Missing block context for block binding %s', self::$context_name ), 'unknown' );
-			return null;
-		}
+		$array_of_input_variables = $source_args['queryInputs'] ?? $remote_data['queryInputs'];
 
 		$block_config = ConfigStore::get_block_configuration( $block_name );
 		$query = $block_config['queries'][ $query_key ] ?? null;

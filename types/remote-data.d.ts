@@ -17,6 +17,7 @@ interface RemoteDataResultFields {
 
 type RemoteDataQueryInput = Record< string, unknown >;
 
+// This interface mirrors the schema of RemoteDataBlockAttribute.
 interface RemoteData {
 	blockName: string;
 	enabledOverrides?: string[];
