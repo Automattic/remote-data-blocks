@@ -72,7 +72,7 @@ function register_aic_block(): void {
 				],
 				'title' => [
 					'name' => 'Title',
-					'type' => 'string',
+					'type' => 'title',
 					'path' => '$.title',
 				],
 				'image_id' => [
@@ -137,7 +137,7 @@ function register_aic_block(): void {
 				],
 				'title' => [
 					'name' => 'Title',
-					'type' => 'string',
+					'type' => 'title',
 					'path' => '$.title',
 				],
 				'image_url' => [
@@ -198,6 +198,7 @@ function register_aic_block(): void {
 
 	register_remote_data_block([
 		'title' => 'Art Institute of Chicago',
+		'icon' => 'art',
 		'render_query' => [
 			'query' => $get_art_query,
 			'additional_queries' => [

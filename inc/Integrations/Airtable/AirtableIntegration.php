@@ -41,6 +41,7 @@ class AirtableIntegration {
 					array_merge(
 						[
 							'title' => $data_source->get_display_name() . '/' . $table['name'],
+							'icon' => 'editor-table',
 							'render_query' => [
 								'query' => $query,
 							],

@@ -5,7 +5,8 @@ interface InnerBlockContext {
 interface RemoteDataPagination {
 	cursorNext?: string;
 	cursorPrevious?: string;
-	totalItems: number;
+	hasNextPage?: boolean;
+	totalItems?: number;
 }
 
 interface RemoteDataResultFields {
@@ -87,7 +88,8 @@ interface RemoteDataApiResponseBody {
 	pagination?: {
 		cursor_next?: string;
 		cursor_previous?: string;
-		total_items: number;
+		has_next_page?: boolean;
+		total_items?: number;
 	};
 	query_input: RemoteDataQueryInput;
 	result_id: string;

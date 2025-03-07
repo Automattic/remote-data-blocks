@@ -27,6 +27,7 @@ function getResultsWithId( results: RemoteDataResult[], instanceId: string ): Re
 interface ItemListProps {
 	availableBindings: Record< string, RemoteDataBinding >;
 	blockName: string;
+	hasNextPage: boolean;
 	idField: string;
 	loading: boolean;
 	onSelect: ( data: RemoteDataQueryInput ) => void;
@@ -37,6 +38,7 @@ interface ItemListProps {
 	searchInput: string;
 	selectedItems: string[];
 	setPage: ( newPage: number ) => void;
+	setPerPage: ( newPerPage: number ) => void;
 	setSearchInput: ( newValue: string ) => void;
 	setSelectedItems: ( newSelectedItems: string[] ) => void;
 	supportsBulk: boolean;
@@ -49,6 +51,7 @@ export function ItemList( props: ItemListProps ) {
 	const {
 		availableBindings,
 		blockName,
+		hasNextPage,
 		idField,
 		loading,
 		onSelect,
@@ -59,6 +62,7 @@ export function ItemList( props: ItemListProps ) {
 		searchInput,
 		selectedItems,
 		setPage,
+		setPerPage,
 		setSearchInput,
 		setSelectedItems,
 		supportsBulk,
@@ -85,7 +89,7 @@ export function ItemList( props: ItemListProps ) {
 
 	// Find title field from availableBindings by checking type
 	const titleField = Object.entries( availableBindings ).find(
-		( [ _, binding ] ) => binding.type === 'string' && binding.name.toLowerCase() === 'title'
+		( [ _, binding ] ) => binding.type === 'title'
 	)?.[ 0 ];
 
 	// Find media field from availableBindings by checking type
@@ -130,6 +134,7 @@ export function ItemList( props: ItemListProps ) {
 
 	function onChangeView( newView: View ) {
 		setPage( newView.page ?? 1 );
+		setPerPage( newView.perPage ?? perPage ?? data.length );
 		setSearchInput( newView.search ?? '' );
 		setView( { ...newView, selection: selectedItems } );
 	}
@@ -182,7 +187,7 @@ export function ItemList( props: ItemListProps ) {
 				onChangeView={ onChangeView }
 				paginationInfo={ {
 					totalItems: totalItems ?? data.length,
-					totalPages: totalPages ?? 1,
+					totalPages: totalPages ?? ( hasNextPage ? page + 1 : Math.max( 1, page ) ),
 				} }
 				search={ supportsSearch }
 				selection={ selectedItems }

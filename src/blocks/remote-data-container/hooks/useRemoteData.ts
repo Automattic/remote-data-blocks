@@ -31,6 +31,7 @@ async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< Re
 		pagination: body.pagination && {
 			cursorNext: body.pagination.cursor_next,
 			cursorPrevious: body.pagination.cursor_previous,
+			hasNextPage: body.pagination.has_next_page,
 			totalItems: body.pagination.total_items,
 		},
 		queryInput: body.query_input,
@@ -51,7 +52,7 @@ interface UseRemoteData {
 	data?: RemoteData;
 	error?: Error;
 	fetch: ( queryInput: RemoteDataQueryInput ) => Promise< void >;
-	hasNextPage: boolean;
+	hasNextPage?: boolean;
 	hasPreviousPage: boolean;
 	loading: boolean;
 	page: number;
@@ -126,6 +127,7 @@ export function useRemoteData( {
 	const inputVariables = query.inputs;
 
 	const {
+		hasNextPage,
 		onFetch: onFetchForPagination,
 		page,
 		perPage,
@@ -237,7 +239,7 @@ export function useRemoteData( {
 		data: resolvedData,
 		error,
 		fetch,
-		hasNextPage: totalPages ? page < totalPages : supportsPagination,
+		hasNextPage: hasNextPage ?? ( totalPages ? page < totalPages : supportsPagination ),
 		hasPreviousPage: page > 1,
 		loading,
 		page,

@@ -69,7 +69,7 @@ class ShopifyIntegration {
 						'title' => [
 							'name' => 'Title',
 							'path' => '$.data.product.title',
-							'type' => 'string',
+							'type' => 'title',
 						],
 						'variant_id' => [
 							'name' => 'Variant ID',
@@ -85,6 +85,19 @@ class ShopifyIntegration {
 				'input_schema' => [
 					'search' => [
 						'type' => 'ui:search_input',
+					],
+					'limit' => [
+						'default_value' => 8,
+						'name' => 'Items per page',
+						'type' => 'ui:pagination_per_page',
+					],
+					'cursor_next' => [
+						'name' => 'Next page cursor',
+						'type' => 'ui:pagination_cursor_next',
+					],
+					'cursor_previous' => [
+						'name' => 'Previous page cursor',
+						'type' => 'ui:pagination_cursor_previous',
 					],
 				],
 				'output_schema' => [
@@ -109,8 +122,25 @@ class ShopifyIntegration {
 						'title' => [
 							'name' => 'Product title',
 							'path' => '$.node.title',
-							'type' => 'string',
+							'type' => 'title',
 						],
+					],
+				],
+				'pagination_schema' => [
+					'cursor_next' => [
+						'name' => 'Next page cursor',
+						'path' => '$.data.products.pageInfo.endCursor',
+						'type' => 'string',
+					],
+					'cursor_previous' => [
+						'name' => 'Previous page cursor',
+						'path' => '$.data.products.pageInfo.startCursor',
+						'type' => 'string',
+					],
+					'has_next_page' => [
+						'name' => 'Has next page',
+						'path' => '$.data.products.pageInfo.hasNextPage',
+						'type' => 'boolean',
 					],
 				],
 				'graphql_query' => file_get_contents( __DIR__ . '/Queries/SearchProducts.graphql' ),
@@ -124,6 +154,7 @@ class ShopifyIntegration {
 
 		register_remote_data_block( [
 			'title' => $block_title,
+			'icon' => 'cart',
 			'render_query' => [
 				'query' => $queries['shopify_get_product'],
 			],

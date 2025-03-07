@@ -42,6 +42,7 @@ interface BlockConfig {
 	settings: {
 		category: string;
 		description?: string;
+		icon?: ReactElement | IconType | ComponentType;
 		title: string;
 	};
 }

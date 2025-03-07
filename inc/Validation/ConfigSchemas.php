@@ -65,6 +65,7 @@ final class ConfigSchemas {
 
 	private static function generate_remote_data_block_config_schema(): array {
 		return Types::object( [
+			'icon' => Types::nullable( Types::string() ),
 			'patterns' => Types::nullable(
 				Types::list_of(
 					Types::object( [
@@ -289,6 +290,7 @@ final class ConfigSchemas {
 							'image_alt',
 							'image_url',
 							'markdown',
+							'title',
 							// 'json_path' is omitted since it likely has no user utility.
 							'url',
 							'uuid',
@@ -304,14 +306,15 @@ final class ConfigSchemas {
 			'pagination_schema' => Types::nullable(
 				Types::object( [
 					// This field provides an integer representing the total number of
-					// items available in paginated results. This field must be defined
-					// in order present to enable pagination support of any type,
-					// including cursor-based pagination.
-					'total_items' => Types::object( [
-						'name' => Types::nullable( Types::string() ),
-						'path' => Types::json_path(),
-						'type' => Types::enum( 'integer' ),
-					] ),
+					// items available in paginated results. Either this field or
+					// `has_next_page` must be defined in order to enable pagination.
+					'total_items' => Types::nullable(
+						Types::object( [
+							'name' => Types::nullable( Types::string() ),
+							'path' => Types::json_path(),
+							'type' => Types::enum( 'integer' ),
+						] ),
+					),
 					// This field provides a pagination cursor for the next page of
 					// paginated results, or a null value if there is no next page. This
 					// field must be defined in order to enable cursor-based pagination.
@@ -331,6 +334,16 @@ final class ConfigSchemas {
 							'path' => Types::json_path(),
 							'type' => Types::enum( 'string' ),
 						] ),
+					),
+					// This field provides a boolean indicating if there is a next page of
+					// paginated results. This is helpful if the API does not provide a
+					// total number of items. 
+					'has_next_page' => Types::nullable(
+						Types::object( [
+							'name' => Types::nullable( Types::string() ),
+							'path' => Types::json_path(),
+							'type' => Types::enum( 'boolean' ),
+						] )
 					),
 				] )
 			),

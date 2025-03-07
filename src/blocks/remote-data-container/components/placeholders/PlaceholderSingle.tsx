@@ -1,4 +1,4 @@
-import { Placeholder } from '@wordpress/components';
+import { IconType, Placeholder } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { cloud } from '@wordpress/icons';
 
@@ -14,9 +14,11 @@ export function PlaceholderSingle( props: PlaceholderSingleProps ) {
 
 	const supportsBulk = blockConfig?.selectors?.some( selector => selector.supports_bulk ) ?? false;
 
+	const iconElement: IconType = ( blockConfig.settings.icon as IconType ) ?? cloud;
+
 	return (
 		<Placeholder
-			icon={ cloud }
+			icon={ iconElement }
 			label={ blockConfig.settings.title }
 			instructions={
 				supportsBulk
