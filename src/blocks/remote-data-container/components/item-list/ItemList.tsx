@@ -14,7 +14,7 @@ interface ItemListProps {
 	blockName: string;
 	hasNextPage: boolean;
 	loading: boolean;
-	onSelect?: ( ids: string[] ) => void;
+	onSelect?: ( results: RemoteDataApiResult[] ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
 	page: number;
 	perPage?: number;
@@ -132,7 +132,7 @@ export function ItemList( props: ItemListProps ) {
 		isPrimary: true,
 		label: '',
 		callback: ( items: RemoteDataApiResult[] ) => {
-			onSelect?.( items.map( item => item.uuid ) );
+			onSelect?.( items );
 		},
 		supportsBulk: true,
 	};

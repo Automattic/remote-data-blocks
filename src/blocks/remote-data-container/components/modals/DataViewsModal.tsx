@@ -72,12 +72,12 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 		setSelection( newSelection );
 	}
 
-	function save(): void {
-		if ( ! selection.length ) {
+	function save( results: RemoteDataApiResult[] ): void {
+		if ( ! results.length ) {
 			return;
 		}
 
-		onSelect?.( createQueryInputsFromRemoteDataResults( selection ) );
+		onSelect?.( createQueryInputsFromRemoteDataResults( results ) );
 		sendTracksEvent( 'add_block', {
 			action: 'select_item',
 			selected_option: 'search_from_list',
@@ -108,6 +108,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 						blockName={ blockName }
 						hasNextPage={ hasNextPage ?? false }
 						loading={ loading }
+						onSelect={ save }
 						onSelectField={ onSelectField }
 						page={ page }
 						results={ data?.results }
@@ -142,7 +143,11 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 								>
 									{ __( 'Cancel' ) }
 								</Button>
-								<Button disabled={ selection.length === 0 } onClick={ save } variant="primary">
+								<Button
+									disabled={ selection.length === 0 }
+									onClick={ () => save( selection ) }
+									variant="primary"
+								>
 									{ __( 'Save' ) }
 								</Button>
 							</HStack>
