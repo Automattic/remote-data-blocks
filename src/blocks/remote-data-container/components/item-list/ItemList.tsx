@@ -136,7 +136,12 @@ export function ItemList( props: ItemListProps ) {
 		},
 		supportsBulk: true,
 	};
-	const actions: Action< RemoteDataApiResult >[] = onSelectField ? [] : [ chooseItemAction ];
+
+	// Only show the action if onSelect is defined and there are results.
+	let actions: Action< RemoteDataApiResult >[] = [];
+	if ( onSelect && results?.length ) {
+		actions = [ chooseItemAction ];
+	}
 
 	return (
 		<>
