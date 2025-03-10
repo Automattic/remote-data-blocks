@@ -11,14 +11,22 @@ import {
 
 const mockRemoteData: RemoteData = {
 	blockName: 'Test Block',
-	isCollection: true,
 	metadata: {},
-	queryInput: {},
+	queryInputs: [],
 	resultId: 'test-result',
 	results: [
-		{ id: 'violets', title: 'Violets' },
-		{ id: 'crimson-clover', title: 'Crimson Clover' },
-		{ id: 'poppy', title: 'Poppy' },
+		{
+			uuid: 'violets',
+			result: { title: { name: 'Title', type: 'title', value: 'Violets' } },
+		},
+		{
+			uuid: 'crimson-clover',
+			result: { title: { name: 'Title', type: 'title', value: 'Crimson Clover' } },
+		},
+		{
+			uuid: 'poppy',
+			result: { title: { name: 'Title', type: 'title', value: 'Poppy' } },
+		},
 	],
 };
 
@@ -35,29 +43,29 @@ const defaultProps = {
 	idField: 'id',
 	loading: false,
 	page: 1,
-	remoteData: mockRemoteData,
+	results: mockRemoteData.results,
 	searchInput: '',
-	selectedItems: [],
+	selectionIds: [],
 	setPage: () => {},
 	setPerPage: () => {},
 	setSearchInput: () => {},
-	setSelectedItems: () => {},
+	setSelectionIds: () => {},
 	supportsBulk: false,
 	supportsSearch: false,
 };
 
 const ItemListComponent = ( props: ItemListProps ) => {
-	const [ selectedItems, setSelectedItems ] = useState< string[] >( [] );
+	const [ selectionIds, setSelectionIds ] = useState< string[] >( [] );
 	return (
 		<>
 			<ItemList
 				{ ...props }
-				selectedItems={ selectedItems }
-				setSelectedItems={ setSelectedItems }
+				selectionIds={ selectionIds }
+				setSelectionIds={ setSelectionIds }
 				onSelect={ props.onSelect }
 			/>
-			<Button onClick={ () => setSelectedItems( [] ) }>Cancel</Button>
-			<Button onClick={ () => props.onSelect( { id: selectedItems.join( ',' ) } ) }>Save</Button>
+			<Button onClick={ () => setSelectionIds( [] ) }>Cancel</Button>
+			<Button onClick={ () => props.onSelect( [ selectionIds ] ) }>Save</Button>
 		</>
 	);
 };
@@ -90,10 +98,18 @@ describe( 'ItemList', () => {
 
 		// Verify onSelect was called with the correct item
 		expect( onSelect ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				id: 'poppy',
-				title: 'Poppy',
-			} )
+			expect.arrayContaining( [
+				{
+					result: {
+						title: {
+							name: 'Title',
+							type: 'title',
+							value: 'Poppy',
+						},
+					},
+					uuid: 'poppy',
+				},
+			] )
 		);
 	} );
 
@@ -101,7 +117,7 @@ describe( 'ItemList', () => {
 		const onSelect = vi.fn();
 		const user = userEvent.setup();
 
-		render( <ItemListComponent { ...defaultProps } onSelect={ onSelect } supportsBulk={ true } /> );
+		render( <ItemListComponent { ...defaultProps } onSelect={ onSelect } /> );
 
 		// Get checkboxes for each item
 		const violetsCheckbox = within( screen.getByRole( 'row', { name: /Violets/i } ) ).getByRole(
@@ -120,18 +136,14 @@ describe( 'ItemList', () => {
 		await user.click( saveButton );
 
 		// Verify onSelect was called with the correct items
-		expect( onSelect ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				id: 'violets,poppy',
-			} )
-		);
+		expect( onSelect ).toHaveBeenCalledWith( expect.arrayContaining( [ [ 'violets', 'poppy' ] ] ) );
 	} );
 
 	it( 'should allow deselection of items', async () => {
 		const onSelect = vi.fn();
 		const user = userEvent.setup();
 
-		render( <ItemListComponent { ...defaultProps } supportsBulk={ true } onSelect={ onSelect } /> );
+		render( <ItemListComponent { ...defaultProps } onSelect={ onSelect } /> );
 
 		// Get checkboxes for each item
 		const violetsCheckbox = within( screen.getByRole( 'row', { name: /Violets/i } ) ).getByRole(
@@ -157,11 +169,7 @@ describe( 'ItemList', () => {
 		await user.click( saveButton );
 
 		// Verify onSelect was called with the correct item
-		expect( onSelect ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				id: 'poppy',
-			} )
-		);
+		expect( onSelect ).toHaveBeenCalledWith( expect.arrayContaining( [ [ 'poppy' ] ] ) );
 	} );
 
 	it( 'should render pagination buttons when there is more than one page', async () => {
