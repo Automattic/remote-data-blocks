@@ -65,7 +65,7 @@ const ItemListComponent = ( props: ItemListProps ) => {
 				onSelect={ props.onSelect }
 			/>
 			<Button onClick={ () => setSelectionIds( [] ) }>Cancel</Button>
-			<Button onClick={ () => props.onSelect( [ selectionIds ] ) }>Save</Button>
+			<Button onClick={ () => props.onSelect( selectionIds ) }>Save</Button>
 		</>
 	);
 };
@@ -136,7 +136,7 @@ describe( 'ItemList', () => {
 		await user.click( saveButton );
 
 		// Verify onSelect was called with the correct items
-		expect( onSelect ).toHaveBeenCalledWith( expect.arrayContaining( [ [ 'violets', 'poppy' ] ] ) );
+		expect( onSelect ).toHaveBeenCalledWith( expect.arrayContaining( [ 'violets', 'poppy' ] ) );
 	} );
 
 	it( 'should allow deselection of items', async () => {
@@ -169,7 +169,7 @@ describe( 'ItemList', () => {
 		await user.click( saveButton );
 
 		// Verify onSelect was called with the correct item
-		expect( onSelect ).toHaveBeenCalledWith( expect.arrayContaining( [ [ 'poppy' ] ] ) );
+		expect( onSelect ).toHaveBeenCalledWith( expect.arrayContaining( [ 'poppy' ] ) );
 	} );
 
 	it( 'should render pagination buttons when there is more than one page', async () => {
