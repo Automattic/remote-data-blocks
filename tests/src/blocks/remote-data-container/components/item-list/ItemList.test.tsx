@@ -164,7 +164,7 @@ describe( 'ItemList', () => {
 		);
 	} );
 
-	it( 'should render pagnination buttons when there is more than one page', async () => {
+	it( 'should render pagination buttons when there is more than one page', async () => {
 		const onSelect = vi.fn();
 		const user = userEvent.setup();
 		const setPage = vi.fn();
