@@ -1,5 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -33,7 +34,6 @@ const defaultProps = {
 	hasNextPage: false,
 	idField: 'id',
 	loading: false,
-	onSelect: () => {},
 	page: 1,
 	remoteData: mockRemoteData,
 	searchInput: '',
@@ -49,13 +49,23 @@ const defaultProps = {
 const ItemListComponent = ( props: ItemListProps ) => {
 	const [ selectedItems, setSelectedItems ] = useState< string[] >( [] );
 	return (
-		<ItemList { ...props } selectedItems={ selectedItems } setSelectedItems={ setSelectedItems } />
+		<>
+			<ItemList
+				{ ...props }
+				selectedItems={ selectedItems }
+				setSelectedItems={ setSelectedItems }
+				onSelect={ props.onSelect }
+			/>
+			<Button onClick={ () => setSelectedItems( [] ) }>Cancel</Button>
+			<Button onClick={ () => props.onSelect( { id: selectedItems.join( ',' ) } ) }>Save</Button>
+		</>
 	);
 };
 
 describe( 'ItemList', () => {
 	it( 'should render rows when there are results', () => {
-		render( <ItemListComponent { ...defaultProps } /> );
+		const onSelect = vi.fn();
+		render( <ItemListComponent { ...defaultProps } onSelect={ onSelect } /> );
 
 		// Field should be visible
 		expect( screen.getByRole( 'button', { name: 'Title' } ) ).toBeVisible();
@@ -72,10 +82,13 @@ describe( 'ItemList', () => {
 
 		render( <ItemListComponent { ...defaultProps } onSelect={ onSelect } /> );
 
-		const poppyRow = screen.getByRole( 'row', { name: /Poppy/i } );
+		await user.click(
+			within( screen.getByRole( 'row', { name: /Poppy/i } ) ).getByRole( 'button', {
+				name: 'Choose',
+			} )
+		);
 
-		await user.click( within( poppyRow ).getByRole( 'button', { name: 'Choose' } ) );
-
+		// Verify onSelect was called with the correct item
 		expect( onSelect ).toHaveBeenCalledWith(
 			expect.objectContaining( {
 				id: 'poppy',
@@ -85,40 +98,48 @@ describe( 'ItemList', () => {
 	} );
 
 	it( 'should allow bulk selection of items', async () => {
+		const onSelect = vi.fn();
 		const user = userEvent.setup();
 
-		render( <ItemListComponent { ...defaultProps } supportsBulk={ true } /> );
+		render( <ItemListComponent { ...defaultProps } onSelect={ onSelect } supportsBulk={ true } /> );
 
-		const violetsRow = screen.getByRole( 'row', { name: /Violets/i } );
-		const violetsCheckbox = within( violetsRow ).getByRole( 'checkbox' );
-
-		const poppyRow = screen.getByRole( 'row', { name: /Poppy/i } );
-		const poppyCheckbox = within( poppyRow ).getByRole( 'checkbox' );
-
-		const crimsonCloverRow = screen.getByRole( 'row', { name: /Crimson Clover/i } );
-		const crimsonCloverCheckbox = within( crimsonCloverRow ).getByRole( 'checkbox' );
+		// Get checkboxes for each item
+		const violetsCheckbox = within( screen.getByRole( 'row', { name: /Violets/i } ) ).getByRole(
+			'checkbox'
+		);
+		const poppyCheckbox = within( screen.getByRole( 'row', { name: /Poppy/i } ) ).getByRole(
+			'checkbox'
+		);
 
 		// Select two items
 		await user.click( violetsCheckbox );
 		await user.click( poppyCheckbox );
 
-		// Assert that both are checked
-		expect( violetsCheckbox ).toBeChecked();
-		expect( poppyCheckbox ).toBeChecked();
+		// Click the Save button
+		const saveButton = screen.getByRole( 'button', { name: 'Save' } );
+		await user.click( saveButton );
 
-		expect( crimsonCloverCheckbox ).not.toBeChecked();
+		// Verify onSelect was called with the correct items
+		expect( onSelect ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				id: 'violets,poppy',
+			} )
+		);
 	} );
 
-	it( 'should allow deselection', async () => {
+	it( 'should allow deselection of items', async () => {
+		const onSelect = vi.fn();
 		const user = userEvent.setup();
 
-		render( <ItemListComponent { ...defaultProps } supportsBulk={ true } /> );
+		render( <ItemListComponent { ...defaultProps } supportsBulk={ true } onSelect={ onSelect } /> );
 
-		const violetsRow = screen.getByRole( 'row', { name: /Violets/i } );
-		const violetsCheckbox = within( violetsRow ).getByRole( 'checkbox' );
-
-		const poppyRow = screen.getByRole( 'row', { name: /Poppy/i } );
-		const poppyCheckbox = within( poppyRow ).getByRole( 'checkbox' );
+		// Get checkboxes for each item
+		const violetsCheckbox = within( screen.getByRole( 'row', { name: /Violets/i } ) ).getByRole(
+			'checkbox'
+		);
+		const poppyCheckbox = within( screen.getByRole( 'row', { name: /Poppy/i } ) ).getByRole(
+			'checkbox'
+		);
 
 		// Select two items
 		await user.click( violetsCheckbox );
@@ -130,5 +151,16 @@ describe( 'ItemList', () => {
 		// Assert that only one is checked
 		expect( violetsCheckbox ).not.toBeChecked();
 		expect( poppyCheckbox ).toBeChecked();
+
+		// Click the Save button
+		const saveButton = screen.getByRole( 'button', { name: 'Save' } );
+		await user.click( saveButton );
+
+		// Verify onSelect was called with the correct item
+		expect( onSelect ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				id: 'poppy',
+			} )
+		);
 	} );
 } );
