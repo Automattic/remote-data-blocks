@@ -372,15 +372,17 @@ final class ConfigSchemas {
 				Types::object( [
 					'name' => Types::string(),
 					'type' => Types::string(),
-					'value' => Types::string(),
+					'value' => Types::one_of( Types::integer(), Types::string() ),
 				] )
 			),
-			'pagination' => Types::object( [
-				'cursorNext' => Types::nullable( Types::string() ),
-				'cursorPrevious' => Types::nullable( Types::string() ),
-				'hasNextPage' => Types::nullable( Types::boolean() ),
-				'totalItems' => Types::nullable( Types::integer() ),
-			] ),
+			'pagination' => Types::nullable(
+				Types::object( [
+					'cursorNext' => Types::nullable( Types::string() ),
+					'cursorPrevious' => Types::nullable( Types::string() ),
+					'hasNextPage' => Types::nullable( Types::boolean() ),
+					'totalItems' => Types::nullable( Types::integer() ),
+				] ),
+			),
 			'queryInputs' => Types::list_of( Types::record( Types::string(), Types::any() ) ),
 			'queryKey' => Types::nullable( Types::string() ),
 			'resultId' => Types::nullable( Types::string() ),
