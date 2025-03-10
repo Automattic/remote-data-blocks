@@ -34,7 +34,7 @@ class RemoteDataBlockAttribute extends ArraySerializable {
 		$config = array_merge( $defaults, $config );
 
 		// Migrate the singular "queryInput" to the plural "queryInputs".
-		if ( ! isset( $config['query_inputs'] ) ) {
+		if ( ! isset( $config['queryInputs'] ) ) {
 			$config['queryInputs'] = [ $config['queryInput'] ?? [] ];
 			unset( $config['queryInput'] );
 		}
