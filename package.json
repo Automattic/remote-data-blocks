@@ -51,7 +51,8 @@
     "test:php": "composer test",
     "test:php:coverage": "composer test-coverage",
     "test:integration": "wp-env run tests-cli --env-cwd=wp-content/plugins/remote-data-blocks ./vendor/bin/phpunit -c ./phpunit-integration.xml",
-    "test:js": "vitest --watch=true",
+    "test:js": "vitest --watch=false",
+    "test:js:watch": "vitest --watch=true",
     "test:js:coverage": "vitest --coverage --watch=false",
     "wp-cli": "wp-env run cli -- wp"
   },
