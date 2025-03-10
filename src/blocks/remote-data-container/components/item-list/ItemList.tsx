@@ -24,7 +24,7 @@ function getResultsWithId( results: RemoteDataResult[], instanceId: string ): Re
 	} );
 }
 
-interface ItemListProps {
+export interface ItemListProps {
 	availableBindings: Record< string, RemoteDataBinding >;
 	blockName: string;
 	hasNextPage: boolean;
