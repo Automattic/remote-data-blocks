@@ -163,4 +163,52 @@ describe( 'ItemList', () => {
 			} )
 		);
 	} );
+
+	it( 'should render pagnination buttons when there is more than one page', async () => {
+		const onSelect = vi.fn();
+		const user = userEvent.setup();
+		const setPage = vi.fn();
+
+		const { rerender } = render(
+			<ItemListComponent
+				{ ...defaultProps }
+				onSelect={ onSelect }
+				setPage={ setPage }
+				totalPages={ 3 }
+			/>
+		);
+
+		const nextButton = screen.getByRole( 'button', { name: /next/i } );
+
+		// Simulate clicking the next page button
+		await user.click( nextButton );
+
+		// Verify setPage was called with next page
+		expect( setPage ).toHaveBeenCalledWith( 2 );
+
+		// Rerender the component with updated page
+		rerender(
+			<ItemListComponent
+				{ ...defaultProps }
+				onSelect={ onSelect }
+				page={ 2 } // Now render page 2
+				setPage={ setPage }
+				totalPages={ 3 }
+			/>
+		);
+
+		// Simulate clicking the next page button
+		await user.click( nextButton );
+
+		// Verify setPage was called with next page
+		expect( setPage ).toHaveBeenCalledWith( 3 );
+
+		const previousButton = screen.getByRole( 'button', { name: /previous/i } );
+
+		// Simulate clicking the previous page button
+		await user.click( previousButton );
+
+		// Verify setPage was called with previous page
+		expect( setPage ).toHaveBeenCalledWith( 2 );
+	} );
 } );
