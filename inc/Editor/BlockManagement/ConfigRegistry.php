@@ -51,26 +51,6 @@ class ConfigRegistry {
 		$display_query = self::inflate_query( $user_config[ self::RENDER_QUERY_KEY ]['query'] );
 		$input_schema = $display_query->get_input_schema();
 
-		// Check if render query has any bulk-supporting inputs
-		$bulk_supported_inputs = array_filter(
-			$input_schema,
-			function ( $input ) {
-				return $input['supports_bulk'] ?? false;
-			}
-		);
-
-		if ( count( $bulk_supported_inputs ) > 0 ) {
-			// Ensure only one input variable when bulk selection is enabled
-			if ( count( $input_schema ) > 1 ) {
-				return self::create_error(
-					$block_title,
-					'Render queries with bulk selection can only have one input variable'
-				);
-			}
-		}
-
-		$has_bulk_support = !empty( $bulk_supported_inputs );
-
 		// Build the base configuration for the block. This is our own internal
 		// configuration, not what will be passed to WordPress's register_block_type.
 		// @see BlockRegistration::register_block_type::register_blocks.
@@ -93,7 +73,6 @@ class ConfigRegistry {
 							'required' => $input_var['required'] ?? true,
 							'slug' => $slug,
 							'type' => $input_var['type'] ?? 'string',
-							'supports_bulk' => $input_var['supports_bulk'] ?? false,
 						];
 					}, array_keys( $input_schema ), array_values( $input_schema ) ),
 					'name' => 'Manual input',
@@ -147,7 +126,6 @@ class ConfigRegistry {
 					}, array_keys( $from_input_schema ), array_values( $from_input_schema ) ),
 					'name' => $selection_query['display_name'] ?? ucfirst( $from_query_type ),
 					'query_key' => $from_query::class,
-					'supports_bulk' => $has_bulk_support,
 					'type' => $from_query_type,
 				]
 			);

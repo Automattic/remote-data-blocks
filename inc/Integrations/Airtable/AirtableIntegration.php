@@ -86,8 +86,7 @@ class AirtableIntegration {
 		$input_schema = [
 			'record_id' => [
 				'name' => 'Record ID',
-				'type' => 'id',
-				'supports_bulk' => true,
+				'type' => 'id:list',
 			],
 		];
 
@@ -100,16 +99,10 @@ class AirtableIntegration {
 		return HttpQuery::from_array( [
 			'data_source' => $data_source,
 			'endpoint' => function ( array $input_variables ) use ( $data_source, $table ): string {
-				// Get and clean record IDs from comma-separated string
-				$record_ids = array_filter(
-					array_map( 'trim', explode( ',', (string) $input_variables['record_id'] ) ),
-					'strlen'
-				);
-
 				// Build the formula
 				$formula_parts = array_map( function ( $id ) {
 					return sprintf( 'RECORD_ID()="%s"', addslashes( $id ) );
-				}, $record_ids );
+				}, $input_variables['record_id'] );
 
 				$formula = count( $formula_parts ) === 1 ? $formula_parts[0] : 'OR(' . implode( ',', $formula_parts ) . ')';
 

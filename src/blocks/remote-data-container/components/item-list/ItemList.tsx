@@ -1,47 +1,30 @@
-import { useInstanceId } from '@wordpress/compose';
 import { Action, DataViews, View } from '@wordpress/dataviews/wp';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { ItemListField } from '@/blocks/remote-data-container/components/item-list/ItemListField';
+import {
+	ID_FIELD_TYPES,
+	IMAGE_URL_FIELD_TYPES,
+} from '@/blocks/remote-data-container/config/constants';
 import { usePatterns } from '@/blocks/remote-data-container/hooks/usePatterns';
-import { removeNullValuesFromObject } from '@/utils/type-narrowing';
-
-function getResultsWithId( results: RemoteDataResult[], instanceId: string ): RemoteDataResult[] {
-	return ( results ?? [] ).map( ( result: RemoteDataResult ) => {
-		const parsedItem = removeNullValuesFromObject( result );
-
-		if ( parsedItem.id ) {
-			return parsedItem;
-		}
-
-		// ensure each result has an 'id' key
-		const idKey = Object.keys( parsedItem ).find( key => /(^|_)(id)$/i.test( key ) );
-		return {
-			...parsedItem,
-			id: idKey ? parsedItem[ idKey ] : instanceId,
-		};
-	} );
-}
+import { getRemoteDataResultValue } from '@/utils/remote-data';
 
 export interface ItemListProps {
-	availableBindings: Record< string, RemoteDataBinding >;
 	blockName: string;
 	hasNextPage: boolean;
-	idField: string;
 	loading: boolean;
-	onSelect: ( data: RemoteDataQueryInput ) => void;
+	onSelect?: ( results: RemoteDataApiResult[] ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
 	page: number;
 	perPage?: number;
-	remoteData?: RemoteData;
+	results?: RemoteDataApiResult[];
 	searchInput: string;
-	selectedItems: string[];
+	selectionIds: string[];
 	setPage: ( newPage: number ) => void;
 	setPerPage: ( newPerPage: number ) => void;
 	setSearchInput: ( newValue: string ) => void;
-	setSelectedItems: ( newSelectedItems: string[] ) => void;
-	supportsBulk: boolean;
+	setSelectionIds: ( ids: string[] ) => void;
 	supportsSearch: boolean;
 	totalItems?: number;
 	totalPages?: number;
@@ -49,68 +32,57 @@ export interface ItemListProps {
 
 export function ItemList( props: ItemListProps ) {
 	const {
-		availableBindings,
 		blockName,
 		hasNextPage,
-		idField,
 		loading,
 		onSelect,
 		onSelectField,
 		page,
 		perPage,
-		remoteData,
+		results = [],
 		searchInput,
-		selectedItems,
+		selectionIds,
 		setPage,
 		setPerPage,
 		setSearchInput,
-		setSelectedItems,
-		supportsBulk,
+		setSelectionIds,
 		supportsSearch,
 		totalItems,
 		totalPages,
 	} = props;
 	const { defaultPattern: pattern } = usePatterns( blockName );
-	const instanceId = useInstanceId( ItemList, blockName );
 
-	const results = remoteData?.results ?? [];
-	const data = loading ? [] : getResultsWithId( results ?? [], instanceId );
+	// Get fields from the first result, if present.
+	const firstResult = results?.[ 0 ]?.result ?? {};
 
-	// get fields from results data to use as columns
-	const fieldNames: string[] = Array.from(
-		new Set(
-			data
-				?.flatMap( item => Object.keys( item ) )
-				.filter(
-					key => key in availableBindings && availableBindings[ key ]?.type !== 'id' // filter out ID fields to hide from table
-				)
-		)
-	);
+	// Filter out ID fields from columns.
+	const fieldNames: string[] = Object.entries( firstResult )
+		.filter( ( [ _slug, data ] ) => ! ID_FIELD_TYPES.includes( data.type ) )
+		.map( ( [ slug ] ) => slug );
 
-	// Find title field from availableBindings by checking type
-	const titleField = Object.entries( availableBindings ).find(
-		( [ _, binding ] ) => binding.type === 'title'
+	// Find title field from by checking type
+	const titleField = Object.entries( firstResult ).find(
+		( [ _slug, data ] ) => data.type === 'title'
 	)?.[ 0 ];
 
 	// Find media field from availableBindings by checking type
-	const mediaField = Object.entries( availableBindings ).find(
-		( [ _, binding ] ) => binding.type === 'image_url'
+	const mediaField = Object.entries( firstResult ).find( ( [ _slug, data ] ) =>
+		IMAGE_URL_FIELD_TYPES.includes( data.type )
 	)?.[ 0 ];
 
 	const fields = fieldNames.map( field => ( {
 		id: field,
-		label: availableBindings[ field ]?.name ?? field,
+		label: firstResult[ field ]?.name ?? field,
 		enableGlobalSearch: true,
-		getValue: ( { item }: { item: RemoteDataResult } ) => item[ field ]?.toString() ?? '',
-		render: ( { item }: { item: RemoteDataResult } ) => (
+		getValue: ( { item }: { item: RemoteDataApiResult } ) =>
+			getRemoteDataResultValue( item, field ),
+		render: ( { item }: { item: RemoteDataApiResult } ) => (
 			<ItemListField
 				blockName={ blockName }
 				field={ field }
 				item={ item }
 				mediaField={ mediaField }
-				onSelect={ onSelect }
 				onSelectField={ onSelectField }
-				remoteData={ remoteData }
 			/>
 		),
 		enableSorting: field !== mediaField,
@@ -119,9 +91,9 @@ export function ItemList( props: ItemListProps ) {
 	// hide media and title fields from table view if defined to avoid duplication
 	const tableFields = fieldNames.filter( field => field !== mediaField && field !== titleField );
 
-	const [ view, setView ] = useState< View & { selection: string[] } >( {
+	const [ view, setView ] = useState< View >( {
 		type: 'table' as const,
-		perPage: perPage ?? data.length,
+		perPage: perPage ?? results.length,
 		page,
 		search: searchInput,
 		fields: tableFields,
@@ -129,14 +101,22 @@ export function ItemList( props: ItemListProps ) {
 		layout: {},
 		titleField,
 		mediaField,
-		selection: selectedItems,
 	} );
+
+	useEffect( () => {
+		setView( currentView => ( {
+			...currentView,
+			fields: tableFields,
+			mediaField,
+			titleField,
+		} ) );
+	}, [ mediaField, titleField, ...tableFields ] );
 
 	function onChangeView( newView: View ) {
 		setPage( newView.page ?? 1 );
-		setPerPage( newView.perPage ?? perPage ?? data.length );
+		setPerPage( newView.perPage ?? perPage ?? results.length );
 		setSearchInput( newView.search ?? '' );
-		setView( { ...newView, selection: selectedItems } );
+		setView( newView );
 	}
 
 	const defaultLayouts = mediaField
@@ -146,51 +126,41 @@ export function ItemList( props: ItemListProps ) {
 		  }
 		: { table: {} };
 
-	// Temporary helper to handle pagination and bulk selection
-	const onChangeSelection = ( newIds: string[] ) => {
-		// Get all currently selected IDs from the view
-		const currentPageIds = data.map( item => item.id );
-		// Keep selections from other pages that aren't in the current view
-		const otherPageSelections = selectedItems.filter( id => ! currentPageIds.includes( id ) );
-		// Combine selections from other pages with new selections
-		setSelectedItems( [ ...otherPageSelections, ...newIds ] );
-	};
-
 	const chooseItemAction = {
 		id: 'choose',
 		icon: <>{ __( 'Choose' ) }</>,
 		isPrimary: true,
 		label: '',
-		callback: ( items: RemoteDataResult[] ) => {
-			if ( supportsBulk && selectedItems.length > 0 ) {
-				const ids = selectedItems.join( ',' );
-				return onSelect( { [ idField ]: ids } );
-			}
-			items.map( item => onSelect( item ) );
+		callback: ( items: RemoteDataApiResult[] ) => {
+			onSelect?.( items );
 		},
-		supportsBulk,
+		supportsBulk: true,
 	};
-	const actions: Action< RemoteDataResult >[] = onSelectField ? [] : [ chooseItemAction ];
+
+	// Only show the action if onSelect is defined and there are results.
+	let actions: Action< RemoteDataApiResult >[] = [];
+	if ( onSelect && results?.length ) {
+		actions = [ chooseItemAction ];
+	}
 
 	return (
 		<>
-			<DataViews< RemoteDataResult >
+			<DataViews< RemoteDataApiResult >
 				actions={ actions }
-				data={ data }
+				data={ results }
 				defaultLayouts={ defaultLayouts }
 				fields={ fields }
-				getItemId={ ( item: { id?: string } ) => item.id || '' }
+				getItemId={ ( item: RemoteDataApiResult ) => item.uuid }
 				isLoading={ loading || ! pattern || ! results }
 				isItemClickable={ () => true }
-				onClickItem={ item => onSelect( item ) }
-				onChangeSelection={ onChangeSelection }
+				onChangeSelection={ setSelectionIds }
 				onChangeView={ onChangeView }
 				paginationInfo={ {
-					totalItems: totalItems ?? data.length,
+					totalItems: totalItems ?? results.length,
 					totalPages: totalPages ?? ( hasNextPage ? page + 1 : Math.max( 1, page ) ),
 				} }
 				search={ supportsSearch }
-				selection={ selectedItems }
+				selection={ selectionIds }
 				view={ view }
 			/>
 		</>

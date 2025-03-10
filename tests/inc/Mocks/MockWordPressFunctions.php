@@ -6,13 +6,18 @@ class MockWordPressFunctions {
 	/** @var array<string, array<mixed>> */
 	private static array $done_actions = [];
 
+	/** @var array<string, array<mixed>> */
+	private static array $done_filters = [];
+
 	/** @var array<string, mixed> */
 	private static array $mocked_filters = [];
 
 	/** @var array<string, mixed> */
 	private static array $mocked_options = [];
 
-	public static function apply_filters( string $filter, mixed $thing ): mixed {
+	public static function apply_filters( string $filter, mixed $thing, mixed ...$args ): mixed {
+		self::$done_filters[ $filter ] = $args;
+
 		return self::$mocked_filters[ $filter ] ?? $thing;
 	}
 
@@ -25,8 +30,12 @@ class MockWordPressFunctions {
 		self::$mocked_filters[ $filter ] = $return_value;
 	}
 
-	public static function get_done_action( string $action ): array {
-		return self::$done_actions[ $action ] ?? [];
+	public static function get_done_action( string $action, int $sequence = 0 ): ?array {
+		return self::$done_actions[ $action ][ $sequence ] ?? null;
+	}
+
+	public static function get_done_filter( string $filter ): ?array {
+		return self::$done_filters[ $filter ] ?? null;
 	}
 
 	public static function get_option( string $option, mixed $default = false ): mixed {
@@ -39,6 +48,7 @@ class MockWordPressFunctions {
 
 	public static function reset(): void {
 		self::$done_actions = [];
+		self::$done_filters = [];
 		self::$mocked_filters = [];
 		self::$mocked_options = [];
 	}

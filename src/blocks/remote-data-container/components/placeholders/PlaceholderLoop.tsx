@@ -4,7 +4,7 @@ import { cloud } from '@wordpress/icons';
 
 interface PlaceholderLoopProps {
 	blockConfig: BlockConfig;
-	onSelect: ( data: RemoteDataQueryInput ) => void;
+	onSelect: ( data: RemoteDataQueryInput[] ) => void;
 }
 
 export function PlaceholderLoop( props: PlaceholderLoopProps ) {
@@ -21,7 +21,7 @@ export function PlaceholderLoop( props: PlaceholderLoopProps ) {
 			label={ title }
 			instructions={ __( 'This block displays a list of items.' ) }
 		>
-			<Button onClick={ () => onSelect( {} ) } variant="primary">
+			<Button onClick={ () => onSelect( [ {} ] ) } variant="primary">
 				{ __( 'Load items' ) }
 			</Button>
 		</Placeholder>

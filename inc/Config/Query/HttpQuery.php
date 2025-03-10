@@ -28,6 +28,17 @@ class HttpQuery extends ArraySerializable implements HttpQueryInterface {
 	}
 
 	/**
+	 * Execute the query multiple times for an array of input variables
+	 * representing multiple runs. Execution can be customized by providing a
+	 * custom query runner.
+	 */
+	public function execute_batch( array $array_of_input_variables ): array|WP_Error {
+		$query_runner = $this->config['query_runner'] ?? new QueryRunner();
+
+		return $query_runner->execute_batch( $this, $array_of_input_variables );
+	}
+
+	/**
 	 * Define the cache object TTL for the current query execution's responses:
 	 * - Return a positive integer to set a custom TTL in seconds.
 	 * - Return -1 to disable caching.

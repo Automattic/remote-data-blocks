@@ -6,13 +6,11 @@ import { ItemSelectQueryType } from '@/blocks/remote-data-container/components/p
 
 interface PlaceholderSingleProps {
 	blockConfig: BlockConfig;
-	onSelect: ( data: RemoteDataQueryInput ) => void;
+	onSelect: ( data: RemoteDataQueryInput[] ) => void;
 }
 
 export function PlaceholderSingle( props: PlaceholderSingleProps ) {
 	const { blockConfig, onSelect } = props;
-
-	const supportsBulk = blockConfig?.selectors?.some( selector => selector.supports_bulk ) ?? false;
 
 	const iconElement: IconType = ( blockConfig.settings.icon as IconType ) ?? cloud;
 
@@ -20,11 +18,7 @@ export function PlaceholderSingle( props: PlaceholderSingleProps ) {
 		<Placeholder
 			icon={ iconElement }
 			label={ blockConfig.settings.title }
-			instructions={
-				supportsBulk
-					? __( 'This block requires selection of one or more items for display.' )
-					: __( 'This block requires selection of a single item for display.' )
-			}
+			instructions={ __( 'This block requires selection of one or more items for display.' ) }
 		>
 			<ItemSelectQueryType blockConfig={ blockConfig } onSelect={ onSelect } />
 		</Placeholder>

@@ -6,17 +6,14 @@ import { ItemList } from '@/blocks/remote-data-container/components/item-list/It
 import { useModalState } from '@/blocks/remote-data-container/hooks/useModalState';
 import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteData';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
-import {
-	getBlockAvailableBindings,
-	getBlockConfig,
-	getBlockDataSourceType,
-} from '@/utils/localized-block-data';
+import { getBlockConfig, getBlockDataSourceType } from '@/utils/localized-block-data';
+import { createQueryInputsFromRemoteDataResults } from '@/utils/remote-data';
 
 interface DataViewsModalProps {
 	className?: string;
 	blockName: string;
 	headerImage?: string;
-	onSelect?: ( data: RemoteDataQueryInput ) => void;
+	onSelect?: ( data: RemoteDataQueryInput[] ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
 	queryKey: string;
 	renderTrigger?: ( props: { onClick: () => void } ) => React.ReactNode;
@@ -27,20 +24,13 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 	const { className, blockName, onSelect, onSelectField, queryKey, renderTrigger, title } = props;
 
 	const blockConfig = getBlockConfig( blockName );
-	const availableBindings = getBlockAvailableBindings( blockName );
 
-	// Supports bulk selection
-	const supportsBulk = blockConfig?.selectors?.some( selector => selector.supports_bulk ) ?? false;
-	// Selected items
-	const [ selectedItems, setSelectedItems ] = useState< string[] >( [] );
-	// Find the ID field from availableBindings
-	const idField =
-		Object.entries( availableBindings ).find(
-			( [ _, binding ] ) => binding.type === 'id'
-		)?.[ 0 ] ?? 'id';
+	// Multi-selected items
+	const [ selection, setSelection ] = useState< RemoteDataApiResult[] >( [] );
+
 	// Total selected items
 	const itemCountLabel =
-		selectedItems.length > 1 ? __( 'items selected in total' ) : __( 'item selected in total' );
+		selection.length > 1 ? __( 'items selected in total' ) : __( 'item selected in total' );
 
 	const { close, isOpen, open } = useModalState();
 	const {
@@ -57,8 +47,37 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 		totalPages,
 	} = useRemoteData( { blockName, fetchOnMount: true, queryKey } );
 
-	function onSelectItem( input: RemoteDataQueryInput ): void {
-		onSelect?.( input );
+	// For selection, DataViews transacts only in IDs, so we provide the UUID from
+	// the API response as a synthetic ID and map them to the full result.
+	// DataViews is only "aware" of the data it is rendering, so we keep track of
+	// selections from previous result pages in the selection state.
+	const selectionIds = selection.map( item => item.uuid );
+	const allIdsFromCurrentPage = data?.results?.map( result => result.uuid ) ?? [];
+
+	function setSelectionIds( uuids: string[] ): void {
+		const selectionIdsFromOtherPages = selectionIds.filter(
+			uuid => ! allIdsFromCurrentPage.includes( uuid )
+		);
+		const newSelectionIds = Array.from(
+			new Set< string >( [ ...selectionIdsFromOtherPages, ...uuids ] )
+		);
+		const newSelection = newSelectionIds
+			.map(
+				uuid =>
+					data?.results?.find( result => uuid === result.uuid ) ??
+					selection.find( result => uuid === result.uuid ) ??
+					null
+			)
+			.filter( ( result ): result is RemoteDataApiResult => result !== null );
+		setSelection( newSelection );
+	}
+
+	function save( results: RemoteDataApiResult[] ): void {
+		if ( ! results.length ) {
+			return;
+		}
+
+		onSelect?.( createQueryInputsFromRemoteDataResults( results ) );
 		sendTracksEvent( 'add_block', {
 			action: 'select_item',
 			selected_option: 'search_from_list',
@@ -80,56 +99,53 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 			{ triggerElement }
 			{ isOpen && (
 				<Modal
-					className={ supportsBulk ? `${ className } rdb-dataviews-bulk-actions-modal` : className }
+					className={ `${ className } rdb-dataviews-bulk-actions-modal` }
 					isFullScreen
 					onRequestClose={ close }
 					title={ blockConfig?.settings?.title ?? title }
 				>
 					<ItemList
-						availableBindings={ availableBindings }
 						blockName={ blockName }
 						hasNextPage={ hasNextPage ?? false }
-						idField={ idField }
 						loading={ loading }
-						onSelect={ onSelect ? onSelectItem : close }
+						onSelect={ save }
 						onSelectField={ onSelectField }
 						page={ page }
-						remoteData={ data }
+						results={ data?.results }
 						searchInput={ searchInput }
-						selectedItems={ selectedItems }
+						selectionIds={ selectionIds }
 						setPage={ setPage }
 						setPerPage={ setPerPage }
 						setSearchInput={ setSearchInput }
-						setSelectedItems={ setSelectedItems }
-						supportsBulk={ supportsBulk }
+						setSelectionIds={ setSelectionIds }
 						supportsSearch={ supportsSearch }
 						totalItems={ totalItems }
 						totalPages={ totalPages }
 					/>
-					{ supportsBulk && ! loading && (
+					{ onSelect && ! loading && (
 						<>
-							{ selectedItems.length > 1 && (
+							{ selection.length > 1 && (
 								<BaseControl
 									className="rdb-dataviews-bulk-actions-footer__item-count-total"
 									__nextHasNoMarginBottom
 								>
 									<BaseControl.VisualLabel style={ { marginBottom: '0' } }>
-										{ selectedItems.length } { itemCountLabel }
+										{ selection.length } { itemCountLabel }
 									</BaseControl.VisualLabel>
 								</BaseControl>
 							) }
 
 							<HStack className="rdb-dataviews-bulk-actions-footer__selection-total">
 								<Button
-									disabled={ selectedItems.length === 0 }
-									onClick={ () => setSelectedItems( [] ) }
+									disabled={ selection.length === 0 }
+									onClick={ () => setSelectionIds( [] ) }
 									variant="secondary"
 								>
 									{ __( 'Cancel' ) }
 								</Button>
 								<Button
-									disabled={ selectedItems.length === 0 }
-									onClick={ () => onSelectItem( { [ idField ]: selectedItems.join( ',' ) } ) }
+									disabled={ selection.length === 0 }
+									onClick={ () => save( selection ) }
 									variant="primary"
 								>
 									{ __( 'Save' ) }

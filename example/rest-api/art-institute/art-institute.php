@@ -32,18 +32,18 @@ function register_aic_block(): void {
 		'data_source' => $aic_data_source,
 		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
 			$endpoint = $aic_data_source->get_endpoint();
-			
-			// Get and clean IDs from comma-separated string
-			$ids = array_filter(
-				array_map( 'trim', explode( ',', (string) $input_variables['id'] ) ),
-				'strlen'
-			);
-			
-			if ( !empty( $ids ) ) {
+
+			if ( is_array( $input_variables['id'] ) ) {
+				$ids = implode( ',', $input_variables['id'] );
+			} else {
+				$ids = $input_variables['id'];
+			}
+
+			if ( ! empty( $ids ) ) {
 				return add_query_arg([
-					'ids' => implode( ',', $ids ),
+					'ids' => $ids,
 					'fields' => 'id,title,image_id,artist_title',
-				], $endpoint);
+				], $endpoint );
 			}
 
 			return $endpoint;
@@ -51,8 +51,7 @@ function register_aic_block(): void {
 		'input_schema' => [
 			'id' => [
 				'name' => 'Art ID',
-				'type' => 'id',
-				'supports_bulk' => true,
+				'type' => 'id:list',
 			],
 		],
 		'output_schema' => [

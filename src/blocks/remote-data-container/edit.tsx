@@ -17,6 +17,7 @@ import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteDat
 import { hasRemoteDataChanged } from '@/utils/block-binding';
 import { getBlockConfig } from '@/utils/localized-block-data';
 import './editor.scss';
+import { migrateRemoteData } from '@/utils/remote-data';
 
 export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	const blockName = props.name;
@@ -28,6 +29,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 
 	const rootClientId = props.clientId;
 	const blockProps = useBlockProps( { className: CONTAINER_CLASS_NAME } );
+	const remoteDataAttribute = migrateRemoteData( props.attributes.remoteData );
 
 	const {
 		getInnerBlocks,
@@ -39,7 +41,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 
 	const { data, fetch, loading, reset } = useRemoteData( {
 		blockName,
-		externallyManagedRemoteData: props.attributes.remoteData,
+		externallyManagedRemoteData: remoteDataAttribute,
 		externallyManagedUpdateRemoteData: updateRemoteData,
 		queryKey: DISPLAY_QUERY_KEY,
 	} );
@@ -47,7 +49,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	const [ showPatternSelection, setShowPatternSelection ] = useState< boolean >( false );
 
 	function refreshRemoteData(): void {
-		void fetch( props.attributes.remoteData?.queryInput ?? {} );
+		void fetch( remoteDataAttribute?.queryInputs ?? [ {} ] );
 	}
 
 	function resetPatternSelection(): void {
@@ -64,8 +66,8 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 		insertPatternBlocks( pattern );
 		setShowPatternSelection( false );
 	}
-	function onSelectRemoteData( queryInput: RemoteDataQueryInput ): void {
-		void fetch( queryInput ).then( () => {
+	function onSelectRemoteData( inputs: RemoteDataQueryInput[] ): void {
+		void fetch( inputs ).then( () => {
 			if ( innerBlocksPattern ) {
 				insertPatternBlocks( innerBlocksPattern );
 				return;
@@ -76,7 +78,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	}
 
 	function updateRemoteData( remoteData?: RemoteData ): void {
-		if ( hasRemoteDataChanged( props.attributes.remoteData, remoteData ) ) {
+		if ( hasRemoteDataChanged( remoteDataAttribute, remoteData ) ) {
 			props.setAttributes( { remoteData } );
 		}
 	}
