@@ -178,13 +178,31 @@ describe( 'ItemList', () => {
 			/>
 		);
 
+		expect(
+			screen.getByRole( 'option', {
+				name: 'Page 1 of 3',
+				selected: true,
+			} )
+		).toBeVisible();
+
+		// Get next and previous buttons
 		const nextButton = screen.getByRole( 'button', { name: /next/i } );
+		const previousButton = screen.getByRole( 'button', { name: /previous/i } );
+
+		// Previous button should be disabled
+		expect( previousButton ).toHaveAttribute( 'aria-disabled', 'true' );
 
 		// Simulate clicking the next page button
 		await user.click( nextButton );
 
 		// Verify setPage was called with next page
 		expect( setPage ).toHaveBeenCalledWith( 2 );
+		expect(
+			screen.getByRole( 'option', {
+				name: 'Page 2 of 3',
+				selected: true,
+			} )
+		).toHaveValue( '2' );
 
 		// Rerender the component with updated page
 		rerender(
@@ -202,8 +220,15 @@ describe( 'ItemList', () => {
 
 		// Verify setPage was called with next page
 		expect( setPage ).toHaveBeenCalledWith( 3 );
+		expect(
+			screen.getByRole( 'option', {
+				name: 'Page 3 of 3',
+				selected: true,
+			} )
+		).toBeVisible();
 
-		const previousButton = screen.getByRole( 'button', { name: /previous/i } );
+		// Next button should be disabled
+		expect( nextButton ).toHaveAttribute( 'aria-disabled', 'true' );
 
 		// Simulate clicking the previous page button
 		await user.click( previousButton );
