@@ -2,7 +2,7 @@ import { DropdownMenu, MenuGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { chevronRightSmall } from '@wordpress/icons';
 
-import { FieldSelectionFromAvailableBindings } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelection';
+import { FieldSelectionFromAvailableBindings } from '@/block-editor/format-types/field-shortcode/components/FieldShortcodeSelection';
 import { getBlocksConfig } from '@/utils/localized-block-data';
 
 interface FieldShortcodeSelectExistingProps {

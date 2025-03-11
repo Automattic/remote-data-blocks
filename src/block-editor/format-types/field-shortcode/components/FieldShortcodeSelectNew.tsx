@@ -3,7 +3,7 @@ import { DropdownMenuProps } from '@wordpress/components/build-types/dropdown-me
 import { __ } from '@wordpress/i18n';
 import { chevronRightSmall } from '@wordpress/icons';
 
-import { DataViewsModal } from '../modals/DataViewsModal';
+import { DataViewsModal } from '@/blocks/remote-data-container/components/modals/DataViewsModal';
 import { getBlocksConfig } from '@/utils/localized-block-data';
 
 type FieldShortcodeSelectNewProps = Omit< DropdownMenuProps, 'label' > & {

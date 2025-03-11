@@ -1,8 +1,8 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { withBlockBinding } from '@/block-editor/filters/withBlockBinding';
 import { REMOTE_DATA_CONTEXT_KEY } from '@/blocks/remote-data-container/config/constants';
-import { withBlockBinding } from '@/blocks/remote-data-container/filters/withBlockBinding';
 import { BLOCK_BINDING_SOURCE, PATTERN_OVERRIDES_CONTEXT_KEY } from '@/config/constants';
 import { createRemoteDataResults as createResults } from '@/utils/remote-data';
 

@@ -1,6 +1,7 @@
 const ForkTsCheckerWebpackPlugin = require( 'fork-ts-checker-webpack-plugin' );
 
 const additionalScripts = {
+	'block-editor/index': './src/block-editor/index',
 	'pattern-editor/index': './src/pattern-editor/index',
 	'settings/index': './src/settings/index',
 };
