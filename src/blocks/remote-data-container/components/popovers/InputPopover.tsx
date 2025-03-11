@@ -18,7 +18,7 @@ interface InputPopoverProps {
 	blockName: string;
 	headerImage?: string;
 	input: InputVariable;
-	onSelect: ( data: RemoteDataQueryInput ) => void;
+	onSelect: ( data: RemoteDataQueryInput[] ) => void;
 	title: string;
 }
 
@@ -29,7 +29,7 @@ export function InputPopover( props: InputPopoverProps ) {
 
 	const initialInputState = { [ input.slug ]: '' };
 
-	const [ inputState, setInputState ] = useState< Record< string, string > >( initialInputState );
+	const [ inputState, setInputState ] = useState< RemoteDataQueryInput >( initialInputState );
 	const { close, isOpen, open } = useModalState();
 
 	function onChange( field: string, value: string ): void {
@@ -37,19 +37,7 @@ export function InputPopover( props: InputPopoverProps ) {
 	}
 
 	function onSelectItem(): void {
-		// Clean up the input value
-		const cleanedInput = Object.fromEntries(
-			Object.entries( inputState ).map( ( [ key, value ] ) => [
-				key,
-				value
-					.split( ',' )
-					.map( id => id.trim() )
-					.filter( Boolean )
-					.join( ',' ),
-			] )
-		);
-
-		onSelect( cleanedInput );
+		onSelect( [ inputState ] );
 		close();
 		sendTracksEvent( 'add_block', {
 			action: 'select_item',
@@ -97,7 +85,7 @@ export function InputPopover( props: InputPopoverProps ) {
 							className="remote-data-blocks-edit__input"
 							label={ input.name }
 							required={ input.required }
-							value={ inputState[ input.slug ] ?? '' }
+							value={ inputState[ input.slug ]?.toString() ?? '' }
 							onChange={ ( value: string | undefined ) => onChange( input.slug, value ?? '' ) }
 							help={ getDataSourceLabels( dataSourceType ).helpText }
 							suffix={ <Button icon={ keyboardReturn } label={ __( 'Save' ) } type="submit" /> }

@@ -3,10 +3,10 @@
 namespace RemoteDataBlocks\Tests\Mocks;
 
 use RemoteDataBlocks\Config\Query\HttpQueryInterface;
-use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
+use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use WP_Error;
 
-class MockQueryRunner implements QueryRunnerInterface {
+class MockQueryRunner extends QueryRunner {
 	/** @var array<array|WP_Error> */
 	private array $query_results = [];
 

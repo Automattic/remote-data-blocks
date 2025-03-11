@@ -4,6 +4,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { REMOTE_DATA_REST_API_URL } from '@/blocks/remote-data-container/config/constants';
 import { usePaginationVariables } from '@/blocks/remote-data-container/hooks/usePaginationVariables';
 import { useSearchVariables } from '@/blocks/remote-data-container/hooks/useSearchVariables';
+import { memoizeFn } from '@/utils/function';
 import { isQueryInputValid, validateQueryInput } from '@/utils/input-validation';
 import { getBlockConfig } from '@/utils/localized-block-data';
 
@@ -13,7 +14,9 @@ export class RemoteDataFetchError extends Error {
 	}
 }
 
-async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< RemoteData | null > {
+async function unmemoizedfetchRemoteData(
+	requestData: RemoteDataApiRequest
+): Promise< RemoteData | null > {
 	const { body } = await apiFetch< RemoteDataApiResponse >( {
 		url: REMOTE_DATA_REST_API_URL,
 		method: 'POST',
@@ -26,7 +29,6 @@ async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< Re
 
 	return {
 		blockName: body.block_name,
-		isCollection: body.is_collection,
 		metadata: body.metadata,
 		pagination: body.pagination && {
 			cursorNext: body.pagination.cursor_next,
@@ -34,25 +36,20 @@ async function fetchRemoteData( requestData: RemoteDataApiRequest ): Promise< Re
 			hasNextPage: body.pagination.has_next_page,
 			totalItems: body.pagination.total_items,
 		},
-		queryInput: body.query_input,
+		queryKey: body.query_key,
+		queryInputs: body.query_inputs,
 		resultId: body.result_id,
-		results: body.results.map( result =>
-			Object.entries( result.result ).reduce(
-				( acc, [ key, value ] ) => ( {
-					...acc,
-					[ key ]: value.value,
-				} ),
-				{}
-			)
-		),
+		results: body.results,
 	};
 }
+
+const fetchRemoteData = memoizeFn< typeof unmemoizedfetchRemoteData >( unmemoizedfetchRemoteData );
 
 interface UseRemoteData {
 	data?: RemoteData;
 	error?: Error;
-	fetch: ( queryInput: RemoteDataQueryInput ) => Promise< void >;
-	hasNextPage?: boolean;
+	fetch: ( inputs: RemoteDataQueryInput[] ) => Promise< void >;
+	hasNextPage: boolean;
 	hasPreviousPage: boolean;
 	loading: boolean;
 	page: number;
@@ -171,7 +168,7 @@ export function useRemoteData( {
 			return;
 		}
 
-		void fetch( resolvedData?.queryInput ?? {} );
+		void fetch( resolvedData?.queryInputs ?? [ {} ] );
 	}, [ shouldClearResolvedData, shouldFetchForManagedVariables, page, perPage, searchInput ] );
 
 	// Separately, some callers request an "optimistic" initial fetch. An example
@@ -189,21 +186,32 @@ export function useRemoteData( {
 			return;
 		}
 
-		void fetch( {} );
+		void fetch( [ {} ] );
 	}, [] );
 
-	async function fetch( queryInput: RemoteDataQueryInput ): Promise< void > {
+	async function fetch( inputs: RemoteDataQueryInput[] ): Promise< void > {
+		// If there are no inputs, there is nothing to fetch. Empty query inputs
+		// must be represented by an empty object, e.g. `[ {} ]`.
+		if ( 0 === inputs.length ) {
+			resolvedUpdater( undefined );
+			setError( new RemoteDataFetchError( 'Query input is empty', inputs ) );
+			return;
+		}
+
+		// Only merge the managed query input if there is a single query input
+		// (representing a collection query).
+		if ( 1 === inputs.length ) {
+			inputs[ 0 ] = { ...inputs[ 0 ], ...managedQueryInput };
+		}
+
 		const requestData: RemoteDataApiRequest = {
 			block_name: blockName,
 			query_key: queryKey,
-			query_input: {
-				...queryInput,
-				...managedQueryInput,
-			},
+			query_inputs: inputs,
 		};
 
 		try {
-			validateQueryInput( requestData.query_input, inputVariables );
+			inputs.forEach( input => validateQueryInput( input, inputVariables ) );
 		} catch ( err: unknown ) {
 			resolvedUpdater( undefined );
 			setError( new RemoteDataFetchError( 'Query input is invalid', err ) );

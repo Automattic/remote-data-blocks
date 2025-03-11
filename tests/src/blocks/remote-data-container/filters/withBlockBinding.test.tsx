@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { REMOTE_DATA_CONTEXT_KEY } from '@/blocks/remote-data-container/config/constants';
 import { withBlockBinding } from '@/blocks/remote-data-container/filters/withBlockBinding';
 import { BLOCK_BINDING_SOURCE, PATTERN_OVERRIDES_CONTEXT_KEY } from '@/config/constants';
+import { createRemoteDataResults as createResults } from '@/utils/remote-data';
 
 vi.mock( '@/blocks/remote-data-container/utils/tracks', () => ( {
 	sendTracksEvent: vi.fn(),
@@ -83,7 +84,7 @@ describe( 'withBlockBinding', () => {
 	it( 'renders BoundBlockEdit when remote data is available', async () => {
 		const remoteData = {
 			blockName: 'test/block',
-			results: [ { field1: 'value1' } ],
+			results: createResults( [ { field1: 'value1' } ] ),
 		};
 		render(
 			<WrappedComponent
@@ -107,7 +108,7 @@ describe( 'withBlockBinding', () => {
 	it( 'does not render BoundBlockEdit for synced pattern without enabled overrides', () => {
 		const remoteData = {
 			blockName: 'test/block',
-			results: [ { field1: 'value1' } ],
+			results: createResults( [ { field1: 'value1' } ] ),
 		};
 		render(
 			<WrappedComponent
@@ -145,7 +146,7 @@ describe( 'withBlockBinding', () => {
 			context: {
 				[ REMOTE_DATA_CONTEXT_KEY ]: {
 					blockName: 'test/block',
-					results: [ { title: 'New Title' } ],
+					results: createResults( [ { title: 'New Title' } ] ),
 				},
 			},
 			name: 'test/block',
@@ -185,7 +186,7 @@ describe( 'withBlockBinding', () => {
 			context: {
 				[ REMOTE_DATA_CONTEXT_KEY ]: {
 					blockName: 'test/block',
-					results: [ { title: 'Matching Title' } ],
+					results: createResults( [ { title: 'Matching Title' } ] ),
 				},
 			},
 			name: 'test/block',

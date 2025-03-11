@@ -66,26 +66,6 @@ class ConfigRegistry {
 
 		$input_schema = $display_query->get_input_schema();
 
-		// Check if render query has any bulk-supporting inputs
-		$bulk_supported_inputs = array_filter(
-			$input_schema,
-			function ( $input ) {
-				return $input['supports_bulk'] ?? false;
-			}
-		);
-
-		if ( count( $bulk_supported_inputs ) > 0 ) {
-			// Ensure only one input variable when bulk selection is enabled
-			if ( count( $input_schema ) > 1 ) {
-				return self::create_error(
-					$block_title,
-					'Render queries with bulk selection can only have one input variable'
-				);
-			}
-		}
-
-		$has_bulk_support = !empty( $bulk_supported_inputs );
-
 		// Build the base configuration for the block. This is our own internal
 		// configuration, not what will be passed to WordPress's register_block_type.
 		// @see BlockRegistration::register_block_type::register_blocks.
@@ -103,7 +83,6 @@ class ConfigRegistry {
 					self::DISPLAY_QUERY_KEY,
 					'input',
 					'Manual input',
-					$has_bulk_support
 				),
 			],
 			'title' => $block_title,
@@ -119,7 +98,6 @@ class ConfigRegistry {
 						$query_config['type'],
 						$query_config['type'],
 						$query_config['display_name'] ?? null,
-						$has_bulk_support
 					)
 				);
 			}
@@ -161,7 +139,6 @@ class ConfigRegistry {
 					$from_query::class,
 					$from_query_type,
 					$selection_query['display_name'] ?? null,
-					$has_bulk_support
 				)
 			);
 		}
@@ -226,7 +203,6 @@ class ConfigRegistry {
 		string $query_key,
 		string $type,
 		?string $display_name = null,
-		bool $supports_bulk = false
 	): array {
 		return [
 			'image_url' => $query->get_image_url(),
@@ -242,7 +218,6 @@ class ConfigRegistry {
 			'name' => $display_name ?? ucfirst( $type ),
 			'query_key' => $query_key,
 			'type' => $type,
-			'supports_bulk' => $supports_bulk,
 		];
 	}
 }

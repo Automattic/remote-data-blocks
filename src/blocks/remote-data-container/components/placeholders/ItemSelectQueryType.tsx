@@ -6,7 +6,7 @@ import { DataViewsModal } from '@/blocks/remote-data-container/components/modals
 
 interface ItemSelectQueryTypeProps {
 	blockConfig: BlockConfig;
-	onSelect: ( data: RemoteDataQueryInput ) => void;
+	onSelect: ( data: RemoteDataQueryInput[] ) => void;
 }
 
 export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {

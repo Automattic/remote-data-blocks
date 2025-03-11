@@ -1,4 +1,5 @@
 import { BLOCK_BINDING_SOURCE } from '@/config/constants';
+import { getRemoteDataResultValue } from '@/utils/remote-data';
 import { getClassName } from '@/utils/string';
 import { isObjectWithStringKeys } from '@/utils/type-narrowing';
 
@@ -19,15 +20,15 @@ function getAttributeValue( attributes: unknown, key: string | undefined | null 
 }
 
 function getExpectedAttributeValue(
-	result?: Record< string, unknown >,
+	result?: RemoteDataApiResult,
 	args?: RemoteDataBlockBindingArgs
 ): string | null {
-	if ( ! args?.field || ! result?.[ args.field ] ) {
+	if ( ! args?.field || ! result?.result?.[ args.field ] ) {
 		return null;
 	}
 
 	// See comment on toString() in getAttributeValue.
-	let expectedValue = result[ args.field ]?.toString() ?? '';
+	let expectedValue = getRemoteDataResultValue( result, args.field );
 	if ( args.label ) {
 		const labelClass = getClassName( 'block-label' );
 		expectedValue = `<span class="${ labelClass }">${ args.label }</span> ${ expectedValue }`;
@@ -65,7 +66,7 @@ export function getBoundBlockClassName(
 
 export function getMismatchedAttributes(
 	attributes: RemoteDataInnerBlockAttributes,
-	results: RemoteDataResult[],
+	results: RemoteDataApiResult[],
 	remoteDataBlockName: string,
 	index = 0
 ): Partial< RemoteDataInnerBlockAttributes > {
@@ -103,9 +104,17 @@ export function hasRemoteDataChanged( one?: RemoteData, two?: RemoteData ): bool
 		return true;
 	}
 
-	// Remove result ID and metadata from comparison
-	const { metadata: _removed1, resultId: _removed2, ...clean1 } = one;
-	const { metadata: _removed3, resultId: _removed4, ...clean2 } = two;
+	// Remove result ID and metadata properties from comparison. Compare results
+	// separately to remove UUID.
+	const { metadata: _removed1, resultId: _removed2, results: results1, ...clean1 } = one;
+	const { metadata: _removed3, resultId: _removed4, results: results2, ...clean2 } = two;
+
+	const cleanedResults1 = results1.map( ( { uuid: _removed, ...result } ) => result );
+	const cleanedResults2 = results2.map( ( { uuid: _removed, ...result } ) => result );
+
+	if ( JSON.stringify( cleanedResults1 ) !== JSON.stringify( cleanedResults2 ) ) {
+		return true;
+	}
 
 	return JSON.stringify( clean1 ) !== JSON.stringify( clean2 );
 }

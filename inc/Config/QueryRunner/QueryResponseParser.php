@@ -109,9 +109,11 @@ final class QueryResponseParser {
 				];
 			}
 
-			// Nest result property to reserve additional meta in the future.
+			// Nest result property to reserve additional meta in the future. Ensure
+			// that each result has an entity ID.
 			return [
 				'result' => $result,
+				'uuid' => wp_generate_uuid4(),
 			];
 		}, $objects );
 	}
