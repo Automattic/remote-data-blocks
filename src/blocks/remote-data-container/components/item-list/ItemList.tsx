@@ -110,7 +110,7 @@ export function ItemList( props: ItemListProps ) {
 			mediaField,
 			titleField,
 		} ) );
-	}, [ mediaField, titleField, ...tableFields ] );
+	}, [ [ mediaField, titleField, ...tableFields ].join( ';' ) ] );
 
 	function onChangeView( newView: View ) {
 		setPage( newView.page ?? 1 );
