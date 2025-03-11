@@ -5,6 +5,7 @@ namespace RemoteDataBlocks\Config\BlockAttribute;
 use RemoteDataBlocks\Config\ArraySerializable;
 use RemoteDataBlocks\Validation\ConfigSchemas;
 use WP_Error;
+use function wp_generate_uuid4;
 
 /**
  * RemoteDataBlockAttribute class
@@ -38,6 +39,30 @@ class RemoteDataBlockAttribute extends ArraySerializable {
 			$config['queryInputs'] = [ $config['queryInput'] ?? [] ];
 			unset( $config['queryInput'] );
 		}
+
+		// Migrate "results" to the new format with UUID and nested result with type.
+		$config['results'] = array_map( function ( array $result ): array {
+			if ( isset( $result['result'] ) && is_array( $result['result'] ) ) {
+				return $result;
+			}
+
+			return [
+				'uuid' => wp_generate_uuid4(),
+				'result' => array_reduce(
+					array_keys( $result ),
+					function ( array $carry, string $name ) use ( $result ): array {
+						$carry[ $name ] = [
+							'name' => $name, // We have lost the name, use the slug.
+							'type' => 'unknown', // We have lost the type information.
+							'value' => $result[ $name ],
+						];
+
+						return $carry;
+					},
+					[]
+				),
+			];
+		}, $config['results'] ?? [] );
 
 		return $config;
 	}

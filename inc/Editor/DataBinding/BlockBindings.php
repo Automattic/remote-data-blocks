@@ -118,7 +118,7 @@ class BlockBindings {
 		$remote_data = RemoteDataBlockAttribute::from_array( $block_context );
 
 		if ( is_wp_error( $remote_data ) ) {
-			self::log_error( sprintf( 'Missing or malformed block context for block binding %s', self::$context_name ), 'unknown' );
+			self::log_error( sprintf( 'Missing or malformed block context for block binding %s', self::$context_name ), $operation_name );
 			return null;
 		}
 
@@ -200,7 +200,9 @@ class BlockBindings {
 			$block_attributes = $block['attributes'] ?? [];
 		}
 
-		$block_name = $block_context['blockName'] ?? null;
+		// Provide some flexibility for external callers to pass the block name.
+		$block_name = $source_args['block'] ?? $block_context['blockName'] ?? null;
+		$block_context['blockName'] = $block_name;
 
 		// Extract field information from the binding source args.
 		$field_label = $source_args['label'] ?? null;

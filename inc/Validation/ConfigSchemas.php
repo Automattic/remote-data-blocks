@@ -335,7 +335,7 @@ final class ConfigSchemas {
 					),
 					// This field provides a boolean indicating if there is a next page of
 					// paginated results. This is helpful if the API does not provide a
-					// total number of items. 
+					// total number of items.
 					'has_next_page' => Types::nullable(
 						Types::object( [
 							'name' => Types::nullable( Types::string() ),
@@ -372,7 +372,7 @@ final class ConfigSchemas {
 				Types::object( [
 					'name' => Types::string(),
 					'type' => Types::string(),
-					'value' => Types::one_of( Types::integer(), Types::string() ),
+					'value' => Types::any(),
 				] )
 			),
 			'pagination' => Types::nullable(
@@ -393,7 +393,7 @@ final class ConfigSchemas {
 						Types::object( [
 							'name' => Types::string(),
 							'type' => Types::string(),
-							'value' => Types::string(),
+							'value' => Types::any(),
 						] )
 					),
 					'uuid' => Types::uuid(),
