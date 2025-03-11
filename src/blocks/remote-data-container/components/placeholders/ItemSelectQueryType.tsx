@@ -43,10 +43,7 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 							<Button
 								key={ title }
 								onClick={ () => {
-									onSelect( {
-										type: selector.type,
-										query_key: selector.query_key,
-									} );
+									onSelect( [ {} ] );
 								} }
 								variant="primary"
 							>
