@@ -206,6 +206,8 @@ final class ConfigSchemas {
 							// implode an array of IDs into a comma-separated list and map it
 							// to a query parameter).
 							'id:list',
+							// A string that represents an input field to refine the query results.
+							'ui:input',
 							// A string that represents search query input. An input variable
 							// with this type must be present for the query to be considered a
 							// search query.

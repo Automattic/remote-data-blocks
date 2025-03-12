@@ -51,6 +51,8 @@ class ConfigRegistry {
 		$display_query = self::inflate_query( $user_config[ self::RENDER_QUERY_KEY ]['query'] );
 		$input_schema = $display_query->get_input_schema();
 
+		$is_loop = $user_config[ self::RENDER_QUERY_KEY ]['loop'] ?? false;
+
 		// Build the base configuration for the block. This is our own internal
 		// configuration, not what will be passed to WordPress's register_block_type.
 		// @see BlockRegistration::register_block_type::register_blocks.
@@ -58,7 +60,7 @@ class ConfigRegistry {
 			'description' => '',
 			'icon' => $user_config['icon'] ?? 'cloud',
 			'name' => $block_name,
-			'loop' => $user_config[ self::RENDER_QUERY_KEY ]['loop'] ?? false,
+			'loop' => $is_loop,
 			'overrides' => $user_config['overrides'] ?? [],
 			'patterns' => [],
 			'queries' => [
@@ -75,9 +77,9 @@ class ConfigRegistry {
 							'type' => $input_var['type'] ?? 'string',
 						];
 					}, array_keys( $input_schema ), array_values( $input_schema ) ),
-					'name' => 'Manual input',
+					'name' => $is_loop ? 'Collection' : 'Manual input',
 					'query_key' => self::DISPLAY_QUERY_KEY,
-					'type' => 'input',
+					'type' => $is_loop ? 'collection' : 'input',
 				],
 			],
 			'title' => $block_title,

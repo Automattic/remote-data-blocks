@@ -1,4 +1,4 @@
-import { ButtonGroup } from '@wordpress/components';
+import { ButtonGroup, Button } from '@wordpress/components';
 
 import { InputModal } from '../modals/InputModal';
 import { InputPopover } from '../popovers/InputPopover';
@@ -43,6 +43,28 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 							<InputPopover key={ title } input={ selector.inputs[ 0 ] } { ...selectorProps } />
 						) : (
 							<InputModal key={ title } inputs={ selector.inputs } { ...selectorProps } />
+						);
+					case 'collection':
+						if ( selector.inputs.length === 1 && selector.inputs[ 0 ] ) {
+							return (
+								<InputPopover
+									key={ title }
+									input={ selector.inputs[ 0 ] }
+									{ ...selectorProps }
+									title={ selector.inputs[ 0 ].name ?? selector.name }
+								/>
+							);
+						}
+						return (
+							<Button
+								key={ title }
+								onClick={ () => {
+									onSelect( [ {} ] );
+								} }
+								variant="primary"
+							>
+								Load Collection
+							</Button>
 						);
 				}
 
