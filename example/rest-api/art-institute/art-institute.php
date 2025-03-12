@@ -203,6 +203,7 @@ function register_aic_block(): void {
 
 	register_remote_data_block( [
 		'title' => 'Art Institute of Chicago Loop',
+		'instructions' => 'This block displays a set amount of artworks based on the provided limit.', 
 		'render_query' => [
 			'query' => $collection_query,
 			'loop' => true,

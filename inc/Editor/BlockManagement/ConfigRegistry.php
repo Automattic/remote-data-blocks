@@ -59,6 +59,7 @@ class ConfigRegistry {
 		$config = [
 			'description' => '',
 			'icon' => $user_config['icon'] ?? 'cloud',
+			'instructions' => $user_config['instructions'] ?? null,
 			'name' => $block_name,
 			'loop' => $is_loop,
 			'overrides' => $user_config['overrides'] ?? [],

@@ -1,17 +1,31 @@
-import { PlaceholderLoop } from '@/blocks/remote-data-container/components/placeholders/PlaceholderLoop';
-import { PlaceholderSingle } from '@/blocks/remote-data-container/components/placeholders/PlaceholderSingle';
+import { IconType, Placeholder as PlaceholderComponent } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { cloud } from '@wordpress/icons';
 
-export interface PlaceholderProps {
+import { ItemSelectQueryType } from '@/blocks/remote-data-container/components/placeholders/ItemSelectQueryType';
+
+interface PlaceholderProps {
 	blockConfig: BlockConfig;
-	onSelect: ( input: RemoteDataQueryInput[] ) => void;
+	onSelect: ( data: RemoteDataQueryInput[] ) => void;
 }
 
 export function Placeholder( props: PlaceholderProps ) {
-	const { loop } = props.blockConfig;
+	const { blockConfig, onSelect } = props;
+	const { instructions, loop, settings } = blockConfig;
 
-	if ( loop ) {
-		return <PlaceholderLoop { ...props } />;
-	}
+	const iconElement: IconType = ( settings.icon as IconType ) ?? cloud;
 
-	return <PlaceholderSingle { ...props } />;
+	const defaultInstructions = loop
+		? __( 'This block displays a list of items.' )
+		: __( 'This block requires selection of one or more items for display.' );
+
+	return (
+		<PlaceholderComponent
+			icon={ iconElement }
+			label={ settings.title }
+			instructions={ instructions ?? defaultInstructions }
+		>
+			<ItemSelectQueryType blockConfig={ blockConfig } onSelect={ onSelect } />
+		</PlaceholderComponent>
+	);
 }
