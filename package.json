@@ -59,7 +59,7 @@
   "devDependencies": {
     "@automattic/eslint-plugin-wpvip": "0.13.0",
     "@babel/preset-react": "7.26.3",
-    "@playwright/test": "^1.50.1",
+    "@playwright/test": "^1.51.0",
     "@testing-library/jest-dom": "6.6.3",
     "@testing-library/react": "16.2.0",
     "@testing-library/user-event": "^14.6.1",
@@ -93,7 +93,7 @@
     "@wordpress/url": "4.19.0",
     "eslint": "8.57.1",
     "fork-ts-checker-webpack-plugin": "9.0.2",
-    "happy-dom": "17.2.2",
+    "happy-dom": "17.4.3",
     "husky": "9.1.7",
     "lint-staged": "15.4.3",
     "prettier": "npm:wp-prettier@2.8.5",
