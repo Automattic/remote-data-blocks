@@ -50,12 +50,13 @@ abstract class WpOptionsConfigStore {
 
 		$config_class_map = static::get_config_class_map();
 		
-		$config_class = $config_class_map[$service] ?? null;
+		$config_class = $config_class_map[ $service ] ?? null;
 		
 		if ( null === $config_class ) {
 			return new WP_Error(
 				'unsupported_service',
 				sprintf(
+					// translators: %s is the name of the service that is not supported
 					__( 'Unsupported service: %s', 'remote-data-blocks' ),
 					$service
 				)
@@ -70,6 +71,7 @@ abstract class WpOptionsConfigStore {
 	}
 
 	private static function get_not_found_error_message(): string {
+		// translators: %s is the error message prefix for the config type
 		return sprintf( __( '%s not found', 'remote-data-blocks' ), static::get_error_message_prefix() );
 	}
 
@@ -78,6 +80,7 @@ abstract class WpOptionsConfigStore {
 	}
 
 	private static function get_save_failed_error_message(): string {
+		// translators: %s is the error message prefix for the config type
 		return sprintf( __( 'Failed to save %s', 'remote-data-blocks' ), static::get_error_message_prefix() );
 	}
 
@@ -86,6 +89,7 @@ abstract class WpOptionsConfigStore {
 	}
 
 	private static function get_delete_failed_error_message(): string {
+		// translators: %s is the error message prefix for the config type
 		return sprintf( __( 'Failed to delete %s', 'remote-data-blocks' ), static::get_error_message_prefix() );
 	}
 
