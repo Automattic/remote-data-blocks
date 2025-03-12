@@ -1,0 +1,27 @@
+query GetProductsByCollectionId($id: ID!) {
+	collection(id: $id) {
+		id
+		title
+		products(first: 10) {
+			nodes {
+				id
+				collections(first: 10) {
+					nodes {
+						title
+					}
+				}
+				description
+				featuredImage {
+					url
+					altText
+				}
+				priceRange {
+					maxVariantPrice {
+						amount
+					}
+				}
+				title
+			}
+		}
+	}
+}

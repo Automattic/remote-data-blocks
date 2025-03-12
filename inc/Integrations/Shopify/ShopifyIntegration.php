@@ -80,6 +80,67 @@ class ShopifyIntegration {
 				],
 				'graphql_query' => file_get_contents( __DIR__ . '/Queries/GetProductById.graphql' ),
 			] ),
+			'shopify_get_products_by_collection_id' => GraphqlQuery::from_array( [
+				'data_source' => $data_source,
+				'input_schema' => [
+					'id' => [
+						'name' => 'Collection ID',
+						'type' => 'ui:input',
+					],
+				],
+				'output_schema' => [
+					'is_collection' => true,
+					'path' => '$.data.collection.products.nodes[*]',
+					'type' => [
+						'id' => [
+							'name' => 'Product ID',
+							'path' => '$.id',
+							'type' => 'id',
+						],
+						'collections' => [
+							'name' => 'Collections',
+							'path' => '$.collections.nodes[*]',
+							'generate' => function ( array $data ): string {
+								if (is_array($data) && isset($data['collections']['nodes'])) {
+									$titles = array_map(function($node) {
+										return $node['title'] ?? '';
+									}, $data['collections']['nodes']);
+									
+									return implode(', ', array_filter($titles));
+								}
+								return '';
+							},
+							'type' => 'string',
+						],
+						'description' => [
+							'name' => 'Product description',
+							'path' => '$.descriptionHtml',
+							'type' => 'string',
+						],
+						'image_alt_text' => [
+							'name' => 'Image Alt Text',
+							'path' => '$.featuredImage.altText',
+							'type' => 'image_alt',
+						],
+						'image_url' => [
+							'name' => 'Item image URL',
+							'path' => '$.featuredImage.url',
+							'type' => 'image_url',
+						],
+						'price' => [
+							'name' => 'Item price',
+							'path' => '$.priceRange.maxVariantPrice.amount',
+							'type' => 'currency_in_current_locale',
+						],
+						'title' => [
+							'name' => 'Product title',
+							'path' => '$.title',
+							'type' => 'title',
+						],
+					],
+				],
+				'graphql_query' => file_get_contents( __DIR__ . '/Queries/GetProductsByCollectionId.graphql' ),
+			] ),
 			'shopify_search_products' => GraphqlQuery::from_array( [
 				'data_source' => $data_source,
 				'input_schema' => [
@@ -153,6 +214,17 @@ class ShopifyIntegration {
 		$queries = self::get_queries( $data_source );
 
 		register_remote_data_block( [
+			'title' => $block_title . ': Products by Collection',
+			'icon' => 'cart',
+			'instructions' => 'Enter a collection ID to display products from that collection.',
+			'render_query' => [
+				'query' => $queries['shopify_get_products_by_collection_id'],
+				'loop' => true,
+			],
+		] );
+
+
+		register_remote_data_block( [
 			'title' => $block_title,
 			'icon' => 'cart',
 			'render_query' => [
@@ -172,6 +244,7 @@ class ShopifyIntegration {
 				],
 			],
 		] );
+		
 	}
 
 	/**
