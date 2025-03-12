@@ -73,6 +73,26 @@ final class ConfigSchemas {
 		return $schema;
 	}
 
+	public static function get_data_source_connection_config_schema(): array {
+		static $schema = null;
+
+		if ( null === $schema ) {
+			$schema = self::generate_data_source_connection_config_schema();
+		}
+
+		return $schema;
+	}
+
+	public static function get_data_source_query_config_schema(): array {
+		static $schema = null;
+
+		if ( null === $schema ) {
+			$schema = self::generate_data_source_query_config_schema();
+		}
+
+		return $schema;
+	}
+
 	private static function generate_remote_data_block_config_schema(): array {
 		return Types::object( [
 			'icon' => Types::nullable( Types::string() ),
@@ -399,6 +419,27 @@ final class ConfigSchemas {
 					'uuid' => Types::uuid(),
 				] )
 			),
+		] );
+	}
+
+	private static function generate_data_source_connection_config_schema(): array {
+		return Types::object( [
+			'uuid' => Types::nullable( Types::uuid() ),
+			'service' => Types::string(),
+			'service_config' => Types::record( Types::string(), Types::any() ),
+			'queries' => Types::list_of( Types::record( Types::string(), Types::any() ) ),
+			'__metadata' => Types::nullable( Types::record( Types::string(), Types::any() ) ),
+		] );
+	}
+
+	private static function generate_data_source_query_config_schema(): array {
+		return Types::object( [
+			'uuid' => Types::nullable( Types::uuid() ),
+			'service' => Types::string(),
+			'service_config' => Types::record( Types::string(), Types::any() ),
+			'connection_uuid' => Types::nullable( Types::uuid() ),
+			'connection' => Types::nullable( Types::record( Types::string(), Types::any() ) ),
+			'__metadata' => Types::nullable( Types::record( Types::string(), Types::any() ) ),
 		] );
 	}
 }
