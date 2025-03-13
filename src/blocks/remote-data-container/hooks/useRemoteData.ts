@@ -213,7 +213,7 @@ export function useRemoteData( {
 		} );
 	}
 
-	function fetch( inputs: RemoteDataQueryInput[] ): void {
+	async function fetch( inputs: RemoteDataQueryInput[] ): Promise< void > {
 		// If there has been an error, do not proceed. The caller must reset the
 		// state using reset() before attempting another fetch.
 		if ( error ) {
@@ -248,7 +248,7 @@ export function useRemoteData( {
 
 		setLoading( true );
 
-		fetchRemoteData( requestData )
+		return fetchRemoteData( requestData )
 			.then( remoteData => {
 				onFetchForPagination( remoteData );
 				resolvedUpdater( { enabledOverrides, ...remoteData } );
