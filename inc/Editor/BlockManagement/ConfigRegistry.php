@@ -80,7 +80,7 @@ class ConfigRegistry {
 					}, array_keys( $input_schema ), array_values( $input_schema ) ),
 					'name' => $is_loop ? 'Collection' : 'Manual input',
 					'query_key' => self::DISPLAY_QUERY_KEY,
-					'type' => $is_loop ? 'collection' : 'input',
+					'type' => $is_loop ? 'loop' : 'input',
 				],
 			],
 			'title' => $block_title,

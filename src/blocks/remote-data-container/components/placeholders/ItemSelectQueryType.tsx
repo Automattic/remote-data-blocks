@@ -39,12 +39,7 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 							/>
 						);
 					case 'input':
-						return selector.inputs.length === 1 && selector.inputs[ 0 ] ? (
-							<InputPopover key={ title } input={ selector.inputs[ 0 ] } { ...selectorProps } />
-						) : (
-							<InputModal key={ title } inputs={ selector.inputs } { ...selectorProps } />
-						);
-					case 'collection':
+					case 'loop':
 						if ( selector.inputs.length === 1 && selector.inputs[ 0 ] ) {
 							return (
 								<InputPopover
@@ -55,18 +50,20 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 								/>
 							);
 						}
-						return (
-							<Button
-								key={ title }
-								onClick={ () => {
-									onSelect( [ {} ] );
-								} }
-								variant="primary"
-							>
-								Load Collection
-							</Button>
-						);
+						return <InputModal key={ title } inputs={ selector.inputs } { ...selectorProps } />;
 				}
+
+				return (
+					<Button
+						key={ title }
+						onClick={ () => {
+							onSelect( [ {} ] );
+						} }
+						variant="primary"
+					>
+						Load Collection
+					</Button>
+				);
 
 				return null;
 			} ) }
