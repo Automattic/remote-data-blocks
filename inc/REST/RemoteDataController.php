@@ -63,9 +63,13 @@ class RemoteDataController {
 		$query_response = $query->execute_batch( $query_inputs );
 
 		if ( is_wp_error( $query_response ) ) {
+			$error_code = $query_response->get_error_code() ?? 'unknown_error';
+			$error_message = $query_response->get_error_message();
+
 			$logger = LoggerManager::instance();
-			$logger->warning( $query_response->get_error_message() );
-			return $query_response;
+			$logger->warning( $error_message );
+
+			return new WP_Error( $error_code, $error_message, [ 'status' => 500 ] );
 		}
 
 		return array_merge(

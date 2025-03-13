@@ -1,5 +1,7 @@
 import apiFetch from '@wordpress/api-fetch';
+import { useDispatch } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
+import { store as noticesStore, NoticeStoreActions } from '@wordpress/notices';
 
 import { REMOTE_DATA_REST_API_URL } from '@/blocks/remote-data-container/config/constants';
 import { usePaginationVariables } from '@/blocks/remote-data-container/hooks/usePaginationVariables';
@@ -9,22 +11,22 @@ import { isQueryInputValid, validateQueryInput } from '@/utils/input-validation'
 import { getBlockConfig } from '@/utils/localized-block-data';
 
 export class RemoteDataFetchError extends Error {
-	constructor( message: string, public cause: unknown ) {
+	constructor( message: string, public cause?: unknown ) {
 		super( message );
 	}
 }
 
 async function unmemoizedfetchRemoteData(
 	requestData: RemoteDataApiRequest
-): Promise< RemoteData | null > {
-	const { body } = await apiFetch< RemoteDataApiResponse >( {
+): Promise< RemoteData > {
+	const { body, status } = await apiFetch< RemoteDataApiResponse >( {
 		url: REMOTE_DATA_REST_API_URL,
 		method: 'POST',
 		data: requestData,
 	} );
 
-	if ( ! body ) {
-		return null;
+	if ( 200 !== status || ! body ) {
+		throw new RemoteDataFetchError( body?.message ?? 'Request for remote data failed' );
 	}
 
 	return {
@@ -100,6 +102,7 @@ export function useRemoteData( {
 	onSuccess,
 	queryKey,
 }: UseRemoteDataInput ): UseRemoteData {
+	const { createErrorNotice } = useDispatch< NoticeStoreActions >( noticesStore );
 	const [ data, setData ] = useState< RemoteData >();
 	const [ error, setError ] = useState< Error >();
 	const [ loading, setLoading ] = useState< boolean >( false );
@@ -155,7 +158,7 @@ export function useRemoteData( {
 	// include them here.
 	//
 	// We only want to refetch if there was a previous successful fetch.
-	const shouldFetchForManagedVariables = ! error && ( hasResolvedData || hasSearchInput );
+	const shouldFetchForManagedVariables = hasResolvedData || hasSearchInput;
 	const shouldClearResolvedData = hasResolvedData && supportsSearch && ! hasSearchInput;
 
 	useEffect( () => {
@@ -189,12 +192,38 @@ export function useRemoteData( {
 		void fetch( [ {} ] );
 	}, [] );
 
-	async function fetch( inputs: RemoteDataQueryInput[] ): Promise< void > {
+	function handleError( err: Error ): void {
+		resolvedUpdater( undefined );
+		setError( err );
+		setLoading( false );
+
+		// Log the error to the console for visibility.
+		console.error( 'Remote Data Blocks query error:', err );
+
+		// Show a prominent notice.
+		let message = err.message;
+		if ( err instanceof RemoteDataFetchError && err.cause instanceof Error ) {
+			message = `${ message }: ${ err.cause.message }`;
+		}
+
+		createErrorNotice( message, {
+			isDismissible: true,
+			onDismiss: () => setError( undefined ),
+			type: 'default',
+		} );
+	}
+
+	function fetch( inputs: RemoteDataQueryInput[] ): void {
+		// If there has been an error, do not proceed. The caller must reset the
+		// state using reset() before attempting another fetch.
+		if ( error ) {
+			return;
+		}
+
 		// If there are no inputs, there is nothing to fetch. Empty query inputs
 		// must be represented by an empty object, e.g. `[ {} ]`.
 		if ( 0 === inputs.length ) {
-			resolvedUpdater( undefined );
-			setError( new RemoteDataFetchError( 'Query input is empty', inputs ) );
+			handleError( new RemoteDataFetchError( 'Query input is empty', inputs ) );
 			return;
 		}
 
@@ -213,28 +242,22 @@ export function useRemoteData( {
 		try {
 			inputs.forEach( input => validateQueryInput( input, inputVariables ) );
 		} catch ( err: unknown ) {
-			resolvedUpdater( undefined );
-			setError( new RemoteDataFetchError( 'Query input is invalid', err ) );
+			handleError( new RemoteDataFetchError( 'Query input is invalid', err ) );
 			return;
 		}
 
 		setLoading( true );
 
-		const remoteData = await fetchRemoteData( requestData ).catch( ( err: unknown ) => {
-			setError( new RemoteDataFetchError( 'Request for remote data failed', err ) );
-			return null;
-		} );
-
-		if ( ! remoteData ) {
-			resolvedUpdater( undefined );
-			setLoading( false );
-			return;
-		}
-
-		onFetchForPagination( remoteData );
-		resolvedUpdater( { enabledOverrides, ...remoteData } );
-		setLoading( false );
-		onSuccess?.();
+		fetchRemoteData( requestData )
+			.then( remoteData => {
+				onFetchForPagination( remoteData );
+				resolvedUpdater( { enabledOverrides, ...remoteData } );
+				setLoading( false );
+				onSuccess?.();
+			} )
+			.catch( ( err: unknown ) => {
+				handleError( new RemoteDataFetchError( 'Request for remote data failed', err ) );
+			} );
 	}
 
 	function reset(): void {
