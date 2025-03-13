@@ -102,5 +102,5 @@ abstract class DataSourceQuery extends ArraySerializable implements DataSourceQu
 	 *
 	 * @return string The service name.
 	 */
-	abstract public function get_service_name(): string;
+	abstract public static function get_service_name(): string;
 } 

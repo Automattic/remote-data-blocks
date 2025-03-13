@@ -13,6 +13,6 @@ use RemoteDataBlocks\Config\ArraySerializableInterface;
 interface DataSourceConnectionInterface extends ArraySerializableInterface {
 	public function get_uuid(): string;
 	public function get_display_name(): string;
-	public function get_service_name(): string;
+	public static function get_service_name(): string;
 	public function get_service_config(): array;
 }

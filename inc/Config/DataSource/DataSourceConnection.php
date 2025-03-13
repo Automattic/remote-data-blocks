@@ -97,7 +97,7 @@ abstract class DataSourceConnection extends ArraySerializable implements DataSou
 	 *
 	 * @return string The service name.
 	 */
-	abstract public function get_service_name(): string;
+	abstract public static function get_service_name(): string;
 
 	/**
 	 * Get the queries for the data source.
