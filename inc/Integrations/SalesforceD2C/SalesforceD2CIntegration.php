@@ -160,6 +160,7 @@ class SalesforceD2CIntegration {
 					'category_id' => [
 						'required' => true,
 						'type' => 'ui:input',
+						'name' => 'Category ID',
 					],
 				],
 				'output_schema' => [

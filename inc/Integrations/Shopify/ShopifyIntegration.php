@@ -34,6 +34,7 @@ class ShopifyIntegration {
 				'input_schema' => [
 					'id' => [
 						'type' => 'id',
+						'name' => 'Product ID',
 					],
 				],
 				'output_schema' => [
