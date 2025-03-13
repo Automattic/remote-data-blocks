@@ -4,6 +4,7 @@ import { Spinner } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 import { QueryInputsPanel } from './components/panels/QueryInputsPanel';
+import { EditErrorBoundary } from '@/blocks/remote-data-container/components/EditErrorBoundary';
 import { InnerBlocks } from '@/blocks/remote-data-container/components/InnerBlocks';
 import { DataPanel } from '@/blocks/remote-data-container/components/panels/DataPanel';
 import { OverridesPanel } from '@/blocks/remote-data-container/components/panels/OverridesPanel';
@@ -16,11 +17,11 @@ import {
 import { usePatterns } from '@/blocks/remote-data-container/hooks/usePatterns';
 import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteData';
 import { hasRemoteDataChanged } from '@/utils/block-binding';
-import { getBlockConfig } from '@/utils/localized-block-data';
+import { getBlockConfig, getBlockTitle } from '@/utils/localized-block-data';
 import { migrateRemoteData } from '@/utils/remote-data';
 import './editor.scss';
 
-export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
+function RemoteDataBlockEdit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	const blockName = props.name;
 	const blockConfig = getBlockConfig( blockName );
 
@@ -29,7 +30,6 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	}
 
 	const rootClientId = props.clientId;
-	const blockProps = useBlockProps( { className: CONTAINER_CLASS_NAME } );
 	const remoteDataAttribute = migrateRemoteData( props.attributes.remoteData );
 
 	const { getSupportedPatterns, innerBlocksPattern, insertPatternBlocks, resetInnerBlocks } =
@@ -95,25 +95,19 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 
 	// No remote data has been selected yet, show a placeholder.
 	if ( ! data ) {
-		return (
-			<div { ...blockProps }>
-				<Placeholder blockConfig={ blockConfig } onSelect={ onSelectRemoteData } />
-			</div>
-		);
+		return <Placeholder blockConfig={ blockConfig } onSelect={ onSelectRemoteData } />;
 	}
 
 	if ( showPatternSelection ) {
 		const supportedPatterns = getSupportedPatterns( data.results[ 0 ] );
 
 		return (
-			<div { ...blockProps }>
-				<PatternSelection
-					blockName={ blockName }
-					onCancel={ resetPatternSelection }
-					onSelectPattern={ onSelectPattern }
-					supportedPatterns={ supportedPatterns }
-				/>
-			</div>
+			<PatternSelection
+				blockName={ blockName }
+				onCancel={ resetPatternSelection }
+				onSelectPattern={ onSelectPattern }
+				supportedPatterns={ supportedPatterns }
+			/>
 		);
 	}
 
@@ -137,19 +131,29 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 				/>
 			</InspectorControls>
 
-			<div { ...blockProps }>
-				{ loading && (
-					<div className="remote-data-blocks-loading-overlay">
-						<Spinner
-							style={ {
-								height: '50px',
-								width: '50px',
-							} }
-						/>
-					</div>
-				) }
-				<InnerBlocks />
-			</div>
+			{ loading && (
+				<div className="remote-data-blocks-loading-overlay">
+					<Spinner
+						style={ {
+							height: '50px',
+							width: '50px',
+						} }
+					/>
+				</div>
+			) }
+			<InnerBlocks />
 		</>
+	);
+}
+
+export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
+	const blockProps = useBlockProps( { className: CONTAINER_CLASS_NAME } );
+
+	return (
+		<div { ...blockProps }>
+			<EditErrorBoundary blockTitle={ getBlockTitle( props.name ) }>
+				<RemoteDataBlockEdit { ...props } />
+			</EditErrorBoundary>
+		</div>
 	);
 }

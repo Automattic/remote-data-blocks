@@ -103,6 +103,8 @@ interface RemoteDataApiResult {
 
 interface RemoteDataApiResponseBody {
 	block_name: string;
+	code?: number | string;
+	message?: string;
 	metadata: Record< string, RemoteDataResultFields >;
 	pagination?: RemoteDataPagination;
 	query_inputs: RemoteDataQueryInput[];
