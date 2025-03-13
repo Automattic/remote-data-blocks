@@ -154,7 +154,6 @@ class SalesforceD2CIntegration {
 						$service_config['store_id'],
 						urlencode( $input_variables['category_id'] )
 					);
-					
 				},
 				'input_schema' => [
 					'category_id' => [

@@ -102,12 +102,12 @@ class ShopifyIntegration {
 							'name' => 'Collections',
 							'path' => '$.collections.nodes[*]',
 							'generate' => function ( array $data ): string {
-								if (is_array($data) && isset($data['collections']['nodes'])) {
-									$titles = array_map(function($node) {
+								if ( is_array( $data ) && isset( $data['collections']['nodes'] ) ) {
+									$titles = array_map(function ( $node ) {
 										return $node['title'] ?? '';
 									}, $data['collections']['nodes']);
 									
-									return implode(', ', array_filter($titles));
+									return implode( ', ', array_filter( $titles ) );
 								}
 								return '';
 							},
@@ -245,7 +245,6 @@ class ShopifyIntegration {
 				],
 			],
 		] );
-		
 	}
 
 	/**
