@@ -3,7 +3,7 @@ import { PlaceholderSingle } from '@/blocks/remote-data-container/components/pla
 
 export interface PlaceholderProps {
 	blockConfig: BlockConfig;
-	onSelect: ( input: RemoteDataQueryInput ) => void;
+	onSelect: ( input: RemoteDataQueryInput[] ) => void;
 }
 
 export function Placeholder( props: PlaceholderProps ) {

@@ -17,7 +17,7 @@ import { getBlockConfig } from '@/utils/localized-block-data';
 
 export function cloneBlockWithAttributes(
 	block: BlockInstance,
-	attributes: RemoteDataResult,
+	attributes: RemoteDataApiResult,
 	remoteDataBlockName: string
 ): BlockInstance {
 	const mismatchedAttributes = getMismatchedAttributes(
@@ -51,13 +51,13 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 	const returnValue = {
 		defaultPattern,
 		getInnerBlocks: (
-			result: RemoteDataResult
+			result: RemoteDataApiResult
 		): BlockInstance< RemoteDataInnerBlockAttributes >[] => {
 			return getBlocks< RemoteDataInnerBlockAttributes >( rootClientId ).map( block =>
 				cloneBlockWithAttributes( block, result, remoteDataBlockName )
 			);
 		},
-		getSupportedPatterns: ( result?: RemoteDataResult ): BlockPattern[] => {
+		getSupportedPatterns: ( result?: RemoteDataApiResult ): BlockPattern[] => {
 			const supportedPatterns = __experimentalGetAllowedPatterns( rootClientId ).filter(
 				pattern =>
 					pattern?.blockTypes?.includes( remoteDataBlockName ) ||

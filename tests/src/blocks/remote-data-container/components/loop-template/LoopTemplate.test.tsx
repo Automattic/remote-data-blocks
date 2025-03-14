@@ -7,13 +7,25 @@ describe( 'LoopTemplate', () => {
 	const mockGetInnerBlocks = () => [];
 	const mockRemoteData: RemoteData = {
 		blockName: 'test/block',
-		isCollection: true,
 		metadata: {},
-		queryInput: {},
+		queryInputs: [ {} ],
+		queryKey: 'test-query',
 		resultId: 'test-result',
 		results: [
-			{ id: '1', title: 'Test 1' },
-			{ id: '2', title: 'Test 2' },
+			{
+				uuid: 'foo',
+				result: {
+					id: { name: 'ID', type: 'id', value: '1' },
+					title: { name: 'Title', type: 'string', value: 'Test 1' },
+				},
+			},
+			{
+				uuid: 'bar',
+				result: {
+					id: { name: 'ID', type: 'id', value: '2' },
+					title: { name: 'Title', type: 'string', value: 'Test 2' },
+				},
+			},
 		],
 	};
 	const expectedListItems = mockRemoteData.results.length + 1; // because of the memoized preview
@@ -23,9 +35,9 @@ describe( 'LoopTemplate', () => {
 	it( 'renders "No results found" when there are no results', () => {
 		const emptyRemoteData: RemoteData = {
 			blockName: 'test/block',
-			isCollection: true,
 			metadata: {},
-			queryInput: {},
+			queryInputs: [ {} ],
+			queryKey: 'test-query',
 			resultId: 'test-result',
 			results: [],
 		};

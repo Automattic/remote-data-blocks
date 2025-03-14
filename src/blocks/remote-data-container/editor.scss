@@ -73,6 +73,14 @@ remote-data-blocks-inline-field {
 	width: 20px;
 }
 
+/* DataViews */
+
+// fix title field overflow for grid layouts
+.dataviews-view-grid__title-field {
+	white-space: normal;
+}
+
+// limit image size
 .dataviews-column-primary__media img {
 	width: 52px;
 	height: 52px;
@@ -82,7 +90,8 @@ remote-data-blocks-inline-field {
 	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
 
-.rdb-editor_dataviews-modal-item-select .dataviews-view-table tbody .dataviews-view-table__cell-content-wrapper:not(.dataviews-column-primary__media) {
+// fix field width to limit horizontal scrolling
+.rdb-editor_dataviews-modal-item-select .dataviews-view-table tbody .dataviews-view-table__row:not(.has-bulk-actions) .dataviews-view-table__cell-content-wrapper:not(.dataviews-column-primary__media) {
 	white-space: normal;
 	width: 250px;
 	max-width: 100%;
@@ -90,6 +99,7 @@ remote-data-blocks-inline-field {
 	overflow-wrap: anywhere;
 }
 
+// hide actions column
 .dataviews-view-table__row .dataviews-view-table__actions-column .components-button.is-compact.has-icon:not(.has-text) {
 	opacity: 0;
 	display: inline-flex;
@@ -102,47 +112,116 @@ remote-data-blocks-inline-field {
 	width: auto;
 }
 
+// show actions column on hover
 .dataviews-view-table__row:hover .dataviews-view-table__actions-column .components-button.is-compact.has-icon:not(.has-text),
 .dataviews-view-table__row:focus-within .dataviews-view-table__actions-column .components-button.is-compact.has-icon:not(.has-text) {
 	opacity: 1;
 
 }
 
+// center table cell content
 .dataviews-view-table tbody td {
 	vertical-align: middle;
 }
 
-.rdb-editor_data-views-modal .components-modal__content {
-	padding: 0;
+// align padding with designs
 
-	> :nth-child(2) {
-		height: 100%;
+.rdb-dataviews-bulk-actions-modal .components-modal__content {
+	scroll-padding-bottom: 72px;
+	max-height: calc(100% - 116px);
+
+	// custom total item count label
+	.rdb-dataviews-bulk-actions-footer__item-count-total {
+		position: fixed;
+		bottom: 80px;
+		left: 50%;
+		transform: translate(-50%);
+		width: max-content;
+		text-align: center;
+		color: #1e1e1e;
+		z-index: 4;
 	}
 
+	// custom total item count actions
+	.rdb-dataviews-bulk-actions-footer__selection-total {
+		background: #fff;
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		padding: 0 24px 24px;
+		gap: 20px;
+		z-index: 3;
+
+		.components-button {
+			width: 100%;
+			display: block;
+			text-align: center;
+		}
+	}
+
+	// hide bulk actions in footer
+	.dataviews-footer {
+		position: fixed;
+		bottom: 60px;
+		left: 0;
+		right: 0;
+		background-color: transparent;
+
+		.dataviews-bulk-actions-footer__container  .dataviews-bulk-actions-footer__action-buttons {
+			display: none;
+		}
+
+	}
+
+}
+
+.rdb-editor_dataviews-modal-item-select .components-modal__content {
+	padding: 0;
+	margin-top: 0;
+
+	// keep header static
+	.components-modal__header {
+		position: static;
+	}
+
+	// align padding with designs
 	.dataviews-view-table {
 		padding: 4px 32px 32px;
+
+		// make actions column sticky
+		tr th.dataviews-view-table__actions-column,
+		tr td.dataviews-view-table__actions-column {
+			position: sticky;
+			right: 0;
+			background: #fff;
+			z-index: 1;
+			padding-left: 24px;
+			padding-right: 24px;
+			text-align: center;
+		}
+
+		td.dataviews-view-table__actions-column::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: -1px;
+			width: 1px;
+			height: 100%;
+			background-color: #f0f0f0;
+			z-index: 2;
+		}
 	}
+
+
 }
 
-
-.dataviews-view-table tr th.dataviews-view-table__actions-column,
-.dataviews-view-table tr td.dataviews-view-table__actions-column {
-	position: sticky;
-	right: 0;
-	background: #fff;
-	z-index: 1;
-	padding-left: 24px;
-	padding-right: 24px;
-	text-align: center;
+// add spacing below table
+.rdb-editor_dataviews-modal-item-select:not(.rdb-dataviews-bulk-actions-modal) .dataviews-view-table {
+	margin-bottom: 48px;
 }
 
-td.dataviews-view-table__actions-column::before {
-	content: "";
-	position: absolute;
-	top: 0;
-	left: -1px;
-	width: 1px;
-	height: 100%;
-	background-color: #f0f0f0;
-	z-index: 2;
+// remove border on modal header when scrolled
+.components-modal__content.has-scrolled-content:not(.hide-header) .components-modal__header {
+	border: none;
 }

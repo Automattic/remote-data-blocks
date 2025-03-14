@@ -9,8 +9,8 @@ function do_action( string $action, mixed ...$args ): void {
 	MockWordPressFunctions::do_action( $action, ...$args );
 }
 
-function apply_filters( string $filter, mixed $thing ): mixed {
-	return MockWordPressFunctions::apply_filters( $filter, $thing );
+function apply_filters( string $filter, mixed $thing, mixed ...$args ): mixed {
+	return MockWordPressFunctions::apply_filters( $filter, $thing, ...$args );
 }
 
 function esc_html( string $text ): string {
@@ -105,25 +105,7 @@ function get_page_by_path( string $path ): string {
 }
 
 function wp_generate_uuid4(): string {
-	return sprintf(
-		'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
-		mt_rand( 0, 0xffff ),
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
-		mt_rand( 0, 0xffff ),
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
-		mt_rand( 0, 0xffff ),
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
-		mt_rand( 0, 0x0fff ) | 0x4000,
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
-		mt_rand( 0, 0x3fff ) | 0x8000,
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
-		mt_rand( 0, 0xffff ),
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
-		mt_rand( 0, 0xffff ),
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
-		mt_rand( 0, 0xffff )
-	);
+	return '00000000-0000-4000-8000-000000000000';
 }
 
 function is_email( mixed $email ): bool {

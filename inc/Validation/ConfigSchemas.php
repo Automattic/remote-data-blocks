@@ -63,8 +63,19 @@ final class ConfigSchemas {
 		return $schema;
 	}
 
+	public static function get_remote_data_block_attribute_config_schema(): array {
+		static $schema = null;
+
+		if ( null === $schema ) {
+			$schema = self::generate_remote_data_block_attribute_config_schema();
+		}
+
+		return $schema;
+	}
+
 	private static function generate_remote_data_block_config_schema(): array {
 		return Types::object( [
+			'icon' => Types::nullable( Types::string() ),
 			'patterns' => Types::nullable(
 				Types::list_of(
 					Types::object( [
@@ -191,6 +202,10 @@ final class ConfigSchemas {
 							'string',
 							// Special non-primitive types
 							//
+							// An array of IDs, to be handled by the query (e.g., a query can
+							// implode an array of IDs into a comma-separated list and map it
+							// to a query parameter).
+							'id:list',
 							// A string that represents search query input. An input variable
 							// with this type must be present for the query to be considered a
 							// search query.
@@ -273,6 +288,7 @@ final class ConfigSchemas {
 							'image_alt',
 							'image_url',
 							'markdown',
+							'title',
 							// 'json_path' is omitted since it likely has no user utility.
 							'url',
 							'uuid',
@@ -288,14 +304,15 @@ final class ConfigSchemas {
 			'pagination_schema' => Types::nullable(
 				Types::object( [
 					// This field provides an integer representing the total number of
-					// items available in paginated results. This field must be defined
-					// in order present to enable pagination support of any type,
-					// including cursor-based pagination.
-					'total_items' => Types::object( [
-						'name' => Types::nullable( Types::string() ),
-						'path' => Types::json_path(),
-						'type' => Types::enum( 'integer' ),
-					] ),
+					// items available in paginated results. Either this field or
+					// `has_next_page` must be defined in order to enable pagination.
+					'total_items' => Types::nullable(
+						Types::object( [
+							'name' => Types::nullable( Types::string() ),
+							'path' => Types::json_path(),
+							'type' => Types::enum( 'integer' ),
+						] ),
+					),
 					// This field provides a pagination cursor for the next page of
 					// paginated results, or a null value if there is no next page. This
 					// field must be defined in order to enable cursor-based pagination.
@@ -316,6 +333,16 @@ final class ConfigSchemas {
 							'type' => Types::enum( 'string' ),
 						] ),
 					),
+					// This field provides a boolean indicating if there is a next page of
+					// paginated results. This is helpful if the API does not provide a
+					// total number of items.
+					'has_next_page' => Types::nullable(
+						Types::object( [
+							'name' => Types::nullable( Types::string() ),
+							'path' => Types::json_path(),
+							'type' => Types::enum( 'boolean' ),
+						] )
+					),
 				] )
 			),
 			'preprocess_response' => Types::nullable( Types::callable() ),
@@ -333,6 +360,45 @@ final class ConfigSchemas {
 				)
 			),
 			'request_method' => Types::nullable( Types::enum( 'GET', 'POST', 'PUT', 'PATCH', 'DELETE' ) ),
+		] );
+	}
+
+	private static function generate_remote_data_block_attribute_config_schema(): array {
+		return Types::object( [
+			'blockName' => Types::string(),
+			'enabledOverrides' => Types::list_of( Types::string() ),
+			'metadata' => Types::record(
+				Types::string(),
+				Types::object( [
+					'name' => Types::string(),
+					'type' => Types::string(),
+					'value' => Types::any(),
+				] )
+			),
+			'pagination' => Types::nullable(
+				Types::object( [
+					'cursorNext' => Types::nullable( Types::string() ),
+					'cursorPrevious' => Types::nullable( Types::string() ),
+					'hasNextPage' => Types::nullable( Types::boolean() ),
+					'totalItems' => Types::nullable( Types::integer() ),
+				] ),
+			),
+			'queryInputs' => Types::list_of( Types::record( Types::string(), Types::any() ) ),
+			'queryKey' => Types::nullable( Types::string() ),
+			'resultId' => Types::nullable( Types::string() ),
+			'results' => Types::list_of(
+				Types::object( [
+					'result' => Types::record(
+						Types::string(),
+						Types::object( [
+							'name' => Types::string(),
+							'type' => Types::string(),
+							'value' => Types::any(),
+						] )
+					),
+					'uuid' => Types::uuid(),
+				] )
+			),
 		] );
 	}
 }

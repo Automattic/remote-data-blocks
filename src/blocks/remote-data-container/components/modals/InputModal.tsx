@@ -16,7 +16,7 @@ interface InputModalProps {
 	blockName: string;
 	headerImage?: string;
 	inputs: InputVariable[];
-	onSelect: ( data: RemoteDataQueryInput ) => void;
+	onSelect: ( data: RemoteDataQueryInput[] ) => void;
 	title: string;
 }
 
@@ -26,7 +26,7 @@ export function InputModal( props: InputModalProps ) {
 		{}
 	);
 
-	const [ inputState, setInputState ] = useState< Record< string, string > >( initialInputState );
+	const [ inputState, setInputState ] = useState< RemoteDataQueryInput >( initialInputState );
 	const { close, isOpen, open } = useModalState();
 
 	function onChange( field: string, value: string ): void {
@@ -34,7 +34,7 @@ export function InputModal( props: InputModalProps ) {
 	}
 
 	function onSelectItem(): void {
-		props.onSelect( inputState );
+		props.onSelect( [ inputState ] );
 		close();
 		sendTracksEvent( 'add_block', {
 			action: 'select_item',
@@ -65,7 +65,7 @@ export function InputModal( props: InputModalProps ) {
 						key={ input.slug }
 						label={ input.name }
 						required={ input.required }
-						value={ inputState[ input.slug ] ?? '' }
+						value={ inputState[ input.slug ]?.toString() ?? '' }
 						onChange={ ( value: string ) => onChange( input.slug, value ) }
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize

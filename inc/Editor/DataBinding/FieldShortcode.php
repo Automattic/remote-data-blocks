@@ -9,16 +9,6 @@ class FieldShortcode {
 		add_action( 'the_content', [ __CLASS__, 'render_frontend_fields' ] );
 	}
 
-	private static function get_meta_field_value( array $context, string $field ): string|int|null {
-		$query_results = BlockBindings::execute_query( $context, $field );
-
-		if ( isset( $query_results['metadata'][ $field ]['value'] ) ) {
-			return $query_results['metadata'][ $field ]['value'];
-		}
-
-		return null;
-	}
-
 	public static function render_frontend_fields( string $content ): string {
 		if ( ! str_contains( $content, 'remote-data-blocks-inline-field' ) ) {
 			return $content;
@@ -42,27 +32,20 @@ class FieldShortcode {
 			$query_data = json_decode( html_entity_decode( $match['query'] ), true /* associative */ );
 			$fallback_value = $match['fallback_value'] ?? '';
 
-			if ( ! isset( $query_data['remoteData']['blockName'], $query_data['remoteData']['queryInput'], $query_data['selectedField'] ) ) {
+			if ( ! isset( $query_data['remoteData']['blockName'], $query_data['selectedField'] ) ) {
 				$status = 'parse-error';
 				$value = $fallback_value;
 			} else {
-				$context = [
-					'blockName' => $query_data['remoteData']['blockName'],
-					'queryInput' => $query_data['remoteData']['queryInput'],
+				$remote_data = $query_data['remoteData'];
+				$query_inputs = $remote_data['queryInputs'] ?? ( $remote_data['queryInput'] ? [ $remote_data['queryInput'] ] : null );
+				$source_args = [
+					'block' => $remote_data['blockName'],
+					'field' => $query_data['selectedField'],
+					'queryInputs' => $query_inputs,
+					'type' => $query_data['type'] ?? 'field',
 				];
-				$block = [
-					'context' => [
-						BlockBindings::$context_name => $context,
-					],
-				];
-				$field = $query_data['selectedField'];
-				$type = $query_data['type'] ?? 'field';
 
-				if ( 'meta' === $type ) {
-					$value = self::get_meta_field_value( $context, $field );
-				} else {
-					$value = BlockBindings::get_value( [ 'field' => $field ], $block );
-				}
+				$value = BlockBindings::get_value( $source_args, [], 'content' );
 
 				if ( is_null( $value ) ) {
 					$status = 'query-error';

@@ -41,6 +41,7 @@ class AirtableIntegration {
 					array_merge(
 						[
 							'title' => $data_source->get_display_name() . '/' . $table['name'],
+							'icon' => 'editor-table',
 							'render_query' => [
 								'query' => $query,
 							],
@@ -85,19 +86,27 @@ class AirtableIntegration {
 		$input_schema = [
 			'record_id' => [
 				'name' => 'Record ID',
-				'type' => 'id',
+				'type' => 'id:list',
 			],
 		];
 
 		$output_schema = [
-			'is_collection' => false,
+			'is_collection' => true,
+			'path' => '$.records[*]',
 			'type' => self::get_airtable_output_schema_mappings( $table ),
 		];
 
 		return HttpQuery::from_array( [
 			'data_source' => $data_source,
 			'endpoint' => function ( array $input_variables ) use ( $data_source, $table ): string {
-				return $data_source->get_endpoint() . '/' . $table['id'] . '/' . $input_variables['record_id'];
+				// Build the formula
+				$formula_parts = array_map( function ( $id ) {
+					return sprintf( 'RECORD_ID()="%s"', addslashes( $id ) );
+				}, $input_variables['record_id'] );
+
+				$formula = count( $formula_parts ) === 1 ? $formula_parts[0] : 'OR(' . implode( ',', $formula_parts ) . ')';
+
+				return $data_source->get_endpoint() . '/' . $table['id'] . '?filterByFormula=' . urlencode( $formula );
 			},
 			'input_schema' => $input_schema,
 			'output_schema' => $output_schema,

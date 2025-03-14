@@ -47,8 +47,14 @@ final class Validator implements ValidatorInterface {
 
 		if ( Types::is_primitive( $type ) ) {
 			$type_name = Types::get_type_name( $type );
-			if ( $this->check_primitive_type( $type_name, $value ) ) {
+			$result = $this->check_primitive_type( $type_name, $value );
+
+			if ( true === $result ) {
 				return true;
+			}
+
+			if ( is_wp_error( $result ) ) {
+				return $result;
 			}
 
 			return $this->create_error( sprintf( 'Value must be a %s', $type_name ), $value );
@@ -232,7 +238,7 @@ final class Validator implements ValidatorInterface {
 		}
 	}
 
-	private function check_primitive_type( string $type_name, mixed $value ): bool {
+	private function check_primitive_type( string $type_name, mixed $value ): bool|WP_Error {
 		switch ( $type_name ) {
 			case 'any':
 				return true;
@@ -256,6 +262,7 @@ final class Validator implements ValidatorInterface {
 			case 'html':
 			case 'image_alt':
 			case 'markdown':
+			case 'title':
 				return is_string( $value );
 
 			case 'button_text':
@@ -274,7 +281,7 @@ final class Validator implements ValidatorInterface {
 				return wp_is_uuid( $value );
 
 			default:
-				return false;
+				return $this->create_error( 'Unknown type', $type_name );
 		}
 	}
 

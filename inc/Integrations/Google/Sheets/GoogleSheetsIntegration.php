@@ -41,6 +41,7 @@ class GoogleSheetsIntegration {
 				array_merge(
 					[
 						'title' => $data_source->get_display_name() . '/' . $sheet['name'],
+						'icon' => 'media-spreadsheet',
 						'render_query' => [
 							'query' => $query,
 						],

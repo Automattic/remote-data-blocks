@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { BLOCK_BINDING_SOURCE } from '@/config/constants';
 import { getBoundAttributeEntries, getMismatchedAttributes } from '@/utils/block-binding';
+import { createRemoteDataResults as createResults } from '@/utils/remote-data';
 
 describe( 'block-binding utils', () => {
 	describe( 'getBoundAttributeEntries', () => {
@@ -50,7 +51,7 @@ describe( 'block-binding utils', () => {
 				},
 			};
 
-			const results = [ { title: 'New content', link: 'https://new-url.com' } ];
+			const results = createResults( [ { title: 'New content', link: 'https://new-url.com' } ] );
 
 			const result = getMismatchedAttributes( attributes, results, block );
 
@@ -76,7 +77,9 @@ describe( 'block-binding utils', () => {
 				},
 			};
 
-			const results = [ { title: 'Current content', link: 'https://current-url.com' } ];
+			const results = createResults( [
+				{ title: 'Current content', link: 'https://current-url.com' },
+			] );
 
 			const result = getMismatchedAttributes( attributes, results, block );
 
@@ -96,7 +99,7 @@ describe( 'block-binding utils', () => {
 				},
 			};
 
-			const results: Record< string, string >[] = [ { title: 'New content' } ];
+			const results = createResults( [ { title: 'New content' } ] );
 
 			const result = getMismatchedAttributes( attributes, results, block );
 
@@ -119,7 +122,7 @@ describe( 'block-binding utils', () => {
 				},
 			};
 
-			const results: Record< string, string >[] = [ { title: 'My Title' } ];
+			const results = createResults( [ { title: 'My Title' } ] );
 
 			const result = getMismatchedAttributes( attributes, results, block );
 
@@ -139,7 +142,7 @@ describe( 'block-binding utils', () => {
 				},
 			};
 
-			const results: Record< string, unknown >[] = [ { a_field: 123 } ];
+			const results = createResults( [ { a_field: 123 } ] );
 
 			const result = getMismatchedAttributes( attributes, results, block );
 
@@ -157,7 +160,7 @@ describe( 'block-binding utils', () => {
 				},
 			};
 
-			const results: Record< string, unknown >[] = [ { a_field: 1234 } ];
+			const results = createResults( [ { a_field: 1234 } ] );
 
 			const result = getMismatchedAttributes( attributes, results, block );
 

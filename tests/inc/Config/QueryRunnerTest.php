@@ -89,7 +89,6 @@ class QueryRunnerTest extends TestCase {
 		$result = $this->query->execute( [] );
 
 		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
 	}
 
@@ -189,9 +188,7 @@ class QueryRunnerTest extends TestCase {
 		$result = $this->query->execute( [] );
 
 		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
-		$this->assertFalse( $result['is_collection'] );
 
 		$this->assertArrayHasKey( 'metadata', $result );
 		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
@@ -205,6 +202,7 @@ class QueryRunnerTest extends TestCase {
 					'value' => 'test value',
 				],
 			],
+			'uuid' => '00000000-0000-4000-8000-000000000000',
 		];
 
 		$this->assertIsArray( $result['results'] );
@@ -233,9 +231,7 @@ class QueryRunnerTest extends TestCase {
 		$result = $this->query->execute( [] );
 
 		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
-		$this->assertFalse( $result['is_collection'] );
 
 		$this->assertArrayHasKey( 'metadata', $result );
 		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
@@ -249,6 +245,7 @@ class QueryRunnerTest extends TestCase {
 					'value' => 'overridden in preprocess_response as JSON string',
 				],
 			],
+			'uuid' => '00000000-0000-4000-8000-000000000000',
 		];
 
 		$this->assertIsArray( $result['results'] );
@@ -278,9 +275,7 @@ class QueryRunnerTest extends TestCase {
 		$result = $this->query->execute( [] );
 
 		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
-		$this->assertFalse( $result['is_collection'] );
 
 		$this->assertArrayHasKey( 'metadata', $result );
 		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
@@ -294,6 +289,7 @@ class QueryRunnerTest extends TestCase {
 					'value' => 'overridden in preprocess_response as array',
 				],
 			],
+			'uuid' => '00000000-0000-4000-8000-000000000000',
 		];
 
 		$this->assertIsArray( $result['results'] );
@@ -325,9 +321,7 @@ class QueryRunnerTest extends TestCase {
 		$result = $this->query->execute( [] );
 
 		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
-		$this->assertFalse( $result['is_collection'] );
 
 		$this->assertArrayHasKey( 'metadata', $result );
 		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
@@ -341,6 +335,7 @@ class QueryRunnerTest extends TestCase {
 					'value' => 'overridden in preprocess_response as object',
 				],
 			],
+			'uuid' => '00000000-0000-4000-8000-000000000000',
 		];
 
 		$this->assertIsArray( $result['results'] );
@@ -385,7 +380,6 @@ class QueryRunnerTest extends TestCase {
 		$result = $query->execute( [] );
 
 		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'metadata', $result );
 		$this->assertArrayHasKey( 'results', $result );
 	}

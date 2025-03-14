@@ -1,25 +1,22 @@
 import { Button } from '@wordpress/components';
 
+import {
+	createQueryInputsFromRemoteDataResults,
+	getFirstRemoteDataResultValueByType,
+	getRemoteDataResultValue,
+} from '@/utils/remote-data';
+
 function createFieldSelection(
 	field: string,
-	item: RemoteDataResult,
-	blockName: string,
-	remoteData: RemoteData
+	item: RemoteDataApiResult,
+	blockName: string
 ): FieldSelection {
 	return {
 		action: 'add_field_shortcode',
 		remoteData: {
-			...remoteData,
 			blockName,
-			queryInput: {
-				...item,
-				field: {
-					field,
-					value: item[ field ],
-				},
-			},
-			resultId: item.id?.toString() ?? '',
-			results: [ item ],
+			queryInputs: createQueryInputsFromRemoteDataResults( [ item ] ),
+			metadata: {},
 		},
 		selectedField: field,
 		selectionPath: 'select_new_tab',
@@ -30,35 +27,25 @@ function createFieldSelection(
 interface ItemListFieldProps {
 	blockName: string;
 	field: string;
-	item: RemoteDataResult;
+	item: RemoteDataApiResult;
 	mediaField?: string;
-	onSelect: ( data: RemoteDataQueryInput ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
-	remoteData?: RemoteData;
 }
 
 export function ItemListField( props: ItemListFieldProps ) {
-	const { blockName, field, item, mediaField, onSelect, onSelectField, remoteData } = props;
-	const value = item[ field ]?.toString() ?? '';
+	const { blockName, field, item, mediaField, onSelectField } = props;
+	const value = getRemoteDataResultValue( item, field );
 
 	if ( field === mediaField ) {
-		return <img alt={ ( item.image_alt as string ) ?? '' } src={ value } />;
+		const imgAlt = getFirstRemoteDataResultValueByType( item, 'image_alt' );
+		return <img alt={ imgAlt } src={ value } />;
 	}
 
-	if ( onSelectField && remoteData ) {
-		const queryInput: RemoteDataQueryInput = {
-			...item,
-			field: {
-				field,
-				value: item[ field ] as string,
-			},
-		};
-
+	if ( onSelectField ) {
 		return (
 			<Button
 				onClick={ () => {
-					onSelectField( createFieldSelection( field, item, blockName, remoteData ), value );
-					onSelect( queryInput );
+					onSelectField( createFieldSelection( field, item, blockName ), value );
 				} }
 				variant="link"
 			>

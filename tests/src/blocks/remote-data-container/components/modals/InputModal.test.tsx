@@ -62,10 +62,12 @@ describe( 'InputModal', () => {
 
 		fireEvent.click( screen.getByText( 'Save' ) );
 
-		expect( mockOnSelect ).toHaveBeenCalledWith( {
-			input1: 'Test Value 1',
-			input2: 'Test Value 2',
-		} );
+		expect( mockOnSelect ).toHaveBeenCalledWith( [
+			{
+				input1: 'Test Value 1',
+				input2: 'Test Value 2',
+			},
+		] );
 		expect( sendTracksEvent ).toHaveBeenCalledWith( 'add_block', {
 			action: 'select_item',
 			data_source_type: '',

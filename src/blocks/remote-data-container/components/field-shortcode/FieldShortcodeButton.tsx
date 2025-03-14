@@ -41,10 +41,17 @@ export function FieldShortcodeButton( props: WPFormatEditProps ) {
 	}, [ isObjectActive ] );
 
 	const updateOrInsertField = ( data: FieldSelection | null, fieldValue: string ) => {
+		// Only serialize a subset of necessary data.
+		const serializedData: Partial< FieldSelection > = {
+			remoteData: data?.remoteData,
+			selectedField: data?.selectedField,
+			type: data?.type,
+		};
+
 		const format: RichTextFormat = {
 			attributes: {
 				...activeObjectAttributes,
-				'data-query': data ? JSON.stringify( data ) : '',
+				'data-query': data ? JSON.stringify( serializedData ) : '',
 			},
 			innerHTML: fieldValue,
 			type: formatName,
@@ -97,7 +104,10 @@ export function FieldShortcodeButton( props: WPFormatEditProps ) {
 							{ () => (
 								<ToolbarGroup>
 									<FieldShortcodeSelectNew onSelectField={ onSelectField } />
-									<FieldShortcodeSelectExisting onSelectField={ onSelectField } />
+									<FieldShortcodeSelectExisting
+										onSelectField={ onSelectField }
+										remoteData={ remoteData }
+									/>
 									<FieldShortcodeSelectMeta onSelectField={ onSelectField } />
 								</ToolbarGroup>
 							) }

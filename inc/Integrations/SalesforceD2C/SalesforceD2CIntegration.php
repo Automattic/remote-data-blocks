@@ -75,7 +75,7 @@ class SalesforceD2CIntegration {
 						'name' => [
 							'name' => 'Name',
 							'path' => '$.name',
-							'type' => 'string',
+							'type' => 'title',
 						],
 						'sku' => [
 							'name' => 'SKU',
@@ -134,7 +134,7 @@ class SalesforceD2CIntegration {
 						'name' => [
 							'name' => 'Name',
 							'path' => '$.name',
-							'type' => 'string',
+							'type' => 'title',
 						],
 						'image_url' => [
 							'name' => 'Image URL',
@@ -154,6 +154,7 @@ class SalesforceD2CIntegration {
 		register_remote_data_block(
 			[
 				'title' => $data_source->get_display_name(),
+				'icon' => 'money-alt',
 				'render_query' => [
 					'query' => $queries['display'],
 				],

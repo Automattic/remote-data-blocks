@@ -29,9 +29,18 @@ abstract class ArraySerializable implements ArraySerializableInterface {
 	 * @inheritDoc
 	 */
 	final public static function from_array( array $config, ?ValidatorInterface $validator = null ): static|WP_Error {
+		// The purpose of this is to ensure that when from_array runs, it is statically bound to the correct child class.
+		// This is important for ensuring that the correct child class is used for migrations, preprocess_config, etc.
 		$subclass = static::get_implementor( $config );
 		if ( null !== $subclass ) {
 			return $subclass::from_array( $config, $validator );
+		}
+
+		// If this is above the get_implementor call, it might still be statically bound to ArraySerializable or HttpDataSource
+		// instead of the actual subclass like ShopifyDataSource.
+		$config = static::migrate_config( $config );
+		if ( is_wp_error( $config ) ) {
+			return $config;
 		}
 
 		$config = static::preprocess_config( $config );
@@ -91,4 +100,15 @@ abstract class ArraySerializable implements ArraySerializableInterface {
 	 * @inheritDoc
 	 */
 	abstract public static function get_config_schema(): array;
+
+	/**
+	 * Migrates the config to the current schema version.
+	 * Can be overridden by child classes to perform custom migrations.
+	 *
+	 * @param array<string, mixed> $config The config to migrate.
+	 * @return array<string, mixed> The migrated config.
+	 */
+	public static function migrate_config( array $config ): array|WP_Error {
+		return $config;
+	}
 }
