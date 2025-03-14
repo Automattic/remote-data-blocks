@@ -197,20 +197,14 @@ function register_aic_block(): void {
 	register_remote_data_block([
 		'title' => 'Art Institute of Chicago',
 		'icon' => 'art',
-		'render_query' => [
-			'query' => $get_art_query,
-			'additional_queries' => [
-				[
-					'query' => $collection_query,
-					'type' => 'collection',
-					'display_name' => 'Collection',
-				],
-			],
+		'queries' => [
+			'display' => $get_art_query,
+			'collection' => $collection_query,
+			'search' => $search_art_query,
 		],
-		'selection_queries' => [
-			[
-				'query' => $search_art_query,
-				'type' => 'search',
+		'query_configurations' => [
+			'display' => [
+				'source_query' => 'search',
 			],
 		],
 	]);

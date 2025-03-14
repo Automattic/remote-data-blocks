@@ -85,42 +85,22 @@ final class ConfigSchemas {
 					] )
 				)
 			),
-			'render_query' => Types::object( [
-				'query' => Types::one_of(
+			'queries' => Types::record(
+				Types::string(),
+				Types::one_of(
 					Types::instance_of( QueryInterface::class ),
 					Types::serialized_config_for( HttpQueryInterface::class ),
-				),
-				'additional_queries' => Types::nullable(
-					Types::list_of(
-						Types::object( [
-							'display_name' => Types::nullable( Types::string() ),
-							'query' => Types::one_of(
-								Types::instance_of( QueryInterface::class ),
-								Types::serialized_config_for( HttpQueryInterface::class ),
-							),
-							'type' => Types::enum(
-								ConfigRegistry::COLLECTION_QUERY_KEY,
-							),
-						] )
-					)
-				),
-				'loop' => Types::nullable( Types::boolean() ),
-			] ),
-			'selection_queries' => Types::nullable(
-				Types::list_of(
+				)
+			),
+			'query_configurations' => Types::nullable(
+				Types::record(
+					Types::string(),
 					Types::object( [
-						'display_name' => Types::nullable( Types::string() ),
-						'query' => Types::one_of(
-							Types::instance_of( QueryInterface::class ),
-							Types::serialized_config_for( HttpQueryInterface::class ),
-						),
-						'type' => Types::enum(
-							ConfigRegistry::LIST_QUERY_KEY,
-							ConfigRegistry::SEARCH_QUERY_KEY
-						),
+						'source_query' => Types::string(),
 					] )
 				)
 			),
+			'loop' => Types::nullable( Types::boolean() ),
 			'overrides' => Types::nullable(
 				Types::list_of(
 					Types::object( [
