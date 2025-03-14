@@ -42,13 +42,13 @@ class GoogleSheetsIntegration {
 					[
 						'title' => $data_source->get_display_name() . '/' . $sheet['name'],
 						'icon' => 'media-spreadsheet',
-						'render_query' => [
-							'query' => $query,
+						'queries' => [
+							'display' => $query,
+							'list' => $list_query,
 						],
-						'selection_queries' => [
-							[
-								'query' => $list_query,
-								'type' => 'list',
+						'query_configurations' => [
+							'display' => [
+								'source_query' => 'list',
 							],
 						],
 					],
@@ -71,10 +71,10 @@ class GoogleSheetsIntegration {
 				array_merge(
 					[
 						'title' => sprintf( '%s/%s Loop', $data_source->get_display_name(), $sheet['name'] ),
-						'render_query' => [
-							'loop' => true,
-							'query' => $list_query,
+						'queries' => [
+							'display' => $list_query,
 						],
+						'loop' => true,
 					],
 					$block_overrides
 				)

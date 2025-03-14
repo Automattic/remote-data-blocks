@@ -155,13 +155,13 @@ class ShopifyIntegration {
 		register_remote_data_block( [
 			'title' => $block_title,
 			'icon' => 'cart',
-			'render_query' => [
-				'query' => $queries['shopify_get_product'],
+			'queries' => [
+				'display' => $queries['shopify_get_product'],
+				'search' => $queries['shopify_search_products'],
 			],
-			'selection_queries' => [
-				[
-					'query' => $queries['shopify_search_products'],
-					'type' => 'search',
+			'query_configurations' => [
+				'display' => [
+					'source_query' => 'search',
 				],
 			],
 			'patterns' => [

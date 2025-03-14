@@ -148,30 +148,28 @@ class SalesforceD2CIntegration {
 		];
 	}
 
-	public static function register_blocks_for_salesforce_data_source( SalesforceD2CDataSource $data_source ): void {
-		$queries = self::get_queries( $data_source );
+	public static function register_blocks_for_salesforce_data_source(SalesforceD2CDataSource $data_source): void {
+		$queries = self::get_queries($data_source);
 
-		register_remote_data_block(
-			[
-				'title' => $data_source->get_display_name(),
-				'icon' => 'money-alt',
-				'render_query' => [
-					'query' => $queries['display'],
+		register_remote_data_block([
+			'title' => $data_source->get_display_name(),
+			'icon' => 'money-alt',
+			'queries' => [
+				'display' => $queries['display'],
+				'search' => $queries['search'],
+			],
+			'query_configurations' => [
+				'display' => [
+					'source_query' => 'search',
 				],
-				'selection_queries' => [
-					[
-						'query' => $queries['search'],
-						'type' => 'search',
-					],
+			],
+			'overrides' => [
+				[
+					'display_name' => 'Use Salesforce product from URL',
+					'name' => 'salesforce_sku',
 				],
-				'overrides' => [
-					[
-						'display_name' => 'Use Salesforce product from URL',
-						'name' => 'salesforce_sku',
-					],
-				],
-			]
-		);
+			],
+		]);
 
 		add_filter( 'query_vars', function ( array $query_vars ): array {
 			$query_vars[] = 'sku';

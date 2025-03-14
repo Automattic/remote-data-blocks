@@ -34,27 +34,27 @@ class AirtableIntegration {
 		$tables = $data_source->to_array()['service_config']['tables'];
 
 		foreach ( $tables as $table ) {
-				$query = self::get_query( $data_source, $table );
-				$list_query = self::get_list_query( $data_source, $table );
+			$query = self::get_query( $data_source, $table );
+			$list_query = self::get_list_query( $data_source, $table );
 
-				register_remote_data_block(
-					array_merge(
-						[
-							'title' => $data_source->get_display_name() . '/' . $table['name'],
-							'icon' => 'editor-table',
-							'render_query' => [
-								'query' => $query,
-							],
-							'selection_queries' => [
-								[
-									'query' => $list_query,
-									'type' => 'list',
-								],
+			register_remote_data_block(
+				array_merge(
+					[
+						'title' => $data_source->get_display_name() . '/' . $table['name'],
+						'icon' => 'editor-table',
+						'queries' => [
+							'display' => $query,
+							'list' => $list_query,
+						],
+						'query_configurations' => [
+							'display' => [
+								'source_query' => 'list',
 							],
 						],
-						$block_overrides
-					)
-				);
+					],
+					$block_overrides
+				)
+			);
 		}
 	}
 
@@ -71,10 +71,10 @@ class AirtableIntegration {
 				array_merge(
 					[
 						'title' => sprintf( '%s/%s Loop', $data_source->get_display_name(), $table['name'] ),
-						'render_query' => [
-							'loop' => true,
-							'query' => $list_query,
+						'queries' => [
+							'display' => $list_query,
 						],
+						'loop' => true,
 					],
 					$block_overrides
 				)
