@@ -1,10 +1,10 @@
 # Query runner
 
-A query runner executes a query and processes the results. The default `QueryRunner` used by the [`HttpQuery` class](query.md) is designed to work with most APIs that transact over HTTP and return JSON, but you may want to provide a custom query runner if:
+A query runner executes a query and processes the results of a query. The default `QueryRunner` used by the [`HttpQuery` class](query.md) is designed to work with most APIs that transact over HTTP and return JSON, but you may want to provide a custom query runner if:
 
 - Your API does not respond with JSON or requires custom deserialization logic.
 - Your API uses a non-HTTP transport.
-- You want to implement custom processing of the response data that is not possible with the provided filters.
+- You want to implement custom processing of the response data, which is not possible with the [provided filters](./hooks.md).
 
 ## Custom QueryRunner for HTTP queries
 
@@ -28,7 +28,7 @@ The `get_raw_response_data` method dispatches the HTTP request and assembles the
 
 ### get_response_metadata( HttpQueryInterface $query, array $response_metadata, array $query_results ): array
 
-The `get_response_metadata` method returns the response metadata for the query, which are available as bindings for [field shortcodes](field-shortcodes.md).
+The `get_response_metadata` method returns the response metadata for the query, which are available as bindings for [field shortcodes](../concepts/field-shortcodes.md).
 
 ## Custom query execution
 

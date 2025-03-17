@@ -1,19 +1,32 @@
 type RemoteDataBinding = Pick< RemoteDataResultFields, 'name' | 'type' >;
 type AvailableBindings = Record< string, RemoteDataBinding >;
 
+/**
+ * This corresponds directly to the input schema defined by a query.
+ */
 interface InputVariable {
-	name: string;
+	/** The display friendly name of the variable */
+	name?: string;
+	/** Whether the variable is required, or not in the query */
 	required: boolean;
+	/** The slug of the variable in the query */
 	slug: string;
+	/** The type of the variable in the query */
 	type: string;
+}
+
+interface InputVariableOverride {
+	display_name?: string;
+	help_text?: string;
+	name: string;
 }
 
 interface BlockConfig {
 	availableBindings: AvailableBindings;
+	availableOverrides: InputVariableOverride[];
 	dataSourceType: string;
 	loop: boolean;
 	name: string;
-	overrides: Record< string, QueryInputOverride[] >;
 	patterns: {
 		default: string;
 		inner_blocks?: string;
@@ -28,6 +41,7 @@ interface BlockConfig {
 	settings: {
 		category: string;
 		description?: string;
+		icon?: ReactElement | IconType | ComponentType;
 		title: string;
 	};
 }

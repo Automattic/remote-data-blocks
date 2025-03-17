@@ -3,15 +3,16 @@
 namespace RemoteDataBlocks\Tests\WpdbStorage;
 
 use PHPUnit\Framework\TestCase;
+use RemoteDataBlocks\Tests\Mocks\MockWordPressFunctions;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use WP_Error;
 
 class DataSourceCrudTest extends TestCase {
 	protected function tearDown(): void {
-		clear_mocked_options();
+		MockWordPressFunctions::reset();
 	}
 
-	public function test_register_new_data_source_with_valid_input() {
+	public function test_register_new_data_source_with_valid_input(): void {
 		$valid_source = [
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'service_config' => [
@@ -33,7 +34,7 @@ class DataSourceCrudTest extends TestCase {
 		$this->assertTrue( wp_is_uuid( $result['uuid'] ) );
 	}
 
-	public function test_register_new_data_source_with_invalid_input() {
+	public function test_register_new_data_source_with_invalid_input(): void {
 		$invalid_source = [
 			'service' => 'unsupported',
 			'service_config' => [],
@@ -54,7 +55,7 @@ class DataSourceCrudTest extends TestCase {
 		$this->assertsame( 'unsupported_data_source', $result->get_error_code() );
 	}
 
-	public function test_get_configs() {
+	public function test_get_configs(): void {
 		$source1 = DataSourceCrud::create_config( [
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'service_config' => [
@@ -67,7 +68,7 @@ class DataSourceCrudTest extends TestCase {
 				],
 				'tables' => [],
 			],
-			'uuid' => wp_generate_uuid4(),
+			'uuid' => '00000000-0000-4000-8000-000000000001',
 		] );
 
 		$source2 = DataSourceCrud::create_config( [
@@ -78,7 +79,7 @@ class DataSourceCrudTest extends TestCase {
 				'display_name' => 'Shopify Source',
 				'store_name' => 'mystore',
 			],
-			'uuid' => wp_generate_uuid4(),
+			'uuid' => '00000000-0000-4000-8000-000000000002',
 		] );
 
 		$all_sources = DataSourceCrud::get_configs();
@@ -95,7 +96,7 @@ class DataSourceCrudTest extends TestCase {
 		$this->assertSame( $source2['uuid'], $shopify_sources[0]['uuid'] );
 	}
 
-	public function test_get_item_by_uuid_with_valid_uuid() {
+	public function test_get_item_by_uuid_with_valid_uuid(): void {
 		$source = DataSourceCrud::create_config( [
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'service_config' => [
@@ -117,13 +118,13 @@ class DataSourceCrudTest extends TestCase {
 		$this->assertArrayHasKey( 'updated_at', $retrieved_source['__metadata'] );
 	}
 
-	public function test_get_item_by_uuid_with_invalid_uuid() {
+	public function test_get_item_by_uuid_with_invalid_uuid(): void {
 		$non_existent = DataSourceCrud::get_config_by_uuid( 'non-existent-uuid' );
 		$this->assertInstanceOf( WP_Error::class, $non_existent );
 		$this->assertsame( 'data_source_not_found', $non_existent->get_error_code() );
 	}
 
-	public function test_update_item_by_uuid_with_valid_uuid() {
+	public function test_update_item_by_uuid_with_valid_uuid(): void {
 		$source = DataSourceCrud::create_config( [
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'service_config' => [
@@ -147,13 +148,13 @@ class DataSourceCrudTest extends TestCase {
 		$this->assertSame( 'updated_token', $updated_source['service_config']['access_token'] );
 	}
 
-	public function test_update_item_by_uuid_with_invalid_uuid() {
+	public function test_update_item_by_uuid_with_invalid_uuid(): void {
 		$non_existent = DataSourceCrud::update_config_by_uuid( 'non-existent-uuid', [ 'token' => 'new_token' ] );
 		$this->assertInstanceOf( WP_Error::class, $non_existent );
 		$this->assertSame( 'data_source_not_found', $non_existent->get_error_code() );
 	}
 
-	public function test_delete_item_by_uuid() {
+	public function test_delete_item_by_uuid(): void {
 		$source = DataSourceCrud::create_config( [
 			'service' => REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE,
 			'service_config' => [
@@ -177,7 +178,7 @@ class DataSourceCrudTest extends TestCase {
 		$this->assertSame( 'data_source_not_found', $deleted_source->get_error_code() );
 	}
 
-	public function test_get_by_uuid_with_non_existent_uuid() {
+	public function test_get_by_uuid_with_non_existent_uuid(): void {
 		$non_existent = DataSourceCrud::get_config_by_uuid( '64af9297-867e-4e39-b51d-7c97beeebec6' );
 		$this->assertInstanceOf( WP_Error::class, $non_existent );
 		$this->assertSame( 'data_source_not_found', $non_existent->get_error_code() );

@@ -7,6 +7,7 @@ import {
 	__experimentalHeading as Heading,
 	Popover,
 } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { WPFormat, useAnchor } from '@wordpress/rich-text';
 
 import { FieldShortcodeSelectField } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelection';
@@ -40,7 +41,7 @@ export function FieldShortcodeSelectFieldPopover( props: FieldShortcodeSelectFie
 		>
 			<Card style={ { width: '24rem' } }>
 				<CardHeader>
-					<Heading level={ 4 }>Select a field to bind</Heading>
+					<Heading level={ 4 }>{ __( 'Select a field to bind', 'remote-data-blocks' ) }</Heading>
 				</CardHeader>
 				<CardBody>
 					<FieldShortcodeSelectField
@@ -49,13 +50,13 @@ export function FieldShortcodeSelectFieldPopover( props: FieldShortcodeSelectFie
 						onSelectField={ ( data, fieldValue ) =>
 							props.onSelectField( { ...data, action: 'update_field_shortcode' }, fieldValue )
 						}
-						queryInput={ remoteData?.queryInput ?? {} }
+						queryInputs={ remoteData?.queryInputs ?? [ {} ] }
 						selectedField={ selectedField }
 					/>
 				</CardBody>
 				<CardFooter>
 					<Button onClick={ () => props.resetField( remoteData?.blockName ) } isDestructive>
-						Reset field
+						{ __( 'Reset field', 'remote-data-blocks' ) }
 					</Button>
 				</CardFooter>
 			</Card>

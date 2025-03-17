@@ -30,12 +30,12 @@ class HttpClientTest extends TestCase {
 		$this->http_client->client = $client;
 	}
 
-	public function testConstructor() {
+	public function testConstructor(): void {
 		$client = new HttpClient( 'https://api.example.com', [ 'X-Test' => 'value' ] );
 		$this->assertInstanceOf( HttpClient::class, $client );
 	}
 
-	public function testRequest() {
+	public function testRequest(): void {
 		$this->mock_handler->append( new Response( 200, [], 'Success' ) );
 		$response = $this->http_client->request( 'GET', '/test' );
 		$this->assertSame( 200, $response->getStatusCode() );
@@ -43,7 +43,7 @@ class HttpClientTest extends TestCase {
 		$this->assertSame( 'MISS', $response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
 	}
 
-	public function testGet() {
+	public function testGet(): void {
 		$this->mock_handler->append( new Response( 200, [], 'GET Success' ) );
 		$response = $this->http_client->get( '/test' );
 		$this->assertSame( 200, $response->getStatusCode() );
@@ -51,7 +51,7 @@ class HttpClientTest extends TestCase {
 		$this->assertSame( 'MISS', $response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
 	}
 
-	public function testPost() {
+	public function testPost(): void {
 		$this->mock_handler->append( new Response( 201, [], 'POST Success' ) );
 		$response = $this->http_client->post( '/test' );
 		$this->assertSame( 201, $response->getStatusCode() );
@@ -59,7 +59,7 @@ class HttpClientTest extends TestCase {
 		$this->assertSame( 'MISS', $response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
 	}
 
-	public function testRetryDecider() {
+	public function testRetryDecider(): void {
 		$request = new Request( 'GET', '/test' );
 
 		// Test max retries
@@ -78,7 +78,7 @@ class HttpClientTest extends TestCase {
 		$this->assertFalse( HttpClient::retry_decider( 0, $request, $response ) );
 	}
 
-	public function testRetryDelay() {
+	public function testRetryDelay(): void {
 		$response = new Response( 429, [ 'Retry-After' => '120' ] );
 		$delay = HttpClient::retry_delay( 1, $response );
 		$this->assertSame( 120000, $delay );
@@ -93,7 +93,7 @@ class HttpClientTest extends TestCase {
 		$this->assertSame( 2000, $delay );
 	}
 
-	public function testQueueRequestAndExecuteParallel() {
+	public function testQueueRequestAndExecuteParallel(): void {
 		$this->mock_handler->append( new Response( 200, [], 'Response 1' ) );
 		$this->mock_handler->append( new Response( 201, [], 'Response 2' ) );
 
@@ -114,7 +114,7 @@ class HttpClientTest extends TestCase {
 		$this->assertSame( 'MISS', $results[1]['value']->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
 	}
 
-	public function testQueueRequestAndExecuteParallelWithFailures() {
+	public function testQueueRequestAndExecuteParallelWithFailures(): void {
 		$this->mock_handler->append( new Response( 200, [], 'Success Response' ) );
 		$this->mock_handler->append( new RequestException( 'Error', new Request( 'GET', '/test2' ) ) );
 		$this->mock_handler->append( new ConnectException( 'Connection Error', new Request( 'POST', '/test3' ) ) );
@@ -140,7 +140,7 @@ class HttpClientTest extends TestCase {
 		$this->assertSame( 'Connection Error', $results[2]['reason']->getMessage() );
 	}
 
-	public function testRepeatedGetCallsResultsInCacheHit() {
+	public function testRepeatedGetCallsResultsInCacheHit(): void {
 		// Set up the mock handler with only one response
 		$this->mock_handler->append( new Response( 200, [], 'Cached Response' ) );
 
@@ -165,7 +165,7 @@ class HttpClientTest extends TestCase {
 		$this->assertEquals( 'HIT', $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
 	}
 
-	public function testRepeatedGetCallsWithQueryArgumentsResultsInCacheHit() {
+	public function testRepeatedGetCallsWithQueryArgumentsResultsInCacheHit(): void {
 		// Set up the mock handler with only one response
 		$this->mock_handler->append( new Response( 200, [], 'Cached Response' ) );
 
@@ -190,7 +190,7 @@ class HttpClientTest extends TestCase {
 		$this->assertEquals( 'HIT', $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
 	}
 
-	public function testSubsequentGetCallsWithDifferentPathsResultsInCacheMiss() {
+	public function testSubsequentGetCallsWithDifferentPathsResultsInCacheMiss(): void {
 		// Set up the mock handler with two identical responses
 		$this->mock_handler->append(
 			new Response( 200, [], 'First Response' ),
@@ -220,7 +220,7 @@ class HttpClientTest extends TestCase {
 		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the second request' );
 	}
 
-	public function testSubsequentGetCallsWithSamePathAndDifferentQueryArgumentsResultsInCacheMiss() {
+	public function testSubsequentGetCallsWithSamePathAndDifferentQueryArgumentsResultsInCacheMiss(): void {
 		// Set up the mock handler with two identical responses
 		$this->mock_handler->append(
 			new Response( 200, [], 'First Response' ),

@@ -3,6 +3,8 @@
     errorLevel="7"
     resolveFromConfigFile="true"
     phpVersion="8.1"
+    allConstantsGlobal="true"
+    allFunctionsGlobal="true"
     findUnusedCode="true"
     findUnusedBaselineEntry="true"
     findUnusedPsalmSuppress="true"
@@ -15,7 +17,6 @@
         <directory name="*"/>
         <ignoreFiles allowMissingFiles="true">
             <directory name="build/"/>
-            <directory name="example/"/>
             <directory name="node_modules/"/>
             <directory name="vendor/"/>
         </ignoreFiles>
@@ -32,6 +33,7 @@
     <stubs>
         <file name="vendor/php-stubs/wordpress-globals/wordpress-globals.php"/>
         <file name="vendor/php-stubs/wordpress-stubs/wordpress-stubs.php"/>
+        <file name="vendor/php-stubs/wordpress-tests-stubs/wordpress-tests-stubs.php" preloadClasses="true"/>
         <file name="tests/inc/test-utils.php"/>
         <file name="remote-data-blocks.php"/>
     </stubs>

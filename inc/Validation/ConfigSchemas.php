@@ -4,6 +4,7 @@ namespace RemoteDataBlocks\Validation;
 
 use RemoteDataBlocks\Validation\Types;
 use RemoteDataBlocks\Config\DataSource\HttpDataSourceInterface;
+use RemoteDataBlocks\Config\Query\HttpQueryInterface;
 use RemoteDataBlocks\Config\Query\QueryInterface;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
@@ -62,17 +63,19 @@ final class ConfigSchemas {
 		return $schema;
 	}
 
+	public static function get_remote_data_block_attribute_config_schema(): array {
+		static $schema = null;
+
+		if ( null === $schema ) {
+			$schema = self::generate_remote_data_block_attribute_config_schema();
+		}
+
+		return $schema;
+	}
+
 	private static function generate_remote_data_block_config_schema(): array {
 		return Types::object( [
-			'pages' => Types::nullable(
-				Types::list_of(
-					Types::object( [
-						'allow_nested_paths' => Types::nullable( Types::boolean() ),
-						'slug' => Types::string(),
-						'title' => Types::nullable( Types::string() ),
-					] )
-				)
-			),
+			'icon' => Types::nullable( Types::string() ),
 			'patterns' => Types::nullable(
 				Types::list_of(
 					Types::object( [
@@ -83,16 +86,9 @@ final class ConfigSchemas {
 				)
 			),
 			'render_query' => Types::object( [
-				'query' => Types::instance_of( QueryInterface::class ),
-				'input_overrides' => Types::nullable(
-					Types::list_of(
-						Types::object( [
-							'source' => Types::string(), // e.g., the name of the query var
-							'source_type' => Types::enum( 'page', 'query_var' ),
-							'target' => Types::string(), // e.g., input variable name
-							'target_type' => Types::const( 'input_var' ),
-						] ),
-					)
+				'query' => Types::one_of(
+					Types::instance_of( QueryInterface::class ),
+					Types::serialized_config_for( HttpQueryInterface::class ),
 				),
 				'loop' => Types::nullable( Types::boolean() ),
 			] ),
@@ -100,12 +96,24 @@ final class ConfigSchemas {
 				Types::list_of(
 					Types::object( [
 						'display_name' => Types::nullable( Types::string() ),
-						'query' => Types::instance_of( QueryInterface::class ),
+						'query' => Types::one_of(
+							Types::instance_of( QueryInterface::class ),
+							Types::serialized_config_for( HttpQueryInterface::class ),
+						),
 						'type' => Types::enum(
 							ConfigRegistry::LIST_QUERY_KEY,
 							ConfigRegistry::SEARCH_QUERY_KEY
 						),
 					] )
+				)
+			),
+			'overrides' => Types::nullable(
+				Types::list_of(
+					Types::object( [
+						'name' => Types::string(),
+						'display_name' => Types::string(),
+						'help_text' => Types::nullable( Types::string() ),
+					] ),
 				)
 			),
 			'title' => Types::string(),
@@ -158,7 +166,10 @@ final class ConfigSchemas {
 	private static function generate_http_query_config_schema(): array {
 		return Types::object( [
 			'cache_ttl' => Types::nullable( Types::one_of( Types::callable(), Types::integer(), Types::null() ) ),
-			'data_source' => Types::instance_of( HttpDataSourceInterface::class ),
+			'data_source' => Types::one_of(
+				Types::instance_of( HttpDataSourceInterface::class ),
+				Types::serialized_config_for( HttpDataSourceInterface::class ),
+			),
 			'endpoint' => Types::nullable( Types::one_of( Types::callable(), Types::url() ) ),
 			'image_url' => Types::nullable( Types::image_url() ),
 			// NOTE: The "input schema" for a query is not a formal schema like the
@@ -179,7 +190,59 @@ final class ConfigSchemas {
 						// NOTE: These values are string references to the "core primitive
 						// types" from our formal schema. Referencing these types allows us
 						// to use the same validation and sanitization logic.
-						'type' => Types::enum( 'boolean', 'id', 'integer', 'null', 'number', 'string' ),
+						//
+						// There are also special types that are not core primitives, with
+						// accompanying notes.
+						'type' => Types::enum(
+							'boolean',
+							'id',
+							'integer',
+							'null',
+							'number',
+							'string',
+							// Special non-primitive types
+							//
+							// An array of IDs, to be handled by the query (e.g., a query can
+							// implode an array of IDs into a comma-separated list and map it
+							// to a query parameter).
+							'id:list',
+							// A string that represents search query input. An input variable
+							// with this type must be present for the query to be considered a
+							// search query.
+							'ui:search_input',
+							//
+							// An integer that represents the requested offset for paginated
+							// results. Providing this input variable enables offset-based
+							// pagination.
+							//
+							// Note that a `total_items` pagination variable is also required
+							// for pagination to be enabled.
+							'ui:pagination_offset',
+							//
+							// An integer that represents the requested page of paginated
+							// results. Providing this input variable enables page-based
+							// pagination.
+							//
+							// Note that a `total_items` pagination variable is also required
+							// for pagination to be enabled.
+							'ui:pagination_page',
+							//
+							// An integer that represents the number of items to request in
+							// paginated results. This variable can be used in any pagination
+							// scheme. Often, this variable is named `limit` or `count`.
+							'ui:pagination_per_page',
+							//
+							// A string that represents the pagination cursor used to request
+							// the next or previous page. Both must be specified to opt-in to
+							// cursor-based pagination, with corresponding fields defined in
+							// the `pagination_schema`.
+							//
+							// If specified, these variables take precedence over page-based
+							// and offset-based pagination variables.
+							'ui:pagination_cursor_next',
+							'ui:pagination_cursor_previous',
+						),
+						'required' => Types::nullable( Types::boolean() ),
 					] ),
 				)
 			),
@@ -225,6 +288,7 @@ final class ConfigSchemas {
 							'image_alt',
 							'image_url',
 							'markdown',
+							'title',
 							// 'json_path' is omitted since it likely has no user utility.
 							'url',
 							'uuid',
@@ -232,6 +296,54 @@ final class ConfigSchemas {
 						Types::record( Types::string(), Types::use_ref( 'FIELD_SCHEMA' ) ), // Nested schema!
 					),
 				] ),
+			),
+			// NOTE: The "pagination schema" for a query is not a formal schema like
+			// the ones generated by this class. It is a simple object structure that
+			// defines how the query response can inform subsequent requests for
+			// paginated data.
+			'pagination_schema' => Types::nullable(
+				Types::object( [
+					// This field provides an integer representing the total number of
+					// items available in paginated results. Either this field or
+					// `has_next_page` must be defined in order to enable pagination.
+					'total_items' => Types::nullable(
+						Types::object( [
+							'name' => Types::nullable( Types::string() ),
+							'path' => Types::json_path(),
+							'type' => Types::enum( 'integer' ),
+						] ),
+					),
+					// This field provides a pagination cursor for the next page of
+					// paginated results, or a null value if there is no next page. This
+					// field must be defined in order to enable cursor-based pagination.
+					'cursor_next' => Types::nullable(
+						Types::object( [
+							'name' => Types::nullable( Types::string() ),
+							'path' => Types::json_path(),
+							'type' => Types::enum( 'string' ),
+						] ),
+					),
+					// This field provides a pagination cursor for the previous page of
+					// paginated results, or a null value if there is no previous page. This
+					// field must be defined in order to enable cursor-based pagination.
+					'cursor_previous' => Types::nullable(
+						Types::object( [
+							'name' => Types::nullable( Types::string() ),
+							'path' => Types::json_path(),
+							'type' => Types::enum( 'string' ),
+						] ),
+					),
+					// This field provides a boolean indicating if there is a next page of
+					// paginated results. This is helpful if the API does not provide a
+					// total number of items.
+					'has_next_page' => Types::nullable(
+						Types::object( [
+							'name' => Types::nullable( Types::string() ),
+							'path' => Types::json_path(),
+							'type' => Types::enum( 'boolean' ),
+						] )
+					),
+				] )
 			),
 			'preprocess_response' => Types::nullable( Types::callable() ),
 			'query_runner' => Types::nullable( Types::instance_of( QueryRunnerInterface::class ) ),
@@ -248,6 +360,45 @@ final class ConfigSchemas {
 				)
 			),
 			'request_method' => Types::nullable( Types::enum( 'GET', 'POST', 'PUT', 'PATCH', 'DELETE' ) ),
+		] );
+	}
+
+	private static function generate_remote_data_block_attribute_config_schema(): array {
+		return Types::object( [
+			'blockName' => Types::string(),
+			'enabledOverrides' => Types::list_of( Types::string() ),
+			'metadata' => Types::record(
+				Types::string(),
+				Types::object( [
+					'name' => Types::string(),
+					'type' => Types::string(),
+					'value' => Types::any(),
+				] )
+			),
+			'pagination' => Types::nullable(
+				Types::object( [
+					'cursorNext' => Types::nullable( Types::string() ),
+					'cursorPrevious' => Types::nullable( Types::string() ),
+					'hasNextPage' => Types::nullable( Types::boolean() ),
+					'totalItems' => Types::nullable( Types::integer() ),
+				] ),
+			),
+			'queryInputs' => Types::list_of( Types::record( Types::string(), Types::any() ) ),
+			'queryKey' => Types::nullable( Types::string() ),
+			'resultId' => Types::nullable( Types::string() ),
+			'results' => Types::list_of(
+				Types::object( [
+					'result' => Types::record(
+						Types::string(),
+						Types::object( [
+							'name' => Types::string(),
+							'type' => Types::string(),
+							'value' => Types::any(),
+						] )
+					),
+					'uuid' => Types::uuid(),
+				] )
+			),
 		] );
 	}
 }

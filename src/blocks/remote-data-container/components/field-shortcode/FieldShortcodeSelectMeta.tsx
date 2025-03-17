@@ -1,4 +1,6 @@
-import { __experimentalHeading as Heading } from '@wordpress/components';
+import { DropdownMenu, MenuGroup } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { chevronRightSmall } from '@wordpress/icons';
 
 import { FieldSelectionFromMetaFields } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelection';
 import { useExistingRemoteData } from '@/blocks/remote-data-container/hooks/useExistingRemoteData';
@@ -12,30 +14,32 @@ export function FieldShortcodeSelectMeta( props: FieldShortcodeSelectMetaProps )
 	const blockConfigs = getBlocksConfig();
 	const remoteDatas: RemoteData[] = useExistingRemoteData();
 
-	if ( remoteDatas.length === 0 ) {
-		return (
-			<div className="remote-data-blocks-select-meta">
-				<p>No query metadata avaialble.</p>
-			</div>
-		);
-	}
-
-	return (
-		<div className="remote-data-blocks-select-meta">
-			{ remoteDatas.map( remoteData => (
-				<div className="remote-data-blocks-meta-item" key={ remoteData.blockName }>
-					<Heading className="remote-data-blocks-item-heading" level="4">
-						{ blockConfigs[ remoteData.blockName ]?.settings.title ?? remoteData.blockName }
-					</Heading>
-
-					<FieldSelectionFromMetaFields
-						onSelectField={ ( data, fieldValue ) =>
-							props.onSelectField( { ...data, selectionPath: 'select_meta_tab' }, fieldValue )
-						}
-						remoteData={ remoteData }
-					/>
-				</div>
-			) ) }
-		</div>
-	);
+	return remoteDatas.length > 0 ? (
+		<DropdownMenu
+			icon={ chevronRightSmall }
+			label=""
+			text={ __( 'Query metadata', 'remote-data-blocks' ) }
+			popoverProps={ {
+				className: 'remote-data-blocks-field-shortcode-dropdown remote-data-blocks-select-meta',
+				placement: 'right-start',
+				offset: 0,
+			} }
+		>
+			{ () =>
+				remoteDatas.map( remoteData => (
+					<MenuGroup
+						key={ remoteData.blockName }
+						label={ blockConfigs[ remoteData.blockName ]?.settings.title ?? remoteData.blockName }
+					>
+						<FieldSelectionFromMetaFields
+							onSelectField={ ( data, fieldValue ) =>
+								props.onSelectField( { ...data, selectionPath: 'select_meta_tab' }, fieldValue )
+							}
+							remoteData={ remoteData }
+						/>
+					</MenuGroup>
+				) )
+			}
+		</DropdownMenu>
+	) : undefined;
 }

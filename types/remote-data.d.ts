@@ -2,40 +2,45 @@ interface InnerBlockContext {
 	index: number;
 }
 
+interface RemoteDataPagination {
+	cursorNext?: string;
+	cursorPrevious?: string;
+	hasNextPage?: boolean;
+	totalItems?: number;
+}
+
 interface RemoteDataResultFields {
 	name: string;
 	type: string;
-	value: string;
+	value: unknown;
 }
 
-interface QueryInputOverride {
-	display: string;
-	source: string;
-	sourceType: 'query_var';
-}
-
-type RemoteDataResult = Record< string, unknown >;
 type RemoteDataQueryInput = Record< string, unknown >;
 
+// This interface mirrors the schema of RemoteDataBlockAttribute.
 interface RemoteData {
-	blockName?: string;
-	isCollection?: boolean;
-	metadata?: Record< string, RemoteDataResultFields >;
-	queryInput: RemoteDataQueryInput;
-	queryInputOverrides?: Record< string, QueryInputOverride >;
-	resultId?: string;
-	results?: RemoteDataResult[];
+	blockName: string;
+	enabledOverrides?: string[];
+	metadata: Record< string, RemoteDataResultFields >;
+	pagination?: RemoteDataPagination;
+	/** @deprecated */
+	queryInput?: RemoteDataQueryInput;
+	queryInputs: RemoteDataQueryInput[];
+	queryKey?: string;
+	resultId: string;
+	results: RemoteDataApiResult[];
 }
 
 interface RemoteDataBlockAttributes {
 	remoteData?: RemoteData;
 }
 
-interface FieldSelection extends RemoteDataBlockAttributes {
-	selectedField: string;
+interface FieldSelection {
 	action: 'add_field_shortcode' | 'update_field_shortcode' | 'reset_field_shortcode';
-	type: 'field' | 'meta';
+	remoteData?: Pick< RemoteData, 'blockName' | 'metadata' | 'queryInputs' | 'queryKey' >;
+	selectedField: string;
 	selectionPath: 'select_new_tab' | 'select_existing_tab' | 'select_meta_tab' | 'popover';
+	type: 'field' | 'meta';
 }
 
 interface MetaFieldSelection extends FieldSelection {
@@ -53,33 +58,44 @@ interface RemoteDataBlockBinding {
 	args: RemoteDataBlockBindingArgs;
 }
 
+interface StringSeriablizable {
+	toString(): string;
+}
+
 interface RemoteDataInnerBlockAttributes {
-	alt?: string | RichTextData;
+	alt?: string | StringSeriablizable;
 	className?: string;
-	content?: string | RichTextData;
+	content?: string | StringSeriablizable;
 	index?: number;
 	metadata?: {
 		bindings?: Record< string, RemoteDataBlockBinding >;
 		name?: string;
 	};
-	url?: string | RichTextData;
+	url?: string | StringSeriablizable;
 }
 
 interface RemoteDataApiRequest {
 	block_name: string;
+	query_inputs: RemoteDataQueryInput[];
 	query_key: string;
-	query_input: RemoteDataQueryInput;
 }
 
 interface RemoteDataApiResult {
 	result: Record< string, RemoteDataResultFields >;
+	uuid: string;
 }
 
 interface RemoteDataApiResponseBody {
 	block_name: string;
-	is_collection: boolean;
 	metadata: Record< string, RemoteDataResultFields >;
-	query_input: RemoteDataQueryInput;
+	pagination?: {
+		cursor_next?: string;
+		cursor_previous?: string;
+		has_next_page?: boolean;
+		total_items?: number;
+	};
+	query_inputs: RemoteDataQueryInput[];
+	query_key: string;
 	result_id: string;
 	results: RemoteDataApiResult[];
 }

@@ -2,6 +2,7 @@ import { Icon, Tooltip } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { chevronRightSmall } from '@wordpress/icons';
 
+import { ConfigSource } from '@/data-sources/constants';
 import { DataSourceConfig } from '@/data-sources/types';
 import './DataSourceList.scss';
 
@@ -23,7 +24,6 @@ const DataSourceDescriptor = ( props: DataSourceMetaTagsProps ) => {
 			tag = {
 				key: 'base',
 				primaryValue: props.source.service_config.base?.name,
-				secondaryValue: props.source.service_config.tables?.[ 0 ]?.name,
 			};
 			break;
 		case 'shopify':
@@ -33,7 +33,6 @@ const DataSourceDescriptor = ( props: DataSourceMetaTagsProps ) => {
 			tag = {
 				key: 'spreadsheet',
 				primaryValue: props.source.service_config.spreadsheet.name ?? 'Google Sheet',
-				secondaryValue: props.source.service_config.sheets[ 0 ]?.name,
 			};
 			break;
 	}
@@ -63,10 +62,19 @@ const CodeBadge = () => {
 	);
 };
 
+const ConstantsBadge = () => {
+	return (
+		<Tooltip text={ __( 'This data source is configured in constants.', 'remote-data-blocks' ) }>
+			<span className="data-source-badge">Constants</span>
+		</Tooltip>
+	);
+};
+
 const DataSourceMetaTags = ( props: DataSourceMetaTagsProps ) => {
 	return (
 		<>
-			{ ! props.source.uuid && <CodeBadge /> }
+			{ props.source.config_source === ConfigSource.CODE && <CodeBadge /> }
+			{ props.source.config_source === ConfigSource.CONSTANTS && <ConstantsBadge /> }
 			<DataSourceDescriptor source={ props.source } />
 		</>
 	);

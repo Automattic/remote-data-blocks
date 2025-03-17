@@ -1,7 +1,7 @@
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import { BlockPattern, InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { BlockEditProps } from '@wordpress/blocks';
 import { Spinner } from '@wordpress/components';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 import { InnerBlocks } from '@/blocks/remote-data-container/components/InnerBlocks';
 import { DataPanel } from '@/blocks/remote-data-container/components/panels/DataPanel';
@@ -17,6 +17,7 @@ import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteDat
 import { hasRemoteDataChanged } from '@/utils/block-binding';
 import { getBlockConfig } from '@/utils/localized-block-data';
 import './editor.scss';
+import { migrateRemoteData } from '@/utils/remote-data';
 
 export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	const blockName = props.name;
@@ -28,25 +29,33 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 
 	const rootClientId = props.clientId;
 	const blockProps = useBlockProps( { className: CONTAINER_CLASS_NAME } );
+	const remoteDataAttribute = migrateRemoteData( props.attributes.remoteData );
 
 	const {
 		getInnerBlocks,
 		getSupportedPatterns,
+		innerBlocksPattern,
 		insertPatternBlocks,
-		markReadyForInsertion,
-		resetReadyForInsertion,
-		showPatternSelection,
+		resetInnerBlocks,
 	} = usePatterns( blockName, rootClientId );
-	const { execute } = useRemoteData( blockName, DISPLAY_QUERY_KEY );
-	const [ initialLoad, setInitialLoad ] = useState< boolean >( true );
 
-	function fetchRemoteData( remoteData: RemoteDataQueryInput, insertBlocks = true ) {
-		// This is where the remoteData attribute is set in the block after selection
-		updateRemoteData(
-			{ blockName, queryKey: DISPLAY_QUERY_KEY, queryInput: remoteData.query_input ?? remoteData.queryInput },
-			insertBlocks
-		);
-		setInitialLoad( false );
+	const { data, fetch, loading, reset } = useRemoteData( {
+		blockName,
+		externallyManagedRemoteData: remoteDataAttribute,
+		externallyManagedUpdateRemoteData: updateRemoteData,
+		queryKey: DISPLAY_QUERY_KEY,
+	} );
+
+	const [ showPatternSelection, setShowPatternSelection ] = useState< boolean >( false );
+
+	function refreshRemoteData(): void {
+		void fetch( remoteDataAttribute?.queryInputs ?? [ {} ] );
+
+		// updateRemoteData(
+		// 	{ blockName, queryKey: DISPLAY_QUERY_KEY, queryInput: remoteData.query_input ?? remoteData.queryInput },
+		// 	insertBlocks
+		// );
+		// setInitialLoad( false );
 		// queryInputOverrides: props.attributes.remoteData?.queryInputOverrides as any,
 		// execute( input, true )
 		// 	.then( remoteData => {
@@ -64,46 +73,42 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 		// 	.finally( () => setInitialLoad( false ) );
 	}
 
-	// Update the remote data in the block attributes, which is passed via context
-	// to children blocks. If this is the initial load of remote data, show the
-	// pattern selection modal so that we can insert the blocks from the pattern.
-	function updateRemoteData( remoteData: RemoteData, insertBlocks = false ) {
-		// console.log({_updateRemoteData: remoteData})
-		// if ( hasRemoteDataChanged( props.attributes.remoteData, remoteData ) ) {
-		if ( remoteData.queryInput ) {
+	function resetPatternSelection(): void {
+		resetInnerBlocks();
+		setShowPatternSelection( false );
+	}
+
+	function resetRemoteData(): void {
+		reset();
+		resetPatternSelection();
+	}
+
+	function onSelectPattern( pattern: BlockPattern ): void {
+		insertPatternBlocks( pattern );
+		setShowPatternSelection( false );
+	}
+	function onSelectRemoteData( inputs: RemoteDataQueryInput[] ): void {
+		void fetch( inputs ).then( () => {
+			if ( innerBlocksPattern ) {
+				insertPatternBlocks( innerBlocksPattern );
+				return;
+			}
+
+			setShowPatternSelection( true );
+		} );
+	}
+
+	function updateRemoteData( remoteData?: RemoteData ): void {
+		// if ( hasRemoteDataChanged( remoteDataAttribute, remoteData ) ) {
 			props.setAttributes( { remoteData } );
-		}
-		
 		// }
-
-		if ( insertBlocks ) {
-			markReadyForInsertion();
-		}
 	}
-
-	function refreshRemoteData() {
-		if ( ! props.attributes.remoteData?.queryInput ) {
-			return;
-		}
-
-		fetchRemoteData( props.attributes.remoteData, false );
-	}
-
-	function resetRemoteData() {
-		props.setAttributes( { remoteData: undefined } );
-		resetReadyForInsertion();
-	}
-
-	useEffect( () => {
-		// Refetch remote data for initial load
-		refreshRemoteData();
-	}, [] );
 
 	// No remote data has been selected yet, show a placeholder.
-	if ( ! props.attributes.remoteData ) {
+	if ( ! data ) {
 		return (
 			<div { ...blockProps }>
-				<Placeholder blockConfig={ blockConfig } fetchRemoteData={ fetchRemoteData } />
+				<Placeholder blockConfig={ blockConfig } onSelect={ onSelectRemoteData } />
 			</div>
 		);
 	}
@@ -111,18 +116,16 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	if ( showPatternSelection ) {
 		const supportedPatterns = getSupportedPatterns( props.attributes.remoteData?.results?.[ 0 ] );
 
-		if ( supportedPatterns.length ) {
-			return (
-				<div { ...blockProps }>
-					<PatternSelection
-						blockName={ blockName }
-						insertPatternBlocks={ insertPatternBlocks }
-						onCancel={ resetReadyForInsertion }
-						supportedPatterns={ supportedPatterns }
-					/>
-				</div>
-			);
-		}
+		return (
+			<div { ...blockProps }>
+				<PatternSelection
+					blockName={ blockName }
+					onCancel={ resetPatternSelection }
+					onSelectPattern={ onSelectPattern }
+					supportedPatterns={ supportedPatterns }
+				/>
+			</div>
+		);
 	}
 
 	return (
@@ -130,18 +133,18 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 			<InspectorControls>
 				<OverridesPanel
 					blockConfig={ blockConfig }
-					remoteData={ props.attributes.remoteData }
+					remoteData={ data }
 					updateRemoteData={ updateRemoteData }
 				/>
 				<DataPanel
 					refreshRemoteData={ refreshRemoteData }
-					remoteData={ props.attributes.remoteData }
+					remoteData={ data }
 					resetRemoteData={ resetRemoteData }
 				/>
 			</InspectorControls>
 
 			<div { ...blockProps }>
-				{ initialLoad && (
+				{ loading && (
 					<div className="remote-data-blocks-loading-overlay">
 						<Spinner
 							style={ {
@@ -155,7 +158,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 				<InnerBlocks
 					blockConfig={ blockConfig }
 					getInnerBlocks={ getInnerBlocks }
-					remoteData={ props.attributes.remoteData }
+					remoteData={ data }
 				/>
 			</div>
 		</>

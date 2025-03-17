@@ -4,6 +4,7 @@ import { __ } from '@wordpress/i18n';
 
 import { DataSourceForm } from '../components/DataSourceForm';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
+import { ConfigSource } from '@/data-sources/constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { useShopifyShopName } from '@/data-sources/hooks/useShopify';
 import { SettingsComponentProps, ShopifyConfig, ShopifyServiceConfig } from '@/data-sources/types';
@@ -20,7 +21,10 @@ export const ShopifySettings = ( {
 	const { onSave } = useDataSources< ShopifyConfig >( false );
 
 	const { state, handleOnChange, validState } = useForm< ShopifyServiceConfig >( {
-		initialValues: config?.service_config ?? { __version: SERVICE_CONFIG_VERSION },
+		initialValues: config?.service_config ?? {
+			__version: SERVICE_CONFIG_VERSION,
+			enable_blocks: true,
+		},
 	} );
 
 	const { shopName, connectionMessage } = useShopifyShopName(
@@ -56,6 +60,7 @@ export const ShopifySettings = ( {
 			service: 'shopify',
 			service_config: validState,
 			uuid: uuid ?? null,
+			config_source: ConfigSource.STORAGE,
 		};
 
 		return onSave( data, mode );
@@ -69,6 +74,7 @@ export const ShopifySettings = ( {
 				handleOnChange={ handleOnChange }
 				heading={ { icon: ShopifyIconWithText, width: '102px', height: '32px' } }
 				inputIcon={ ShopifyIcon }
+				uuid={ uuid }
 			>
 				<TextControl
 					type="url"
@@ -104,6 +110,10 @@ export const ShopifySettings = ( {
 					__nextHasNoMarginBottom
 				/>
 			</DataSourceForm.Setup>
+			<DataSourceForm.Blocks
+				handleOnChange={ handleOnChange }
+				hasEnabledBlocks={ Boolean( state.enable_blocks ) }
+			/>
 		</DataSourceForm>
 	);
 };

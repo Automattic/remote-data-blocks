@@ -1,104 +1,123 @@
-import { useInstanceId } from '@wordpress/compose';
-import { DataViews, filterSortAndPaginate, View } from '@wordpress/dataviews/wp';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { Action, DataViews, View } from '@wordpress/dataviews/wp';
+import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
+import { ItemListField } from '@/blocks/remote-data-container/components/item-list/ItemListField';
+import {
+	ID_FIELD_TYPES,
+	IMAGE_URL_FIELD_TYPES,
+} from '@/blocks/remote-data-container/config/constants';
 import { usePatterns } from '@/blocks/remote-data-container/hooks/usePatterns';
+import { getRemoteDataResultValue } from '@/utils/remote-data';
 
-interface ItemListProps {
+export interface ItemListProps {
 	blockName: string;
+	hasNextPage: boolean;
 	loading: boolean;
-	onSelect: ( data: RemoteDataQueryInput ) => void;
-	results?: RemoteDataResult[];
-	searchTerms: string;
-	setSearchTerms: ( newValue: string ) => void;
+	onSelect?: ( results: RemoteDataApiResult[] ) => void;
+	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
+	page: number;
+	perPage?: number;
+	results?: RemoteDataApiResult[];
+	searchInput: string;
+	selectionIds: string[];
+	setPage: ( newPage: number ) => void;
+	setPerPage: ( newPerPage: number ) => void;
+	setSearchInput: ( newValue: string ) => void;
+	setSelectionIds: ( ids: string[] ) => void;
+	supportsSearch: boolean;
+	totalItems?: number;
+	totalPages?: number;
 }
 
 export function ItemList( props: ItemListProps ) {
-	const { blockName, loading, onSelect, results, searchTerms, setSearchTerms } = props;
+	const {
+		blockName,
+		hasNextPage,
+		loading,
+		onSelect,
+		onSelectField,
+		page,
+		perPage,
+		results = [],
+		searchInput,
+		selectionIds,
+		setPage,
+		setPerPage,
+		setSearchInput,
+		setSelectionIds,
+		supportsSearch,
+		totalItems,
+		totalPages,
+	} = props;
 	const { defaultPattern: pattern } = usePatterns( blockName );
 
-	const instanceId = useInstanceId( ItemList, blockName );
+	// Get fields from the first result, if present.
+	const firstResult = results?.[ 0 ]?.result ?? {};
 
-	// ensure each result has an 'id' key
-	const data = useMemo( () => {
-		return ( results ?? [] ).map( ( item: Record< string, unknown > ) =>
-			item.id
-				? item
-				: {
-						...item,
-						id: Object.keys( item ).find( key => /(^|_)(id)$/i.test( key ) ) // Regex to match 'id' or part of '_id'
-							? item[ Object.keys( item ).find( key => /(^|_)(id)$/i.test( key ) ) as string ]
-							: instanceId,
-				  }
-		) as RemoteDataResult[];
-	}, [ results ] );
+	// Filter out ID fields from columns.
+	const fieldNames: string[] = Object.entries( firstResult )
+		.filter( ( [ _slug, data ] ) => ! ID_FIELD_TYPES.includes( data.type ) )
+		.map( ( [ slug ] ) => slug );
 
-	// get fields from results data to use as columns
-	const { fields, mediaField, tableFields, titleField } = useMemo( () => {
-		const getFields: string[] = Array.from(
-			new Set(
-				data
-					?.flatMap( item => Object.keys( item ) )
-					.filter( ( key: string ) => ! /(^|_)(id)$/i.test( key ) ) // Filters out keys containing 'id' or similar patterns
-			)
-		);
+	// Find title field from by checking type
+	const titleField = Object.entries( firstResult ).find(
+		( [ _slug, data ] ) => data.type === 'title'
+	)?.[ 0 ];
 
-		// generic search for title
-		const title: string =
-			getFields.find(
-				( field: string ) =>
-					field.toLowerCase().includes( 'title' ) || field.toLowerCase().includes( 'name' )
-			) || '';
+	// Find media field from availableBindings by checking type
+	const mediaField = Object.entries( firstResult ).find( ( [ _slug, data ] ) =>
+		IMAGE_URL_FIELD_TYPES.includes( data.type )
+	)?.[ 0 ];
 
-		// generic search for media
-		const media: string =
-			getFields.find(
-				( field: string ) =>
-					field.toLowerCase().includes( 'url' ) || field.toLowerCase().includes( 'image' )
-			) || '';
+	const fields = fieldNames.map( field => ( {
+		id: field,
+		label: firstResult[ field ]?.name ?? field,
+		enableGlobalSearch: true,
+		getValue: ( { item }: { item: RemoteDataApiResult } ) =>
+			getRemoteDataResultValue( item, field ),
+		render: ( { item }: { item: RemoteDataApiResult } ) => (
+			<ItemListField
+				blockName={ blockName }
+				field={ field }
+				item={ item }
+				mediaField={ mediaField }
+				onSelectField={ onSelectField }
+			/>
+		),
+		enableSorting: field !== mediaField,
+	} ) );
 
-		const fieldObject: {
-			id: string;
-			label: string;
-			enableGlobalSearch: boolean;
-			render?: ( { item }: { item: RemoteDataResult } ) => JSX.Element;
-			enableSorting: boolean;
-		}[] = getFields.map( field => {
-			return {
-				id: field,
-				label: field ?? '',
-				enableGlobalSearch: true,
-				render:
-					field === media
-						? ( { item }: { item: RemoteDataResult } ) => {
-								return (
-									<img
-										// temporary until we pull in more data
-										alt=""
-										src={ item[ field ] as string }
-									/>
-								);
-						  }
-						: undefined,
-				enableSorting: field !== media,
-			};
-		} );
-
-		return { fields: fieldObject, tableFields: getFields, titleField: title, mediaField: media };
-	}, [ data ] );
+	// hide media and title fields from table view if defined to avoid duplication
+	const tableFields = fieldNames.filter( field => field !== mediaField && field !== titleField );
 
 	const [ view, setView ] = useState< View >( {
 		type: 'table' as const,
-		perPage: 8,
-		page: 1,
-		search: '',
-		fields: [],
+		perPage: perPage ?? results.length,
+		page,
+		search: searchInput,
+		fields: tableFields,
 		filters: [],
 		layout: {},
 		titleField,
 		mediaField,
 	} );
+
+	useEffect( () => {
+		setView( currentView => ( {
+			...currentView,
+			fields: tableFields,
+			mediaField,
+			titleField,
+		} ) );
+	}, [ [ mediaField, titleField, ...tableFields ].join( ';' ) ] );
+
+	function onChangeView( newView: View ) {
+		setPage( newView.page ?? 1 );
+		setPerPage( newView.perPage ?? perPage ?? results.length );
+		setSearchInput( newView.search ?? '' );
+		setView( newView );
+	}
 
 	const defaultLayouts = mediaField
 		? {
@@ -107,52 +126,43 @@ export function ItemList( props: ItemListProps ) {
 		  }
 		: { table: {} };
 
-	// this prevents just an empty table rendering
-	useEffect( () => {
-		if ( tableFields.length > 0 ) {
-			setView( prevView => ( {
-				...prevView,
-				fields: tableFields.filter( field => field !== mediaField ),
-			} ) );
-		}
-	}, [ mediaField, tableFields ] );
-
-	useEffect( () => {
-		if ( view.search !== searchTerms ) {
-			setSearchTerms( view.search ?? '' );
-		}
-	}, [ view, searchTerms ] );
-
-	// filter, sort and paginate data
-	const { data: filteredData, paginationInfo } = useMemo( () => {
-		return filterSortAndPaginate( data ?? [], view, fields );
-	}, [ data, view ] );
-
-	const actions = [
-		{
-			id: 'choose',
-			icon: <>{ __( 'Choose' ) }</>,
-			isPrimary: true,
-			label: '',
-			callback: ( items: RemoteDataResult[] ) => {
-				items.map( item => onSelect( item ) );
-			},
+	const chooseItemAction = {
+		id: 'choose',
+		icon: <>{ __( 'Choose' ) }</>,
+		isPrimary: true,
+		label: '',
+		callback: ( items: RemoteDataApiResult[] ) => {
+			onSelect?.( items );
 		},
-	];
+		supportsBulk: true,
+	};
+
+	// Only show the action if onSelect is defined and there are results.
+	let actions: Action< RemoteDataApiResult >[] = [];
+	if ( onSelect && results?.length ) {
+		actions = [ chooseItemAction ];
+	}
 
 	return (
-		<DataViews
-			actions={ actions }
-			data={ filteredData }
-			defaultLayouts={ defaultLayouts }
-			fields={ fields }
-			getItemId={ ( item: { id?: string } ) => item.id || '' }
-			isLoading={ loading || ! pattern || ! results || results.length === 0 }
-			isItemClickable={ () => true }
-			onClickItem={ item => onSelect( item ) }
-			onChangeView={ setView }
-			paginationInfo={ paginationInfo }
-			view={ view }
-		/>
+		<>
+			<DataViews< RemoteDataApiResult >
+				actions={ actions }
+				data={ results }
+				defaultLayouts={ defaultLayouts }
+				fields={ fields }
+				getItemId={ ( item: RemoteDataApiResult ) => item.uuid }
+				isLoading={ loading || ! pattern || ! results }
+				isItemClickable={ () => true }
+				onChangeSelection={ setSelectionIds }
+				onChangeView={ onChangeView }
+				paginationInfo={ {
+					totalItems: totalItems ?? results.length,
+					totalPages: totalPages ?? ( hasNextPage ? page + 1 : Math.max( 1, page ) ),
+				} }
+				search={ supportsSearch }
+				selection={ selectionIds }
+				view={ view }
+			/>
+		</>
 	);
 }

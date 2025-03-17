@@ -1,16 +1,14 @@
 import { Button, Modal } from '@wordpress/components';
+import { ModalProps } from '@wordpress/components/build-types/modal/types';
 
 import { __ } from '@/utils/i18n';
 
-export interface BaseModalProps {
+export type BaseModalProps = Omit< ModalProps, 'onRequestClose' > & {
 	children: JSX.Element;
-	className?: string;
 	headerActions?: JSX.Element;
 	headerImage?: string;
 	onClose: () => void;
-	size?: 'small' | 'medium' | 'large' | 'fill';
-	title: string;
-}
+};
 
 export function BaseModal( props: BaseModalProps ) {
 	return (
@@ -30,7 +28,7 @@ export function BaseModal( props: BaseModalProps ) {
 			}
 			onRequestClose={ props.onClose }
 			size={ props.size ?? 'fill' }
-			title={ props.title }
+			{ ...props }
 		>
 			{ props.children }
 		</Modal>

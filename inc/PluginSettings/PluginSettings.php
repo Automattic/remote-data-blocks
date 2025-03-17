@@ -5,6 +5,8 @@ namespace RemoteDataBlocks\PluginSettings;
 use RemoteDataBlocks\REST\DataSourceController;
 use RemoteDataBlocks\REST\AuthController;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
+use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
+use RemoteDataBlocks\Telemetry\DataSourceTelemetry;
 use function wp_get_environment_type;
 use function wp_is_development_mode;
 use function add_settings_error;
@@ -18,6 +20,11 @@ class PluginSettings {
 		add_action( 'pre_update_option_' . DataSourceCrud::CONFIG_OPTION_NAME, [ __CLASS__, 'encrypt_option' ], 10, 2 );
 		add_action( 'option_' . DataSourceCrud::CONFIG_OPTION_NAME, [ __CLASS__, 'decrypt_option' ], 10, 1 );
 		add_action( 'rest_api_init', [ __CLASS__, 'init_rest_routes' ] );
+		// fix for dashicons not being enqueued in the editor:
+		// https://github.com/WordPress/gutenberg/issues/53528#issuecomment-1692717292
+		add_action( 'enqueue_block_assets', function (): void {
+			wp_enqueue_style( 'dashicons' );
+		} );
 	}
 
 	public static function add_options_page(): void {
@@ -37,6 +44,12 @@ class PluginSettings {
 			</div>',
 			esc_html__( 'Loading…', 'remote-data-blocks' )
 		);
+
+		/**
+		 * Track the view event.
+		 */
+		$configs = DataSourceConfigManager::get_all();
+		DataSourceTelemetry::track_view( $configs );
 	}
 
 	public static function init_rest_routes(): void {
@@ -146,11 +159,8 @@ class PluginSettings {
 		try {
 			return $encryptor->encrypt( wp_json_encode( $new_value ) );
 		} catch ( \Exception $e ) {
-			add_settings_error(
-				'remote_data_blocks_settings',
-				'encryption_error',
-				__( 'Error encrypting remote-data-blocks settings.', 'remote-data-blocks' )
-			);
+			self::show_settings_error( __( 'Error encrypting remote-data-blocks settings.', 'remote-data-blocks' ) );
+
 			return $old_value;
 		}
 	}
@@ -170,20 +180,20 @@ class PluginSettings {
 		}
 
 		if ( $is_error ) {
-			self::show_decryption_error();
+			self::show_settings_error( __( 'Error decrypting remote-data-blocks settings.', 'remote-data-blocks' ) );
 			return [];
 		} else {
 			return json_decode( $decrypted, true );
 		}
 	}
 
-	private static function show_decryption_error(): void {
+	private static function show_settings_error( string $message ): void {
 		// Check that we have add_settings_error() available. This can be unavailable during wp-env startup.
-		if ( is_admin() ) {
+		if ( is_admin() && function_exists( 'add_settings_error' ) ) {
 			add_settings_error(
 				'remote_data_blocks_settings',
 				'decryption_error',
-				__( 'Error decrypting remote-data-blocks settings.', 'remote-data-blocks' )
+				$message
 			);
 		}
 	}

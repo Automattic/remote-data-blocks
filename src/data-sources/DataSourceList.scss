@@ -75,3 +75,33 @@ table.data-source-list {
 	padding: 4px 8px;
 	vertical-align: baseline;
 }
+
+.settings_page_remote-data-blocks-settings .components-modal__frame.has-size-medium:not(.components-confirm-dialog) {
+	max-width: calc(100% - 32px);
+	max-height: calc(100% - 120px);
+
+	.components-modal__header {
+		padding: 24px 32px 8px 56px;
+	}
+}
+
+.rdb-settings-page_data-source-code-snippet {
+
+	.components-tab-panel__tabs {
+		border-bottom: 1px solid var(--Alias-border-border-input, #aeaeae);
+		// to match tab panel in editor sidebar
+		height: 48px;
+	}
+
+	.components-tab-panel__tab-content {
+		border: 1px solid var(--Alias-border-border-input, #aeaeae);
+		border-top: none;
+
+	}
+}
+
+.rdb-settings-page_data-source-code-snippet-modal svg {
+	width: 25px;
+	margin-right: 8px;
+}
+

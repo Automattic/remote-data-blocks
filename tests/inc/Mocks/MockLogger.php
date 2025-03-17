@@ -9,7 +9,7 @@ use Stringable;
 class MockLogger implements LoggerInterface {
 	private array $logs = [];
 
-	public function log( $level, Stringable|string $message, array $context = [] ): void {
+	public function log( mixed $level, Stringable|string $message, array $context = [] ): void {
 		$this->logs[] = [
 			'level' => $level,
 			'message' => (string) $message,

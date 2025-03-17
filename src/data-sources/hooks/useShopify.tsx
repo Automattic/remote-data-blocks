@@ -43,7 +43,7 @@ export const useShopifyShopName = ( store: string, token: string ): ShopifyConne
 				getConnectionMessage(
 					'error',
 					__(
-						'Connection failed. Please verify store name and access token.',
+						'Connection failed. Please verify the myshopify.com domain name and access token“.',
 						'remote-data-blocks'
 					)
 				)

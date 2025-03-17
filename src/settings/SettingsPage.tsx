@@ -15,6 +15,8 @@ const SettingsPage = () => {
 
 	return (
 		<div className="rdb-settings-page">
+			<Notices />
+
 			<SettingsContext.Provider value={ settingsContext }>
 				<div className="rdb-settings-page_header">
 					{ addOrEditScreen ? (
@@ -55,8 +57,6 @@ const SettingsPage = () => {
 						addOrEditScreen ? 'rdb-settings-page_add-edit' : 'rdb-settings-page_sources'
 					}` }
 				>
-					<Notices />
-
 					{ addOrEditScreen ? <DataSourceSettings /> : <DataSourceList /> }
 				</div>
 			</SettingsContext.Provider>

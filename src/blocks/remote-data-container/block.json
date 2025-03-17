@@ -5,7 +5,6 @@
   "version": "0.1.0",
   "title": "Remote Data Container",
   "category": "widgets",
-  "icon": "cloud",
   "description": "A container and context provider for Remote Data Blocks",
   "example": {},
   "providesContext": {

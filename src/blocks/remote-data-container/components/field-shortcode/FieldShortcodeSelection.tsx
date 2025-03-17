@@ -1,4 +1,4 @@
-import { Spinner } from '@wordpress/components';
+import { BaseControl, Icon, MenuItem, Spinner } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 
@@ -8,6 +8,7 @@ import {
 } from '@/blocks/remote-data-container/config/constants';
 import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteData';
 import { getBlockAvailableBindings } from '@/utils/localized-block-data';
+import { getRemoteDataResultValue } from '@/utils/remote-data';
 
 interface FieldSelectionProps {
 	fields: Record< string, { name: string; value: string } >;
@@ -30,28 +31,42 @@ export function FieldSelection( props: FieldSelectionProps ) {
 				};
 
 				return (
-					<div key={ index } className="remote-data-blocks-inline-field-choice">
-						{ fieldDetails.name }:{ ' ' }
-						<span
-							role="button"
-							tabIndex={ 0 }
-							className="remote-data-blocks-inline-field-choice-link"
-							onClick={ evt => {
-								evt.preventDefault();
+					<MenuItem
+						className="remote-data-blocks-inline-field"
+						key={ index }
+						onClick={ evt => {
+							evt.preventDefault();
+							props.onSelectField( fieldSelection, fieldDetails.value );
+						} }
+						onKeyDown={ evt => {
+							if ( evt.key.toLowerCase() === 'enter' ) {
 								props.onSelectField( fieldSelection, fieldDetails.value );
-							} }
-							onKeyDown={ evt => {
-								if ( evt.key.toLowerCase() === 'enter' ) {
-									props.onSelectField( fieldSelection, fieldDetails.value );
-								}
-							} }
-						>
-							{ fieldDetails.value }
-							{ props.selectedField === fieldName && (
-								<span className="remote-data-blocks-inline-field-selected-icon">{ check }</span>
-							) }
-						</span>
-					</div>
+							}
+						} }
+						suffix={
+							props.selectedField === fieldName ? (
+								<Icon
+									icon={ check }
+									size={ 24 }
+									style={ {
+										color: '#4ab866',
+									} }
+								/>
+							) : undefined
+						}
+					>
+						<BaseControl className="remote-data-blocks-inline-field-choice" __nextHasNoMarginBottom>
+							<BaseControl.VisualLabel
+								style={ {
+									marginBottom: 0,
+									whiteSpace: 'normal',
+								} }
+							>
+								{ fieldDetails.name }:
+							</BaseControl.VisualLabel>
+							{ fieldDetails.value?.toString() }
+						</BaseControl>
+					</MenuItem>
 				);
 			} ) }
 		</>
@@ -65,7 +80,7 @@ export function FieldSelectionFromAvailableBindings( props: FieldSelectionWithFi
 
 	const fields = Object.entries( availableBindings ).reduce< FieldSelectionProps[ 'fields' ] >(
 		( acc, [ fieldName, binding ] ) => {
-			const fieldValue = props.remoteData.results[ 0 ]?.[ fieldName ] ?? '';
+			const fieldValue = getRemoteDataResultValue( props.remoteData.results[ 0 ], fieldName );
 			if ( ! fieldValue || ! TEXT_FIELD_TYPES.includes( binding.type ) ) {
 				return acc;
 			}
@@ -74,8 +89,7 @@ export function FieldSelectionFromAvailableBindings( props: FieldSelectionWithFi
 				...acc,
 				[ fieldName ]: {
 					name: binding.name,
-					// eslint-disable-next-line @typescript-eslint/no-base-to-string
-					value: fieldValue?.toString() ?? '',
+					value: fieldValue,
 				},
 			};
 		},
@@ -86,17 +100,15 @@ export function FieldSelectionFromAvailableBindings( props: FieldSelectionWithFi
 }
 
 export function FieldSelectionFromMetaFields( props: FieldSelectionWithFieldsProps ) {
-	const fields = Object.entries( props.remoteData.metadata ?? {} ).reduce<
-		FieldSelectionProps[ 'fields' ]
-	>( ( acc, [ fieldName, metadatum ] ) => {
-		return {
-			...acc,
-			[ fieldName ]: {
+	const fields: FieldSelectionProps[ 'fields' ] = Object.fromEntries(
+		Object.entries( props.remoteData.metadata ?? {} ).map( ( [ fieldName, metadatum ] ) => [
+			fieldName,
+			{
 				name: metadatum.name,
-				value: metadatum.value,
+				value: metadatum.value?.toString() ?? '',
 			},
-		};
-	}, {} );
+		] )
+	);
 
 	return <FieldSelection { ...props } fields={ fields } fieldType="meta" />;
 }
@@ -105,19 +117,22 @@ interface FieldShortcodeSelectFieldProps {
 	blockName: string;
 	fieldType: 'field' | 'meta';
 	onSelectField: ( data: FieldSelection, fieldValue: string ) => void;
-	queryInput: RemoteDataQueryInput;
+	queryInputs: RemoteDataQueryInput[];
 	selectedField?: string;
 }
 
 export function FieldShortcodeSelectField( props: FieldShortcodeSelectFieldProps ) {
-	const { data, execute, loading } = useRemoteData( props.blockName, DISPLAY_QUERY_KEY );
+	const { data, fetch, loading } = useRemoteData( {
+		blockName: props.blockName,
+		queryKey: DISPLAY_QUERY_KEY,
+	} );
 
 	useEffect( () => {
 		if ( loading || data ) {
 			return;
 		}
 
-		void execute( props.queryInput );
+		void fetch( props.queryInputs );
 	}, [ loading, data ] );
 
 	if ( ! data || loading ) {

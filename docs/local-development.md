@@ -61,7 +61,7 @@ npm run dev:destroy
 
 ## Local playground
 
-While not a suitable for local developement, it can sometimes be useful to quickly spin up a local WordPress playground using `@wp-now/wp-now`:
+While not suitable for local developement, it can sometimes be useful to quickly spin up a local WordPress playground using `@wp-now/wp-now`:
 
 ```sh
 npm run build # or `npm start` in a separate terminal

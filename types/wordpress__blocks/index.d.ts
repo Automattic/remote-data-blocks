@@ -1,4 +1,4 @@
-import type { BlockEditProps as BlockEditPropsOriginal } from '@wordpress/blocks';
+import type { BlockEditProps as BlockEditPropsOriginal, Block } from '@wordpress/blocks';
 import type {
 	BlockEditorStoreActions,
 	BlockEditorStoreSelectors,
@@ -21,6 +21,11 @@ interface SetValuesPayload< Context, Values > extends GetValuesPayload< Context,
 	values: Values;
 }
 
+// Properly allow simplified block registration calls when register_block_type() is already called server-side.
+// Use a Partial<Block> to allow all attributes to be optional.
+// https://github.com/WordPress/gutenberg/issues/53605
+type ServerSideBlockConfiguration< T extends Record< string, any > = {} > = Partial< Block< T > >;
+
 declare module '@wordpress/blocks' {
 	interface BlockEditProps< T extends Record< string, any > > extends BlockEditPropsOriginal< T > {
 		name: string;
@@ -38,4 +43,9 @@ declare module '@wordpress/blocks' {
 	function registerBlockBindingsSource< Context, Values >(
 		source: BlockBindingsSource< Context, Values >
 	): void;
+
+	export function registerBlockType< TAttributes extends Record< string, any > = {} >(
+		name: string,
+		settings: ServerSideBlockConfiguration< TAttributes >
+	): Block< TAttributes > | undefined;
 }

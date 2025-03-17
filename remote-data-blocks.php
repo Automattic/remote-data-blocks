@@ -7,7 +7,7 @@
  * Author: WPVIP
  * Author URI: https://wpvip.com
  * Text Domain: remote-data-blocks
- * Version: 0.3.3
+ * Version: 0.9.1
  * Requires at least: 6.7
  * Requires PHP: 8.1
  */
@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit();
 
 define( 'REMOTE_DATA_BLOCKS__PLUGIN_ROOT', __FILE__ );
 define( 'REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
-define( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION', '0.3.3' );
+define( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION', '0.9.1' );
 
 define( 'REMOTE_DATA_BLOCKS__REST_NAMESPACE', 'remote-data-blocks/v1' );
 
@@ -29,13 +29,12 @@ require_once __DIR__ . '/vendor/autoload.php';
 Editor\AdminNotices\AdminNotices::init();
 Editor\DataBinding\BlockBindings::init();
 Editor\DataBinding\FieldShortcode::init();
-Editor\DataBinding\QueryOverrides::init();
 Editor\BlockManagement\BlockRegistration::init();
 Editor\BlockManagement\ConfigRegistry::init();
 Editor\PatternEditor\PatternEditor::init();
 
-// Analytics
-Analytics\TracksAnalytics::init( new Analytics\EnvironmentConfig() );
+// Telemetry
+Telemetry\TracksTelemetry::init( new Telemetry\EnvironmentConfig() );
 
 // Example API
 ExampleApi\ExampleApi::init();
@@ -45,9 +44,14 @@ PluginSettings\PluginSettings::init();
 
 // Integrations
 Integrations\Airtable\AirtableIntegration::init();
+Integrations\Google\Sheets\GoogleSheetsIntegration::init();
 Integrations\Shopify\ShopifyIntegration::init();
-Integrations\SalesforceB2C\SalesforceB2CIntegration::init();
+Integrations\SalesforceD2C\SalesforceD2CIntegration::init();
 Integrations\VipBlockDataApi\VipBlockDataApi::init();
 
 // REST endpoints
 REST\RemoteDataController::init();
+
+// Plugin developers: If you need to register additional code for testing, you
+// can do so here, e.g.:
+// require_once __DIR__ . '/example/shopify/register.php';

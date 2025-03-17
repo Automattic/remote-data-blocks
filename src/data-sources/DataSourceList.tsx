@@ -1,9 +1,10 @@
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
+	ExternalLink,
 	Icon,
 	Placeholder,
+	TabPanel,
 } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
 import {
 	Action,
 	DataViews,
@@ -14,26 +15,49 @@ import {
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { info } from '@wordpress/icons';
-import { store as noticesStore, NoticeStoreActions, WPNotice } from '@wordpress/notices';
 
-import { SUPPORTED_SERVICES, SUPPORTED_SERVICES_LABELS } from './constants';
+import CodeSnippet from './components/CodeSnippet';
+import { BaseModal } from '@/blocks/remote-data-container/components/modals/BaseModal';
+import { useModalState } from '@/blocks/remote-data-container/hooks/useModalState';
 import DataSourceMetaTags from '@/data-sources/DataSourceMetaTags';
+import {
+	ConfigSource,
+	SUPPORTED_SERVICES,
+	SUPPORTED_SERVICES_LABELS,
+} from '@/data-sources/constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig } from '@/data-sources/types';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
-import './DataSourceList.scss';
 import { AirtableIcon } from '@/settings/icons/AirtableIcon';
 import { GoogleSheetsIcon } from '@/settings/icons/GoogleSheetsIcon';
 import HttpIcon from '@/settings/icons/HttpIcon';
+import SalesforceCommerceD2CIcon from '@/settings/icons/SalesforceCommerceD2CIcon';
 import { ShopifyIcon } from '@/settings/icons/ShopifyIcon';
 
+import './DataSourceList.scss';
+
 const DataSourceList = () => {
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch< NoticeStoreActions >( noticesStore );
-	const { dataSources, loadingDataSources, deleteDataSource, fetchDataSources } = useDataSources();
+	const {
+		dataSources,
+		loadingDataSources,
+		deleteDataSource,
+		deleteMultipleDataSources,
+		fetchDataSources,
+		getDataSourceSnippet,
+		addDataSource,
+		showSnackbar,
+	} = useDataSources();
 	const [ dataSourceToDelete, setDataSourceToDelete ] = useState<
 		DataSourceConfig | DataSourceConfig[] | null
 	>( null );
+	const [ codeSnippets, setCodeSnippets ] = useState<
+		{
+			name: string;
+			code: string;
+		}[]
+	>( [] );
+	const [ currentSource, setCurrentSource ] = useState< DataSourceConfig | null >( null );
+	const { close, isOpen, open } = useModalState();
 	const { pushState } = useSettingsContext();
 
 	const onCancelDeleteDialog = () => {
@@ -50,8 +74,11 @@ const DataSourceList = () => {
 	};
 
 	const onConfirmDeleteDataSource = async ( source: DataSourceConfig | DataSourceConfig[] ) => {
-		const sources = Array.isArray( source ) ? source : [ source ];
-		await Promise.all( sources.map( src => deleteDataSource( src ).catch( () => null ) ) );
+		if ( Array.isArray( source ) ) {
+			await deleteMultipleDataSources( source );
+		} else {
+			await deleteDataSource( source );
+		}
 		setDataSourceToDelete( null );
 		await fetchDataSources().catch( () => null );
 	};
@@ -60,21 +87,6 @@ const DataSourceList = () => {
 		// eslint-disable-next-line security/detect-object-injection
 		return SUPPORTED_SERVICES_LABELS[ service ] ?? 'HTTP';
 	};
-
-	function showSnackbar( type: 'success' | 'error', message: string ): void {
-		const SNACKBAR_OPTIONS: Partial< WPNotice > = {
-			isDismissible: true,
-		};
-
-		switch ( type ) {
-			case 'success':
-				createSuccessNotice( message, { ...SNACKBAR_OPTIONS, icon: '✅' } );
-				break;
-			case 'error':
-				createErrorNotice( message, { ...SNACKBAR_OPTIONS, icon: '❌' } );
-				break;
-		}
-	}
 
 	const getServiceIcon = (
 		service: ( typeof SUPPORTED_SERVICES )[ number ]
@@ -86,6 +98,8 @@ const DataSourceList = () => {
 				return ShopifyIcon;
 			case 'google-sheets':
 				return GoogleSheetsIcon;
+			case 'salesforce-d2c':
+				return SalesforceCommerceD2CIcon;
 			default:
 				return HttpIcon;
 		}
@@ -142,15 +156,17 @@ const DataSourceList = () => {
 		table: {},
 	};
 
+	const isItemEligibleForActions = ( item: DataSourceConfig ) => {
+		return item.config_source === ConfigSource.STORAGE;
+	};
+
 	const actions: Action< DataSourceConfig >[] = [
 		{
 			id: 'edit',
 			label: __( 'Edit', 'remote-data-blocks' ),
 			icon: 'edit',
 			isPrimary: true,
-			isEligible: ( item: DataSourceConfig ) => {
-				return Boolean( item?.uuid );
-			},
+			isEligible: isItemEligibleForActions,
 			callback: ( [ item ]: DataSourceConfig[] ) => {
 				if ( item?.uuid ) {
 					onEditDataSource( item.uuid );
@@ -161,9 +177,7 @@ const DataSourceList = () => {
 			id: 'copy',
 			label: __( 'Copy UUID', 'remote-data-blocks' ),
 			icon: 'copy',
-			isEligible: ( item: DataSourceConfig ) => {
-				return Boolean( item?.uuid );
-			},
+			isEligible: isItemEligibleForActions,
 			callback: ( [ item ]: DataSourceConfig[] ) => {
 				if ( item && item.uuid ) {
 					navigator.clipboard
@@ -185,9 +199,7 @@ const DataSourceList = () => {
 			label: __( 'Delete', 'remote-data-blocks' ),
 			icon: 'trash',
 			isDestructive: true,
-			isEligible: ( item: DataSourceConfig ) => {
-				return Boolean( item?.uuid );
-			},
+			isEligible: isItemEligibleForActions,
 			callback: ( items: DataSourceConfig[] ) => {
 				if ( items.length === 1 ) {
 					if ( items[ 0 ] ) {
@@ -199,6 +211,56 @@ const DataSourceList = () => {
 			},
 			supportsBulk: true,
 		},
+		{
+			id: 'duplicate',
+			label: __( 'Duplicate', 'remote-data-blocks' ),
+			isEligible: isItemEligibleForActions,
+			callback: ( [ item ]: DataSourceConfig[] ) => {
+				if ( item ) {
+					const duplicatedSource = {
+						...item,
+						uuid: null,
+						service: item.service,
+						service_config: {
+							...item.service_config,
+							display_name: item.service_config.display_name + __( ' copy', 'remote-data-blocks' ),
+						} as DataSourceConfig[ 'service_config' ],
+					};
+					addDataSource( duplicatedSource as DataSourceConfig )
+						.then( result => {
+							if ( result && result.uuid ) {
+								return onEditDataSource( result.uuid );
+							}
+						} )
+						.catch( () => {
+							showSnackbar(
+								'error',
+								__( 'Failed to duplicate data source.', 'remote-data-blocks' )
+							);
+						} );
+				}
+			},
+		},
+		{
+			id: 'view-code',
+			label: __( 'View Code', 'remote-data-blocks' ),
+			isEligible: isItemEligibleForActions,
+			callback: ( [ item ]: DataSourceConfig[] ) => {
+				if ( item?.uuid ) {
+					setCurrentSource( item );
+					getDataSourceSnippet( item.uuid )
+						.then( snippets => {
+							if ( snippets ) {
+								setCodeSnippets( snippets );
+								open();
+							}
+						} )
+						.catch( () => {
+							showSnackbar( 'error', __( 'Failed to load code snippets.', 'remote-data-blocks' ) );
+						} );
+				}
+			},
+		},
 	];
 
 	if ( dataSources.length === 0 ) {
@@ -207,7 +269,7 @@ const DataSourceList = () => {
 				icon={ info }
 				label={ __( 'No data source found.', 'remote-data-blocks' ) }
 				instructions={ __(
-					'Use the “Connect New” button to add a data source.',
+					'Use the "Connect New" button to add a data source.',
 					'remote-data-blocks'
 				) }
 			/>
@@ -246,6 +308,46 @@ const DataSourceList = () => {
 								dataSourceToDelete.service_config.display_name
 						  ) }
 				</ConfirmDialog>
+			) }
+			{ codeSnippets && isOpen && (
+				<BaseModal
+					className="rdb-settings-page_data-source-code-snippet-modal"
+					icon={ getServiceIcon( currentSource?.service ?? 'generic-http' ) }
+					title={ __(
+						`${ currentSource?.service_config.display_name }: Data Source Code`,
+						'remote-data-blocks'
+					) }
+					onClose={ () => {
+						close();
+						setCodeSnippets( [] ); // Clear snippets when closing
+					} }
+				>
+					<>
+						<p style={ { marginBottom: '16px', padding: '0 8px' } }>
+							{ __(
+								"Below, you'll find the code used to register the block(s) for this data source, which can be used as a reference for extending the data source.\nTo get started, copy the code below and add it to your plugin directory. "
+							) }
+							<ExternalLink href="https://remotedatablocks.com/docs/extending/index/">
+								{ __( 'Learn more about extending', 'remote-data-blocks' ) }
+							</ExternalLink>
+						</p>
+						<TabPanel
+							className="rdb-settings-page_data-source-code-snippet"
+							tabs={ codeSnippets.map( ( { name } ) => ( {
+								name,
+								title: name,
+							} ) ) }
+						>
+							{ tab => {
+								return (
+									<CodeSnippet
+										code={ codeSnippets.find( snippet => snippet.name === tab.name )?.code ?? '' }
+									/>
+								);
+							} }
+						</TabPanel>
+					</>
+				</BaseModal>
 			) }
 		</>
 	);

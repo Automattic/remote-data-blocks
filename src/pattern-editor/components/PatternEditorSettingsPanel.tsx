@@ -25,7 +25,7 @@ export function PatternEditorSettingsPanel() {
 
 	function updateBlockTypes( blockName: string ): void {
 		updatePostMeta( { ...postMeta, [ PATTERN_BLOCK_TYPE_POST_META_KEY ]: blockName } );
-		sendTracksEvent( 'remotedatablocks_associate_block_type_to_pattern', {
+		sendTracksEvent( 'associate_block_type_to_pattern', {
 			data_source_type: getBlockDataSourceType( blockName ),
 			is_pattern_synced: isSynced,
 		} );

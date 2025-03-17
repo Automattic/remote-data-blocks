@@ -3,6 +3,7 @@ import { CheckboxControl, SelectControl } from '@wordpress/components';
 import {
 	BUTTON_TEXT_FIELD_TYPES,
 	BUTTON_URL_FIELD_TYPES,
+	HTML_FIELD_TYPES,
 	IMAGE_ALT_FIELD_TYPES,
 	IMAGE_URL_FIELD_TYPES,
 	TEXT_FIELD_TYPES,
@@ -61,7 +62,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 	function updateFieldBinding( target: string, field: string ): void {
 		if ( ! field ) {
 			removeBinding( target );
-			sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
+			sendTracksEvent( 'remote_data_container_actions', {
 				action: 'remove_binding',
 				data_source_type: getBlockDataSourceType( remoteDataName ),
 				block_target_attribute: target,
@@ -72,7 +73,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 
 		const args = attributes.metadata?.bindings?.[ target ]?.args ?? {};
 		updateBinding( target, { ...args, field } );
-		sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
+		sendTracksEvent( 'remote_data_container_actions', {
 			action: 'update_binding',
 			data_source_type: getBlockDataSourceType( remoteDataName ),
 			remote_data_field: field,
@@ -90,7 +91,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 			? Object.entries( availableBindings ).find( ( [ key ] ) => key === contentField )?.[ 1 ]?.name
 			: undefined;
 		updateBinding( 'content', { ...contentArgs, field: contentField, label } );
-		sendTracksEvent( 'remotedatablocks_remote_data_container_actions', {
+		sendTracksEvent( 'remote_data_container_actions', {
 			action: showLabel ? 'show_label' : 'hide_label',
 			data_source_type: getBlockDataSourceType( remoteDataName ),
 		} );
@@ -158,6 +159,20 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 						target="text"
 						updateFieldBinding={ updateFieldBinding }
 						value={ buttonTextField }
+					/>
+				</>
+			);
+
+		case 'remote-data-blocks/remote-html':
+			return (
+				<>
+					<BlockBindingFieldControl
+						availableBindings={ availableBindings }
+						fieldTypes={ HTML_FIELD_TYPES }
+						label="Raw HTML"
+						target="content"
+						updateFieldBinding={ updateFieldBinding }
+						value={ contentField }
 					/>
 				</>
 			);

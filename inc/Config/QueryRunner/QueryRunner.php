@@ -197,6 +197,23 @@ class QueryRunner implements QueryRunnerInterface {
 	 * @inheritDoc
 	 */
 	public function execute( HttpQueryInterface $query, array $input_variables ): array|WP_Error {
+		$input_schema = $query->get_input_schema();
+
+		// Only include input variables defined by the query's input schema.
+		$input_variables = array_intersect_key( $input_variables, $input_schema );
+
+		// Set default input variables.
+		foreach ( $input_schema as $key => $schema ) {
+			if ( ! array_key_exists( $key, $input_variables ) && isset( $schema['default_value'] ) ) {
+				$input_variables[ $key ] = $schema['default_value'];
+			}
+
+			// If the input variable is required and not provided, return an error.
+			if ( ! array_key_exists( $key, $input_variables ) && isset( $schema['required'] ) && $schema['required'] ) {
+				return new WP_Error( 'remote-data-blocks-missing-required-input-variable', sprintf( 'Missing required input variable: %s', $key ) );
+			}
+		}
+
 		$raw_response_data = $this->get_raw_response_data( $query, $input_variables );
 
 		if ( is_wp_error( $raw_response_data ) ) {
@@ -207,21 +224,92 @@ class QueryRunner implements QueryRunnerInterface {
 		$response_data = $this->preprocess_response( $query, $raw_response_data['response_data'], $input_variables );
 
 		// Determine if the response data is expected to be a collection.
-		$schema = $query->get_output_schema();
-		$is_collection = $schema['is_collection'] ?? false;
+		$output_schema = $query->get_output_schema();
+		$is_collection = $output_schema['is_collection'] ?? false;
 
 		// The parser always returns an array, even if it's a single item. This
 		// ensures a consistent response shape. The requestor is expected to inspect
 		// is_collection and unwrap if necessary.
 		$parser = new QueryResponseParser();
-		$results = $parser->parse( $response_data, $schema );
+		$results = $parser->parse( $response_data, $output_schema );
 		$results = $is_collection ? $results : [ $results ];
 		$metadata = $this->get_response_metadata( $query, $raw_response_data['metadata'], $results );
 
+		// Pagination schema defines how to extract pagination data from the response.
+		$pagination = null;
+		$pagination_schema = $query->get_pagination_schema();
+
+		if ( is_array( $pagination_schema ) ) {
+			$pagination_data = $parser->parse( $response_data, [ 'type' => $pagination_schema ] )['result'] ?? null;
+
+			if ( is_array( $pagination_data ) ) {
+				$pagination = [];
+				foreach ( $pagination_data as $key => $value ) {
+					$pagination[ $key ] = $value['value'];
+				}
+			}
+		}
+
 		return [
-			'is_collection' => $is_collection,
 			'metadata' => $metadata,
+			'pagination' => $pagination,
 			'results' => $results,
+			'query_inputs' => [ $input_variables ],
+		];
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function execute_batch( HttpQueryInterface $query, array $array_of_input_variables ): array|WP_Error {
+		// If the query supports a `id:list` input variable and the query inputs
+		// consist entirely of variables that match that variable type, we can
+		// consolidate the queries into a single request.
+		$input_schema = $query->get_input_schema();
+		$id_list_input = array_filter( $input_schema, function ( string $slug ) use ( $input_schema ): bool {
+			return 'id:list' === $input_schema[ $slug ]['type'];
+		}, ARRAY_FILTER_USE_KEY );
+
+		if ( 1 === count( $id_list_input ) ) {
+			$id_list_slug = array_key_first( $id_list_input );
+			$ids = array_reduce(
+				array_column( $array_of_input_variables, $id_list_slug ),
+				function ( array $carry, mixed $item ): array {
+					if ( is_array( $item ) ) {
+						return array_merge( $carry, $item );
+					}
+
+					return array_merge( $carry, [ $item ] );
+				},
+				[]
+			);
+
+			return $this->execute( $query, [ $id_list_slug => $ids ] );
+		}
+
+		if ( 1 === count( $array_of_input_variables ) ) {
+			return $this->execute( $query, $array_of_input_variables[0] );
+		}
+
+		$merged_results = [];
+		$merged_query_inputs = [];
+
+		foreach ( $array_of_input_variables as $input_variables ) {
+			$query_response = $query->execute( $input_variables );
+
+			if ( is_wp_error( $query_response ) ) {
+				return $query_response;
+			}
+
+			$merged_results = array_merge( $merged_results, $query_response['results'] );
+			$merged_query_inputs = array_merge( $merged_query_inputs, $query_response['query_inputs'] );
+		}
+
+		return [
+			'metadata' => $this->get_response_metadata( $query, [ 'batch' => true ], $merged_results ),
+			'pagination' => null, // Pagination is always disabled for batch executions.
+			'results' => $merged_results,
+			'query_inputs' => $merged_query_inputs,
 		];
 	}
 
@@ -232,8 +320,6 @@ class QueryRunner implements QueryRunnerInterface {
 	 *
 	 * @param string $raw_response_data The raw response data.
 	 * @return mixed The deserialized response data.
-	 *
-	 * @psalm-suppress PossiblyUnusedParam
 	 */
 	protected function deserialize_response( string $raw_response_data, array $input_variables ): mixed {
 		return json_decode( $raw_response_data, true );

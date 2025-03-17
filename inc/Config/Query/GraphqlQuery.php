@@ -9,8 +9,8 @@ defined( 'ABSPATH' ) || exit();
 /**
  * GraphqlQuery class
  *
- * Base class used to define a Remote Data Query. This class defines a
- * composable query that allows it to be composed with another query or a block.
+ * This class can be used to implement most GraphQL queries. It extends the
+ * HttpQuery class to modify its behavior.
  *
  */
 class GraphqlQuery extends HttpQuery {
@@ -19,7 +19,7 @@ class GraphqlQuery extends HttpQuery {
 	}
 
 	/**
-	 * Convert the query and variables into a GraphQL request body.
+	 * Assemble the GraphQL query and variables into a GraphQL request body.
 	 */
 	public function get_request_body( array $input_variables ): array {
 		return [
@@ -31,7 +31,19 @@ class GraphqlQuery extends HttpQuery {
 	/**
 	 * @inheritDoc
 	 */
-	protected static function get_config_schema(): array {
+	public static function get_config_schema(): array {
 		return ConfigSchemas::get_graphql_query_config_schema();
+	}
+
+	/**
+	 * GraphQL queries are typically made with POST requests, however, we do
+	 * want to cache the response to queries. Override the default HTTP behavior
+	 * for POST requests and allow caching.
+	 *
+	 * Caching policy for GraphQL mutations is separately handled and disabled.
+	 */
+	public function get_cache_ttl( array $input_variables ): int|null {
+		// Return null for default cache TTL.
+		return null;
 	}
 }

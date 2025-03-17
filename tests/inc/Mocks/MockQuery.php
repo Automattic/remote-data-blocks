@@ -11,10 +11,11 @@ use WP_Error;
 class MockQuery extends HttpQuery {
 	private mixed $response_data = null;
 
-	public static function from_array( array $config = [], ?ValidatorInterface $validator = null ): self|WP_Error {
-		return parent::from_array( [
-			'data_source' => $config['data_source'] ?? MockDataSource::from_array(),
+	public static function create( array $config = [], ?ValidatorInterface $validator = null ): static|WP_Error {
+		return self::from_array( [
+			'data_source' => $config['data_source'] ?? MockDataSource::create(),
 			'display_name' => 'Mock Query',
+			'endpoint' => $config['endpoint'] ?? null,
 			'input_schema' => $config['input_schema'] ?? [],
 			'output_schema' => $config['output_schema'] ?? [ 'type' => 'string' ],
 			'query_runner' => $config['query_runner'] ?? new MockQueryRunner(),

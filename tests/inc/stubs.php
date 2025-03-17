@@ -1,26 +1,24 @@
 <?php declare(strict_types = 1);
 
-$GLOBALS['__wordpress_filters'] = [];
-function apply_filters( string $filter, mixed $thing ): mixed {
-	return $GLOBALS['__wordpress_filters'][ $filter ] ?? $thing;
-}
+use RemoteDataBlocks\Tests\Mocks\MockWordPressFunctions;
 
-$GLOBALS['__wordpress_actions'] = [];
-function add_action( string $action, mixed ...$args ): void {
-	$GLOBALS['__wordpress_actions'][ $action ][] = $args;
-}
-function add_filter( string $filter, mixed ...$args ): void {
-	$GLOBALS['__wordpress_filters'][ $filter ][] = $args;
-}
+function add_action(): void {}
+function add_filter(): void {}
 
-$GLOBALS['__wordpress_done_actions'] = [];
 function do_action( string $action, mixed ...$args ): void {
-	$GLOBALS['__wordpress_done_actions'][ $action ] = $GLOBALS['__wordpress_done_actions'][ $action ] ?? [];
-	$GLOBALS['__wordpress_done_actions'][ $action ][] = $args;
+	MockWordPressFunctions::do_action( $action, ...$args );
+}
+
+function apply_filters( string $filter, mixed $thing, mixed ...$args ): mixed {
+	return MockWordPressFunctions::apply_filters( $filter, $thing, ...$args );
 }
 
 function esc_html( string $text ): string {
 	return $text;
+}
+
+function esc_html__( string $text ): string {
+	return apply_filters( 'esc_html__', $text );
 }
 
 function register_block_pattern( string $_name, array $_options ): void {
@@ -28,10 +26,6 @@ function register_block_pattern( string $_name, array $_options ): void {
 }
 
 function is_multisite(): void {
-	// Do nothing
-}
-
-function get_bloginfo( $_property ): void {
 	// Do nothing
 }
 
@@ -75,7 +69,7 @@ function wp_strip_all_tags( string $string ): string {
 	return $string;
 }
 
-function is_wp_error( $thing ): bool {
+function is_wp_error( mixed $thing ): bool {
 	return $thing instanceof \WP_Error;
 }
 
@@ -84,7 +78,7 @@ function wp_parse_url( string $url ): array|false {
 	return parse_url( $url );
 }
 
-function wp_json_encode( $data ): string {
+function wp_json_encode( mixed $data ): string {
     // phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode
 	return json_encode( $data );
 }
@@ -98,60 +92,27 @@ function wp_cache_set(): bool {
 }
 
 function update_option( string $option, mixed $value ): bool {
-	set_mocked_option( $option, $value );
+	MockWordPressFunctions::set_mock_option( $option, $value );
 	return true;
 }
 
 function get_option( string $option, mixed $default = false ): mixed {
-	if ( isset( $GLOBALS['__mocked_options'][ $option ] ) ) {
-		return $GLOBALS['__mocked_options'][ $option ];
-	}
-	return $default;
-}
-
-function set_mocked_option( string $option, mixed $value ): void {
-	$GLOBALS['__mocked_options'][ $option ] = $value;
-}
-
-function clear_mocked_options(): void {
-	$GLOBALS['__mocked_options'] = [];
+	return MockWordPressFunctions::get_option( $option, $default );
 }
 
 function get_page_by_path( string $path ): string {
 	return $path ?? 'fake WP_Post';
 }
 
-function add_rewrite_rule( string $_regex, string $_target, string $_position ): void {
-	// Do nothing
+function wp_generate_uuid4(): string {
+	return '00000000-0000-4000-8000-000000000000';
 }
 
-function wp_generate_uuid4() {
-	return sprintf(
-		'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
-		mt_rand( 0, 0xffff ),
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
-		mt_rand( 0, 0xffff ),
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
-		mt_rand( 0, 0xffff ),
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
-		mt_rand( 0, 0x0fff ) | 0x4000,
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
-		mt_rand( 0, 0x3fff ) | 0x8000,
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
-		mt_rand( 0, 0xffff ),
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
-		mt_rand( 0, 0xffff ),
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand
-		mt_rand( 0, 0xffff )
-	);
-}
-
-function is_email( $email ) {
+function is_email( mixed $email ): bool {
 	return filter_var( $email, FILTER_VALIDATE_EMAIL ) !== false;
 }
 
-function wp_is_uuid( $uuid, $version = null ) {
+function wp_is_uuid( mixed $uuid, ?int $version = null ): bool {
 	if ( ! is_string( $uuid ) ) {
 		return false;
 	}
@@ -169,99 +130,17 @@ function wp_is_uuid( $uuid, $version = null ) {
 }
 
 class WP_Error {
-	public $errors = array();
-	public $error_data = array();
-	protected $additional_data = array();
+	public function __construct( private string $code = '', private string $message = '', private mixed $data = null ) {}
 
-	public function __construct( $code = '', $message = '', $data = '' ) {
-		if ( empty( $code ) ) {
-			return;
-		}
-
-		$this->add( $code, $message, $data );
+	public function get_error_code(): string {
+			return $this->code;
 	}
 
-	public function get_error_codes() {
-		if ( ! $this->has_errors() ) {
-			return array();
-		}
-
-		return array_keys( $this->errors );
+	public function get_error_data(): mixed {
+		return $this->data;
 	}
 
-	public function get_error_code() {
-		$codes = $this->get_error_codes();
-
-		if ( empty( $codes ) ) {
-			return '';
-		}
-
-		return $codes[0];
-	}
-
-	public function get_error_messages( $code = '' ) {
-		// Return all messages if no code specified.
-		if ( empty( $code ) ) {
-			$all_messages = array();
-			foreach ( (array) $this->errors as $_code => $messages ) {
-				$all_messages = array_merge( $all_messages, $messages );
-			}
-
-			return $all_messages;
-		}
-
-		if ( isset( $this->errors[ $code ] ) ) {
-			return $this->errors[ $code ];
-		} else {
-			return array();
-		}
-	}
-
-	public function get_error_message( $code = '' ) {
-		if ( empty( $code ) ) {
-			$code = $this->get_error_code();
-		}
-		$messages = $this->get_error_messages( $code );
-		if ( empty( $messages ) ) {
-			return '';
-		}
-		return $messages[0];
-	}
-
-	public function get_error_data( $code = '' ) {
-		if ( empty( $code ) ) {
-			$code = $this->get_error_code();
-		}
-
-		if ( isset( $this->error_data[ $code ] ) ) {
-			return $this->error_data[ $code ];
-		}
-	}
-
-	public function has_errors() {
-		if ( ! empty( $this->errors ) ) {
-			return true;
-		}
-		return false;
-	}
-
-	public function add( $code, $message, $data = '' ) {
-		$this->errors[ $code ][] = $message;
-
-		if ( ! empty( $data ) ) {
-			$this->add_data( $data, $code );
-		}
-	}
-
-	public function add_data( $data, $code = '' ) {
-		if ( empty( $code ) ) {
-			$code = $this->get_error_code();
-		}
-
-		if ( isset( $this->error_data[ $code ] ) ) {
-			$this->additional_data[ $code ][] = $this->error_data[ $code ];
-		}
-
-		$this->error_data[ $code ] = $data;
+	public function get_error_message(): string {
+		return $this->message;
 	}
 }

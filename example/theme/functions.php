@@ -12,7 +12,7 @@ defined( 'ABSPATH' ) || exit();
 /**
  * Enqueue the Remote Data Blocks styles.
  */
-function remote_data_blocks_example_theme_enqueue_block_styles() {
+function remote_data_blocks_example_theme_enqueue_block_styles(): void {
 	wp_enqueue_style(
 		'remote-data-blocks-example-theme-style',
 		get_stylesheet_directory_uri() . '/style-remote-data-blocks.css',

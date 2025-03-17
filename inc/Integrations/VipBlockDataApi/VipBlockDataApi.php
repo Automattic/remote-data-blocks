@@ -44,7 +44,7 @@ class VipBlockDataApi {
 
 		$block_callback = function ( $block ) use ( $block_context ) {
 			// @TODO: look at this more closely. This is a hack to get around the fact that the block data API
-			// sommmmetimes returns objects for attributes, but the block bindings code expects arrays.
+			// sometimes returns objects for attributes, but the block bindings code expects arrays.
 			if ( is_object( $block['attributes'] ) ) {
 				$block['attributes'] = (array) $block['attributes'];
 			}
@@ -56,7 +56,7 @@ class VipBlockDataApi {
 			$block['context'] = $block_context;
 
 			foreach ( $block['attributes']['metadata']['bindings'] as $attr_name => $binding ) {
-				$block['attributes'][ $attr_name ] = BlockBindings::get_value( $binding['args'], $block );
+				$block['attributes'][ $attr_name ] = BlockBindings::get_value( $binding['args'], $block, $attr_name );
 			}
 
 			unset( $block['context'] );

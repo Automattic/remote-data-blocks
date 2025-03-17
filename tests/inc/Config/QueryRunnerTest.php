@@ -19,9 +19,9 @@ class QueryRunnerTest extends TestCase {
 		parent::setUp();
 
 		$this->http_client = $this->createMock( HttpClient::class );
-		$this->http_data_source = MockDataSource::from_array();
+		$this->http_data_source = MockDataSource::create();
 
-		$this->query = MockQuery::from_array( [
+		$this->query = MockQuery::create( [
 			'data_source' => $this->http_data_source,
 			'query_runner' => new QueryRunner( $this->http_client ),
 		] );
@@ -59,7 +59,7 @@ class QueryRunnerTest extends TestCase {
 	/**
 		* @dataProvider provideValidEndpoints
 	 */
-	public function testExecuteSuccessfulRequest( string $endpoint ) {
+	public function testExecuteSuccessfulRequest( string $endpoint ): void {
 		$response_body = wp_json_encode( [
 			'data' => [
 				'id' => 1,
@@ -89,7 +89,6 @@ class QueryRunnerTest extends TestCase {
 		$result = $this->query->execute( [] );
 
 		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
 	}
 
@@ -137,7 +136,7 @@ class QueryRunnerTest extends TestCase {
 	/**
 		* @dataProvider provideInvalidEndpoints
 	 */
-	public function testExecuteInvalidEndpoints( string $endpoint, string $expected_error_code ) {
+	public function testExecuteInvalidEndpoints( string $endpoint, string $expected_error_code ): void {
 		$this->http_data_source->set_endpoint( $endpoint );
 
 		$result = $this->query->execute( [] );
@@ -146,7 +145,7 @@ class QueryRunnerTest extends TestCase {
 		$this->assertSame( $expected_error_code, $result->get_error_code() );
 	}
 
-	public function testExecuteHttpClientException() {
+	public function testExecuteHttpClientException(): void {
 		$this->http_client->method( 'request' )->willThrowException( new \Exception( 'HTTP Client Error' ) );
 
 		$query_runner = new QueryRunner( $this->http_client );
@@ -156,7 +155,7 @@ class QueryRunnerTest extends TestCase {
 		$this->assertSame( 'remote-data-blocks-unexpected-exception', $result->get_error_code() );
 	}
 
-	public function testExecuteBadStatusCode() {
+	public function testExecuteBadStatusCode(): void {
 		$response = new \GuzzleHttp\Psr7\Response( 400, [], 'Bad Request' );
 		$this->http_client->method( 'request' )->willReturn( $response );
 
@@ -167,7 +166,7 @@ class QueryRunnerTest extends TestCase {
 		$this->assertSame( 'remote-data-blocks-bad-status-code', $result->get_error_code() );
 	}
 
-	public function testExecuteSuccessfulResponse() {
+	public function testExecuteSuccessfulResponse(): void {
 		$response_body = $this->createMock( \Psr\Http\Message\StreamInterface::class );
 		$response_body->method( 'getContents' )->willReturn( wp_json_encode( [ 'test' => 'test value' ] ) );
 
@@ -189,9 +188,7 @@ class QueryRunnerTest extends TestCase {
 		$result = $this->query->execute( [] );
 
 		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
-		$this->assertFalse( $result['is_collection'] );
 
 		$this->assertArrayHasKey( 'metadata', $result );
 		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
@@ -205,6 +202,7 @@ class QueryRunnerTest extends TestCase {
 					'value' => 'test value',
 				],
 			],
+			'uuid' => '00000000-0000-4000-8000-000000000000',
 		];
 
 		$this->assertIsArray( $result['results'] );
@@ -212,7 +210,7 @@ class QueryRunnerTest extends TestCase {
 		$this->assertSame( $expected_result, $result['results'][0] );
 	}
 
-	public function testExecuteSuccessfulResponseWithJsonStringResponseData() {
+	public function testExecuteSuccessfulResponseWithJsonStringResponseData(): void {
 		$response_body = $this->createMock( \Psr\Http\Message\StreamInterface::class );
 		$response = new Response( 200, [], $response_body );
 
@@ -233,9 +231,7 @@ class QueryRunnerTest extends TestCase {
 		$result = $this->query->execute( [] );
 
 		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
-		$this->assertFalse( $result['is_collection'] );
 
 		$this->assertArrayHasKey( 'metadata', $result );
 		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
@@ -249,6 +245,7 @@ class QueryRunnerTest extends TestCase {
 					'value' => 'overridden in preprocess_response as JSON string',
 				],
 			],
+			'uuid' => '00000000-0000-4000-8000-000000000000',
 		];
 
 		$this->assertIsArray( $result['results'] );
@@ -256,7 +253,7 @@ class QueryRunnerTest extends TestCase {
 		$this->assertSame( $expected_result, $result['results'][0] );
 	}
 
-	public function testExecuteSuccessfulResponseWithArrayResponseData() {
+	public function testExecuteSuccessfulResponseWithArrayResponseData(): void {
 		$response_body = $this->createMock( \Psr\Http\Message\StreamInterface::class );
 
 		$response = new Response( 200, [], $response_body );
@@ -278,9 +275,7 @@ class QueryRunnerTest extends TestCase {
 		$result = $this->query->execute( [] );
 
 		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
-		$this->assertFalse( $result['is_collection'] );
 
 		$this->assertArrayHasKey( 'metadata', $result );
 		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
@@ -294,6 +289,7 @@ class QueryRunnerTest extends TestCase {
 					'value' => 'overridden in preprocess_response as array',
 				],
 			],
+			'uuid' => '00000000-0000-4000-8000-000000000000',
 		];
 
 		$this->assertIsArray( $result['results'] );
@@ -301,7 +297,7 @@ class QueryRunnerTest extends TestCase {
 		$this->assertSame( $expected_result, $result['results'][0] );
 	}
 
-	public function testExecuteSuccessfulResponseWithObjectResponseData() {
+	public function testExecuteSuccessfulResponseWithObjectResponseData(): void {
 		$response_body = $this->createMock( \Psr\Http\Message\StreamInterface::class );
 		$response = new Response( 200, [], $response_body );
 
@@ -325,9 +321,7 @@ class QueryRunnerTest extends TestCase {
 		$result = $this->query->execute( [] );
 
 		$this->assertIsArray( $result );
-		$this->assertArrayHasKey( 'is_collection', $result );
 		$this->assertArrayHasKey( 'results', $result );
-		$this->assertFalse( $result['is_collection'] );
 
 		$this->assertArrayHasKey( 'metadata', $result );
 		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
@@ -341,10 +335,52 @@ class QueryRunnerTest extends TestCase {
 					'value' => 'overridden in preprocess_response as object',
 				],
 			],
+			'uuid' => '00000000-0000-4000-8000-000000000000',
 		];
 
 		$this->assertIsArray( $result['results'] );
 		$this->assertCount( 1, $result['results'] );
 		$this->assertSame( $expected_result, $result['results'][0] );
+	}
+
+	public function testQueryRunnerAppliesDefaultInputVariables(): void {
+		$query = MockQuery::create( [
+			'data_source' => $this->http_data_source,
+			'endpoint' => function ( array $input_variables ): string {
+				return sprintf(
+					'https://example.com/api?foo=%s&baz=%s',
+					$input_variables['foo'] ?? 'MISSING',
+					$input_variables['baz'] ?? 'MISSING',
+				);
+			},
+			'input_schema' => [
+				'baz' => [
+					'name' => 'Baz',
+					'type' => 'string',
+				],
+				'foo' => [
+					'default_value' => 'bar',
+					'name' => 'Foo',
+					'type' => 'string',
+				],
+			],
+			'query_runner' => new QueryRunner( $this->http_client ),
+		] );
+
+		$response_body = $this->createMock( \Psr\Http\Message\StreamInterface::class );
+		$response = new Response( 200, [], $response_body );
+
+		$this
+			->http_client
+			->expects( $this->exactly( 1 ) )
+			->method( 'request' )
+			->willReturn( $response )
+			->with( 'GET', '/api?foo=bar&baz=MISSING' );
+
+		$result = $query->execute( [] );
+
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'metadata', $result );
+		$this->assertArrayHasKey( 'results', $result );
 	}
 }
