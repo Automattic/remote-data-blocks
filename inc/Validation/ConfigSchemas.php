@@ -241,6 +241,11 @@ final class ConfigSchemas {
 							// and offset-based pagination variables.
 							'ui:pagination_cursor_next',
 							'ui:pagination_cursor_previous',
+							//
+							// Some APIs provide a single pagination cursor that is used for
+							// both previous and next pages. If specified, this variable
+							// takes precedence over next and previous cursor variables.
+							'ui:pagination_cursor',
 						),
 						'required' => Types::nullable( Types::boolean() ),
 					] ),

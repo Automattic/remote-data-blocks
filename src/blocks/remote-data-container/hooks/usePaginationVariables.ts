@@ -3,6 +3,7 @@ import { useState } from '@wordpress/element';
 import {
 	PAGINATION_CURSOR_NEXT_VARIABLE_TYPE,
 	PAGINATION_CURSOR_PREVIOUS_VARIABLE_TYPE,
+	PAGINATION_CURSOR_VARIABLE_TYPE,
 	PAGINATION_OFFSET_VARIABLE_TYPE,
 	PAGINATION_PAGE_VARIABLE_TYPE,
 	PAGINATION_PER_PAGE_VARIABLE_TYPE,
@@ -16,9 +17,6 @@ interface UsePaginationVariables {
 	perPage?: number;
 	setPage: ( page: number ) => void;
 	setPerPage: ( perPage: number ) => void;
-	supportsCursorPagination: boolean;
-	supportsOffsetPagination: boolean;
-	supportsPagePagination: boolean;
 	supportsPagination: boolean;
 	supportsPerPage: boolean;
 	totalItems?: number;
@@ -31,6 +29,19 @@ interface UsePaginationVariablesInput {
 	inputVariables: InputVariable[];
 }
 
+interface PaginationCursors {
+	next?: string;
+	previous?: string;
+}
+
+export enum PaginationType {
+	CURSOR_SIMPLE = 'cursor_simple',
+	CURSOR = 'cursor',
+	OFFSET = 'offset',
+	NONE = 'none',
+	PAGE = 'page',
+}
+
 export function usePaginationVariables( {
 	initialPage = 1,
 	initialPerPage,
@@ -39,7 +50,11 @@ export function usePaginationVariables( {
 	const [ paginationData, setPaginationData ] = useState< RemoteDataPagination >();
 	const [ page, setPage ] = useState< number >( initialPage );
 	const [ perPage, setPerPage ] = useState< number | null >( initialPerPage ?? null );
+	const [ cursors, setCursors ] = useState< PaginationCursors >( {} );
 
+	const cursorVariable = inputVariables?.find(
+		input => input.type === PAGINATION_CURSOR_VARIABLE_TYPE
+	);
 	const cursorNextVariable = inputVariables?.find(
 		input => input.type === PAGINATION_CURSOR_NEXT_VARIABLE_TYPE
 	);
@@ -57,27 +72,38 @@ export function usePaginationVariables( {
 	);
 
 	const paginationQueryInput: RemoteDataQueryInput = {};
+	const nonFirstPage = page > 1;
+	const calculatedPerPage = perPage ?? paginationData?.perPage ?? 10;
 
 	// These will be amended below.
-	let supportsCursorPagination = false;
-	let supportsOffsetPagination = false;
-	let supportsPagePagination = false;
+	let hasNextPage = Boolean( paginationData?.hasNextPage ?? paginationData?.cursorNext );
+	let paginationType = PaginationType.NONE;
 	let setPageFn: ( page: number ) => void = () => {};
 
-	if ( cursorNextVariable && cursorPreviousVariable ) {
+	if ( cursorVariable ) {
+		paginationType = PaginationType.CURSOR_SIMPLE;
 		setPageFn = setPageForCursorPagination;
-		supportsCursorPagination = true;
 		Object.assign( paginationQueryInput, {
-			[ cursorNextVariable.slug ]: paginationData?.cursorNext,
-			[ cursorPreviousVariable.slug ]: paginationData?.cursorPrevious,
+			[ cursorVariable.slug ]: cursors.next ?? cursors.previous,
 		} );
-	} else if ( offsetVariable && perPage ) {
+	} else if ( cursorNextVariable && cursorPreviousVariable ) {
+		paginationType = PaginationType.CURSOR;
+		setPageFn = setPageForCursorPagination;
+		Object.assign( paginationQueryInput, {
+			[ cursorNextVariable.slug ]: cursors.next,
+			[ cursorPreviousVariable.slug ]: cursors.previous,
+		} );
+	} else if ( offsetVariable ) {
+		paginationType = PaginationType.OFFSET;
 		setPageFn = setPage;
-		supportsOffsetPagination = true;
-		Object.assign( paginationQueryInput, { [ offsetVariable.slug ]: page * perPage } );
+		if ( nonFirstPage ) {
+			Object.assign( paginationQueryInput, {
+				[ offsetVariable.slug ]: ( page - 1 ) * calculatedPerPage,
+			} );
+		}
 	} else if ( pageVariable ) {
+		paginationType = PaginationType.PAGE;
 		setPageFn = setPage;
-		supportsPagePagination = true;
 		Object.assign( paginationQueryInput, { [ pageVariable.slug ]: page } );
 	}
 
@@ -85,43 +111,44 @@ export function usePaginationVariables( {
 		Object.assign( paginationQueryInput, { [ perPageVariable.slug ]: perPage } );
 	}
 
+	const supportsPagination = paginationType !== PaginationType.NONE;
 	const totalItems = paginationData?.totalItems;
-	const totalPages = totalItems && perPage ? Math.ceil( totalItems / perPage ) : undefined;
-	const hasNextPage = paginationData?.hasNextPage;
-	const supportsPagination =
-		supportsCursorPagination ||
-		supportsPagePagination ||
-		supportsOffsetPagination ||
-		hasNextPage ||
-		Boolean( totalItems );
+	const totalPages = totalItems ? Math.ceil( totalItems / calculatedPerPage ) : undefined;
+
+	if ( totalPages && page < totalPages ) {
+		hasNextPage = true;
+	}
 
 	function onFetch( remoteData: RemoteData ): void {
 		if ( ! supportsPagination ) {
 			return;
 		}
 
-		setPaginationData( remoteData.pagination );
-
-		// We need a perPage value to calculate the total pages, so inpsect the results.
-		if ( ! perPage && remoteData.results.length ) {
-			setPerPage( remoteData.results.length );
-		}
+		setPaginationData( {
+			perPage: perPage ?? remoteData.results.length,
+			...remoteData.pagination,
+		} );
 	}
 
 	// With cursor pagination, we can only go one page at a time.
 	function setPageForCursorPagination( newPage: number ): void {
+		// if page has gone up, we want to use nextCursor and set aside the current cursor as the previous one
+		// if the page has gone down, we want to use previousCursor and set aside the current cursor as the next one
 		if ( newPage > page ) {
-			if ( totalPages ) {
-				setPage( Math.min( totalPages, page + 1 ) );
-				return;
-			}
-
-			setPage( page + 1 );
+			setPage( Math.min( totalPages ?? page + 1, page + 1 ) );
+			setCursors( {
+				next: paginationData?.cursorNext ?? cursors.next,
+				previous: undefined,
+			} );
 			return;
 		}
 
 		if ( newPage < page ) {
 			setPage( Math.max( 1, page - 1 ) );
+			setCursors( {
+				next: undefined,
+				previous: paginationData?.cursorPrevious ?? cursors.previous,
+			} );
 		}
 	}
 
@@ -130,12 +157,9 @@ export function usePaginationVariables( {
 		onFetch,
 		page,
 		paginationQueryInput,
-		perPage: perPage ?? undefined,
+		perPage: perPage ?? paginationData?.perPage,
 		setPage: setPageFn,
 		setPerPage: supportsPagination ? setPerPage : () => {},
-		supportsCursorPagination,
-		supportsOffsetPagination,
-		supportsPagePagination,
 		supportsPagination,
 		supportsPerPage: Boolean( perPageVariable ),
 		totalItems,
