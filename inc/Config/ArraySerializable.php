@@ -25,10 +25,18 @@ abstract class ArraySerializable implements ArraySerializableInterface {
 		return $config_value;
 	}
 
+	private static $cache = [];
+
 	/**
 	 * @inheritDoc
 	 */
 	final public static function from_array( array $config, ?ValidatorInterface $validator = null ): static|WP_Error {
+		$config_hash = md5( wp_json_encode( $config ) );
+
+		if ( isset( self::$cache[ $config_hash ] ) ) {
+			return self::$cache[ $config_hash ];
+		}
+
 		// The purpose of this is to ensure that when from_array runs, it is statically bound to the correct child class.
 		// This is important for ensuring that the correct child class is used for migrations, preprocess_config, etc.
 		$subclass = static::get_implementor( $config );
@@ -60,7 +68,11 @@ abstract class ArraySerializable implements ArraySerializableInterface {
 		$sanitizer = new Sanitizer( $schema );
 		$sanitized = $sanitizer->sanitize( $config );
 
-		return new static( $sanitized );
+		$result = new static( $sanitized );
+
+		self::$cache[ $config_hash ] = $result;
+
+		return $result;
 	}
 
 	/**
