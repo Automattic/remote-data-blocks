@@ -23,7 +23,7 @@ async function unmemoizedfetchRemoteData(
 		data: requestData,
 	} );
 
-	console.log( { body } );
+	console.log( { body, requestData } );
 
 	if ( ! body ) {
 		return null;
@@ -45,7 +45,8 @@ async function unmemoizedfetchRemoteData(
 	};
 }
 
-const fetchRemoteData = memoizeFn< typeof unmemoizedfetchRemoteData >( unmemoizedfetchRemoteData );
+export const fetchRemoteData =
+	memoizeFn< typeof unmemoizedfetchRemoteData >( unmemoizedfetchRemoteData );
 
 interface UseRemoteData {
 	data?: RemoteData;

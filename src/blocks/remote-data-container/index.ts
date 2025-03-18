@@ -1,4 +1,4 @@
-import { BlockInstance, registerBlockBindingsSource, registerBlockType } from '@wordpress/blocks';
+import { registerBlockBindingsSource, registerBlockType } from '@wordpress/blocks';
 import { createReduxStore, register } from '@wordpress/data';
 import { ReduxStoreConfig } from '@wordpress/data/build-types/types';
 import { addFilter } from '@wordpress/hooks';
@@ -64,44 +64,44 @@ type Actions = {
 
 interface Selectors {}
 
-const queryDataStateKey = (queryKey: string, blockName: string, queryInput: Record<string, string>) => `${blockName}:${queryKey}:${JSON.stringify(queryInput)}`;
+const queryDataStateKey = (queryKey: string, blockName: string, queryInputs: Record<string, string>) => `${blockName}:${queryKey}:${JSON.stringify(queryInputs ?? {})}`;
 
 const remoteDataBlocksStoreConfig: ReduxStoreConfig< State, Actions, Selectors > = {
 	reducer: ( state = {}, action ) => {
 		switch ( action.type ) {
 			case 'RECEIVE_REMOTE_DATA':
-				console.log('store: RECEIVED REMOTE DATA')
-				console.log({action});
-				console.log(`key: ${queryDataStateKey(action.queryKey, action.blockName, action.queryInput)}`);
-				return { ...state, [ queryDataStateKey(action.queryKey, action.blockName, action.queryInput) ]: action.data };
+				// console.log('store: RECEIVED REMOTE DATA')
+				// console.log({action});
+				// console.log(`key: ${queryDataStateKey(action.queryKey, action.blockName, action.queryInput)}`);
+				return { ...state, [ queryDataStateKey(action.queryKey, action.blockName, action.queryInputs) ]: action.data };
 			case 'RECEIVE_REMOTE_DATA_ERROR':
-				console.log('store: RECEIVED REMOTE DATA ERROR')
-				return { ...state, [ queryDataStateKey(action.queryKey, action.blockName, action.queryInput) ]: action.error };
+				// console.log('store: RECEIVED REMOTE DATA ERROR')
+				return { ...state, [ queryDataStateKey(action.queryKey, action.blockName, action.queryInputs) ]: action.error };
 		}
 		return state;
 	},
 	selectors: {
-		getRemoteData: ( state, queryKey, blockName, queryInput = {} ) => {
+		getRemoteData: ( state, queryKey, blockName, queryInputs = {} ) => {
 			// console.log( 'store: CALLED SELECTOR' );
-			console.log( { state, queryKey, blockName, queryInput } );
-			return state[ queryDataStateKey(queryKey, blockName, queryInput) ];
+			console.log( { state, queryKey, blockName, queryInputs } );
+			return state[ queryDataStateKey(queryKey, blockName, queryInputs) ];
 		},
 	},
 	resolvers: {
 		getRemoteData:
-			( queryKey: string, blockName: string, queryInput: Record< string, string > ) =>
+			( queryKey: string, blockName: string, queryInputs: Record< string, string > ) =>
 			async ( { dispatch } ) => {
-				// console.log( 'store: CALLED RESOLVER', { queryKey, blockName, queryInput } );
+				console.log( 'store: CALLED RESOLVER', { queryKey, blockName, queryInputs } );
 				try {
-					console.log({blockName, queryKey, queryInput });
+						console.log({FETCH:{blockName, queryKey, queryInputs }});
 					const data = await fetchRemoteData( {
 						block_name: blockName,
 						query_key: queryKey,
-						query_input: queryInput,
+						query_inputs: [	queryInputs	],
 					} );
 					// console.log('store: DISPATCHING RECEIVE_REMOTE_DATA')
 					console.log( { retrievedData: data } );
-					dispatch( { type: 'RECEIVE_REMOTE_DATA', blockName, queryKey, data, queryInput } );
+					dispatch( { type: 'RECEIVE_REMOTE_DATA', blockName, queryKey, data, queryInputs } );
 				} catch ( err: unknown ) {
 					console.error(err);
 					dispatch( { type: 'RECEIVE_REMOTE_DATA_ERROR', blockName, queryKey, error: err } );
@@ -122,7 +122,7 @@ registerBlockBindingsSource( {
 	label: 'Remote Data Binding',
 	usesContext: [ 'remote-data-blocks/remoteData' ],
 	getValues( { context, clientId, bindings, select, ...other } ) {
-		console.log({other});
+		// console.log({other});
 		const remoteDataContext = context[ 'remote-data-blocks/remoteData' ];
 		console.log({CONTEXT:remoteDataContext});
 
@@ -142,19 +142,21 @@ registerBlockBindingsSource( {
 		const data = select( remoteDataBlocksStore ).getRemoteData(
 			constants.DISPLAY_QUERY_KEY,
 			remoteDataContext.blockName,
-			remoteDataContext.queryInput
+			remoteDataContext.queryInputs?.[0]
 		);
 
-		const result = data?.results?.[0];
+		const result = data?.results?.[0].result;
 
 		const newValues = {};
 
 		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
-			const { key, field } = source.args;
+			console.log({source});
+			const { block, field } = source.args;
 			// const { gravatar_id: id } =
 			// 	getEditedEntityRecord( 'postType', context?.postType, context?.postId ).meta || {};
 			// const data = select( gravatarStore ).getGravatarData( id );
-			newValues[ attributeName ] = result?.[ field ]?.toString() ?? 'TEST'; // data?.[ key || field ];
+			console.log({block, field,result,data});
+			newValues[ attributeName ] = result?.[ field ]?.value?.toString() ?? 'TEST'; // data?.[ key || field ];
 		}
 		// console.log( remoteDataContext?.results?.[ 0 ] );
 		return newValues;
