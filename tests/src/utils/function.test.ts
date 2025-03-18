@@ -37,6 +37,25 @@ describe( 'function utils', () => {
 			expect( fn ).toHaveBeenCalledTimes( 3 );
 		} );
 
+		it( 'should cache a then-able promise if that is returned by the function', async () => {
+			const fn = vi.fn().mockImplementation( async ( arg: number ): Promise< string > => {
+				await Promise.resolve();
+				return `called with: ${ arg }`;
+			} );
+			const memoized = memoizeFn< ( arg: number ) => Promise< string > >( fn );
+
+			expect( await memoized( 1 ) ).toEqual( 'called with: 1' );
+			expect( await memoized( 1 ) ).toEqual( 'called with: 1' );
+
+			const thenPromise = new Promise< string >( ( resolve, reject ) => {
+				memoized( 1 ).then( resolve ).catch( reject );
+			} );
+
+			expect( await thenPromise ).toEqual( 'called with: 1' );
+
+			expect( fn ).toHaveBeenCalledTimes( 1 );
+		} );
+
 		it( 'should not cache promise rejections', async () => {
 			const fn = vi
 				.fn()

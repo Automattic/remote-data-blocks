@@ -25,11 +25,13 @@ export function memoizeFn< T extends ( ...args: Parameters< T > ) => ReturnType<
 
 		const result = func( ...args );
 
-		// If the result is a Promise, only cache the resolved value.
+		// If the result is a Promise, ensure that it does not reject so that we
+		// do not cache a bad result. Wrap the resolved value in a Promise to ensure
+		// that it remains then-able.
 		if ( result instanceof Promise ) {
-			return result.then( ( resolvedResult: ReturnType< T > ) => {
-				cache.set( key, resolvedResult );
-				return resolvedResult;
+			return result.then( () => {
+				cache.set( key, result );
+				return result;
 			} ) as ReturnType< T >;
 		}
 
