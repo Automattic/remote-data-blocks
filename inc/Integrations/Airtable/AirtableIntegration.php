@@ -78,7 +78,7 @@ class AirtableIntegration {
 		}
 	}
 
-	private static function get_item_query( AirtableDataSource $data_source, array $table ): array {
+	public static function get_item_query( AirtableDataSource $data_source, array $table ): array {
 		return [
 			'__class' => HttpQuery::class,
 			'data_source' => $data_source,
@@ -127,7 +127,7 @@ class AirtableIntegration {
 		return $output_schema;
 	}
 
-	private static function get_list_query( AirtableDataSource $data_source, array $table ): array {
+	public static function get_list_query( AirtableDataSource $data_source, array $table ): array {
 		return [
 			'__class' => HttpQuery::class,
 			'data_source' => $data_source,
