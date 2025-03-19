@@ -3,6 +3,7 @@ import { BlockEditProps } from '@wordpress/blocks';
 import { Spinner } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
+import { QueryInputsPanel } from './components/panels/QueryInputsPanel';
 import { InnerBlocks } from '@/blocks/remote-data-container/components/InnerBlocks';
 import { DataPanel } from '@/blocks/remote-data-container/components/panels/DataPanel';
 import { OverridesPanel } from '@/blocks/remote-data-container/components/panels/OverridesPanel';
@@ -83,6 +84,16 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 		}
 	}
 
+	function onUpdateQueryInputs( inputs: RemoteDataQueryInput[] ): void {
+		if ( ! remoteDataAttribute ) return;
+
+		updateRemoteData( {
+			...remoteDataAttribute,
+			queryInputs: inputs,
+		} );
+		refreshRemoteData();
+	}
+
 	// No remote data has been selected yet, show a placeholder.
 	if ( ! data ) {
 		return (
@@ -110,6 +121,10 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	return (
 		<>
 			<InspectorControls>
+				<QueryInputsPanel
+					queryInputs={ migrateRemoteData( props.attributes.remoteData )?.queryInputs ?? [] }
+					onUpdateQueryInputs={ onUpdateQueryInputs }
+				/>
 				<OverridesPanel
 					blockConfig={ blockConfig }
 					remoteData={ data }
