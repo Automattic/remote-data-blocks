@@ -1,4 +1,5 @@
 import { Button, PanelBody, TextControl } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 interface QueryInputsPanelProps {
@@ -7,13 +8,14 @@ interface QueryInputsPanelProps {
 }
 
 export function QueryInputsPanel( { queryInputs, onUpdateQueryInputs }: QueryInputsPanelProps ) {
+	const [ localInputs, setLocalInputs ] = useState( queryInputs );
+
 	return (
 		<PanelBody title={ __( 'Query Inputs', 'remote-data-blocks' ) }>
 			<form
 				onSubmit={ event => {
 					event.preventDefault();
-
-					const cleanedInputs = queryInputs.map( input => {
+					const cleanedInputs = localInputs.map( input => {
 						const entries = Object.entries( input ).map( ( [ key, value ] ) => [
 							key,
 							typeof value === 'string' && value.includes( ',' )
@@ -30,7 +32,7 @@ export function QueryInputsPanel( { queryInputs, onUpdateQueryInputs }: QueryInp
 					onUpdateQueryInputs( cleanedInputs );
 				} }
 			>
-				{ queryInputs.map( ( input, index ) =>
+				{ localInputs.map( ( input, index ) =>
 					Object.entries( input ).map( ( [ key, value ] ) => {
 						const displayValue = Array.isArray( value ) ? value.join( ',' ) : ( value as string );
 
@@ -40,15 +42,14 @@ export function QueryInputsPanel( { queryInputs, onUpdateQueryInputs }: QueryInp
 								label={ key }
 								value={ displayValue }
 								onChange={ newValue => {
-									const processedValue = newValue.includes( ',' )
-										? newValue.split( ',' ).map( item => item.trim() )
-										: newValue;
-
-									onUpdateQueryInputs(
-										queryInputs.map( ( item, itemIndex ) =>
-											itemIndex === index ? { ...item, [ key ]: processedValue } : item
+									setLocalInputs(
+										localInputs.map( ( item, itemIndex ) =>
+											itemIndex === index ? { ...item, [ key ]: newValue } : item
 										)
 									);
+								} }
+								onBlur={ () => {
+									onUpdateQueryInputs( localInputs );
 								} }
 							/>
 						);
