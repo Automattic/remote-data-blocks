@@ -244,6 +244,11 @@ final class ConfigSchemas {
 							// and offset-based pagination variables.
 							'ui:pagination_cursor_next',
 							'ui:pagination_cursor_previous',
+							//
+							// Some APIs provide a single pagination cursor that is used for
+							// both previous and next pages. If specified, this variable
+							// takes precedence over next and previous cursor variables.
+							'ui:pagination_cursor',
 						),
 						'required' => Types::nullable( Types::boolean() ),
 					] ),
@@ -311,8 +316,9 @@ final class ConfigSchemas {
 					// `has_next_page` must be defined in order to enable pagination.
 					'total_items' => Types::nullable(
 						Types::object( [
+							'generate' => Types::nullable( Types::callable() ),
 							'name' => Types::nullable( Types::string() ),
-							'path' => Types::json_path(),
+							'path' => Types::nullable( Types::json_path() ),
 							'type' => Types::enum( 'integer' ),
 						] ),
 					),
@@ -321,8 +327,9 @@ final class ConfigSchemas {
 					// field must be defined in order to enable cursor-based pagination.
 					'cursor_next' => Types::nullable(
 						Types::object( [
+							'generate' => Types::nullable( Types::callable() ),
 							'name' => Types::nullable( Types::string() ),
-							'path' => Types::json_path(),
+							'path' => Types::nullable( Types::json_path() ),
 							'type' => Types::enum( 'string' ),
 						] ),
 					),
@@ -331,8 +338,9 @@ final class ConfigSchemas {
 					// field must be defined in order to enable cursor-based pagination.
 					'cursor_previous' => Types::nullable(
 						Types::object( [
+							'generate' => Types::nullable( Types::callable() ),
 							'name' => Types::nullable( Types::string() ),
-							'path' => Types::json_path(),
+							'path' => Types::nullable( Types::json_path() ),
 							'type' => Types::enum( 'string' ),
 						] ),
 					),
@@ -341,8 +349,9 @@ final class ConfigSchemas {
 					// total number of items.
 					'has_next_page' => Types::nullable(
 						Types::object( [
+							'generate' => Types::nullable( Types::callable() ),
 							'name' => Types::nullable( Types::string() ),
-							'path' => Types::json_path(),
+							'path' => Types::nullable( Types::json_path() ),
 							'type' => Types::enum( 'boolean' ),
 						] )
 					),

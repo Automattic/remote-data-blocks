@@ -6,7 +6,6 @@ use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Formatting\StringFormatter;
 use RemoteDataBlocks\Snippet\Snippet;
-use WP_Error;
 
 class AirtableIntegration {
 	public static function init(): void {
@@ -34,20 +33,17 @@ class AirtableIntegration {
 		$tables = $data_source->to_array()['service_config']['tables'];
 
 		foreach ( $tables as $table ) {
-				$query = self::get_query( $data_source, $table );
-				$list_query = self::get_list_query( $data_source, $table );
-
 				register_remote_data_block(
 					array_merge(
 						[
 							'title' => $data_source->get_display_name() . '/' . $table['name'],
 							'icon' => 'editor-table',
 							'render_query' => [
-								'query' => $query,
+								'query' => self::get_item_query( $data_source, $table ),
 							],
 							'selection_queries' => [
 								[
-									'query' => $list_query,
+									'query' => self::get_list_query( $data_source, $table ),
 									'type' => 'list',
 								],
 							],
@@ -82,21 +78,9 @@ class AirtableIntegration {
 		}
 	}
 
-	public static function get_query( AirtableDataSource $data_source, array $table ): HttpQuery|WP_Error {
-		$input_schema = [
-			'record_id' => [
-				'name' => 'Record ID',
-				'type' => 'id:list',
-			],
-		];
-
-		$output_schema = [
-			'is_collection' => true,
-			'path' => '$.records[*]',
-			'type' => self::get_airtable_output_schema_mappings( $table ),
-		];
-
-		return HttpQuery::from_array( [
+	public static function get_item_query( AirtableDataSource $data_source, array $table ): array {
+		return [
+			'__class' => HttpQuery::class,
 			'data_source' => $data_source,
 			'endpoint' => function ( array $input_variables ) use ( $data_source, $table ): string {
 				// Build the formula
@@ -108,9 +92,18 @@ class AirtableIntegration {
 
 				return $data_source->get_endpoint() . '/' . $table['id'] . '?filterByFormula=' . urlencode( $formula );
 			},
-			'input_schema' => $input_schema,
-			'output_schema' => $output_schema,
-		] );
+			'input_schema' => [
+				'record_id' => [
+					'name' => 'Record ID',
+					'type' => 'id:list',
+				],
+			],
+			'output_schema' => [
+				'is_collection' => true,
+				'path' => '$.records[*]',
+				'type' => self::get_airtable_output_schema_mappings( $table ),
+			],
+		];
 	}
 
 	private static function get_airtable_output_schema_mappings( array $table ): array {
@@ -134,19 +127,50 @@ class AirtableIntegration {
 		return $output_schema;
 	}
 
-	public static function get_list_query( AirtableDataSource $data_source, array $table ): HttpQuery|WP_Error {
-		$output_schema = [
-			'is_collection' => true,
-			'path' => '$.records[*]',
-			'type' => self::get_airtable_output_schema_mappings( $table ),
-		];
-
-		return HttpQuery::from_array( [
+	public static function get_list_query( AirtableDataSource $data_source, array $table ): array {
+		return [
+			'__class' => HttpQuery::class,
 			'data_source' => $data_source,
-			'endpoint' => $data_source->get_endpoint() . '/' . $table['id'],
-			'input_schema' => [],
-			'output_schema' => $output_schema,
-		] );
+			'endpoint' => function ( array $input_variables ) use ( $data_source, $table ): string {
+				$endpoint = $data_source->get_endpoint() . '/' . $table['id'];
+
+				if ( isset( $input_variables['cursor'] ) ) {
+					// While named as "offset", this is implemented as a string cursor.
+					$endpoint = add_query_arg( 'offset', $input_variables['cursor'], $endpoint );
+				}
+
+				if ( isset( $input_variables['page_size'] ) ) {
+					$endpoint = add_query_arg( 'pageSize', $input_variables['page_size'], $endpoint );
+				}
+
+				return $endpoint;
+			},
+			'input_schema' => [
+				'cursor' => [
+					'name' => 'Pagination cursor',
+					'required' => false,
+					'type' => 'ui:pagination_cursor',
+				],
+				'page_size' => [
+					'default_value' => 20,
+					'name' => 'Page Size',
+					'required' => false,
+					'type' => 'ui:pagination_per_page',
+				],
+			],
+			'output_schema' => [
+				'is_collection' => true,
+				'path' => '$.records[*]',
+				'type' => self::get_airtable_output_schema_mappings( $table ),
+			],
+			'pagination_schema' => [
+				'cursor_next' => [
+					'name' => 'Next page cursor',
+					'path' => '$.offset', // named "offset" but functions as cursor
+					'type' => 'string',
+				],
+			],
+		];
 	}
 
 	private static function get_output_schema_mappings_snippet( array $table ): string {

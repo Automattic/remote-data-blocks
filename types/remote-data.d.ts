@@ -6,6 +6,7 @@ interface RemoteDataPagination {
 	cursorNext?: string;
 	cursorPrevious?: string;
 	hasNextPage?: boolean;
+	perPage?: number;
 	totalItems?: number;
 }
 
@@ -102,4 +103,5 @@ interface RemoteDataApiResponseBody {
 
 interface RemoteDataApiResponse {
 	body?: RemoteDataApiResponseBody;
+	status?: number;
 }

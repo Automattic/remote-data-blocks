@@ -14,6 +14,7 @@ export const REMOTE_DATA_REST_API_URL = getRestUrl();
 
 export const CONTAINER_CLASS_NAME = getClassName( 'container' );
 
+export const PAGINATION_CURSOR_VARIABLE_TYPE = 'ui:pagination_cursor';
 export const PAGINATION_CURSOR_NEXT_VARIABLE_TYPE = 'ui:pagination_cursor_next';
 export const PAGINATION_CURSOR_PREVIOUS_VARIABLE_TYPE = 'ui:pagination_cursor_previous';
 export const PAGINATION_OFFSET_VARIABLE_TYPE = 'ui:pagination_offset';
