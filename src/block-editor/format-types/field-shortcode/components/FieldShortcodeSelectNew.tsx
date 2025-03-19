@@ -14,8 +14,7 @@ type FieldShortcodeSelectNewProps = Omit< DropdownMenuProps, 'label' > & {
 export function FieldShortcodeSelectNew( props: FieldShortcodeSelectNewProps ) {
 	const { onSelectField, ...restProps } = props;
 	const blockConfigs = getBlocksConfig();
-	const nonLoopBlocks = Object.values( blockConfigs ).filter( ( { loop } ) => ! loop );
-	const blocksByType = nonLoopBlocks.reduce<
+	const blocksByType = Object.values( blockConfigs ).reduce<
 		Record< string, Array< BlocksConfig[ keyof BlocksConfig ] > >
 	>( ( source, blockConfig ) => {
 		const type = blockConfig.dataSourceType;

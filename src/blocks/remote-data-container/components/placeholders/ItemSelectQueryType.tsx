@@ -1,8 +1,8 @@
-import { ButtonGroup } from '@wordpress/components';
+import { Button, ButtonGroup } from '@wordpress/components';
 
-import { InputModal } from '../modals/InputModal';
-import { InputPopover } from '../popovers/InputPopover';
 import { DataViewsModal } from '@/blocks/remote-data-container/components/modals/DataViewsModal';
+import { InputModal } from '@/blocks/remote-data-container/components/modals/InputModal';
+import { InputPopover } from '@/blocks/remote-data-container/components/popovers/InputPopover';
 
 interface ItemSelectQueryTypeProps {
 	blockConfig: BlockConfig;
@@ -37,6 +37,12 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 								key={ title }
 								{ ...selectorProps }
 							/>
+						);
+					case 'load-collection':
+						return (
+							<Button onClick={ () => onSelect( [ {} ] ) } variant="primary">
+								{ selector.name }
+							</Button>
 						);
 					case 'input':
 						return selector.inputs.length === 1 && selector.inputs[ 0 ] ? (

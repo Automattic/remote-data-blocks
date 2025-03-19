@@ -50,6 +50,7 @@ class ConfigRegistry {
 
 		$display_query = self::inflate_query( $user_config[ self::RENDER_QUERY_KEY ]['query'] );
 		$input_schema = $display_query->get_input_schema();
+		$output_schema = $display_query->get_output_schema();
 
 		// Build the base configuration for the block. This is our own internal
 		// configuration, not what will be passed to WordPress's register_block_type.
@@ -81,6 +82,25 @@ class ConfigRegistry {
 			],
 			'title' => $block_title,
 		];
+
+		// If the render query has no required input variables and outputs a
+		// collection, we should provide a "load collection" selector.
+		$required_variables = array_filter( $input_schema, function ( array $input_var ): bool {
+			return true === ( $input_var['required'] ?? true );
+		} );
+		if ( empty( $required_variables ) && true === ( $output_schema['is_collection'] ?? false ) ) {
+			// Add a "load collection" selector.
+			array_unshift(
+				$config['selectors'],
+				[
+					'image_url' => $display_query->get_image_url(),
+					'inputs' => [],
+					'name' => 'Load collection',
+					'query_key' => self::DISPLAY_QUERY_KEY,
+					'type' => 'load-collection',
+				]
+			);
+		}
 
 		// Register "selectors" which allow the user to use a query to assist in
 		// selecting data for display by the block.
