@@ -51,6 +51,8 @@ export function QueryInputsPanel( { queryInputs, onUpdateQueryInputs }: QueryInp
 								onBlur={ () => {
 									onUpdateQueryInputs( localInputs );
 								} }
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
 							/>
 						);
 					} )
