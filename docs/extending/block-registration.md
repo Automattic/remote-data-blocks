@@ -66,7 +66,6 @@ The human-friendly name of the block. It is also used to construct the block's n
 The render query is executed when the block is rendered and fetches the data that will be provided to block bindings. It is an array with the following properties:
 
 - `query` (required): An instance of [`QueryInterface`](./query.md) that fetches the data.
-- `loop`: A boolean that indicates if the query returns a collection of data. If `true`, the block will be rendered for each item in the collection. If not provided `false` is the default.
 
 ### `selection_queries`: array (optional)
 

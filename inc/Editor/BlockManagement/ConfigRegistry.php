@@ -58,7 +58,6 @@ class ConfigRegistry {
 			'description' => '',
 			'icon' => $user_config['icon'] ?? 'cloud',
 			'name' => $block_name,
-			'loop' => $user_config[ self::RENDER_QUERY_KEY ]['loop'] ?? false,
 			'overrides' => $user_config['overrides'] ?? [],
 			'patterns' => [],
 			'queries' => [

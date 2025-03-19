@@ -25,7 +25,6 @@ interface BlockConfig {
 	availableBindings: AvailableBindings;
 	availableOverrides: InputVariableOverride[];
 	dataSourceType: string;
-	loop: boolean;
 	name: string;
 	patterns: {
 		default: string;

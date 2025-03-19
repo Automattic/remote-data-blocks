@@ -90,7 +90,6 @@ final class ConfigSchemas {
 					Types::instance_of( QueryInterface::class ),
 					Types::serialized_config_for( HttpQueryInterface::class ),
 				),
-				'loop' => Types::nullable( Types::boolean() ),
 			] ),
 			'selection_queries' => Types::nullable(
 				Types::list_of(

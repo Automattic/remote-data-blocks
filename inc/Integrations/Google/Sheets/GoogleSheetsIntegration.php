@@ -72,7 +72,6 @@ class GoogleSheetsIntegration {
 					[
 						'title' => sprintf( '%s/%s Loop', $data_source->get_display_name(), $sheet['name'] ),
 						'render_query' => [
-							'loop' => true,
 							'query' => $list_query,
 						],
 					],

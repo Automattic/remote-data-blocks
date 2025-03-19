@@ -148,7 +148,6 @@ function register_google_sheets_westeros_houses_blocks(): void {
 	register_remote_data_block( [
 		'title' => 'Westeros Houses List',
 		'render_query' => [
-			'loop' => true,
 			'query' => $list_westeros_houses_query,
 		],
 	] );

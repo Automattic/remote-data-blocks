@@ -40,7 +40,6 @@ describe( 'withBlockBinding', () => {
 				availableBindings: { field1: { name: 'Field 1', type: 'string' } },
 				availableOverrides: [],
 				dataSourceType: 'test-source',
-				loop: false,
 				name: 'test/block',
 				patterns: { default: 'test/block/pattern' },
 				selectors: [],

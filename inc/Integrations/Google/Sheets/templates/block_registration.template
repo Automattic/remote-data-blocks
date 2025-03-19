@@ -74,7 +74,6 @@ function register_google_sheets__{{BLOCK_REG_FN_SLUG}}__blocks(): void {
 	register_remote_data_block( [
 		'title' => sprintf( '%s List', $block_title ),
 		'render_query' => [
-			'loop' => true,
 			'query' => $list_query,
 		],
 	] );
