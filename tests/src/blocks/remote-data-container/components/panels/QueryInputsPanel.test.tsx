@@ -55,7 +55,7 @@ describe( 'QueryInputsPanel', () => {
 		] );
 	} );
 
-	it.only( 'should render a single input for comma separated values', async () => {
+	it( 'should render a single input for comma separated values', async () => {
 		const user = userEvent.setup();
 		const onUpdateQueryInputs = vi.fn();
 		render(
