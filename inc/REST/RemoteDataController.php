@@ -28,7 +28,7 @@ class RemoteDataController {
 	public static function register_rest_routes(): void {
 		register_rest_route( REMOTE_DATA_BLOCKS__REST_NAMESPACE, '/' . self::$slug, [
 			'methods' => 'POST',
-			'callback' => [ __CLASS__, 'execute_query' ],
+			'callback' => [ __CLASS__, 'execute_queries' ],
 			'permission_callback' => [ __CLASS__, 'permission_callback' ],
 			'args' => [
 				'block_name' => [
@@ -46,7 +46,7 @@ class RemoteDataController {
 						return strval( $value );
 					},
 				],
-				'query_input' => [
+				'query_inputs' => [
 					'required' => true,
 					'validate_callback' => function ( $value ) {
 						return is_array( $value );
@@ -57,7 +57,7 @@ class RemoteDataController {
 
 		register_rest_route( REMOTE_DATA_BLOCKS__REST_NAMESPACE, '/' . self::$slug . '/salesforce-d2c/generate-buyer-info', [
 			'methods' => 'POST',
-			'callback' => [ __CLASS__, 'execute_salesforce_d2c_generate_buyer_info' ],
+			'callback' => [ __CLASS__, 'execute_d2c_generate_buyer_info' ],
 			'permission_callback' => [ __CLASS__, 'permission_callback' ],
 			'args' => [
 				'uuid' => [
@@ -84,24 +84,19 @@ class RemoteDataController {
 		] );
 	}
 
-	public static function execute_query( WP_REST_Request $request ): array|WP_Error {
+	public static function execute_queries( WP_REST_Request $request ): array|WP_Error {
 		$block_name = $request->get_param( 'block_name' );
 		$query_key = $request->get_param( 'query_key' );
-		$query_input = $request->get_param( 'query_input' );
+		$query_inputs = $request->get_param( 'query_inputs' );
 
 		$block_config = ConfigStore::get_block_configuration( $block_name );
 		$query = $block_config['queries'][ $query_key ];
+		$query_response = $query->execute_batch( $query_inputs );
 
-		// The frontend might send more input variables than the query needs or
-		// expects, so only include those defined by the query.
-		$query_input = array_intersect_key( $query_input, $query->get_input_schema() );
-
-		$query_result = $query->execute( $query_input );
-
-		if ( is_wp_error( $query_result ) ) {
+		if ( is_wp_error( $query_response ) ) {
 			$logger = LoggerManager::instance();
-			$logger->warning( $query_result->get_error_message() );
-			return $query_result;
+			$logger->warning( $query_response->get_error_message() );
+			return $query_response;
 		}
 
 		return array_merge(
@@ -109,13 +104,12 @@ class RemoteDataController {
 				'block_name' => $block_name,
 				'result_id' => wp_generate_uuid4(),
 				'query_key' => $query_key,
-				'query_input' => $query_input,
 			],
-			$query_result
+			$query_response
 		);
 	}
 
-	public static function execute_salesforce_d2c_generate_buyer_info( WP_REST_Request $request ): array|WP_Error {
+	public static function execute_d2c_generate_buyer_info( WP_REST_Request $request ): array|WP_Error {
 		$uuid = $request->get_param( 'uuid' );
 
 		$data_source_config = DataSourceConfigManager::get( $uuid );

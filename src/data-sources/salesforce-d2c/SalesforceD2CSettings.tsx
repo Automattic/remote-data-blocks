@@ -229,6 +229,7 @@ export const SalesforceD2CSettings = ( {
 					onChange={ onClientSecretChange }
 					value={ state.client_secret ?? '' }
 					help={ credentialsHelpText }
+					type="password"
 					autoComplete="off"
 					__nextHasNoMarginBottom
 				/>
