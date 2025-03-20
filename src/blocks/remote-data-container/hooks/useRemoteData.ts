@@ -199,18 +199,6 @@ export function useRemoteData( {
 
 		// Log the error to the console for visibility.
 		console.error( 'Remote Data Blocks query error:', err );
-
-		// Show a prominent notice.
-		let message = err.message;
-		if ( err instanceof RemoteDataFetchError && err.cause instanceof Error ) {
-			message = `${ message }: ${ err.cause.message }`;
-		}
-
-		createErrorNotice( message, {
-			isDismissible: true,
-			onDismiss: () => setError( undefined ),
-			type: 'default',
-		} );
 	}
 
 	async function fetch( inputs: RemoteDataQueryInput[] ): Promise< void > {

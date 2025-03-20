@@ -21,7 +21,7 @@ function register_aic_block(): void {
 		'service_config' => [
 			'__version' => 1,
 			'display_name' => 'Art Institute of Chicago',
-			'endpoint' => 'https://api.artic.edu/api/v1/artworks',
+			'endpoint' => 'https://api.artic.edu/api!/v1/artworks',
 			'request_headers' => [
 				'Content-Type' => 'application/json',
 			],

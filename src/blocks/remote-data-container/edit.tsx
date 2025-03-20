@@ -8,6 +8,7 @@ import { DataPanel } from '@/blocks/remote-data-container/components/panels/Data
 import { OverridesPanel } from '@/blocks/remote-data-container/components/panels/OverridesPanel';
 import { PatternSelection } from '@/blocks/remote-data-container/components/pattern-selection/PatternSelection';
 import { Placeholder } from '@/blocks/remote-data-container/components/placeholders/Placeholder';
+import { PlaceholderError } from '@/blocks/remote-data-container/components/placeholders/PlaceholderError';
 import {
 	CONTAINER_CLASS_NAME,
 	DISPLAY_QUERY_KEY,
@@ -39,12 +40,17 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 		resetInnerBlocks,
 	} = usePatterns( blockName, rootClientId );
 
-	const { data, fetch, loading, reset } = useRemoteData( {
+	const { data, error, fetch, loading, reset } = useRemoteData( {
 		blockName,
 		externallyManagedRemoteData: remoteDataAttribute,
 		externallyManagedUpdateRemoteData: updateRemoteData,
+		// error is passed along with this query key
+		// queryKey: 'RemoteDataBlocks\\Config\\Query\\HttpQuery',
+		// error is undefined with this query key
 		queryKey: DISPLAY_QUERY_KEY,
 	} );
+
+	console.log( 'error', error );
 
 	const [ showPatternSelection, setShowPatternSelection ] = useState< boolean >( false );
 
@@ -81,6 +87,14 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 		if ( hasRemoteDataChanged( remoteDataAttribute, remoteData ) ) {
 			props.setAttributes( { remoteData } );
 		}
+	}
+
+	if ( error ) {
+		return (
+			<div { ...blockProps }>
+				<PlaceholderError blockName={ blockConfig.settings.title } error={ error } />
+			</div>
+		);
 	}
 
 	// No remote data has been selected yet, show a placeholder.

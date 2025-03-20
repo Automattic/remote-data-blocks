@@ -55,3 +55,4 @@ REST\RemoteDataController::init();
 // Plugin developers: If you need to register additional code for testing, you
 // can do so here, e.g.:
 // require_once __DIR__ . '/example/shopify/register.php';
+require_once __DIR__ . '/example/rest-api/art-institute/art-institute.php';
