@@ -121,10 +121,6 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	return (
 		<>
 			<InspectorControls>
-				<QueryInputsPanel
-					queryInputs={ migrateRemoteData( props.attributes.remoteData )?.queryInputs ?? [] }
-					onUpdateQueryInputs={ onUpdateQueryInputs }
-				/>
 				<OverridesPanel
 					blockConfig={ blockConfig }
 					remoteData={ data }
@@ -134,6 +130,10 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 					refreshRemoteData={ refreshRemoteData }
 					remoteData={ data }
 					resetRemoteData={ resetRemoteData }
+				/>
+				<QueryInputsPanel
+					queryInputs={ migrateRemoteData( props.attributes.remoteData )?.queryInputs ?? [] }
+					onUpdateQueryInputs={ onUpdateQueryInputs }
 				/>
 			</InspectorControls>
 
