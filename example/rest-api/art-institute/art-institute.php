@@ -120,7 +120,7 @@ function register_aic_block(): void {
 				],
 				'title' => [
 					'name' => 'Title',
-					'type' => 'string',
+					'type' => 'title',
 					'path' => '$.title',
 				],
 				'image_url' => [
