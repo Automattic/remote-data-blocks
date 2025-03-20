@@ -8,9 +8,9 @@ import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { ItemPreview } from '@/blocks/remote-data-container/components/item-list/ItemPreview';
-import { LoopTemplateInnerBlocks } from '@/blocks/remote-data-container/components/loop-template/LoopTemplateInnerBlocks';
-import { LoopIndexContext } from '@/blocks/remote-data-container/context/LoopIndexContext';
+import { ItemPreview } from '@/blocks/remote-data-template/components/item-preview/ItemPreview';
+import { LoopTemplateInnerBlocks } from '@/blocks/remote-data-template/components/loop-template/LoopTemplateInnerBlocks';
+import { PreviewIndexContext } from '@/blocks/remote-data-template/context/PreviewIndexContext';
 
 interface LoopTemplateProps {
 	getInnerBlocks: (
@@ -44,14 +44,14 @@ export function LoopTemplate( props: LoopTemplateProps ) {
 			{ remoteData.results.map( ( result, index ) => {
 				const isActive = index === activeBlockIndex;
 				return (
-					<LoopIndexContext.Provider key={ `template-${ index }` } value={ { index } }>
+					<PreviewIndexContext.Provider key={ index } value={ index }>
 						<LoopTemplateInnerBlocks isActive={ isActive } />
 						<ItemPreview
 							blocks={ getInnerBlocks( result ) }
 							isHidden={ isActive }
 							onSelect={ () => setActiveBlockIndex( index ) }
 						/>
-					</LoopIndexContext.Provider>
+					</PreviewIndexContext.Provider>
 				);
 			} ) }
 		</ul>

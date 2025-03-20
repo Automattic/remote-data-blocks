@@ -1,13 +1,9 @@
-import { useContext } from '@wordpress/element';
-
 import { REMOTE_DATA_CONTEXT_KEY } from '@/blocks/remote-data-container/config/constants';
-import { LoopIndexContext } from '@/blocks/remote-data-container/context/LoopIndexContext';
 import { PATTERN_BLOCK_TYPE_POST_META_KEY } from '@/config/constants';
 import { useEditedPostAttribute } from '@/hooks/useEditedPostAttribute';
 import { getBlockConfig } from '@/utils/localized-block-data';
 
 export interface RemoteDataContext {
-	index: number;
 	remoteData?: RemoteData;
 }
 
@@ -19,7 +15,6 @@ export function useRemoteDataContext( context: Record< string, unknown > ): Remo
 		postMeta: getEditedPostAttribute< Record< string, unknown > >( 'meta' ) ?? {},
 		postType: getEditedPostAttribute< string >( 'type' ) ?? '',
 	} ) );
-	const { index } = useContext( LoopIndexContext );
 
 	if ( 'wp_block' === postType ) {
 		const remoteDataBlockName = String( postMeta[ PATTERN_BLOCK_TYPE_POST_META_KEY ] ?? '' );
@@ -27,7 +22,6 @@ export function useRemoteDataContext( context: Record< string, unknown > ): Remo
 
 		if ( blockConfig ) {
 			return {
-				index,
 				remoteData: {
 					blockName: remoteDataBlockName,
 					metadata: {},
@@ -56,7 +50,6 @@ export function useRemoteDataContext( context: Record< string, unknown > ): Remo
 	}
 
 	return {
-		index,
 		remoteData: context[ REMOTE_DATA_CONTEXT_KEY ] as RemoteData | undefined,
 	};
 }

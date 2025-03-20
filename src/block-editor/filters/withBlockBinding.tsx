@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 
 import { BlockBindingControls } from '@/blocks/remote-data-container/components/BlockBindingControls';
 import { useRemoteDataContext } from '@/blocks/remote-data-container/hooks/useRemoteDataContext';
+import { useLoopContext } from '@/blocks/remote-data-template/hooks/useLoopContext';
 import {
 	BLOCK_BINDING_SOURCE,
 	PATTERN_OVERRIDES_BINDING_SOURCE,
@@ -21,6 +22,12 @@ interface BoundBlockEditProps {
 	children: JSX.Element;
 	remoteDataName: string;
 	setAttributes: ( attributes: RemoteDataInnerBlockAttributes ) => void;
+}
+
+// This prop is provided by the `withPreviewIndex` filter, which is bundled with
+// the Remote Data Template block.
+interface BlockEditWithPreviewIndex {
+	previewIndex?: number;
 }
 
 function BoundBlockEdit( props: BoundBlockEditProps ) {
@@ -78,9 +85,11 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 }
 
 export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
-	return ( props: BlockEditProps< RemoteDataInnerBlockAttributes > ) => {
-		const { attributes, context, name, setAttributes } = props;
-		const { remoteData, index } = useRemoteDataContext( context );
+	return (
+		props: BlockEditProps< RemoteDataInnerBlockAttributes > & BlockEditWithPreviewIndex
+	) => {
+		const { attributes, context, name, previewIndex: index = 0, setAttributes } = props;
+		const { remoteData } = useRemoteDataContext( context );
 		const availableBindings = getBlockAvailableBindings( remoteData?.blockName ?? '' );
 		const hasAvailableBindings = Boolean( Object.keys( availableBindings ).length );
 
