@@ -4,6 +4,69 @@
 
 @import url(@wordpress/dataviews/build-style/style.css);
 
+// selected error placeholder
+.rdb-container.is-selected .components-placeholder.remote-data-container-error {
+
+	.components-placeholder__label > svg {
+		fill: var(--Gutenberg-Alert-Red, #cc1818);
+	}
+
+	.remote-data-container-error__content {
+		width: auto;
+		background: var(--Gutenberg-Gray-100, #f0f0f0);
+		color: var(--Gutenberg-Gray-900, #1e1e1e);
+		line-height: 1.5;
+		padding: 12px 16px;
+		border-radius: 2px;
+	}
+
+	// hide overlay icon
+	.remote-data-container-error__icon-overlay {
+		display: none;
+	}
+}
+
+// unselected error placeholder
+.rdb-container:not(.is-selected) .components-placeholder.remote-data-container-error {
+	background: var(--Gutenberg-Gray-100, #f0f0f0);
+	box-shadow: inset 0 0 1px 1px var(--Gutenberg-Alert-Red, #cc1818);
+
+	// hide content when block is not selected
+	*:not(.remote-data-container-error__icon-overlay):not(.remote-data-container-error__icon-overlay *) {
+		visibility: hidden;
+	}
+
+	// hide open error details when block is not selected for consistent sizing
+	.remote-data-container-error__content.is-open {
+		display: none;
+	}
+
+	// add strikethrough across placeholder
+	&::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: var(--Gutenberg-Gray-200, #e0e0e0);
+		clip-path: polygon(1% 1%, 2% 1%, 99% 99%, 98% 99%);
+	}
+
+	// show overlay icon when block is not selected
+	.remote-data-container-error__icon-overlay {
+		visibility: visible;
+		width: 48px;
+		height: 48px;
+		background: var(--Gutenberg-Gray-100, #f0f0f0);
+		fill: var(--Gutenberg-Gray-200, #e0e0e0);
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+}
+
 .remote-data-blocks-loading-overlay {
 	align-items: center;
 	background-color: rgba(255, 255, 255, 0.25);
