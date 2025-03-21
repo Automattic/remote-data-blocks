@@ -7,7 +7,7 @@
       "name": "Add to Cart",
       "seq": 8,
       "request": {
-        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/carts/{{guest-cart-id}}/cart-items",
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{webstore-id}}/carts/{{guest-cart-id}}/cart-items",
         "method": "POST",
         "headers": [],
         "params": [],
@@ -136,7 +136,7 @@
       "name": "Delete Cart Item",
       "seq": 11,
       "request": {
-        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/carts/{{guest-cart-id}}/cart-items/0a9Ws00000390iEIAQ",
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{webstore-id}}/carts/{{guest-cart-id}}/cart-items/0a9Ws00000390iEIAQ",
         "method": "DELETE",
         "headers": [],
         "params": [],
@@ -165,7 +165,7 @@
       "name": "Get Cart Items",
       "seq": 9,
       "request": {
-        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/carts/{{guest-cart-id}}/cart-items",
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{webstore-id}}/carts/{{guest-cart-id}}/cart-items",
         "method": "GET",
         "headers": [],
         "params": [],
@@ -194,7 +194,7 @@
       "name": "Product Price",
       "seq": 12,
       "request": {
-        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/pricing/products?productIds=01tWs000005ccpPIAQ,01tWs000005ccpwIAA",
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{webstore-id}}/pricing/products?productIds=01tWs000005ccpPIAQ,01tWs000005ccpwIAA",
         "method": "GET",
         "headers": [],
         "params": [
@@ -229,7 +229,7 @@
       "name": "Product",
       "seq": 3,
       "request": {
-        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/products?skus=WBP231J.BA0618",
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{webstore-id}}/products?skus=WBP231J.BA0618",
         "method": "GET",
         "headers": [],
         "params": [
@@ -264,7 +264,7 @@
       "name": "Products",
       "seq": 2,
       "request": {
-        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/products?skus=WBP231J.BA0618",
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{webstore-id}}/products?skus=WBP231J.BA0618",
         "method": "GET",
         "headers": [],
         "params": [
@@ -299,7 +299,7 @@
       "name": "Search",
       "seq": 4,
       "request": {
-        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/search/products?searchTerm=Energy&fields=Name,StockKeepingUnit,Description,Flag__c,SizeDescription__c,SpecCaseCase__c,MediaImage1",
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{webstore-id}}/search/products?searchTerm=Energy&fields=Name,StockKeepingUnit,Description,Flag__c,SizeDescription__c,SpecCaseCase__c,MediaImage1",
         "method": "GET",
         "headers": [],
         "params": [
@@ -340,17 +340,26 @@
       "name": "Start Cart",
       "seq": 7,
       "request": {
-        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/carts/current",
+        "url": "https://{{salesforce-domain}}.my.site.com/{{store-name}}/webruntime/api/services/data/v63.0/commerce/webstores/{{webstore-id}}/carts/current?asGuest=true",
         "method": "PUT",
         "headers": [],
-        "params": [],
+        "params": [
+          {
+            "name": "asGuest",
+            "value": "true",
+            "type": "query",
+            "enabled": true
+          }
+        ],
         "body": {
-          "mode": "none",
+          "mode": "json",
+          "json": "{\n   \"type\":\"Cart\",\n   \"currencyIsoCode\": \"USD\"\n}",
           "formUrlEncoded": [],
           "multipartForm": [],
           "file": []
         },
         "script": {
+          "req": "const { v4: uuidv4 } = require('uuid');\n\nconst site_id = bru.getEnvVar(\"site-id\").substring(0, 15);\nconst uuid = uuidv4();\nreq.setHeader(\"Cookie\", `guest_uuid_essential_${site_id}=${uuid}`);\n",
           "res": "const response = res.getBody();\nconst cart_id = response.cartId;\n\nbru.setEnvVar('guest-cart-id', cart_id);"
         },
         "vars": {},
@@ -405,7 +414,7 @@
       "name": "Update Cart",
       "seq": 10,
       "request": {
-        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/carts/{{guest-cart-id}}/cart-items/0a9Ws00000390iEIAQ",
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{webstore-id}}/carts/{{guest-cart-id}}/cart-items/0a9Ws00000390iEIAQ",
         "method": "PATCH",
         "headers": [],
         "params": [],
@@ -449,7 +458,7 @@
           "type": "text"
         },
         {
-          "name": "store-id",
+          "name": "webstore-id",
           "value": "0ZEWs000001QnqvOAC",
           "enabled": true,
           "secret": false,
@@ -458,6 +467,34 @@
         {
           "name": "client-secret",
           "value": "",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "access-token",
+          "value": "",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "guest-cart-id",
+          "value": "",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "site-id",
+          "value": "0DMWs000000b9HGOAY",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "store-name",
+          "value": "vipdemo",
           "enabled": true,
           "secret": false,
           "type": "text"
