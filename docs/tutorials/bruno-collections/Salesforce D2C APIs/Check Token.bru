@@ -1,0 +1,29 @@
+meta {
+  name: Check Token
+  type: http
+  seq: 5
+}
+
+post {
+  url: https://{{salesforce-domain}}.my.salesforce.com/services/oauth2/introspect
+  body: formUrlEncoded
+  auth: none
+}
+
+headers {
+  Content-Type: application/x-www-form-urlencoded
+}
+
+body:json {
+  {
+    "token": "{{access-token}}",
+    "client_id": "{{client-id}}",
+    "client_secret": "{{client-secret}}"
+  }
+}
+
+body:form-urlencoded {
+  token: {{access-token}}
+  client_id: {{client-id}}
+  client_secret: {{client-secret}}
+}

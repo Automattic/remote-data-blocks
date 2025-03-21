@@ -1,0 +1,20 @@
+meta {
+  name: Search
+  type: http
+  seq: 4
+}
+
+get {
+  url: https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{webstore-id}}/search/products?searchTerm=Energy&fields=Name,StockKeepingUnit,Description,Flag__c,SizeDescription__c,SpecCaseCase__c,MediaImage1
+  body: none
+  auth: bearer
+}
+
+params:query {
+  searchTerm: Energy
+  fields: Name,StockKeepingUnit,Description,Flag__c,SizeDescription__c,SpecCaseCase__c,MediaImage1
+}
+
+auth:bearer {
+  token: {{access-token}}
+}

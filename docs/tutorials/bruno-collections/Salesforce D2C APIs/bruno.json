@@ -1,0 +1,11 @@
+{
+  "version": "1",
+  "name": "Salesforce D2C APIs",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ],
+  "size": 0.004137992858886719,
+  "filesCount": 13
+}

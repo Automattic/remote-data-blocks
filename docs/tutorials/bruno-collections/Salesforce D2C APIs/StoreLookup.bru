@@ -1,0 +1,19 @@
+meta {
+  name: StoreLookup
+  type: http
+  seq: 6
+}
+
+get {
+  url: https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/query/?q=SELECT name,id from webstore
+  body: none
+  auth: bearer
+}
+
+params:query {
+  q: SELECT name,id from webstore
+}
+
+auth:bearer {
+  token: {{access-token}}
+}

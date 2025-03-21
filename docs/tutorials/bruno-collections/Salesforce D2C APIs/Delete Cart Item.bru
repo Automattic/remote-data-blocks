@@ -1,0 +1,27 @@
+meta {
+  name: Delete Cart Item
+  type: http
+  seq: 11
+}
+
+delete {
+  url: https://{{salesforce-domain}}.my.site.com/{{store-name}}/webruntime/api/services/data/v63.0/commerce/webstores/{{webstore-id}}/carts/{{guest-cart-id}}/cart-items/0a9Ws0000039499IAA
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access-token}}
+}
+
+script:pre-request {
+  const cookie_essential = bru.getVar("cookie-guest-essential");
+  const cookie_cart_session = bru.getVar("cookie-guest-cart-session");
+  
+  if (cookie_essential && cookie_cart_session) {
+    const cookies = `${cookie_essential}; ${cookie_cart_session};`;
+    req.setHeader("Cookie", cookies);
+    console.log('Sending delete cart cookies:', cookies);
+  }
+  
+}

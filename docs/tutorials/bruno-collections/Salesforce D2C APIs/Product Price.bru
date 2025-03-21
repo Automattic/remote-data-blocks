@@ -1,0 +1,19 @@
+meta {
+  name: Product Price
+  type: http
+  seq: 12
+}
+
+get {
+  url: https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{webstore-id}}/pricing/products?productIds=01tWs000005ccpPIAQ,01tWs000005ccpwIAA
+  body: none
+  auth: bearer
+}
+
+params:query {
+  productIds: 01tWs000005ccpPIAQ,01tWs000005ccpwIAA
+}
+
+auth:bearer {
+  token: {{access-token}}
+}

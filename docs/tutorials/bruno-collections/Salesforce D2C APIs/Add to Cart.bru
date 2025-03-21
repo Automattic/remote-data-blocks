@@ -1,0 +1,31 @@
+meta {
+  name: Add to Cart
+  type: http
+  seq: 8
+}
+
+post {
+  url: https://{{salesforce-domain}}.my.site.com/{{store-name}}/webruntime/api/services/data/v63.0/commerce/webstores/{{webstore-id}}/carts/{{guest-cart-id}}/cart-items
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "quantity": 1,
+    "type": "Product",
+    "productId":"01tWs000005ccpWIAQ"
+  }
+}
+
+script:pre-request {
+  const cookie_essential = bru.getVar("cookie-guest-essential");
+  const cookie_cart_session = bru.getVar("cookie-guest-cart-session");
+
+  if (cookie_essential && cookie_cart_session) {
+    const cookies = `${cookie_essential}; ${cookie_cart_session};`;
+    req.setHeader("Cookie", cookies);
+    console.log('Sending add to cart cookies:', cookies);
+  }
+
+}

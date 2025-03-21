@@ -1,0 +1,55 @@
+meta {
+  name: Start Cart
+  type: http
+  seq: 7
+}
+
+put {
+  url: https://{{salesforce-domain}}.my.site.com/{{store-name}}/webruntime/api/services/data/v63.0/commerce/webstores/{{webstore-id}}/carts/current?asGuest=true
+  body: json
+  auth: bearer
+}
+
+params:query {
+  asGuest: true
+}
+
+auth:bearer {
+  token: {{access-token}}
+}
+
+body:json {
+  {
+     "type":"Cart",
+     "currencyIsoCode": "USD"
+  }
+}
+
+script:pre-request {
+  const { v4: uuidv4 } = require('uuid');
+  
+  // Generate a guest cookie with a new UUID
+  const site_id = bru.getEnvVar("site-id").substring(0, 15);
+  const uuid = uuidv4();
+  const guest_cookie = `guest_uuid_essential_${site_id}=${uuid}`;
+  
+  req.setHeader("Cookie", guest_cookie);
+  
+  bru.setVar('cookie-guest-essential', guest_cookie);
+  console.log('Set cookie-guest-essential:', guest_cookie);
+}
+
+script:post-response {
+  // Set cartId from response
+  const response = res.getBody();
+  const cart_id = response.cartId;
+  
+  bru.setVar('guest-cart-id', cart_id);
+  
+  // Save GuestCartSessionId cookie
+  const response_cookies = res.getHeader('set-cookie').join('; ');
+  const guest_cart_session = response_cookies.split('; ').filter(c => c.startsWith('GuestCartSessionId_'))[0];
+  
+  bru.setVar('cookie-guest-cart-session', guest_cart_session)
+  console.log('Set cookie-guest-cart-session:', guest_cart_session);
+}
