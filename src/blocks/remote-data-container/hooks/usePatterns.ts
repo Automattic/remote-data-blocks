@@ -4,38 +4,21 @@ import {
 	BlockPattern,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { BlockInstance, cloneBlock, createBlock } from '@wordpress/blocks';
+import { cloneBlock, createBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 import {
+	cloneBlockForPreview,
 	getBoundAttributeEntries,
-	getMismatchedAttributes,
 	hasBlockBinding,
 	isSyncedPattern,
 } from '@/utils/block-binding';
 import { getBlockConfig } from '@/utils/localized-block-data';
 
-export function cloneBlockWithAttributes(
-	block: BlockInstance,
-	attributes: RemoteDataApiResult,
-	remoteDataBlockName: string
-): BlockInstance {
-	const mismatchedAttributes = getMismatchedAttributes(
-		block.attributes,
-		[ attributes ],
-		remoteDataBlockName
-	);
-	const newInnerBlocks = block.innerBlocks?.map( innerBlock =>
-		cloneBlockWithAttributes( innerBlock, attributes, remoteDataBlockName )
-	);
-
-	return cloneBlock( block, mismatchedAttributes, newInnerBlocks );
-}
-
 export function usePatterns( remoteDataBlockName: string, rootClientId: string = '' ) {
 	const { patterns } = getBlockConfig( remoteDataBlockName ) ?? {};
 	const { replaceInnerBlocks } = useDispatch< BlockEditorStoreActions >( blockEditorStore );
-	const { getBlocks, getPatternsByBlockTypes, __experimentalGetAllowedPatterns } =
+	const { getPatternsByBlockTypes, __experimentalGetAllowedPatterns } =
 		useSelect< BlockEditorStoreSelectors >( blockEditorStore, [
 			remoteDataBlockName,
 			[ remoteDataBlockName, rootClientId ],
@@ -50,13 +33,6 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 
 	const returnValue = {
 		defaultPattern,
-		getInnerBlocks: (
-			result: RemoteDataApiResult
-		): BlockInstance< RemoteDataInnerBlockAttributes >[] => {
-			return getBlocks< RemoteDataInnerBlockAttributes >( rootClientId ).map( block =>
-				cloneBlockWithAttributes( block, result, remoteDataBlockName )
-			);
-		},
 		getSupportedPatterns: ( result?: RemoteDataApiResult ): BlockPattern[] => {
 			const supportedPatterns = __experimentalGetAllowedPatterns( rootClientId ).filter(
 				pattern =>
@@ -74,7 +50,7 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 			return supportedPatterns.map( pattern => ( {
 				...pattern,
 				blocks: pattern.blocks.map( block =>
-					cloneBlockWithAttributes( block, result, remoteDataBlockName )
+					cloneBlockForPreview( block, result, remoteDataBlockName )
 				),
 			} ) );
 		},
@@ -83,7 +59,8 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 			// If the pattern is a synced pattern, insert it directly.
 			if ( isSyncedPattern( pattern ) ) {
 				const syncedPattern = createBlock( 'core/block', { ref: pattern.id } );
-				replaceInnerBlocks( rootClientId, [ syncedPattern ] ).catch( () => {} );
+				const loopTemplate = createBlock( 'remote-data-blocks/template', {}, [ syncedPattern ] );
+				replaceInnerBlocks( rootClientId, [ loopTemplate ] ).catch( () => {} );
 				return;
 			}
 
@@ -101,8 +78,9 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 
 					return cloneBlock( block );
 				} ) ?? [];
+			const loopTemplate = createBlock( 'remote-data-blocks/template', {}, patternBlocks );
 
-			replaceInnerBlocks( rootClientId, patternBlocks ).catch( () => {} );
+			replaceInnerBlocks( rootClientId, [ loopTemplate ] ).catch( () => {} );
 		},
 		resetInnerBlocks: (): void => {
 			replaceInnerBlocks( rootClientId, [] ).catch( () => {} );

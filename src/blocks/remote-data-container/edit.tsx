@@ -31,13 +31,8 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	const blockProps = useBlockProps( { className: CONTAINER_CLASS_NAME } );
 	const remoteDataAttribute = migrateRemoteData( props.attributes.remoteData );
 
-	const {
-		getInnerBlocks,
-		getSupportedPatterns,
-		innerBlocksPattern,
-		insertPatternBlocks,
-		resetInnerBlocks,
-	} = usePatterns( blockName, rootClientId );
+	const { getSupportedPatterns, innerBlocksPattern, insertPatternBlocks, resetInnerBlocks } =
+		usePatterns( blockName, rootClientId );
 
 	const { data, fetch, loading, reset } = useRemoteData( {
 		blockName,
@@ -133,11 +128,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 						/>
 					</div>
 				) }
-				<InnerBlocks
-					blockConfig={ blockConfig }
-					getInnerBlocks={ getInnerBlocks }
-					remoteData={ data }
-				/>
+				<InnerBlocks />
 			</div>
 		</>
 	);

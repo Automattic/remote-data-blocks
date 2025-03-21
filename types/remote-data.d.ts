@@ -36,6 +36,8 @@ interface RemoteDataBlockAttributes {
 	remoteData?: RemoteData;
 }
 
+interface RemoteDataTemplateBlockAttributes {}
+
 interface FieldSelection {
 	action: 'add_field_shortcode' | 'update_field_shortcode' | 'reset_field_shortcode';
 	remoteData?: Pick< RemoteData, 'blockName' | 'metadata' | 'queryInputs' | 'queryKey' >;
@@ -67,7 +69,6 @@ interface RemoteDataInnerBlockAttributes {
 	alt?: string | StringSeriablizable;
 	className?: string;
 	content?: string | StringSeriablizable;
-	index?: number;
 	metadata?: {
 		bindings?: Record< string, RemoteDataBlockBinding >;
 		name?: string;

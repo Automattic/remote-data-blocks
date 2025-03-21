@@ -1,3 +1,5 @@
+import { cloneBlock } from '@wordpress/blocks';
+
 import { BLOCK_BINDING_SOURCE } from '@/config/constants';
 import { getRemoteDataResultValue } from '@/utils/remote-data';
 import { getClassName } from '@/utils/string';
@@ -5,6 +7,28 @@ import { isObjectWithStringKeys } from '@/utils/type-narrowing';
 
 import type { BlockPattern } from '@wordpress/block-editor';
 import type { BlockInstance } from '@wordpress/blocks';
+
+/**
+ * Clone a block and inject remote data so that it can be previewed, either for
+ * a pattern preview or a template preview.
+ */
+export function cloneBlockForPreview(
+	block: BlockInstance< RemoteDataInnerBlockAttributes >,
+	result: RemoteDataApiResult,
+	remoteDataBlockName: string
+): BlockInstance {
+	const newInnerBlocks = block.innerBlocks?.map( innerBlock =>
+		cloneBlockForPreview( innerBlock, result, remoteDataBlockName )
+	);
+
+	const mismatchedAttributes = getMismatchedAttributes(
+		block.attributes,
+		[ result ],
+		remoteDataBlockName
+	);
+
+	return cloneBlock( block, mismatchedAttributes, newInnerBlocks );
+}
 
 function getAttributeValue( attributes: unknown, key: string | undefined | null ): string {
 	if ( ! key || ! isObjectWithStringKeys( attributes ) ) {

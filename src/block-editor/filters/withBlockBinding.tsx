@@ -6,7 +6,6 @@ import { __ } from '@wordpress/i18n';
 
 import { BlockBindingControls } from '@/blocks/remote-data-container/components/BlockBindingControls';
 import { useRemoteDataContext } from '@/blocks/remote-data-container/hooks/useRemoteDataContext';
-import { useLoopContext } from '@/blocks/remote-data-template/hooks/useLoopContext';
 import {
 	BLOCK_BINDING_SOURCE,
 	PATTERN_OVERRIDES_BINDING_SOURCE,

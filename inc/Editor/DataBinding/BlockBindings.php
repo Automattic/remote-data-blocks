@@ -264,14 +264,51 @@ class BlockBindings {
 		return Sanitizer::sanitize_primitive_type( 'string', $fallback_content );
 	}
 
+	/**
+	 * Find a "template block" in a parsed block's inner blocks.
+	 * 
+	 * @param array $parsed_block The parsed block.
+	 * @return bool True if a template block was found.
+	 */
+	private static function has_template_block( array $parsed_block ): bool {
+		foreach ( ( $parsed_block['innerBlocks'] ?? [] ) as $inner_block ) {
+			if ( 'remote-data-blocks/template' === $inner_block['blockName'] ) {
+				return true;
+			}
+
+			// Recurse inner blocks.
+			if ( true === self::has_template_block( $inner_block ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public static function render_remote_data_block( array $attributes, string $content, WP_Block $block ): string {
-		// This is the parent block that provides the context, so we don't have
+		// Look for a template block in the parsed block's inner blocks. If
+		// there is one, we can delegate to it for template rendering.
+		if ( self::has_template_block( $block->parsed_block ) ) {
+			return $block->render( [ 'dynamic' => false ] );
+		}
+
+		// Otherwise, use this block's inner blocks as the template.
+		return self::render_remote_data_template_block( $attributes, $content, $block );
+	}
+
+	public static function render_remote_data_template_block( array $attributes, string $content, WP_Block $block ): string {
+		// If already rendered, don't render dynamically again.
+		if ( isset( $block->parsed_block['dynamicallyRenderedContent'] ) ) {
+			return $block->parsed_block['dynamicallyRenderedContent'];
+		}
+
+		// If this is the parent block that *provides* the context, we won't have
 		// context available on the block's context property. However, context for
 		// children blocks comes from this block's `remoteData` attribtue (see
 		// block.json#providesContext), so we can access it directly.
-		$block_context = $attributes['remoteData'] ?? [];
+		$block_context = $block->context[ self::$context_name ] ?? $attributes['remoteData'] ?? [];
 		$block_name = $block_context['blockName'] ?? null;
-		$operation_name = 'remote_data_block_render_callback';
+		$operation_name = 'remote_data_block_render';
 
 		$query_response = self::execute_queries( $block_context, [], $operation_name );
 
@@ -289,7 +326,8 @@ class BlockBindings {
 
 		$loop_template = $block->parsed_block['innerBlocks'];
 		$loop_template_content = $block->parsed_block['innerContent'];
-
+		
+		// Remove the existing blocks and content so that we can repopulate it.
 		$block->parsed_block['innerBlocks'] = [];
 		$block->parsed_block['innerContent'] = [];
 
@@ -311,9 +349,14 @@ class BlockBindings {
 		// Create an updated block with the new inner blocks and content.
 		$updated_block = new WP_Block( $block->parsed_block );
 
-		// Render the updated block but set dynamic to false so that we don't have
-		// recursion.
-		return $updated_block->render( [ 'dynamic' => false ] );
+		// Render the updated block but set dynamic to false so that we don't
+		// have recursion. Save the rendered output in a property on the
+		// parsed block, which will not be persisted. This is needed because
+		// our container block can trigger a non-dynamic re-render. This helps
+		// avoid descendant dynamic blocks from being rendered twice.
+		$block->parsed_block['dynamicallyRenderedContent'] = $updated_block->render( [ 'dynamic' => false ] );
+
+		return $block->parsed_block['dynamicallyRenderedContent'];
 	}
 
 	/**
