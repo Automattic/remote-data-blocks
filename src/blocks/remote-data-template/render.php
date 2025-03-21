@@ -8,5 +8,4 @@ use function wp_kses_post;
 // $content (string): The block default content.
 // $block (WP_Block): The block instance.
 
-// @psalm-suppress UndefinedGlobalVariable
 echo wp_kses_post( BlockBindings::render_remote_data_template_block( $attributes, $content, $block ) );

@@ -24,6 +24,11 @@
     <issueHandlers>
         <PossiblyUnusedReturnValue errorLevel="suppress"/>
         <PossiblyUnusedMethod errorLevel="suppress"/>
+        <UndefinedGlobalVariable>
+            <errorLevel type="suppress">
+                <file name="**/render.php" />
+            </errorLevel>
+        </UndefinedGlobalVariable>
         <UnusedClass>
             <errorLevel type="suppress">
                 <directory name="tests/" />
