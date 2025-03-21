@@ -4,10 +4,39 @@
   "items": [
     {
       "type": "http",
+      "name": "Add to Cart",
+      "seq": 9,
+      "request": {
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/carts/{{guest-cart-id}}/cart-items",
+        "method": "POST",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "json": "{\n  \"quantity\": 2,\n  \"type\": \"Product\",\n  \"productId\":\"01tWs000005QwjpIAC\"\n}",
+          "formUrlEncoded": [],
+          "multipartForm": [],
+          "file": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": "{{access-token}}"
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
       "name": "Auth",
       "seq": 2,
       "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/oauth2/token?grant_type=client_credentials&client_id=<client-id>&client_secret=<client-secret>",
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/oauth2/token?grant_type=client_credentials&client_id={{client-id}}&client_secret={{client-secret}}",
         "method": "POST",
         "headers": [
           {
@@ -25,13 +54,13 @@
           },
           {
             "name": "client_id",
-            "value": "<client-id>",
+            "value": "{{client-id}}",
             "type": "query",
             "enabled": true
           },
           {
             "name": "client_secret",
-            "value": "<client-secret>",
+            "value": "{{client-secret}}",
             "type": "query",
             "enabled": true
           }
@@ -39,7 +68,58 @@
         "body": {
           "mode": "none",
           "formUrlEncoded": [],
-          "multipartForm": []
+          "multipartForm": [],
+          "file": []
+        },
+        "script": {
+          "res": "const response = res.getBody();\nconst access_token = response.access_token;\n\nbru.setEnvVar('access-token', access_token);\n"
+        },
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "none"
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Check Token",
+      "seq": 6,
+      "request": {
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/oauth2/introspect",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/x-www-form-urlencoded",
+            "enabled": true
+          }
+        ],
+        "params": [],
+        "body": {
+          "mode": "formUrlEncoded",
+          "json": "{\n  \"token\": \"{{access-token}}\",\n  \"client_id\": \"{{client-id}}\",\n  \"client_secret\": \"{{client-secret}}\"\n}",
+          "formUrlEncoded": [
+            {
+              "name": "token",
+              "value": "{{access-token}}",
+              "enabled": true
+            },
+            {
+              "name": "client_id",
+              "value": "{{client-id}}",
+              "enabled": true
+            },
+            {
+              "name": "client_secret",
+              "value": "{{client-secret}}",
+              "enabled": true
+            }
+          ],
+          "multipartForm": [],
+          "file": []
         },
         "script": {},
         "vars": {},
@@ -53,24 +133,19 @@
     },
     {
       "type": "http",
-      "name": "Products",
-      "seq": 3,
+      "name": "Delete Cart Item",
+      "seq": 12,
       "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/products?skus=6010009",
-        "method": "GET",
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/carts/{{guest-cart-id}}/cart-items/0a9Ws000002aFx3IAE",
+        "method": "DELETE",
         "headers": [],
-        "params": [
-          {
-            "name": "skus",
-            "value": "6010009",
-            "type": "query",
-            "enabled": true
-          }
-        ],
+        "params": [],
         "body": {
-          "mode": "none",
+          "mode": "json",
+          "json": "",
           "formUrlEncoded": [],
-          "multipartForm": []
+          "multipartForm": [],
+          "file": []
         },
         "script": {},
         "vars": {},
@@ -80,7 +155,71 @@
         "auth": {
           "mode": "bearer",
           "bearer": {
-            "token": ""
+            "token": "{{access-token}}"
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Get Cart Items",
+      "seq": 11,
+      "request": {
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/carts/{{guest-cart-id}}/cart-items",
+        "method": "GET",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "json": "",
+          "formUrlEncoded": [],
+          "multipartForm": [],
+          "file": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": "{{access-token}}"
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Product Price",
+      "seq": 13,
+      "request": {
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/pricing/products?productIds=01tWs000005ccpPIAQ,01tWs000005ccpwIAA",
+        "method": "GET",
+        "headers": [],
+        "params": [
+          {
+            "name": "productIds",
+            "value": "01tWs000005ccpPIAQ,01tWs000005ccpwIAA",
+            "type": "query",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": [],
+          "file": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": "{{access-token}}"
           }
         }
       }
@@ -90,7 +229,7 @@
       "name": "Product",
       "seq": 4,
       "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/products?skus=6010053",
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/products?skus=6010053",
         "method": "GET",
         "headers": [],
         "params": [
@@ -104,7 +243,8 @@
         "body": {
           "mode": "none",
           "formUrlEncoded": [],
-          "multipartForm": []
+          "multipartForm": [],
+          "file": []
         },
         "script": {},
         "vars": {},
@@ -114,7 +254,42 @@
         "auth": {
           "mode": "bearer",
           "bearer": {
-            "token": ""
+            "token": "{{access-token}}"
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Products",
+      "seq": 3,
+      "request": {
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/products?skus=6010009",
+        "method": "GET",
+        "headers": [],
+        "params": [
+          {
+            "name": "skus",
+            "value": "6010009",
+            "type": "query",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": [],
+          "file": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "docs": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": "{{access-token}}"
           }
         }
       }
@@ -124,7 +299,7 @@
       "name": "Search",
       "seq": 5,
       "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/search/products?searchTerm=Energy",
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/search/products?searchTerm=Energy&fields=Name,StockKeepingUnit,Description,Flag__c,SizeDescription__c,SpecCaseCase__c,MediaImage1",
         "method": "GET",
         "headers": [],
         "params": [
@@ -133,12 +308,19 @@
             "value": "Energy",
             "type": "query",
             "enabled": true
+          },
+          {
+            "name": "fields",
+            "value": "Name,StockKeepingUnit,Description,Flag__c,SizeDescription__c,SpecCaseCase__c,MediaImage1",
+            "type": "query",
+            "enabled": true
           }
         ],
         "body": {
           "mode": "none",
           "formUrlEncoded": [],
-          "multipartForm": []
+          "multipartForm": [],
+          "file": []
         },
         "script": {},
         "vars": {},
@@ -148,39 +330,38 @@
         "auth": {
           "mode": "bearer",
           "bearer": {
-            "token": ""
+            "token": "{{access-token}}"
           }
         }
       }
     },
     {
       "type": "http",
-      "name": "Check Token",
-      "seq": 6,
+      "name": "Start Cart",
+      "seq": 8,
       "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/oauth2/introspect",
-        "method": "POST",
-        "headers": [
-          {
-            "name": "Content-Type",
-            "value": "application/x-www-form-urlencoded",
-            "enabled": true
-          }
-        ],
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/carts/current",
+        "method": "GET",
+        "headers": [],
         "params": [],
         "body": {
-          "mode": "json",
-          "json": "token=<token>&client_id=<client-id>&client_secret=<client-secret>",
+          "mode": "none",
           "formUrlEncoded": [],
-          "multipartForm": []
+          "multipartForm": [],
+          "file": []
         },
-        "script": {},
+        "script": {
+          "res": "const response = res.getBody();\nconst cart_id = response.cartId;\n\nbru.setEnvVar('guest-cart-id', cart_id);"
+        },
         "vars": {},
         "assertions": [],
         "tests": "",
         "docs": "",
         "auth": {
-          "mode": "none"
+          "mode": "bearer",
+          "bearer": {
+            "token": "{{access-token}}"
+          }
         }
       }
     },
@@ -189,7 +370,7 @@
       "name": "StoreLookup",
       "seq": 7,
       "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/query/?q=SELECT name,id from webstore",
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/query/?q=SELECT name,id from webstore",
         "method": "GET",
         "headers": [],
         "params": [
@@ -203,7 +384,8 @@
         "body": {
           "mode": "none",
           "formUrlEncoded": [],
-          "multipartForm": []
+          "multipartForm": [],
+          "file": []
         },
         "script": {},
         "vars": {},
@@ -213,62 +395,7 @@
         "auth": {
           "mode": "bearer",
           "bearer": {
-            "token": ""
-          }
-        }
-      }
-    },
-    {
-      "type": "http",
-      "name": "Start Cart",
-      "seq": 8,
-      "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/carts/current",
-        "method": "GET",
-        "headers": [],
-        "params": [],
-        "body": {
-          "mode": "none",
-          "formUrlEncoded": [],
-          "multipartForm": []
-        },
-        "script": {},
-        "vars": {},
-        "assertions": [],
-        "tests": "",
-        "docs": "",
-        "auth": {
-          "mode": "bearer",
-          "bearer": {
-            "token": ""
-          }
-        }
-      }
-    },
-    {
-      "type": "http",
-      "name": "Add to Cart",
-      "seq": 9,
-      "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/carts/0a6Ws000001MUGbIAO/cart-items",
-        "method": "POST",
-        "headers": [],
-        "params": [],
-        "body": {
-          "mode": "json",
-          "json": "{\n  \"quantity\": 2,\n  \"type\": \"Product\",\n  \"productId\":\"01tWs000005QwjpIAC\"\n}",
-          "formUrlEncoded": [],
-          "multipartForm": []
-        },
-        "script": {},
-        "vars": {},
-        "assertions": [],
-        "tests": "",
-        "docs": "",
-        "auth": {
-          "mode": "bearer",
-          "bearer": {
-            "token": ""
+            "token": "{{access-token}}"
           }
         }
       }
@@ -278,7 +405,7 @@
       "name": "Update Cart",
       "seq": 10,
       "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/carts/0a6Ws000001MUGbIAO/cart-items/0a9Ws000002aFx3IAE",
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/carts/{{guest-cart-id}}/cart-items/0a9Ws000002aFx3IAE",
         "method": "PATCH",
         "headers": [],
         "params": [],
@@ -286,7 +413,8 @@
           "mode": "json",
           "json": "{\n  \"quantity\": 1\n}",
           "formUrlEncoded": [],
-          "multipartForm": []
+          "multipartForm": [],
+          "file": []
         },
         "script": {},
         "vars": {},
@@ -296,73 +424,57 @@
         "auth": {
           "mode": "bearer",
           "bearer": {
-            "token": ""
-          }
-        }
-      }
-    },
-    {
-      "type": "http",
-      "name": "Get Cart Items",
-      "seq": 11,
-      "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/carts/0a6Ws000001MUGbIAO/cart-items",
-        "method": "GET",
-        "headers": [],
-        "params": [],
-        "body": {
-          "mode": "json",
-          "json": "",
-          "formUrlEncoded": [],
-          "multipartForm": []
-        },
-        "script": {},
-        "vars": {},
-        "assertions": [],
-        "tests": "",
-        "docs": "",
-        "auth": {
-          "mode": "bearer",
-          "bearer": {
-            "token": ""
-          }
-        }
-      }
-    },
-    {
-      "type": "http",
-      "name": "Delete Cart Item",
-      "seq": 12,
-      "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/carts/0a6Ws000001MUGbIAO/cart-items/0a9Ws000002aFx3IAE",
-        "method": "DELETE",
-        "headers": [],
-        "params": [],
-        "body": {
-          "mode": "json",
-          "json": "",
-          "formUrlEncoded": [],
-          "multipartForm": []
-        },
-        "script": {},
-        "vars": {},
-        "assertions": [],
-        "tests": "",
-        "docs": "",
-        "auth": {
-          "mode": "bearer",
-          "bearer": {
-            "token": ""
+            "token": "{{access-token}}"
           }
         }
       }
     }
   ],
-  "environments": [],
+  "activeEnvironmentUid": "H7PkxeeUnVWiJy4Psuhoz",
+  "environments": [
+    {
+      "variables": [
+        {
+          "name": "salesforce-domain",
+          "value": "",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "client-id",
+          "value": "",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "store-id",
+          "value": "",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "client-secret",
+          "value": "",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        }
+      ],
+      "name": "d2c-env"
+    }
+  ],
   "brunoConfig": {
     "version": "1",
     "name": "Salesforce D2C APIs",
     "type": "collection",
-    "ignore": [ "node_modules", ".git" ]
+    "ignore": [
+      "node_modules",
+      ".git"
+    ],
+    "size": 0.004137992858886719,
+    "filesCount": 13
   }
 }
