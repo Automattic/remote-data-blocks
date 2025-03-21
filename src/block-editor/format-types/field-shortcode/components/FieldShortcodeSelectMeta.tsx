@@ -2,8 +2,8 @@ import { DropdownMenu, MenuGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { chevronRightSmall } from '@wordpress/icons';
 
-import { FieldSelectionFromMetaFields } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelection';
-import { useExistingRemoteData } from '@/blocks/remote-data-container/hooks/useExistingRemoteData';
+import { FieldSelectionFromMetaFields } from '@/block-editor/format-types/field-shortcode/components/FieldShortcodeSelection';
+import { useExistingRemoteData } from '@/block-editor/format-types/field-shortcode/hooks/useExistingRemoteData';
 import { getBlocksConfig } from '@/utils/localized-block-data';
 
 interface FieldShortcodeSelectMetaProps {

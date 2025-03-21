@@ -4,6 +4,7 @@ namespace RemoteDataBlocks\Editor\BlockManagement;
 
 defined( 'ABSPATH' ) || exit();
 
+use RemoteDataBlocks\Editor\Assets\Assets;
 use RemoteDataBlocks\Telemetry\TracksTelemetry;
 use RemoteDataBlocks\Editor\BlockPatterns\BlockPatterns;
 use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
@@ -23,6 +24,7 @@ class BlockRegistration {
 	public static function init(): void {
 		add_action( 'init', [ __CLASS__, 'register_helper_blocks' ], 10, 0 );
 		add_action( 'init', [ __CLASS__, 'register_container_blocks' ], 50, 0 );
+		add_action( 'enqueue_block_editor_assets', [ __CLASS__, 'enqueue_block_assets' ], 10, 0 );
 		add_filter( 'block_categories_all', [ __CLASS__, 'add_block_category' ], 10, 1 );
 	}
 
@@ -30,6 +32,15 @@ class BlockRegistration {
 		array_push( $block_categories, self::$block_category );
 
 		return $block_categories;
+	}
+
+	/**
+	 * Register scripts so that they will be available for our registered blocks
+	 * and settings pages.
+	 */
+	public static function enqueue_block_assets(): void {
+		Assets::enqueue_build_asset( 'remote-data-blocks-dataviews', 'dataviews' );
+		Assets::enqueue_build_asset( 'remote-data-blocks-block-editor', 'block-editor', [ 'remote-data-blocks-dataviews' ] );
 	}
 
 	public static function register_helper_blocks(): void {

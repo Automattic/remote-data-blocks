@@ -4,18 +4,18 @@ import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { RichTextFormat, insertObject, WPFormatEditProps } from '@wordpress/rich-text';
 
-import { FieldShortcodeSelectExisting } from './FieldShortcodeSelectExisting';
-import { FieldShortcodeSelectMeta } from './FieldShortcodeSelectMeta';
-import { FieldShortcodeSelectNew } from './FieldShortcodeSelectNew';
-import { useExistingRemoteData } from '../../hooks/useExistingRemoteData';
+import { FieldShortcodeSelectExisting } from '@/block-editor/format-types/field-shortcode/components/FieldShortcodeSelectExisting';
+import { FieldShortcodeSelectFieldPopover } from '@/block-editor/format-types/field-shortcode/components/FieldShortcodeSelectFieldPopover';
+import { FieldShortcodeSelectMeta } from '@/block-editor/format-types/field-shortcode/components/FieldShortcodeSelectMeta';
+import { FieldShortcodeSelectNew } from '@/block-editor/format-types/field-shortcode/components/FieldShortcodeSelectNew';
+import { useExistingRemoteData } from '@/block-editor/format-types/field-shortcode/hooks/useExistingRemoteData';
 import {
 	formatName,
 	formatTypeSettings,
-} from '@/blocks/remote-data-container/components/field-shortcode';
-import { FieldShortcodeSelectFieldPopover } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelectFieldPopover';
+} from '@/block-editor/format-types/field-shortcode/settings';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
 import { getBlockDataSourceType } from '@/utils/localized-block-data';
-import './FieldShortcode.scss';
+import '@/block-editor/format-types/field-shortcode/components/FieldShortcode.scss';
 
 function parseDataQuery( dataQuery?: string ): FieldSelection | null {
 	if ( ! dataQuery ) {

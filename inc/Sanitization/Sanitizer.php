@@ -30,7 +30,7 @@ class Sanitizer implements SanitizerInterface {
 			return $value;
 		}
 
-		if ( Types::is_nullable( $type ) && empty( $value ) ) {
+		if ( Types::is_nullable( $type ) && null === $value ) {
 			return null;
 		}
 

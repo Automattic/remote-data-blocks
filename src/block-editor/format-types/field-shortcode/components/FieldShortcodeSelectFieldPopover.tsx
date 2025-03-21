@@ -10,7 +10,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { WPFormat, useAnchor } from '@wordpress/rich-text';
 
-import { FieldShortcodeSelectField } from '@/blocks/remote-data-container/components/field-shortcode/FieldShortcodeSelection';
+import { FieldShortcodeSelectField } from '@/block-editor/format-types/field-shortcode/components/FieldShortcodeSelection';
 
 interface FieldShortcodeSelectFieldPopoverProps {
 	contentRef: React.RefObject< HTMLElement >;

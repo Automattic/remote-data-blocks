@@ -2,6 +2,7 @@
 
 namespace RemoteDataBlocks\PluginSettings;
 
+use RemoteDataBlocks\Editor\Assets\Assets;
 use RemoteDataBlocks\REST\DataSourceController;
 use RemoteDataBlocks\REST\AuthController;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
@@ -20,11 +21,6 @@ class PluginSettings {
 		add_action( 'pre_update_option_' . DataSourceCrud::CONFIG_OPTION_NAME, [ __CLASS__, 'encrypt_option' ], 10, 2 );
 		add_action( 'option_' . DataSourceCrud::CONFIG_OPTION_NAME, [ __CLASS__, 'decrypt_option' ], 10, 1 );
 		add_action( 'rest_api_init', [ __CLASS__, 'init_rest_routes' ] );
-		// fix for dashicons not being enqueued in the editor:
-		// https://github.com/WordPress/gutenberg/issues/53528#issuecomment-1692717292
-		add_action( 'enqueue_block_assets', function (): void {
-			wp_enqueue_style( 'dashicons' );
-		} );
 	}
 
 	public static function add_options_page(): void {
@@ -65,21 +61,8 @@ class PluginSettings {
 			return;
 		}
 
-		$asset_file = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/settings/index.asset.php';
-
-		if ( ! file_exists( $asset_file ) ) {
-			wp_die( 'The settings asset file is missing. Run `npm run build` to generate it.' );
-		}
-
-		$asset = include $asset_file;
-
-		wp_register_script(
-			'remote-data-blocks-settings',
-			plugins_url( 'build/settings/index.js', REMOTE_DATA_BLOCKS__PLUGIN_ROOT ),
-			$asset['dependencies'],
-			$asset['version'],
-			[ 'in_footer' => true ]
-		);
+		Assets::enqueue_build_asset( 'remote-data-blocks-dataviews', 'dataviews' );
+		Assets::enqueue_build_asset( 'remote-data-blocks-settings', 'settings', [ 'remote-data-blocks-dataviews' ] );
 
 		wp_localize_script(
 			'remote-data-blocks-settings',
@@ -88,20 +71,6 @@ class PluginSettings {
 				...( self::is_dev() ? self::get_build() : [] ),
 				'version' => self::get_version(),
 			]
-		);
-
-		wp_enqueue_script( 'remote-data-blocks-settings' );
-
-		wp_enqueue_style(
-			'remote-data-blocks-settings-style',
-			plugins_url( 'build/settings/index.css', REMOTE_DATA_BLOCKS__PLUGIN_ROOT ),
-			array_filter(
-				$asset['dependencies'],
-				function ( $style ) {
-					return wp_style_is( $style, 'registered' );
-				}
-			),
-			$asset['version'],
 		);
 	}
 

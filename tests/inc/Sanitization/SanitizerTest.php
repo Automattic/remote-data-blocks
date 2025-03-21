@@ -7,44 +7,121 @@ use RemoteDataBlocks\Sanitization\Sanitizer;
 use RemoteDataBlocks\Validation\Types;
 
 class SanitizerTest extends TestCase {
-	public function test_sanitize_string(): void {
+	public static function provideSanitizableStrings(): array {
+		return [
+			[ ' John Doe ', 'John Doe' ],
+			[ ' Jane Doe', 'Jane Doe' ],
+			[ 'Alice', 'Alice' ],
+			[ ' Bob ', 'Bob' ],
+			[ '  Charlie  ', 'Charlie' ],
+			[ [ [ 'John Doe' ], 'Jane Doe', 33 ], 'John Doe' ],
+			[ 0, '0' ],
+			[ null, '' ],
+			[ true, '1' ],
+			[ false, '' ],
+			[ [], '' ],
+			[ '', '' ],
+			[ '   ', '' ],
+		];
+	}
+
+	/**
+	 * @dataProvider provideSanitizableStrings
+	 */
+	public function test_sanitize_string( mixed $value, string $expected ): void {
 		$schema = Types::object( [
 			'name' => Types::string(),
 		] );
 
 		$sanitizer = new Sanitizer( $schema );
-		$result = $sanitizer->sanitize( [ 'name' => ' John Doe ' ] );
+		$result = $sanitizer->sanitize( [ 'name' => $value ] );
 
-		$this->assertSame( 'John Doe', $result['name'] );
-
-		// Takes the first element of the array.
-		$result = $sanitizer->sanitize( [ 'name' => [ [ 'John Doe' ], 'Jane Doe', 33 ] ] );
-
-		$this->assertSame( 'John Doe', $result['name'] );
+		$this->assertSame( $expected, $result['name'] );
 	}
 
-	public function test_sanitize_integer(): void {
+	public static function provideSanitizableIntegers(): array {
+		return [
+			[ '25', 25 ],
+			[ 25, 25 ],
+			[ '0', 0 ],
+			[ 0, 0 ],
+			[ '-10', -10 ],
+			[ -10, -10 ],
+			[ null, 0 ],
+			[ [], 0 ],
+			[ false, 0 ],
+		];
+	}
+
+	/**
+	 * @dataProvider provideSanitizableIntegers
+	 */
+	public function test_sanitize_integer( mixed $value, int $expected ): void {
 		$schema = Types::object( [
 			'age' => Types::integer(),
 		] );
-		$data = [ 'age' => '25' ];
+		$data = [ 'age' => $value ];
 
 		$sanitizer = new Sanitizer( $schema );
 		$result = $sanitizer->sanitize( $data );
 
-		$this->assertSame( 25, $result['age'] );
+		$this->assertSame( $expected, $result['age'] );
 	}
 
-	public function test_sanitize_boolean(): void {
+	public static function provideSanitizableBooleans(): array {
+		return [
+			[ true, true ],
+			[ 'true', true ],
+			[ 'false', true ],
+			[ 1, true ],
+			[ -1, true ],
+			[ 100, true ],
+			[ false, false ],
+			[ '', false ],
+			[ [], false ],
+			[ 0, false ],
+			[ null, false ],
+		];
+	}
+
+	/**
+	 * @dataProvider provideSanitizableBooleans
+	 */
+	public function test_sanitize_boolean( mixed $value, bool $expected ): void {
 		$schema = Types::object( [
 			'is_active' => Types::boolean(),
 		] );
-		$data = [ 'is_active' => 1 ];
+		$data = [ 'is_active' => $value ];
 
 		$sanitizer = new Sanitizer( $schema );
 		$result = $sanitizer->sanitize( $data );
 
-		$this->assertSame( true, $result['is_active'] );
+		$this->assertSame( $expected, $result['is_active'] );
+	}
+
+	public static function provideSanitizableNullableBooleans(): array {
+		return [
+			[ true, true ],
+			[ 1, true ],
+			[ false, false ],
+			[ 0, false ],
+			[ null, null ],
+		];
+	}
+
+	/**
+	 * @dataProvider provideSanitizableNullableBooleans
+	 */
+	public function test_sanitize_nullable_boolean( mixed $value, bool|null $expected ): void {
+		$schema = Types::object( [
+			'is_active' => Types::nullable( Types::boolean() ),
+		] );
+		$data = [ 'is_active' => $value ];
+
+		$sanitizer = new Sanitizer( $schema );
+		$result = $sanitizer->sanitize( $data );
+
+		$this->assertSame( $expected, $result['is_active'] );
 	}
 
 	public function test_sanitize_any(): void {
