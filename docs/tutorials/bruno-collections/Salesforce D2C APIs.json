@@ -5,7 +5,7 @@
     {
       "type": "http",
       "name": "Add to Cart",
-      "seq": 9,
+      "seq": 8,
       "request": {
         "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/carts/{{guest-cart-id}}/cart-items",
         "method": "POST",
@@ -13,7 +13,7 @@
         "params": [],
         "body": {
           "mode": "json",
-          "json": "{\n  \"quantity\": 2,\n  \"type\": \"Product\",\n  \"productId\":\"01tWs000005QwjpIAC\"\n}",
+          "json": "{\n  \"quantity\": 2,\n  \"type\": \"Product\",\n  \"productId\":\"01tWs000005ccpWIAQ\"\n}",
           "formUrlEncoded": [],
           "multipartForm": [],
           "file": []
@@ -34,7 +34,7 @@
     {
       "type": "http",
       "name": "Auth",
-      "seq": 2,
+      "seq": 1,
       "request": {
         "url": "https://{{salesforce-domain}}.my.salesforce.com/services/oauth2/token?grant_type=client_credentials&client_id={{client-id}}&client_secret={{client-secret}}",
         "method": "POST",
@@ -86,7 +86,7 @@
     {
       "type": "http",
       "name": "Check Token",
-      "seq": 6,
+      "seq": 5,
       "request": {
         "url": "https://{{salesforce-domain}}.my.salesforce.com/services/oauth2/introspect",
         "method": "POST",
@@ -134,9 +134,9 @@
     {
       "type": "http",
       "name": "Delete Cart Item",
-      "seq": 12,
+      "seq": 11,
       "request": {
-        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/carts/{{guest-cart-id}}/cart-items/0a9Ws000002aFx3IAE",
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/carts/{{guest-cart-id}}/cart-items/0a9Ws00000390iEIAQ",
         "method": "DELETE",
         "headers": [],
         "params": [],
@@ -163,7 +163,7 @@
     {
       "type": "http",
       "name": "Get Cart Items",
-      "seq": 11,
+      "seq": 9,
       "request": {
         "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/carts/{{guest-cart-id}}/cart-items",
         "method": "GET",
@@ -192,7 +192,7 @@
     {
       "type": "http",
       "name": "Product Price",
-      "seq": 13,
+      "seq": 12,
       "request": {
         "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/pricing/products?productIds=01tWs000005ccpPIAQ,01tWs000005ccpwIAA",
         "method": "GET",
@@ -227,15 +227,15 @@
     {
       "type": "http",
       "name": "Product",
-      "seq": 4,
+      "seq": 3,
       "request": {
-        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/products?skus=6010053",
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/products?skus=WBP231J.BA0618",
         "method": "GET",
         "headers": [],
         "params": [
           {
             "name": "skus",
-            "value": "6010053",
+            "value": "WBP231J.BA0618",
             "type": "query",
             "enabled": true
           }
@@ -262,15 +262,15 @@
     {
       "type": "http",
       "name": "Products",
-      "seq": 3,
+      "seq": 2,
       "request": {
-        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/products?skus=6010009",
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/products?skus=WBP231J.BA0618",
         "method": "GET",
         "headers": [],
         "params": [
           {
             "name": "skus",
-            "value": "6010009",
+            "value": "WBP231J.BA0618",
             "type": "query",
             "enabled": true
           }
@@ -297,7 +297,7 @@
     {
       "type": "http",
       "name": "Search",
-      "seq": 5,
+      "seq": 4,
       "request": {
         "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/search/products?searchTerm=Energy&fields=Name,StockKeepingUnit,Description,Flag__c,SizeDescription__c,SpecCaseCase__c,MediaImage1",
         "method": "GET",
@@ -338,10 +338,10 @@
     {
       "type": "http",
       "name": "Start Cart",
-      "seq": 8,
+      "seq": 7,
       "request": {
         "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/carts/current",
-        "method": "GET",
+        "method": "PUT",
         "headers": [],
         "params": [],
         "body": {
@@ -368,7 +368,7 @@
     {
       "type": "http",
       "name": "StoreLookup",
-      "seq": 7,
+      "seq": 6,
       "request": {
         "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/query/?q=SELECT name,id from webstore",
         "method": "GET",
@@ -405,13 +405,13 @@
       "name": "Update Cart",
       "seq": 10,
       "request": {
-        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/carts/{{guest-cart-id}}/cart-items/0a9Ws000002aFx3IAE",
+        "url": "https://{{salesforce-domain}}.my.salesforce.com/services/data/v63.0/commerce/webstores/{{store-id}}/carts/{{guest-cart-id}}/cart-items/0a9Ws00000390iEIAQ",
         "method": "PATCH",
         "headers": [],
         "params": [],
         "body": {
           "mode": "json",
-          "json": "{\n  \"quantity\": 1\n}",
+          "json": "{\n  \"quantity\": 2\n}",
           "formUrlEncoded": [],
           "multipartForm": [],
           "file": []
@@ -436,7 +436,7 @@
       "variables": [
         {
           "name": "salesforce-domain",
-          "value": "",
+          "value": "scomwp254usa794org1",
           "enabled": true,
           "secret": false,
           "type": "text"
@@ -450,7 +450,7 @@
         },
         {
           "name": "store-id",
-          "value": "",
+          "value": "0ZEWs000001QnqvOAC",
           "enabled": true,
           "secret": false,
           "type": "text"
