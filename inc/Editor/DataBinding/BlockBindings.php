@@ -264,7 +264,7 @@ class BlockBindings {
 		return Sanitizer::sanitize_primitive_type( 'string', $fallback_content );
 	}
 
-	public static function remote_data_block_render_callback( array $attributes, string $content, WP_Block $block ): string {
+	public static function render_remote_data_block( array $attributes, string $content, WP_Block $block ): string {
 		// This is the parent block that provides the context, so we don't have
 		// context available on the block's context property. However, context for
 		// children blocks comes from this block's `remoteData` attribtue (see

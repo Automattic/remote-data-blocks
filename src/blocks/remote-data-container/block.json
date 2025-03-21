@@ -32,5 +32,6 @@
   "textdomain": "remote-data-blocks",
   "editorScript": [ "file:./index.js", "remote-data-blocks-block-editor" ],
   "editorStyle": "file:./index.css",
+  "render": "file:./render.php",
   "style": "file:./style-index.css"
 }

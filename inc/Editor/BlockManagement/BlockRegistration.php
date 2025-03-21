@@ -7,7 +7,6 @@ defined( 'ABSPATH' ) || exit();
 use RemoteDataBlocks\Editor\Assets\Assets;
 use RemoteDataBlocks\Telemetry\TracksTelemetry;
 use RemoteDataBlocks\Editor\BlockPatterns\BlockPatterns;
-use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 use RemoteDataBlocks\REST\RemoteDataController;
 use function register_block_type;
 
@@ -101,7 +100,6 @@ class BlockRegistration {
 
 		$block_options = [
 			'name' => $block_name,
-			'render_callback' => [ BlockBindings::class, 'remote_data_block_render_callback' ],
 			'title' => $config['title'],
 		];
 
