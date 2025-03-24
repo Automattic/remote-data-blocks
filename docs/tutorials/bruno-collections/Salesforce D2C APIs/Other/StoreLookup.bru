@@ -1,7 +1,7 @@
 meta {
   name: StoreLookup
   type: http
-  seq: 6
+  seq: 1
 }
 
 get {
@@ -16,4 +16,8 @@ params:query {
 
 auth:bearer {
   token: {{access-token}}
+}
+
+docs {
+  Used during setup to select the active store.
 }

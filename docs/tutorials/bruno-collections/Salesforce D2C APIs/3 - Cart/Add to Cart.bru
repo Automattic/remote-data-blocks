@@ -1,7 +1,7 @@
 meta {
   name: Add to Cart
   type: http
-  seq: 8
+  seq: 2
 }
 
 post {
@@ -21,11 +21,10 @@ body:json {
 script:pre-request {
   const cookie_essential = bru.getVar("cookie-guest-essential");
   const cookie_cart_session = bru.getVar("cookie-guest-cart-session");
-
+  
   if (cookie_essential && cookie_cart_session) {
     const cookies = `${cookie_essential}; ${cookie_cart_session};`;
     req.setHeader("Cookie", cookies);
-    console.log('Sending add to cart cookies:', cookies);
   }
-
+  
 }

@@ -1,0 +1,42 @@
+meta {
+  name: X Checkout Payment
+  type: http
+  seq: 5
+}
+
+post {
+  url: https://{{salesforce-domain}}.my.site.com/{{store-name}}/webruntime/api/services/data/v63.0/commerce/webstores/{{webstore-id}}/checkouts/{{guest-checkout-id}}/payments
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access-token}}
+}
+
+body:json {
+  {
+    "requestType": "Auth",
+    "paymentToken":"cardPaymentMethodId",
+    "billingAddress": {
+       "name": "A G",
+       "street": "166 Crosby St",
+       "city": "New York",
+       "region": "NY",
+       "country": "US",
+       "postalCode": "10012"
+    }
+  }
+  
+}
+
+script:pre-request {
+  const cookie_essential = bru.getVar("cookie-guest-essential");
+  const cookie_cart_session = bru.getVar("cookie-guest-cart-session");
+  
+  if (cookie_essential && cookie_cart_session) {
+    const cookies = `${cookie_essential}; ${cookie_cart_session};`;
+    req.setHeader("Cookie", cookies);
+  }
+  
+}

@@ -1,23 +1,17 @@
 meta {
-  name: Update Cart
+  name: Get Checkout
   type: http
-  seq: 10
+  seq: 2
 }
 
-patch {
-  url: https://{{salesforce-domain}}.my.site.com/{{store-name}}/webruntime/api/services/data/v63.0/commerce/webstores/{{webstore-id}}/carts/{{guest-cart-id}}/cart-items/0a9Ws0000039499IAA
+get {
+  url: https://{{salesforce-domain}}.my.site.com/{{store-name}}/webruntime/api/services/data/v63.0/commerce/webstores/{{webstore-id}}/checkouts/{{guest-checkout-id}}
   body: json
   auth: bearer
 }
 
 auth:bearer {
   token: {{access-token}}
-}
-
-body:json {
-  {
-    "quantity": 2
-  }
 }
 
 script:pre-request {
@@ -27,7 +21,6 @@ script:pre-request {
   if (cookie_essential && cookie_cart_session) {
     const cookies = `${cookie_essential}; ${cookie_cart_session};`;
     req.setHeader("Cookie", cookies);
-    console.log('Sending update cart cookies:', cookies);
   }
   
 }

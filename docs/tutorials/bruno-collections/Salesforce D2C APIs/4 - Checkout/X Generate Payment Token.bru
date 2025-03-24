@@ -1,0 +1,24 @@
+meta {
+  name: X Generate Payment Token
+  type: http
+  seq: 4
+}
+
+post {
+  url: https://{{salesforce-domain}}.my.site.com/{{store-name}}/webruntime/api/services/data/v63.0/commerce/webstores/{{webstore-id}}/payments/token
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+     "cardPaymentMethod":{
+        "cardHolderName": "John Doe",
+        "cardNumber": "4242424242424242",
+        "expiryMonth": "12",
+        "expiryYear": "24",
+        "cvv": "242",
+        "cardType": "Visa"
+     }
+  }
+}

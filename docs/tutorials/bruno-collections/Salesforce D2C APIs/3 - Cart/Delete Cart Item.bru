@@ -1,11 +1,11 @@
 meta {
-  name: Get Cart Items
+  name: Delete Cart Item
   type: http
-  seq: 9
+  seq: 5
 }
 
-get {
-  url: https://{{salesforce-domain}}.my.site.com/{{store-name}}/webruntime/api/services/data/v63.0/commerce/webstores/{{webstore-id}}/carts/{{guest-cart-id}}/cart-items
+delete {
+  url: https://{{salesforce-domain}}.my.site.com/{{store-name}}/webruntime/api/services/data/v63.0/commerce/webstores/{{webstore-id}}/carts/{{guest-cart-id}}/cart-items/0a9Ws0000039499IAA
   body: json
   auth: bearer
 }
@@ -21,7 +21,7 @@ script:pre-request {
   if (cookie_essential && cookie_cart_session) {
     const cookies = `${cookie_essential}; ${cookie_cart_session};`;
     req.setHeader("Cookie", cookies);
-    console.log('Sending get cart cookies:', cookies);
+    console.log('Sending delete cart cookies:', cookies);
   }
   
 }

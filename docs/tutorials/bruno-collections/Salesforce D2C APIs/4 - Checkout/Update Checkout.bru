@@ -1,0 +1,32 @@
+meta {
+  name: Update Checkout
+  type: http
+  seq: 3
+}
+
+patch {
+  url: https://{{salesforce-domain}}.my.site.com/{{store-name}}/webruntime/api/services/data/v63.0/commerce/webstores/{{webstore-id}}/checkouts/{{guest-checkout-id}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access-token}}
+}
+
+body:json {
+  {
+    "shippingInstructions": "type code 1234 on gate keypad"
+  }
+}
+
+script:pre-request {
+  const cookie_essential = bru.getVar("cookie-guest-essential");
+  const cookie_cart_session = bru.getVar("cookie-guest-cart-session");
+  
+  if (cookie_essential && cookie_cart_session) {
+    const cookies = `${cookie_essential}; ${cookie_cart_session};`;
+    req.setHeader("Cookie", cookies);
+  }
+  
+}
