@@ -35,13 +35,27 @@ export function cloneBlockWithAttributes(
 export function usePatterns( remoteDataBlockName: string, rootClientId: string = '' ) {
 	const { patterns } = getBlockConfig( remoteDataBlockName ) ?? {};
 	const { replaceInnerBlocks } = useDispatch< BlockEditorStoreActions >( blockEditorStore );
-	const { getBlocks, getPatternsByBlockTypes, __experimentalGetAllowedPatterns } =
-		useSelect< BlockEditorStoreSelectors >( blockEditorStore, [
-			remoteDataBlockName,
-			[ remoteDataBlockName, rootClientId ],
-		] );
 
-	// Extract patterns with defined roles.
+	// Use `useSelect` and correctly type its return value
+	const { getBlocks, getPatternsByBlockTypes, allowedPatterns } = useSelect(
+		(
+			select
+		): {
+			getBlocks: BlockEditorStoreSelectors[ 'getBlocks' ];
+			getPatternsByBlockTypes: BlockEditorStoreSelectors[ 'getPatternsByBlockTypes' ];
+			allowedPatterns: BlockPattern[];
+		} => {
+			const store = select( blockEditorStore ) as BlockEditorStoreSelectors;
+			return {
+				getBlocks: store.getBlocks,
+				getPatternsByBlockTypes: store.getPatternsByBlockTypes,
+				allowedPatterns: store.__experimentalGetAllowedPatterns( rootClientId ) ?? [],
+			};
+		},
+		[ remoteDataBlockName, rootClientId ]
+	);
+
+	// Extract patterns with defined roles
 	const patternsByBlockTypes = getPatternsByBlockTypes( remoteDataBlockName );
 	const defaultPattern = patternsByBlockTypes.find( ( { name } ) => name === patterns?.default );
 	const innerBlocksPattern = patternsByBlockTypes.find(
@@ -58,11 +72,16 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 			);
 		},
 		getSupportedPatterns: ( result?: RemoteDataApiResult ): BlockPattern[] => {
-			const supportedPatterns = __experimentalGetAllowedPatterns( rootClientId ).filter(
+			const supportedPatterns = allowedPatterns.filter(
 				pattern =>
 					pattern?.blockTypes?.includes( remoteDataBlockName ) ||
 					pattern.blocks.some( block => hasBlockBinding( block, remoteDataBlockName ) )
 			);
+
+			// Return early if there are no supported patterns
+			if ( ! supportedPatterns.length ) {
+				return [];
+			}
 
 			// If no result is provided, return the supported patterns as is.
 			if ( ! result ) {
@@ -93,7 +112,7 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 			// of the collection.
 			const patternBlocks =
 				pattern.blocks.map( block => {
-					const boundAttributes = getBoundAttributeEntries( block.attributes, remoteDataBlockName );
+				const boundAttributes = getBoundAttributeEntries( block.attributes, remoteDataBlockName );
 
 					if ( ! boundAttributes.length ) {
 						return block;
