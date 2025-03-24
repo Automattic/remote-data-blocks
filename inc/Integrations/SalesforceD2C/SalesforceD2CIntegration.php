@@ -145,66 +145,11 @@ class SalesforceD2CIntegration {
 				],
 				'request_headers' => $get_request_headers,
 			] ),
-			'by_category' => HttpQuery::from_array( [
-				'data_source' => $data_source,
-				'endpoint' => function ( array $input_variables ) use ( $base_endpoint, $service_config ): string {
-					return sprintf(
-						'%s/services/data/v63.0/commerce/webstores/%s/search/products?categoryId=%s',
-						$base_endpoint,
-						$service_config['store_id'],
-						urlencode( $input_variables['category_id'] )
-					);
-				},
-				'input_schema' => [
-					'category_id' => [
-						'required' => true,
-						'type' => 'ui:input',
-						'name' => 'Category ID',
-					],
-				],
-				'output_schema' => [
-					'path' => '$.productsPage.products[*]',
-					'is_collection' => true,
-					'type' => [
-						'product_id' => [
-							'name' => 'Product ID',
-							'path' => '$.id',
-							'type' => 'id',
-						],
-						'product_sku' => [
-							'name' => 'Product SKU',
-							'path' => '$.fields.StockKeepingUnit.value',
-							'type' => 'string',
-						],
-						'name' => [
-							'name' => 'Name',
-							'path' => '$.name',
-							'type' => 'title',
-						],
-						'image_url' => [
-							'name' => 'Image URL',
-							'path' => '$.defaultImage.url',
-							'type' => 'image_url',
-						],
-					],
-				],
-				'request_headers' => $get_request_headers,
-			] ),
 		];
 	}
 
 	public static function register_blocks_for_salesforce_data_source( SalesforceD2CDataSource $data_source ): void {
 		$queries = self::get_queries( $data_source );
-
-		register_remote_data_block( [
-			'title' => $data_source->get_display_name() . ': Products by Category',
-			'icon' => 'money-alt',
-			'instructions' => 'Enter a category ID to display products from that category.',
-			'render_query' => [
-				'query' => $queries['by_category'],
-				'loop' => true,
-			],
-		] );
 
 		register_remote_data_block(
 			[
