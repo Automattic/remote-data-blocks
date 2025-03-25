@@ -36,7 +36,6 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 	const { patterns } = getBlockConfig( remoteDataBlockName ) ?? {};
 	const { replaceInnerBlocks } = useDispatch< BlockEditorStoreActions >( blockEditorStore );
 
-	// Use `useSelect` and correctly type its return value
 	const { getBlocks, getPatternsByBlockTypes, allowedPatterns } = useSelect(
 		(
 			select
@@ -78,11 +77,6 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 					pattern.blocks.some( block => hasBlockBinding( block, remoteDataBlockName ) )
 			);
 
-			// Return early if there are no supported patterns
-			if ( ! supportedPatterns.length ) {
-				return [];
-			}
-
 			// If no result is provided, return the supported patterns as is.
 			if ( ! result ) {
 				return supportedPatterns;
@@ -112,7 +106,7 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 			// of the collection.
 			const patternBlocks =
 				pattern.blocks.map( block => {
-				const boundAttributes = getBoundAttributeEntries( block.attributes, remoteDataBlockName );
+					const boundAttributes = getBoundAttributeEntries( block.attributes, remoteDataBlockName );
 
 					if ( ! boundAttributes.length ) {
 						return block;
