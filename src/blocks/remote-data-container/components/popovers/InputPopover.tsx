@@ -23,7 +23,7 @@ interface InputPopoverProps {
 }
 
 export function InputPopover( props: InputPopoverProps ) {
-	const { input, onSelect } = props;
+	const { input, onSelect, title } = props;
 
 	const dataSourceType = getBlockDataSourceType( props.blockName );
 
@@ -62,7 +62,7 @@ export function InputPopover( props: InputPopoverProps ) {
 				};
 			default:
 				return {
-					buttonText: __( 'Provide manual input' ),
+					buttonText: __( 'Provide' ) + ' ' + title,
 				};
 		}
 	}

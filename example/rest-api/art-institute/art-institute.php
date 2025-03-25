@@ -89,6 +89,51 @@ function register_aic_block(): void {
 		],
 	]);
 
+	$collection_query = HttpQuery::from_array([
+		'data_source' => $aic_data_source,
+		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
+			$endpoint = $aic_data_source->get_endpoint();
+			return add_query_arg( [
+				'limit' => $input_variables['limit'],  
+				'fields' => 'id,title,image_id,artist_title',
+			], $endpoint );
+		},
+		'input_schema' => [
+			'limit' => [
+				'name' => 'Limit',
+				'type' => 'ui:input',
+				'default_value' => 10,
+			],
+		],
+		'output_schema' => [
+			'is_collection' => true,
+			'path' => '$.data[*]',
+			'type' => [
+				'id' => [
+					'name' => 'Art ID',
+					'type' => 'id',
+				],
+				'artist_title' => [
+					'name' => 'Artist Title',
+					'type' => 'string',
+					'path' => '$.artist_title',
+				],
+				'title' => [
+					'name' => 'Title',
+					'type' => 'title',
+					'path' => '$.title',
+				],
+				'image_url' => [
+					'name' => 'Image URL',
+					'generate' => function ( $data ): string {
+						return 'https://www.artic.edu/iiif/2/' . $data['image_id'] . '/full/843,/0/default.jpg';
+					},
+					'type' => 'image_url',
+				],
+			],
+		],
+	]);
+
 	$search_art_query = HttpQuery::from_array([
 		'data_source' => $aic_data_source,
 		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
@@ -155,6 +200,16 @@ function register_aic_block(): void {
 			],
 		],
 	]);
+
+	register_remote_data_block( [
+		'title' => 'Art Institute of Chicago Loop',
+		'icon' => 'art',
+		'instructions' => 'This block displays a set amount of artworks based on the provided limit.', 
+		'render_query' => [
+			'query' => $collection_query,
+			'loop' => true,
+		],
+	] );
 
 	register_remote_data_block([
 		'title' => 'Art Institute of Chicago',

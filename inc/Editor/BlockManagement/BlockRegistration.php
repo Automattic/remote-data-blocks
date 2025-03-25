@@ -89,6 +89,7 @@ class BlockRegistration {
 		$block_config = [
 			'availableBindings' => $available_bindings,
 			'availableOverrides' => $config['overrides'] ?? [],
+			'instructions' => $config['instructions'],
 			'name' => $block_name,
 			'dataSourceType' => ConfigStore::get_data_source_type( $block_name ),
 			'patterns' => $config['patterns'],

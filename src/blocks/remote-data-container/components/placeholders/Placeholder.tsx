@@ -11,14 +11,17 @@ export interface PlaceholderProps {
 
 export function Placeholder( props: PlaceholderProps ) {
 	const { blockConfig, onSelect } = props;
+	const { instructions, settings } = blockConfig;
 
-	const iconElement: IconType = ( blockConfig.settings.icon as IconType ) ?? cloud;
+	const iconElement: IconType = ( settings.icon as IconType ) ?? cloud;
 
 	return (
 		<PlaceholderComponent
 			icon={ iconElement }
-			label={ blockConfig.settings.title }
-			instructions={ __( 'This block requires selection of one or more items for display.' ) }
+			label={ settings.title }
+			instructions={
+				instructions ?? __( 'This block requires selection of one or more items for display.' )
+			}
 		>
 			<ItemSelectQueryType blockConfig={ blockConfig } onSelect={ onSelect } />
 		</PlaceholderComponent>

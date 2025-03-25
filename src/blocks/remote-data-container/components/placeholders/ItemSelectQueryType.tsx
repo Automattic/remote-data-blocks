@@ -45,11 +45,17 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 							</Button>
 						);
 					case 'input':
-						return selector.inputs.length === 1 && selector.inputs[ 0 ] ? (
-							<InputPopover key={ title } input={ selector.inputs[ 0 ] } { ...selectorProps } />
-						) : (
-							<InputModal key={ title } inputs={ selector.inputs } { ...selectorProps } />
-						);
+						if ( selector.inputs.length === 1 && selector.inputs[ 0 ] ) {
+							return (
+								<InputPopover
+									key={ title }
+									input={ selector.inputs[ 0 ] }
+									{ ...selectorProps }
+									title={ selector.inputs[ 0 ].name ?? selector.name }
+								/>
+							);
+						}
+						return <InputModal key={ title } inputs={ selector.inputs } { ...selectorProps } />;
 				}
 
 				return null;
