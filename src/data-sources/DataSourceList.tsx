@@ -5,13 +5,6 @@ import {
 	Placeholder,
 	TabPanel,
 } from '@wordpress/components';
-import {
-	Action,
-	DataViews,
-	Field,
-	filterSortAndPaginate,
-	type View,
-} from '@wordpress/dataviews/wp';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { info } from '@wordpress/icons';
@@ -33,6 +26,8 @@ import { GoogleSheetsIcon } from '@/settings/icons/GoogleSheetsIcon';
 import HttpIcon from '@/settings/icons/HttpIcon';
 import SalesforceCommerceD2CIcon from '@/settings/icons/SalesforceCommerceD2CIcon';
 import { ShopifyIcon } from '@/settings/icons/ShopifyIcon';
+
+import type { Action, Field, View } from '@wordpress/dataviews/wp';
 
 import './DataSourceList.scss';
 
@@ -150,6 +145,7 @@ const DataSourceList = () => {
 	];
 
 	// filter, sort and paginate data
+	const { DataViews, filterSortAndPaginate } = window.LockedPrivateDataViews;
 	const { data: shownData, paginationInfo } = filterSortAndPaginate( dataSources, view, fields );
 
 	const defaultLayouts = {

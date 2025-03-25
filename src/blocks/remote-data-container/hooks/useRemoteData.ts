@@ -59,9 +59,6 @@ interface UseRemoteData {
 	setPage: ( page: number ) => void;
 	setPerPage: ( perPage: number ) => void;
 	setSearchInput: ( searchInput: string ) => void;
-	supportsCursorPagination: boolean;
-	supportsOffsetPagination: boolean;
-	supportsPagePagination: boolean;
 	supportsPagination: boolean;
 	supportsPerPage: boolean;
 	supportsSearch: boolean;

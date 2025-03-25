@@ -30,7 +30,7 @@
     }
   },
   "textdomain": "remote-data-blocks",
-  "editorScript": "file:./index.js",
+  "editorScript": [ "file:./index.js", "remote-data-blocks-block-editor" ],
   "editorStyle": "file:./index.css",
   "style": "file:./style-index.css"
 }

@@ -1,4 +1,3 @@
-import { Action, DataViews, View } from '@wordpress/dataviews/wp';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -9,6 +8,8 @@ import {
 } from '@/blocks/remote-data-container/config/constants';
 import { usePatterns } from '@/blocks/remote-data-container/hooks/usePatterns';
 import { getRemoteDataResultValue } from '@/utils/remote-data';
+
+import type { Action, View } from '@wordpress/dataviews/wp';
 
 export interface ItemListProps {
 	blockName: string;
@@ -50,6 +51,7 @@ export function ItemList( props: ItemListProps ) {
 		totalItems,
 		totalPages,
 	} = props;
+	const { DataViews } = window.LockedPrivateDataViews;
 	const { defaultPattern: pattern } = usePatterns( blockName );
 
 	// Get fields from the first result, if present.

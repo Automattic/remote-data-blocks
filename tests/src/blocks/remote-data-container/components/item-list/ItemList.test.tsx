@@ -4,6 +4,8 @@ import { Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { describe, expect, it, vi } from 'vitest';
 
+import '@/dataviews'; // Required to load data views global
+
 import {
 	ItemList,
 	ItemListProps,

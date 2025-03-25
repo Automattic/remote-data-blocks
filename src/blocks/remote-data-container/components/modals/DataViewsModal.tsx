@@ -111,7 +111,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 						onSelect={ save }
 						onSelectField={ onSelectField }
 						page={ page }
-						results={ data?.results }
+						results={ loading ? undefined : data?.results }
 						searchInput={ searchInput }
 						selectionIds={ selectionIds }
 						setPage={ setPage }
