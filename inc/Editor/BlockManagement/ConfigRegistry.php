@@ -50,7 +50,6 @@ class ConfigRegistry {
 
 		$display_query = self::inflate_query( $user_config[ self::RENDER_QUERY_KEY ]['query'] );
 		$input_schema = $display_query->get_input_schema();
-		$output_schema = $display_query->get_output_schema();
 
 		// Check if any variables are required
 		$has_required_variables = array_reduce(
@@ -80,7 +79,7 @@ class ConfigRegistry {
 						return [
 							'name' => $input_var['name'] ?? $slug,
 							'required' => $input_var['required'] ?? true,
-						'slug' => $slug,
+							'slug' => $slug,
 							'type' => $input_var['type'] ?? 'string',
 						];
 					}, array_keys( $input_schema ), array_values( $input_schema ) ),
