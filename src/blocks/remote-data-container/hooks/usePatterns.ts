@@ -36,15 +36,14 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 	const { patterns } = getBlockConfig( remoteDataBlockName ) ?? {};
 	const { replaceInnerBlocks } = useDispatch< BlockEditorStoreActions >( blockEditorStore );
 
-	const { getBlocks, getPatternsByBlockTypes, allowedPatterns } = useSelect(
-		(
-			select
-		): {
-			getBlocks: BlockEditorStoreSelectors[ 'getBlocks' ];
-			getPatternsByBlockTypes: BlockEditorStoreSelectors[ 'getPatternsByBlockTypes' ];
+	const { getBlocks, getPatternsByBlockTypes, allowedPatterns } = useSelect<
+		BlockEditorStoreSelectors,
+		Pick< BlockEditorStoreSelectors, 'getBlocks' | 'getPatternsByBlockTypes' > & {
 			allowedPatterns: BlockPattern[];
-		} => {
-			const store = select( blockEditorStore ) as BlockEditorStoreSelectors;
+		}
+	>(
+		select => {
+			const store = select( blockEditorStore );
 			return {
 				getBlocks: store.getBlocks,
 				getPatternsByBlockTypes: store.getPatternsByBlockTypes,
