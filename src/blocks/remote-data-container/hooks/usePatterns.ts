@@ -18,13 +18,24 @@ import { getBlockConfig } from '@/utils/localized-block-data';
 export function usePatterns( remoteDataBlockName: string, rootClientId: string = '' ) {
 	const { patterns } = getBlockConfig( remoteDataBlockName ) ?? {};
 	const { replaceInnerBlocks } = useDispatch< BlockEditorStoreActions >( blockEditorStore );
-	const { getPatternsByBlockTypes, __experimentalGetAllowedPatterns } =
-		useSelect< BlockEditorStoreSelectors >( blockEditorStore, [
-			remoteDataBlockName,
-			[ remoteDataBlockName, rootClientId ],
-		] );
+	const { getPatternsByBlockTypes, allowedPatterns } = useSelect<
+		BlockEditorStoreSelectors,
+		Pick< BlockEditorStoreSelectors, 'getBlocks' | 'getPatternsByBlockTypes' > & {
+			allowedPatterns: BlockPattern[];
+		}
+	>(
+		select => {
+			const store = select( blockEditorStore );
+			return {
+				getBlocks: store.getBlocks,
+				getPatternsByBlockTypes: store.getPatternsByBlockTypes,
+				allowedPatterns: store.__experimentalGetAllowedPatterns( rootClientId ) ?? [],
+			};
+		},
+		[ remoteDataBlockName, rootClientId ]
+	);
 
-	// Extract patterns with defined roles.
+	// Extract patterns with defined roles
 	const patternsByBlockTypes = getPatternsByBlockTypes( remoteDataBlockName );
 	const defaultPattern = patternsByBlockTypes.find( ( { name } ) => name === patterns?.default );
 	const innerBlocksPattern = patternsByBlockTypes.find(
@@ -34,7 +45,7 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 	const returnValue = {
 		defaultPattern,
 		getSupportedPatterns: ( result?: RemoteDataApiResult ): BlockPattern[] => {
-			const supportedPatterns = __experimentalGetAllowedPatterns( rootClientId ).filter(
+			const supportedPatterns = allowedPatterns.filter(
 				pattern =>
 					pattern?.blockTypes?.includes( remoteDataBlockName ) ||
 					pattern.blocks.some( block => hasBlockBinding( block, remoteDataBlockName ) )
