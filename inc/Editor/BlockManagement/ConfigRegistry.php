@@ -52,6 +52,13 @@ class ConfigRegistry {
 		$input_schema = $display_query->get_input_schema();
 		$output_schema = $display_query->get_output_schema();
 
+		// Check if any variables are required
+		$has_required_variables = array_reduce(
+			array_column( $input_schema, 'required' ),
+			fn( $carry, $required ) => $carry || ( $required ?? true ),
+			false
+		);
+
 		// Build the base configuration for the block. This is our own internal
 		// configuration, not what will be passed to WordPress's register_block_type.
 		// @see BlockRegistration::register_block_type::register_blocks.
@@ -76,9 +83,9 @@ class ConfigRegistry {
 							'type' => $input_var['type'] ?? 'string',
 						];
 					}, array_keys( $input_schema ), array_values( $input_schema ) ),
-					'name' => 'Manual input',
+					'name' => $has_required_variables ? 'Manual input' : 'Load collection',
 					'query_key' => self::DISPLAY_QUERY_KEY,
-					'type' => 'input',
+					'type' => $has_required_variables ? 'input' : 'collection',
 				],
 			],
 			'title' => $block_title,

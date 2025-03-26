@@ -38,9 +38,9 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 								{ ...selectorProps }
 							/>
 						);
-					case 'load-collection':
+					case 'collection':
 						return (
-							<Button onClick={ () => onSelect( [ {} ] ) } variant="primary">
+							<Button key={ title } onClick={ () => onSelect( [ {} ] ) } variant="primary">
 								{ selector.name }
 							</Button>
 						);
