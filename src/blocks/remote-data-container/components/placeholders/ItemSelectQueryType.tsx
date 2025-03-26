@@ -38,13 +38,13 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 								{ ...selectorProps }
 							/>
 						);
-					case 'collection':
+					case 'load-without-input':
 						return (
 							<Button key={ title } onClick={ () => onSelect( [ {} ] ) } variant="primary">
 								{ selector.name }
 							</Button>
 						);
-					case 'input':
+					case 'manual-input':
 						if ( selector.inputs.length === 1 && selector.inputs[ 0 ] ) {
 							return (
 								<InputPopover

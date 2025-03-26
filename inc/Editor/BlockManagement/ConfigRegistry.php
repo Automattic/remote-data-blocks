@@ -51,6 +51,7 @@ class ConfigRegistry {
 		$display_query = self::inflate_query( $user_config[ self::RENDER_QUERY_KEY ]['query'] );
 		$input_schema = $display_query->get_input_schema();
 		$output_schema = $display_query->get_output_schema();
+		$is_collection = true === ( $output_schema['is_collection'] ?? false );
 
 		// Check if any variables are required
 		$has_required_variables = array_reduce(
@@ -83,9 +84,9 @@ class ConfigRegistry {
 							'type' => $input_var['type'] ?? 'string',
 						];
 					}, array_keys( $input_schema ), array_values( $input_schema ) ),
-					'name' => $has_required_variables ? 'Manual input' : 'Load collection',
+					'name' => $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ),
 					'query_key' => self::DISPLAY_QUERY_KEY,
-					'type' => $has_required_variables ? 'input' : 'collection',
+					'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
 				],
 			],
 			'title' => $block_title,
