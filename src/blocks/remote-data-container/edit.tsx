@@ -35,7 +35,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	const { getSupportedPatterns, innerBlocksPattern, insertPatternBlocks, resetInnerBlocks } =
 		usePatterns( blockName, rootClientId );
 
-	const { data, fetch, loading, reset } = useRemoteData( {
+	const { data, fetch, loading, reset, supportsPagination } = useRemoteData( {
 		blockName,
 		externallyManagedRemoteData: remoteDataAttribute,
 		externallyManagedUpdateRemoteData: updateRemoteData,
@@ -59,13 +59,14 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	}
 
 	function onSelectPattern( pattern: BlockPattern ): void {
-		insertPatternBlocks( pattern );
+		insertPatternBlocks( pattern, supportsPagination );
 		setShowPatternSelection( false );
 	}
+
 	function onSelectRemoteData( inputs: RemoteDataQueryInput[] ): void {
 		void fetch( inputs ).then( () => {
 			if ( innerBlocksPattern ) {
-				insertPatternBlocks( innerBlocksPattern );
+				insertPatternBlocks( innerBlocksPattern, supportsPagination );
 				return;
 			}
 
