@@ -20,7 +20,7 @@ function my_plugin_init() {
 	// All Remote Data Blocks classes and functionality are now available
 }
 
-if ( defined( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) ) {
+if ( defined( 'REMOTE_DATA_BLOCKS__LOADED' ) ) {
 	// Immediately init the plugin since remote data blocks is already loaded
 	my_plugin_init()
 } else {
