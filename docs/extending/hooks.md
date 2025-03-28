@@ -10,6 +10,25 @@ There are two types of hooks: Actions and Filters. To use either, you need to wr
 
 Actions allow you to add data or change how WordPress operates. Actions will run at a specific point in the execution of plugin. Callback functions for an Action do not return anything back to the calling Action hook.
 
+### remote_data_blocks_loaded
+
+This action fires when Remote Data Blocks is fully loaded and ready for use. Plugins that depend on Remote Data Blocks should use this hook to defer their initialization until Remote Data Blocks is fully loaded.
+
+```php
+function my_plugin_init() {
+	// Initialize your plugin that depends on Remote Data Blocks here
+	// All Remote Data Blocks classes and functionality are now available
+}
+
+if ( defined( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) ) {
+	// Immediately init the plugin since remote data blocks is already loaded
+	my_plugin_init()
+} else {
+	// Defer the init until the remote data block is loaded
+	add_action( 'remote_data_blocks_loaded', 'my_plugin_init' );
+}
+```
+
 ### wpcomvip_log
 
 If you want to send debugging information to another source besides [Query Monitor](../troubleshooting.md#query-monitor), use the `wpcomvip_log` action.

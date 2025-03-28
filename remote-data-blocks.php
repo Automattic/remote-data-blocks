@@ -52,6 +52,9 @@ Integrations\VipBlockDataApi\VipBlockDataApi::init();
 // REST endpoints
 REST\RemoteDataController::init();
 
+// Fire action to indicate that the plugin is loaded
+do_action( 'remote_data_blocks_loaded' );
+
 // Plugin developers: If you need to register additional code for testing, you
 // can do so here, e.g.:
 // require_once __DIR__ . '/example/shopify/register.php';
