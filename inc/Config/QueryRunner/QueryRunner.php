@@ -34,74 +34,51 @@ class QueryRunner implements QueryRunnerInterface {
 	 * }
 	 */
 	protected function get_request_details( HttpQueryInterface $query, array $input_variables ): array|WP_Error {
+		// Move expensive operations out of the URL construction
 		$headers = $query->get_request_headers( $input_variables );
-
 		if ( is_wp_error( $headers ) ) {
 			return $headers;
 		}
 
-		$method = $query->get_request_method();
-		$body = $query->get_request_body( $input_variables );
 		$endpoint = $query->get_endpoint( $input_variables );
-		$cache_ttl = $query->get_cache_ttl( $input_variables );
 		$parsed_url = wp_parse_url( $endpoint );
-
 		if ( false === $parsed_url ) {
 			return new WP_Error( 'Unable to parse endpoint URL' );
 		}
 
-		/**
-		 * Filters the allowed URL schemes for this request.
-		 *
-		 * @param array<string>    $allowed_url_schemes The allowed URL schemes.
-		 * @param HttpQueryInterface $query The current query.
-		 * @return array<string> The filtered allowed URL schemes.
-		 */
-		$allowed_url_schemes = apply_filters( 'remote_data_blocks_allowed_url_schemes', [ 'https' ], $query );
+		// Cache these values to avoid repeated array access
+		$scheme = $parsed_url['scheme'] ?? '';
+		$host = $parsed_url['host'] ?? '';
 
-		if ( empty( $parsed_url['scheme'] ?? '' ) || ! in_array( $parsed_url['scheme'], $allowed_url_schemes, true ) ) {
+		$allowed_schemes = apply_filters( 'remote_data_blocks_allowed_url_schemes', [ 'https' ], $query );
+		if ( empty( $scheme ) || ! in_array( $scheme, $allowed_schemes, true ) ) {
 			return new WP_Error( 'Invalid endpoint URL scheme' );
 		}
 
-		if ( empty( $parsed_url['host'] ?? '' ) ) {
+		if ( empty( $host ) ) {
 			return new WP_Error( 'Invalid endpoint URL host' );
 		}
 
-		$scheme = $parsed_url['scheme'];
-		$host = $parsed_url['host'];
+		// Build URL components more efficiently
 		$user = $parsed_url['user'] ?? '';
-		$path = $parsed_url['path'] ?? '';
+		$pass = $parsed_url['pass'] ?? '';
+		$auth = '';
+		if ($user || $pass) {
+			$auth = $user . ($pass ? ':' . $pass : '') . '@';
+		}
 
-		$query = ! empty( $parsed_url['query'] ?? '' ) ? '?' . $parsed_url['query'] : '';
-		$port = ! empty( $parsed_url['port'] ?? '' ) ? ':' . $parsed_url['port'] : '';
-		$pass = ! empty( $parsed_url['pass'] ?? '' ) ? ':' . $parsed_url['pass'] : '';
-		$pass = ( $user || $pass ) ? $pass . '@' : '';
-
-		$request_details = [
-			'method' => $method,
+		$result = [
+			'method' => $query->get_request_method(),
 			'options' => [
 				RequestOptions::HEADERS => $headers,
-				RequestOptions::JSON => $body,
+				RequestOptions::JSON => $query->get_request_body( $input_variables ),
 			],
-			'origin' => sprintf( '%s://%s%s%s%s', $scheme, $user, $pass, $host, $port ),
-			'ttl' => $cache_ttl,
-			'uri' => sprintf( '%s%s', $path, $query ),
+			'origin' => $scheme . '://' . $auth . $host . (!empty($parsed_url['port']) ? ':' . $parsed_url['port'] : ''),
+			'ttl' => $query->get_cache_ttl( $input_variables ),
+			'uri' => ($parsed_url['path'] ?? '') . (!empty($parsed_url['query']) ? '?' . $parsed_url['query'] : ''),
 		];
 
-		/**
-		 * Filters the request details before the HTTP request is dispatched.
-		 *
-		 * @param array<string, mixed> $request_details The request details.
-		 * @param HttpQueryInterface $query The query being executed.
-		 * @param array<string, mixed> $input_variables The input variables for the current request.
-		 * @return array<string, array{
-		 *   method: string,
-		 *   options: array<string, mixed>,
-		 *   origin: string,
-		 *   uri: string,
-		 * }>
-		 */
-		return apply_filters( 'remote_data_blocks_request_details', $request_details, $query, $input_variables );
+		return apply_filters( 'remote_data_blocks_query_response_metadata', $result, $query, $parsed_url );
 	}
 
 	/**
@@ -164,8 +141,8 @@ class QueryRunner implements QueryRunnerInterface {
 	 * }>,
 	 */
 	protected function get_response_metadata( HttpQueryInterface $query, array $response_metadata, array $query_results ): array {
-		$age = intval( $response_metadata['age'] ?? 0 );
-		$time = time() - $age;
+		$time = time() - ($response_metadata['age'] ?? 0);
+		$count = count( $query_results );
 
 		$query_response_metadata = [
 			'last_updated' => [
@@ -176,7 +153,7 @@ class QueryRunner implements QueryRunnerInterface {
 			'total_count' => [
 				'name' => 'Total count',
 				'type' => 'integer',
-				'value' => count( $query_results ),
+				'value' => $count,
 			],
 		];
 
@@ -202,15 +179,16 @@ class QueryRunner implements QueryRunnerInterface {
 		// Only include input variables defined by the query's input schema.
 		$input_variables = array_intersect_key( $input_variables, $input_schema );
 
-		// Set default input variables.
+		// Combine the default value setting and required field checking into a single loop
 		foreach ( $input_schema as $key => $schema ) {
-			if ( ! array_key_exists( $key, $input_variables ) && isset( $schema['default_value'] ) ) {
-				$input_variables[ $key ] = $schema['default_value'];
-			}
-
-			// If the input variable is required and not provided, return an error.
-			if ( ! array_key_exists( $key, $input_variables ) && isset( $schema['required'] ) && $schema['required'] ) {
-				return new WP_Error( 'remote-data-blocks-missing-required-input-variable', sprintf( 'Missing required input variable: %s', $key ) );
+			if ( !array_key_exists( $key, $input_variables ) ) {
+				if ( isset( $schema['default_value'] ) ) {
+					$input_variables[ $key ] = $schema['default_value'];
+				} elseif ( isset( $schema['required'] ) && $schema['required'] ) {
+					return new WP_Error( 'remote-data-blocks-missing-required-input-variable',
+						sprintf( 'Missing required input variable: %s', $key )
+					);
+				}
 			}
 		}
 
@@ -272,17 +250,11 @@ class QueryRunner implements QueryRunnerInterface {
 
 		if ( 1 === count( $id_list_input ) ) {
 			$id_list_slug = array_key_first( $id_list_input );
-			$ids = array_reduce(
-				array_column( $array_of_input_variables, $id_list_slug ),
-				function ( array $carry, mixed $item ): array {
-					if ( is_array( $item ) ) {
-						return array_merge( $carry, $item );
-					}
-
-					return array_merge( $carry, [ $item ] );
-				},
-				[]
-			);
+			// Use array_merge to flatten in one go instead of array_reduce
+            $ids = [];
+            foreach ( array_column( $array_of_input_variables, $id_list_slug ) as $item ) {
+                $ids = array_merge( $ids, is_array( $item ) ? $item : [ $item ] );
+            }
 
 			return $this->execute( $query, [ $id_list_slug => $ids ] );
 		}
