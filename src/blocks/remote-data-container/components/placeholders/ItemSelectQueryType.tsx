@@ -38,8 +38,13 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 								{ ...selectorProps }
 							/>
 						);
+					case 'collection':
+						return (
+							<Button key={ title } onClick={ () => onSelect( [ {} ] ) } variant="primary">
+								{ selector.name }
+							</Button>
+						);
 					case 'input':
-					case 'loop':
 						if ( selector.inputs.length === 1 && selector.inputs[ 0 ] ) {
 							return (
 								<InputPopover
@@ -52,18 +57,6 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 						}
 						return <InputModal key={ title } inputs={ selector.inputs } { ...selectorProps } />;
 				}
-
-				return (
-					<Button
-						key={ title }
-						onClick={ () => {
-							onSelect( [ {} ] );
-						} }
-						variant="primary"
-					>
-						Load Collection
-					</Button>
-				);
 
 				return null;
 			} ) }
