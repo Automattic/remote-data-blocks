@@ -9,6 +9,8 @@ use RemoteDataBlocks\Validation\Validator;
  * Sanitizer class.
  */
 class Sanitizer implements SanitizerInterface {
+	private static array $compiledPatterns = [];
+
 	/**
 	 * @inheritDoc
 	 */
@@ -78,20 +80,24 @@ class Sanitizer implements SanitizerInterface {
 				$key_type = $type_args[0];
 				$value_type = $type_args[1];
 
+				$sanitized_record = [];
 				foreach ( $value as $key => $record_value ) {
 					$sanitized_key = $this->sanitize_type( $key_type, $key );
-					$sanitized_record_value = $this->sanitize_type( $value_type, $record_value );
-					$value[ $sanitized_key ] = $sanitized_record_value;
+					$sanitized_value = $this->sanitize_type( $value_type, $record_value );
+					$sanitized_record[$sanitized_key] = $sanitized_value;
 				}
 
-				return $value;
+				return $sanitized_record;
 
 			case 'string_matching':
 				$regex = Types::get_type_args( $type );
-				if ( preg_match( $regex, strval( $value ) ) ) {
+				$pattern = self::$compiledPatterns[$regex] ?? null;
+				if ($pattern === null) {
+					self::$compiledPatterns[$regex] = $regex;
+				}
+				if ( preg_match( self::$compiledPatterns[$regex], strval( $value ) ) ) {
 					return $value;
 				}
-
 				return null;
 
 			default:
@@ -100,7 +106,7 @@ class Sanitizer implements SanitizerInterface {
 	}
 
 	public static function sanitize_primitive_type( string $type_name, mixed $value ): mixed {
-		// If the value is an array, just take the first element.
+		// Current approach requires checking the first element
 		if ( is_array( $value ) ) {
 			return self::sanitize_primitive_type( $type_name, $value[0] ?? null );
 		}

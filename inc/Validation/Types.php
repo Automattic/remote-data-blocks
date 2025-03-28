@@ -25,6 +25,27 @@ final class Types {
 	/** @var array<string, array<string, mixed>> */
 	private static array $ref_store = [];
 
+	private static array $primitiveTypeCache = [];
+
+	private static array $nonPrimitiveTypeCache = [];
+
+	private static array $allowedTypes = [
+		'list_of' => ['const', 'enum', 'instance_of', 'object', 'record', 'string_matching'],
+		'one_of' => [
+			'callable',
+			'const',
+			'enum',
+			'instance_of',
+			'object',
+			'record',
+			'ref',
+			'serialized_config_for',
+			'string_matching',
+		],
+		'record' => ['integer', 'string'],
+		'ref' => ['object'],
+	];
+
 	/* === CORE PRIMITIVE TYPES === */
 	/* Primitive types do not accept type arguments! */
 
@@ -161,11 +182,10 @@ final class Types {
 	public static function list_of( array $member_type ): array {
 		self::check_type( $member_type );
 
-		$allowed_non_primitive_member_types = [ 'const', 'enum', 'instance_of', 'object', 'record', 'string_matching' ];
 		$is_primitive = self::is_primitive( $member_type );
 		$member_type_name = self::get_type_name( $member_type );
 
-		if ( ! $is_primitive && ! in_array( $member_type_name, $allowed_non_primitive_member_types, true ) ) {
+		if ( ! $is_primitive && ! in_array( $member_type_name, self::$allowedTypes['list_of'], true ) ) {
 			throw new \InvalidArgumentException( sprintf( "Invalid member type '%s' for list_of.", esc_html( $member_type_name ) ) );
 		}
 
@@ -180,21 +200,10 @@ final class Types {
 		foreach ( $member_types as $member_type ) {
 			self::check_type( $member_type );
 
-			$allowed_non_primitive_member_types = [
-				'callable',
-				'const',
-				'enum',
-				'instance_of',
-				'object',
-				'record',
-				'ref',
-				'serialized_config_for',
-				'string_matching',
-			];
 			$is_primitive = self::is_primitive( $member_type );
 			$member_type_name = self::get_type_name( $member_type );
 
-			if ( ! $is_primitive && ! in_array( $member_type_name, $allowed_non_primitive_member_types, true ) ) {
+			if ( ! $is_primitive && ! in_array( $member_type_name, self::$allowedTypes['one_of'], true ) ) {
 				throw new \InvalidArgumentException( sprintf( "Invalid member type '%s' for one_of.", esc_html( $member_type_name ) ) );
 			}
 		}
@@ -315,26 +324,37 @@ final class Types {
 	}
 
 	private static function is_type( string $type_name, array ...$types_to_check ): bool {
-		return array_reduce( $types_to_check, function ( bool $carry, array $type ) use ( $type_name ): bool {
-			self::check_type( $type );
-
-			return $carry && self::get_type_name( $type ) === $type_name;
-		}, true );
+		foreach ($types_to_check as $type) {
+			self::check_type($type);
+			if (self::get_type_name($type) !== $type_name) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private static function generate_primitive_type( string $type_name ): array {
-		return [
-			self::PRIMITIVE_PROP => true,
-			self::TYPE_PROP => $type_name,
-		];
+		if (!isset(self::$primitiveTypeCache[$type_name])) {
+			self::$primitiveTypeCache[$type_name] = [
+				self::PRIMITIVE_PROP => true,
+				self::TYPE_PROP => $type_name,
+			];
+		}
+		return self::$primitiveTypeCache[$type_name];
 	}
 
 	private static function generate_non_primitive_type( string $type_name, mixed $type_args = null ): array {
-		return [
-			self::ARGS_PROP => $type_args,
-			self::PRIMITIVE_PROP => false,
-			self::TYPE_PROP => $type_name,
-		];
+		$cache_key = $type_name . '_' . (is_array($type_args) ? serialize($type_args) : strval($type_args));
+
+		if (!isset(self::$nonPrimitiveTypeCache[$cache_key])) {
+			self::$nonPrimitiveTypeCache[$cache_key] = [
+				self::ARGS_PROP => $type_args,
+				self::PRIMITIVE_PROP => false,
+				self::TYPE_PROP => $type_name,
+			];
+		}
+
+		return self::$nonPrimitiveTypeCache[$cache_key];
 	}
 
 	private static function generate_unserializable_type( string $type_name, mixed $type_args = null ): array {
@@ -365,15 +385,31 @@ final class Types {
 		return self::$ref_store[ $ref ];
 	}
 
-	public static function merge_object_types( array ...$types ): array {
-		if ( ! self::is_type( 'object', ...$types ) ) {
-			throw new \InvalidArgumentException( 'Provided types are not all object types.' );
+	public static function merge_object_types(array ...$types): array {
+		// Pre-allocate the array size
+		$merged_properties = [];
+		$total_properties = 0;
+
+		// First pass to validate and count properties
+		foreach ($types as $type) {
+			if (!self::is_type('object', $type)) {
+				throw new \InvalidArgumentException('Provided types are not all object types.');
+			}
+			$total_properties += count(self::get_type_args($type));
 		}
 
-		$merged_properties = array_reduce( $types, function ( array $carry, array $type ): array {
-			return array_merge( $carry, self::get_type_args( $type ) );
-		}, [] );
+		// Pre-allocate array
+		$merged_properties = [];
+		$merged_properties = array_pad($merged_properties, $total_properties, null);
 
-		return self::object( $merged_properties );
+		// Second pass to merge properties
+		$index = 0;
+		foreach ($types as $type) {
+			foreach (self::get_type_args($type) as $key => $value) {
+				$merged_properties[$key] = $value;
+			}
+		}
+
+		return self::object($merged_properties);
 	}
 }

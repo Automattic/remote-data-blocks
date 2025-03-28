@@ -14,18 +14,22 @@ use function is_email;
 final class Validator implements ValidatorInterface {
 	public function __construct( private array $schema, private string $description = 'Validator' ) {}
 
+	private static array $regexCache = [];
+	private static array $classImplementsCache = [];
+
 	public function validate( mixed $data ): bool|WP_Error {
 		$validation = $this->check_type( $this->schema, $data );
 
 		if ( is_wp_error( $validation ) ) {
-			$error_message = sprintf( '[%s] %s', $this->description, $validation->get_error_message() );
+			$error_messages = [sprintf( '[%s] %s', $this->description, $validation->get_error_message() )];
 
 			$child_error = $validation->get_error_data()['child'] ?? null;
 			while ( is_wp_error( $child_error ) ) {
-				$error_message .= sprintf( '; %s', $child_error->get_error_message() );
+				$error_messages[] = $child_error->get_error_message();
 				$child_error = $child_error->get_error_data()['child'] ?? null;
 			}
 
+			$error_message = implode( '; ', $error_messages );
 			LoggerManager::instance()->error( $error_message );
 			return $validation;
 		}
@@ -185,11 +189,15 @@ final class Validator implements ValidatorInterface {
 
 				$class_ref = Types::get_type_args( $type );
 
-				if ( ! class_exists( $class_ref ) && ! interface_exists( $class_ref ) ) {
-					return $this->create_error( 'Class does not exist', $class_ref );
+				// Cache class_exists and interface_exists checks
+				if ( ! isset( self::$classImplementsCache[$class_ref] ) ) {
+					if ( ! class_exists( $class_ref ) && ! interface_exists( $class_ref ) ) {
+						return $this->create_error( 'Class does not exist', $class_ref );
+					}
+					self::$classImplementsCache[$class_ref] = class_implements( $class_ref );
 				}
 
-				$implements = class_implements( $class_ref );
+				$implements = self::$classImplementsCache[$class_ref];
 				if ( ! in_array( ArraySerializableInterface::class, $implements, true ) ) {
 					return $this->create_error( 'Class does not implement ArraySerializableInterface', $class_ref );
 				}
@@ -226,8 +234,11 @@ final class Validator implements ValidatorInterface {
 
 			case 'string_matching':
 				$regex = Types::get_type_args( $type );
+				if (!isset(self::$regexCache[$regex])) {
+					self::$regexCache[$regex] = $regex;
+				}
 
-				if ( $this->check_primitive_type( 'string', $value ) && $this->check_primitive_type( 'string', $regex ) && preg_match( $regex, $value ) ) {
+				if ( $this->check_primitive_type( 'string', $value ) && $this->check_primitive_type( 'string', $regex ) && preg_match( self::$regexCache[$regex], $value ) ) {
 					return true;
 				}
 

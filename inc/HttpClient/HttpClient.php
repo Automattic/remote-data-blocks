@@ -25,7 +25,7 @@ class HttpClient {
 	public Client $client;
 
 	private const MAX_RETRIES = 3;
-	private const FALLBACK_CACHE_TTL_IN_SECONDS = 60;
+	private const FALLBACK_CACHE_TTL_IN_SECONDS = 600;
 	private const WP_OBJECT_CACHE_GROUP = 'remote-data-blocks';
 	private const CACHE_INVALIDATING_REQUEST_HEADERS = [ 'Authorization', 'Cache-Control' ];
 
