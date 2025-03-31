@@ -6,7 +6,6 @@ import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import { AirtableIcon } from '@/settings/icons/AirtableIcon';
 import { GoogleSheetsIcon } from '@/settings/icons/GoogleSheetsIcon';
 import HttpIcon from '@/settings/icons/HttpIcon';
-import SalesforceCommerceD2CIcon from '@/settings/icons/SalesforceCommerceD2CIcon';
 import { ShopifyIcon } from '@/settings/icons/ShopifyIcon';
 
 import '../DataSourceList.scss';
@@ -52,11 +51,6 @@ export const AddDataSourceDropdown = () => {
 							icon: ShopifyIcon,
 							label: SUPPORTED_SERVICES_LABELS.shopify,
 							value: 'shopify',
-						},
-						{
-							icon: SalesforceCommerceD2CIcon,
-							label: SUPPORTED_SERVICES_LABELS[ 'salesforce-d2c' ],
-							value: 'salesforce-d2c',
 						},
 						{
 							icon: HttpIcon,

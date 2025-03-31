@@ -7,7 +7,6 @@ use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use RemoteDataBlocks\Integrations\Airtable\AirtableIntegration;
 use RemoteDataBlocks\Integrations\Google\Sheets\GoogleSheetsIntegration;
 use RemoteDataBlocks\Integrations\Shopify\ShopifyIntegration;
-use RemoteDataBlocks\Integrations\SalesforceD2C\SalesforceD2CIntegration;
 use WP_Error;
 
 class Snippet implements JsonSerializable {
@@ -48,9 +47,6 @@ class Snippet implements JsonSerializable {
 				break;
 			case REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE:
 				$snippets = GoogleSheetsIntegration::get_block_registration_snippets( $data_source_config );
-				break;
-			case REMOTE_DATA_BLOCKS_SALESFORCE_D2C_SERVICE:
-				$snippets = SalesforceD2CIntegration::get_block_registration_snippets( $data_source_config );
 				break;
 			default:
 				return new WP_Error( 'invalid_service', __( 'Invalid service', 'remote-data-blocks' ) );

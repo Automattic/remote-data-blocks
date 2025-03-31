@@ -52,7 +52,6 @@ PluginSettings\PluginSettings::init();
 Integrations\Airtable\AirtableIntegration::init();
 Integrations\Google\Sheets\GoogleSheetsIntegration::init();
 Integrations\Shopify\ShopifyIntegration::init();
-Integrations\SalesforceD2C\SalesforceD2CIntegration::init();
 Integrations\VipBlockDataApi\VipBlockDataApi::init();
 
 // REST endpoints

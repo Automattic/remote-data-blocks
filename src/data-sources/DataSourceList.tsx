@@ -24,7 +24,6 @@ import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import { AirtableIcon } from '@/settings/icons/AirtableIcon';
 import { GoogleSheetsIcon } from '@/settings/icons/GoogleSheetsIcon';
 import HttpIcon from '@/settings/icons/HttpIcon';
-import SalesforceCommerceD2CIcon from '@/settings/icons/SalesforceCommerceD2CIcon';
 import { ShopifyIcon } from '@/settings/icons/ShopifyIcon';
 
 import type { Action, Field, View } from '@wordpress/dataviews/wp';
@@ -93,8 +92,6 @@ const DataSourceList = () => {
 				return ShopifyIcon;
 			case 'google-sheets':
 				return GoogleSheetsIcon;
-			case 'salesforce-d2c':
-				return SalesforceCommerceD2CIcon;
 			default:
 				return HttpIcon;
 		}

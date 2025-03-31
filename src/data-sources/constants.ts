@@ -8,7 +8,6 @@ export const SUPPORTED_SERVICES = [
 	'example-api',
 	'generic-http',
 	'google-sheets',
-	'salesforce-d2c',
 	'shopify',
 ] as const;
 export const SUPPORTED_SERVICES_LABELS: Record< ( typeof SUPPORTED_SERVICES )[ number ], string > =
@@ -17,7 +16,6 @@ export const SUPPORTED_SERVICES_LABELS: Record< ( typeof SUPPORTED_SERVICES )[ n
 		'example-api': __( 'Conference Events Example API', 'remote-data-blocks' ),
 		'generic-http': __( 'HTTP', 'remote-data-blocks' ),
 		'google-sheets': __( 'Google Sheets', 'remote-data-blocks' ),
-		'salesforce-d2c': __( 'Salesforce D2C', 'remote-data-blocks' ),
 		shopify: __( 'Shopify', 'remote-data-blocks' ),
 	} as const;
 export const OPTIONS_PAGE_SLUG = 'remote-data-blocks-settings';
