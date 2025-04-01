@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\WpdbStorage;
 
 use RemoteDataBlocks\Config\DataSource\DataSourceInterface;
+use RemoteDataBlocks\Logging\LoggerManager;
 use WP_Error;
 
 use const RemoteDataBlocks\REMOTE_DATA_BLOCKS__DATA_SOURCE_CLASSMAP;
@@ -37,7 +38,25 @@ class DataSourceCrud {
 	}
 
 	public static function get_configs(): array {
-		return self::get_all_configs();
+		$configs = self::get_all_configs();
+		$valid_configs = [];
+
+		foreach ( $configs as $config ) {
+			$instance = self::inflate_config( $config );
+			if ( ! is_wp_error( $instance ) ) {
+				$valid_configs[] = $config;
+			} else {
+				LoggerManager::instance()->debug(
+					sprintf(
+						'Unsupported data source config found (uuid: %s): %s',
+						$config['uuid'] ?? 'unknown',
+						$instance->get_error_message()
+					)
+				);
+			}
+		}
+
+		return $valid_configs;
 	}
 
 	public static function get_configs_by_service( string $service_name ): array {
