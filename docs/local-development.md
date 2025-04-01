@@ -21,6 +21,12 @@ This will spin up a WordPress environment and a Valkey (Redis) instance for obje
 
 Stop the development environment with `Ctrl+C` and resume it by running the same command. You can also manually stop the environment with `npm run dev:stop`. Stopping the environment optionally stops the WordPress containers but preserves their state.
 
+### Sharing configuration
+
+Data Sources configured via the Remote Data Blocks WordPress Admin UI are encrypted and stored as `remote_data_blocks_configs` in the Options table of the WordPress database.
+
+If your local and production environments do not use the same encryption secrets, your configuration from one environment will not work in the other. Keep this in mind when migrating the database between environments.
+
 ### Testing
 
 Run unit tests:
