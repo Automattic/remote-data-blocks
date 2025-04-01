@@ -3,7 +3,6 @@
 namespace RemoteDataBlocks\WpdbStorage;
 
 use RemoteDataBlocks\Config\DataSource\DataSourceInterface;
-use RemoteDataBlocks\Logging\LoggerManager;
 use WP_Error;
 
 use const RemoteDataBlocks\REMOTE_DATA_BLOCKS__DATA_SOURCE_CLASSMAP;
@@ -37,23 +36,30 @@ class DataSourceCrud {
 		return new WP_Error( 'data_source_not_found', __( 'Data source not found', 'remote-data-blocks' ), [ 'status' => 404 ] );
 	}
 
-	public static function get_configs(): array {
+	public static function get_configs(): array|WP_Error {
 		$configs = self::get_all_configs();
 		$valid_configs = [];
 
+		/**
+		 * Filters whether to delete unsupported data sources.
+		 *
+		 * This is set to false by default, out of safety.
+		 *
+		 * @param bool $delete_unsupported_data_source Whether to delete unsupported data sources.
+		 * @return bool if true, the unsupported data sources will be deleted.
+		 */
+		$delete_unsupported_data_source = apply_filters( 'remote_data_blocks_delete_unsupported_data_source', false );
+
 		foreach ( $configs as $config ) {
 			$instance = self::inflate_config( $config );
+
 			if ( ! is_wp_error( $instance ) ) {
 				$valid_configs[] = $config;
-			} else {
-				LoggerManager::instance()->debug(
-					sprintf(
-						'Unsupported data source config found (uuid: %s): %s',
-						$config['uuid'] ?? 'unknown',
-						$instance->get_error_message()
-					)
-				);
 			}
+		}
+
+		if ( $delete_unsupported_data_source && true !== self::save_configs( $valid_configs ) ) {
+			return new WP_Error( 'failed_to_cleanup_unsupported_data_sources', __( 'Failed to cleanup unsupported data sources', 'remote-data-blocks' ) );
 		}
 
 		return $valid_configs;
