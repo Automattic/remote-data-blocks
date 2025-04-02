@@ -12,6 +12,7 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Exception\RequestException;
 use Kevinrob\GuzzleCache\Storage\VolatileRuntimeStorage;
 use RemoteDataBlocks\HttpClient\RdbCacheMiddleware;
+use RemoteDataBlocks\HttpClient\RdbCacheStrategy;
 use RemoteDataBlocks\HttpClient\HttpClient;
 
 class HttpClientTest extends TestCase {
@@ -23,7 +24,7 @@ class HttpClientTest extends TestCase {
 		$this->mock_handler = new MockHandler();
 		$handler = HandlerStack::create( $this->mock_handler );
 
-		$handler->push( HttpClient::get_cache_middleware( new VolatileRuntimeStorage() ), 'phpunit_remote_data_blocks_cache' );
+		$handler->push( new RdbCacheMiddleware( new RdbCacheStrategy( null, new VolatileRuntimeStorage() ) ) );
 		$client = new Client( [ 'handler' => $handler ] );
 
 		$this->http_client = new HttpClient( 'https://api.example.com' );
@@ -126,15 +127,15 @@ class HttpClientTest extends TestCase {
 		$results = $this->http_client->execute_parallel();
 
 		$this->assertCount( 3, $results );
-		
+
 		$this->assertSame( 'fulfilled', $results[0]['state'] );
 		$this->assertSame( 200, $results[0]['value']->getStatusCode() );
 		$this->assertSame( 'Success Response', (string) $results[0]['value']->getBody() );
-		
+
 		$this->assertSame( 'rejected', $results[1]['state'] );
 		$this->assertInstanceOf( RequestException::class, $results[1]['reason'] );
 		$this->assertSame( 'Error', $results[1]['reason']->getMessage() );
-		
+
 		$this->assertSame( 'rejected', $results[2]['state'] );
 		$this->assertInstanceOf( ConnectException::class, $results[2]['reason'] );
 		$this->assertSame( 'Connection Error', $results[2]['reason']->getMessage() );

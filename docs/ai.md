@@ -760,14 +760,6 @@ function custom_query_response_metadata( array $metadata, HttpQueryInterface $qu
 add_filter( 'remote_data_blocks_query_response_metadata', 'custom_query_response_metadata', 10, 3 );
 ```
 
-### remote_data_blocks_bypass_cache
-
-Filter to bypass the cache for a specific request (default: `false`).
-
-```php
-add_filter( 'remote_data_blocks_bypass_cache', '__return_true' );
-```
-
 ### remote_data_blocks_http_client_retry_delay
 
 Filter to change the defualt 1 second delapy after an HTTP request fails. The Remote Data Blocks Plugin uses the [Guzzle](https://github.com/guzzle/guzzle) HTTP client. You can read about the response interface in their [documentation](https://docs.guzzlephp.org/en/stable/).

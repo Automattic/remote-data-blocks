@@ -9,9 +9,6 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\Utils;
-use Kevinrob\GuzzleCache\KeyValueHttpHeader;
-use Kevinrob\GuzzleCache\Storage\CacheStorageInterface;
-use Kevinrob\GuzzleCache\Storage\WordPressObjectCacheStorage;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
@@ -25,14 +22,12 @@ class HttpClient {
 	public Client $client;
 
 	private const MAX_RETRIES = 3;
-	private const FALLBACK_CACHE_TTL_IN_SECONDS = 60;
-	private const WP_OBJECT_CACHE_GROUP = 'remote-data-blocks';
-	private const CACHE_INVALIDATING_REQUEST_HEADERS = [ 'Authorization', 'Cache-Control' ];
 
 	public const CACHE_TTL_CLIENT_OPTION_KEY = '__default_cache_ttl';
 
 	private string $base_uri;
 	private HandlerStack $handler_stack;
+	private static RdbCacheMiddleware $cache_middleware;
 
 	/**
 	 * @var array<string, string>
@@ -58,22 +53,15 @@ class HttpClient {
 	 */
 	private array $queued_requests = [];
 
-	public static function get_cache_storage(): CacheStorageInterface {
-		return new WordPressObjectCacheStorage( self::WP_OBJECT_CACHE_GROUP );
-	}
-
 	/**
 	 * Get the cache middleware for the HTTP client.
-	 *
 	 */
-	public static function get_cache_middleware( CacheStorageInterface $cache_storage, int|null $default_ttl = null ): callable {
-		return new RdbCacheMiddleware(
-			new RdbCacheStrategy(
-				$cache_storage,
-				$default_ttl ?? self::FALLBACK_CACHE_TTL_IN_SECONDS,
-				new KeyValueHttpHeader( self::CACHE_INVALIDATING_REQUEST_HEADERS )
-			)
-		);
+	protected static function get_cache_middleware( int|null $default_ttl = null ): callable {
+		if ( ! isset( self::$cache_middleware ) ) {
+			self::$cache_middleware = new RdbCacheMiddleware( new RdbCacheStrategy( $default_ttl ) );
+		}
+
+		return self::$cache_middleware;
 	}
 
 	/**
@@ -105,7 +93,7 @@ class HttpClient {
 		} ) );
 
 		$default_ttl = $client_options[ self::CACHE_TTL_CLIENT_OPTION_KEY ] ?? null;
-		$cache_middleware = self::get_cache_middleware( self::get_cache_storage(), $default_ttl );
+		$cache_middleware = self::get_cache_middleware( $default_ttl );
 		$this->handler_stack->push( $cache_middleware, 'remote_data_blocks_cache' );
 
 		$this->handler_stack->push( Middleware::log(
