@@ -40,26 +40,14 @@ class DataSourceCrud {
 		$configs = self::get_all_configs();
 		$valid_configs = [];
 
-		/**
-		 * Filters whether to delete unsupported data sources.
-		 *
-		 * This is set to false by default, out of safety.
-		 *
-		 * @param bool $delete_unsupported_data_source Whether to delete unsupported data sources.
-		 * @return bool if true, the unsupported data sources will be deleted.
-		 */
-		$delete_unsupported_data_source = apply_filters( 'remote_data_blocks_delete_unsupported_data_source', false );
-
 		foreach ( $configs as $config ) {
 			$instance = self::inflate_config( $config );
 
 			if ( ! is_wp_error( $instance ) ) {
+				// append a disabled flag to the config.
+				$config['disabled'] = true;
 				$valid_configs[] = $config;
 			}
-		}
-
-		if ( $delete_unsupported_data_source && true !== self::save_configs( $valid_configs ) ) {
-			return new WP_Error( 'failed_to_cleanup_unsupported_data_sources', __( 'Failed to cleanup unsupported data sources', 'remote-data-blocks' ) );
 		}
 
 		return $valid_configs;
