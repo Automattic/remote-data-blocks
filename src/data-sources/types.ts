@@ -14,6 +14,7 @@ interface BaseDataSourceConfig<
 	ServiceName extends DataSourceType,
 	ServiceConfig extends BaseServiceConfig
 > {
+	enabled?: boolean;
 	service: ServiceName;
 	service_config: ServiceConfig;
 	uuid: string | null;

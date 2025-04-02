@@ -43,11 +43,10 @@ class DataSourceCrud {
 		foreach ( $configs as $config ) {
 			$instance = self::inflate_config( $config );
 
-			if ( ! is_wp_error( $instance ) ) {
-				// append a disabled flag to the config.
-				$config['disabled'] = true;
-				$valid_configs[] = $config;
-			}
+			// If the data source is valid, set a transient field called enabled to true or false otherwise.
+			$config['enabled'] = ! is_wp_error( $instance );
+
+			$valid_configs[] = $config;
 		}
 
 		return $valid_configs;

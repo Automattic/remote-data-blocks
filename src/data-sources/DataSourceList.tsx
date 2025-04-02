@@ -9,7 +9,6 @@ import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { info } from '@wordpress/icons';
 
-import CodeSnippet from './components/CodeSnippet';
 import { BaseModal } from '@/blocks/remote-data-container/components/modals/BaseModal';
 import { useModalState } from '@/blocks/remote-data-container/hooks/useModalState';
 import DataSourceMetaTags from '@/data-sources/DataSourceMetaTags';
@@ -25,6 +24,7 @@ import { AirtableIcon } from '@/settings/icons/AirtableIcon';
 import { GoogleSheetsIcon } from '@/settings/icons/GoogleSheetsIcon';
 import HttpIcon from '@/settings/icons/HttpIcon';
 import { ShopifyIcon } from '@/settings/icons/ShopifyIcon';
+import CodeSnippet from './components/CodeSnippet';
 
 import type { Action, Field, View } from '@wordpress/dataviews/wp';
 
@@ -149,8 +149,16 @@ const DataSourceList = () => {
 		table: {},
 	};
 
-	const isItemEligibleForActions = ( item: DataSourceConfig ) => {
-		return item.config_source === ConfigSource.STORAGE;
+	const isItemEligibleForActions = ( item: DataSourceConfig, action: string ) => {
+		if ( item.config_source !== ConfigSource.STORAGE ) {
+			return false;
+		}
+
+		if ( ! item?.enabled && action !== 'delete' && action !== 'copy' ) {
+			return false;
+		}
+
+		return true;
 	};
 
 	const actions: Action< DataSourceConfig >[] = [
@@ -159,7 +167,7 @@ const DataSourceList = () => {
 			label: __( 'Edit', 'remote-data-blocks' ),
 			icon: 'edit',
 			isPrimary: true,
-			isEligible: isItemEligibleForActions,
+			isEligible: ( item: DataSourceConfig ) => isItemEligibleForActions( item, 'edit' ),
 			callback: ( [ item ]: DataSourceConfig[] ) => {
 				if ( item?.uuid ) {
 					onEditDataSource( item.uuid );
@@ -170,7 +178,7 @@ const DataSourceList = () => {
 			id: 'copy',
 			label: __( 'Copy UUID', 'remote-data-blocks' ),
 			icon: 'copy',
-			isEligible: isItemEligibleForActions,
+			isEligible: ( item: DataSourceConfig ) => isItemEligibleForActions( item, 'copy' ),
 			callback: ( [ item ]: DataSourceConfig[] ) => {
 				if ( item && item.uuid ) {
 					navigator.clipboard
@@ -192,7 +200,7 @@ const DataSourceList = () => {
 			label: __( 'Delete', 'remote-data-blocks' ),
 			icon: 'trash',
 			isDestructive: true,
-			isEligible: isItemEligibleForActions,
+			isEligible: ( item: DataSourceConfig ) => isItemEligibleForActions( item, 'delete' ),
 			callback: ( items: DataSourceConfig[] ) => {
 				if ( items.length === 1 ) {
 					if ( items[ 0 ] ) {
@@ -207,7 +215,7 @@ const DataSourceList = () => {
 		{
 			id: 'duplicate',
 			label: __( 'Duplicate', 'remote-data-blocks' ),
-			isEligible: isItemEligibleForActions,
+			isEligible: ( item: DataSourceConfig ) => isItemEligibleForActions( item, 'duplicate' ),
 			callback: ( [ item ]: DataSourceConfig[] ) => {
 				if ( item ) {
 					const duplicatedSource = {
@@ -237,7 +245,7 @@ const DataSourceList = () => {
 		{
 			id: 'view-code',
 			label: __( 'View Code', 'remote-data-blocks' ),
-			isEligible: isItemEligibleForActions,
+			isEligible: ( item: DataSourceConfig ) => isItemEligibleForActions( item, 'view-code' ),
 			callback: ( [ item ]: DataSourceConfig[] ) => {
 				if ( item?.uuid ) {
 					setCurrentSource( item );
