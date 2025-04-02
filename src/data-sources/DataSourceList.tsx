@@ -9,6 +9,7 @@ import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { info } from '@wordpress/icons';
 
+import CodeSnippet from './components/CodeSnippet';
 import { BaseModal } from '@/blocks/remote-data-container/components/modals/BaseModal';
 import { useModalState } from '@/blocks/remote-data-container/hooks/useModalState';
 import DataSourceMetaTags from '@/data-sources/DataSourceMetaTags';
@@ -24,7 +25,6 @@ import { AirtableIcon } from '@/settings/icons/AirtableIcon';
 import { GoogleSheetsIcon } from '@/settings/icons/GoogleSheetsIcon';
 import HttpIcon from '@/settings/icons/HttpIcon';
 import { ShopifyIcon } from '@/settings/icons/ShopifyIcon';
-import CodeSnippet from './components/CodeSnippet';
 
 import type { Action, Field, View } from '@wordpress/dataviews/wp';
 
@@ -154,7 +154,9 @@ const DataSourceList = () => {
 			return false;
 		}
 
-		if ( ! item?.enabled && action !== 'delete' && action !== 'copy' ) {
+		const actionsAllowedForDisabledItems = [ 'delete', 'copy' ];
+
+		if ( ! item?.enabled && ! actionsAllowedForDisabledItems.includes( action ) ) {
 			return false;
 		}
 
