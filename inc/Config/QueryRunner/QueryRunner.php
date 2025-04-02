@@ -5,6 +5,7 @@ namespace RemoteDataBlocks\Config\QueryRunner;
 use Exception;
 use GuzzleHttp\RequestOptions;
 use RemoteDataBlocks\Config\Query\HttpQueryInterface;
+use RemoteDataBlocks\Editor\DataBinding\Pagination;
 use RemoteDataBlocks\HttpClient\HttpClient;
 use WP_Error;
 
@@ -252,7 +253,7 @@ class QueryRunner implements QueryRunnerInterface {
 
 		return [
 			'metadata' => $metadata,
-			'pagination' => $pagination,
+			'pagination' => Pagination::format_pagination_data_for_query_response( $pagination, $input_schema, $input_variables ),
 			'results' => $results,
 			'query_inputs' => [ $input_variables ],
 		];

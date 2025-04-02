@@ -104,6 +104,10 @@ function get_page_by_path( string $path ): string {
 	return $path ?? 'fake WP_Post';
 }
 
+function get_query_var( string $_var_name, mixed $default_value ): mixed {
+	return $default_value;
+}
+
 function wp_generate_uuid4(): string {
 	return '00000000-0000-4000-8000-000000000000';
 }

@@ -3,11 +3,19 @@ interface InnerBlockContext {
 }
 
 interface RemoteDataPagination {
-	cursorNext?: string;
-	cursorPrevious?: string;
-	hasNextPage?: boolean;
-	perPage?: number;
-	totalItems?: number;
+	input_variables: {
+		next_page?: RemoteDataQueryInput;
+		previous_page?: RemoteDataQueryInput;
+	};
+	// Mapping of supported pagination input variables to their slugs.
+	input_variable_targets: {
+		offset?: string;
+		page?: string;
+		per_page?: string;
+	};
+	per_page?: number;
+	total_items?: number;
+	type: 'CURSOR' | 'CURSOR_SIMPLE' | 'OFFSET' | 'PAGE' | 'NONE';
 }
 
 interface RemoteDataResultFields {
@@ -35,6 +43,8 @@ interface RemoteData {
 interface RemoteDataBlockAttributes {
 	remoteData?: RemoteData;
 }
+
+interface RemoteDataPaginationBlockAttributes {}
 
 interface RemoteDataTemplateBlockAttributes {}
 
@@ -90,12 +100,7 @@ interface RemoteDataApiResult {
 interface RemoteDataApiResponseBody {
 	block_name: string;
 	metadata: Record< string, RemoteDataResultFields >;
-	pagination?: {
-		cursor_next?: string;
-		cursor_previous?: string;
-		has_next_page?: boolean;
-		total_items?: number;
-	};
+	pagination?: RemoteDataPagination;
 	query_inputs: RemoteDataQueryInput[];
 	query_key: string;
 	result_id: string;

@@ -30,12 +30,7 @@ async function unmemoizedfetchRemoteData(
 	return {
 		blockName: body.block_name,
 		metadata: body.metadata,
-		pagination: body.pagination && {
-			cursorNext: body.pagination.cursor_next,
-			cursorPrevious: body.pagination.cursor_previous,
-			hasNextPage: body.pagination.has_next_page,
-			totalItems: body.pagination.total_items,
-		},
+		pagination: body.pagination,
 		queryKey: body.query_key,
 		queryInputs: body.query_inputs,
 		resultId: body.result_id,
@@ -119,10 +114,10 @@ export function useRemoteData( {
 	const enabledOverrides = externallyManagedRemoteData?.enabledOverrides ?? [];
 
 	const inputVariables = query.inputs;
+	const paginationData = resolvedData?.pagination;
 
 	const {
 		hasNextPage,
-		onFetch: onFetchForPagination,
 		page,
 		perPage,
 		paginationQueryInput,
@@ -130,11 +125,7 @@ export function useRemoteData( {
 		totalItems,
 		totalPages,
 		...paginationVariables
-	} = usePaginationVariables( {
-		initialPage,
-		initialPerPage,
-		inputVariables,
-	} );
+	} = usePaginationVariables( { initialPage, initialPerPage, paginationData } );
 	const { hasSearchInput, searchQueryInput, searchInput, setSearchInput, supportsSearch } =
 		useSearchVariables( {
 			initialSearchInput,
@@ -228,7 +219,6 @@ export function useRemoteData( {
 			return;
 		}
 
-		onFetchForPagination( remoteData );
 		resolvedUpdater( { enabledOverrides, ...remoteData } );
 		setLoading( false );
 		onSuccess?.();
@@ -254,7 +244,6 @@ export function useRemoteData( {
 		setSearchInput,
 		supportsPagination,
 		supportsSearch,
-		totalItems: resolvedData?.pagination?.totalItems,
 		totalPages,
 		...paginationVariables,
 	};

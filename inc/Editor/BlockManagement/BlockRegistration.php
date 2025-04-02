@@ -46,6 +46,9 @@ class BlockRegistration {
 		// Remote data HTML block - used to render HTML content in the absence of a proper binding.
 		register_block_type( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-html' );
 
+		// Remote data pagination block - used to render pagination links for collections.
+		register_block_type( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-pagination' );
+
 		// Remote data template - used to render remote data collections.
 		register_block_type( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-template' );
 	}

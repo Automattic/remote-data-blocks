@@ -10,6 +10,9 @@ use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\Logging\LoggerManager;
 use RemoteDataBlocks\Sanitization\Sanitizer;
 use WP_Block;
+use function add_action;
+use function add_filter;
+use function remove_filter;
 
 use function register_block_bindings_source;
 
@@ -130,8 +133,7 @@ class BlockBindings {
 		$enabled_overrides = $source_args['enabledOverrides'] ?? $remote_data['enabledOverrides'];
 		$query_key = $source_args['queryKey'] ?? $remote_data['queryKey'] ?? ConfigRegistry::DISPLAY_QUERY_KEY;
 
-		// Extract the input variables. Support the previous property name used
-		// before we allowed multiple query inputs.
+		// Extract the input variables. Allow the binding source args to override.
 		$array_of_input_variables = $source_args['queryInputs'] ?? $remote_data['queryInputs'];
 
 		$block_config = ConfigStore::get_block_configuration( $block_name );
@@ -140,6 +142,14 @@ class BlockBindings {
 		if ( null === $query ) {
 			self::log_error( sprintf( 'Cannot load query %s for block binding', $query_key ), $block_name, $operation_name );
 			return null;
+		}
+
+		// If there is a single array of input variables, fetch pagination variables.
+		// Pagination is disabled for batch execution.
+		if ( 1 === count( $array_of_input_variables ) ) {
+			$block_id = self::get_block_id( $block_name, $array_of_input_variables[0] );
+			$pagination_input_variables = Pagination::get_pagination_input_variables_for_current_request( $block_id );
+			$array_of_input_variables[0] = array_merge( $array_of_input_variables[0] ?? [], $pagination_input_variables );
 		}
 
 		$array_of_input_variables = array_map( function ( $input_variables ) use ( $enabled_overrides, $block_name ): array {
@@ -187,6 +197,44 @@ class BlockBindings {
 			self::log_error( 'Unexpected exception for block binding: ' . $e->getMessage(), $block_name, $operation_name );
 			return null;
 		}
+	}
+
+	/**
+	 * Create a hash of the block name and input variables as a kind of
+	 * identifier for the block. This is not a unique ID and could result in
+	 * collisions, but is unlikely to surprise the user since the hash input
+	 * contains the configured behavior (block name and input variables).
+	 */
+	private static function get_block_id( string $block_name, array $input_variables ): string {
+		return md5( wp_json_encode( [ $block_name, $input_variables ] ) );
+	}
+
+	public static function get_pagination_links( WP_Block $block ): array {
+		$block_context = $block->context[ self::$context_name ] ?? [];
+		$query_response = self::execute_queries( $block_context, [], 'remote_data_block_get_pagination_data' );
+		$pagination_data = $query_response['pagination'] ?? null;
+
+		if ( null === $pagination_data ) {
+			return [];
+		}
+
+		$block_id = self::get_block_id( $block_context['blockName'], $block_context['queryInputs'][0] ?? null );
+		$next_link = null;
+		$previous_link = null;
+
+		// Create pagination links.
+		if ( isset( $pagination_data['input_variables']['next_page'] ) ) {
+			$next_link = Pagination::create_query_var( $block_id, $pagination_data['input_variables']['next_page'] );
+		}
+
+		if ( isset( $pagination_data['input_variables']['previous_page'] ) ) {
+			$previous_link = Pagination::create_query_var( $block_id, $pagination_data['input_variables']['previous_page'] );
+		}
+
+		return [
+			'next_page' => $next_link,
+			'previous_page' => $previous_link,
+		];
 	}
 
 	public static function get_value( array $source_args, WP_Block|array $block, string $attribute_name ): ?string {

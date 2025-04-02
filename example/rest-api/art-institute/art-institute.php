@@ -96,13 +96,19 @@ function register_aic_block(): void {
 			return add_query_arg( [
 				'limit' => $input_variables['limit'],  
 				'fields' => 'id,title,image_id,artist_title',
+				'page' => $input_variables['page'],
 			], $endpoint );
 		},
 		'input_schema' => [
 			'limit' => [
-				'name' => 'Limit',
-				'type' => 'ui:input',
 				'default_value' => 10,
+				'name' => 'Pagination limit',
+				'type' => 'ui:pagination_per_page',
+			],
+			'page' => [
+				'default_value' => 1,
+				'name' => 'Pagination page',
+				'type' => 'ui:pagination_page',
 			],
 		],
 		'output_schema' => [
