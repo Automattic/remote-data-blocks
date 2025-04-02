@@ -11,23 +11,46 @@ use Psr\Http\Message\ResponseInterface;
 use RemoteDataBlocks\Logging\Logger;
 use RemoteDataBlocks\Logging\LoggerManager;
 
-class RdbCacheStrategy extends GreedyCacheStrategy {
+abstract class RdbCacheStrategy extends GreedyCacheStrategy {
+	private const CACHE_INVALIDATING_REQUEST_HEADERS = [ 'Authorization', 'Cache-Control' ];
+	private const FALLBACK_CACHE_TTL_IN_SECONDS = 60;
+
 	private Logger $logger;
 
-	public function __construct( CacheStorageInterface $cache, int $default_ttl, ?KeyValueHttpHeader $vary_headers = null ) {
-		parent::__construct( $cache, $default_ttl, $vary_headers );
+	public function __construct( ?int $default_ttl = null, ?CacheStorageInterface $storage = null ) {
+		// Filter this if customization is needed.
+		$vary_headers = new KeyValueHttpHeader( self::CACHE_INVALIDATING_REQUEST_HEADERS );
+
+		parent::__construct(
+			$storage ?? $this->get_default_cache_storage(),
+			$default_ttl ?? self::FALLBACK_CACHE_TTL_IN_SECONDS,
+			$vary_headers
+		);
+
 		$this->logger = LoggerManager::instance( __CLASS__ );
 	}
 
-	private static function getRequestString( RequestInterface $request ): string {
+	abstract protected function get_default_cache_storage(): CacheStorageInterface;
+	abstract protected function get_cache_type(): string;
+
+	private function log( RequestInterface $request, string $message, ?CacheEntry $cache_entry = null ): void {
 		$uri = $request->getUri();
 		$uri_string = $uri->getScheme() . '://' . $uri->getHost() . $uri->getPath();
 		$method = $request->getMethod();
-		$body = $request->getBody()->getContents();
-		return $method . ' ' . $uri_string . ' ' . $body;
+		$has_body = (bool) $request->getBody();
+
+		$context = [
+			'cache_type' => $this->get_cache_type(),
+			'cache_age' => $cache_entry instanceof CacheEntry ? $cache_entry->getAge() : null,
+			'uri' => $uri_string,
+			'method' => $method,
+			'has_body' => $has_body,
+		];
+
+		$this->logger->debug( $message, $context );
 	}
 
-	private function should_bypass_cache( RequestInterface $request ): bool {
+	protected function should_bypass_cache( RequestInterface $request ): bool {
 		if ( apply_filters( 'remote_data_blocks_bypass_cache', false, $request ) ) {
 			return true;
 		}
@@ -52,36 +75,35 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 
 	public function fetch( RequestInterface $request ): CacheEntry|null {
 		if ( $this->should_bypass_cache( $request ) ) {
-			$this->logger->debug( 'Cache Bypass: ' . self::getRequestString( $request ) );
+			$this->log( $request, 'cache:read:bypass' );
 			return null;
 		}
 
 		$result = parent::fetch( $request );
 
 		if ( null === $result ) {
-			$this->logger->debug( 'Cache Miss: ' . self::getRequestString( $request ) );
+			$this->log( $request, 'cache:read:miss' );
 			return null;
 		}
-		$this->logger->debug( 'Cache Hit: ' . self::getRequestString( $request ) );
+
+		$this->log( $request, 'cache:read:hit', $result );
 		return $result;
 	}
 
 	public function cache( RequestInterface $request, ResponseInterface $response ): bool {
-		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-		$cache_ttl = $this->defaultTtl;
-
 		// Negative TTL indicates disabled caching.
-		if ( $cache_ttl < 0 ) {
-			$this->logger->debug( 'Did not cache (negative TTL): ' . self::getRequestString( $request ) );
+		if ( $this->defaultTtl < 0 ) {
+			$this->log( $request, 'cache:write:disabled' );
 			return false;
 		}
 
 		$result = parent::cache( $request, $response );
 		if ( false === $result ) {
-			$this->logger->debug( 'Did not cache (uncacheable): ' . self::getRequestString( $request ) );
+			$this->log( $request, 'cache:write:uncacheable' );
 			return false;
 		}
-		$this->logger->debug( 'Cached (TTL=' . $cache_ttl . '): ' . self::getRequestString( $request ) );
+
+		$this->log( $request, 'cache:write:success' );
 		return $result;
 	}
 }
