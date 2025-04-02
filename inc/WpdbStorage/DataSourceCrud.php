@@ -36,7 +36,7 @@ class DataSourceCrud {
 		return new WP_Error( 'data_source_not_found', __( 'Data source not found', 'remote-data-blocks' ), [ 'status' => 404 ] );
 	}
 
-	public static function get_configs(): array|WP_Error {
+	public static function get_configs(): array {
 		$configs = self::get_all_configs();
 		$valid_configs = [];
 
