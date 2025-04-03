@@ -67,7 +67,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ sprintf( __( 'Remote Data Block: %s', 'remote-data-blocks' ), remoteDataName ) }>
+				<PanelBody title={ __( sprintf ( 'Remote Data Block: %s', remoteDataName ), 'remote-data-blocks' ) }>
 					<BlockBindingControls
 						attributes={ attributes }
 						availableBindings={ availableBindings }
