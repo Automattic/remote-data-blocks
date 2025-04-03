@@ -2,7 +2,7 @@ import { InspectorControls } from '@wordpress/block-editor';
 import { BlockConfiguration, BlockEditProps } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 import { BlockBindingControls } from '@/blocks/remote-data-container/components/BlockBindingControls';
 import { useRemoteDataContext } from '@/blocks/remote-data-container/hooks/useRemoteDataContext';
@@ -67,7 +67,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Remote Data', 'remote-data-blocks' ) }>
+				<PanelBody title={ sprintf( __( 'Remote Data Block: %s', 'remote-data-blocks' ), remoteDataName ) }>
 					<BlockBindingControls
 						attributes={ attributes }
 						availableBindings={ availableBindings }
