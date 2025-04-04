@@ -17,6 +17,8 @@ class BlockBindings {
 	public static string $context_name = 'remote-data-blocks/remoteData';
 	public static string $binding_source = 'remote-data/binding';
 
+	private static array $query_cache = [];
+
 	public static function init(): void {
 		add_action( 'init', [ __CLASS__, 'register_block_bindings' ], 50, 0 );
 		add_filter( 'register_block_type_args', [ __CLASS__, 'inject_context_for_synced_patterns' ], 10, 2 );
@@ -223,7 +225,24 @@ class BlockBindings {
 			return $fallback_content;
 		}
 
-		$query_response = self::execute_queries( $block_context, $source_args, $field_name );
+		// Generate cache key based on context and source args that affect the query
+		$filtered_source_args = array_intersect_key( $source_args, [
+			'block' => 1,
+			'enabledOverrides' => 1,
+			'queryKey' => 1,
+			'queryInputs' => 1,
+		]);
+
+		$cache_key = md5(
+			wp_json_encode( $block_context ) .
+			wp_json_encode( $filtered_source_args )
+		);
+
+		if ( ! isset( self::$query_cache[ $cache_key ] ) ) {
+			self::$query_cache[ $cache_key ] = self::execute_queries( $block_context, $source_args, $field_name );
+		}
+
+		$query_response = self::$query_cache[ $cache_key ];
 
 		if ( empty( $query_response ) ) {
 			self::log_error( 'Cannot resolve query response for block binding', $block_name, $field_name );
@@ -266,7 +285,7 @@ class BlockBindings {
 
 	/**
 	 * Find a "template block" in a parsed block's inner blocks.
-	 * 
+	 *
 	 * @param array $parsed_block The parsed block.
 	 * @return bool True if a template block was found.
 	 */
@@ -326,7 +345,7 @@ class BlockBindings {
 
 		$loop_template = $block->parsed_block['innerBlocks'];
 		$loop_template_content = $block->parsed_block['innerContent'];
-		
+
 		// Remove the existing blocks and content so that we can repopulate it.
 		$block->parsed_block['innerBlocks'] = [];
 		$block->parsed_block['innerContent'] = [];
