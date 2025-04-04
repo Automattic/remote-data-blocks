@@ -231,6 +231,9 @@ class BlockBindings {
 			'enabledOverrides' => 1,
 			'queryKey' => 1,
 			'queryInputs' => 1,
+			'field' => $field_name,
+			'type' => $field_type,
+			'index' => $result_index,
 		]);
 		// Generate cache key based on context and source args that affect the query
 		$cache_key = md5(wp_json_encode([
