@@ -232,11 +232,11 @@ class BlockBindings {
 			'queryKey' => 1,
 			'queryInputs' => 1,
 		]);
-
-		$cache_key = md5(
-			wp_json_encode( $block_context ) .
-			wp_json_encode( $filtered_source_args )
-		);
+		// Generate cache key based on context and source args that affect the query
+		$cache_key = md5(wp_json_encode([
+			'block_context' => $block_context,
+			'source_args' => $filtered_source_args,
+		]));
 
 		if ( ! isset( self::$query_cache[ $cache_key ] ) ) {
 			self::$query_cache[ $cache_key ] = self::execute_queries( $block_context, $source_args, $field_name );
