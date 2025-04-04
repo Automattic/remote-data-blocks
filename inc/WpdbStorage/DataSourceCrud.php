@@ -37,19 +37,19 @@ class DataSourceCrud {
 	}
 
 	public static function get_configs(): array {
-		$configs = self::get_all_configs();
-		$valid_configs = [];
+		return array_map(
+			function ( array $config ) {
+				// Inflate the config to check if it's valid.
+				$instance = self::inflate_config( $config );
 
-		foreach ( $configs as $config ) {
-			$instance = self::inflate_config( $config );
+				// If the data source is valid, set a transient field called enabled to true or false otherwise.
+				$config['enabled'] = ! is_wp_error( $instance );
 
-			// If the data source is valid, set a transient field called enabled to true or false otherwise.
-			$config['enabled'] = ! is_wp_error( $instance );
-
-			$valid_configs[] = $config;
-		}
-
-		return $valid_configs;
+				// Give back the same config with the enabled field set, not the inflated instance.
+				return $config;
+			},
+			self::get_all_configs()
+		);
 	}
 
 	public static function get_configs_by_service( string $service_name ): array {
