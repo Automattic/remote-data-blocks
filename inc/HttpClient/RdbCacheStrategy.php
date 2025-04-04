@@ -14,7 +14,7 @@ use RemoteDataBlocks\Logging\LoggerManager;
 
 class RdbCacheStrategy extends GreedyCacheStrategy {
 	private const CACHE_INVALIDATING_REQUEST_HEADERS = [ 'Authorization', 'Cache-Control' ];
-	private const FALLBACK_CACHE_TTL_IN_SECONDS = 60;
+	private const FALLBACK_CACHE_TTL_IN_SECONDS = 120;
 	private const WP_OBJECT_CACHE_GROUP = 'remote-data-blocks';
 
 	private Logger $logger;
