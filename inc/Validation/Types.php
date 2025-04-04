@@ -177,20 +177,21 @@ final class Types {
 	}
 
 	public static function one_of( array ...$member_types ): array {
+		$allowed_non_primitive_member_types = [
+			'callable',
+			'const',
+			'enum',
+			'instance_of',
+			'object',
+			'record',
+			'ref',
+			'serialized_config_for',
+			'string_matching',
+		];
+
 		foreach ( $member_types as $member_type ) {
 			self::check_type( $member_type );
 
-			$allowed_non_primitive_member_types = [
-				'callable',
-				'const',
-				'enum',
-				'instance_of',
-				'object',
-				'record',
-				'ref',
-				'serialized_config_for',
-				'string_matching',
-			];
 			$is_primitive = self::is_primitive( $member_type );
 			$member_type_name = self::get_type_name( $member_type );
 
@@ -315,11 +316,15 @@ final class Types {
 	}
 
 	private static function is_type( string $type_name, array ...$types_to_check ): bool {
-		return array_reduce( $types_to_check, function ( bool $carry, array $type ) use ( $type_name ): bool {
+		foreach ( $types_to_check as $type ) {
 			self::check_type( $type );
 
-			return $carry && self::get_type_name( $type ) === $type_name;
-		}, true );
+			if ( self::get_type_name( $type ) !== $type_name ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	private static function generate_primitive_type( string $type_name ): array {
