@@ -9,6 +9,8 @@ use RemoteDataBlocks\Validation\Validator;
  * Sanitizer class.
  */
 class Sanitizer implements SanitizerInterface {
+	private static array $compiled_patterns = [];
+
 	/**
 	 * @inheritDoc
 	 */
@@ -88,7 +90,11 @@ class Sanitizer implements SanitizerInterface {
 
 			case 'string_matching':
 				$regex = Types::get_type_args( $type );
-				if ( preg_match( $regex, strval( $value ) ) ) {
+				$pattern = self::$compiled_patterns[ $regex ] ?? null;
+				if ( null === $pattern ) {
+					self::$compiled_patterns[ $regex ] = $regex;
+				}
+				if ( preg_match( self::$compiled_patterns[ $regex ], strval( $value ) ) ) {
 					return $value;
 				}
 
