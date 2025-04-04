@@ -40,15 +40,15 @@ class QueryRunner implements QueryRunnerInterface {
 			return $headers;
 		}
 
-		$method = $query->get_request_method();
-		$body = $query->get_request_body( $input_variables );
 		$endpoint = $query->get_endpoint( $input_variables );
-		$cache_ttl = $query->get_cache_ttl( $input_variables );
 		$parsed_url = wp_parse_url( $endpoint );
 
 		if ( false === $parsed_url ) {
 			return new WP_Error( 'Unable to parse endpoint URL' );
 		}
+
+		$scheme = $parsed_url['scheme'] ?? '';
+		$host = $parsed_url['host'] ?? '';
 
 		/**
 		 * Filters the allowed URL schemes for this request.
@@ -59,23 +59,26 @@ class QueryRunner implements QueryRunnerInterface {
 		 */
 		$allowed_url_schemes = apply_filters( 'remote_data_blocks_allowed_url_schemes', [ 'https' ], $query );
 
-		if ( empty( $parsed_url['scheme'] ?? '' ) || ! in_array( $parsed_url['scheme'], $allowed_url_schemes, true ) ) {
+		if ( empty( $scheme ) || ! in_array( $scheme, $allowed_url_schemes, true ) ) {
 			return new WP_Error( 'Invalid endpoint URL scheme' );
 		}
 
-		if ( empty( $parsed_url['host'] ?? '' ) ) {
+		if ( empty( $host ) ) {
 			return new WP_Error( 'Invalid endpoint URL host' );
 		}
 
-		$scheme = $parsed_url['scheme'];
-		$host = $parsed_url['host'];
-		$user = $parsed_url['user'] ?? '';
-		$path = $parsed_url['path'] ?? '';
-
+		$method = $query->get_request_method();
+		$body = $query->get_request_body( $input_variables );
+		$cache_ttl = $query->get_cache_ttl( $input_variables );
 		$query = ! empty( $parsed_url['query'] ?? '' ) ? '?' . $parsed_url['query'] : '';
 		$port = ! empty( $parsed_url['port'] ?? '' ) ? ':' . $parsed_url['port'] : '';
-		$pass = ! empty( $parsed_url['pass'] ?? '' ) ? ':' . $parsed_url['pass'] : '';
-		$pass = ( $user || $pass ) ? $pass . '@' : '';
+		$path = $parsed_url['path'] ?? '';
+		$user = $parsed_url['user'] ?? '';
+		$pass = $parsed_url['pass'] ?? '';
+		$auth = '';
+		if ( $user || $pass ) {
+			$auth = $user . ( $pass ? ':' . $pass : '' ) . '@';
+		}
 
 		$request_details = [
 			'method' => $method,
@@ -83,7 +86,7 @@ class QueryRunner implements QueryRunnerInterface {
 				RequestOptions::HEADERS => $headers,
 				RequestOptions::JSON => $body,
 			],
-			'origin' => sprintf( '%s://%s%s%s%s', $scheme, $user, $pass, $host, $port ),
+			'origin' => $scheme . '://' . $auth . $host . $port,
 			'ttl' => $cache_ttl,
 			'uri' => sprintf( '%s%s', $path, $query ),
 		];
@@ -166,6 +169,7 @@ class QueryRunner implements QueryRunnerInterface {
 	protected function get_response_metadata( HttpQueryInterface $query, array $response_metadata, array $query_results ): array {
 		$age = intval( $response_metadata['age'] ?? 0 );
 		$time = time() - $age;
+		$count = count( $query_results );
 
 		$query_response_metadata = [
 			'last_updated' => [
@@ -176,7 +180,7 @@ class QueryRunner implements QueryRunnerInterface {
 			'total_count' => [
 				'name' => 'Total count',
 				'type' => 'integer',
-				'value' => count( $query_results ),
+				'value' => $count,
 			],
 		];
 
@@ -204,13 +208,12 @@ class QueryRunner implements QueryRunnerInterface {
 
 		// Set default input variables.
 		foreach ( $input_schema as $key => $schema ) {
-			if ( ! array_key_exists( $key, $input_variables ) && isset( $schema['default_value'] ) ) {
-				$input_variables[ $key ] = $schema['default_value'];
-			}
-
-			// If the input variable is required and not provided, return an error.
-			if ( ! array_key_exists( $key, $input_variables ) && isset( $schema['required'] ) && $schema['required'] ) {
-				return new WP_Error( 'remote-data-blocks-missing-required-input-variable', sprintf( 'Missing required input variable: %s', $key ) );
+			if ( ! array_key_exists( $key, $input_variables ) ) {
+				if ( isset( $schema['default_value'] ) ) {
+					$input_variables[ $key ] = $schema['default_value'];
+				} elseif ( isset( $schema['required'] ) && $schema['required'] ) {
+					return new WP_Error( 'remote-data-blocks-missing-required-input-variable', sprintf( 'Missing required input variable: %s', $key ) );
+				}
 			}
 		}
 
@@ -272,17 +275,10 @@ class QueryRunner implements QueryRunnerInterface {
 
 		if ( 1 === count( $id_list_input ) ) {
 			$id_list_slug = array_key_first( $id_list_input );
-			$ids = array_reduce(
-				array_column( $array_of_input_variables, $id_list_slug ),
-				function ( array $carry, mixed $item ): array {
-					if ( is_array( $item ) ) {
-						return array_merge( $carry, $item );
-					}
-
-					return array_merge( $carry, [ $item ] );
-				},
-				[]
-			);
+			$ids = [];
+			foreach ( array_column( $array_of_input_variables, $id_list_slug ) as $item ) {
+				$ids = array_merge( $ids, is_array( $item ) ? $item : [ $item ] );
+			}
 
 			return $this->execute( $query, [ $id_list_slug => $ids ] );
 		}
