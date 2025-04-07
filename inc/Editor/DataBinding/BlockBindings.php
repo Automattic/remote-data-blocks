@@ -17,8 +17,6 @@ class BlockBindings {
 	public static string $context_name = 'remote-data-blocks/remoteData';
 	public static string $binding_source = 'remote-data/binding';
 
-	private static array $query_cache = [];
-
 	public static function init(): void {
 		add_action( 'init', [ __CLASS__, 'register_block_bindings' ], 50, 0 );
 		add_filter( 'register_block_type_args', [ __CLASS__, 'inject_context_for_synced_patterns' ], 10, 2 );
@@ -225,27 +223,7 @@ class BlockBindings {
 			return $fallback_content;
 		}
 
-		// Generate cache key based on context and source args that affect the query
-		$filtered_source_args = array_intersect_key( $source_args, [
-			'block' => 1,
-			'enabledOverrides' => 1,
-			'queryKey' => 1,
-			'queryInputs' => 1,
-			'field' => $field_name,
-			'type' => $field_type,
-			'index' => $result_index,
-		]);
-		// Generate cache key based on context and source args that affect the query
-		$cache_key = md5(wp_json_encode([
-			'block_context' => $block_context,
-			'source_args' => $filtered_source_args,
-		]));
-
-		if ( ! isset( self::$query_cache[ $cache_key ] ) ) {
-			self::$query_cache[ $cache_key ] = self::execute_queries( $block_context, $source_args, $field_name );
-		}
-
-		$query_response = self::$query_cache[ $cache_key ];
+		$query_response = self::execute_queries( $block_context, $source_args, $field_name );
 
 		if ( empty( $query_response ) ) {
 			self::log_error( 'Cannot resolve query response for block binding', $block_name, $field_name );

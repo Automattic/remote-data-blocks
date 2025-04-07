@@ -275,10 +275,17 @@ class QueryRunner implements QueryRunnerInterface {
 
 		if ( 1 === count( $id_list_input ) ) {
 			$id_list_slug = array_key_first( $id_list_input );
-			$ids = [];
-			foreach ( array_column( $array_of_input_variables, $id_list_slug ) as $item ) {
-				$ids = array_merge( $ids, is_array( $item ) ? $item : [ $item ] );
-			}
+			$ids = array_reduce(
+				array_column( $array_of_input_variables, $id_list_slug ),
+				function ( array $carry, mixed $item ): array {
+					if ( is_array( $item ) ) {
+						return array_merge( $carry, $item );
+					}
+
+					return array_merge( $carry, [ $item ] );
+				},
+				[]
+			);
 
 			return $this->execute( $query, [ $id_list_slug => $ids ] );
 		}
