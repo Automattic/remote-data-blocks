@@ -14,11 +14,16 @@ interface BaseDataSourceConfig<
 	ServiceName extends DataSourceType,
 	ServiceConfig extends BaseServiceConfig
 > {
-	enabled?: boolean;
+	errors?: WP_Error[];
 	service: ServiceName;
 	service_config: ServiceConfig;
 	uuid: string | null;
 	config_source: ConfigSource;
+}
+
+interface WP_Error {
+	code: string;
+	message: string;
 }
 
 export interface DataSourceQueryMappingValue {

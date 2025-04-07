@@ -154,10 +154,10 @@ const DataSourceList = () => {
 			return false;
 		}
 
-		// This is meant to limit actions on disabled items. For an item to be disabled, it must have the enabled field set to false.
+		// This is meant to limit actions on disabled items. For an item to be disabled, it must have any errors on it.
 		// The only actions allowed on disabled items are delete and copy as they won't cause any unintended side effects.
 		const actionsAllowedForDisabledItems = [ 'delete', 'copy' ];
-		if ( item?.enabled === false && ! actionsAllowedForDisabledItems.includes( action ) ) {
+		if ( item.errors?.length && ! actionsAllowedForDisabledItems.includes( action ) ) {
 			return false;
 		}
 

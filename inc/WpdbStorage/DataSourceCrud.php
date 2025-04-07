@@ -42,10 +42,11 @@ class DataSourceCrud {
 				// Inflate the config to check if it's valid.
 				$instance = self::inflate_config( $config );
 
-				// If the data source is valid, set a transient field called enabled to true or false otherwise.
-				$config['enabled'] = ! is_wp_error( $instance );
+				// If the data source is valid, set a transient field with the errors encountered when inflating the config.
+				// We get the errors from the instance, otherwise there'll be an errors field in the errors field in the config.
+				$config['errors'] = is_wp_error( $instance ) ? [ $instance->errors ] : [];
 
-				// Give back the same config with the enabled field set, not the inflated instance.
+				// Give back the same config with the errors field set, not the inflated instance.
 				return $config;
 			},
 			self::get_all_configs()
