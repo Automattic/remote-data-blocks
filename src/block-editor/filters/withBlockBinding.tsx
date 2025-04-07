@@ -12,7 +12,7 @@ import {
 	PATTERN_OVERRIDES_CONTEXT_KEY,
 } from '@/config/constants';
 import { getBoundBlockClassName, getMismatchedAttributes } from '@/utils/block-binding';
-import { getBlockAvailableBindings } from '@/utils/localized-block-data';
+import { getBlockAvailableBindings, getBlockTitle } from '@/utils/localized-block-data';
 
 interface BoundBlockEditProps {
 	attributes: RemoteDataInnerBlockAttributes;
@@ -20,6 +20,7 @@ interface BoundBlockEditProps {
 	blockName: string;
 	children: JSX.Element;
 	remoteDataName: string;
+	remoteDataTitle: string;
 	setAttributes: ( attributes: RemoteDataInnerBlockAttributes ) => void;
 }
 
@@ -30,7 +31,14 @@ interface BlockEditWithPreviewIndex {
 }
 
 function BoundBlockEdit( props: BoundBlockEditProps ) {
-	const { attributes, availableBindings, blockName, remoteDataName, setAttributes } = props;
+	const {
+		attributes,
+		availableBindings,
+		blockName,
+		remoteDataName,
+		remoteDataTitle,
+		setAttributes,
+	} = props;
 	const existingBindings = attributes.metadata?.bindings ?? {};
 
 	function removeBinding( target: string ) {
@@ -68,10 +76,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 		<>
 			<InspectorControls>
 				<PanelBody
-					title={ sprintf(
-						__( 'Remote Data Block: %s', 'remote-data-blocks' ),
-						remoteDataName.replace( 'remote-data-blocks/', '' )
-					) }
+					title={ sprintf( __( 'Remote Data Block: %s', 'remote-data-blocks' ), remoteDataTitle ) }
 				>
 					<BlockBindingControls
 						attributes={ attributes }
@@ -135,12 +140,16 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 			return <BlockEdit { ...props } attributes={ mergedAttributes } />;
 		}
 
+		// lookup the title of the remote data block
+		const remoteBlockTitle = getBlockTitle( remoteData?.blockName );
+
 		return (
 			<BoundBlockEdit
 				attributes={ mergedAttributes }
 				availableBindings={ availableBindings }
 				blockName={ name }
 				remoteDataName={ remoteData?.blockName ?? '' }
+				remoteDataTitle={ remoteBlockTitle }
 				setAttributes={ setAttributes }
 			>
 				<BlockEdit { ...props } attributes={ mergedAttributes } />

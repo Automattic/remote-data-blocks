@@ -14,6 +14,14 @@ export function getBlockDataSourceType( blockName?: string ): string {
 	return getBlockConfig( blockName )?.dataSourceType ?? '';
 }
 
+export function getBlockTitle( blockName?: string ): string {
+	if ( ! blockName ) {
+		return '';
+	}
+
+	return getBlockConfig( blockName )?.settings?.title ?? '';
+}
+
 export function getBlocksConfig(): BlocksConfig {
 	return window.REMOTE_DATA_BLOCKS?.config ?? {};
 }
