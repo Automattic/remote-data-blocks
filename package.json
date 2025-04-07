@@ -92,7 +92,7 @@
     "@wordpress/server-side-render": "5.21.0",
     "@wordpress/url": "4.21.0",
     "eslint": "8.57.1",
-    "fork-ts-checker-webpack-plugin": "9.0.2",
+    "fork-ts-checker-webpack-plugin": "9.1.0",
     "happy-dom": "17.4.4",
     "husky": "9.1.7",
     "lint-staged": "15.5.0",
