@@ -3,12 +3,12 @@
  */
 
 .remote-data-pagination {
-	color: var( --wp--custom--remote-data-blocks--paginatin-link-disabled, #999 );
+	color: var(--wp--custom--remote-data-blocks--paginatin-link-disabled, #999);
 	display: flex;
 	justify-content: space-between;
 	margin: 1rem 0;
 
 	a {
-		color: var( --wp--custom--remote-data-blocks--pagination-link, #000 );
+		color: var(--wp--custom--remote-data-blocks--pagination-link, #000);
 	}
 }
