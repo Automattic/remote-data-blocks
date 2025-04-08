@@ -40,7 +40,7 @@ Editor\BlockManagement\ConfigRegistry::init();
 Editor\PatternEditor\PatternEditor::init();
 
 // Telemetry
-Telemetry\TracksTelemetry::init( new Telemetry\EnvironmentConfig() );
+Telemetry\Telemetry::init( __FILE__ );
 
 // Example API
 ExampleApi\ExampleApi::init();

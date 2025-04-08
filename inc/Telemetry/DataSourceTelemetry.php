@@ -2,8 +2,9 @@
 
 namespace RemoteDataBlocks\Telemetry;
 
-use RemoteDataBlocks\Telemetry\TracksTelemetry;
 use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
+use function do_action;
+
 defined( 'ABSPATH' ) || exit();
 
 class DataSourceTelemetry {
@@ -23,7 +24,7 @@ class DataSourceTelemetry {
 	}
 
 	private static function track_interaction( array $config, string $action ): void {
-		TracksTelemetry::record_event( self::DATA_SOURCE_INTERACTION_EVENT_NAME, array_merge( [
+		do_action( 'remote_data_blocks_track_event', self::DATA_SOURCE_INTERACTION_EVENT_NAME, array_merge( [
 			'data_source_type' => $config['service'],
 			'action' => $action,
 		], self::get_interaction_track_props( $config ) ) );
@@ -61,7 +62,7 @@ class DataSourceTelemetry {
 			}
 		) );
 
-		TracksTelemetry::record_event( self::DATA_SOURCE_VIEW_EVENT_NAME, [
+		do_action( 'remote_data_blocks_track_event', self::DATA_SOURCE_VIEW_EVENT_NAME, [
 			'total_data_sources_count' => count( $configs ),
 			'code_configured_data_sources_count' => $code_configured_count,
 			'ui_configured_data_sources_count' => $storage_configured_count,

@@ -5,7 +5,7 @@ namespace RemoteDataBlocks\Editor\BlockManagement;
 defined( 'ABSPATH' ) || exit();
 
 use RemoteDataBlocks\Editor\Assets\Assets;
-use RemoteDataBlocks\Telemetry\TracksTelemetry;
+use RemoteDataBlocks\Telemetry\Telemetry;
 use RemoteDataBlocks\Editor\BlockPatterns\BlockPatterns;
 use RemoteDataBlocks\REST\RemoteDataController;
 use function register_block_type;
@@ -66,7 +66,7 @@ class BlockRegistration {
 			wp_localize_script( $script_handle, 'REMOTE_DATA_BLOCKS', [
 				'config' => $all_remote_block_configs,
 				'rest_url' => RemoteDataController::get_url(),
-				'tracks_global_properties' => TracksTelemetry::get_global_properties(),
+				'tracks_global_properties' => Telemetry::get_global_properties(),
 			] );
 		}
 	}
