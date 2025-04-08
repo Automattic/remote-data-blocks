@@ -68,6 +68,6 @@ jobs:
 
   dependaban:
     name: Dependaban
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: Automattic/vip-actions/dependaban@trunk

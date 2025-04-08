@@ -17,7 +17,7 @@ concurrency:
 jobs:
   test:
     name: End-to-End Testing against WordPress
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
