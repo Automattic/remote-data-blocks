@@ -147,8 +147,7 @@ class BlockBindings {
 		// If there is a single array of input variables, fetch pagination variables.
 		// Pagination is disabled for batch execution.
 		if ( 1 === count( $array_of_input_variables ) ) {
-			$block_id = self::get_block_id( $block_name, $array_of_input_variables[0] );
-			$pagination_input_variables = Pagination::get_pagination_input_variables_for_current_request( $block_id );
+			$pagination_input_variables = Pagination::get_pagination_input_variables_for_current_request( $query->get_id() );
 			$array_of_input_variables[0] = array_merge( $array_of_input_variables[0] ?? [], $pagination_input_variables );
 		}
 
@@ -199,36 +198,27 @@ class BlockBindings {
 		}
 	}
 
-	/**
-	 * Create a hash of the block name and input variables as a kind of
-	 * identifier for the block. This is not a unique ID and could result in
-	 * collisions, but is unlikely to surprise the user since the hash input
-	 * contains the configured behavior (block name and input variables).
-	 */
-	private static function get_block_id( string $block_name, array $input_variables ): string {
-		return md5( wp_json_encode( [ $block_name, $input_variables ] ) );
-	}
-
 	public static function get_pagination_links( WP_Block $block ): array {
 		$block_context = $block->context[ self::$context_name ] ?? [];
 		$query_response = self::execute_queries( $block_context, [], 'remote_data_block_get_pagination_data' );
-		$pagination_data = $query_response['pagination'] ?? null;
 
-		if ( null === $pagination_data ) {
+		$pagination_data = $query_response['pagination'] ?? null;
+		$query_id = $query_response['query_id'] ?? null;
+
+		if ( null === $pagination_data || null === $query_id ) {
 			return [];
 		}
 
-		$block_id = self::get_block_id( $block_context['blockName'], $block_context['queryInputs'][0] ?? null );
 		$next_link = null;
 		$previous_link = null;
 
 		// Create pagination links.
 		if ( isset( $pagination_data['input_variables']['next_page'] ) ) {
-			$next_link = Pagination::create_query_var( $block_id, $pagination_data['input_variables']['next_page'] );
+			$next_link = Pagination::create_query_var( $query_id, $pagination_data['input_variables']['next_page'] );
 		}
 
 		if ( isset( $pagination_data['input_variables']['previous_page'] ) ) {
-			$previous_link = Pagination::create_query_var( $block_id, $pagination_data['input_variables']['previous_page'] );
+			$previous_link = Pagination::create_query_var( $query_id, $pagination_data['input_variables']['previous_page'] );
 		}
 
 		return [
