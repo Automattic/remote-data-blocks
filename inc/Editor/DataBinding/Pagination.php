@@ -2,6 +2,8 @@
 
 namespace RemoteDataBlocks\Editor\DataBinding;
 
+use RemoteDataBlocks\Config\Query\QueryInterface;
+
 use function add_filter;
 use function add_query_arg;
 use function get_query_var;
@@ -31,12 +33,14 @@ class Pagination {
 		return base64_encode( wp_json_encode( $query_var_value ) );
 	}
 
-	public static function get_pagination_input_variables_for_current_request( string $query_id ): array {
-		$value = self::decode_query_var( get_query_var( self::$variable_name, '' ) );
+	public static function get_pagination_input_variables_for_current_request( QueryInterface $query ): array {
+		$untrusted_variables = self::decode_query_var( get_query_var( self::$variable_name, '' ) );
 
-		if ( empty( $value ) ) {
+		if ( empty( $untrusted_variables ) || ! is_array( $untrusted_variables ) ) {
 			return [];
 		}
+
+		$query_id = $query->get_id();
 
 		// The query var value is an associative array with IDs as keys and
 		// values that are an associative array of input variables.
@@ -44,7 +48,44 @@ class Pagination {
 		// We only expect a single key => value pair, but in the future we may
 		// decide to support more than one. This would allow us to control the
 		// pagination of multiple remote data blocks independently.
-		return $value[ $query_id ] ?? [];
+		$untrusted_variables = $untrusted_variables[ $query_id ] ?? [];
+
+		if ( empty( $untrusted_variables ) || ! is_array( $untrusted_variables ) ) {
+			return [];
+		}
+
+		// Only accept pagination input variables that are defined in this query's
+		// input schema.
+		$input_schema = $query->get_input_schema();
+		$input_variables = [];
+		$pagination_input_variable_types = [
+			'ui:pagination_cursor',
+			'ui:pagination_cursor_next',
+			'ui:pagination_cursor_previous',
+			'ui:pagination_offset',
+			'ui:pagination_page',
+			'ui:pagination_per_page',
+		];
+
+		foreach ( $input_schema as $slug => $input ) {
+			if ( ! in_array( $input['type'] ?? null, $pagination_input_variable_types, true ) ) {
+				continue;
+			}
+
+			if ( ! array_key_exists( $slug, $untrusted_variables ) ) {
+				continue;
+			}
+
+			$value = $untrusted_variables[ $slug ];
+
+			if ( ! is_string( $value ) && ! is_int( $value ) ) {
+				continue;
+			}
+
+			$input_variables[ $slug ] = $value;
+		}
+
+		return $input_variables;
 	}
 
 	public static function format_pagination_data_for_query_response( array|null $pagination_data, array $query_input_schema, array $input_variables ): array {

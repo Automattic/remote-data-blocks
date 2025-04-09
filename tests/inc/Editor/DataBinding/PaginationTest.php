@@ -4,8 +4,15 @@ namespace RemoteDataBlocks\Tests\Editor\DataBinding;
 
 use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\Editor\DataBinding\Pagination;
+use RemoteDataBlocks\Tests\Mocks\MockQuery;
+use RemoteDataBlocks\Tests\Mocks\MockWordPressFunctions;
 
 class PaginationTest extends TestCase {
+	protected function setUp(): void {
+		parent::setUp();
+		MockWordPressFunctions::reset();
+	}
+
 	public function test_decode_query_var(): void {
 		$query_var_value = [
 			'test-block' => [
@@ -133,5 +140,126 @@ class PaginationTest extends TestCase {
 		$result = Pagination::format_pagination_data_for_query_response( $pagination_data, $query_input_schema, $input_variables );
 
 		$this->assertEquals( [], $result );
+	}
+
+	public function test_get_pagination_input_variables_for_current_request_with_valid_query_var(): void {
+		$mock_query = MockQuery::create( [
+			'input_schema' => [
+				'page' => [ 'type' => 'ui:pagination_page' ],
+				'per_page' => [ 'type' => 'ui:pagination_per_page' ],
+			],
+		] );
+
+		$query_id = $mock_query->get_id();
+		$query_var_value = [
+			'page' => 2,
+			'per_page' => 10,
+		];
+
+		// Mock get_query_var to return the encoded query var.
+		MockWordPressFunctions::inject_mock_query_var(
+			'rdb-pagination',
+			base64_encode( wp_json_encode( [ $query_id => $query_var_value ] ) )
+		);
+
+		$result = Pagination::get_pagination_input_variables_for_current_request( $mock_query );
+
+		$this->assertEquals( $query_var_value, $result );
+	}
+
+	public function test_get_pagination_input_variables_for_current_request_with_empty_query_var(): void {
+		$result = Pagination::get_pagination_input_variables_for_current_request( MockQuery::create() );
+
+		$this->assertEquals( [], $result );
+	}
+
+	public function test_get_pagination_input_variables_for_current_request_with_invalid_query_var(): void {
+		$mock_query = MockQuery::create();
+		$query_id = $mock_query->get_id();
+
+		// Mock get_query_var to return the encoded query var.
+		MockWordPressFunctions::inject_mock_query_var(
+			'rdb-pagination',
+			base64_encode( wp_json_encode( [ $query_id => base64_encode( wp_json_encode( 'foo' ) ) ] ) )
+		);
+
+		$result = Pagination::get_pagination_input_variables_for_current_request( $mock_query );
+
+		$this->assertEquals( [], $result );
+	}
+
+	public function test_get_pagination_input_variables_for_current_request_with_wrong_query_id(): void {
+		$mock_query = MockQuery::create( [
+			'input_schema' => [
+				'page' => [ 'type' => 'ui:pagination_page' ],
+				'per_page' => [ 'type' => 'ui:pagination_per_page' ],
+			],
+		] );
+
+		$query_id = 'wrong_' . $mock_query->get_id();
+		$query_var_value = [
+			'page' => 2,
+			'per_page' => 10,
+		];
+
+		// Mock get_query_var to return the encoded query var.
+		MockWordPressFunctions::inject_mock_query_var(
+			'rdb-pagination',
+			base64_encode( wp_json_encode( [ $query_id => $query_var_value ] ) )
+		);
+
+		$result = Pagination::get_pagination_input_variables_for_current_request( $mock_query );
+
+		$this->assertEquals( [], $result );
+	}
+
+	public function test_get_pagination_input_variables_for_current_request_removes_non_pagination_variables(): void {
+		$mock_query = MockQuery::create( [
+			'input_schema' => [
+				'page' => [ 'type' => 'ui:pagination_page' ],
+			],
+		] );
+
+		$query_id = $mock_query->get_id();
+		$query_var_value = [
+			'all_ur_base' => 'belong2us',
+			'name' => 'bobby_tables',
+			'page' => 2,
+		];
+
+		// Mock get_query_var to return the encoded query var.
+		MockWordPressFunctions::inject_mock_query_var(
+			'rdb-pagination',
+			base64_encode( wp_json_encode( [ $query_id => $query_var_value ] ) )
+		);
+
+		$result = Pagination::get_pagination_input_variables_for_current_request( $mock_query );
+
+		$this->assertEquals( [ 'page' => 2 ], $result );
+	}
+
+	public function test_get_pagination_input_variables_for_current_request_removes_non_primitive_values(): void {
+		$mock_query = MockQuery::create( [
+			'input_schema' => [
+				'page' => [ 'type' => 'ui:pagination_page' ],
+				'per_page' => [ 'type' => 'ui:pagination_per_page' ],
+			],
+		] );
+
+		$query_id = $mock_query->get_id();
+		$query_var_value = [
+			'page' => [ 1 ],
+			'per_page' => 10,
+		];
+
+		// Mock get_query_var to return the encoded query var.
+		MockWordPressFunctions::inject_mock_query_var(
+			'rdb-pagination',
+			base64_encode( wp_json_encode( [ $query_id => $query_var_value ] ) )
+		);
+
+		$result = Pagination::get_pagination_input_variables_for_current_request( $mock_query );
+
+		$this->assertEquals( [ 'per_page' => 10 ], $result );
 	}
 }

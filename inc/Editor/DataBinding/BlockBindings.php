@@ -147,7 +147,7 @@ class BlockBindings {
 		// If there is a single array of input variables, fetch pagination variables.
 		// Pagination is disabled for batch execution.
 		if ( 1 === count( $array_of_input_variables ) ) {
-			$pagination_input_variables = Pagination::get_pagination_input_variables_for_current_request( $query->get_id() );
+			$pagination_input_variables = Pagination::get_pagination_input_variables_for_current_request( $query );
 			$array_of_input_variables[0] = array_merge( $array_of_input_variables[0] ?? [], $pagination_input_variables );
 		}
 
