@@ -45,9 +45,12 @@ export function InputModal( props: InputModalProps ) {
 	}
 
 	function getButtonText(): string {
-
-		const allHavePagination = props.inputs.length > 0 && props.inputs.every( input => input.type.indexOf( 'ui:pagination' ) !== -1 );
-		const someHavePagination = props.inputs.some( input => input.type.indexOf( 'ui:pagination' ) !== -1 );
+		const allHavePagination =
+			props.inputs.length > 0 &&
+			props.inputs.every( input => input.type.indexOf( 'ui:pagination' ) !== -1 );
+		const someHavePagination = props.inputs.some(
+			input => input.type.indexOf( 'ui:pagination' ) !== -1
+		);
 
 		if ( allHavePagination ) {
 			return __( 'Customize pagination' );
