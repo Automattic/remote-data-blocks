@@ -13,6 +13,8 @@ interface InputVariable {
 	slug: string;
 	/** The type of the variable in the query */
 	type: string;
+	/** The default value of the variable in the query */
+	default_value?: string;
 }
 
 interface InputVariableOverride {

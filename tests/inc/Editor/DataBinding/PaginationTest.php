@@ -158,7 +158,7 @@ class PaginationTest extends TestCase {
 
 		// Mock get_query_var to return the encoded query var.
 		MockWordPressFunctions::inject_mock_query_var(
-			'rdb-pagination',
+			Pagination::get_query_var_name(),
 			base64_encode( wp_json_encode( [ $query_id => $query_var_value ] ) )
 		);
 
@@ -179,7 +179,7 @@ class PaginationTest extends TestCase {
 
 		// Mock get_query_var to return the encoded query var.
 		MockWordPressFunctions::inject_mock_query_var(
-			'rdb-pagination',
+			Pagination::get_query_var_name(),
 			base64_encode( wp_json_encode( [ $query_id => base64_encode( wp_json_encode( 'foo' ) ) ] ) )
 		);
 
@@ -204,7 +204,7 @@ class PaginationTest extends TestCase {
 
 		// Mock get_query_var to return the encoded query var.
 		MockWordPressFunctions::inject_mock_query_var(
-			'rdb-pagination',
+			Pagination::get_query_var_name(),
 			base64_encode( wp_json_encode( [ $query_id => $query_var_value ] ) )
 		);
 
@@ -229,7 +229,7 @@ class PaginationTest extends TestCase {
 
 		// Mock get_query_var to return the encoded query var.
 		MockWordPressFunctions::inject_mock_query_var(
-			'rdb-pagination',
+			Pagination::get_query_var_name(),
 			base64_encode( wp_json_encode( [ $query_id => $query_var_value ] ) )
 		);
 
@@ -254,7 +254,7 @@ class PaginationTest extends TestCase {
 
 		// Mock get_query_var to return the encoded query var.
 		MockWordPressFunctions::inject_mock_query_var(
-			'rdb-pagination',
+			Pagination::get_query_var_name(),
 			base64_encode( wp_json_encode( [ $query_id => $query_var_value ] ) )
 		);
 

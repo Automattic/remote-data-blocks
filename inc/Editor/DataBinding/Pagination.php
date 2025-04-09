@@ -209,4 +209,13 @@ class Pagination {
 		$query_vars[] = self::$variable_name;
 		return $query_vars;
 	}
+
+	/**
+	 * Get the query variable name used for pagination.
+	 * 
+	 * @return string The query variable name
+	 */
+	public static function get_query_var_name(): string {
+		return self::$variable_name;
+	}
 }

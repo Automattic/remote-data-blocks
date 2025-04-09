@@ -82,6 +82,7 @@ class ConfigRegistry {
 							'required' => $input_var['required'] ?? true,
 							'slug' => $slug,
 							'type' => $input_var['type'] ?? 'string',
+							'default_value' => $input_var['default_value'] ?? null,
 						];
 					}, array_keys( $input_schema ), array_values( $input_schema ) ),
 					'name' => $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ),
@@ -131,6 +132,7 @@ class ConfigRegistry {
 							'required' => $input_var['required'] ?? false,
 							'slug' => $slug,
 							'type' => $input_var['type'] ?? 'string',
+							'default_value' => $input_var['default_value'] ?? null,
 						];
 					}, array_keys( $from_input_schema ), array_values( $from_input_schema ) ),
 					'name' => $selection_query['display_name'] ?? ucfirst( $from_query_type ),

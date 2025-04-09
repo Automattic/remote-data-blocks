@@ -22,9 +22,10 @@ interface InputModalProps {
 
 export function InputModal( props: InputModalProps ) {
 	const initialInputState = props.inputs.reduce(
-		( acc, input ) => ( { ...acc, [ input.slug ]: '' } ),
+		( acc, input ) => ( { ...acc, [ input.slug ]: input.default_value ?? '' } ),
 		{}
 	);
+	console.log( props.inputs );
 
 	const [ inputState, setInputState ] = useState< RemoteDataQueryInput >( initialInputState );
 	const { close, isOpen, open } = useModalState();
@@ -43,9 +44,23 @@ export function InputModal( props: InputModalProps ) {
 		} );
 	}
 
+	function getButtonText(): string {
+
+		const allHavePagination = props.inputs.length > 0 && props.inputs.every( input => input.type.indexOf( 'ui:pagination' ) !== -1 );
+		const someHavePagination = props.inputs.some( input => input.type.indexOf( 'ui:pagination' ) !== -1 );
+
+		if ( allHavePagination ) {
+			return __( 'Customize pagination' );
+		} else if ( someHavePagination ) {
+			return __( 'Customize pagination & inputs' );
+		}
+
+		return __( 'Provide manual input' );
+	}
+
 	return (
 		<ModalWithButtonTrigger
-			buttonText="Provide manual input"
+			buttonText={ getButtonText() }
 			buttonVariant="secondary"
 			isOpen={ isOpen }
 			onClose={ close }
