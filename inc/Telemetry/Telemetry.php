@@ -31,7 +31,7 @@ class Telemetry {
 		}
 
 		if ( null === $telemetry && class_exists( 'Automattic\VIP\Telemetry\Telemetry' ) ) {
-			$telemetry = new Automattic\VIP\Telemetry\Telemetry( self::EVENT_PREFIX, self::get_global_properties() );
+			$telemetry = new \Automattic\VIP\Telemetry\Telemetry( self::EVENT_PREFIX, self::get_global_properties() );
 		}
 
 		self::$instance = new self( $plugin_path, $telemetry );
@@ -65,7 +65,7 @@ class Telemetry {
 	 * @param string $plugin_path Path of the plugin that was activated.
 	 */
 	public function track_plugin_activation( string $plugin_path ): void {
-		if ( $this->plugin_path !== $plugin_path ) {
+		if ( ! str_ends_with( $this->plugin_path, $plugin_path ) ) {
 			return;
 		}
 
@@ -78,7 +78,7 @@ class Telemetry {
 	 * @param string $plugin_path Path of the plugin that was deactivated.
 	 */
 	public function track_plugin_deactivation( string $plugin_path ): void {
-		if ( $this->plugin_path !== $plugin_path ) {
+		if ( ! str_ends_with( $this->plugin_path, $plugin_path ) ) {
 			return;
 		}
 
