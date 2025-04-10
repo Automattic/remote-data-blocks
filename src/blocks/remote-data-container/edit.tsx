@@ -80,12 +80,15 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 		}
 	}
 
-	function onUpdateQueryInputs( inputs: RemoteDataQueryInput[] ): void {
-		if ( ! remoteDataAttribute ) return;
+	function onUpdateQueryInputs( queryKey: string, inputs: RemoteDataQueryInput[] ): void {
+		if ( ! remoteDataAttribute ) {
+			return;
+		}
 
 		updateRemoteData( {
 			...remoteDataAttribute,
 			queryInputs: inputs,
+			queryKey,
 		} );
 		refreshRemoteData();
 	}
@@ -128,8 +131,9 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 					resetRemoteData={ resetRemoteData }
 				/>
 				<QueryInputsPanel
-					queryInputs={ migrateRemoteData( props.attributes.remoteData )?.queryInputs ?? [] }
 					onUpdateQueryInputs={ onUpdateQueryInputs }
+					remoteData={ data }
+					selectors={ blockConfig.selectors }
 				/>
 			</InspectorControls>
 

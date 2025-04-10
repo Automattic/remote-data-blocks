@@ -5,23 +5,50 @@ import { describe, expect, it, vi } from 'vitest';
 import { QueryInputsPanel } from '@/blocks/remote-data-container/components/panels/QueryInputsPanel';
 
 describe( 'QueryInputsPanel', () => {
+	const selectors: BlockConfig[ 'selectors' ] = [
+		{
+			inputs: [
+				{
+					name: 'id',
+					required: true,
+					slug: 'id',
+					type: 'string',
+					default_value: '',
+				},
+				{
+					name: 'record_id',
+					required: false,
+					slug: 'record_id',
+					type: 'string',
+					default_value: '',
+				},
+			],
+			name: 'test_selector',
+			query_key: 'test_query_key',
+			type: 'manual',
+		},
+	];
+
+	const remoteData: RemoteData = {
+		blockName: 'test/block',
+		metadata: {},
+		queryKey: 'test_query_key',
+		queryInputs: [],
+		resultId: 'test',
+		results: [],
+	};
+
 	it( 'should render multiple inputs for query inputs with an array of ids', async () => {
 		const user = userEvent.setup();
 		const onUpdateQueryInputs = vi.fn();
 		render(
 			<QueryInputsPanel
-				queryInputs={ [
-					{
-						id: 'test1',
-					},
-					{
-						id: 'test2',
-					},
-					{
-						id: 'test3',
-					},
-				] }
 				onUpdateQueryInputs={ onUpdateQueryInputs }
+				remoteData={ {
+					...remoteData,
+					queryInputs: [ { id: 'test1' }, { id: 'test2' }, { id: 'test3' } ],
+				} }
+				selectors={ selectors }
 			/>
 		);
 
@@ -42,7 +69,7 @@ describe( 'QueryInputsPanel', () => {
 		await user.tab();
 
 		// Called with only the first input value changed
-		expect( onUpdateQueryInputs ).toHaveBeenCalledWith( [
+		expect( onUpdateQueryInputs ).toHaveBeenCalledWith( 'test_query_key', [
 			{
 				id: 'test4',
 			},
@@ -60,12 +87,16 @@ describe( 'QueryInputsPanel', () => {
 		const onUpdateQueryInputs = vi.fn();
 		render(
 			<QueryInputsPanel
-				queryInputs={ [
-					{
-						record_id: [ 'test1', 'test2', 'test3', 'test4' ],
-					},
-				] }
 				onUpdateQueryInputs={ onUpdateQueryInputs }
+				remoteData={ {
+					...remoteData,
+					queryInputs: [
+						{
+							record_id: [ 'test1', 'test2', 'test3', 'test4' ],
+						},
+					],
+				} }
+				selectors={ selectors }
 			/>
 		);
 
@@ -76,7 +107,7 @@ describe( 'QueryInputsPanel', () => {
 		await user.type( screen.getByRole( 'textbox' ), 'test5' );
 		await user.tab();
 
-		expect( onUpdateQueryInputs ).toHaveBeenCalledWith( [
+		expect( onUpdateQueryInputs ).toHaveBeenCalledWith( 'test_query_key', [
 			{
 				record_id: 'test5',
 			},
@@ -86,7 +117,7 @@ describe( 'QueryInputsPanel', () => {
 		await user.type( screen.getByRole( 'textbox' ), ',test6' );
 		await user.tab();
 
-		expect( onUpdateQueryInputs ).toHaveBeenCalledWith( [
+		expect( onUpdateQueryInputs ).toHaveBeenCalledWith( 'test_query_key', [
 			{
 				record_id: 'test5,test6',
 			},
