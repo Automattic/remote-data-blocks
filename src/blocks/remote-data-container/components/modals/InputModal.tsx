@@ -22,7 +22,7 @@ interface InputModalProps {
 
 export function InputModal( props: InputModalProps ) {
 	const initialInputState = props.inputs.reduce(
-		( acc, input ) => ( { ...acc, [ input.slug ]: '' } ),
+		( acc, input ) => ( { ...acc, [ input.slug ]: input.default_value ?? '' } ),
 		{}
 	);
 

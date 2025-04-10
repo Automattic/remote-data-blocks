@@ -78,6 +78,7 @@ class ConfigRegistry {
 					'image_url' => $display_query->get_image_url(),
 					'inputs' => array_map( function ( $slug, $input_var ) {
 						return [
+							'default_value' => isset( $input_var['default_value'] ) ? strval( $input_var['default_value'] ) : null,
 							'name' => $input_var['name'] ?? $slug,
 							'required' => $input_var['required'] ?? true,
 							'slug' => $slug,
