@@ -72,6 +72,17 @@ function custom_allowed_url_schemes( array $allowed_url_schemes, HttpQueryInterf
 add_filter( 'remote_data_blocks_allowed_url_schemes', 'custom_allowed_url_schemes', 10, 2 );
 ```
 
+### remote_data_blocks_pagination_query_var_name
+
+Filter the query variable name used for pagination (default: `rdb-pagination`).
+
+```php
+function custom_pagination_query_var_name(): string {
+	return 'paginate';
+}
+add_filter( 'remote_data_blocks_pagination_query_var_name', 'custom_pagination_query_var_name', 10, 0 );
+```
+
 ### remote_data_blocks_request_details
 
 Filter the request details (method, options, url) before the HTTP request is dispatched.

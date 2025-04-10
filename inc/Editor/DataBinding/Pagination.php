@@ -11,10 +11,20 @@ use function get_query_var;
 defined( 'ABSPATH' ) || exit();
 
 class Pagination {
-	private static $variable_name = 'rdb-pagination';
+	private static string $variable_name = 'rdb-pagination';
 
 	public static function init(): void {
 		add_filter( 'query_vars', [ __CLASS__, 'register_query_var' ], 10, 1 );
+
+		/**
+		 * Filter the name of the query variable used for pagination.
+		 *
+		 * @param string $query_var_name The name of the query variable.
+		 */
+		self::$variable_name = apply_filters(
+			'remote_data_blocks_pagination_query_var_name',
+			'rdb-pagination'
+		);
 	}
 
 	public static function create_query_var( string $query_id, array $pagination_input_variables ): string {
