@@ -102,12 +102,12 @@ function register_aic_block(): void {
 		'input_schema' => [
 			'limit' => [
 				'default_value' => 10,
-				'name' => 'Pagination limit',
+				'name' => 'Items per page',
 				'type' => 'ui:pagination_per_page',
 			],
 			'page' => [
 				'default_value' => 1,
-				'name' => 'Pagination page',
+				'name' => 'Starting page',
 				'type' => 'ui:pagination_page',
 			],
 		],
