@@ -112,6 +112,7 @@ class Pagination {
 		$page_variable = null;
 		$per_page_variable = null;
 
+		// Inspect the input schema to find the pagination variables.
 		foreach ( $query_input_schema as $slug => $input ) {
 			$type = $input['type'] ?? '';
 			if ( 'ui:pagination_cursor' === $type ) {
@@ -135,12 +136,17 @@ class Pagination {
 		$pagination_type = 'NONE';
 		$total_items = $pagination_data['total_items'] ?? null;
 
+		// These are the input variables that will be targeted for basic
+		// pagination types.
 		$pagination_input_variable_targets = [
 			'offset' => $offset_variable,
 			'page' => $page_variable,
 			'per_page' => $per_page_variable,
 		];
 
+		// For each pagination type, define the input variables used to
+		// navigate to the previous or next page. This will allow the
+		// pagination helper block to provide links to those pages.
 		if ( $cursor_variable ) {
 			$pagination_type = 'CURSOR_SIMPLE';
 
