@@ -133,8 +133,6 @@ class Telemetry {
 	 *
 	 * @param string $event_name The name of the event.
 	 * @param array  $props      The properties to send with the event.
-	 *
-	 * @return bool True if the event was recorded, false otherwise.
 	 */
 	public function record_event( string $event_name, array $props ): void {
 		if ( null === $this->telemetry ) {
