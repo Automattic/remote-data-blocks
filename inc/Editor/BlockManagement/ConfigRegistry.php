@@ -162,7 +162,7 @@ class ConfigRegistry {
 
 	private static function register_block_pattern( string $block_name, string $pattern_title, string $pattern_content ): string {
 		// Add the block arg to any bindings present in the pattern.
-		$pattern_name = 'remote-data-blocks/' . sanitize_title_with_dashes( $pattern_title );
+		$pattern_name = 'remote-data-blocks/' . sanitize_title_with_dashes( $pattern_title, '', 'save' );
 
 		// Create the pattern properties, allowing overrides via pattern options.
 		$pattern_properties = [
