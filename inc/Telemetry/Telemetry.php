@@ -129,7 +129,7 @@ class Telemetry {
 	}
 
 	/**
-	 * Record an event with Tracks.
+	 * Record a telemetry event.
 	 *
 	 * @param string $event_name The name of the event.
 	 * @param array  $props      The properties to send with the event.
