@@ -76,7 +76,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Remote Data', 'remote-data-blocks' ) }>
-					<p style={ { fontSize: 'small', color: 'rgb(117, 117, 117)' } }>
+					<p className="rdb-block-helper-text">
 						{ sprintf( __( 'Connected to %s', 'remote-data-blocks' ), remoteDataTitle ) }
 					</p>
 					<BlockBindingControls
