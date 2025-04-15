@@ -2,10 +2,12 @@ import { SelectControl, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
+import { HttpAuthTypes } from '../http/types';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import {
 	HTTP_SOURCE_AUTH_TYPE_SELECT_OPTIONS,
 	HTTP_SOURCE_ADD_TO_SELECT_OPTIONS,
+	HTTP_SOURCE_AUTH_HELP_TEXT,
 } from '@/data-sources/constants';
 import { HttpConfig } from '@/data-sources/types';
 
@@ -77,10 +79,7 @@ export const HttpAuthSettingsInput: React.FC< HttpAuthSettingsInputProps > = ( {
 					value={ auth?.value ?? '' }
 					onChange={ value => onChange( 'value', value ) }
 					__next40pxDefaultSize
-					help={ __(
-						'The authentication value to use for the HTTP endpoint. When using Basic Auth, this is "username:password" string.',
-						'remote-data-blocks'
-					) }
+					help={ HTTP_SOURCE_AUTH_HELP_TEXT[ ( auth?.type ?? 'none' ) as HttpAuthTypes ] }
 				/>
 			) }
 		</>

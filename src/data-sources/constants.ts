@@ -44,6 +44,13 @@ export const HTTP_SOURCE_ADD_TO_SELECT_OPTIONS: SelectOption< HttpApiKeyDestinat
 	{ label: __( 'Query Params', 'remote-data-blocks' ), value: 'queryparams' },
 ];
 
+export const HTTP_SOURCE_AUTH_HELP_TEXT: Record< HttpAuthTypes, string > = {
+	none: __( 'No authentication is required.', 'remote-data-blocks' ),
+	bearer: __( 'A string like: "Bearer {token}".', 'remote-data-blocks' ),
+	basic: __( 'A string like: "username:password".', 'remote-data-blocks' ),
+	'api-key': __( 'The key provided by the API.', 'remote-data-blocks' ),
+};
+
 export enum ConfigSource {
 	CODE = 'code',
 	STORAGE = 'storage',
