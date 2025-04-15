@@ -143,11 +143,8 @@ class HttpClient {
 	 * @return int Number of milliseconds to delay.
 	 */
 	public static function retry_delay( int $retries, ?ResponseInterface $response ): int {
-		// "Full Jitter" algorithm taken from https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/
-		$retry_base = 1; // 1 second
-		$retry_cap = 60; // 1 minute
-		$min_retry_after = min( $retry_cap, $retry_base * ( 2 ** $retries ) );
-		$retry_after = wp_rand( $retry_base, $min_retry_after );
+		// Implement an exponential backoff strategy, with the delay capped at 60s.
+		$retry_after = min( 1 * pow( $retries, 2 ), 60 );
 
 		// If the response has a Retry-After header, use that value.
 		// If the value is a date, calculate the difference from now.
