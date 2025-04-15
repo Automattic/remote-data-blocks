@@ -6,7 +6,6 @@ use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Formatting\StringFormatter;
 use RemoteDataBlocks\Snippet\Snippet;
-use Psr\Http\Message\ResponseInterface;
 
 class AirtableIntegration {
 	public static function init(): void {
