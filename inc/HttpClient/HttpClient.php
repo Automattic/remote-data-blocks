@@ -124,7 +124,7 @@ class HttpClient {
 
 		$should_retry = false;
 
-		if ( $response && $response->getStatusCode() >= 500 ) {
+		if ( $response && ( $response->getStatusCode() >= 500 || $response->getStatusCode() === 429 ) ) {
 			$should_retry = true;
 		}
 

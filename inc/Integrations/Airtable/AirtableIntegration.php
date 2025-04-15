@@ -6,10 +6,12 @@ use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Formatting\StringFormatter;
 use RemoteDataBlocks\Snippet\Snippet;
+use Psr\Http\Message\ResponseInterface;
 
 class AirtableIntegration {
 	public static function init(): void {
 		add_action( 'init', [ __CLASS__, 'register_blocks' ], 10, 0 );
+		add_filter( 'rdb_http_client_set_retry_delay', [ __CLASS__, 'set_retry_delay_for_rate_limiting' ], 10, 3 );
 	}
 
 	public static function register_blocks(): void {
@@ -208,5 +210,21 @@ class AirtableIntegration {
 		}
 
 		return $snippets;
+	}
+
+	/**
+	 * Set the retry delay to be 30s, when requests are rate limited by Airtable.
+	 *
+	 * @param int $retry_after_ms The retry delay in milliseconds.
+	 * @param int $retries The number of retries that have been attempted so far.
+	 * @param ResponseInterface|null $response The response that was received.
+	 * @return int The number of milliseconds to delay.
+	 */
+	public static function set_retry_delay_for_rate_limiting( int $retry_after_ms, int $retries, ?ResponseInterface $response ): int {
+		if ( $response && $response->getStatusCode() === 429 && $retry_after_ms < 300000 ) {
+			$retry_after_ms = 300000;
+		}
+
+		return $retry_after_ms;
 	}
 }
