@@ -70,6 +70,10 @@ class HttpClientTest extends TestCase {
 		$response = new Response( 500 );
 		$this->assertTrue( HttpClient::retry_decider( 0, $request, $response ) );
 
+		// Test 429 status code
+		$response = new Response( 429 );
+		$this->assertTrue( HttpClient::retry_decider( 0, $request, $response ) );
+
 		// Test ConnectException
 		$exception = new ConnectException( 'Error Connecting', $request );
 		$this->assertTrue( HttpClient::retry_decider( 0, $request, null, $exception ) );
@@ -91,7 +95,11 @@ class HttpClientTest extends TestCase {
 
 		$response = new Response( 500 );
 		$delay = HttpClient::retry_delay( 2, $response );
-		$this->assertSame( 2000, $delay );
+		$this->assertSame( 4000, $delay );
+
+		$response = new Response( 500 );
+		$delay = HttpClient::retry_delay( 3, $response );
+		$this->assertSame( 8000, $delay );
 	}
 
 	public function testQueueRequestAndExecuteParallel(): void {

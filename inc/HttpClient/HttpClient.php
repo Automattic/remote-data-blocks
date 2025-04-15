@@ -92,9 +92,9 @@ class HttpClient {
 			return $request;
 		} ) );
 
-		$default_ttl = $client_options[ self::CACHE_TTL_CLIENT_OPTION_KEY ] ?? null;
-		$cache_middleware = self::get_cache_middleware( $default_ttl );
-		$this->handler_stack->push( $cache_middleware, 'remote_data_blocks_cache' );
+		// $default_ttl = $client_options[ self::CACHE_TTL_CLIENT_OPTION_KEY ] ?? null;
+		// $cache_middleware = self::get_cache_middleware( $default_ttl );
+		// $this->handler_stack->push( $cache_middleware, 'remote_data_blocks_cache' );
 
 		$this->handler_stack->push( Middleware::log(
 			LoggerManager::instance(),
@@ -143,11 +143,9 @@ class HttpClient {
 	 * @return int Number of milliseconds to delay.
 	 */
 	public static function retry_delay( int $retries, ?ResponseInterface $response ): int {
-		// Implement an exponential backoff strategy with jitter, with the delay capped at 10s and a minimum of 1s.
-		// Full Jitter taken from https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/.
+		// Implement an exponential backoff strategy, with the delay capped at 10s and a minimum of 1s.
 		// Given we only retry 3 times, this will really never exceed 8s.
-		$retry_after_without_jitter = min( 10, 1 * pow( 2, $retries ) );
-		$retry_after = wp_rand( 1, $retry_after_without_jitter );
+		$retry_after = min( 10, 1 * pow( 2, $retries ) );
 
 		// If the response has a Retry-After header, use that value.
 		// If the value is a date, calculate the difference from now.
