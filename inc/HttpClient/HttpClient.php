@@ -159,7 +159,6 @@ class HttpClient {
 
 		// Convert it to milliseconds.
 		$retry_after_ms = (int) $retry_after * 1000;
-
 		return apply_filters( 'remote_data_blocks_http_client_retry_delay', $retry_after_ms, $retries, $response );
 	}
 
