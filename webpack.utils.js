@@ -37,7 +37,7 @@ function modernize( config, additionalScripts = {}, additionalPlugins = [], watc
 				'@': path.resolve( __dirname, 'src/' ),
 			},
 		},
-		watchOptions: Object.keys( watchOptions ).length ? watchOptions : config.watchOptions,
+		watchOptions: { ...config.watchOptions, ...watchOptions },
 	};
 }
 
