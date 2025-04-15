@@ -92,9 +92,9 @@ class HttpClient {
 			return $request;
 		} ) );
 
-		// $default_ttl = $client_options[ self::CACHE_TTL_CLIENT_OPTION_KEY ] ?? null;
-		// $cache_middleware = self::get_cache_middleware( $default_ttl );
-		// $this->handler_stack->push( $cache_middleware, 'remote_data_blocks_cache' );
+		$default_ttl = $client_options[ self::CACHE_TTL_CLIENT_OPTION_KEY ] ?? null;
+		$cache_middleware = self::get_cache_middleware( $default_ttl );
+		$this->handler_stack->push( $cache_middleware, 'remote_data_blocks_cache' );
 
 		$this->handler_stack->push( Middleware::log(
 			LoggerManager::instance(),
