@@ -2,7 +2,6 @@ import { SelectControl, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
-import { HttpAuthTypes } from '../http/types';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import {
 	HTTP_SOURCE_AUTH_TYPE_SELECT_OPTIONS,
@@ -79,7 +78,7 @@ export const HttpAuthSettingsInput: React.FC< HttpAuthSettingsInputProps > = ( {
 					value={ auth?.value ?? '' }
 					onChange={ value => onChange( 'value', value ) }
 					__next40pxDefaultSize
-					help={ HTTP_SOURCE_AUTH_HELP_TEXT[ ( auth?.type ?? 'none' ) as HttpAuthTypes ] }
+					help={ HTTP_SOURCE_AUTH_HELP_TEXT[ auth?.type ?? 'none' ] }
 				/>
 			) }
 		</>
