@@ -69,12 +69,14 @@ if ( class_exists( 'QM_Collector_Logger' ) ) {
 		/**
 		 * This method must match the implementation of the parent class,
 		 * including the missing type hints.
-		 * 
+		 *
 		 * @param string $level Log level (e.g., 'error', 'warning', 'info')
 		 * @param string $message Log message
 		 * @param array<string, mixed> $context Context
 		 * @param string|null $prefix Log message prefix
+		 * @return void
 		 */
+		// phpcs:ignore SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint,SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
 		protected function store( $level, $message, array $context = array(), ?string $prefix = null ) {
 			$trace = new QM_Backtrace( [
 				'ignore_class' => [
