@@ -53,7 +53,7 @@ $zipcode_query = HttpQuery::from_array( [
 ])
 ```
 
-In this case the `data_source` has a built in `get_endpoint()` method. Other configuration options can be retrieved directly:
+In this case the `data_source` has a built in `get_endpoint()` method. Other configuration options should be stored seperately. 
 
 ```php
 $data_source = HttpDataSource::from_array( [
