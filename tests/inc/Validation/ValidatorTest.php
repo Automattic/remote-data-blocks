@@ -174,11 +174,11 @@ class ValidatorTest extends TestCase {
 	 * @dataProvider provideStrings
 	 */
 	public function testInvalidBooleans( mixed $invalid_value ): void {
-		$validator = new Validator( Types::boolean() );
+		$validator = new Validator( Types::boolean(), 'BooleanValidator', '$boolean_value' );
 
 		$result = $validator->validate( $invalid_value );
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertStringStartsWith( 'Value must be a boolean:', $result->get_error_message() );
+		$this->assertStringStartsWith( '$boolean_value must be a boolean', $result->get_error_message() );
 	}
 
 	/**
@@ -194,11 +194,11 @@ class ValidatorTest extends TestCase {
 	 * @dataProvider provideStrings
 	 */
 	public function testInvalidIntegers( mixed $invalid_value ): void {
-		$validator = new Validator( Types::integer() );
+		$validator = new Validator( Types::integer(), 'IntegerValidator', '$integer_value' );
 
 		$result = $validator->validate( $invalid_value );
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertStringStartsWith( 'Value must be a integer:', $result->get_error_message() );
+		$this->assertStringStartsWith( '$integer_value must be a integer', $result->get_error_message() );
 	}
 
 	/**
@@ -214,11 +214,11 @@ class ValidatorTest extends TestCase {
 	 * @dataProvider provideStrings
 	 */
 	public function testInvalidNulls( mixed $invalid_value ): void {
-		$validator = new Validator( Types::null() );
+		$validator = new Validator( Types::null(), 'NullValidator', '$null_value' );
 
 		$result = $validator->validate( $invalid_value );
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertStringStartsWith( 'Value must be a null:', $result->get_error_message() );
+		$this->assertStringStartsWith( '$null_value must be a null', $result->get_error_message() );
 	}
 
 	/**
@@ -232,11 +232,11 @@ class ValidatorTest extends TestCase {
 	 * @dataProvider provideStrings
 	 */
 	public function testInvalidNumbers( mixed $invalid_value ): void {
-		$validator = new Validator( Types::number() );
+		$validator = new Validator( Types::number(), 'NumberValidator', '$number_value' );
 
 		$result = $validator->validate( $invalid_value );
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertStringStartsWith( 'Value must be a number:', $result->get_error_message() );
+		$this->assertStringStartsWith( '$number_value must be a number', $result->get_error_message() );
 	}
 
 	/**
@@ -247,11 +247,11 @@ class ValidatorTest extends TestCase {
 	 * @dataProvider provideObjectLikes
 	 */
 	public function testInvalidStrings( mixed $invalid_value ): void {
-		$validator = new Validator( Types::string() );
+		$validator = new Validator( Types::string(), 'StringValidator', '$string_value' );
 
 		$result = $validator->validate( $invalid_value );
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertStringStartsWith( 'Value must be a string:', $result->get_error_message() );
+		$this->assertStringStartsWith( '$string_value must be a string', $result->get_error_message() );
 	}
 
 	/**
@@ -263,11 +263,11 @@ class ValidatorTest extends TestCase {
 	 * @dataProvider provideObjectLikes
 	 */
 	public function testInvalidButtonTexts( mixed $invalid_value ): void {
-		$validator = new Validator( Types::button_text() );
+		$validator = new Validator( Types::button_text(), 'ButtonTextValidator', '$button_text' );
 
 		$result = $validator->validate( $invalid_value );
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertStringStartsWith( 'Value must be a button_text:', $result->get_error_message() );
+		$this->assertStringStartsWith( '$button_text must be a button_text', $result->get_error_message() );
 	}
 
 	/**
@@ -283,11 +283,11 @@ class ValidatorTest extends TestCase {
 	 * @dataProvider provideObjectLikes
 	 */
 	public function testInvalidButtonUrls( mixed $invalid_value ): void {
-		$validator = new Validator( Types::button_url() );
+		$validator = new Validator( Types::button_url(), 'ButtonUrlValidator', '$button_url' );
 
 		$result = $validator->validate( $invalid_value );
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertStringStartsWith( 'Value must be a button_url:', $result->get_error_message() );
+		$this->assertStringStartsWith( '$button_url must be a button_url', $result->get_error_message() );
 	}
 
 	/**
@@ -296,11 +296,11 @@ class ValidatorTest extends TestCase {
 	 * @dataProvider provideObjectLikes
 	 */
 	public function testInvalidCurrencyInCurrentLocales( mixed $invalid_value ): void {
-		$validator = new Validator( Types::currency_in_current_locale() );
+		$validator = new Validator( Types::currency_in_current_locale(), 'CurrencyInCurrentLocaleValidator', '$currency_in_current_locale' );
 
 		$result = $validator->validate( $invalid_value );
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertStringStartsWith( 'Value must be a currency_in_current_locale:', $result->get_error_message() );
+		$this->assertStringStartsWith( '$currency_in_current_locale must be a currency_in_current_locale', $result->get_error_message() );
 	}
 
 	/**
@@ -316,11 +316,11 @@ class ValidatorTest extends TestCase {
 	 * @dataProvider provideObjectLikes
 	 */
 	public function testInvalidEmailAddresses( mixed $invalid_value ): void {
-		$validator = new Validator( Types::email_address() );
+		$validator = new Validator( Types::email_address(), 'EmailAddressValidator', '$email_address' );
 
 		$result = $validator->validate( $invalid_value );
 		$this->assertinstanceof( wp_error::class, $result );
-		$this->assertstringstartswith( 'Value must be a email_address:', $result->get_error_message() );
+		$this->assertstringstartswith( '$email_address must be a email_address', $result->get_error_message() );
 	}
 
 	/**
@@ -331,11 +331,11 @@ class ValidatorTest extends TestCase {
 	 * @dataProvider provideObjectLikes
 	 */
 	public function testInvalidHtmls( mixed $invalid_value ): void {
-		$validator = new Validator( Types::html() );
+		$validator = new Validator( Types::html(), 'HtmlValidator', '$html' );
 
 		$result = $validator->validate( $invalid_value );
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertStringStartsWith( 'Value must be a html:', $result->get_error_message() );
+		$this->assertStringStartsWith( '$html must be a html', $result->get_error_message() );
 	}
 
 	/**
@@ -347,22 +347,22 @@ class ValidatorTest extends TestCase {
 	 * @dataProvider provideObjectLikes
 	 */
 	public function testInvalidIds( mixed $invalid_value ): void {
-		$validator = new Validator( Types::id() );
+		$validator = new Validator( Types::id(), 'IdValidator', '$id' );
 
 		$result = $validator->validate( $invalid_value );
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertStringStartsWith( 'Value must be a id:', $result->get_error_message() );
+		$this->assertStringStartsWith( '$id must be a id', $result->get_error_message() );
 	}
 
 	public function testInvalidNonPrimitiveType(): void {
 		$schema = [ '@type' => 'invented' ];
 
-		$validator = new Validator( $schema );
+		$validator = new Validator( $schema, 'InvalidNonPrimitiveValidator', '$invalid_non_primitive' );
 
 		$result = $validator->validate( 'hello, world!' );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Unknown type: invented', $result->get_error_message() );
+		$this->assertSame( '$invalid_non_primitive is unknown type "invented"', $result->get_error_message() );
 	}
 
 	public function testInvalidPrimitiveType(): void {
@@ -371,18 +371,18 @@ class ValidatorTest extends TestCase {
 			'@type' => 'invented',
 		];
 
-		$validator = new Validator( $schema );
+		$validator = new Validator( $schema, 'InvalidPrimitiveValidator', '$invalid_primitive' );
 
 		$result = $validator->validate( 'hello, world!' );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Unknown type: invented', $result->get_error_message() );
+		$this->assertSame( '$invalid_primitive is unknown type "invented"', $result->get_error_message() );
 	}
 
 	public function testCallable(): void {
 		$schema = Types::callable();
 
-		$validator = new Validator( $schema );
+		$validator = new Validator( $schema, 'CallableValidator', '$callable' );
 
 		$this->assertTrue( $validator->validate( 'is_string' ) );
 		$this->assertTrue( $validator->validate( function (): string {
@@ -393,26 +393,26 @@ class ValidatorTest extends TestCase {
 		$result = $validator->validate( 'foo' );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Value must be callable: foo', $result->get_error_message() );
+		$this->assertSame( '$callable must be callable', $result->get_error_message() );
 	}
 
 	public function testConst(): void {
 		$schema = Types::const( 'foo' );
 
-		$validator = new Validator( $schema );
+		$validator = new Validator( $schema, 'ConstValidator', '$const' );
 
 		$this->assertTrue( $validator->validate( 'foo' ) );
 
 		$result = $validator->validate( 'bar' );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Value must be the constant: bar', $result->get_error_message() );
+		$this->assertSame( '$const must equal the constant "foo"', $result->get_error_message() );
 	}
 
 	public function testEnum(): void {
 		$schema = Types::enum( 'foo', 'bar' );
 
-		$validator = new Validator( $schema );
+		$validator = new Validator( $schema, 'EnumValidator', '$enum' );
 
 		$this->assertTrue( $validator->validate( 'foo' ) );
 		$this->assertTrue( $validator->validate( 'bar' ) );
@@ -420,26 +420,26 @@ class ValidatorTest extends TestCase {
 		$result = $validator->validate( 'baz' );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Value must be one of the enumerated values: baz', $result->get_error_message() );
+		$this->assertSame( '$enum must be one of the enumerated values: foo, bar', $result->get_error_message() );
 	}
 
 	public function testInstanceOf(): void {
 		$schema = Types::instance_of( self::class );
 
-		$validator = new Validator( $schema );
+		$validator = new Validator( $schema, 'InstanceOfValidator', '$instance_of' );
 
 		$this->assertTrue( $validator->validate( $this ) );
 
 		$result = $validator->validate( new stdClass() );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Value must be an instance of the specified class: {}', $result->get_error_message() );
+		$this->assertSame( '$instance_of must be an instance of class "RemoteDataBlocks\Tests\Validation\ValidatorTest"', $result->get_error_message() );
 	}
 
 	public function testOneOf(): void {
 		$schema = Types::one_of( Types::string(), Types::integer() );
 
-		$validator = new Validator( $schema );
+		$validator = new Validator( $schema, 'OneOfValidator', '$one_of' );
 
 		$this->assertTrue( $validator->validate( 'foo' ) );
 		$this->assertTrue( $validator->validate( 42 ) );
@@ -447,7 +447,7 @@ class ValidatorTest extends TestCase {
 		$result = $validator->validate( null );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Value must be one of the specified types: null', $result->get_error_message() );
+		$this->assertSame( '$one_of must match one of the specified types: string, integer', $result->get_error_message() );
 	}
 
 	public function testListOfObjects(): void {
@@ -457,7 +457,7 @@ class ValidatorTest extends TestCase {
 			] )
 		);
 
-		$validator = new Validator( $schema );
+		$validator = new Validator( $schema, 'ListOfObjectsValidator', '$list_of_objects' );
 
 		$this->assertTrue( $validator->validate( [
 			[ 'a_string' => 'foo' ],
@@ -470,18 +470,18 @@ class ValidatorTest extends TestCase {
 		] );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Value must be a list of the specified type: {"a_string":42}', $result->get_error_message() );
+		$this->assertSame( "\$list_of_objects[1]['a_string'] must be a string", $result->get_error_message() );
 		$result = $validator->validate( [
 			[ 'a_string' => 'foo' ],
 			'foo',
 		] );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Value must be a list of the specified type: foo', $result->get_error_message() );
+		$this->assertSame( '$list_of_objects[1] must be an associative array', $result->get_error_message() );
 	}
 
 	public function testNullableString(): void {
-		$nullable_validator = new Validator( Types::nullable( Types::string() ) );
+		$nullable_validator = new Validator( Types::nullable( Types::string() ), 'NullableStringValidator', '$nullable_string' );
 
 		$this->assertTrue( $nullable_validator->validate( null ) );
 		$this->assertTrue( $nullable_validator->validate( 'foo' ) );
@@ -493,7 +493,7 @@ class ValidatorTest extends TestCase {
 			'maybe_a_string' => Types::nullable( Types::string() ),
 		] );
 
-		$validator = new Validator( $schema );
+		$validator = new Validator( $schema, 'ObjectValidator', '$object' );
 
 		$this->assertTrue( $validator->validate( [ 'a_string' => 'foo' ] ) );
 		$this->assertTrue( $validator->validate( [
@@ -504,12 +504,12 @@ class ValidatorTest extends TestCase {
 		$result = $validator->validate( [ 'a_string' => 42 ] );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Object must have valid property: a_string', $result->get_error_message() );
+		$this->assertSame( "\$object['a_string'] must be a string", $result->get_error_message() );
 
 		$result = $validator->validate( [] );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Object must have valid property: a_string', $result->get_error_message() );
+		$this->assertSame( "\$object['a_string'] must be a string", $result->get_error_message() );
 	}
 
 	public function testNestedObject(): void {
@@ -526,7 +526,7 @@ class ValidatorTest extends TestCase {
 			] ),
 		] );
 
-		$validator = new Validator( $schema );
+		$validator = new Validator( $schema, 'NestedObjectValidator', '$nested_object' );
 
 		$this->assertTrue( $validator->validate( [
 			'nested1' => [
@@ -553,7 +553,7 @@ class ValidatorTest extends TestCase {
 		] );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Object must have valid property: nested1', $result->get_error_message() );
+		$this->assertSame( "\$nested_object['nested1']['nested2']['list_of_objects'][1]['a_boolean'] must be a boolean", $result->get_error_message() );
 	}
 
 	public function testRecord(): void {
@@ -562,7 +562,7 @@ class ValidatorTest extends TestCase {
 			Types::integer()
 		);
 
-		$validator = new Validator( $schema );
+		$validator = new Validator( $schema, 'RecordValidator', '$record' );
 
 		$this->assertTrue( $validator->validate( [ 'record_id' => 123 ] ) );
 		$this->assertTrue( $validator->validate( [
@@ -574,7 +574,7 @@ class ValidatorTest extends TestCase {
 		$result = $validator->validate( [ 'record_id' => '123' ] );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Record must have valid value: 123', $result->get_error_message() );
+		$this->assertSame( "\$record['record_id'] must be a integer", $result->get_error_message() );
 	}
 
 	public function testObjectRef(): void {
@@ -588,7 +588,7 @@ class ValidatorTest extends TestCase {
 			'bar' => Types::use_ref( 'my-ref' ),
 		] );
 
-		$validator = new Validator( $schema );
+		$validator = new Validator( $schema, 'RefValidator', '$object_ref' );
 
 		$this->assertTrue( $validator->validate( [
 			'foo' => [ 'a_string' => 'foo' ],
@@ -601,7 +601,7 @@ class ValidatorTest extends TestCase {
 		] );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Object must have valid property: bar', $result->get_error_message() );
+		$this->assertSame( "\$object_ref['bar'] must be an associative array", $result->get_error_message() );
 
 		$result = $validator->validate( [
 			'foo' => [ 'a_string' => 'foo' ],
@@ -609,7 +609,7 @@ class ValidatorTest extends TestCase {
 		] );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Object must have valid property: bar', $result->get_error_message() );
+		$this->assertSame( "\$object_ref['bar']['a_string'] must be a string", $result->get_error_message() );
 	}
 
 	public function testSerializedConfigFor(): void {
@@ -617,7 +617,7 @@ class ValidatorTest extends TestCase {
 			'config' => Types::serialized_config_for( MockSerializableClass::class ),
 		] );
 
-		$validator = new Validator( $schema );
+		$validator = new Validator( $schema, 'SerializedConfigValidator', '$serialized_config' );
 
 		$this->assertTrue( $validator->validate( [
 			'config' => [
@@ -638,24 +638,21 @@ class ValidatorTest extends TestCase {
 		] );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Object must have valid property: config', $result->get_error_message() );
-		$this->assertSame( 'Object must have valid property: boolean_value', $result->get_error_data()['child']->get_error_message() );
+		$this->assertSame( "\$serialized_config['config']['boolean_value'] must be a boolean", $result->get_error_message() );
 
 		$result = $validator->validate( [
 			'config' => null,
 		] );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Object must have valid property: config', $result->get_error_message() );
-		$this->assertSame( 'Value must be an associative array: null', $result->get_error_data()['child']->get_error_message() );
+		$this->assertSame( "\$serialized_config['config'] must be an associative array", $result->get_error_message() );
 
 		$result = $validator->validate( [
 			'config' => new stdClass(),
 		] );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Object must have valid property: config', $result->get_error_message() );
-		$this->assertSame( 'Value must be an associative array: {}', $result->get_error_data()['child']->get_error_message() );
+		$this->assertSame( "\$serialized_config['config'] must be an associative array", $result->get_error_message() );
 
 		$result = $validator->validate( [
 			'config' => [
@@ -664,8 +661,7 @@ class ValidatorTest extends TestCase {
 		] );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Object must have valid property: config', $result->get_error_message() );
-		$this->assertSame( 'Object must have valid property: boolean_value', $result->get_error_data()['child']->get_error_message() );
+		$this->assertSame( "\$serialized_config['config']['boolean_value'] must be a boolean", $result->get_error_message() );
 	}
 
 	public function testSerializedConfigForSubclass(): void {
@@ -673,7 +669,7 @@ class ValidatorTest extends TestCase {
 			'config' => Types::serialized_config_for( MockSerializableClass::class ),
 		] );
 
-		$validator = new Validator( $schema );
+		$validator = new Validator( $schema, 'SerializedConfigForSubclassValidator', '$serialized_config' );
 
 		$this->assertTrue( $validator->validate( [
 			'config' => [
@@ -695,20 +691,19 @@ class ValidatorTest extends TestCase {
 		] );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Object must have valid property: config', $result->get_error_message() );
-		$this->assertSame( 'Object must have valid property: extra_value', $result->get_error_data()['child']->get_error_message() );
+		$this->assertSame( "\$serialized_config['config']['extra_value'] must be a string", $result->get_error_message() );
 	}
 
 	public function testStringMatching(): void {
 		$schema = Types::string_matching( '/^foo$/' );
 
-		$validator = new Validator( $schema );
+		$validator = new Validator( $schema, 'StringMatchingValidator', '$string_matching' );
 
 		$this->assertTrue( $validator->validate( 'foo' ) );
 
 		$result = $validator->validate( 'bar' );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
-		$this->assertSame( 'Value must match the specified regex: bar', $result->get_error_message() );
+		$this->assertSame( '$string_matching must match regex "/^foo$/"', $result->get_error_message() );
 	}
 }

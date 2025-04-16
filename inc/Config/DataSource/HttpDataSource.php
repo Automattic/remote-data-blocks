@@ -45,7 +45,7 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 	 */
 	public static function preprocess_config( array $config ): array|WP_Error {
 		$service_config = $config['service_config'] ?? [];
-		$validator = new Validator( static::get_service_config_schema() );
+		$validator = new Validator( static::get_service_config_schema(), static::class, '$service_config' );
 		$validated = $validator->validate( $service_config );
 
 		if ( is_wp_error( $validated ) ) {

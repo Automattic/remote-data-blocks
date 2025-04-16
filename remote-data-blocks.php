@@ -58,6 +58,9 @@ Integrations\VipBlockDataApi\VipBlockDataApi::init();
 // REST endpoints
 REST\RemoteDataController::init();
 
+// QueryMonitor panel
+Logging\QueryMonitor\QueryMonitor::init();
+
 // Fire action to indicate that the plugin is loaded
 do_action( 'remote_data_blocks_loaded' );
 

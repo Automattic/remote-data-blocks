@@ -128,7 +128,7 @@ class RemoteDataBlockAttributeTest extends TestCase {
 		$block_attribute = RemoteDataBlockAttribute::from_array( $config );
 
 		$this->assertTrue( is_wp_error( $block_attribute ) );
-		$this->assertEquals( 'Object must have valid property: blockName', $block_attribute->get_error_message() );
+		$this->assertEquals( "\$config['blockName'] must be a string", $block_attribute->get_error_message() );
 	}
 
 	public function test_only_block_name_is_required(): void {
