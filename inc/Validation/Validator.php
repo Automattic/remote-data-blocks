@@ -30,6 +30,7 @@ final class Validator implements ValidatorInterface {
 	 * Validate a value recursively against a schema.
 	 *
 	 * @param array<string, mixed> $type The schema to validate against.
+	 * @param string $path The PHP-syntax path to the value being validated.
 	 * @param mixed $value The value to validate.
 	 * @return bool|WP_Error Returns true if the data is valid, otherwise a WP_Error.
 	 */
@@ -62,7 +63,7 @@ final class Validator implements ValidatorInterface {
 	 * return the value directly or check it with is_wp_error().
 	 *
 	 * @param array<string, mixed> $type The schema type to validate against.
-	 * @param string $path The path to the value in the schema.
+	 * @param string $path The PHP-syntax path to the value being validated.
 	 * @param mixed $value The value to validate.
 	 * @return bool|WP_Error Returns true if the data is valid, otherwise a WP_Error.
 	 */
@@ -241,6 +242,16 @@ final class Validator implements ValidatorInterface {
 		}
 	}
 
+	/**
+	 * Validate a primitive value against a schema. This method returns true
+	 * or a WP_Error object. Never check the return value for truthiness; either
+	 * return the value directly or check it with is_wp_error().
+	 *
+	 * @param string $type_name The string name of the schema type to validate against.
+	 * @param string $path The PHP-syntax path to the value being validated.
+	 * @param mixed $value The value to validate.
+	 * @return bool|WP_Error Returns true if the data is valid, otherwise a WP_Error.
+	 */
 	private function check_primitive_type( string $type_name, string $path, mixed $value ): bool|WP_Error {
 		switch ( $type_name ) {
 			case 'any':
