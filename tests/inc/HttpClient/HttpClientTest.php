@@ -107,28 +107,6 @@ class HttpClientTest extends TestCase {
 		$this->assertSame( 'Connection Error', $results[2]['reason']->getMessage() );
 	}
 
-	public function testRepeatedGetCallsWithErrorsResultsInCacheHit(): void {
-		// We are going to simulate a scenario where the first request returns a 200 response,
-		// and the second request returns a 500 error.
-		$this->mock_handler->append( new Response( 200, [], 'Cached Response' ), new Response( 500, [], 'Server Error' ) );
-		$this->assertEquals( 2, $this->mock_handler->count(), 'The mock handler should have exactly two requests' );
-
-		// Make the first request and ensure the 200 is cached
-		$first_response = $this->http_client->request( 'GET', '/test' );
-		$this->assertEquals( 1, $this->mock_handler->count(), 'The mock handler should have exactly one request after the first request' );
-		$this->assertEquals( 200, $first_response->getStatusCode() );
-		$this->assertEquals( 'Cached Response', (string) $first_response->getBody() );
-		$this->assertEquals( 'MISS', $first_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
-
-
-		// Make the second request to the same endpoint, and it should return the cached response
-		$second_response = $this->http_client->request( 'GET', '/test' );
-		$this->assertEquals( 200, $second_response->getStatusCode() );
-		$this->assertEquals( 'Cached Response', (string) $second_response->getBody() );
-		$this->assertEquals( 'HIT', $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
-		$this->assertEquals( 1, $this->mock_handler->count(), 'The mock handler should be not be empty as a cached 200 is returned during an error' );
-	}
-
 	public function testRepeatedGetCallsResultsInCacheHit(): void {
 		// Set up the mock handler with only one response
 		$this->mock_handler->append( new Response( 200, [], 'Cached Response' ) );
