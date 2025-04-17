@@ -72,7 +72,7 @@ When a request to your site renders one or more remote data blocks, our plugin w
 
 The plugin offers a caching layer for optimal performance and helps avoid rate limiting from remote data sources. It will be used if your WordPress environment configures a [persistent object cache](https://developer.wordpress.org/reference/classes/wp_object_cache/#persistent-cache-plugins). Otherwise, the plugin will utilize in-memory (per-page-load) caching. Deploying to production without a persistent object cache is not recommended.
 
-The default TTL for all cache objects is 60 seconds, but it can be [configured per query or request](../extending/query.md#get_cache_ttl).
+The default TTL for all cache objects is 5 minutes, but it can be [configured per query or request](../extending/query.md#get_cache_ttl).
 
 ## Theming
 
