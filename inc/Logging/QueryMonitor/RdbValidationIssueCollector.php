@@ -89,7 +89,7 @@ if ( class_exists( 'QM_Collector_Logger' ) ) {
 				),
 			] );
 
-			$this->data->counts[ $level ] = $this->data->counts[ $level ] + 1;
+			$this->data->counts[ $level ] = ( $this->data->counts[ $level ] ?? 0 ) + 1;
 			$this->data->logs[] = [
 				'message' => self::interpolate( $message, $context, $prefix ),
 				'filtered_trace' => $trace->get_filtered_trace(),
