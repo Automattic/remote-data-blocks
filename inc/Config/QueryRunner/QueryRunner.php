@@ -82,15 +82,20 @@ class QueryRunner implements QueryRunnerInterface {
 		$port = ! empty( $parsed_url['port'] ?? '' ) ? ':' . $parsed_url['port'] : '';
 		$pass = ! empty( $parsed_url['pass'] ?? '' ) ? ':' . $parsed_url['pass'] : '';
 		$pass = ( $user || $pass ) ? $pass . '@' : '';
-
 		$origin = sprintf( '%s://%s%s%s%s', $scheme, $user, $pass, $host, $port );
+
+		$cache_headers = [];
+		if ( intval( $cache_ttl ) > 0 ) {
+			$cache_headers[ RdbCacheStrategy::CACHE_TTL_REQUEST_HEADER ] = $cache_ttl;
+		}
+		if ( intval( $cache_ttl ) < 0 ) {
+			$cache_headers['Cache-Control'] = 'no-store';
+		}
 
 		$request_details = [
 			'method' => $method,
 			'options' => [
-				RequestOptions::HEADERS => array_merge( $headers, [
-					RdbCacheStrategy::CACHE_TTL_REQUEST_HEADER => $cache_ttl,
-				] ),
+				RequestOptions::HEADERS => array_merge( $headers, $cache_headers ),
 				RequestOptions::JSON => $body,
 			],
 			'origin' => $origin,
