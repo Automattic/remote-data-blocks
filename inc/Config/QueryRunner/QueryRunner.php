@@ -7,6 +7,7 @@ use GuzzleHttp\RequestOptions;
 use RemoteDataBlocks\Config\Query\HttpQueryInterface;
 use RemoteDataBlocks\Editor\DataBinding\Pagination;
 use RemoteDataBlocks\HttpClient\HttpClient;
+use RemoteDataBlocks\HttpClient\RdbCacheStrategy;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit();
@@ -17,10 +18,14 @@ defined( 'ABSPATH' ) || exit();
  * Class that executes queries.
  */
 class QueryRunner implements QueryRunnerInterface {
+	protected HttpClient $http_client;
+
 	/**
-	 * @param HttpClient $http_client The HTTP client used to make HTTP requests.
+	 * @param HttpClient|null $http_client The HTTP client used to make HTTP requests.
 	 */
-	public function __construct( private HttpClient $http_client = new HttpClient() ) {}
+	public function __construct( ?HttpClient $http_client = null ) {
+		$this->http_client = $http_client ?? HttpClient::instance();
+	}
 
 	/**
 	 * Get the HTTP request details for the query
@@ -81,11 +86,12 @@ class QueryRunner implements QueryRunnerInterface {
 		$request_details = [
 			'method' => $method,
 			'options' => [
-				RequestOptions::HEADERS => $headers,
+				RequestOptions::HEADERS => array_merge( $headers, [
+					RdbCacheStrategy::CACHE_TTL_REQUEST_HEADER => $cache_ttl,
+				] ),
 				RequestOptions::JSON => $body,
 			],
 			'origin' => sprintf( '%s://%s%s%s%s', $scheme, $user, $pass, $host, $port ),
-			'ttl' => $cache_ttl,
 			'uri' => sprintf( '%s%s', $path, $query ),
 		];
 
@@ -121,12 +127,6 @@ class QueryRunner implements QueryRunnerInterface {
 		if ( is_wp_error( $request_details ) ) {
 			return $request_details;
 		}
-
-		$client_options = [
-			HttpClient::CACHE_TTL_CLIENT_OPTION_KEY => $request_details['ttl'],
-		];
-
-		$this->http_client->init( $request_details['origin'], [], $client_options );
 
 		try {
 			$response = $this->http_client->request( $request_details['method'], $request_details['uri'], $request_details['options'] );

@@ -13,19 +13,21 @@ use RemoteDataBlocks\Logging\Logger;
 use RemoteDataBlocks\Logging\LoggerManager;
 
 class RdbCacheStrategy extends GreedyCacheStrategy {
+	public const CACHE_TTL_REQUEST_HEADER = GreedyCacheStrategy::HEADER_TTL;
+
 	private const CACHE_INVALIDATING_REQUEST_HEADERS = [ 'Authorization', 'Cache-Control' ];
 	private const FALLBACK_CACHE_TTL_IN_SECONDS = 300; // 5 minutes
 	private const WP_OBJECT_CACHE_GROUP = 'remote-data-blocks';
 
 	private Logger $logger;
 
-	public function __construct( ?int $default_ttl = null, ?CacheStorageInterface $storage = null ) {
+	public function __construct( ?CacheStorageInterface $storage = null ) {
 		// Filter this if customization is needed.
 		$vary_headers = new KeyValueHttpHeader( self::CACHE_INVALIDATING_REQUEST_HEADERS );
 
 		parent::__construct(
 			$storage ?? new WordPressObjectCacheStorage( self::WP_OBJECT_CACHE_GROUP ),
-			$default_ttl ?? self::FALLBACK_CACHE_TTL_IN_SECONDS,
+			self::FALLBACK_CACHE_TTL_IN_SECONDS,
 			$vary_headers
 		);
 

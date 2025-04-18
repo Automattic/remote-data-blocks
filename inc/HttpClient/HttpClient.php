@@ -16,86 +16,56 @@ use RemoteDataBlocks\Logging\LoggerManager;
 defined( 'ABSPATH' ) || exit();
 
 class HttpClient {
-	public Client $client;
+	public const USER_AGENT_STRING = 'WordPress Remote Data Blocks/1.0';
 
-	public const CACHE_TTL_CLIENT_OPTION_KEY = '__default_cache_ttl';
-
-	private string $base_uri;
-	private HandlerStack $handler_stack;
-	private static RdbCacheMiddleware $cache_middleware;
+	protected Client $client;
 
 	/**
-	 * @var array<string, string>
+	 * Private constructor to enforce singleton pattern.
 	 */
-	private array $headers = [];
-
-	/**
-	 * @var array<string, mixed>
-	 */
-	private array $options = [];
-
-	/**
-	 * @var array<string, mixed>
-	 */
-	private array $default_options = [
-		'headers' => [
-			'User-Agent' => 'WordPress Remote Data Blocks/1.0',
-		],
-	];
-
-	/**
-	 * Get the cache middleware for the HTTP client.
-	 */
-	protected static function get_cache_middleware(): callable {
-		if ( ! isset( self::$cache_middleware ) ) {
-			self::$cache_middleware = new RdbCacheMiddleware( new RdbCacheStrategy() );
-		}
-
-		return self::$cache_middleware;
-	}
-
-	/**
-	 * Initialize the HTTP client.
-	 */
-	public function init( string $base_uri, array $headers = [], array $client_options = [] ): void {
-		$this->base_uri = $base_uri;
-		$this->headers = $headers;
-		$this->options = $client_options;
-
+	private function __construct() {
 		// Initialize a request handler that uses wp_remote_request instead of cURL.
 		// PHP cURL bindings are not always available, e.g., in WASM environments
 		// like WP Now and WP Playground.
 		$request_handler = new WPRemoteRequestHandler();
 
-		$this->handler_stack = HandlerStack::create( $request_handler );
+		$handler_stack = HandlerStack::create( $request_handler );
 
-		$this->handler_stack->push( Middleware::mapRequest( function ( RequestInterface $request ) {
-			foreach ( $this->headers as $header => $value ) {
-				$request = $request->withHeader( $header, $value );
-			}
+		$handler_stack->push( new RdbCacheMiddleware( new RdbCacheStrategy() ), 'remote_data_blocks_cache' );
 
-			return $request;
-		} ) );
-
-		$default_ttl = $client_options[ self::CACHE_TTL_CLIENT_OPTION_KEY ] ?? null;
-		$cache_middleware = self::get_cache_middleware( $default_ttl );
-		$this->handler_stack->push( $cache_middleware, 'remote_data_blocks_cache' );
-
-		$this->handler_stack->push( Middleware::log(
+		$handler_stack->push( Middleware::log(
 			LoggerManager::instance(),
 			new MessageFormatter( '{total_time} {code} {phrase} {method} {url}' )
 		) );
 
-		$this->client = new Client( array_merge( $this->default_options, $this->options, [
-			'base_uri' => $this->base_uri,
-			'handler' => $this->handler_stack,
-		] ) );
+		// Set our User Agent header.
+		$handler_stack->push( Middleware::mapRequest( function ( RequestInterface $request ) {
+			return $request->withHeader( 'User-Agent', self::USER_AGENT_STRING );
+		} ) );
+
+		$this->client = new Client( [ 'handler' => $handler_stack ] );
+	}
+
+	/**
+	 * Get the singleton instance of HttpClient.
+	 *
+	 * @return self The singleton instance.
+	 */
+	public static function instance(): self {
+		static $instance = null;
+
+		if ( null === $instance ) {
+			$instance = new self();
+		}
+
+		return $instance;
 	}
 
 	/**
 	 * Execute a request.
 	 */
-	public function request( string $method, string|UriInterface $uri, array $options = [] ): ResponseInterface {
-		return $this->client->request( $method, $uri, array_merge( $this->options, $options ) );
+	public function request( string $method, string|UriInterface $uri, array $options = [], ?Client $client = null ): ResponseInterface {
+		$http_client = $client ?? $this->client;
+		return $http_client->request( $method, $uri, $options );
 	}
 }
