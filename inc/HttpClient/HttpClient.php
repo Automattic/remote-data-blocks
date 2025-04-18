@@ -2,10 +2,8 @@
 
 namespace RemoteDataBlocks\HttpClient;
 
-use Exception;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\Utils;
@@ -20,8 +18,6 @@ defined( 'ABSPATH' ) || exit();
 
 class HttpClient {
 	public Client $client;
-
-	private const MAX_RETRIES = 3;
 
 	public const CACHE_TTL_CLIENT_OPTION_KEY = '__default_cache_ttl';
 
@@ -79,11 +75,6 @@ class HttpClient {
 
 		$this->handler_stack = HandlerStack::create( $request_handler );
 
-		$this->handler_stack->push( Middleware::retry(
-			self::class . '::retry_decider',
-			self::class . '::retry_delay'
-		) );
-
 		$this->handler_stack->push( Middleware::mapRequest( function ( RequestInterface $request ) {
 			foreach ( $this->headers as $header => $value ) {
 				$request = $request->withHeader( $header, $value );
@@ -105,57 +96,6 @@ class HttpClient {
 			'base_uri' => $this->base_uri,
 			'handler' => $this->handler_stack,
 		] ) );
-	}
-
-	/**
-	 * Determine if the request request be retried.
-	 *
-	 * @param int               $retries Number of retries that have been attempted so far.
-	 * @param RequestInterface  $request Request that was sent.
-	 * @param ResponseInterface $response Response that was received.
-	 * @param Exception         $exception Exception that was received (if any).
-	 * @return bool Whether the request should be retried.
-	 */
-	public static function retry_decider( int $retries, RequestInterface $request, ?ResponseInterface $response = null, ?Exception $exception = null ): bool {
-		// Exceeding max retries is not overrideable.
-		if ( $retries >= self::MAX_RETRIES ) {
-			return false;
-		}
-
-		$should_retry = false;
-
-		if ( $response && $response->getStatusCode() >= 500 ) {
-			$should_retry = true;
-		}
-
-		if ( $exception ) {
-			$should_retry = $should_retry || $exception instanceof ConnectException;
-		}
-
-		return apply_filters( 'remote_data_blocks_http_client_retry_decider', $should_retry, $retries, $request, $response, $exception );
-	}
-
-	/**
-	 * Calculate the delay before retrying a request.
-	 *
-	 * @param int               $retries Number of retries that have been attempted so far.
-	 * @param ResponseInterface $response Response that was received.
-	 * @return int Number of milliseconds to delay.
-	 */
-	public static function retry_delay( int $retries, ?ResponseInterface $response ): int {
-		// Be default, implement a linear backoff strategy.
-		$retry_after = $retries;
-
-		if ( $response instanceof ResponseInterface && $response->hasHeader( 'Retry-After' ) ) {
-			$retry_after = $response->getHeaderLine( 'Retry-After' );
-
-			if ( ! is_numeric( $retry_after ) ) {
-				$retry_after = ( new \DateTime( $retry_after ) )->getTimestamp() - time();
-			}
-		}
-
-		$retry_after_ms = (int) $retry_after * 1000;
-		return apply_filters( 'remote_data_blocks_http_client_retry_delay', $retry_after_ms, $retries, $response );
 	}
 
 	/**

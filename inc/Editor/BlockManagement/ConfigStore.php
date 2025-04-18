@@ -29,7 +29,7 @@ class ConfigStore {
 	 * titles must be unique).
 	 */
 	public static function get_block_name( string $block_title ): string {
-		return 'remote-data-blocks/' . sanitize_title_with_dashes( $block_title );
+		return 'remote-data-blocks/' . sanitize_title_with_dashes( $block_title, '', 'save' );
 	}
 
 	/**
