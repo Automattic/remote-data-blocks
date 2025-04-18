@@ -375,7 +375,7 @@ class QueryRunnerTest extends TestCase {
 			->expects( $this->exactly( 1 ) )
 			->method( 'request' )
 			->willReturn( $response )
-			->with( 'GET', '/api?foo=bar&baz=MISSING' );
+			->with( 'GET', 'https://example.com/api?foo=bar&baz=MISSING' );
 
 		$result = $query->execute( [] );
 

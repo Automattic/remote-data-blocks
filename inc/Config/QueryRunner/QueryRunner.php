@@ -83,6 +83,8 @@ class QueryRunner implements QueryRunnerInterface {
 		$pass = ! empty( $parsed_url['pass'] ?? '' ) ? ':' . $parsed_url['pass'] : '';
 		$pass = ( $user || $pass ) ? $pass . '@' : '';
 
+		$origin = sprintf( '%s://%s%s%s%s', $scheme, $user, $pass, $host, $port );
+
 		$request_details = [
 			'method' => $method,
 			'options' => [
@@ -91,8 +93,8 @@ class QueryRunner implements QueryRunnerInterface {
 				] ),
 				RequestOptions::JSON => $body,
 			],
-			'origin' => sprintf( '%s://%s%s%s%s', $scheme, $user, $pass, $host, $port ),
-			'uri' => sprintf( '%s%s', $path, $query ),
+			'origin' => $origin,
+			'uri' => sprintf( '%s%s%s', $origin, $path, $query ),
 		];
 
 		/**
