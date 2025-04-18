@@ -6,7 +6,6 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Client;
 use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
-use GuzzleHttp\Promise\Utils;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
@@ -45,16 +44,11 @@ class HttpClient {
 	];
 
 	/**
-	 * @var array<int, array{method: string, uri: string|UriInterface, options: array<string, mixed>}>
-	 */
-	private array $queued_requests = [];
-
-	/**
 	 * Get the cache middleware for the HTTP client.
 	 */
-	protected static function get_cache_middleware( int|null $default_ttl = null ): callable {
+	protected static function get_cache_middleware(): callable {
 		if ( ! isset( self::$cache_middleware ) ) {
-			self::$cache_middleware = new RdbCacheMiddleware( new RdbCacheStrategy( $default_ttl ) );
+			self::$cache_middleware = new RdbCacheMiddleware( new RdbCacheStrategy() );
 		}
 
 		return self::$cache_middleware;
@@ -99,55 +93,9 @@ class HttpClient {
 	}
 
 	/**
-	 * Queue a request for later execution.
-	 */
-	public function queue_request( string $method, string|UriInterface $uri, array $options = [] ): void {
-		$this->queued_requests[] = [
-			'method' => $method,
-			'uri' => $uri,
-			'options' => array_merge( $this->options, $options ),
-		];
-	}
-
-	/**
-	 * Execute all queued requests in parallel.
-	 */
-	public function execute_parallel(): array {
-		$promises = [];
-		foreach ( $this->queued_requests as $request ) {
-			$promises[] = $this->client->requestAsync(
-				$request['method'],
-				$request['uri'],
-				$request['options']
-			);
-		}
-
-		$results = Utils::settle( $promises )->wait();
-
-		// Clear the queue after execution
-		$this->queued_requests = [];
-
-		return $results;
-	}
-
-	/**
 	 * Execute a request.
 	 */
 	public function request( string $method, string|UriInterface $uri, array $options = [] ): ResponseInterface {
 		return $this->client->request( $method, $uri, array_merge( $this->options, $options ) );
-	}
-
-	/**
-	 * Execute a GET request.
-	 */
-	public function get( string|UriInterface $uri, array $options = [] ): ResponseInterface {
-		return $this->request( 'GET', $uri, $options );
-	}
-
-	/**
-	 * Execute a POST request.
-	 */
-	public function post( string|UriInterface $uri, array $options = [] ): ResponseInterface {
-		return $this->request( 'POST', $uri, $options );
 	}
 }
