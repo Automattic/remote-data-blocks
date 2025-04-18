@@ -60,40 +60,6 @@ class HttpClientTest extends TestCase {
 		$this->assertSame( 'MISS', $response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
 	}
 
-	public function testRetryDecider(): void {
-		$request = new Request( 'GET', '/test' );
-
-		// Test max retries
-		$this->assertFalse( HttpClient::retry_decider( 3, $request ) );
-
-		// Test 500 status code
-		$response = new Response( 500 );
-		$this->assertTrue( HttpClient::retry_decider( 0, $request, $response ) );
-
-		// Test ConnectException
-		$exception = new ConnectException( 'Error Connecting', $request );
-		$this->assertTrue( HttpClient::retry_decider( 0, $request, null, $exception ) );
-
-		// Test no retry on good response
-		$response = new Response( 200 );
-		$this->assertFalse( HttpClient::retry_decider( 0, $request, $response ) );
-	}
-
-	public function testRetryDelay(): void {
-		$response = new Response( 429, [ 'Retry-After' => '120' ] );
-		$delay = HttpClient::retry_delay( 1, $response );
-		$this->assertSame( 120000, $delay );
-
-		$response = new Response( 429, [ 'Retry-After' => ( new \DateTime( '+2 minutes' ) )->format( \DateTime::RFC7231 ) ] );
-		$delay = HttpClient::retry_delay( 1, $response );
-		$this->assertGreaterThan( 119000, $delay );
-		$this->assertLessThan( 121000, $delay );
-
-		$response = new Response( 500 );
-		$delay = HttpClient::retry_delay( 2, $response );
-		$this->assertSame( 2000, $delay );
-	}
-
 	public function testQueueRequestAndExecuteParallel(): void {
 		$this->mock_handler->append( new Response( 200, [], 'Response 1' ) );
 		$this->mock_handler->append( new Response( 201, [], 'Response 2' ) );

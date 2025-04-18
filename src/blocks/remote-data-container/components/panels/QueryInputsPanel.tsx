@@ -2,13 +2,23 @@ import { Button, PanelBody, TextControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
+import { DISPLAY_QUERY_KEY } from '@/blocks/remote-data-container/config/constants';
+
 interface QueryInputsPanelProps {
-	queryInputs: RemoteDataQueryInput[];
-	onUpdateQueryInputs: ( inputs: RemoteDataQueryInput[] ) => void;
+	onUpdateQueryInputs: ( queryKey: string, inputs: RemoteDataQueryInput[] ) => void;
+	remoteData: RemoteData;
+	selectors: BlockConfig[ 'selectors' ];
 }
 
-export function QueryInputsPanel( { queryInputs, onUpdateQueryInputs }: QueryInputsPanelProps ) {
+export function QueryInputsPanel( {
+	onUpdateQueryInputs,
+	remoteData,
+	selectors,
+}: QueryInputsPanelProps ) {
+	const { queryInputs = [], queryKey = DISPLAY_QUERY_KEY } = remoteData;
 	const [ localInputs, setLocalInputs ] = useState( queryInputs );
+	const inputDefinitions =
+		selectors?.find( selector => selector.query_key === queryKey )?.inputs ?? [];
 
 	return (
 		<PanelBody title={ __( 'Query Inputs', 'remote-data-blocks' ) }>
@@ -29,17 +39,18 @@ export function QueryInputsPanel( { queryInputs, onUpdateQueryInputs }: QueryInp
 						return Object.fromEntries( entries ) as RemoteDataQueryInput;
 					} );
 
-					onUpdateQueryInputs( cleanedInputs );
+					onUpdateQueryInputs( queryKey, cleanedInputs );
 				} }
 			>
 				{ localInputs.map( ( input, index ) =>
 					Object.entries( input ).map( ( [ key, value ] ) => {
 						const displayValue = Array.isArray( value ) ? value.join( ',' ) : ( value as string );
+						const inputDefinition = inputDefinitions.find( definition => definition.slug === key );
 
 						return (
 							<TextControl
 								key={ `${ index }-${ key }` }
-								label={ key }
+								label={ inputDefinition?.name ?? key }
 								value={ displayValue }
 								onChange={ newValue => {
 									setLocalInputs(
@@ -49,7 +60,7 @@ export function QueryInputsPanel( { queryInputs, onUpdateQueryInputs }: QueryInp
 									);
 								} }
 								onBlur={ () => {
-									onUpdateQueryInputs( localInputs );
+									onUpdateQueryInputs( queryKey, localInputs );
 								} }
 								__next40pxDefaultSize
 								__nextHasNoMarginBottom

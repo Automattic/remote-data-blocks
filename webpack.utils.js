@@ -7,7 +7,7 @@ const path = require( 'path' );
 // This function modernizes the configuration object to support TypeScript. It
 // also allows for additional scripts to be added to the entry point. Blocks are
 // included by default, so this is only needed for non-block scripts.
-function modernize( config, additionalScripts = {}, additionalPlugins = [] ) {
+function modernize( config, additionalScripts = {}, additionalPlugins = [], watchOptions = {} ) {
 	return {
 		...config,
 		entry: {
@@ -37,6 +37,7 @@ function modernize( config, additionalScripts = {}, additionalPlugins = [] ) {
 				'@': path.resolve( __dirname, 'src/' ),
 			},
 		},
+		watchOptions: { ...config.watchOptions, ...watchOptions },
 	};
 }
 

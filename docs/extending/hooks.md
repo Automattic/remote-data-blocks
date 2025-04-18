@@ -146,30 +146,3 @@ function custom_query_response_metadata( array $metadata, HttpQueryInterface $qu
 }
 add_filter( 'remote_data_blocks_query_response_metadata', 'custom_query_response_metadata', 10, 3 );
 ```
-
-### remote_data_blocks_http_client_retry_delay
-
-Filter to change the defualt 1 second delapy after an HTTP request fails. The Remote Data Blocks Plugin uses the [Guzzle](https://github.com/guzzle/guzzle) HTTP client. You can read about the response interface in their [documentation](https://docs.guzzlephp.org/en/stable/).
-
-```php
-function custom_response_retry_delay( int $retry_after_ms, int $retries, ?ResponseInterface $response ): int {
-	// Implement a custom exponential backoff strategy.
-	return floor( pow( 1.5, $retries ) * 1000 );
-}
-add_filter( 'remote_data_blocks_http_client_retry_delay', 'custom_response_retry_delay', 10, 3 );
-```
-
-### remote_data_blocks_http_client_retry_decider
-
-Filter the default HTTP retry logic when an HTTP request fails or encounters an exception. The Remote Data Blocks Plugin uses the [Guzzle](https://github.com/guzzle/guzzle) HTTP client. You can read about the request, response, and exception interfaces in their [documentation](https://docs.guzzlephp.org/en/stable/).
-
-```php
-function custom_retry_decider( bool $should_retry, int $retries, RequestInterface $request, ?ResponseInterface $response, ?Exception $exception ): bool {
-	// Retry on a 408 error if the number of retries is less than 5.
-	if ( $retries < 5 && $response && 408 === $response->getStatusCode ) {
-		return true;
-	}
-	return $should_retry;
-}
-add_filter( 'remote_data_blocks_http_client_retry_decider', 'custom_response_retry_on_exception', 10, 5 );
-```
