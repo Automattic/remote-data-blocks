@@ -4,14 +4,10 @@ namespace RemoteDataBlocks\HttpClient;
 
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Client;
-use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
-use RemoteDataBlocks\HttpClient\RdbCacheStrategy;
-use RemoteDataBlocks\HttpClient\RdbCacheMiddleware;
-use RemoteDataBlocks\Logging\LoggerManager;
 
 defined( 'ABSPATH' ) || exit();
 
@@ -31,12 +27,8 @@ class HttpClient {
 
 		$handler_stack = HandlerStack::create( $request_handler );
 
+		$handler_stack->push( new RdbLogMiddleware(), 'remote_data_blocks_logger' );
 		$handler_stack->push( new RdbCacheMiddleware( new RdbCacheStrategy() ), 'remote_data_blocks_cache' );
-
-		$handler_stack->push( Middleware::log(
-			LoggerManager::instance(),
-			new MessageFormatter( '{total_time} {code} {phrase} {method} {url}' )
-		) );
 
 		// Set our User Agent header.
 		$handler_stack->push( Middleware::mapRequest( function ( RequestInterface $request ) {
