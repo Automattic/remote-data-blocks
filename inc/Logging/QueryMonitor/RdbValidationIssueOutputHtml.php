@@ -23,13 +23,6 @@ class RdbValidationIssueOutputHtml extends QM_Output_Html_Logger {
 		$count = 0;
 
 		if ( ! empty( $data->logs ) ) {
-			foreach ( $data->logs as $log ) {
-				if ( in_array( $log['level'], $this->collector->get_warning_levels(), true ) ) {
-					$key = 'warning';
-					break;
-				}
-			}
-
 			$count = count( $data->logs );
 
 			/* translators: %s: Number of logs that are available */
