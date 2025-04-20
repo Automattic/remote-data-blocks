@@ -5,7 +5,6 @@ namespace RemoteDataBlocks\REST;
 defined( 'ABSPATH' ) || exit();
 
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
-use RemoteDataBlocks\Logging\LoggerManager;
 use WP_Error;
 use WP_REST_Request;
 use function wp_generate_uuid4;
@@ -63,8 +62,6 @@ class RemoteDataController {
 		$query_response = $query->execute_batch( $query_inputs );
 
 		if ( is_wp_error( $query_response ) ) {
-			$logger = LoggerManager::instance();
-			$logger->warning( $query_response->get_error_message() );
 			return $query_response;
 		}
 
