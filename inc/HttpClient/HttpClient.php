@@ -5,6 +5,7 @@ namespace RemoteDataBlocks\HttpClient;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Client;
 use GuzzleHttp\Middleware;
+use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
@@ -58,6 +59,11 @@ class HttpClient {
 	 */
 	public function request( string $method, string|UriInterface $uri, array $options = [], ?Client $client = null ): ResponseInterface {
 		$http_client = $client ?? $this->client;
+		$options = array_merge( $options, [
+			// Avoid thrown exceptions for HTTP errors.
+			RequestOptions::HTTP_ERRORS => false,
+		] );
+
 		return $http_client->request( $method, $uri, $options );
 	}
 }
