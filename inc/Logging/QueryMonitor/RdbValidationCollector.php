@@ -16,7 +16,7 @@ if ( class_exists( 'QM_Collector_Logger' ) ) {
 	/**
 	 * @extends QM_Collector_Logger<QM_Data_Logger>
 	 */
-	class RdbValidationIssueCollector extends QM_Collector_Logger {
+	class RdbValidationCollector extends QM_Collector_Logger {
 		/**
 		 * @var string
 		 */

@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( class_exists( 'QM_Output_Html_Logger' ) ) {
-	class RdbValidationIssueOutputHtml extends QM_Output_Html_Logger {
+	class RdbValidationOutputHtml extends QM_Output_Html_Logger {
 		public static string $collector_id = 'remote-data-blocks-validation';
 
 		public function admin_menu( array $menu ): array {
@@ -21,19 +21,13 @@ if ( class_exists( 'QM_Output_Html_Logger' ) ) {
 				$count = count( $data->logs );
 
 				/* translators: %s: Number of logs that are available */
-				$label = __( 'Validation issues (%s)', 'query-monitor' );
+				$label = __( 'Validation (%s)', 'query-monitor' );
 			} else {
-				$label = __( 'Validation issues', 'query-monitor' );
+				$label = __( 'Validation', 'query-monitor' );
 			}
 
-			if ( ! isset( $menu['remote-data-blocks'] ) ) {
-					$menu['remote-data-blocks'] = $this->menu( [
-						'title' => __( 'Remote Data Blocks', 'query-monitor' ),
-					] );
-			}
-
-			$menu['remote-data-blocks']['children'][ $this->collector->id() ] = $this->menu( array(
-				'id' => 'remote-data-blocks-validation',
+			$menu['qm-remote-data-blocks']['children'][ $this->collector->id() ] = $this->menu( array(
+				'id' => 'qm-remote-data-blocks-validation',
 				'title' => esc_html( sprintf(
 					$label,
 					number_format_i18n( $count )
