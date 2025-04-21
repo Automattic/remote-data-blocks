@@ -32,18 +32,6 @@ class WPRemoteRequestHandler {
 			$url = (string) $request->getUri();
 			$headers = [];
 
-			// If we are running on WordPress Playground, use the provided CORS proxy.
-			if ( defined( 'USE_PLAYGROUND_CORS_PROXY' ) && true === USE_PLAYGROUND_CORS_PROXY ) {
-				$new_uri = $request->getUri()
-					->withHost( 'playground.wordpress.net' )
-					->withScheme( 'https' )
-					->withPath( '/cors-proxy.php' )
-					->withQuery( $url );
-				$request = $request->withUri( $new_uri );
-				$url = (string) $new_uri;
-				$headers['X-Cors-Proxy-Allowed-Request-Headers'] = 'Authorization';
-			}
-
 			$args = [
 				'body' => (string) $request->getBody(), // Stream has been read, let __toString() rewind and read it.
 				'headers' => $headers,

@@ -24,12 +24,6 @@
       }
     },
     {
-      "step": "defineWpConfigConsts",
-      "consts": {
-        "USE_PLAYGROUND_CORS_PROXY": true
-      }
-    },
-    {
       "step": "installPlugin",
       "options": {
         "activate": true,

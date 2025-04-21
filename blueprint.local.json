@@ -24,12 +24,6 @@
       }
     },
     {
-      "step": "defineWpConfigConsts",
-      "consts": {
-        "USE_PLAYGROUND_CORS_PROXY": false
-      }
-    },
-    {
       "step": "activatePlugin",
       "pluginPath": "remote-data-blocks/remote-data-blocks.php"
     }
