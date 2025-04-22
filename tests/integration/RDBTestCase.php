@@ -139,6 +139,13 @@ class RDBTestCase extends WP_UnitTestCase {
 		return $nodes;
 	}
 
+	protected function get_dom_elements_by_html_class( DOMDocument $dom, string $html_class ): DOMNodeList|false {
+		$xpath = new DOMXPath( $dom );
+		$nodes = $xpath->query( sprintf( "//*[@class='%s']", $html_class ) );
+
+		return $nodes;
+	}
+
 	protected function assertDomIdHasTextContent( DOMDocument $dom, string $html_id, string $expected_content ): void {
 		$id_nodes = $this->get_dom_element_by_html_id( $dom, $html_id );
 

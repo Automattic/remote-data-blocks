@@ -327,7 +327,7 @@ class BlockBindings {
 		// Look for a template block in the parsed block's inner blocks. If
 		// there is one, we can delegate to it for template rendering.
 		if ( self::has_template_block( $block->parsed_block ) ) {
-			return $block->render( [ 'dynamic' => false ] );
+			return $content;
 		}
 
 		// Otherwise, use this block's inner blocks as the template.
@@ -352,6 +352,12 @@ class BlockBindings {
 
 		if ( null === $query_response ) {
 			self::log_error( 'Cannot resolve query response for block binding', $block_name, $operation_name );
+			return $content;
+		}
+
+		// If there is only one result, it has already been resolved by the
+		// block bindings. We can just return the content.
+		if ( 1 === count( $query_response['results'] ) ) {
 			return $content;
 		}
 
