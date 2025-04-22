@@ -12,6 +12,25 @@ if ( class_exists( 'QM_Output_Html_Logger' ) ) {
 	class RdbValidationOutputHtml extends QM_Output_Html_Logger {
 		public static string $collector_id = 'remote-data-blocks-validation';
 
+		public function output(): void {
+			/** @var QM_Data_Logger $data */
+			$data = $this->collector->get_data();
+
+			if ( empty( $data->logs ) ) {
+				$this->before_non_tabular_output();
+
+				$notice = __( 'No validation issues.', 'remote-data-blocks' );
+				echo $this->build_notice( $notice ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+				$this->after_non_tabular_output();
+
+				return;
+			}
+
+			paremt::output();
+		}
+
+
 		public function admin_menu( array $menu ): array {
 			/** @var QM_Data_Logger $data */
 			$data = $this->collector->get_data();
