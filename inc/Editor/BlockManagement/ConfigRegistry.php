@@ -34,7 +34,7 @@ class ConfigRegistry {
 	public static function register_block( array $user_config = [] ): bool|WP_Error {
 		// Validate the provided user configuration.
 		$schema = ConfigSchemas::get_remote_data_block_config_schema();
-		$validator = new Validator( $schema, static::class );
+		$validator = new Validator( $schema, static::class, '$user_config' );
 		$validated = $validator->validate( $user_config );
 
 		if ( is_wp_error( $validated ) ) {

@@ -74,13 +74,14 @@ function is_wp_error( mixed $thing ): bool {
 }
 
 function wp_parse_url( string $url ): array|false {
-    // phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url
+	// phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url
 	return parse_url( $url );
 }
 
 function wp_json_encode( mixed $data ): string {
-    // phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode
-	return json_encode( $data );
+	// phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode
+	$string = json_encode( $data );
+	return $string ?: '';
 }
 
 function wp_cache_get(): bool {
