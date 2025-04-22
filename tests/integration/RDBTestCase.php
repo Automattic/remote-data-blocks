@@ -97,7 +97,7 @@ class RDBTestCase extends WP_UnitTestCase {
 	}
 
 	protected function get_query_runner_with_response( array $response_data, int $status_code = 200 ): QueryRunner {
-		return new class($response_data, $status_code) extends QueryRunner {
+		return new class( $response_data, $status_code ) extends QueryRunner {
 			private $response_data;
 			private $status_code;
 
@@ -135,6 +135,13 @@ class RDBTestCase extends WP_UnitTestCase {
 	protected function get_dom_element_by_html_id( DOMDocument $dom, string $html_id ): DOMNodeList|false {
 		$xpath = new DOMXPath( $dom );
 		$nodes = $xpath->query( sprintf( "//*[@id='%s']", $html_id ) );
+
+		return $nodes;
+	}
+
+	protected function get_dom_elements_by_html_class( DOMDocument $dom, string $html_class ): DOMNodeList|false {
+		$xpath = new DOMXPath( $dom );
+		$nodes = $xpath->query( sprintf( "//*[@class='%s']", $html_class ) );
 
 		return $nodes;
 	}

@@ -699,6 +699,48 @@ class ValidatorTest extends TestCase {
 		$this->assertSame( 'Object must have valid property: extra_value', $result->get_error_data()['child']->get_error_message() );
 	}
 
+	public function testOneOfSerializedConfig(): void {
+		$schema = Types::object( [
+			'config' => Types::one_of(
+				Types::serialized_config_for( MockSerializableClass::class ),
+				Types::serialized_config_for( MockSerializableSubclass::class )
+			),
+		] );
+
+		$validator = new Validator( $schema );
+
+		$this->assertTrue( $validator->validate( [
+			'config' => [
+				'__class' => MockSerializableSubclass::class,
+				'boolean_value' => true,
+				'enum_value' => 'foo',
+				'string_value' => 'hello, world!',
+				'extra_value' => 'required for subclass',
+			],
+		] ) );
+
+		$this->assertTrue( $validator->validate( [
+			'config' => [
+				'__class' => MockSerializableClass::class,
+				'boolean_value' => true,
+				'enum_value' => 'foo',
+				'string_value' => 'hello, world!',
+			],
+		] ) );
+
+		$result = $validator->validate( [
+			'config' => [
+				'boolean_value' => true,
+				'enum_value' => 'foo',
+				'string_value' => 'hello, world!',
+			],
+		] );
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertSame( 'Object must have valid property: config', $result->get_error_message() );
+		$this->assertSame( 'Value must be one of the specified types: {"boolean_value":true,"enum_value":"foo","string_value":"hello, world!"}', $result->get_error_data()['child']->get_error_message() );
+	}
+
 	public function testStringMatching(): void {
 		$schema = Types::string_matching( '/^foo$/' );
 

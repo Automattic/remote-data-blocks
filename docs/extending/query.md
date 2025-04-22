@@ -66,9 +66,9 @@ This example features a small subset of the customization available for a query;
 
 The `display_name` property defines the query's human-friendly name.
 
-### data_source: HttpDataSourceInterface (required)
+### data_source: HttpDataSourceInterface|HttpQueryInterface (required)
 
-The `data_source` property provides the [data source](./data-source.md) the query uses.
+The `data_source` property provides the [data source](./data-source.md) the query uses. You can also supply another query as the data source, allowing you to compose queries together. This is useful when you want to access subcollections or related data returned by a "parent" query. Query results are always cached in-memory, so there is no performance penalty for composing queries in this way.
 
 ### endpoint: string|callable
 
