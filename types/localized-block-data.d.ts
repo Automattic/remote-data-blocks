@@ -5,6 +5,8 @@ type AvailableBindings = Record< string, RemoteDataBinding >;
  * This corresponds directly to the input schema defined by a query.
  */
 interface InputVariable {
+	/** The stringified default value of the variable */
+	default_value?: string;
 	/** The display friendly name of the variable */
 	name?: string;
 	/** Whether the variable is required, or not in the query */

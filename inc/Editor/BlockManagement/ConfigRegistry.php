@@ -76,14 +76,7 @@ class ConfigRegistry {
 			'selectors' => [
 				[
 					'image_url' => $display_query->get_image_url(),
-					'inputs' => array_map( function ( $slug, $input_var ) {
-						return [
-							'name' => $input_var['name'] ?? $slug,
-							'required' => $input_var['required'] ?? true,
-							'slug' => $slug,
-							'type' => $input_var['type'] ?? 'string',
-						];
-					}, array_keys( $input_schema ), array_values( $input_schema ) ),
+					'inputs' => self::map_input_variables( $input_schema ),
 					'name' => $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ),
 					'query_key' => self::DISPLAY_QUERY_KEY,
 					'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
@@ -125,14 +118,7 @@ class ConfigRegistry {
 				$config['selectors'],
 				[
 					'image_url' => $from_query->get_image_url(),
-					'inputs' => array_map( function ( $slug, $input_var ) {
-						return [
-							'name' => $input_var['name'] ?? $slug,
-							'required' => $input_var['required'] ?? false,
-							'slug' => $slug,
-							'type' => $input_var['type'] ?? 'string',
-						];
-					}, array_keys( $from_input_schema ), array_values( $from_input_schema ) ),
+					'inputs' => self::map_input_variables( $input_schema ),
 					'name' => $selection_query['display_name'] ?? ucfirst( $from_query_type ),
 					'query_key' => $from_query::class,
 					'type' => $from_query_type,
@@ -162,7 +148,7 @@ class ConfigRegistry {
 
 	private static function register_block_pattern( string $block_name, string $pattern_title, string $pattern_content ): string {
 		// Add the block arg to any bindings present in the pattern.
-		$pattern_name = 'remote-data-blocks/' . sanitize_title_with_dashes( $pattern_title );
+		$pattern_name = 'remote-data-blocks/' . sanitize_title_with_dashes( $pattern_title, '', 'save' );
 
 		// Create the pattern properties, allowing overrides via pattern options.
 		$pattern_properties = [
@@ -192,5 +178,21 @@ class ConfigRegistry {
 		}
 
 		return $config;
+	}
+
+	private static function map_input_variables( array $input_schema ): array {
+		return array_map(
+			function ( string $slug, array $input_var ): array {
+				return [
+					'default_value' => isset( $input_var['default_value'] ) ? strval( $input_var['default_value'] ) : null,
+					'name' => $input_var['name'] ?? '',
+					'slug' => $slug,
+					'type' => $input_var['type'] ?? 'string',
+					'required' => $input_var['required'] ?? false,
+				];
+			},
+			array_keys( $input_schema ),
+			array_values( $input_schema )
+		);
 	}
 }

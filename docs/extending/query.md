@@ -261,6 +261,45 @@ Remote data blocks utilize the WordPress object cache (`wp_cache_get()` / `wp_ca
 
 If you do not have a peristent object cache, no caching will be available. We do not recommend running the Remote Data Blocks plugin in this configuration.
 
+#### Example
+
+```php
+$query = HttpQuery::from_array( [
+	'display_name' => 'Get location by Zip code',
+	'data_source' => $data_source,
+	'endpoint' => function( array $input_variables ) use ( $data_source ): string {
+		return $data_source->get_endpoint() . $input_variables['zip_code'];
+	},
+	'cache_ttl' => 3600, // Set the cache TTL to 1 hour
+	'input_schema' => [
+		'zip_code' => [
+			'name' => 'Zip Code',
+			'type' => 'string',
+		],
+	],
+	'output_schema' => [
+		'is_collection' => false,
+		'type' => [
+			'zip_code' => [
+				'name' => 'Zip Code',
+				'path' => '$["post code"]',
+				'type' => 'string',
+			],
+			'city'     => [
+				'name' => 'City',
+				'path' => '$.places[0]["place name"]',
+				'type' => 'string',
+			],
+			'state'    => [
+				'name' => 'State',
+				'path' => '$.places[0].state',
+				'type' => 'string',
+			],
+		],
+	],
+] );
+```
+
 ### image_url: string|null
 
 The `image_url` property defines an image URL that represents the query in the UI. If omitted, the query will use the image URL defined by the data source.
