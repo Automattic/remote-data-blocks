@@ -17,6 +17,7 @@ class QueryMonitor {
 	public static function add_collectors( array $collectors ): array {
 		$collector_classes = [
 			'RemoteDataBlocks\Logging\QueryMonitor\RdbMainCollector',
+			'RemoteDataBlocks\Logging\QueryMonitor\RdbBlockBindingCollector',
 			'RemoteDataBlocks\Logging\QueryMonitor\RdbHttpRequestCollector',
 			'RemoteDataBlocks\Logging\QueryMonitor\RdbValidationCollector',
 		];
@@ -34,6 +35,7 @@ class QueryMonitor {
 	public static function add_outputters( array $outputters ): array {
 		$outputter_classes = [
 			'RemoteDataBlocks\Logging\QueryMonitor\RdbMainOutputHtml',
+			'RemoteDataBlocks\Logging\QueryMonitor\RdbBlockBindingOutputHtml',
 			'RemoteDataBlocks\Logging\QueryMonitor\RdbHttpRequestOutputHtml',
 			'RemoteDataBlocks\Logging\QueryMonitor\RdbValidationOutputHtml',
 		];

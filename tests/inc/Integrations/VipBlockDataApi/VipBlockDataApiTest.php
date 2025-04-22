@@ -4,6 +4,7 @@ namespace RemoteDataBlocks\Tests\Integrations\VipBlockDataApi;
 
 use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
+use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 use RemoteDataBlocks\Integrations\VipBlockDataApi\VipBlockDataApi;
 use RemoteDataBlocks\Tests\Mocks\MockQuery;
 use RemoteDataBlocks\Tests\Mocks\MockQueryRunner;
@@ -167,9 +168,10 @@ class VipBlockDataApiTest extends TestCase {
 	}
 
 	public function testResolveRemoteDataFallsBackToDbOnQuery(): void {
+		$error = new \WP_Error( 'rdb-uh-oh', 'uh-oh!' );
 		$mock_qr = new MockQueryRunner();
 		$mock_qr->addResult( 'title', 'Happy happy hour! No networking!' );
-		$mock_qr->addResult( 'location', new \WP_Error( 'rdb-uh-oh', 'uh-oh!' ) );
+		$mock_qr->addResult( 'location', $error );
 
 		$mock_query = MockQuery::create( [ 'query_runner' => $mock_qr ] );
 		register_remote_data_block( [
@@ -181,14 +183,37 @@ class VipBlockDataApiTest extends TestCase {
 
 		$result = VipBlockDataApi::resolve_remote_data( self::$sourced_block1, 'remote-data-blocks/events', 12, self::$parsed_block1 );
 
+		// The first binding is successful.
 		$this->assertSame(
 			[
-				'remote-data-blocks',
-				'error',
-				'Error executing query for block binding: uh-oh! remote-data-blocks/remoteData (block: remote-data-blocks/events; operation: location)',
-				[],
+				'info',
+				'Successfully resolved block binding',
+				[
+					'block_name' => 'core/paragraph',
+					'remote_data_block_name' => 'remote-data-blocks/events',
+					'source_args' => [
+						'field' => 'title',
+					],
+				],
 			],
-			MockWordPressFunctions::get_done_action( 'wpcomvip_log', 0 )
+			MockWordPressFunctions::get_done_action( BlockBindings::$log_action_name, 0 )
+		);
+
+		// The first binding results in an error.
+		$this->assertSame(
+			[
+				'error',
+				'uh-oh!',
+				[
+					'block_name' => 'core/heading',
+					'remote_data_block_name' => 'remote-data-blocks/events',
+					'source_args' => [
+						'field' => 'location',
+					],
+				],
+				$error,
+			],
+			MockWordPressFunctions::get_done_action( BlockBindings::$log_action_name, 1 )
 		);
 		$this->assertSame( 'Happy happy hour! No networking!', $result['innerBlocks'][0]['attributes']['content'] );
 		$this->assertSame( 'President&#039;s dining hall', $result['innerBlocks'][1]['attributes']['content'] );

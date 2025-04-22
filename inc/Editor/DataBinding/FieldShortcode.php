@@ -45,7 +45,7 @@ class FieldShortcode {
 					'type' => $query_data['type'] ?? 'field',
 				];
 
-				$value = BlockBindings::get_value( $source_args, [], 'content' );
+				$value = BlockBindings::get_value( $source_args, [ 'name' => '<field-shortcode>' ], 'content' );
 
 				if ( is_null( $value ) ) {
 					$status = 'query-error';

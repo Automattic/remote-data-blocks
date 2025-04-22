@@ -4,12 +4,14 @@ namespace RemoteDataBlocks\Editor\DataBinding;
 
 defined( 'ABSPATH' ) || exit();
 
+use Psr\Log\LogLevel;
 use RemoteDataBlocks\Config\BlockAttribute\RemoteDataBlockAttribute;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
-use RemoteDataBlocks\Logging\LoggerManager;
 use RemoteDataBlocks\Sanitization\Sanitizer;
 use WP_Block;
+use WP_Error;
+
 use function add_action;
 use function add_filter;
 use function remove_filter;
@@ -19,6 +21,10 @@ use function register_block_bindings_source;
 class BlockBindings {
 	public static string $context_name = 'remote-data-blocks/remoteData';
 	public static string $binding_source = 'remote-data/binding';
+	public static string $log_action_name = 'remote_data_blocks_log_block_binding_event';
+
+	protected static string $hydrated_results_key = 'hydrated_results';
+	protected static string $prerendered_content_key = 'prerendered_content';
 
 	public static function init(): void {
 		add_action( 'init', [ __CLASS__, 'register_block_bindings' ], 50, 0 );
@@ -110,19 +116,18 @@ class BlockBindings {
 		return $block_type_args;
 	}
 
-	private static function execute_queries( array $block_context, array $source_args, string $operation_name ): array|null {
+	private static function execute_queries( array $block_context, array $source_args ): array|WP_Error {
 		// If this binding is inside a remote data block, we should have hydrated
 		// results already present. Use them.
-		if ( isset( $source_args['hydrated_results'] ) ) {
-			return $source_args['hydrated_results'];
+		if ( isset( $source_args[ self::$hydrated_results_key ] ) ) {
+			return $source_args[ self::$hydrated_results_key ];
 		}
 
 		// Load the attribute data and validate it.
 		$remote_data = RemoteDataBlockAttribute::from_array( $block_context );
 
 		if ( is_wp_error( $remote_data ) ) {
-			self::log_error( sprintf( 'Missing or malformed block context for block binding %s', self::$context_name ), $operation_name );
-			return null;
+			return $remote_data;
 		}
 
 		// Extract block and query information. In cases where the binding has become
@@ -140,8 +145,7 @@ class BlockBindings {
 		$query = $block_config['queries'][ $query_key ] ?? null;
 
 		if ( null === $query ) {
-			self::log_error( sprintf( 'Cannot load query %s for block binding', $query_key ), $block_name, $operation_name );
-			return null;
+			return new WP_Error( 'remote_data_blocks_binding_query_error', 'Cannot load query for block binding' );
 		}
 
 		// If there is a single array of input variables, fetch pagination variables.
@@ -187,20 +191,22 @@ class BlockBindings {
 			);
 
 			if ( is_wp_error( $query_response ) ) {
-				self::log_error( 'Error executing query for block binding: ' . $query_response->get_error_message(), $block_name, $operation_name );
-				return null;
+				return $query_response;
 			}
 
 			return $query_response;
 		} catch ( \Exception $e ) {
-			self::log_error( 'Unexpected exception for block binding: ' . $e->getMessage(), $block_name, $operation_name );
-			return null;
+			return new WP_Error( 'remote_data_blocks_binding_query_error', $e->getMessage(), [ 'cause' => $e ] );
 		}
 	}
 
 	public static function get_pagination_links( WP_Block $block ): array {
 		$block_context = $block->context[ self::$context_name ] ?? [];
-		$query_response = self::execute_queries( $block_context, [], 'remote_data_block_get_pagination_data' );
+		$query_response = self::execute_queries( $block_context, [] );
+
+		if ( is_wp_error( $query_response ) ) {
+			return [];
+		}
 
 		$pagination_data = $query_response['pagination'] ?? null;
 		$query_id = $query_response['query_id'] ?? null;
@@ -233,9 +239,11 @@ class BlockBindings {
 		if ( $block instanceof WP_Block ) {
 			$block_context = $block->context[ self::$context_name ] ?? [];
 			$block_attributes = $block->attributes;
+			$bound_block_name = $block->name;
 		} else {
 			$block_context = $block['context'][ self::$context_name ] ?? [];
 			$block_attributes = $block['attributes'] ?? [];
+			$bound_block_name = $block['name'] ?? 'unknown';
 		}
 
 		// Provide some flexibility for external callers to pass the block name.
@@ -256,15 +264,24 @@ class BlockBindings {
 		// have the expected context.
 		$fallback_content = self::get_block_fallback_content( $field_name, $block_attributes, $attribute_name, $serialized_results, $result_index );
 
+		$log_context = [
+			'block_name' => $bound_block_name,
+			'remote_data_block_name' => $block_name,
+			'source_args' => $source_args,
+		];
+
 		if ( null === $field_name ) {
-			self::log_error( 'Missing field mapping for block binding', $block_name, $field_name );
+			self::log_error( $log_context, new WP_Error(
+				'remote_data_blocks_binding_get_value_error',
+				'Missing field mapping for block binding',
+			) );
 			return $fallback_content;
 		}
 
-		$query_response = self::execute_queries( $block_context, $source_args, $field_name );
+		$query_response = self::execute_queries( $block_context, $source_args );
 
-		if ( empty( $query_response ) ) {
-			self::log_error( 'Cannot resolve query response for block binding', $block_name, $field_name );
+		if ( is_wp_error( $query_response ) ) {
+			self::log_error( $log_context, $query_response );
 			return $fallback_content;
 		}
 
@@ -275,12 +292,18 @@ class BlockBindings {
 		}
 
 		if ( null === $value ) {
-			self::log_error( sprintf( 'Cannot resolve %s %s for block binding', $field_type, $field_name ), $block_name, $field_name );
+			self::log_error( $log_context, new WP_Error(
+				'remote_data_blocks_binding_get_value_error',
+				'Cannot resolve field mapping for block binding',
+			) );
 			return $fallback_content;
 		}
 
 		// Convert the value to a string.
 		$value = strval( $value );
+
+		// If we've reached this point, the binding was successful.
+		self::log_success( $log_context );
 
 		// Prepend label to value if provided. Class name should match the one
 		// generated by the block editor script.
@@ -304,7 +327,7 @@ class BlockBindings {
 
 	/**
 	 * Find a "template block" in a parsed block's inner blocks.
-	 * 
+	 *
 	 * @param array $parsed_block The parsed block.
 	 * @return bool True if a template block was found.
 	 */
@@ -336,22 +359,33 @@ class BlockBindings {
 
 	public static function render_remote_data_template_block( array $attributes, string $content, WP_Block $block ): string {
 		// If already rendered, don't render dynamically again.
-		if ( isset( $block->parsed_block['dynamicallyRenderedContent'] ) ) {
-			return $block->parsed_block['dynamicallyRenderedContent'];
+		if ( isset( $block->parsed_block[ self::$prerendered_content_key ] ) ) {
+			return $block->parsed_block[ self::$prerendered_content_key ];
 		}
 
 		// If this is the parent block that *provides* the context, we won't have
 		// context available on the block's context property. However, context for
 		// children blocks comes from this block's `remoteData` attribtue (see
 		// block.json#providesContext), so we can access it directly.
-		$block_context = $block->context[ self::$context_name ] ?? $attributes['remoteData'] ?? [];
-		$block_name = $block_context['blockName'] ?? null;
-		$operation_name = 'remote_data_block_render';
+		$block_context = $block->context[ self::$context_name ] ?? $attributes['remoteData'] ?? null;
 
-		$query_response = self::execute_queries( $block_context, [], $operation_name );
+		$log_context = [
+			'block_name' => $block->name,
+			'remote_data_block_name' => $block_context['blockName'] ?? 'unknown',
+		];
 
-		if ( null === $query_response ) {
-			self::log_error( 'Cannot resolve query response for block binding', $block_name, $operation_name );
+		if ( empty( $block_context ) ) {
+			self::log_error( $log_context, new WP_Error(
+				'remote_data_blocks_binding_template_render_error',
+				'Missing block context for block binding',
+			) );
+			return $content;
+		}
+
+		$query_response = self::execute_queries( $block_context, [] );
+
+		if ( is_wp_error( $query_response ) ) {
+			self::log_error( $log_context, $query_response );
 			return $content;
 		}
 
@@ -363,14 +397,14 @@ class BlockBindings {
 
 		$source_args_for_each_item = array_map( function ( $index ) use ( $query_response ): array {
 			return [
-				'hydrated_results' => $query_response,
+				self::$hydrated_results_key => $query_response,
 				'index' => $index,
 			];
 		}, array_keys( $query_response['results'] ) );
 
 		$loop_template = $block->parsed_block['innerBlocks'];
 		$loop_template_content = $block->parsed_block['innerContent'];
-		
+
 		// Remove the existing blocks and content so that we can repopulate it.
 		$block->parsed_block['innerBlocks'] = [];
 		$block->parsed_block['innerContent'] = [];
@@ -398,9 +432,9 @@ class BlockBindings {
 		// parsed block, which will not be persisted. This is needed because
 		// our container block can trigger a non-dynamic re-render. This helps
 		// avoid descendant dynamic blocks from being rendered twice.
-		$block->parsed_block['dynamicallyRenderedContent'] = $updated_block->render( [ 'dynamic' => false ] );
+		$block->parsed_block[ self::$prerendered_content_key ] = $updated_block->render( [ 'dynamic' => false ] );
 
-		return $block->parsed_block['dynamicallyRenderedContent'];
+		return $block->parsed_block[ self::$prerendered_content_key ];
 	}
 
 	/**
@@ -437,8 +471,21 @@ class BlockBindings {
 		return $inner_blocks;
 	}
 
-	public static function log_error( string $message, ?string $block_name = 'unknown', ?string $operation_name = 'unknown' ): void {
-		$logger = LoggerManager::instance();
-		$logger->error( sprintf( '%s %s (block: %s; operation: %s)', $message, self::$context_name, $block_name, $operation_name ) );
+	protected static function log_error( array $log_context, WP_Error $error ): void {
+		// Remove key "hydrated_results" if it exists.
+		if ( isset( $log_context['source_args'][ self::$hydrated_results_key ] ) ) {
+			unset( $log_context['source_args'][ self::$hydrated_results_key ] );
+		}
+
+		do_action( self::$log_action_name, LogLevel::ERROR, $error->get_error_message(), $log_context, $error );
+	}
+
+	protected static function log_success( array $log_context ): void {
+		// Remove key "hydrated_results" if it exists.
+		if ( isset( $log_context['source_args'][ self::$hydrated_results_key ] ) ) {
+			unset( $log_context['source_args'][ self::$hydrated_results_key ] );
+		}
+
+		do_action( self::$log_action_name, LogLevel::INFO, 'Successfully resolved block binding', $log_context );
 	}
 }
