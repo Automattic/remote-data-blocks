@@ -3,7 +3,6 @@
 use WP_UnitTestCase;
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Config\Query\HttpQuery;
-use RemoteDataBlocks\Config\Query\HttpQueryInterface;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\Editor\BlockManagement\BlockRegistration;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
@@ -102,11 +101,13 @@ class RDBTestCase extends WP_UnitTestCase {
 			private $status_code;
 
 			public function __construct( array $response_data, int $status_code ) {
+				parent::__construct( null, [] );
+
 				$this->response_data = $response_data;
 				$this->status_code = $status_code;
 			}
 
-			protected function get_raw_response_data( HttpQueryInterface $query, array $input_variables ): array|WP_Error {
+			protected function get_raw_response_data( array $request_details, array $input_variables ): array|WP_Error {
 				return [
 					'metadata' => [
 						'age' => 100,

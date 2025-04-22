@@ -23,7 +23,7 @@ class QueryRunnerTest extends TestCase {
 
 		$this->query = MockQuery::create( [
 			'data_source' => $this->http_data_source,
-			'query_runner' => new QueryRunner( $this->http_client ),
+			'query_runner' => new QueryRunner( $this->http_client, [] ),
 		] );
 	}
 
@@ -382,5 +382,57 @@ class QueryRunnerTest extends TestCase {
 		$this->assertIsArray( $result );
 		$this->assertArrayHasKey( 'metadata', $result );
 		$this->assertArrayHasKey( 'results', $result );
+	}
+
+	public function testSubsequentRequestsResolveFromInMemoryCache(): void {
+		$response_body = wp_json_encode( [
+			'data' => [
+				'id' => 1,
+				'name' => 'Test',
+			],
+		] );
+		$response = new Response( 200, [], $response_body );
+
+		$this->query->set_output_schema( [
+			'is_collection' => false,
+			'path' => '$.data',
+			'type' => [
+				'id' => [
+					'name' => 'ID',
+					'type' => 'id',
+				],
+				'name' => [
+					'name' => 'Name',
+					'type' => 'string',
+				],
+			],
+		] );
+
+		$this->http_client->method( 'request' )->willReturn( $response );
+
+		$result = $this->query->execute( [] );
+
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'results', $result );
+		$this->assertEquals( 1, $result['results'][0]['result']['id']['value'] );
+		$this->assertEquals( 'Test', $result['results'][0]['result']['name']['value'] );
+
+		$updated_response_body = wp_json_encode( [
+			'data' => [
+				'id' => 2,
+				'name' => 'Test 2',
+			],
+		] );
+		$updated_response = new Response( 200, [], $updated_response_body );
+
+		$this->http_client->method( 'request' )->willReturn( $updated_response );
+
+		$result = $this->query->execute( [] );
+
+		// Returns original response from in-memory cache.
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'results', $result );
+		$this->assertEquals( 1, $result['results'][0]['result']['id']['value'] );
+		$this->assertEquals( 'Test', $result['results'][0]['result']['name']['value'] );
 	}
 }

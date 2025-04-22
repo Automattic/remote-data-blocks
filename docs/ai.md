@@ -1124,7 +1124,7 @@ By default, the `deserialize_response` assumes a JSON string and deserializes it
 
 The `get_request_details` method extracts and validates the request details provided by the query. The input variables for the current request are provided as an associative array (`[ $var_name => $value ]`). The return value is an associative array that provides the HTTP method, request options, origin, and URI.
 
-### get_raw_response_data( HttpQueryInterface $query, array $input_variables ): array|WP_Error
+### get_raw_response_data( array $request_details, array $input_variables ): array|WP_Error
 
 The `get_raw_response_data` method dispatches the HTTP request and assembles the raw (pre-processed) response data. The input variables for the current request are provided as an associative array (`[ $var_name => $value ]`). The return value is an associative array that provides the response metadata and the raw response data.
 
