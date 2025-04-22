@@ -272,7 +272,7 @@ When a request to your site renders one or more remote data blocks, our plugin w
 
 The plugin offers a caching layer for optimal performance and helps avoid rate limiting from remote data sources. It will be used if your WordPress environment configures a [persistent object cache](https://developer.wordpress.org/reference/classes/wp_object_cache/#persistent-cache-plugins). Otherwise, the plugin will utilize in-memory (per-page-load) caching. Deploying to production without a persistent object cache is not recommended.
 
-The default TTL for all cache objects is 60 seconds, but it can be [configured per query or request](../extending/query.md#get_cache_ttl).
+The default TTL for all cache objects is 5 minutes, but it can be [configured per query or request](../extending/query.md#cache_ttl-intnullcallable).
 
 ## Theming
 
@@ -785,33 +785,6 @@ function custom_query_response_metadata( array $metadata, HttpQueryInterface $qu
 	return $metadata;
 }
 add_filter( 'remote_data_blocks_query_response_metadata', 'custom_query_response_metadata', 10, 3 );
-```
-
-### remote_data_blocks_http_client_retry_delay
-
-Filter to change the defualt 1 second delapy after an HTTP request fails. The Remote Data Blocks Plugin uses the [Guzzle](https://github.com/guzzle/guzzle) HTTP client. You can read about the response interface in their [documentation](https://docs.guzzlephp.org/en/stable/).
-
-```php
-function custom_response_retry_delay( int $retry_after_ms, int $retries, ?ResponseInterface $response ): int {
-	// Implement a custom exponential backoff strategy.
-	return floor( pow( 1.5, $retries ) * 1000 );
-}
-add_filter( 'remote_data_blocks_http_client_retry_delay', 'custom_response_retry_delay', 10, 3 );
-```
-
-### remote_data_blocks_http_client_retry_decider
-
-Filter the default HTTP retry logic when an HTTP request fails or encounters an exception. The Remote Data Blocks Plugin uses the [Guzzle](https://github.com/guzzle/guzzle) HTTP client. You can read about the request, response, and exception interfaces in their [documentation](https://docs.guzzlephp.org/en/stable/).
-
-```php
-function custom_retry_decider( bool $should_retry, int $retries, RequestInterface $request, ?ResponseInterface $response, ?Exception $exception ): bool {
-	// Retry on a 408 error if the number of retries is less than 5.
-	if ( $retries < 5 && $response && 408 === $response->getStatusCode ) {
-		return true;
-	}
-	return $should_retry;
-}
-add_filter( 'remote_data_blocks_http_client_retry_decider', 'custom_response_retry_on_exception', 10, 5 );
 ```
 ````
 
@@ -1428,6 +1401,45 @@ A value of `-1` indicates the query should not be cached. A value of `null` indi
 Remote data blocks utilize the WordPress object cache (`wp_cache_get()` / `wp_cache_set()`) for response caching. Ensure that your platform provides or installs a persistent object cache plugin so that this value is respected.
 
 If you do not have a peristent object cache, no caching will be available. We do not recommend running the Remote Data Blocks plugin in this configuration.
+
+#### Example
+
+```php
+$query = HttpQuery::from_array( [
+	'display_name' => 'Get location by Zip code',
+	'data_source' => $data_source,
+	'endpoint' => function( array $input_variables ) use ( $data_source ): string {
+		return $data_source->get_endpoint() . $input_variables['zip_code'];
+	},
+	'cache_ttl' => 3600, // Set the cache TTL to 1 hour
+	'input_schema' => [
+		'zip_code' => [
+			'name' => 'Zip Code',
+			'type' => 'string',
+		],
+	],
+	'output_schema' => [
+		'is_collection' => false,
+		'type' => [
+			'zip_code' => [
+				'name' => 'Zip Code',
+				'path' => '$["post code"]',
+				'type' => 'string',
+			],
+			'city'     => [
+				'name' => 'City',
+				'path' => '$.places[0]["place name"]',
+				'type' => 'string',
+			],
+			'state'    => [
+				'name' => 'State',
+				'path' => '$.places[0].state',
+				'type' => 'string',
+			],
+		],
+	],
+] );
+```
 
 ### image_url: string|null
 
@@ -3060,12 +3072,12 @@ function register_aic_block(): void {
 		'input_schema' => [
 			'limit' => [
 				'default_value' => 10,
-				'name' => 'Pagination limit',
+				'name' => 'Items per page',
 				'type' => 'ui:pagination_per_page',
 			],
 			'page' => [
 				'default_value' => 1,
-				'name' => 'Pagination page',
+				'name' => 'Starting page',
 				'type' => 'ui:pagination_page',
 			],
 		],
