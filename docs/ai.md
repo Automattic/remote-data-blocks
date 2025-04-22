@@ -29,6 +29,7 @@ The content is organized as follows:
 - Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
 - Files matching patterns in .gitignore are excluded
 - Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
 
 ## Additional Info
 
@@ -106,13 +107,10 @@ theme/
   style.css
   theme.json
 tutorials/
-  bruno-collections/
-    Salesforce D2C APIs.json
   airtable.md
   google-sheets.md
   http.md
   index.md
-  salesforce-commerce.md
   shopify.md
 index.md
 local-development.md
@@ -274,7 +272,7 @@ When a request to your site renders one or more remote data blocks, our plugin w
 
 The plugin offers a caching layer for optimal performance and helps avoid rate limiting from remote data sources. It will be used if your WordPress environment configures a [persistent object cache](https://developer.wordpress.org/reference/classes/wp_object_cache/#persistent-cache-plugins). Otherwise, the plugin will utilize in-memory (per-page-load) caching. Deploying to production without a persistent object cache is not recommended.
 
-The default TTL for all cache objects is 60 seconds, but it can be [configured per query or request](../extending/query.md#get_cache_ttl).
+The default TTL for all cache objects is 5 minutes, but it can be [configured per query or request](../extending/query.md#cache_ttl-intnullcallable).
 
 ## Theming
 
@@ -415,7 +413,6 @@ The human-friendly name of the block. It is also used to construct the block's n
 The render query is executed when the block is rendered and fetches the data that will be provided to block bindings. It is an array with the following properties:
 
 - `query` (required): An instance of [`QueryInterface`](./query.md) that fetches the data.
-- `loop`: A boolean that indicates if the query returns a collection of data. If `true`, the block will be rendered for each item in the collection. If not provided `false` is the default.
 
 ### `selection_queries`: array (optional)
 
@@ -653,6 +650,25 @@ There are two types of hooks: Actions and Filters. To use either, you need to wr
 
 Actions allow you to add data or change how WordPress operates. Actions will run at a specific point in the execution of plugin. Callback functions for an Action do not return anything back to the calling Action hook.
 
+### remote_data_blocks_loaded
+
+This action fires when Remote Data Blocks is fully loaded and ready for use. Plugins that depend on Remote Data Blocks should use this hook to defer their initialization until Remote Data Blocks is fully loaded.
+
+```php
+function my_plugin_init() {
+	// Initialize your plugin that depends on Remote Data Blocks here
+	// All Remote Data Blocks classes and functionality are now available
+}
+
+if ( defined( 'REMOTE_DATA_BLOCKS__LOADED' ) ) {
+	// Immediately init the plugin since remote data blocks is already loaded
+	my_plugin_init()
+} else {
+	// Defer the init until the remote data block is loaded
+	add_action( 'remote_data_blocks_loaded', 'my_plugin_init' );
+}
+```
+
 ### wpcomvip_log
 
 If you want to send debugging information to another source besides [Query Monitor](../troubleshooting.md#query-monitor), use the `wpcomvip_log` action.
@@ -694,6 +710,17 @@ function custom_allowed_url_schemes( array $allowed_url_schemes, HttpQueryInterf
 	return $allowed_url_schemes;
 }
 add_filter( 'remote_data_blocks_allowed_url_schemes', 'custom_allowed_url_schemes', 10, 2 );
+```
+
+### remote_data_blocks_pagination_query_var_name
+
+Filter the query variable name used for pagination (default: `rdb-pagination`).
+
+```php
+function custom_pagination_query_var_name(): string {
+	return 'paginate';
+}
+add_filter( 'remote_data_blocks_pagination_query_var_name', 'custom_pagination_query_var_name', 10, 0 );
 ```
 
 ### remote_data_blocks_request_details
@@ -758,33 +785,6 @@ function custom_query_response_metadata( array $metadata, HttpQueryInterface $qu
 	return $metadata;
 }
 add_filter( 'remote_data_blocks_query_response_metadata', 'custom_query_response_metadata', 10, 3 );
-```
-
-### remote_data_blocks_http_client_retry_delay
-
-Filter to change the defualt 1 second delapy after an HTTP request fails. The Remote Data Blocks Plugin uses the [Guzzle](https://github.com/guzzle/guzzle) HTTP client. You can read about the response interface in their [documentation](https://docs.guzzlephp.org/en/stable/).
-
-```php
-function custom_response_retry_delay( int $retry_after_ms, int $retries, ?ResponseInterface $response ): int {
-	// Implement a custom exponential backoff strategy.
-	return floor( pow( 1.5, $retries ) * 1000 );
-}
-add_filter( 'remote_data_blocks_http_client_retry_delay', 'custom_response_retry_delay', 10, 3 );
-```
-
-### remote_data_blocks_http_client_retry_decider
-
-Filter the default HTTP retry logic when an HTTP request fails or encounters an exception. The Remote Data Blocks Plugin uses the [Guzzle](https://github.com/guzzle/guzzle) HTTP client. You can read about the request, response, and exception interfaces in their [documentation](https://docs.guzzlephp.org/en/stable/).
-
-```php
-function custom_retry_decider( bool $should_retry, int $retries, RequestInterface $request, ?ResponseInterface $response, ?Exception $exception ): bool {
-	// Retry on a 408 error if the number of retries is less than 5.
-	if ( $retries < 5 && $response && 408 === $response->getStatusCode ) {
-		return true;
-	}
-	return $should_retry;
-}
-add_filter( 'remote_data_blocks_http_client_retry_decider', 'custom_response_retry_on_exception', 10, 5 );
 ```
 ````
 
@@ -910,6 +910,7 @@ Unless your API returns a single value, `type` will be constructed of an associa
 - `null`
 - `number`
 - `string`
+- `title`
 - `url`
 - `uuid`
 
@@ -1253,7 +1254,8 @@ There are also some special input variable types:
 - `ui:pagination_offset`: A variable with this type indicates that the query supports offset pagination. It must accept an `integer` containing the requested offset. See `pagination_schema` for additional information and requirements.
 - `ui:pagination_page`: A variable with this type indicates that the query supports page-based pagination. It must accept an `integer` containing the requested results page. See `pagination_schema` for additional information and requirements.
 - `ui:pagination_per_page`: A variable with this type indicates that the query supports controlling the number of resultsper page. It must accept an `integer` containing the number of requested results.
-- `ui:pagination_cursor_next` and `ui_pagination_cursor_previous`: Variables with these types indicate that the query supports cursor pagination. They accept `strings` containing the requested cursor. See `pagination_schema` for additional information and requirements.
+- `ui:pagination_cursor_next` and `ui_pagination_cursor_previous`: Variables with these types indicate that the query supports cursor pagination. They accept `string`s containing the requested cursor. See `pagination_schema` for additional information and requirements.
+- `ui:pagination_cursor`: A variable with this type indicates support for a simple variant of cursor pagination that uses a single cursor instead of a pair of forward / backward cursors. It accepts a `string` containing the requested cursor. See `pagination_schema` for additional information and requirements.
 
 #### Example with search and pagination input variables
 
@@ -1336,11 +1338,14 @@ We have more in-depth [`output_schema`](./query-output_schema.md) examples.
 
 If your query supports pagination, the `pagination_schema` property defines how to extract pagination-related values from the query response. If defined, the property should be an associative array with the following structure:
 
-- `total_items` (required): A variable definition that extracts the total number of items across every page of results.
-- `cursor_next`: If your query supports cursor pagination, a variable definition that extracts the cursor for the next page of results.
+- `total_items`: A variable definition that extracts the total number of items across every page of results.
+- `has_next_page`: A variable definition that extracts a boolean indicating whether there are more pages of results. Useful for APIs that do not report the total number of items.
+- `cursor_next`: If your query supports cursor pagination, a variable definition that extracts the cursor for the next page of results. This output variable will also be mapped to `ui:pagination_cursor`, if present.
 - `cursor_previous`: If your query supports cursor pagination, a variable definition that extracts the cursor for the previous page of results.
 
-Note that the `total_items` variable is required for all types of pagination.
+Note that one of `has_next_page` or `total_items` is required for all pagination types.
+
+A pagination block will automatically be added to remote data blocks that support pagination.
 
 #### Example
 
@@ -1397,6 +1402,45 @@ Remote data blocks utilize the WordPress object cache (`wp_cache_get()` / `wp_ca
 
 If you do not have a peristent object cache, no caching will be available. We do not recommend running the Remote Data Blocks plugin in this configuration.
 
+#### Example
+
+```php
+$query = HttpQuery::from_array( [
+	'display_name' => 'Get location by Zip code',
+	'data_source' => $data_source,
+	'endpoint' => function( array $input_variables ) use ( $data_source ): string {
+		return $data_source->get_endpoint() . $input_variables['zip_code'];
+	},
+	'cache_ttl' => 3600, // Set the cache TTL to 1 hour
+	'input_schema' => [
+		'zip_code' => [
+			'name' => 'Zip Code',
+			'type' => 'string',
+		],
+	],
+	'output_schema' => [
+		'is_collection' => false,
+		'type' => [
+			'zip_code' => [
+				'name' => 'Zip Code',
+				'path' => '$["post code"]',
+				'type' => 'string',
+			],
+			'city'     => [
+				'name' => 'City',
+				'path' => '$.places[0]["place name"]',
+				'type' => 'string',
+			],
+			'state'    => [
+				'name' => 'State',
+				'path' => '$.places[0].state',
+				'type' => 'string',
+			],
+		],
+	],
+] );
+```
+
 ### image_url: string|null
 
 The `image_url` property defines an image URL that represents the query in the UI. If omitted, the query will use the image URL defined by the data source.
@@ -1421,378 +1465,6 @@ If you need to pre-process the response in some way before the output variables 
 ### query_runner: QueryRunnerInterface
 
 Use the `query_runner` property to provide a custom [query runner](./query-runner.md) for the query. If omitted, the query will use the default query runner, which works well with most HTTP-powered APIs.
-````
-
-## File: tutorials/bruno-collections/Salesforce D2C APIs.json
-````json
-{
-  "name": "Salesforce D2C APIs",
-  "version": "1",
-  "items": [
-    {
-      "type": "http",
-      "name": "Auth",
-      "seq": 2,
-      "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/oauth2/token?grant_type=client_credentials&client_id=<client-id>&client_secret=<client-secret>",
-        "method": "POST",
-        "headers": [
-          {
-            "name": "Content-Type",
-            "value": "application/x-www-form-urlencoded",
-            "enabled": true
-          }
-        ],
-        "params": [
-          {
-            "name": "grant_type",
-            "value": "client_credentials",
-            "type": "query",
-            "enabled": true
-          },
-          {
-            "name": "client_id",
-            "value": "<client-id>",
-            "type": "query",
-            "enabled": true
-          },
-          {
-            "name": "client_secret",
-            "value": "<client-secret>",
-            "type": "query",
-            "enabled": true
-          }
-        ],
-        "body": {
-          "mode": "none",
-          "formUrlEncoded": [],
-          "multipartForm": []
-        },
-        "script": {},
-        "vars": {},
-        "assertions": [],
-        "tests": "",
-        "docs": "",
-        "auth": {
-          "mode": "none"
-        }
-      }
-    },
-    {
-      "type": "http",
-      "name": "Products",
-      "seq": 3,
-      "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/products?skus=6010009",
-        "method": "GET",
-        "headers": [],
-        "params": [
-          {
-            "name": "skus",
-            "value": "6010009",
-            "type": "query",
-            "enabled": true
-          }
-        ],
-        "body": {
-          "mode": "none",
-          "formUrlEncoded": [],
-          "multipartForm": []
-        },
-        "script": {},
-        "vars": {},
-        "assertions": [],
-        "tests": "",
-        "docs": "",
-        "auth": {
-          "mode": "bearer",
-          "bearer": {
-            "token": ""
-          }
-        }
-      }
-    },
-    {
-      "type": "http",
-      "name": "Product",
-      "seq": 4,
-      "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/products?skus=6010053",
-        "method": "GET",
-        "headers": [],
-        "params": [
-          {
-            "name": "skus",
-            "value": "6010053",
-            "type": "query",
-            "enabled": true
-          }
-        ],
-        "body": {
-          "mode": "none",
-          "formUrlEncoded": [],
-          "multipartForm": []
-        },
-        "script": {},
-        "vars": {},
-        "assertions": [],
-        "tests": "",
-        "docs": "",
-        "auth": {
-          "mode": "bearer",
-          "bearer": {
-            "token": ""
-          }
-        }
-      }
-    },
-    {
-      "type": "http",
-      "name": "Search",
-      "seq": 5,
-      "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/search/products?searchTerm=Energy",
-        "method": "GET",
-        "headers": [],
-        "params": [
-          {
-            "name": "searchTerm",
-            "value": "Energy",
-            "type": "query",
-            "enabled": true
-          }
-        ],
-        "body": {
-          "mode": "none",
-          "formUrlEncoded": [],
-          "multipartForm": []
-        },
-        "script": {},
-        "vars": {},
-        "assertions": [],
-        "tests": "",
-        "docs": "",
-        "auth": {
-          "mode": "bearer",
-          "bearer": {
-            "token": ""
-          }
-        }
-      }
-    },
-    {
-      "type": "http",
-      "name": "Check Token",
-      "seq": 6,
-      "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/oauth2/introspect",
-        "method": "POST",
-        "headers": [
-          {
-            "name": "Content-Type",
-            "value": "application/x-www-form-urlencoded",
-            "enabled": true
-          }
-        ],
-        "params": [],
-        "body": {
-          "mode": "json",
-          "json": "token=<token>&client_id=<client-id>&client_secret=<client-secret>",
-          "formUrlEncoded": [],
-          "multipartForm": []
-        },
-        "script": {},
-        "vars": {},
-        "assertions": [],
-        "tests": "",
-        "docs": "",
-        "auth": {
-          "mode": "none"
-        }
-      }
-    },
-    {
-      "type": "http",
-      "name": "StoreLookup",
-      "seq": 7,
-      "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/query/?q=SELECT name,id from webstore",
-        "method": "GET",
-        "headers": [],
-        "params": [
-          {
-            "name": "q",
-            "value": "SELECT name,id from webstore",
-            "type": "query",
-            "enabled": true
-          }
-        ],
-        "body": {
-          "mode": "none",
-          "formUrlEncoded": [],
-          "multipartForm": []
-        },
-        "script": {},
-        "vars": {},
-        "assertions": [],
-        "tests": "",
-        "docs": "",
-        "auth": {
-          "mode": "bearer",
-          "bearer": {
-            "token": ""
-          }
-        }
-      }
-    },
-    {
-      "type": "http",
-      "name": "Start Cart",
-      "seq": 8,
-      "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/carts/current",
-        "method": "GET",
-        "headers": [],
-        "params": [],
-        "body": {
-          "mode": "none",
-          "formUrlEncoded": [],
-          "multipartForm": []
-        },
-        "script": {},
-        "vars": {},
-        "assertions": [],
-        "tests": "",
-        "docs": "",
-        "auth": {
-          "mode": "bearer",
-          "bearer": {
-            "token": ""
-          }
-        }
-      }
-    },
-    {
-      "type": "http",
-      "name": "Add to Cart",
-      "seq": 9,
-      "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/carts/0a6Ws000001MUGbIAO/cart-items",
-        "method": "POST",
-        "headers": [],
-        "params": [],
-        "body": {
-          "mode": "json",
-          "json": "{\n  \"quantity\": 2,\n  \"type\": \"Product\",\n  \"productId\":\"01tWs000005QwjpIAC\"\n}",
-          "formUrlEncoded": [],
-          "multipartForm": []
-        },
-        "script": {},
-        "vars": {},
-        "assertions": [],
-        "tests": "",
-        "docs": "",
-        "auth": {
-          "mode": "bearer",
-          "bearer": {
-            "token": ""
-          }
-        }
-      }
-    },
-    {
-      "type": "http",
-      "name": "Update Cart",
-      "seq": 10,
-      "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/carts/0a6Ws000001MUGbIAO/cart-items/0a9Ws000002aFx3IAE",
-        "method": "PATCH",
-        "headers": [],
-        "params": [],
-        "body": {
-          "mode": "json",
-          "json": "{\n  \"quantity\": 1\n}",
-          "formUrlEncoded": [],
-          "multipartForm": []
-        },
-        "script": {},
-        "vars": {},
-        "assertions": [],
-        "tests": "",
-        "docs": "",
-        "auth": {
-          "mode": "bearer",
-          "bearer": {
-            "token": ""
-          }
-        }
-      }
-    },
-    {
-      "type": "http",
-      "name": "Get Cart Items",
-      "seq": 11,
-      "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/carts/0a6Ws000001MUGbIAO/cart-items",
-        "method": "GET",
-        "headers": [],
-        "params": [],
-        "body": {
-          "mode": "json",
-          "json": "",
-          "formUrlEncoded": [],
-          "multipartForm": []
-        },
-        "script": {},
-        "vars": {},
-        "assertions": [],
-        "tests": "",
-        "docs": "",
-        "auth": {
-          "mode": "bearer",
-          "bearer": {
-            "token": ""
-          }
-        }
-      }
-    },
-    {
-      "type": "http",
-      "name": "Delete Cart Item",
-      "seq": 12,
-      "request": {
-        "url": "https://<salesforce-url>.my.salesforce.com/services/data/v63.0/commerce/webstores/0ZEWs000001OtArOAK/carts/0a6Ws000001MUGbIAO/cart-items/0a9Ws000002aFx3IAE",
-        "method": "DELETE",
-        "headers": [],
-        "params": [],
-        "body": {
-          "mode": "json",
-          "json": "",
-          "formUrlEncoded": [],
-          "multipartForm": []
-        },
-        "script": {},
-        "vars": {},
-        "assertions": [],
-        "tests": "",
-        "docs": "",
-        "auth": {
-          "mode": "bearer",
-          "bearer": {
-            "token": ""
-          }
-        }
-      }
-    }
-  ],
-  "environments": [],
-  "brunoConfig": {
-    "version": "1",
-    "name": "Salesforce D2C APIs",
-    "type": "collection",
-    "ignore": [ "node_modules", ".git" ]
-  }
-}
 ````
 
 ## File: tutorials/airtable.md
@@ -1972,52 +1644,7 @@ This section will guide you through configuring data sources in the plugin UI an
 - [Airtable](airtable.md)
 - [Google Sheets integration](google-sheets.md)
 - [HTTP](http.md)
-- [Salesforce Commerce D2C](salesforce-commerce.md)
 - [Shopify](shopify.md)
-````
-
-## File: tutorials/salesforce-commerce.md
-````markdown
-# Create a Salesforce Commerce D2C remote data block
-
-This tutorial will walk you through connecting a [Salesforce Commerce D2C](https://developer.salesforce.com/docs/commerce/salesforce-commerce/guide) data source and how to use the automatically created block in the WordPress editor.
-
-## Salesforce Commerce D2C API Access
-
-We have provided a pre-configured Bruno Collection for interacting with the Salesforce Commerce D2C APIs. These are located [here](../bruno-collections/Salesforce D2C APIs.json). These can be imported into the [Bruno API Client](https://www.usebruno.com/docs/api-client/introduction) to interact with the APIs.
-
-In order to use the collection, you will need to provide the following variables:
-
-- `salesforce domain`
-- `client_id`
-- `client_secret`
-
-## Create the data source
-
-1. Go to Settings > Remote Data Blocks in your WordPress admin.
-2. Click on the "Connect new" button.
-3. Choose "Salesforce Commerce D2C" from the dropdown menu as the data source type.
-4. Name the data source. This name is only used for display purposes.
-5. Provide the Salesforce Commerce domain.
-6. Provide the client ID and the client secret. Ensure these are correct or else authentication will fail.
-7. Click Continue.
-8. The stores for the provided domain will be listed. Select the store you wish to use.
-9. Click Continue.
-10. If you wish to have the blocks automatically be registered, ensure the `Auto-generate blocks` checkbox is checked.
-
-## Insert the block
-
-Create or edit a page or post, then using the Block Inserter, search for the block using the name you provided in step four.
-
-## Patterns and styling
-
-You can use patterns to create a consistent, reusable layout for your remote data. You can read more about [patterns and other Core Concepts](../concepts/index.md#patterns).
-
-Remote data blocks can be styled using the block editor's style settings, `theme.json`, or custom stylesheets. See the [example child theme](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/theme) for more details.
-
-## Code reference
-
-You can also configure Salesforce Commerce D2C integrations with code. These integrations appear in the WordPress admin but can not be modified. You may wish to do this to have more control over the data source or because you have more advanced data processing needs.
 ````
 
 ## File: tutorials/shopify.md
@@ -2099,7 +1726,6 @@ For plugin overview and getting started guide, see [README](../README.md).
   - [Airtable](tutorials/airtable.md)
   - [Google Sheets integration](tutorials/google-sheets.md)
   - [HTTP](tutorials/http.md)
-  - [Salesforce Commerce D2C](tutorials/salesforce-commerce.md)
   - [Shopify](tutorials/shopify.md)
 
 - [Development](local-development.md)
@@ -2138,6 +1764,12 @@ npm run dev
 This will spin up a WordPress environment and a Valkey (Redis) instance for object cache. It will also build the block editor scripts, watch for changes, and open a Node.js debugging port. The WordPress environment will be available at `http://localhost:8888` (admin user: `admin`, password: `password`).
 
 Stop the development environment with `Ctrl+C` and resume it by running the same command. You can also manually stop the environment with `npm run dev:stop`. Stopping the environment optionally stops the WordPress containers but preserves their state.
+
+### Sharing configuration
+
+Data Sources configured via the Remote Data Blocks WordPress Admin UI are encrypted and stored as `remote_data_blocks_configs` in the Options table of the WordPress database.
+
+If your local and production environments do not use the same encryption secrets, your configuration from one environment will not work in the other. Keep this in mind when migrating the database between environments.
 
 ### Testing
 
@@ -3369,29 +3001,103 @@ function register_aic_block(): void {
 	$get_art_query = HttpQuery::from_array([
 		'data_source' => $aic_data_source,
 		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
-			return sprintf( '%s/%s', $aic_data_source->get_endpoint(), $input_variables['id'] ?? '' );
+			$endpoint = $aic_data_source->get_endpoint();
+
+			if ( is_array( $input_variables['id'] ) ) {
+				$ids = implode( ',', $input_variables['id'] );
+			} else {
+				$ids = $input_variables['id'];
+			}
+
+			if ( ! empty( $ids ) ) {
+				return add_query_arg([
+					'ids' => $ids,
+					'fields' => 'id,title,image_id,artist_title',
+				], $endpoint );
+			}
+
+			return $endpoint;
 		},
 		'input_schema' => [
 			'id' => [
 				'name' => 'Art ID',
-				'type' => 'id',
+				'type' => 'id:list',
 			],
 		],
 		'output_schema' => [
-			'is_collection' => false,
-			'path' => '$.data',
+			'is_collection' => true,
+			'path' => '$.data[*]',
+			'type' => [
+				'id' => [
+					'name' => 'Art ID',
+					'type' => 'id',
+					'path' => '$.id',
+				],
+				'artist_title' => [
+					'name' => 'Artist Title',
+					'type' => 'string',
+					'path' => '$.artist_title',
+				],
+				'title' => [
+					'name' => 'Title',
+					'type' => 'title',
+					'path' => '$.title',
+				],
+				'image_id' => [
+					'name' => 'Image ID',
+					'type' => 'id',
+					'path' => '$.image_id',
+				],
+				'image_url' => [
+					'name' => 'Image URL',
+					'generate' => function ( $data ): string {
+						return 'https://www.artic.edu/iiif/2/' . $data['image_id'] . '/full/843,/0/default.jpg';
+					},
+					'type' => 'image_url',
+				],
+			],
+		],
+	]);
+
+	$collection_query = HttpQuery::from_array([
+		'data_source' => $aic_data_source,
+		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
+			$endpoint = $aic_data_source->get_endpoint();
+			return add_query_arg( [
+				'limit' => $input_variables['limit'],  
+				'fields' => 'id,title,image_id,artist_title',
+				'page' => $input_variables['page'],
+			], $endpoint );
+		},
+		'input_schema' => [
+			'limit' => [
+				'default_value' => 10,
+				'name' => 'Items per page',
+				'type' => 'ui:pagination_per_page',
+			],
+			'page' => [
+				'default_value' => 1,
+				'name' => 'Starting page',
+				'type' => 'ui:pagination_page',
+			],
+		],
+		'output_schema' => [
+			'is_collection' => true,
+			'path' => '$.data[*]',
 			'type' => [
 				'id' => [
 					'name' => 'Art ID',
 					'type' => 'id',
 				],
+				'artist_title' => [
+					'name' => 'Artist Title',
+					'type' => 'string',
+					'path' => '$.artist_title',
+				],
 				'title' => [
 					'name' => 'Title',
-					'type' => 'string',
-				],
-				'image_id' => [
-					'name' => 'Image ID',
-					'type' => 'id',
+					'type' => 'title',
+					'path' => '$.title',
 				],
 				'image_url' => [
 					'name' => 'Image URL',
@@ -3443,9 +3149,22 @@ function register_aic_block(): void {
 					'name' => 'Art ID',
 					'type' => 'id',
 				],
+				'artist_title' => [
+					'name' => 'Artist Title',
+					'type' => 'string',
+					'path' => '$.artist_title',
+				],
 				'title' => [
 					'name' => 'Title',
-					'type' => 'string',
+					'type' => 'title',
+					'path' => '$.title',
+				],
+				'image_url' => [
+					'name' => 'Image URL',
+					'generate' => function ( $data ): string {
+						return 'https://www.artic.edu/iiif/2/' . $data['image_id'] . '/full/843,/0/default.jpg';
+					},
+					'type' => 'image_url',
 				],
 			],
 		],
@@ -3458,8 +3177,19 @@ function register_aic_block(): void {
 		],
 	]);
 
+	register_remote_data_block( [
+		'title' => 'Art Institute of Chicago Loop',
+		'icon' => 'art',
+		'instructions' => 'This block displays a set amount of artworks based on the provided limit.', 
+		'render_query' => [
+			'query' => $collection_query,
+			'loop' => true,
+		],
+	] );
+
 	register_remote_data_block([
 		'title' => 'Art Institute of Chicago',
+		'icon' => 'art',
 		'render_query' => [
 			'query' => $get_art_query,
 		],

@@ -59,7 +59,7 @@
   "devDependencies": {
     "@automattic/eslint-plugin-wpvip": "0.13.1",
     "@babel/preset-react": "7.26.3",
-    "@playwright/test": "^1.51.1",
+    "@playwright/test": "^1.52.0",
     "@testing-library/jest-dom": "6.6.3",
     "@testing-library/react": "16.3.0",
     "@testing-library/user-event": "^14.6.1",
