@@ -222,8 +222,8 @@ class QueryRunnerTest extends TestCase {
 						'test' => 'test value 2',
 					],
 				],
-			]
-		) );
+			] )
+		);
 
 		$response = new Response( 200, [], $response_body );
 
@@ -288,8 +288,8 @@ class QueryRunnerTest extends TestCase {
 				[
 					'test' => 'test value 2',
 				],
-			]
-		) );
+			] )
+		);
 
 		$response = new Response( 200, [], $response_body );
 
