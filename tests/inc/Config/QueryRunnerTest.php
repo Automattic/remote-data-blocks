@@ -210,6 +210,139 @@ class QueryRunnerTest extends TestCase {
 		$this->assertSame( $expected_result, $result['results'][0] );
 	}
 
+	public function testExecuteSuccessfulResponseWithCollectionResponse(): void {
+		$response_body = $this->createMock( \Psr\Http\Message\StreamInterface::class );
+		$response_body->method( 'getContents' )->willReturn(
+			wp_json_encode( [
+				'values' => [
+					[
+						'test' => 'test value 1',
+					],
+					[
+						'test' => 'test value 2',
+					],
+				],
+			]
+		) );
+
+		$response = new Response( 200, [], $response_body );
+
+		$this->http_client->method( 'request' )->willReturn( $response );
+
+		$this->query->set_output_schema( [
+			'is_collection' => true,
+			'path' => '$.values[*]',
+			'type' => [
+				'test' => [
+					'name' => 'Test Field',
+					'path' => '$.test',
+					'type' => 'string',
+				],
+			],
+		] );
+
+		$result = $this->query->execute( [] );
+
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'results', $result );
+
+		$this->assertArrayHasKey( 'metadata', $result );
+		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
+		$this->assertSame( 2, $result['metadata']['total_count']['value'] );
+
+		$expected_results = [
+			[
+				'result' => [
+					'test' => [
+						'name' => 'Test Field',
+						'type' => 'string',
+						'value' => 'test value 1',
+					],
+				],
+				'uuid' => '00000000-0000-4000-8000-000000000000',
+			],
+			[
+				'result' => [
+					'test' => [
+						'name' => 'Test Field',
+						'type' => 'string',
+						'value' => 'test value 2',
+					],
+				],
+				'uuid' => '00000000-0000-4000-8000-000000000000',
+			],
+		];
+
+		$this->assertIsArray( $result['results'] );
+		$this->assertCount( 2, $result['results'] );
+		$this->assertSame( $expected_results, $result['results'] );
+	}
+
+	public function testExecuteSuccessfulResponseWithCollectionResponseAtRoot(): void {
+		$response_body = $this->createMock( \Psr\Http\Message\StreamInterface::class );
+		$response_body->method( 'getContents' )->willReturn(
+			wp_json_encode( [
+				[
+					'test' => 'test value 1',
+				],
+				[
+					'test' => 'test value 2',
+				],
+			]
+		) );
+
+		$response = new Response( 200, [], $response_body );
+
+		$this->http_client->method( 'request' )->willReturn( $response );
+
+		$this->query->set_output_schema( [
+			'is_collection' => true,
+			'type' => [
+				'test' => [
+					'name' => 'Test Field',
+					'path' => '$.test',
+					'type' => 'string',
+				],
+			],
+		] );
+
+		$result = $this->query->execute( [] );
+
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'results', $result );
+
+		$this->assertArrayHasKey( 'metadata', $result );
+		$this->assertArrayHasKey( 'total_count', $result['metadata'] );
+		$this->assertSame( 2, $result['metadata']['total_count']['value'] );
+
+		$expected_results = [
+			[
+				'result' => [
+					'test' => [
+						'name' => 'Test Field',
+						'type' => 'string',
+						'value' => 'test value 1',
+					],
+				],
+				'uuid' => '00000000-0000-4000-8000-000000000000',
+			],
+			[
+				'result' => [
+					'test' => [
+						'name' => 'Test Field',
+						'type' => 'string',
+						'value' => 'test value 2',
+					],
+				],
+				'uuid' => '00000000-0000-4000-8000-000000000000',
+			],
+		];
+
+		$this->assertIsArray( $result['results'] );
+		$this->assertCount( 2, $result['results'] );
+		$this->assertSame( $expected_results, $result['results'] );
+	}
+
 	public function testExecuteSuccessfulResponseWithJsonStringResponseData(): void {
 		$response_body = $this->createMock( \Psr\Http\Message\StreamInterface::class );
 		$response = new Response( 200, [], $response_body );

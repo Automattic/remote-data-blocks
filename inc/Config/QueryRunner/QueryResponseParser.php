@@ -55,7 +55,8 @@ final class QueryResponseParser {
 	 */
 	public function parse( mixed $data, array $schema ): mixed {
 		$json_obj = $data instanceof JsonObject ? $data : new JsonObject( $data );
-		$value = $json_obj->get( $schema['path'] ?? '$' );
+		$default_path = $schema['is_collection'] ?? false ? '$[*]' : '$';
+		$value = $json_obj->get( $schema['path'] ?? $default_path );
 
 		if ( is_array( $schema['type'] ?? null ) ) {
 			$value = $this->parse_response_objects( $value, $schema['type'] ) ?? [];
