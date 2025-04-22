@@ -13,6 +13,7 @@ use RemoteDataBlocks\Logging\Logger;
 use RemoteDataBlocks\Logging\LoggerManager;
 
 class RdbCacheStrategy extends GreedyCacheStrategy {
+	public const CACHE_AGE_RESPONSE_HEADER = 'Age';
 	public const CACHE_TTL_REQUEST_HEADER = GreedyCacheStrategy::HEADER_TTL;
 
 	private const CACHE_INVALIDATING_REQUEST_HEADERS = [ 'Authorization', 'Cache-Control' ];

@@ -153,6 +153,7 @@ class QueryRunner implements QueryRunnerInterface {
 
 		return [
 			'metadata' => [
+				'age' => $response->getHeaderLine( RdbCacheStrategy::CACHE_AGE_RESPONSE_HEADER ),
 				'status_code' => $response_code,
 			],
 			'response_data' => $this->deserialize_response( $raw_response_string, $input_variables ),
