@@ -146,3 +146,15 @@ function custom_query_response_metadata( array $metadata, HttpQueryInterface $qu
 }
 add_filter( 'remote_data_blocks_query_response_metadata', 'custom_query_response_metadata', 10, 3 );
 ```
+
+### remote_data_blocks_empty_result_message
+
+Filter the empty result message that's shown when a block binding's query comes back empty. This will not be called when there are results.
+
+```php
+function custom_empty_result_message( string $empty_message, array $block_context ): array {
+	// Modify the message based on the $block_context
+	return $empty_message;
+}
+add_filter( 'remote_data_blocks_empty_result_message', 'custom_query_response_metadata', 10, 3 );
+```
