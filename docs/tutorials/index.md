@@ -6,3 +6,4 @@ This section will guide you through configuring data sources in the plugin UI an
 - [Google Sheets integration](google-sheets.md)
 - [HTTP](http.md)
 - [Shopify](shopify.md)
+- [Using AI to build a custom integration](using-ai.md)
