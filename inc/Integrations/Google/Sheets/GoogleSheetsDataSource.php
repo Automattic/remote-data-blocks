@@ -100,6 +100,14 @@ class GoogleSheetsDataSource extends HttpDataSource {
 		if ( isset( $response_data['values'] ) && is_array( $response_data['values'] ) ) {
 			$values = $response_data['values'];
 			$columns = array_shift( $values ); // Get column names from first row
+
+			// if the values are now empty, give back $selected_row as null
+			// This can happen if rows are deleted in the sheet after they
+			// have been used in a remote data block.
+			if ( empty( $values ) ) {
+				return [];
+			}
+
 			$raw_selected_row = $values[ $row_id - 1 ];
 			if ( is_array( $raw_selected_row ) ) {
 				$selected_row = array_combine( $columns, $raw_selected_row );
