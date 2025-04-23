@@ -198,6 +198,35 @@ class BlockBindings {
 		}
 	}
 
+	public static function should_render_empty_result( WP_Block $block ): bool {
+		$block_context = $block->context[ self::$context_name ] ?? [];
+
+		if ( $block_context && empty( $block_context['results'] ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public static function get_empty_result_message( WP_Block $block ): ?string {
+		$block_context = $block->context[ self::$context_name ] ?? [];
+		$empty_message = __( 'No results found.', 'remote-data-blocks' );
+
+		/**
+		 * Filter the empty result message for a block binding.
+		 *
+		 * @param string $empty_message The original empty result message.
+		 * @param array $block_context The block context.
+		 */
+		$empty_message = apply_filters(
+			'remote_data_blocks_empty_result_message',
+			$empty_message,
+			$block_context,
+		);
+
+		return $empty_message;
+	}
+
 	public static function get_pagination_links( WP_Block $block ): array {
 		$block_context = $block->context[ self::$context_name ] ?? [];
 		$query_response = self::execute_queries( $block_context, [], 'remote_data_block_get_pagination_data' );
@@ -304,7 +333,7 @@ class BlockBindings {
 
 	/**
 	 * Find a "template block" in a parsed block's inner blocks.
-	 * 
+	 *
 	 * @param array $parsed_block The parsed block.
 	 * @return bool True if a template block was found.
 	 */
@@ -364,7 +393,7 @@ class BlockBindings {
 
 		$loop_template = $block->parsed_block['innerBlocks'];
 		$loop_template_content = $block->parsed_block['innerContent'];
-		
+
 		// Remove the existing blocks and content so that we can repopulate it.
 		$block->parsed_block['innerBlocks'] = [];
 		$block->parsed_block['innerContent'] = [];
