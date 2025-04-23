@@ -201,11 +201,8 @@ class BlockBindings {
 	public static function should_render_empty_result( WP_Block $block ): bool {
 		$block_context = $block->context[ self::$context_name ] ?? [];
 
-		if ( $block_context && empty( $block_context['results'] ) ) {
-			return true;
-		}
-
-		return false;
+		// Only give back true if there are no results
+		return isset( $block_context['results'] ) && empty( $block_context['results'] );
 	}
 
 	public static function get_empty_result_message( WP_Block $block ): ?string {
