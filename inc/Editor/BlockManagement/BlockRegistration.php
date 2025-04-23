@@ -49,6 +49,8 @@ class BlockRegistration {
 		// Remote data pagination block - used to render pagination links for collections.
 		register_block_type( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-pagination' );
 
+		register_block_type( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-empty-result' );
+
 		// Remote data template - used to render remote data collections.
 		register_block_type( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-template' );
 	}
