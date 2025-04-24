@@ -6,7 +6,6 @@ import {
 import { BlockInstance } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 
 import { ItemPreview } from '@/blocks/remote-data-template/components/item-preview/ItemPreview';
 import { LoopTemplateInnerBlocks } from '@/blocks/remote-data-template/components/loop-template/LoopTemplateInnerBlocks';
@@ -31,7 +30,7 @@ export function LoopTemplate( props: LoopTemplateProps ) {
 	);
 
 	if ( ! remoteData.results.length ) {
-		return <p>{ __( 'No results found.' ) }</p>;
+		return;
 	}
 
 	// To avoid flicker when switching active block contexts, a preview is rendered
