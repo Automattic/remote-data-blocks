@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { LoopTemplate } from '@/blocks/remote-data-template/components/loop-template/LoopTemplate';
@@ -31,19 +31,6 @@ describe( 'LoopTemplate', () => {
 	const expectedListItems = mockRemoteData.results.length + 1; // because of the memoized preview
 
 	afterEach( cleanup );
-
-	it( 'renders "No results found" when there are no results', () => {
-		const emptyRemoteData: RemoteData = {
-			blockName: 'test/block',
-			metadata: {},
-			queryInputs: [ {} ],
-			queryKey: 'test-query',
-			resultId: 'test-result',
-			results: [],
-		};
-		render( <LoopTemplate getInnerBlocks={ mockGetInnerBlocks } remoteData={ emptyRemoteData } /> );
-		expect( screen.getByText( 'No results found.' ) ).toBeInTheDocument();
-	} );
 
 	it( 'renders a list when there are results', () => {
 		const { container } = render(

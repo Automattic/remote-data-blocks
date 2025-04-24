@@ -29,8 +29,10 @@ export function LoopTemplate( props: LoopTemplateProps ) {
 		[ clientId ]
 	);
 
+	// Don't render anything if there are no results.
+	// Leave it to the no results block to handle this.
 	if ( ! remoteData.results.length ) {
-		return;
+		return null;
 	}
 
 	// To avoid flicker when switching active block contexts, a preview is rendered
