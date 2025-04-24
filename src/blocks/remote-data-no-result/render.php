@@ -13,12 +13,4 @@ if ( ! $should_render_empty_result ) {
 	return;
 }
 
-// Get the customized empty result message.
-$empty_result_message = BlockBindings::get_empty_result_message( $block );
-
-?>
-<div className="remote-data-empty-result">
-	<p>
-		<?php echo esc_html( $empty_result_message ); ?>
-	</p>
-</div>
+echo wp_kses_post( $content );

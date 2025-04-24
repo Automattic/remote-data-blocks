@@ -200,28 +200,10 @@ class BlockBindings {
 
 	public static function should_render_empty_result( WP_Block $block ): bool {
 		$block_context = $block->context[ self::$context_name ] ?? [];
+		$query_response = self::execute_queries( $block_context, [], 'remote_data_block_check_for_no_results' );
 
 		// Only give back true if there are no results
-		return isset( $block_context['results'] ) && empty( $block_context['results'] );
-	}
-
-	public static function get_empty_result_message( WP_Block $block ): ?string {
-		$block_context = $block->context[ self::$context_name ] ?? [];
-		$empty_message = __( 'No results found.', 'remote-data-blocks' );
-
-		/**
-		 * Filter the empty result message for a block binding.
-		 *
-		 * @param string $empty_message The original empty result message.
-		 * @param array $block_context The block context.
-		 */
-		$empty_message = apply_filters(
-			'remote_data_blocks_empty_result_message',
-			$empty_message,
-			$block_context,
-		);
-
-		return $empty_message;
+		return isset( $query_response['results'] ) && empty( $query_response['results'] );
 	}
 
 	public static function get_pagination_links( WP_Block $block ): array {

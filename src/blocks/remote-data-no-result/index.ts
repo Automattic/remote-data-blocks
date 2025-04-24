@@ -6,7 +6,7 @@ import { Edit } from './edit';
 import { Save } from './save';
 import './style.scss';
 
-registerBlockType< RemoteDataEmptyResultBlockAttributes >( metadata.name, {
+registerBlockType< RemoteDataNoResultBlockAttributes >( metadata.name, {
 	edit: Edit,
 	icon: {
 		src: error,
