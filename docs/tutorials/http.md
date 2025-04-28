@@ -9,7 +9,7 @@ This page will walk you through registering a remote data block that loads data 
 3. Choose "HTTP" from the dropdown menu as the data source type.
 4. Fill in the following details:
    - Data Source Name: Zip Code API
-   - URL: https://api.zippopotam.us/us/
+   - URL: https://api.zippopotam.us/
 5. If your API requires authentication, enter those details. This API does not.
 6. Save the data source and return the data source list.
 7. In the Actions column, click the three-dot menu, then "Copy UUID" to copy the data source's UUID to your clipboard.
