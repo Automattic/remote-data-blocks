@@ -76,7 +76,7 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 			innerBlocks.push( createBlock( 'remote-data-blocks/pagination' ) );
 		}
 
-		innerBlocks.push( createBlock( 'remote-data-blocks/no-result' ) );
+		innerBlocks.push( createBlock( 'remote-data-blocks/no-results' ) );
 
 		replaceInnerBlocks( rootClientId, innerBlocks ).catch( () => {} );
 	}
