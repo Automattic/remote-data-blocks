@@ -4,7 +4,7 @@
   "name": "remote-data-blocks/no-result",
   "version": "0.1.0",
   "usesContext": [ "remote-data-blocks/remoteData" ],
-  "title": "No Remote Data Results",
+  "title": "No Remote Data Result",
   "description": "Contains the blocks to display when no remote data is found.",
   "category": "widgets",
   "example": {},

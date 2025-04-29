@@ -32,5 +32,11 @@ export function Edit( props: BlockEditProps< RemoteDataTemplateBlockAttributes >
 		);
 	}
 
+	// Don't render anything if there are no results.
+	// Leave it to the no results block to handle this.
+	if ( ! remoteData.results.length ) {
+		return <div { ...blockProps } />;
+	}
+
 	return <LoopTemplate getInnerBlocks={ getInnerBlocks } remoteData={ remoteData } />;
 }

@@ -10,7 +10,7 @@ $should_render_empty_result = BlockBindings::should_render_empty_result( $block 
 
 // Skip the rendering if the block's results are not empty.
 if ( ! $should_render_empty_result ) {
-	return;
+	return null;
 }
 
 echo wp_kses_post( $content );

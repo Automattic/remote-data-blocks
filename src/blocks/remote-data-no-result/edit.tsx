@@ -36,13 +36,9 @@ export function Edit( props: BlockEditProps< RemoteDataNoResultBlockAttributes >
 
 	// This is mirroring the query-no-results block from Gutenberg.
 	// https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/query-no-results/edit.js
-	let templateToUse = NO_RESULTS_PLACEHOLDER_TEMPLATE;
-
-	if ( remoteData?.results?.length === 0 ) {
-		templateToUse = NO_RESULTS_TEMPLATE;
-	} else if ( remoteData?.results ) {
-		templateToUse = [];
-	}
+	const templateToUse = ! remoteData?.blockName
+		? NO_RESULTS_PLACEHOLDER_TEMPLATE
+		: NO_RESULTS_TEMPLATE;
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: templateToUse,

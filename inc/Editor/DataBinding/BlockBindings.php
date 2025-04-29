@@ -202,7 +202,7 @@ class BlockBindings {
 
 	public static function should_render_empty_result( WP_Block $block ): bool {
 		$block_context = $block->context[ self::$context_name ] ?? [];
-		$query_response = self::execute_queries( $block_context, [], 'remote_data_block_check_for_no_results' );
+		$query_response = self::execute_queries( $block_context, [] );
 
 		// Only give back true if there are no results
 		return isset( $query_response['results'] ) && empty( $query_response['results'] );
