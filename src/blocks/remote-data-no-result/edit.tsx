@@ -30,7 +30,7 @@ export function Edit( props: BlockEditProps< RemoteDataNoResultBlockAttributes >
 			<Placeholder
 				icon={ blockDefault }
 				label={ __(
-					'This block only works when placed inside a remote data block when there are no results. This block will be ignored as currently configured.'
+					'This block must be placed inside a remote data block. This block will be ignored as currently configured.'
 				) }
 			/>
 		);

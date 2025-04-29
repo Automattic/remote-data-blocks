@@ -21,7 +21,7 @@ export function Edit( props: BlockEditProps< RemoteDataPaginationBlockAttributes
 			<Placeholder
 				icon={ blockDefault }
 				label={ __(
-					'This block only works when placed inside a remote data block using data that supports pagination. This block will be ignored as currently configured.'
+					'This block must be placed inside a remote data block. This block will be ignored as currently configured.'
 				) }
 			/>
 		);
