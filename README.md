@@ -5,9 +5,9 @@
 
 **Remote Data Blocks** is a WordPress plugin that makes it easy to combine content and remote data in the block editor. Easily register blocks that load data from Airtable, Google Sheets, Shopify, GitHub, or any other API. Your data stays in sync. Built-in caching ensures performance and reliability. [Read more about well-supported use cases](docs/concepts/index.md#supported-use-cases).
 
-[![Launch in WordPress Playground](https://img.shields.io/badge/Launch%20in%20WordPress%20Playground-DA9A45?style=for-the-badge&logo=wordpress)](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/blueprint.json)
+[![Launch in WordPress Playground](https://img.shields.io/badge/Launch%20in%20WordPress%20Playground-DA9A45?style=for-the-badge&logo=wordpress)](https://wordpress-playground.atomicsites.blog/?blueprint-url=https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/blueprint.json)
 
-[Launch the plugin in WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/blueprint.json) and explore. An example API ("Conference Event") is included, or visit Settings > Remote Data Blocks to add your own. Read our [tutorials](docs/tutorials/index.md) to dive in.
+[Launch the plugin in WordPress Playground](https://wordpress-playground.atomicsites.blog/?blueprint-url=https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/blueprint.json) and explore. An example API ("Conference Event") is included, or visit Settings > Remote Data Blocks to add your own. Read our [tutorials](docs/tutorials/index.md) to dive in.
 
 ## Next steps
 
