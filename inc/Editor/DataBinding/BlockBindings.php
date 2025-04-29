@@ -206,6 +206,10 @@ class BlockBindings {
 		// stale results from the block.
 		$query_response = self::execute_queries( $block_context, [] );
 
+		if ( is_wp_error( $query_response ) ) {
+			return false;
+		}
+
 		// Only give back true if there are no results
 		return isset( $query_response['results'] ) && empty( $query_response['results'] );
 	}

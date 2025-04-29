@@ -1,6 +1,7 @@
 <?php declare(strict_types = 1);
 
 use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
+
 // Global variables provided by WordPress for block rendering:
 // $attributes (array): The block attributes.
 // $content (string): The block default content.

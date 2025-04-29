@@ -1,8 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 import { BlockEditProps, Template } from '@wordpress/blocks';
+import { Placeholder } from '@wordpress/components';
+import { blockDefault } from '@wordpress/icons';
 
 import { useRemoteDataContext } from '@/blocks/remote-data-container/hooks/useRemoteDataContext';
 import { __ } from '@/utils/i18n';
@@ -18,31 +20,25 @@ const NO_RESULTS_TEMPLATE: Template[] = [
 	],
 ];
 
-const NO_RESULTS_PLACEHOLDER_TEMPLATE: Template[] = [
-	[
-		'core/paragraph',
-		{
-			placeholder: __(
-				'This block only works when placed inside a remote data block when there are no results. This block will be ignored as currently configured.'
-			),
-		},
-	],
-];
-
 export function Edit( props: BlockEditProps< RemoteDataNoResultBlockAttributes > ): JSX.Element {
 	const { context } = props;
 	const { remoteData } = useRemoteDataContext( context );
 	const blockProps = useBlockProps();
 
-	// This is mirroring the query-no-results block from Gutenberg.
-	// https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/query-no-results/edit.js
-	const templateToUse = ! remoteData?.blockName
-		? NO_RESULTS_PLACEHOLDER_TEMPLATE
-		: NO_RESULTS_TEMPLATE;
+	if ( ! remoteData?.blockName ) {
+		return (
+			<Placeholder
+				icon={ blockDefault }
+				label={ __(
+					'This block only works when placed inside a remote data block when there are no results. This block will be ignored as currently configured.'
+				) }
+			/>
+		);
+	}
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: templateToUse,
-	} );
-
-	return <div { ...innerBlocksProps } />;
+	return (
+		<div { ...blockProps }>
+			<InnerBlocks template={ NO_RESULTS_TEMPLATE } />
+		</div>
+	);
 }

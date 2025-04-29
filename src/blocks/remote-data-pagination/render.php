@@ -9,6 +9,11 @@ use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 
 $pagination_links = BlockBindings::get_pagination_links( $block );
 
+// Skip the rendering if there are no pagination links.
+if ( empty( $pagination_links ) ) {
+	return null;
+}
+
 $next_page_link = $pagination_links['next_page'] ?? null;
 $next_page_link_label = 'Next';
 $previous_page_link = $pagination_links['previous_page'] ?? null;
