@@ -6,10 +6,8 @@ use RDBTestCase;
 
 class RemoteHtmlBlockTest extends RDBTestCase {
 	public function testRemoteHtmlBlockRenders(): void {
-		$test_title = 'My Product';
-
 		$test_api_response = [
-			'title' => $test_title,
+			'title' => 'My product',
 			'content' => '<div id="rendered-html">A <strong>one of a kind</strong> product!</div>',
 		];
 
@@ -35,7 +33,7 @@ class RemoteHtmlBlockTest extends RDBTestCase {
 			<!-- wp:remote-data-blocks/test-html-render {"remoteData":{"blockName":"remote-data-blocks/test-html-render"}} -->
 			<div>
 				<!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"block":"remote-data-blocks/test-html-render","field":"title"}}},"name":"Title"}} -->
-				<h2 id="field-title" class="wp-block-heading"></h2>
+				<h2 id="field-title" class="wp-block-heading">Fallback title</h2>
 				<!-- /wp:heading -->
 
 				<!-- wp:remote-data-blocks/remote-html {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"content","block":"remote-data-blocks/test-html-render"}}},"name":"Content"}} /-->
@@ -44,6 +42,8 @@ class RemoteHtmlBlockTest extends RDBTestCase {
 		');
 
 		$dom = $this->load_html( $result_html );
+
+		$this->assertDomIdHasHtmlContent( $dom, 'field-title', 'My product' );
 		$this->assertDomIdHasHtmlContent( $dom, 'rendered-html', 'A <strong>one of a kind</strong> product!' );
 	}
 
@@ -54,7 +54,7 @@ class RemoteHtmlBlockTest extends RDBTestCase {
 			<!-- wp:remote-data-blocks/test-html-failure {"remoteData":{"blockName":"remote-data-blocks/test-html-failure"}} -->
 			<div>
 				<!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"block":"remote-data-blocks/test-html-failure","field":"title"}}},"name":"Title"}} -->
-				<h2 id="field-title" class="wp-block-heading"></h2>
+				<h2 id="field-title" class="wp-block-heading">Fallback title</h2>
 				<!-- /wp:heading -->
 
 				<!-- wp:remote-data-blocks/remote-html {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"content","block":"remote-data-blocks/test-html-failure"}}},"name":"Content"}} --><div id="fallback-content"><div class="warning">Use <em>this</em> content in case of emergency!</div></div><!-- /wp:remote-data-blocks/remote-html -->
@@ -63,6 +63,8 @@ class RemoteHtmlBlockTest extends RDBTestCase {
 		');
 
 		$dom = $this->load_html( $result_html );
+
+		$this->assertDomIdHasHtmlContent( $dom, 'field-title', 'Fallback title' );
 		$this->assertDomIdHasHtmlContent( $dom, 'fallback-content', '<div class="warning">Use <em>this</em> content in case of emergency!</div>' );
 	}
 }

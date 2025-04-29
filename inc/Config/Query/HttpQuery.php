@@ -42,7 +42,7 @@ class HttpQuery extends ArraySerializable implements HttpQueryInterface {
 	 * Define the cache object TTL for the current query execution's responses:
 	 * - Return a positive integer to set a custom TTL in seconds.
 	 * - Return -1 to disable caching.
-	 * - Return null to use the global default cache TTL (60 seconds).
+	 * - Return null to use the global default cache TTL (300 seconds).
 	 *
 	 * @return int|null The cache object TTL in seconds.
 	 */

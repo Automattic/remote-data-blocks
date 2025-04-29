@@ -3,7 +3,6 @@
 use WP_UnitTestCase;
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Config\Query\HttpQuery;
-use RemoteDataBlocks\Config\Query\HttpQueryInterface;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\Editor\BlockManagement\BlockRegistration;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
@@ -102,11 +101,13 @@ class RDBTestCase extends WP_UnitTestCase {
 			private $status_code;
 
 			public function __construct( array $response_data, int $status_code ) {
+				parent::__construct( null, [] );
+
 				$this->response_data = $response_data;
 				$this->status_code = $status_code;
 			}
 
-			protected function get_raw_response_data( HttpQueryInterface $query, array $input_variables ): array|WP_Error {
+			protected function get_raw_response_data( array $request_details, array $input_variables ): array|WP_Error {
 				return [
 					'metadata' => [
 						'age' => 100,
@@ -135,6 +136,13 @@ class RDBTestCase extends WP_UnitTestCase {
 	protected function get_dom_element_by_html_id( DOMDocument $dom, string $html_id ): DOMNodeList|false {
 		$xpath = new DOMXPath( $dom );
 		$nodes = $xpath->query( sprintf( "//*[@id='%s']", $html_id ) );
+
+		return $nodes;
+	}
+
+	protected function get_dom_elements_by_html_class( DOMDocument $dom, string $html_class ): DOMNodeList|false {
+		$xpath = new DOMXPath( $dom );
+		$nodes = $xpath->query( sprintf( "//*[@class='%s']", $html_class ) );
 
 		return $nodes;
 	}

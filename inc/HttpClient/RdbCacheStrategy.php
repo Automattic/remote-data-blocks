@@ -2,24 +2,25 @@
 
 namespace RemoteDataBlocks\HttpClient;
 
+use DateTime;
 use Kevinrob\GuzzleCache\CacheEntry;
+use Kevinrob\GuzzleCache\CacheMiddleware;
 use Kevinrob\GuzzleCache\KeyValueHttpHeader;
 use Kevinrob\GuzzleCache\Storage\CacheStorageInterface;
 use Kevinrob\GuzzleCache\Storage\WordPressObjectCacheStorage;
 use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use RemoteDataBlocks\Logging\Logger;
-use RemoteDataBlocks\Logging\LoggerManager;
 
 class RdbCacheStrategy extends GreedyCacheStrategy {
+	public const CACHE_AGE_RESPONSE_HEADER = 'Age';
+	public const CACHE_STATUS_RESPONSE_HEADER = CacheMiddleware::HEADER_CACHE_INFO;
 	public const CACHE_TTL_REQUEST_HEADER = GreedyCacheStrategy::HEADER_TTL;
+	public const WP_OBJECT_CACHE_GROUP = 'remote-data-blocks';
 
 	private const CACHE_INVALIDATING_REQUEST_HEADERS = [ 'Authorization', 'Cache-Control' ];
-	private const FALLBACK_CACHE_TTL_IN_SECONDS = 300; // 5 minutes
-	private const WP_OBJECT_CACHE_GROUP = 'remote-data-blocks';
-
-	private Logger $logger;
+	private const ERROR_CACHE_TTL_IN_SECONDS = 30; // 30 seconds for error responses
+	private const FALLBACK_CACHE_TTL_IN_SECONDS = 300; // 5 minutes for success responses
 
 	public function __construct( ?CacheStorageInterface $storage = null ) {
 		// Filter this if customization is needed.
@@ -30,77 +31,54 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 			self::FALLBACK_CACHE_TTL_IN_SECONDS,
 			$vary_headers
 		);
-
-		$this->logger = LoggerManager::instance( __CLASS__ );
 	}
 
-	private function log( RequestInterface $request, string $message, ?CacheEntry $cache_entry = null ): void {
-		$uri = $request->getUri();
-		$uri_string = $uri->getScheme() . '://' . $uri->getHost() . $uri->getPath();
-		$method = $request->getMethod();
-		$has_body = (bool) $request->getBody();
+	public static function get_object_cache_key_from_request( RequestInterface $request ): string {
+		$request_body = (string) $request->getBody();
+		$request_headers = $request->getHeaders();
+		$request_method = $request->getMethod();
+		$request_uri = (string) $request->getUri();
 
-		$context = [
-			'method' => $method,
-			'uri' => $uri_string,
-			'has_body' => $has_body,
-			'key' => $this->getCacheKey( $request ),
-		];
-
-		if ( $cache_entry instanceof CacheEntry ) {
-			$context['age'] = $cache_entry->getAge();
-			$context['ttl'] = $cache_entry->getTtl();
+		$cache_headers = [];
+		foreach ( self::CACHE_INVALIDATING_REQUEST_HEADERS as $header ) {
+			if ( isset( $request_headers[ $header ] ) ) {
+				$cache_headers[ $header ] = $request_headers[ $header ];
+			}
 		}
 
-		ksort( $context );
+		$input_hash = md5( wp_json_encode( [
+			'body' => $request_body,
+			'headers' => $cache_headers,
+			'method' => $request_method,
+			'uri' => (string) $request_uri,
+		] ) );
 
-		$this->logger->debug( $message, $context );
+		return sprintf( 'http-client:%s', $input_hash );
 	}
 
 	/** @psalm-suppress ParamNameMismatch reason: parent is camelCase, but we want snake_case */
-	protected function getCacheKey( RequestInterface $request, ?KeyValueHttpHeader $vary_headers = null ): string {
-		$cache_key = parent::getCacheKey( $request, $vary_headers );
-
-		if ( $request->getMethod() === 'POST' ) {
-			$body = $request->getBody();
-			if ( empty( $body ) ) {
-				return $cache_key;
-			}
-			$cache_key .= '-' . md5( (string) $body );
-		}
-
-		return $cache_key;
+	protected function getCacheKey( RequestInterface $request, ?KeyValueHttpHeader $_vary_headers = null ): string {
+		return self::get_object_cache_key_from_request( $request );
 	}
 
-	public function fetch( RequestInterface $request ): CacheEntry|null {
-		$result = parent::fetch( $request );
-
-		if ( null === $result ) {
-			$this->log( $request, 'cache:read:miss' );
-			return null;
+	protected function getCacheObject( RequestInterface $request, ResponseInterface $response ): ?CacheEntry {
+		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+		$ttl = $this->defaultTtl;
+		if ( $request->hasHeader( static::HEADER_TTL ) ) {
+			$ttl_header_values = $request->getHeader( static::HEADER_TTL );
+			$ttl = (int) reset( $ttl_header_values );
 		}
 
-		$this->log( $request, 'cache:read:hit', $result );
-		return $result;
-	}
-
-	public function cache( RequestInterface $request, ResponseInterface $response ): bool {
-		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-		$cache_ttl = $this->defaultTtl;
-
-		// Negative TTL indicates disabled caching.
-		if ( $cache_ttl < 0 ) {
-			$this->log( $request, 'cache:write:disabled' );
-			return false;
+		if ( ! array_key_exists( $response->getStatusCode(), $this->statusAccepted ) ) {
+			// Cache it for a short time period to prevent error floods.
+			$ttl = self::ERROR_CACHE_TTL_IN_SECONDS;
 		}
 
-		$result = parent::cache( $request, $response );
-		if ( false === $result ) {
-			$this->log( $request, 'cache:write:uncacheable' );
-			return false;
-		}
+		// NOTE: We skip the vary headers '*' check from the parent method
+		// since our defined vary headers cannot accept a '*' value.
 
-		$this->log( $request, 'cache:write:success' );
-		return $result;
+		$response = $response->withoutHeader( 'Etag' )->withoutHeader( 'Last-Modified' );
+
+		return new CacheEntry( $request->withoutHeader( static::HEADER_TTL ), $response, new DateTime( sprintf( '%+d seconds', $ttl ) ) );
 	}
 }

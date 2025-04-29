@@ -7,26 +7,14 @@ use WP_Error;
 
 class MockValidator implements ValidatorInterface {
 	/**
-	 * @psalm-suppress UnusedProperty
-	 */
-	private array $schema;
-
-	private bool $should_pass;
-
-	/**
 	 * Constructor.
 	 *
-	 * @param array $schema      Validation schema.
-	 * @param bool  $should_pass Whether the validation should pass or fail.
+	 * @param bool $should_pass Whether the validation should pass or fail.
 	 */
-	public function __construct( array $schema = [], bool $should_pass = true ) {
-		$this->schema = $schema;
-		$this->should_pass = $should_pass;
-	}
+	public function __construct( private bool $should_pass = true ) {}
 
 	/**
 	 * Validate data against a schema.
-	 *
 	 *
 	 * @return true|\WP_Error WP_Error for invalid data, true otherwise
 	 */
@@ -40,13 +28,5 @@ class MockValidator implements ValidatorInterface {
 			'Mock validation failed',
 			[ 'status' => 400 ]
 		);
-	}
-
-	/**
-	 * Set whether the validation should pass or fail.
-	 *
-	 */
-	public function set_should_pass( bool $should_pass ): void {
-		$this->should_pass = $should_pass;
 	}
 }

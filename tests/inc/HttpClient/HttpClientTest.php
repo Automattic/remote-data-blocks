@@ -523,4 +523,32 @@ class HttpClientTest extends TestCase {
 
 		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the second request' );
 	}
+
+	public function testRepeatedErrorsWithSameCacheKeyResultInCacheHit(): void {
+		// Set up the mock handler with one response
+		$this->mock_handler->append( new Response( 500, [], 'Error response' ) );
+		$this->mock_handler->append( new Response( 200, [], 'Success response' ) );
+
+		$this->assertEquals( 2, $this->mock_handler->count(), 'The mock handler should have two requests' );
+
+		// Make the first request
+		$first_response = $this->http_client->request( 'GET', '/test', [], $this->client );
+
+		$this->assertEquals( 1, $this->mock_handler->count(), 'The mock handler should have one request left after the first request' );
+
+		// Assert the first response
+		$this->assertEquals( 500, $first_response->getStatusCode() );
+		$this->assertEquals( 'Error response', (string) $first_response->getBody() );
+		$this->assertEquals( 'MISS', $first_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		// Make the second request to the same endpoint
+		$second_response = $this->http_client->request( 'GET', '/test', [], $this->client );
+
+		// Assert the second response
+		$this->assertEquals( 500, $second_response->getStatusCode() );
+		$this->assertEquals( 'Error response', (string) $second_response->getBody() );
+		$this->assertEquals( 'HIT', $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+
+		$this->assertEquals( 1, $this->mock_handler->count(), 'The mock handler should still have one request left after the second request' );
+	}
 }

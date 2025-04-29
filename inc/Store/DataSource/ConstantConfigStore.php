@@ -3,7 +3,6 @@
 namespace RemoteDataBlocks\Store\DataSource;
 
 use RemoteDataBlocks\Config\DataSource\DataSourceInterface;
-use RemoteDataBlocks\Logging\LoggerManager;
 use WP_Error;
 
 use const RemoteDataBlocks\REMOTE_DATA_BLOCKS__DATA_SOURCE_CLASSMAP;
@@ -31,14 +30,6 @@ class ConstantConfigStore {
 			$validation_result = self::validate_config( $config );
 			if ( ! is_wp_error( $validation_result ) ) {
 				$valid_configs[] = $config;
-			} else {
-				LoggerManager::instance()->error(
-					sprintf(
-						'Invalid data source config found (uuid: %s): %s',
-						$config['uuid'] ?? 'unknown',
-						$validation_result->get_error_message()
-					)
-				);
 			}
 		}
 
@@ -50,7 +41,7 @@ class ConstantConfigStore {
 		$found = array_filter( $configs, function ( $config ) use ( $uuid ) {
 			return $config['uuid'] === $uuid;
 		} );
-		
+
 		if ( empty( $found ) ) {
 			return new WP_Error(
 				'data_source_not_found',
@@ -61,7 +52,7 @@ class ConstantConfigStore {
 
 		$config = reset( $found );
 		$validation_result = self::validate_config( $config );
-		
+
 		if ( is_wp_error( $validation_result ) ) {
 			return $validation_result;
 		}

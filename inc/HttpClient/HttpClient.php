@@ -4,14 +4,11 @@ namespace RemoteDataBlocks\HttpClient;
 
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Client;
-use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
+use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
-use RemoteDataBlocks\HttpClient\RdbCacheStrategy;
-use RemoteDataBlocks\HttpClient\RdbCacheMiddleware;
-use RemoteDataBlocks\Logging\LoggerManager;
 
 defined( 'ABSPATH' ) || exit();
 
@@ -31,12 +28,8 @@ class HttpClient {
 
 		$handler_stack = HandlerStack::create( $request_handler );
 
+		$handler_stack->push( new RdbLogMiddleware(), 'remote_data_blocks_logger' );
 		$handler_stack->push( new RdbCacheMiddleware( new RdbCacheStrategy() ), 'remote_data_blocks_cache' );
-
-		$handler_stack->push( Middleware::log(
-			LoggerManager::instance(),
-			new MessageFormatter( '{total_time} {code} {phrase} {method} {url}' )
-		) );
 
 		// Set our User Agent header.
 		$handler_stack->push( Middleware::mapRequest( function ( RequestInterface $request ) {
@@ -66,6 +59,11 @@ class HttpClient {
 	 */
 	public function request( string $method, string|UriInterface $uri, array $options = [], ?Client $client = null ): ResponseInterface {
 		$http_client = $client ?? $this->client;
+		$options = array_merge( $options, [
+			// Avoid thrown exceptions for HTTP errors.
+			RequestOptions::HTTP_ERRORS => false,
+		] );
+
 		return $http_client->request( $method, $uri, $options );
 	}
 }

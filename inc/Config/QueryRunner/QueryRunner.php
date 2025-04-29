@@ -18,13 +18,20 @@ defined( 'ABSPATH' ) || exit();
  * Class that executes queries.
  */
 class QueryRunner implements QueryRunnerInterface {
+	/**
+	 * @var array<string, array|WP_Error>
+	 */
+	protected static array $in_memory_cache;
+
 	protected HttpClient $http_client;
 
 	/**
 	 * @param HttpClient|null $http_client The HTTP client used to make HTTP requests.
+	 * @param array|null $in_memory_cache The in-memory cache used to store query results.
 	 */
-	public function __construct( ?HttpClient $http_client = null ) {
+	public function __construct( ?HttpClient $http_client = null, ?array $in_memory_cache = null ) {
 		$this->http_client = $http_client ?? HttpClient::instance();
+		self::$in_memory_cache = $in_memory_cache ?? self::$in_memory_cache ?? [];
 	}
 
 	/**
@@ -121,20 +128,14 @@ class QueryRunner implements QueryRunnerInterface {
 	/**
 	 * Dispatch the HTTP request and assemble the raw (pre-processed) response data.
 	 *
-	 * @param HttpQueryInterface $query The query being executed.
+	 * @param array<string, mixed> $request_details The parsed request details for the current request.
 	 * @param array<string, mixed> $input_variables The input variables for the current request.
-	 * @return WP_Error|array{
+	 * @return array{
 	 *   metadata:      array<string, string|int|null>,
-	 *   response_data: string|array|object|null,
+	 *   response_data: string|array|object|null|WP_Error,
 	 * }
 	 */
-	protected function get_raw_response_data( HttpQueryInterface $query, array $input_variables ): array|WP_Error {
-		$request_details = $this->get_request_details( $query, $input_variables );
-
-		if ( is_wp_error( $request_details ) ) {
-			return $request_details;
-		}
-
+	protected function get_raw_response_data( array $request_details, array $input_variables ): array|WP_Error {
 		try {
 			$response = $this->http_client->request( $request_details['method'], $request_details['uri'], $request_details['options'] );
 		} catch ( Exception $e ) {
@@ -152,7 +153,7 @@ class QueryRunner implements QueryRunnerInterface {
 
 		return [
 			'metadata' => [
-				'age' => intval( $response->getHeaderLine( 'Age' ) ),
+				'age' => $response->getHeaderLine( RdbCacheStrategy::CACHE_AGE_RESPONSE_HEADER ),
 				'status_code' => $response_code,
 			],
 			'response_data' => $this->deserialize_response( $raw_response_string, $input_variables ),
@@ -222,10 +223,31 @@ class QueryRunner implements QueryRunnerInterface {
 			}
 		}
 
-		$raw_response_data = $this->get_raw_response_data( $query, $input_variables );
+		$request_details = $this->get_request_details( $query, $input_variables );
 
+		if ( is_wp_error( $request_details ) ) {
+			return $request_details;
+		}
+
+		// Try to resolve the request from the in-memory cache using a hash of
+		// the query and input. This is not 1:1 with the object caching that is
+		// implemented by HttpClient, but it is good enough to de-duplicate
+		// requests that occur in the same process.
+		//
+		// This avoids redundant post-processing (QueryResponseParser) and
+		// object cache requests.
+		$in_memory_cache_key = sprintf( 'query-runner:%s', md5( wp_json_encode( $request_details ) ) );
+		$cached_result = $this->cache_get( $in_memory_cache_key );
+
+		if ( null !== $cached_result ) {
+			return $cached_result;
+		}
+
+		$raw_response_data = $this->get_raw_response_data( $request_details, $input_variables );
+
+		// Errors are also cached in-memory to prevent repeating failed requests.
 		if ( is_wp_error( $raw_response_data ) ) {
-			return $raw_response_data;
+			return $this->cache_save( $in_memory_cache_key, $raw_response_data );
 		}
 
 		// Preprocess the response data.
@@ -258,13 +280,15 @@ class QueryRunner implements QueryRunnerInterface {
 			}
 		}
 
-		return [
+		$result = [
 			'metadata' => $metadata,
 			'pagination' => Pagination::format_pagination_data_for_query_response( $pagination, $input_schema, $input_variables ),
 			'results' => $results,
 			'query_id' => $query->get_id(),
 			'query_inputs' => [ $input_variables ],
 		];
+
+		return $this->cache_save( $in_memory_cache_key, $result );
 	}
 
 	/**
@@ -343,5 +367,27 @@ class QueryRunner implements QueryRunnerInterface {
 	 */
 	protected function preprocess_response( HttpQueryInterface $query, mixed $response_data, array $input_variables ): mixed {
 		return $query->preprocess_response( $response_data, $input_variables );
+	}
+
+	/**
+	 * Cache the response data in memory.
+	 *
+	 * @param string $cache_key The cache key.
+	 * @return array|WP_Error|null The cached data or null if not found.
+	 */
+	protected function cache_get( string $cache_key ): array|WP_Error|null {
+		return self::$in_memory_cache[ $cache_key ] ?? null;
+	}
+
+	/**
+	 * Cache the response data in memory.
+	 *
+	 * @param string $cache_key The cache key.
+	 * @param array|WP_Error $data The data to cache.
+	 * @return array|WP_Error The cached data.
+	 */
+	protected function cache_save( string $cache_key, array|WP_Error $data ): array|WP_Error {
+		self::$in_memory_cache[ $cache_key ] = $data;
+		return $data;
 	}
 }
