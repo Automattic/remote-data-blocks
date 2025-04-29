@@ -11,7 +11,7 @@ This page will walk you through registering a remote data block that loads data 
    - Data Source Name: Zip Code API
    - URL: https://api.zippopotam.us/us/
 
-_Note: The `endpoint` function in the code below will append the provided Zip Code (by the user) to the "URL" value defined here, to form the final endpoint_
+_Note: The `endpoint` function in the code below will append the provided Zip Code (by the user) to the "URL" value defined here, to form the final endpoint of this example_
 
 5. If your API requires authentication, enter those details. This API does not.
 6. Save the data source and return the data source list.
