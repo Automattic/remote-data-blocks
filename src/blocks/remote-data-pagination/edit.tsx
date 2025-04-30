@@ -13,17 +13,32 @@ import './editor.scss';
 
 export function Edit( props: BlockEditProps< RemoteDataPaginationBlockAttributes > ): JSX.Element {
 	const { context } = props;
-	const { remoteData } = useRemoteDataContext( context );
 	const blockProps = useBlockProps();
+
+	const { remoteData } = useRemoteDataContext( context );
 
 	if ( ! remoteData?.blockName ) {
 		return (
 			<Placeholder
+				label={ __( 'Remote Data Pagination' ) }
 				icon={ blockDefault }
-				label={ __(
+				instructions={ __(
 					'This block must be placed inside a remote data block. This block will be ignored as currently configured.'
 				) }
 			/>
+		);
+	}
+
+	if ( ! remoteData?.pagination ) {
+		return (
+			<div { ...blockProps }>
+				<Placeholder
+					label={ __( 'Remote Data Pagination' ) }
+					instructions={ __(
+						'This block only works when placed inside a remote data block using data that supports pagination. This block will be ignored as currently configured.'
+					) }
+				/>
+			</div>
 		);
 	}
 

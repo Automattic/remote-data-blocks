@@ -28,8 +28,9 @@ export function Edit( props: BlockEditProps< RemoteDataNoResultBlockAttributes >
 	if ( ! remoteData?.blockName ) {
 		return (
 			<Placeholder
+				label={ __( 'No Remote Data Results' ) }
 				icon={ blockDefault }
-				label={ __(
+				instructions={ __(
 					'This block must be placed inside a remote data block. This block will be ignored as currently configured.'
 				) }
 			/>
