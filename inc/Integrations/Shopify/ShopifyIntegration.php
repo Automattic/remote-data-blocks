@@ -86,6 +86,7 @@ class ShopifyIntegration {
 				'input_schema' => [
 					'search' => [
 						'type' => 'ui:search_input',
+						'default_value' => '',
 					],
 					'limit' => [
 						'default_value' => 8,
