@@ -7,7 +7,7 @@ use function do_action;
 defined( 'ABSPATH' ) || exit();
 
 class Logger extends AbstractLogger {
-	public const ACTION_NAME = 'wpcomvip_log';
+	public const ACTION_NAME = 'remote_data_blocks_log';
 
 	/**
 	 * Constructor.
@@ -31,7 +31,7 @@ class Logger extends AbstractLogger {
 		 */
 		do_action( self::ACTION_NAME, $this->namespace, $level, $message, $context );
 
-		if ( LogLevel::meets_threshold( $level, LogLevel::ERROR ) ) {
+		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) && LogLevel::meets_threshold( $level, LogLevel::ERROR ) ) {
 			error_log( sprintf( '[%s] %s: %s', $this->namespace, $level, $message ) );
 		}
 	}

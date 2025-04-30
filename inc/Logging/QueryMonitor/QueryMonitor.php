@@ -67,7 +67,7 @@ class QueryMonitor {
 		] );
 	}
 
-	public static function log_to_query_monitor( string $level, string $message, array $context = [] ): void {
+	public static function log_to_query_monitor( string $_namespace, string $level, string $message, array $context = [] ): void {
 		$action = sprintf( 'qm/%s', $level );
 		$qm_log = trim( sprintf( '%s %s', $message, empty( $context ) ? '' : wp_json_encode( $context ) ) );
 

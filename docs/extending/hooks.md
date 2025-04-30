@@ -29,15 +29,15 @@ if ( defined( 'REMOTE_DATA_BLOCKS__LOADED' ) ) {
 }
 ```
 
-### wpcomvip_log
+### remote_data_blocks_log
 
-If you want to send debugging information to another source besides [Query Monitor](../troubleshooting.md#query-monitor), use the `wpcomvip_log` action.
+If you want to send debugging information to another source besides [Query Monitor](../troubleshooting.md#query-monitor), use the `remote_data_blocks_log` action.
 
 ```php
 function custom_log( string $namespace, string $level, string $message, array $context ): void {
     // Send the log to a custom destination.
 }
-add_action( 'wpcomvip_log', 'custom_log', 10, 4 );
+add_action( 'remote_data_blocks_log', 'custom_log', 10, 4 );
 ```
 
 ## Filters

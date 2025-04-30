@@ -669,28 +669,20 @@ if ( defined( 'REMOTE_DATA_BLOCKS__LOADED' ) ) {
 }
 ```
 
-### wpcomvip_log
+### remote_data_blocks_log
 
-If you want to send debugging information to another source besides [Query Monitor](../troubleshooting.md#query-monitor), use the `wpcomvip_log` action.
+If you want to send debugging information to another source besides [Query Monitor](../troubleshooting.md#query-monitor), use the `remote_data_blocks_log` action.
 
 ```php
 function custom_log( string $namespace, string $level, string $message, array $context ): void {
     // Send the log to a custom destination.
 }
-add_action( 'wpcomvip_log', 'custom_log', 10, 4 );
+add_action( 'remote_data_blocks_log', 'custom_log', 10, 4 );
 ```
 
 ## Filters
 
 Filters give you the ability to change data during the execution of the plugin. Callback functions for Filters will accept a variable, modify it, and return it. They are meant to work in an isolated manner, and should never have side effects such as affecting global variables and output.
-
-### wpcomvip_log_to_query_monitor
-
-Filter whether to log a message to Query Monitor (default: `true`).
-
-```php
-add_filter( 'wpcomvip_log_to_query_monitor', '__return_false' );
-```
 
 ### remote_data_blocks_register_example_block
 
@@ -3064,7 +3056,7 @@ function register_aic_block(): void {
 		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
 			$endpoint = $aic_data_source->get_endpoint();
 			return add_query_arg( [
-				'limit' => $input_variables['limit'],  
+				'limit' => $input_variables['limit'],
 				'fields' => 'id,title,image_id,artist_title',
 				'page' => $input_variables['page'],
 			], $endpoint );
@@ -3180,7 +3172,7 @@ function register_aic_block(): void {
 	register_remote_data_block( [
 		'title' => 'Art Institute of Chicago Loop',
 		'icon' => 'art',
-		'instructions' => 'This block displays a set amount of artworks based on the provided limit.', 
+		'instructions' => 'This block displays a set amount of artworks based on the provided limit.',
 		'render_query' => [
 			'query' => $collection_query,
 			'loop' => true,
