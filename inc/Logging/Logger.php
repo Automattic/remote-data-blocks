@@ -31,7 +31,7 @@ class Logger extends AbstractLogger {
 		 */
 		do_action( self::ACTION_NAME, $this->namespace, $level, $message, $context );
 
-		if ( LogLevel::is_log_level_higher( $level, LogLevel::ERROR ) ) {
+		if ( LogLevel::meets_threshold( $level, LogLevel::ERROR ) ) {
 			error_log( sprintf( '[%s] %s: %s', $this->namespace, $level, $message ) );
 		}
 	}

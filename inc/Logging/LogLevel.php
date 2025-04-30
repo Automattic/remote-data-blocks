@@ -32,16 +32,17 @@ class LogLevel {
 	];
 
 	/**
-	 * Returns true if log level 1 is higher than log level 2, otherwise false.
+	 * Returns true if log level 1 is higher than or equal to log level 2,
+	 * otherwise false.
 	 *
-	 * @param string $level1 The first log level.
-	 * @param string $level2 The second log level.
+	 * @param string $level The level being logged.
+	 * @param string $threshold_level The threshold level to compare against.
 	 */
-	public static function is_log_level_higher( string $level1, string $level2 ): bool {
-		if ( ! isset( self::$priority[ $level1 ], self::$priority[ $level2 ] ) ) {
+	public static function meets_threshold( string $level, string $threshold_level ): bool {
+		if ( ! isset( self::$priority[ $level ], self::$priority[ $threshold_level ] ) ) {
 			return false;
 		}
 
-		return self::$priority[ $level1 ] >= self::$priority[ $level2 ];
+		return self::$priority[ $level ] >= self::$priority[ $threshold_level ];
 	}
 }

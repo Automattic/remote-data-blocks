@@ -36,7 +36,7 @@ class AdminNotices {
 	}
 
 	public static function store_log( string $namespace, string $log_level, string $message ): void {
-		if ( ! LogLevel::is_log_level_higher( $log_level, self::$log_level_threshold ) ) {
+		if ( ! LogLevel::meets_threshold( $log_level, self::$log_level_threshold ) ) {
 			return;
 		}
 
