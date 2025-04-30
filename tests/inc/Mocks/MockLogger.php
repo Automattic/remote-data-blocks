@@ -2,14 +2,13 @@
 
 namespace RemoteDataBlocks\Tests\Mocks;
 
-use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
-use Stringable;
+use RemoteDataBlocks\Logging\LoggerInterface;
+use RemoteDataBlocks\Logging\LogLevel;
 
 class MockLogger implements LoggerInterface {
 	private array $logs = [];
 
-	public function log( mixed $level, Stringable|string $message, array $context = [] ): void {
+	public function log( string $level, string $message, array $context = [] ): void {
 		$this->logs[] = [
 			'level' => $level,
 			'message' => (string) $message,
@@ -17,35 +16,35 @@ class MockLogger implements LoggerInterface {
 		];
 	}
 
-	public function emergency( Stringable|string $message, array $context = [] ): void {
+	public function emergency( string $message, array $context = [] ): void {
 		$this->log( LogLevel::EMERGENCY, $message, $context );
 	}
 
-	public function alert( Stringable|string $message, array $context = [] ): void {
+	public function alert( string $message, array $context = [] ): void {
 		$this->log( LogLevel::ALERT, $message, $context );
 	}
 
-	public function critical( Stringable|string $message, array $context = [] ): void {
+	public function critical( string $message, array $context = [] ): void {
 		$this->log( LogLevel::CRITICAL, $message, $context );
 	}
 
-	public function error( Stringable|string $message, array $context = [] ): void {
+	public function error( string $message, array $context = [] ): void {
 		$this->log( LogLevel::ERROR, $message, $context );
 	}
 
-	public function warning( Stringable|string $message, array $context = [] ): void {
+	public function warning( string $message, array $context = [] ): void {
 		$this->log( LogLevel::WARNING, $message, $context );
 	}
 
-	public function notice( Stringable|string $message, array $context = [] ): void {
+	public function notice( string $message, array $context = [] ): void {
 		$this->log( LogLevel::NOTICE, $message, $context );
 	}
 
-	public function info( Stringable|string $message, array $context = [] ): void {
+	public function info( string $message, array $context = [] ): void {
 		$this->log( LogLevel::INFO, $message, $context );
 	}
 
-	public function debug( Stringable|string $message, array $context = [] ): void {
+	public function debug( string $message, array $context = [] ): void {
 		$this->log( LogLevel::DEBUG, $message, $context );
 	}
 

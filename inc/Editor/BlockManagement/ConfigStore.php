@@ -6,7 +6,7 @@ defined( 'ABSPATH' ) || exit();
 
 use RemoteDataBlocks\Config\Query\QueryInterface;
 use RemoteDataBlocks\Logging\LoggerManager;
-use RemoteDataBlocks\Logging\Logger;
+use RemoteDataBlocks\Logging\LoggerInterface;
 
 use function sanitize_title_with_dashes;
 
@@ -16,9 +16,9 @@ class ConfigStore {
 	 */
 	private static array $blocks = [];
 
-	private static Logger $logger;
+	private static LoggerInterface $logger;
 
-	public static function init( ?Logger $logger = null ): void {
+	public static function init( ?LoggerInterface $logger = null ): void {
 		self::$blocks = [];
 		self::$logger = $logger ?? LoggerManager::instance();
 	}

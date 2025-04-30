@@ -7,6 +7,7 @@ defined( 'ABSPATH' ) || exit();
 use RemoteDataBlocks\Config\BlockAttribute\RemoteDataBlockAttribute;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
+use RemoteDataBlocks\Logging\LogLevel;
 use RemoteDataBlocks\Sanitization\Sanitizer;
 use WP_Block;
 use WP_Error;

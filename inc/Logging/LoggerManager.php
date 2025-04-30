@@ -9,7 +9,7 @@ class LoggerManager {
 	 * The logger instance.
 	 *
 	 */
-	private static ?Logger $instance = null;
+	private static ?LoggerInterface $instance = null;
 
 	/**
 	 * The namespace for the logger.
@@ -21,7 +21,7 @@ class LoggerManager {
 	 * Get the logger singleton instance.
 	 *
 	 */
-	public static function instance(): Logger {
+	public static function instance(): LoggerInterface {
 		if ( null === self::$instance ) {
 			self::$instance = Logger::create( self::$log_namespace );
 		}
