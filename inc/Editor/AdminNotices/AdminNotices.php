@@ -3,6 +3,8 @@
 namespace RemoteDataBlocks\Editor\AdminNotices;
 
 use RemoteDataBlocks\Logging\LoggerManager;
+use RemoteDataBlocks\Logging\LogLevel;
+
 use function add_action;
 
 defined( 'ABSPATH' ) || exit();
@@ -38,7 +40,7 @@ class AdminNotices {
 			return;
 		}
 
-		if ( ! LoggerManager::instance()->is_log_level_higher( $log_level, self::$log_level_threshold ) ) {
+		if ( ! LogLevel::is_log_level_higher( $log_level, self::$log_level_threshold ) ) {
 			return;
 		}
 
