@@ -2,7 +2,6 @@
 
 namespace RemoteDataBlocks\Editor\AdminNotices;
 
-use Psr\Log\LogLevel;
 use RemoteDataBlocks\Logging\LoggerManager;
 use function add_action;
 

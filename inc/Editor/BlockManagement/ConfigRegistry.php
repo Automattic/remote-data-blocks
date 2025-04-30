@@ -4,8 +4,8 @@ namespace RemoteDataBlocks\Editor\BlockManagement;
 
 defined( 'ABSPATH' ) || exit();
 
+use RemoteDataBlocks\Logging\Logger;
 use RemoteDataBlocks\Logging\LoggerManager;
-use Psr\Log\LoggerInterface;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Config\Query\QueryInterface;
 use RemoteDataBlocks\Editor\BlockPatterns\BlockPatterns;
@@ -18,7 +18,7 @@ use function register_block_pattern;
 use function serialize_blocks;
 
 class ConfigRegistry {
-	private static LoggerInterface $logger;
+	private static Logger $logger;
 
 	public const RENDER_QUERY_KEY = 'render_query';
 	public const SELECTION_QUERIES_KEY = 'selection_queries';
@@ -26,7 +26,7 @@ class ConfigRegistry {
 	public const LIST_QUERY_KEY = 'list';
 	public const SEARCH_QUERY_KEY = 'search';
 
-	public static function init( ?LoggerInterface $logger = null ): void {
+	public static function init( ?Logger $logger = null ): void {
 		self::$logger = $logger ?? LoggerManager::instance();
 		ConfigStore::init( self::$logger );
 	}

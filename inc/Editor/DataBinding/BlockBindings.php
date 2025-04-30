@@ -4,7 +4,6 @@ namespace RemoteDataBlocks\Editor\DataBinding;
 
 defined( 'ABSPATH' ) || exit();
 
-use Psr\Log\LogLevel;
 use RemoteDataBlocks\Config\BlockAttribute\RemoteDataBlockAttribute;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;

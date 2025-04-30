@@ -2,9 +2,6 @@
 
 namespace RemoteDataBlocks\Logging;
 
-use Psr\Log\AbstractLogger;
-use Psr\Log\LogLevel;
-use Stringable;
 use function add_filter;
 use function apply_filters;
 use function do_action;
@@ -120,7 +117,7 @@ class Logger extends AbstractLogger {
 	/**
 	 * PSR log implementation.
 	 */
-	public function log( mixed $level, Stringable|string $message, array $context = [] ): void {
+	public function log( string $level, string $message, array $context = [] ): void {
 		$level = strval( $level );
 		$message = strval( $message );
 
