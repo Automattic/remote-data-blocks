@@ -44,14 +44,6 @@ add_action( 'wpcomvip_log', 'custom_log', 10, 4 );
 
 Filters give you the ability to change data during the execution of the plugin. Callback functions for Filters will accept a variable, modify it, and return it. They are meant to work in an isolated manner, and should never have side effects such as affecting global variables and output.
 
-### wpcomvip_log_to_query_monitor
-
-Filter whether to log a message to Query Monitor (default: `true`).
-
-```php
-add_filter( 'wpcomvip_log_to_query_monitor', '__return_false' );
-```
-
 ### remote_data_blocks_register_example_block
 
 Filter whether to register the included example API block ("Conference Event") (default: `true`).

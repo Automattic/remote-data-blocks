@@ -146,20 +146,6 @@ class Logger extends AbstractLogger {
 	}
 
 	private function log_to_query_monitor( string $level, string $message, array $context = [] ): void {
-		/**
-		 * Filter to determine if a message should be logged to Query Monitor.
-		 *
-		 * @param bool   $should_log_to_query_monitor Whether the message should be logged to Query Monitor.
-		 * @param string $level                       The log level.
-		 * @param string $message                     The log message.
-		 * @param array  $context                     Additional context for the log message.
-		 */
-		$should_log_to_query_monitor = apply_filters( 'wpcomvip_log_to_query_monitor', true, $level, $message, $context );
-
-		if ( ! $should_log_to_query_monitor ) {
-			return;
-		}
-
 		$action = sprintf( 'qm/%s', $level );
 		$qm_log = trim( sprintf( '%s %s', $message, empty( $context ) ? '' : wp_json_encode( $context ) ) );
 
