@@ -20,7 +20,7 @@ const NO_RESULTS_TEMPLATE: Template[] = [
 	],
 ];
 
-export function Edit( props: BlockEditProps< RemoteDataNoResultBlockAttributes > ): JSX.Element {
+export function Edit( props: BlockEditProps< RemoteDataNoResultsBlockAttributes > ): JSX.Element {
 	const { context } = props;
 	const { remoteData } = useRemoteDataContext( context );
 	const blockProps = useBlockProps();
