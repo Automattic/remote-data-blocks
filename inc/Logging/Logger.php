@@ -32,6 +32,7 @@ class Logger extends AbstractLogger {
 		do_action( self::ACTION_NAME, $this->namespace, $level, $message, $context );
 
 		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) && LogLevel::meets_threshold( $level, LogLevel::ERROR ) ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			error_log( sprintf( '[%s] %s: %s', $this->namespace, $level, $message ) );
 		}
 	}

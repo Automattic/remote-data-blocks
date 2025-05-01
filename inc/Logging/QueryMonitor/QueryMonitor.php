@@ -5,7 +5,6 @@ namespace RemoteDataBlocks\Logging\QueryMonitor;
 use QM_Collectors;
 use RemoteDataBlocks\Logging\AbstractLogger;
 use RemoteDataBlocks\Logging\Logger;
-use function add_action;
 use function add_filter;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -14,7 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class QueryMonitor {
 	public static function init(): void {
-		add_action( Logger::ACTION_NAME, [ __CLASS__, 'log_to_query_monitor' ], 10, 3 );
 		add_filter( 'qm/collectors', [ __CLASS__, 'add_collectors' ], 90, 1 );
 		add_filter( 'qm/outputter/html', [ __CLASS__, 'add_outputters' ], 90, 1 );
 		add_filter( 'qm/trace/ignore_class', [ __CLASS__, 'ignore_classes' ], 10, 1 );
@@ -24,6 +22,7 @@ class QueryMonitor {
 		$collector_classes = [
 			'RemoteDataBlocks\Logging\QueryMonitor\RdbMainCollector',
 			'RemoteDataBlocks\Logging\QueryMonitor\RdbBlockBindingCollector',
+			'RemoteDataBlocks\Logging\QueryMonitor\RdbLogCollector',
 			'RemoteDataBlocks\Logging\QueryMonitor\RdbHttpRequestCollector',
 			'RemoteDataBlocks\Logging\QueryMonitor\RdbValidationCollector',
 		];
@@ -43,6 +42,7 @@ class QueryMonitor {
 			'RemoteDataBlocks\Logging\QueryMonitor\RdbMainOutputHtml',
 			'RemoteDataBlocks\Logging\QueryMonitor\RdbBlockBindingOutputHtml',
 			'RemoteDataBlocks\Logging\QueryMonitor\RdbHttpRequestOutputHtml',
+			'RemoteDataBlocks\Logging\QueryMonitor\RdbLogOutputHtml',
 			'RemoteDataBlocks\Logging\QueryMonitor\RdbValidationOutputHtml',
 		];
 
@@ -65,13 +65,5 @@ class QueryMonitor {
 			AbstractLogger::class => true,
 			Logger::class => true,
 		] );
-	}
-
-	public static function log_to_query_monitor( string $_namespace, string $level, string $message, array $context = [] ): void {
-		$action = sprintf( 'qm/%s', $level );
-		$qm_log = trim( sprintf( '%s %s', $message, empty( $context ) ? '' : wp_json_encode( $context ) ) );
-
-		// https://querymonitor.com/wordpress-debugging/profiling-and-logging/#logging
-		do_action( $action, $qm_log );
 	}
 }
