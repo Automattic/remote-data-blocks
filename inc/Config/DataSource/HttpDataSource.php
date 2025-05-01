@@ -98,11 +98,51 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 		return ConfigSchemas::get_http_data_source_service_config_schema();
 	}
 
+	private static function get_auth_to_request_headers( array $service_config ): array {
+		if ( ! isset( $service_config['auth'] ) ) {
+			return [];
+		}
+
+		$auth_headers = [];
+		$auth = $service_config['auth'];
+
+		if ( 'bearer' === $auth['type'] ) {
+			$auth_headers['Authorization'] = 'Bearer ' . $auth['value'];
+		} elseif ( 'basic' === $auth['type'] ) {
+			$auth_headers['Authorization'] = 'Basic ' . base64_encode( $auth['value'] );
+		} elseif ( 'api-key' === $auth['type'] && 'header' === $auth['add_to'] ) {
+			$auth_headers[ $auth['key'] ] = $auth['value'];
+		}
+
+		return $auth_headers;
+	}
+
+	private static function add_auth_to_endpoint( string|null $endpoint, array $service_config ): string|null {
+		if ( ! isset( $service_config['auth'] ) 
+			|| 'api-key' !== $service_config['auth']['type'] 
+			|| 'queryparams' !== $service_config['auth']['add_to']
+			|| empty( $endpoint )
+		) {
+			return $endpoint;
+		}
+
+		$query_string = $service_config['auth']['key'] . '=' . $service_config['auth']['value'];
+		
+		return $endpoint . ( strpos( $endpoint, '?' ) === false ? '?' : '&' ) . $query_string;
+	}
+
 	protected static function map_service_config( array $service_config ): array {
+		$request_headers = $service_config['request_headers'] ?? [];
+		$endpoint = $service_config['endpoint'] ?? null; // Invalid, but we won't guess it.
+
+		$auth_headers = self::get_auth_to_request_headers( $service_config );
+		$request_headers = array_merge( $request_headers, $auth_headers );
+		$endpoint = self::add_auth_to_endpoint( $endpoint, $service_config );
+
 		return [
 			'display_name' => $service_config['display_name'] ?? static::SERVICE_NAME,
-			'endpoint' => $service_config['endpoint'] ?? null, // Invalid, but we won't guess it.
-			'request_headers' => $service_config['request_headers'] ?? [],
+			'endpoint' => $endpoint,
+			'request_headers' => $request_headers,
 		];
 	}
 
