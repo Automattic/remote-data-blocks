@@ -46,17 +46,13 @@ export function Edit( props: BlockEditProps< RemoteDataNoResultsBlockAttributes 
 		);
 	}
 
-	if ( props.attributes?.mode === 'error' ) {
-		return (
-			<div { ...blockProps }>
-				<InnerBlocks template={ ERROR_FALLBACK_TEMPLATE } />
-			</div>
-		);
-	}
-
 	return (
 		<div { ...blockProps }>
-			<InnerBlocks template={ NO_RESULTS_TEMPLATE } />
+			<InnerBlocks
+				template={
+					props.attributes?.mode === 'error' ? ERROR_FALLBACK_TEMPLATE : NO_RESULTS_TEMPLATE
+				}
+			/>
 		</div>
 	);
 }

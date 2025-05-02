@@ -10,7 +10,7 @@
   "example": {},
   "attributes": {
     "mode": {
-      "type": "string",
+      "enum": [ "empty", "error" ],
       "default": "empty"
     }
   },
@@ -26,7 +26,8 @@
       "description": "Display an error message when the remote data fails to load.",
       "attributes": {
         "mode": "error"
-      }
+      },
+      "isActive": [ "mode" ]
     }
   ],
   "textdomain": "remote-data-blocks",

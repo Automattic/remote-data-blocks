@@ -50,7 +50,7 @@ class BlockRegistration {
 		register_block_type( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-pagination' );
 
 		// Remote data error fallback block - used to render a message when results aren't available to load.
-		$result = register_block_type( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-no-results', [
+		register_block_type( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-no-results', [
 			'variations' => [
 				[
 					'name' => 'remote-data-blocks/error-fallback',
@@ -59,13 +59,10 @@ class BlockRegistration {
 					'attributes' => [
 						'mode' => 'error',
 					],
+					'isActive' => [ 'mode' ],
 				],
 			],
 		] );
-
-		// if ( empty( $result->variations ) ) {
-		// 	error_log( 'No variations found for remote-data-no-results block' );
-		// }
 
 		// Remote data template - used to render remote data collections.
 		register_block_type( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-template' );
