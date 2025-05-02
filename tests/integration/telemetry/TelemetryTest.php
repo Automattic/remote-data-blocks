@@ -87,7 +87,7 @@ class TelemetryTest extends WP_UnitTestCase {
 					'post_status' => 'publish',
 					'post_type' => 'post',
 					'remote_data_blocks_total_count' => 1,
-					'generic-http_data_source_count' => 1,
+					'code-configured_data_source_count' => 1,
 				] ),
 			);
 
