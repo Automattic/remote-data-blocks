@@ -49,7 +49,7 @@ class DataSourceConfigManager {
 			$configs,
 			function ( array $acc, array $item ) {
 				$identifier = $item['uuid'] ?? md5(
-					sprintf( '%s_%s', $item['service_config']['display_name'], $item['service'] )
+					sprintf( '%s_%s', $item['display_name'], $item['service'] ?? 'code-configured' )
 				);
 				$acc[ $identifier ] = $item;
 				return $acc;
