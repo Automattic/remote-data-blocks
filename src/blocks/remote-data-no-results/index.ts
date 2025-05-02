@@ -15,7 +15,7 @@ registerBlockType< RemoteDataNoResultsBlockAttributes >( metadata.name, {
 } );
 
 registerBlockVariation( metadata.name, {
-	name: 'remote-data-blocks/error-fallback',
+	name: 'remote-data-blocks/error',
 	title: 'Error Fallback',
 	attributes: { mode: 'error' },
 } );

@@ -53,8 +53,8 @@ class BlockRegistration {
 		register_block_type( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-no-results', [
 			'variations' => [
 				[
-					'name' => 'remote-data-blocks/error-fallback',
-					'title' => 'Error Fallback',
+					'name' => 'remote-data-blocks/error',
+					'title' => 'Error',
 					'description' => 'Display an error message when the remote data fails to load.',
 					'attributes' => [
 						'mode' => 'error',
