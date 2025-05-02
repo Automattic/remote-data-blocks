@@ -2,10 +2,10 @@
 
 namespace RemoteDataBlocks\Integrations\GitHub;
 
-use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use RemoteDataBlocks\Integrations\GenericHttp\GenericHttpDataSource;
 use RemoteDataBlocks\Validation\Types;
 
-class GitHubDataSource extends HttpDataSource {
+class GitHubDataSource extends GenericHttpDataSource {
 	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_GITHUB_SERVICE;
 	protected const SERVICE_SCHEMA_VERSION = 1;
 

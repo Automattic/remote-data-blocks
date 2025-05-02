@@ -2,11 +2,11 @@
 
 namespace RemoteDataBlocks\Integrations\Google\Sheets;
 
-use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use RemoteDataBlocks\Integrations\GenericHttp\GenericHttpDataSource;
 use RemoteDataBlocks\Integrations\Google\Auth\GoogleAuth;
 use RemoteDataBlocks\Validation\Types;
 
-class GoogleSheetsDataSource extends HttpDataSource {
+class GoogleSheetsDataSource extends GenericHttpDataSource {
 	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE;
 	protected const SERVICE_SCHEMA_VERSION = 1;
 
