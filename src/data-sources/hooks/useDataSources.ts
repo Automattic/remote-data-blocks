@@ -6,6 +6,7 @@ import { store as noticesStore, NoticeStoreActions, WPNotice } from '@wordpress/
 
 import { REST_BASE_DATA_SOURCES } from '@/data-sources/constants';
 import { DataSourceConfig } from '@/data-sources/types';
+import { getDataSourceName } from '@/data-sources/utils';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
 export const useDataSources = < SourceConfig extends DataSourceConfig = DataSourceConfig >(
@@ -20,7 +21,7 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 	const canUseDisplayName = ( displayName: string, uuid: string ) =>
 		displayName &&
 		dataSources.every(
-			source => source.uuid === uuid || source.service_config.display_name !== displayName
+			source => source.uuid === uuid || getDataSourceName( source ) !== displayName
 		);
 
 	async function fetchDataSources() {
@@ -64,7 +65,7 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 			'success',
 			sprintf(
 				__( '"%s" has been successfully updated.', 'remote-data-blocks' ),
-				sourceConfig.service_config.display_name
+				getDataSourceName( sourceConfig )
 			)
 		);
 		return result;
@@ -100,7 +101,7 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 			'success',
 			sprintf(
 				__( '"%s" has been successfully added.', 'remote-data-blocks' ),
-				source.service_config.display_name
+				getDataSourceName( source )
 			)
 		);
 		return result;
@@ -122,7 +123,7 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 			'success',
 			sprintf(
 				__( '"%s" has been successfully deleted.', 'remote-data-blocks' ),
-				source.service_config.display_name
+				getDataSourceName( source )
 			)
 		);
 	}

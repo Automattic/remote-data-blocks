@@ -13,8 +13,6 @@ use WP_Error;
  * Implements the HttpDataSourceInterface to define a generic HTTP data source.
  */
 class HttpDataSource extends ArraySerializable implements HttpDataSourceInterface {
-	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_HTTP_SERVICE;
-
 	final public function get_display_name(): string {
 		return $this->config['display_name'];
 	}
@@ -29,10 +27,6 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 
 	public function get_image_url(): ?string {
 		return $this->config['image_url'] ?? null;
-	}
-
-	final public function get_service_name(): string {
-		return static::SERVICE_NAME;
 	}
 
 	public static function from_uuid( string $uuid ): DataSourceInterface|WP_Error {

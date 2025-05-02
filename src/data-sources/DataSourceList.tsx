@@ -20,6 +20,7 @@ import {
 } from '@/data-sources/constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { DataSourceConfig } from '@/data-sources/types';
+import { getDataSourceName } from '@/data-sources/utils';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 import { AirtableIcon } from '@/settings/icons/AirtableIcon';
 import { GoogleSheetsIcon } from '@/settings/icons/GoogleSheetsIcon';
@@ -119,7 +120,7 @@ const DataSourceList = () => {
 							icon={ getServiceIcon( item.service ) }
 							style={ { marginRight: '16px', verticalAlign: 'text-bottom' } }
 						/>
-						{ item.service_config.display_name }
+						{ getDataSourceName( item ) }
 					</>
 				);
 			},
@@ -227,7 +228,7 @@ const DataSourceList = () => {
 						service: item.service,
 						service_config: {
 							...item.service_config,
-							display_name: item.service_config.display_name + __( ' copy', 'remote-data-blocks' ),
+							display_name: getDataSourceName( item ) + __( ' copy', 'remote-data-blocks' ),
 						} as DataSourceConfig[ 'service_config' ],
 					};
 					addDataSource( duplicatedSource as DataSourceConfig )
@@ -309,7 +310,7 @@ const DataSourceList = () => {
 						: sprintf(
 								__( 'Are you sure you want to delete %s data source "%s"?', 'remote-data-blocks' ),
 								getServiceLabel( dataSourceToDelete.service ),
-								dataSourceToDelete.service_config.display_name
+								getDataSourceName( dataSourceToDelete )
 						  ) }
 				</ConfirmDialog>
 			) }
@@ -318,7 +319,7 @@ const DataSourceList = () => {
 					className="rdb-settings-page_data-source-code-snippet-modal"
 					icon={ getServiceIcon( currentSource?.service ?? 'generic-http' ) }
 					title={ __(
-						`${ currentSource?.service_config.display_name }: Data Source Code`,
+						`${ getDataSourceName( currentSource ) }: Data Source Code`,
 						'remote-data-blocks'
 					) }
 					onClose={ () => {

@@ -32,11 +32,4 @@ interface DataSourceInterface extends ArraySerializableInterface {
 	 * @return string|null The image URL or null if not set.
 	 */
 	public function get_image_url(): ?string;
-
-	/**
-	 * Get a name for the underlying service for this data source
-	 *
-	 * @return string|null The service name of the data source.
-	 */
-	public function get_service_name(): ?string;
 }

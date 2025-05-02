@@ -59,6 +59,10 @@ class GenericHttpDataSource extends HttpDataSource {
 		return [];
 	}
 
+	final public function get_service_name(): string {
+		return static::SERVICE_NAME;
+	}
+
 	protected static function map_service_config( array $service_config ): array {
 		return [
 			'display_name' => $service_config['display_name'],

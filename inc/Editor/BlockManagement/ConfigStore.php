@@ -4,9 +4,10 @@ namespace RemoteDataBlocks\Editor\BlockManagement;
 
 defined( 'ABSPATH' ) || exit();
 
-use RemoteDataBlocks\Config\Query\QueryInterface;
-use RemoteDataBlocks\Logging\LoggerManager;
 use Psr\Log\LoggerInterface;
+use RemoteDataBlocks\Config\Query\QueryInterface;
+use RemoteDataBlocks\Integrations\GenericHttp\GenericHttpDataSource;
+use RemoteDataBlocks\Logging\LoggerManager;
 
 use function sanitize_title_with_dashes;
 
@@ -82,7 +83,12 @@ class ConfigStore {
 			return null;
 		}
 
-		return $query->get_data_source()->get_service_name();
+		$data_source = $query->get_data_source();
+		if ( $data_source instanceof GenericHttpDataSource ) {
+			return $data_source->get_service_name();
+		}
+
+		return 'code-configured';
 	}
 
 	/**

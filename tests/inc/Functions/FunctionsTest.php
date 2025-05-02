@@ -60,11 +60,8 @@ class FunctionsTest extends TestCase {
 					'__class' => 'RemoteDataBlocks\Tests\Mocks\MockQuery',
 					'data_source' => [
 						'__class' => 'RemoteDataBlocks\Tests\Mocks\MockDataSource',
-						'service_config' => [
-							'__version' => 1,
-							'display_name' => 'Mock Data Source',
-							'endpoint' => 'https://example.com/api',
-						],
+						'display_name' => 'Mock Data Source',
+						'endpoint' => 'https://example.com/api',
 					],
 					'display_name' => 'Mock Query',
 					'input_schema' => [],

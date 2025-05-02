@@ -14,6 +14,7 @@ interface BaseDataSourceConfig<
 	ServiceName extends DataSourceType,
 	ServiceConfig extends BaseServiceConfig
 > {
+	display_name?: string;
 	errors?: WP_Error[];
 	service: ServiceName;
 	service_config: ServiceConfig;

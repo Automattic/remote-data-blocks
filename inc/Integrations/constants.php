@@ -4,7 +4,6 @@ namespace RemoteDataBlocks;
 
 define( 'REMOTE_DATA_BLOCKS_AIRTABLE_SERVICE', 'airtable' );
 define( 'REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE', 'generic-http' );
-define( 'REMOTE_DATA_BLOCKS_HTTP_SERVICE', 'http' );
 define( 'REMOTE_DATA_BLOCKS_GITHUB_SERVICE', 'github' );
 define( 'REMOTE_DATA_BLOCKS_GOOGLE_SHEETS_SERVICE', 'google-sheets' );
 define( 'REMOTE_DATA_BLOCKS_SHOPIFY_SERVICE', 'shopify' );

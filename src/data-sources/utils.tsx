@@ -1,3 +1,4 @@
+import { DataSourceConfig } from '@/data-sources/types';
 import CheckIcon from '@/settings/icons/CheckIcon';
 import ErrorIcon from '@/settings/icons/ErrorIcon';
 
@@ -26,5 +27,11 @@ export function getConnectionMessage(
 			) }
 			{ message }
 		</span>
+	);
+}
+
+export function getDataSourceName( config: DataSourceConfig | null ): string {
+	return (
+		config?.display_name ?? config?.service_config.display_name ?? config?.service ?? 'Unknown'
 	);
 }
