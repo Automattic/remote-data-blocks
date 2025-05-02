@@ -102,6 +102,7 @@ if ( class_exists( 'QM_Collector_Logger' ) ) {
 			$this->data->counts[ $level ] = ( $this->data->counts[ $level ] ?? 0 ) + 1;
 			$this->data->logs[] = [
 				'block_name' => $context['block_name'] ?? 'unknown',
+				'block_info' => $context['block_info'] ?? [],
 				'component' => $trace->get_component(),
 				'context' => $context,
 				'filtered_trace' => $trace->get_filtered_trace(),

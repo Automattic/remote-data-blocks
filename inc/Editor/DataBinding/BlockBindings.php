@@ -270,8 +270,10 @@ class BlockBindings {
 
 		$log_context = [
 			'block_name' => $bound_block_name,
+			'block_info' => [
+				'source_args' => $source_args,
+			],
 			'remote_data_block_name' => $block_name,
-			'source_args' => $source_args,
 		];
 
 		if ( null === $field_name ) {
@@ -375,6 +377,7 @@ class BlockBindings {
 
 		$log_context = [
 			'block_name' => $block->name,
+			'block_info' => [],
 			'remote_data_block_name' => $block_context['blockName'] ?? 'unknown',
 		];
 
@@ -481,8 +484,8 @@ class BlockBindings {
 		}
 
 		// Remove key "hydrated_results" if it exists.
-		if ( isset( $log_context['source_args'][ self::$hydrated_results_key ] ) ) {
-			unset( $log_context['source_args'][ self::$hydrated_results_key ] );
+		if ( isset( $log_context['block_info']['source_args'][ self::$hydrated_results_key ] ) ) {
+			unset( $log_context['block_info']['source_args'][ self::$hydrated_results_key ] );
 		}
 
 		$log_context['error'] = $error;
@@ -497,8 +500,8 @@ class BlockBindings {
 		}
 
 		// Remove key "hydrated_results" if it exists.
-		if ( isset( $log_context['source_args'][ self::$hydrated_results_key ] ) ) {
-			unset( $log_context['source_args'][ self::$hydrated_results_key ] );
+		if ( isset( $log_context['block_info']['source_args'][ self::$hydrated_results_key ] ) ) {
+			unset( $log_context['block_info']['source_args'][ self::$hydrated_results_key ] );
 		}
 
 		$log_context['type'] = 'block-binding';
