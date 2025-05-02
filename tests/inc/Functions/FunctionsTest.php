@@ -2,10 +2,10 @@
 
 namespace RemoteDataBlocks\Tests\Editor\BlockManagement;
 
-use Psr\Log\LogLevel;
 use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
+use RemoteDataBlocks\Logging\LogLevel;
 use RemoteDataBlocks\Tests\Mocks\MockLogger;
 use RemoteDataBlocks\Tests\Mocks\MockQuery;
 

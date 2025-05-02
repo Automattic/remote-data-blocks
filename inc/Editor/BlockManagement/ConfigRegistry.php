@@ -4,11 +4,11 @@ namespace RemoteDataBlocks\Editor\BlockManagement;
 
 defined( 'ABSPATH' ) || exit();
 
-use RemoteDataBlocks\Logging\LoggerManager;
-use Psr\Log\LoggerInterface;
+use RemoteDataBlocks\Logging\Logger;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Config\Query\QueryInterface;
 use RemoteDataBlocks\Editor\BlockPatterns\BlockPatterns;
+use RemoteDataBlocks\Logging\LoggerInterface;
 use RemoteDataBlocks\Validation\ConfigSchemas;
 use RemoteDataBlocks\Validation\Validator;
 use WP_Error;
@@ -27,7 +27,7 @@ class ConfigRegistry {
 	public const SEARCH_QUERY_KEY = 'search';
 
 	public static function init( ?LoggerInterface $logger = null ): void {
-		self::$logger = $logger ?? LoggerManager::instance();
+		self::$logger = $logger ?? new Logger();
 		ConfigStore::init( self::$logger );
 	}
 

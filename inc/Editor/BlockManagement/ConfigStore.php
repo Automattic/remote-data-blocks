@@ -4,10 +4,10 @@ namespace RemoteDataBlocks\Editor\BlockManagement;
 
 defined( 'ABSPATH' ) || exit();
 
-use Psr\Log\LoggerInterface;
 use RemoteDataBlocks\Config\Query\QueryInterface;
 use RemoteDataBlocks\Integrations\GenericHttp\GenericHttpDataSource;
-use RemoteDataBlocks\Logging\LoggerManager;
+use RemoteDataBlocks\Logging\Logger;
+use RemoteDataBlocks\Logging\LoggerInterface;
 
 use function sanitize_title_with_dashes;
 
@@ -21,7 +21,7 @@ class ConfigStore {
 
 	public static function init( ?LoggerInterface $logger = null ): void {
 		self::$blocks = [];
-		self::$logger = $logger ?? LoggerManager::instance();
+		self::$logger = $logger ?? new Logger();
 	}
 
 	/**

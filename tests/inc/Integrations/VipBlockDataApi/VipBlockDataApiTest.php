@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 use RemoteDataBlocks\Integrations\VipBlockDataApi\VipBlockDataApi;
+use RemoteDataBlocks\Tests\Mocks\MockLogger;
 use RemoteDataBlocks\Tests\Mocks\MockQuery;
 use RemoteDataBlocks\Tests\Mocks\MockQueryRunner;
 use RemoteDataBlocks\Tests\Mocks\MockWordPressFunctions;
@@ -181,39 +182,50 @@ class VipBlockDataApiTest extends TestCase {
 			],
 		] );
 
+		$mock_logger = new MockLogger();
+
+		BlockBindings::init( $mock_logger );
+
 		$result = VipBlockDataApi::resolve_remote_data( self::$sourced_block1, 'remote-data-blocks/events', 12, self::$parsed_block1 );
+		$logs = $mock_logger->getLogs();
 
 		// The first binding is successful.
 		$this->assertSame(
 			[
-				'info',
-				'Successfully resolved block binding',
-				[
+				'level' => 'info',
+				'message' => 'Successfully resolved block binding',
+				'context' => [
 					'block_name' => 'core/paragraph',
-					'remote_data_block_name' => 'remote-data-blocks/events',
-					'source_args' => [
-						'field' => 'title',
+					'block_info' => [
+						'source_args' => [
+							'field' => 'title',
+						],
 					],
+					'remote_data_block_name' => 'remote-data-blocks/events',
+					'type' => 'block-binding',
 				],
 			],
-			MockWordPressFunctions::get_done_action( BlockBindings::$log_action_name, 0 )
+			$logs[0]
 		);
 
 		// The first binding results in an error.
 		$this->assertSame(
 			[
-				'error',
-				'uh-oh!',
-				[
+				'level' => 'error',
+				'message' => 'uh-oh!',
+				'context' => [
 					'block_name' => 'core/heading',
-					'remote_data_block_name' => 'remote-data-blocks/events',
-					'source_args' => [
-						'field' => 'location',
+					'block_info' => [
+						'source_args' => [
+							'field' => 'location',
+						],
 					],
+					'remote_data_block_name' => 'remote-data-blocks/events',
+					'error' => $error,
+					'type' => 'block-binding',
 				],
-				$error,
 			],
-			MockWordPressFunctions::get_done_action( BlockBindings::$log_action_name, 1 )
+			$logs[1]
 		);
 		$this->assertSame( 'Happy happy hour! No networking!', $result['innerBlocks'][0]['attributes']['content'] );
 		$this->assertSame( 'President&#039;s dining hall', $result['innerBlocks'][1]['attributes']['content'] );

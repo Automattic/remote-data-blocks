@@ -2,8 +2,9 @@
 
 namespace RemoteDataBlocks\Editor\AdminNotices;
 
-use Psr\Log\LogLevel;
-use RemoteDataBlocks\Logging\LoggerManager;
+use RemoteDataBlocks\Logging\Logger;
+use RemoteDataBlocks\Logging\LogLevel;
+
 use function add_action;
 
 defined( 'ABSPATH' ) || exit();
@@ -30,22 +31,19 @@ class AdminNotices {
 	 * Initialize the logger and provide WordPress hooks.
 	 */
 	public static function init(): void {
-		add_action( 'wpcomvip_log', [ __CLASS__, 'store_log' ], 10, 3 );
+		add_action( Logger::ACTION_NAME, [ __CLASS__, 'store_log' ], 10, 3 );
 		add_action( 'admin_notices', [ __CLASS__, 'admin_notices' ], 10, 0 );
 	}
 
 	public static function store_log( string $namespace, string $log_level, string $message ): void {
-		if ( LoggerManager::$log_namespace !== $namespace ) {
-			return;
-		}
-
-		if ( ! LoggerManager::instance()->is_log_level_higher( $log_level, self::$log_level_threshold ) ) {
+		if ( ! LogLevel::meets_threshold( $log_level, self::$log_level_threshold ) ) {
 			return;
 		}
 
 		self::$log_store[] = [
 			'level' => $log_level,
 			'message' => $message,
+			'namespace' => $namespace,
 		];
 	}
 

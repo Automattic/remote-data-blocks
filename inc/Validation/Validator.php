@@ -3,6 +3,8 @@
 namespace RemoteDataBlocks\Validation;
 
 use RemoteDataBlocks\Config\ArraySerializableInterface;
+use RemoteDataBlocks\Logging\Logger;
+use RemoteDataBlocks\Logging\LoggerInterface;
 use RemoteDataBlocks\Validation\Types;
 use WP_Error;
 use function is_email;
@@ -11,15 +13,23 @@ use function is_email;
  * Validator class.
  */
 final class Validator implements ValidatorInterface {
-	public const ACTION_NAME = 'remote_data_blocks_validation_issue';
-
-	public function __construct( private array $schema, private string $entity_name = 'Unknown entity', private string $root_path_name = '$value' ) {}
+	public function __construct(
+		private array $schema,
+		private string $entity_name = 'Unknown entity',
+		private string $root_path_name = '$value',
+		private LoggerInterface $logger = new Logger(),
+	) {}
 
 	public function validate( mixed $data ): bool|WP_Error {
 		$validation = $this->check_type( $this->schema, $this->root_path_name, $data );
 
 		if ( is_wp_error( $validation ) ) {
-			do_action( self::ACTION_NAME, $validation );
+			$error_data = $validation->get_error_data();
+			$context = $error_data['context'] ?? null;
+			$level = $error_data['level'] ?? 'error';
+
+			$this->logger->log( $level, $validation->get_error_message(), $context );
+
 			return $validation;
 		}
 
@@ -327,7 +337,7 @@ final class Validator implements ValidatorInterface {
 
 	private function create_error( string $message, string $path, array $context = [] ): WP_Error {
 		return new WP_Error( 'invalid_type', esc_html( sprintf( '%s %s', $path, $message ) ), [
-			'context' => $context,
+			'context' => array_merge( $context, [ 'type' => 'validation' ] ),
 			'entity' => $this->entity_name,
 			'level' => 'error',
 			'path' => $path,

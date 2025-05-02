@@ -3,15 +3,15 @@
 namespace RemoteDataBlocks\Logging\QueryMonitor;
 
 use QueryMonitor as QM;
-use QM_Output_Html_Logger;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( class_exists( 'QM_Output_Html_Logger' ) ) {
-	class RdbBlockBindingOutputHtml extends QM_Output_Html_Logger {
+if ( class_exists( __NAMESPACE__ . '\RdbLogOutputHtml' ) ) {
+	class RdbBlockBindingOutputHtml extends RdbLogOutputHtml {
 		public static string $collector_id = 'remote-data-blocks-block-binding';
+		protected string $menu_title = 'Block bindings';
 
 		public function output(): void {
 			/** @var QM_Data_Logger $data */
@@ -154,36 +154,6 @@ if ( class_exists( 'QM_Output_Html_Logger' ) ) {
 
 				$this->after_non_tabular_output();
 			}
-		}
-
-		/**
-		 * @param array<string, mixed[]> $menu
-		 * @return array<string, mixed[]>
-		 */
-		public function admin_menu( array $menu ): array {
-			/** @var QM_Data_HTTP $data */
-			$data = $this->collector->get_data();
-			$count = 0;
-
-			if ( ! empty( $data->logs ) ) {
-				$count = count( $data->logs );
-
-				/* translators: %s: Number of logs that are available */
-				$label = __( 'Block bindings (%s)', 'query-monitor' );
-			} else {
-				$label = __( 'Block bindings', 'query-monitor' );
-			}
-
-			$menu['qm-remote-data-blocks']['children'][ $this->collector->id() ] = $this->menu( [
-				'id' => $this->collector->id(),
-				'title' => esc_html( sprintf(
-					$label,
-					number_format_i18n( $count )
-				) ),
-
-			] );
-
-			return $menu;
 		}
 	}
 }

@@ -4,10 +4,11 @@ namespace RemoteDataBlocks\Editor\DataBinding;
 
 defined( 'ABSPATH' ) || exit();
 
-use Psr\Log\LogLevel;
 use RemoteDataBlocks\Config\BlockAttribute\RemoteDataBlockAttribute;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
+use RemoteDataBlocks\Logging\Logger;
+use RemoteDataBlocks\Logging\LoggerInterface;
 use RemoteDataBlocks\Sanitization\Sanitizer;
 use WP_Block;
 use WP_Error;
@@ -21,12 +22,15 @@ use function register_block_bindings_source;
 class BlockBindings {
 	public static string $context_name = 'remote-data-blocks/remoteData';
 	public static string $binding_source = 'remote-data/binding';
-	public static string $log_action_name = 'remote_data_blocks_log_block_binding_event';
 
 	protected static string $hydrated_results_key = 'hydrated_results';
 	protected static string $prerendered_content_key = 'prerendered_content';
 
-	public static function init(): void {
+	protected static ?LoggerInterface $logger = null;
+
+	public static function init( ?LoggerInterface $logger = null ): void {
+		self::$logger = $logger ?? new Logger();
+
 		add_action( 'init', [ __CLASS__, 'register_block_bindings' ], 50, 0 );
 		add_filter( 'register_block_type_args', [ __CLASS__, 'inject_context_for_synced_patterns' ], 10, 2 );
 	}
@@ -282,8 +286,10 @@ class BlockBindings {
 
 		$log_context = [
 			'block_name' => $bound_block_name,
+			'block_info' => [
+				'source_args' => $source_args,
+			],
 			'remote_data_block_name' => $block_name,
-			'source_args' => $source_args,
 		];
 
 		if ( null === $field_name ) {
@@ -387,6 +393,7 @@ class BlockBindings {
 
 		$log_context = [
 			'block_name' => $block->name,
+			'block_info' => [],
 			'remote_data_block_name' => $block_context['blockName'] ?? 'unknown',
 		];
 
@@ -488,20 +495,33 @@ class BlockBindings {
 	}
 
 	protected static function log_error( array $log_context, WP_Error $error ): void {
-		// Remove key "hydrated_results" if it exists.
-		if ( isset( $log_context['source_args'][ self::$hydrated_results_key ] ) ) {
-			unset( $log_context['source_args'][ self::$hydrated_results_key ] );
+		if ( null === self::$logger ) {
+			return;
 		}
 
-		do_action( self::$log_action_name, LogLevel::ERROR, $error->get_error_message(), $log_context, $error );
+		// Remove key "hydrated_results" if it exists.
+		if ( isset( $log_context['block_info']['source_args'][ self::$hydrated_results_key ] ) ) {
+			unset( $log_context['block_info']['source_args'][ self::$hydrated_results_key ] );
+		}
+
+		$log_context['error'] = $error;
+		$log_context['type'] = 'block-binding';
+
+		self::$logger->error( $error->get_error_message(), $log_context );
 	}
 
 	protected static function log_success( array $log_context ): void {
-		// Remove key "hydrated_results" if it exists.
-		if ( isset( $log_context['source_args'][ self::$hydrated_results_key ] ) ) {
-			unset( $log_context['source_args'][ self::$hydrated_results_key ] );
+		if ( null === self::$logger ) {
+			return;
 		}
 
-		do_action( self::$log_action_name, LogLevel::INFO, 'Successfully resolved block binding', $log_context );
+		// Remove key "hydrated_results" if it exists.
+		if ( isset( $log_context['block_info']['source_args'][ self::$hydrated_results_key ] ) ) {
+			unset( $log_context['block_info']['source_args'][ self::$hydrated_results_key ] );
+		}
+
+		$log_context['type'] = 'block-binding';
+
+		self::$logger->info( 'Successfully resolved block binding', $log_context );
 	}
 }
