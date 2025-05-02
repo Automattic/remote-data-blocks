@@ -50,6 +50,7 @@
     "test:e2e:help": "wp-scripts test-playwright --help",
     "test:php": "composer test",
     "test:php:coverage": "composer test-coverage",
+    "test:php:debug": "wp-env run tests-cli --env-cwd=wp-content/plugins/remote-data-blocks ./vendor/bin/phpunit",
     "test:integration": "wp-env run tests-cli --env-cwd=wp-content/plugins/remote-data-blocks ./vendor/bin/phpunit -c ./phpunit-integration.xml",
     "test:js": "vitest --watch=false",
     "test:js:watch": "vitest --watch=true",

@@ -55,20 +55,24 @@ final class QueryResponseParser {
 	 */
 	public function parse( mixed $data, array $schema ): mixed {
 		$json_obj = $data instanceof JsonObject ? $data : new JsonObject( $data );
-		$default_path = ( $schema['is_collection'] ?? false ) ? '$[*]' : '$';
+		$is_collection = $schema['is_collection'] ?? false;
+		$default_path = $is_collection ? '$[*]' : '$';
 		$value = $json_obj->get( $schema['path'] ?? $default_path );
 
 		if ( is_array( $schema['type'] ?? null ) ) {
 			$value = $this->parse_response_objects( $value, $schema['type'] ) ?? [];
 		} elseif ( is_string( $schema['type'] ?? null ) ) {
-			$value = array_map( function ( $item ) use ( $schema ) {
-				return $this->get_field_value( $item, $schema['type'], $schema['default_value'] ?? null );
-			}, $value );
+			if ( $is_collection ) {
+				$value = array_map( function ( $item ) use ( $schema ) {
+					return $this->get_field_value( $item, $schema['type'], $schema['default_value'] ?? null );
+				}, $value );
+			} else {
+				$value = [ $this->get_field_value( $value[0] ?? null, $schema['type'], $schema['default_value'] ?? null ) ];
+			}
 		} else {
 			$value = [];
 		}
 
-		$is_collection = $schema['is_collection'] ?? false;
 		return $is_collection ? $value : $value[0] ?? null;
 	}
 
