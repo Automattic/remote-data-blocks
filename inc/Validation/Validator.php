@@ -117,6 +117,23 @@ final class Validator implements ValidatorInterface {
 
 				return true;
 
+			case 'not':
+				// This type is equivalent to an `any` type with exclusions.
+				$excluded_types = Types::get_type_args( $type );
+
+				foreach ( $excluded_types as $excluded_type ) {
+					$validated = $this->check_type( $excluded_type, $path, $value );
+					if ( true === $validated ) {
+						$excluded_type_names = array_map( static function ( array $type ): string {
+							return Types::get_type_name( $type );
+						}, $excluded_types );
+
+						return $this->create_error( sprintf( 'must not be one of the specified types: %s', join( ', ', $excluded_type_names ) ), $path );
+					}
+				}
+
+				return true;
+
 			case 'one_of':
 				// Keep track of all failed validations. Since one_of is a union type,
 				// if none of the types match, we will return all of the errors so that

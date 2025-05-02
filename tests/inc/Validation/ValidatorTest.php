@@ -436,6 +436,27 @@ class ValidatorTest extends TestCase {
 		$this->assertSame( '$instance_of must be an instance of class "RemoteDataBlocks\Tests\Validation\ValidatorTest"', $result->get_error_message() );
 	}
 
+	public function testNot(): void {
+		$schema = Types::not( Types::string(), Types::callable() );
+
+		$validator = new Validator( $schema, 'NotValidator', '$not' );
+
+		$this->assertTrue( $validator->validate( 42 ) );
+		$this->assertTrue( $validator->validate( null ) );
+
+		$result = $validator->validate( 'foo' );
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertSame( '$not must not be one of the specified types: string, callable', $result->get_error_message() );
+
+		$result = $validator->validate( function (): int {
+			return 123;
+		} );
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertSame( '$not must not be one of the specified types: string, callable', $result->get_error_message() );
+	}
+
 	public function testOneOf(): void {
 		$schema = Types::one_of( Types::string(), Types::integer() );
 

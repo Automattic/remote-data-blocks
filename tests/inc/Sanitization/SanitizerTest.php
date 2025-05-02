@@ -239,6 +239,24 @@ class SanitizerTest extends TestCase {
 		$this->assertSame( $expected, $result );
 	}
 
+	public function test_sanitize_not(): void {
+		$schema = Types::record(
+			Types::string(),
+			Types::not( Types::callable() )
+		);
+		$data = [
+			'string' => 'string',
+			'number' => 123,
+			'boolean' => true,
+			'list_of' => [ 'array' ],
+			'null' => null,
+		];
+
+		$sanitizer = new Sanitizer( $schema );
+		$result = $sanitizer->sanitize( $data );
+
+		$this->assertSame( $data, $result );
+	}
 
 	public function test_sanitize_object(): void {
 		$schema = Types::object( [

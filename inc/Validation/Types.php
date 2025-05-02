@@ -172,6 +172,15 @@ final class Types {
 		return self::generate_non_primitive_type( 'list_of', $member_type );
 	}
 
+	// This type is equivalent to an `any` type with exclusions.
+	public static function not( array ...$array_of_excluded_types ): array {
+		foreach ( $array_of_excluded_types as $type ) {
+			self::check_type( $type );
+		}
+
+		return self::generate_non_primitive_type( 'not', $array_of_excluded_types );
+	}
+
 	public static function object( array $properties ): array {
 		return self::generate_non_primitive_type( 'object', $properties );
 	}

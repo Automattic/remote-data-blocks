@@ -142,7 +142,7 @@ final class ConfigSchemas {
 				)
 			),
 			'service' => Types::string(),
-			'service_config' => Types::record( Types::string(), Types::any() ),
+			'service_config' => Types::record( Types::string(), Types::not( Types::callable() ) ),
 			'uuid' => Types::nullable( Types::uuid() ),
 		] );
 	}
