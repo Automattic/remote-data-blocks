@@ -44,7 +44,9 @@ interface RemoteDataBlockAttributes {
 	remoteData?: RemoteData;
 }
 
-interface RemoteDataNoResultsBlockAttributes {}
+interface RemoteDataNoResultsBlockAttributes {
+	mode?: 'error' | 'empty';
+}
 
 interface RemoteDataPaginationBlockAttributes {}
 

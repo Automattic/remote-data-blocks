@@ -77,6 +77,7 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 		}
 
 		innerBlocks.push( createBlock( 'remote-data-blocks/no-results' ) );
+		innerBlocks.push( createBlock( 'remote-data-blocks/error-fallback' ) );
 
 		replaceInnerBlocks( rootClientId, innerBlocks ).catch( () => {} );
 	}

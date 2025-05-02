@@ -4,16 +4,31 @@
   "name": "remote-data-blocks/no-results",
   "version": "0.1.0",
   "usesContext": [ "remote-data-blocks/remoteData" ],
-  "title": "No Remote Data Results",
+  "title": "No Results",
   "description": "Contains the blocks to display when no remote data is found.",
   "category": "widgets",
   "example": {},
-  "attributes": {},
+  "attributes": {
+    "mode": {
+      "type": "string",
+      "default": "empty"
+    }
+  },
   "supports": {
     "customClassName": false,
     "className": false,
     "html": false
   },
+  "variations": [
+    {
+      "name": "remote-data-blocks/error-fallback",
+      "title": "Error Fallback",
+      "description": "Display an error message when the remote data fails to load.",
+      "attributes": {
+        "mode": "error"
+      }
+    }
+  ],
   "textdomain": "remote-data-blocks",
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",

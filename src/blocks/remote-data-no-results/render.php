@@ -7,10 +7,9 @@ use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 // $content (string): The block default content.
 // $block (WP_Block): The block instance.
 
-$should_render_empty_result = BlockBindings::should_render_empty_result( $block );
+$block_state = BlockBindings::determine_block_state_to_render( $block );
 
-// Skip the rendering if the block's results are not empty.
-if ( ! $should_render_empty_result ) {
+if ( ! $block_state || ! isset( $attributes['mode'] ) || $block_state !== $attributes['mode'] ) {
 	return null;
 }
 

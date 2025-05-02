@@ -20,6 +20,15 @@ const NO_RESULTS_TEMPLATE: Template[] = [
 	],
 ];
 
+const ERROR_FALLBACK_TEMPLATE: Template[] = [
+	[
+		'core/paragraph',
+		{
+			content: __( 'Error loading results.' ),
+		},
+	],
+];
+
 export function Edit( props: BlockEditProps< RemoteDataNoResultsBlockAttributes > ): JSX.Element {
 	const { context } = props;
 	const { remoteData } = useRemoteDataContext( context );
@@ -34,6 +43,14 @@ export function Edit( props: BlockEditProps< RemoteDataNoResultsBlockAttributes 
 					'This block must be placed inside a remote data block. This block will be ignored as currently configured.'
 				) }
 			/>
+		);
+	}
+
+	if ( props.attributes?.mode === 'error' ) {
+		return (
+			<div { ...blockProps }>
+				<InnerBlocks template={ ERROR_FALLBACK_TEMPLATE } />
+			</div>
 		);
 	}
 
