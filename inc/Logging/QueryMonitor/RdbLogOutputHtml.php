@@ -23,7 +23,7 @@ if ( class_exists( 'QM_Output_Html_Logger' ) ) {
 			$label = $this->menu_title;
 
 			if ( ! empty( $data->logs ) ) {
-				$label = sprintf( '%s (%d)', $this->menu_title, number_format_i18n( count( $data->logs ) ) );
+				$label = sprintf( '%s (%s)', $this->menu_title, number_format_i18n( count( $data->logs ) ) );
 			}
 
 			$menu['qm-remote-data-blocks']['children'][ $this->collector->id() ] = $this->menu( [
