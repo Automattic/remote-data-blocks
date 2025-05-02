@@ -196,10 +196,12 @@ class VipBlockDataApiTest extends TestCase {
 				'message' => 'Successfully resolved block binding',
 				'context' => [
 					'block_name' => 'core/paragraph',
-					'remote_data_block_name' => 'remote-data-blocks/events',
-					'source_args' => [
-						'field' => 'title',
+					'block_info' => [
+						'source_args' => [
+							'field' => 'title',
+						],
 					],
+					'remote_data_block_name' => 'remote-data-blocks/events',
 					'type' => 'block-binding',
 				],
 			],
@@ -213,10 +215,12 @@ class VipBlockDataApiTest extends TestCase {
 				'message' => 'uh-oh!',
 				'context' => [
 					'block_name' => 'core/heading',
-					'remote_data_block_name' => 'remote-data-blocks/events',
-					'source_args' => [
-						'field' => 'location',
+					'block_info' => [
+						'source_args' => [
+							'field' => 'location',
+						],
 					],
+					'remote_data_block_name' => 'remote-data-blocks/events',
 					'error' => $error,
 					'type' => 'block-binding',
 				],
