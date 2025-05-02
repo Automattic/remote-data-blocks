@@ -204,20 +204,23 @@ class BlockBindings {
 		}
 	}
 
-	public static function determine_block_state_to_render( WP_Block $block ): string|null {
+	public static function get_empty_or_error_state_for_block( WP_Block $block ): string|null {
 		$block_context = $block->context[ self::$context_name ] ?? [];
 		// Re-execute the query to get the latest results, rather than using the
 		// stale results from the block.
 		$query_response = self::execute_queries( $block_context, [] );
 
+		// If there is an error, return the error state.
 		if ( is_wp_error( $query_response ) ) {
 			return 'error';
 		}
 
+		// If there are no results, return the empty state.
 		if ( isset( $query_response['results'] ) && empty( $query_response['results'] ) ) {
 			return 'empty';
 		}
 
+		// If there are results, it's fine to render the block.
 		return null;
 	}
 
