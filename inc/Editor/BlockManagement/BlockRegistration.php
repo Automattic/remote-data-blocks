@@ -50,19 +50,8 @@ class BlockRegistration {
 		register_block_type( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-pagination' );
 
 		// Remote data error fallback block - used to render a message when results aren't available to load.
-		register_block_type( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-no-results', [
-			'variations' => [
-				[
-					'name' => 'remote-data-blocks/error',
-					'title' => 'Error',
-					'description' => 'Display an error message when the remote data fails to load.',
-					'attributes' => [
-						'mode' => 'error',
-					],
-					'isActive' => [ 'mode' ],
-				],
-			],
-		] );
+		// This registers the empty results block, with a variation for when there is an error.
+		register_block_type( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-no-results' );
 
 		// Remote data template - used to render remote data collections.
 		register_block_type( REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-template' );

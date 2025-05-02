@@ -7,10 +7,10 @@ use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 // $content (string): The block default content.
 // $block (WP_Block): The block instance.
 
-$state = BlockBindings::get_empty_or_error_state_for_block( $block );
+$state = BlockBindings::is_error_or_empty_state( $block );
 
-// If the state is not set to empty or error, and that doesn't match the block's attributes, then we don't need to render the block.
-if ( ! $state || ! isset( $attributes['mode'] ) || $state !== $attributes['mode'] ) {
+// The state will only be true when the query gives back an error, or no results and the block attribute matched the response.
+if ( ! $state ) {
 	return null;
 }
 

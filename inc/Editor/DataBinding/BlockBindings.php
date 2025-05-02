@@ -204,24 +204,24 @@ class BlockBindings {
 		}
 	}
 
-	public static function get_empty_or_error_state_for_block( WP_Block $block ): string|null {
+	public static function is_error_or_empty_state( WP_Block $block ): bool {
 		$block_context = $block->context[ self::$context_name ] ?? [];
 		// Re-execute the query to get the latest results, rather than using the
 		// stale results from the block.
 		$query_response = self::execute_queries( $block_context, [] );
 
-		// If there is an error, return the error state.
+		// If there is an error, and it's the error block variation, return true.
 		if ( is_wp_error( $query_response ) ) {
-			return 'error';
+			return 'error' === $block->attributes['mode'] ?? 'unknown';
 		}
 
-		// If there are no results, return the empty state.
+		// If there are no results, and it's the empty block variation, return true.
 		if ( isset( $query_response['results'] ) && empty( $query_response['results'] ) ) {
-			return 'empty';
+			return 'empty' === $block->attributes['mode'] ?? 'unknown';
 		}
 
 		// If there are results, it's fine to render the block.
-		return null;
+		return false;
 	}
 
 	public static function get_pagination_links( WP_Block $block ): array {
