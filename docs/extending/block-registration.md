@@ -19,11 +19,8 @@ We are assuming `https://api.example.com/` returns JSON that has a shape like:
 ```php
 function register_your_custom_block() {
 	$data_source = HttpDataSource::from_array( [
-		'service_config' => [
-			'__version' => 1,
-			'display_name' => 'Example API',
-			'endpoint' => 'https://api.example.com/',
-		],
+		'display_name' => 'Example API',
+		'endpoint' => 'https://api.example.com/',
 	] );
 
 	$render_query = HttpQuery::from_array( [

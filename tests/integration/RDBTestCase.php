@@ -6,6 +6,7 @@ use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\Editor\BlockManagement\BlockRegistration;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
+use RemoteDataBlocks\Integrations\GenericHttp\GenericHttpDataSource;
 
 class RDBTestCase extends WP_UnitTestCase {
 	// Query mocking
@@ -14,13 +15,11 @@ class RDBTestCase extends WP_UnitTestCase {
 		$test_query_runner = $this->get_query_runner_with_response( $api_response );
 
 		$test_data_source = HttpDataSource::from_array( [
-			'service_config' => [
-				'__version' => 1,
-				'display_name' => 'Test API',
+			'__version' => 1,
+			'display_name' => 'Test API',
 
-				// Mocked query runner will not actually make a request to the endpoint URL.
-				'endpoint' => 'https://example.com/not-a-real-api',
-			],
+			// Mocked query runner will not actually make a request to the endpoint URL.
+			'endpoint' => 'https://example.com/not-a-real-api',
 		] );
 
 		$test_query = HttpQuery::from_array( [
@@ -43,7 +42,7 @@ class RDBTestCase extends WP_UnitTestCase {
 	protected function register_failed_query_data_block( string $block_title ): void {
 		$test_query_runner = $this->get_query_runner_with_response( [], 500 );
 
-		$test_data_source = HttpDataSource::from_array( [
+		$test_data_source = GenericHttpDataSource::from_array( [
 			'service_config' => [
 				'__version' => 1,
 				'display_name' => 'Test Failing API',

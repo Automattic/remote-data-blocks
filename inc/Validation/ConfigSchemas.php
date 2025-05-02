@@ -43,16 +43,6 @@ final class ConfigSchemas {
 		return $schema;
 	}
 
-	public static function get_http_data_source_service_config_schema(): array {
-		static $schema = null;
-
-		if ( null === $schema ) {
-			$schema = self::generate_http_data_source_service_config_schema();
-		}
-
-		return $schema;
-	}
-
 	public static function get_http_query_config_schema(): array {
 		static $schema = null;
 
@@ -141,25 +131,7 @@ final class ConfigSchemas {
 					Types::record( Types::string(), Types::string() ),
 				)
 			),
-			'service' => Types::string(),
-			'service_config' => Types::record( Types::string(), Types::not( Types::callable() ) ),
 			'uuid' => Types::nullable( Types::uuid() ),
-		] );
-	}
-
-	private static function generate_http_data_source_service_config_schema(): array {
-		return Types::object( [
-			'__version' => Types::integer(),
-			'auth' => Types::nullable(
-				Types::object( [
-					'add_to' => Types::nullable( Types::enum( 'header', 'query' ) ),
-					'key' => Types::nullable( Types::skip_sanitize( Types::string() ) ),
-					'type' => Types::enum( 'basic', 'bearer', 'api-key', 'none' ),
-					'value' => Types::skip_sanitize( Types::string() ),
-				] )
-			),
-			'display_name' => Types::string(),
-			'endpoint' => Types::url(),
 		] );
 	}
 

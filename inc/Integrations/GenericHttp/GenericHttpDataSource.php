@@ -4,6 +4,8 @@ namespace RemoteDataBlocks\Integrations\GenericHttp;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Validation\Types;
+use RemoteDataBlocks\Validation\Validator;
+use WP_Error;
 
 class GenericHttpDataSource extends HttpDataSource {
 	protected const SERVICE_NAME = REMOTE_DATA_BLOCKS_GENERIC_HTTP_SERVICE;
@@ -12,12 +14,14 @@ class GenericHttpDataSource extends HttpDataSource {
 	protected static function get_service_config_schema(): array {
 		return Types::object( [
 			'__version' => Types::integer(),
-			'auth' => Types::nullable( Types::object( [
-				'type' => Types::string(),
-				'key' => Types::nullable( Types::string() ),
-				'value' => Types::string(),
-				'add_to' => Types::nullable( Types::string() ),
-			] ) ),
+			'auth' => Types::nullable(
+				Types::object( [
+					'add_to' => Types::nullable( Types::enum( 'header', 'query' ) ),
+					'key' => Types::nullable( Types::skip_sanitize( Types::string() ) ),
+					'type' => Types::enum( 'basic', 'bearer', 'api-key', 'none' ),
+					'value' => Types::skip_sanitize( Types::string() ),
+				] )
+			),
 			'display_name' => Types::string(),
 			'endpoint' => Types::string(),
 		] );
@@ -55,12 +59,51 @@ class GenericHttpDataSource extends HttpDataSource {
 		return [];
 	}
 
-
 	protected static function map_service_config( array $service_config ): array {
 		return [
 			'display_name' => $service_config['display_name'],
 			'endpoint' => self::get_endpoint_from_service_config( $service_config ),
 			'request_headers' => self::get_request_headers_from_service_config( $service_config ),
+		];
+	}
+
+	/**
+	 * @inheritDoc
+	 *
+	 * NOTE: This method uses late static bindings to allow child classes to
+	 * define their own validation schema.
+	 */
+	public static function preprocess_config( array $config ): array|WP_Error {
+		$service_config = $config['service_config'] ?? [];
+		$validator = new Validator( static::get_service_config_schema(), static::class, '$service_config' );
+		$validated = $validator->validate( $service_config );
+
+		if ( is_wp_error( $validated ) ) {
+			return $validated;
+		}
+
+		return array_merge(
+			static::map_service_config( $service_config ),
+			[
+				// Store the exact data used to create the instance to preserve determinism.
+				'service' => static::SERVICE_NAME,
+				'service_config' => $service_config,
+				'uuid' => $config['uuid'] ?? null,
+			]
+		);
+	}
+
+	/**
+	 * @inheritDoc
+	 *
+	 * TODO: Do we need to sanitize this to prevent leaking sensitive data?
+	 */
+	final public function to_array(): array {
+		return [
+			'__class' => static::class,
+			'service' => static::SERVICE_NAME,
+			'service_config' => $this->config['service_config'],
+			'uuid' => $this->config['uuid'],
 		];
 	}
 }

@@ -8,15 +8,12 @@ Most HTTP-powered APIs can be represented by defining a class that extends `Http
 
 ```php
 $data_source = HttpDataSource::from_array( [
-    'service_config' => [
-        '__version' => 1,
-        'display_name' => 'Example API',
-        'endpoint' => 'https://api.example.com/',
-        'request_headers' => [
-            'Content-Type' => 'application/json',
-            'X-Api-Key' => MY_API_KEY_CONSTANT,
-        ],
-    ],
+	'display_name' => 'Example API',
+	'endpoint' => 'https://api.example.com/',
+	'request_headers' => [
+		'Content-Type' => 'application/json',
+		'X-Api-Key' => MY_API_KEY_CONSTANT,
+	],
 ] );
 ```
 

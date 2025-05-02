@@ -366,11 +366,8 @@ We are assuming `https://api.example.com/` returns JSON that has a shape like:
 ```php
 function register_your_custom_block() {
 	$data_source = HttpDataSource::from_array( [
-		'service_config' => [
-			'__version' => 1,
-			'display_name' => 'Example API',
-			'endpoint' => 'https://api.example.com/',
-		],
+		'display_name' => 'Example API',
+		'endpoint' => 'https://api.example.com/',
 	] );
 
 	$render_query = HttpQuery::from_array( [
@@ -502,15 +499,12 @@ Most HTTP-powered APIs can be represented by defining a class that extends `Http
 
 ```php
 $data_source = HttpDataSource::from_array( [
-    'service_config' => [
-        '__version' => 1,
-        'display_name' => 'Example API',
-        'endpoint' => 'https://api.example.com/',
-        'request_headers' => [
-            'Content-Type' => 'application/json',
-            'X-Api-Key' => MY_API_KEY_CONSTANT,
-        ],
-    ],
+	'display_name' => 'Example API',
+	'endpoint' => 'https://api.example.com/',
+	'request_headers' => [
+		'Content-Type' => 'application/json',
+		'X-Api-Key' => MY_API_KEY_CONSTANT,
+	],
 ] );
 ```
 
@@ -551,14 +545,11 @@ In this case the `data_source` has a built in `get_endpoint()` method. Other con
 
 ```php
 $data_source = HttpDataSource::from_array( [
-    'service_config' => [
-        '__version' => 1,
-        'display_name' => 'More Complicated Example API',
-        'endpoint' => 'https://api.complexexample.com/',
-        'request_headers' => [
-            'Content-Type' => 'application/json',
-            'X-Api-Key' => MY_API_KEY_CONSTANT,
-        ],
+    'display_name' => 'More Complicated Example API',
+    'endpoint' => 'https://api.complexexample.com/',
+    'request_headers' => [
+        'Content-Type' => 'application/json',
+        'X-Api-Key' => MY_API_KEY_CONSTANT,
     ],
 ] );
 
@@ -2987,16 +2978,13 @@ use RemoteDataBlocks\Config\Query\HttpQuery;
 use function add_query_arg;
 
 function register_aic_block(): void {
-	$aic_data_source = HttpDataSource::from_array([
-		'service_config' => [
-			'__version' => 1,
-			'display_name' => 'Art Institute of Chicago',
-			'endpoint' => 'https://api.artic.edu/api/v1/artworks',
-			'request_headers' => [
-				'Content-Type' => 'application/json',
-			],
+	$aic_data_source = HttpDataSource::from_array( [
+		'display_name' => 'Art Institute of Chicago',
+		'endpoint' => 'https://api.artic.edu/api/v1/artworks',
+		'request_headers' => [
+			'Content-Type' => 'application/json',
 		],
-	]);
+	] );
 
 	$get_art_query = HttpQuery::from_array([
 		'data_source' => $aic_data_source,
@@ -3064,7 +3052,7 @@ function register_aic_block(): void {
 		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
 			$endpoint = $aic_data_source->get_endpoint();
 			return add_query_arg( [
-				'limit' => $input_variables['limit'],  
+				'limit' => $input_variables['limit'],
 				'fields' => 'id,title,image_id,artist_title',
 				'page' => $input_variables['page'],
 			], $endpoint );
@@ -3180,7 +3168,7 @@ function register_aic_block(): void {
 	register_remote_data_block( [
 		'title' => 'Art Institute of Chicago Loop',
 		'icon' => 'art',
-		'instructions' => 'This block displays a set amount of artworks based on the provided limit.', 
+		'instructions' => 'This block displays a set amount of artworks based on the provided limit.',
 		'render_query' => [
 			'query' => $collection_query,
 			'loop' => true,
