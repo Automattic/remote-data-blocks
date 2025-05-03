@@ -7,10 +7,10 @@ use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 // $content (string): The block default content.
 // $block (WP_Block): The block instance.
 
-$state = BlockBindings::is_error_or_empty_state( $block->context, $attributes );
+$should_render_fallback_content = BlockBindings::should_render_fallback_content( $block->context, $attributes );
 
-// The state will only be true when the query gives back an error, or no results and the block attribute matched the response.
-if ( ! $state ) {
+// The fallback content should only be rendered if the query errors out, or if the query returns no results.
+if ( ! $should_render_fallback_content ) {
 	return null;
 }
 

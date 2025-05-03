@@ -43,7 +43,7 @@ class BlockBindingsTest extends TestCase {
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
 	 */
-	public function test_is_error_or_empty_state_with_error_mode(): void {
+	public function test_should_render_fallback_content_with_error_mode(): void {
 			/**
 		 * Mock the QueryRunner to return a result.
 		 */
@@ -77,7 +77,7 @@ class BlockBindingsTest extends TestCase {
 			->with( self::MOCK_BLOCK_NAME )
 			->andReturn( $mock_block_config );
 
-		$this->assertTrue( BlockBindings::is_error_or_empty_state( [
+		$this->assertTrue( BlockBindings::should_render_fallback_content( [
 			BlockBindings::$context_name => [
 				'blockName' => self::MOCK_BLOCK_NAME,
 				'queryInput' => [
@@ -92,7 +92,7 @@ class BlockBindingsTest extends TestCase {
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
 	 */
-	public function test_is_error_or_empty_state_with_empty_mode(): void {
+	public function test_should_render_fallback_content_with_empty_mode(): void {
 		/**
 		 * Mock the QueryRunner to return a result.
 		 */
@@ -132,7 +132,7 @@ class BlockBindingsTest extends TestCase {
 			->with( self::MOCK_BLOCK_NAME )
 			->andReturn( $mock_block_config );
 
-		$this->assertTrue( BlockBindings::is_error_or_empty_state( [
+		$this->assertTrue( BlockBindings::should_render_fallback_content( [
 			BlockBindings::$context_name => [
 				'blockName' => self::MOCK_BLOCK_NAME,
 				'queryInput' => [

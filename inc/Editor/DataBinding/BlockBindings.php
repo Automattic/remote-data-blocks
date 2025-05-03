@@ -204,7 +204,7 @@ class BlockBindings {
 		}
 	}
 
-	public static function is_error_or_empty_state( array $context, array $attributes ): bool {
+	public static function should_render_fallback_content( array $context, array $attributes ): bool {
 		$block_context = $context[ self::$context_name ] ?? [];
 		// Re-execute the query to get the latest results, rather than using the
 		// stale results from the block.
@@ -212,12 +212,12 @@ class BlockBindings {
 
 		// If there is an error, and it's the error block variation, return true.
 		if ( is_wp_error( $query_response ) ) {
-			return 'error' === $attributes['mode'] ?? 'unknown';
+			return 'error' === $attributes['mode'];
 		}
 
 		// If there are no results, and it's the empty block variation, return true.
 		if ( isset( $query_response['results'] ) && empty( $query_response['results'] ) ) {
-			return 'empty' === $attributes['mode'] ?? 'unknown';
+			return 'empty' === $attributes['mode'];
 		}
 
 		// If there are results, it's fine to render the block.
