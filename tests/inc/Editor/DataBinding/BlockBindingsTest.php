@@ -50,13 +50,6 @@ class BlockBindingsTest extends TestCase {
 		$mock_qr = new MockQueryRunner();
 		$mock_qr->addResult( 'output_field', new WP_Error( 'test-error', 'Test Error' ) );
 
-		$block_context = [
-			'blockName' => self::MOCK_BLOCK_NAME,
-			'queryInput' => [
-				'test_input_field' => 'test_value',
-			],
-		];
-
 		$input_schema = [
 			'test_input_field' => [
 				'name' => 'Test Input Field',
