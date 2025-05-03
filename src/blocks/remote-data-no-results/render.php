@@ -7,7 +7,7 @@ use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 // $content (string): The block default content.
 // $block (WP_Block): The block instance.
 
-$state = BlockBindings::is_error_or_empty_state( $block );
+$state = BlockBindings::is_error_or_empty_state( $block->context, $attributes );
 
 // The state will only be true when the query gives back an error, or no results and the block attribute matched the response.
 if ( ! $state ) {

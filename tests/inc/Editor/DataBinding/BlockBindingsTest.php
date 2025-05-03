@@ -11,6 +11,7 @@ use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 use RemoteDataBlocks\Tests\Mocks\MockQueryRunner;
 use RemoteDataBlocks\Tests\Mocks\MockQuery;
 use RemoteDataBlocks\Tests\Mocks\MockWordPressFunctions;
+use WP_Error;
 
 class BlockBindingsTest extends TestCase {
 	private const MOCK_BLOCK_NAME = 'test/block';
@@ -36,6 +37,117 @@ class BlockBindingsTest extends TestCase {
 	protected function tearDown(): void {
 		parent::tearDown();
 		Mockery::close();
+	}
+
+	/**
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	public function test_is_error_or_empty_state_with_error_mode(): void {
+			/**
+		 * Mock the QueryRunner to return a result.
+		 */
+		$mock_qr = new MockQueryRunner();
+		$mock_qr->addResult( 'output_field', new WP_Error( 'test-error', 'Test Error' ) );
+
+		$block_context = [
+			'blockName' => self::MOCK_BLOCK_NAME,
+			'queryInput' => [
+				'test_input_field' => 'test_value',
+			],
+		];
+
+		$input_schema = [
+			'test_input_field' => [
+				'name' => 'Test Input Field',
+				'type' => 'string',
+			],
+			'another_input_field' => [
+				'name' => 'Another Input Field',
+				'type' => 'string',
+			],
+		];
+
+		$mock_block_config = [
+			'queries' => [
+				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
+					'input_schema' => $input_schema,
+					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
+					'query_runner' => $mock_qr,
+				] ),
+			],
+		];
+
+		$mock_config_store = Mockery::namedMock( ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_block_configuration' )
+			->once()
+			->with( self::MOCK_BLOCK_NAME )
+			->andReturn( $mock_block_config );
+
+		$this->assertTrue( BlockBindings::is_error_or_empty_state( [
+			BlockBindings::$context_name => [
+				'blockName' => self::MOCK_BLOCK_NAME,
+					'queryInput' => [
+						'test_input_field' => 'test_value',
+						'another_input_field' => 'another_value',
+					],
+			],
+		], [ 'mode' => 'error' ] ) );
+	}
+
+	/**
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	public function test_is_error_or_empty_state_with_empty_mode(): void {
+		/**
+		 * Mock the QueryRunner to return a result.
+		 */
+		$mock_qr = new class() extends MockQueryRunner {
+			public function execute( HttpQueryInterface $query, array $input_variables ): array {
+				return [
+					'is_collection' => true,
+					'results' => [],
+				];
+			}
+		};
+
+		$input_schema = [
+			'test_input_field' => [
+				'name' => 'Test Input Field',
+				'type' => 'string',
+			],
+			'another_input_field' => [
+				'name' => 'Another Input Field',
+				'type' => 'string',
+			],
+		];
+
+		$mock_block_config = [
+			'queries' => [
+				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
+					'input_schema' => $input_schema,
+					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
+					'query_runner' => $mock_qr,
+				] ),
+			],
+		];
+
+		$mock_config_store = Mockery::namedMock( ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_block_configuration' )
+			->once()
+			->with( self::MOCK_BLOCK_NAME )
+			->andReturn( $mock_block_config );
+
+		$this->assertTrue( BlockBindings::is_error_or_empty_state( [
+			BlockBindings::$context_name => [
+				'blockName' => self::MOCK_BLOCK_NAME,
+					'queryInput' => [
+						'test_input_field' => 'test_value',
+						'another_input_field' => 'another_value',
+					],
+			],
+		], [ 'mode' => 'empty' ] ) );
 	}
 
 	/**

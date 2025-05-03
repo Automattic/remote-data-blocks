@@ -204,20 +204,20 @@ class BlockBindings {
 		}
 	}
 
-	public static function is_error_or_empty_state( WP_Block $block ): bool {
-		$block_context = $block->context[ self::$context_name ] ?? [];
+	public static function is_error_or_empty_state( array $context, array $attributes ): bool {
+		$block_context = $context[ self::$context_name ] ?? [];
 		// Re-execute the query to get the latest results, rather than using the
 		// stale results from the block.
 		$query_response = self::execute_queries( $block_context, [] );
 
 		// If there is an error, and it's the error block variation, return true.
 		if ( is_wp_error( $query_response ) ) {
-			return 'error' === $block->attributes['mode'] ?? 'unknown';
+			return 'error' === $attributes['mode'] ?? 'unknown';
 		}
 
 		// If there are no results, and it's the empty block variation, return true.
 		if ( isset( $query_response['results'] ) && empty( $query_response['results'] ) ) {
-			return 'empty' === $block->attributes['mode'] ?? 'unknown';
+			return 'empty' === $attributes['mode'] ?? 'unknown';
 		}
 
 		// If there are results, it's fine to render the block.
