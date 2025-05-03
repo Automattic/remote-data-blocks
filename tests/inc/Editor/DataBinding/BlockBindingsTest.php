@@ -87,10 +87,10 @@ class BlockBindingsTest extends TestCase {
 		$this->assertTrue( BlockBindings::is_error_or_empty_state( [
 			BlockBindings::$context_name => [
 				'blockName' => self::MOCK_BLOCK_NAME,
-					'queryInput' => [
-						'test_input_field' => 'test_value',
-						'another_input_field' => 'another_value',
-					],
+				'queryInput' => [
+					'test_input_field' => 'test_value',
+					'another_input_field' => 'another_value',
+				],
 			],
 		], [ 'mode' => 'error' ] ) );
 	}
@@ -142,10 +142,10 @@ class BlockBindingsTest extends TestCase {
 		$this->assertTrue( BlockBindings::is_error_or_empty_state( [
 			BlockBindings::$context_name => [
 				'blockName' => self::MOCK_BLOCK_NAME,
-					'queryInput' => [
-						'test_input_field' => 'test_value',
-						'another_input_field' => 'another_value',
-					],
+				'queryInput' => [
+					'test_input_field' => 'test_value',
+					'another_input_field' => 'another_value',
+				],
 			],
 		], [ 'mode' => 'empty' ] ) );
 	}
