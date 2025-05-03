@@ -210,17 +210,19 @@ class BlockBindings {
 		// stale results from the block.
 		$query_response = self::execute_queries( $block_context, [] );
 
-		// If there is an error, and it's the error block variation, return true.
+		// If there is an error, and it's the error block variation, the fallback
+		// content should be rendered.
 		if ( is_wp_error( $query_response ) ) {
 			return 'error' === $attributes['mode'];
 		}
 
-		// If there are no results, and it's the empty block variation, return true.
+		// If there are no results, and it's the empty block variation, the fallback
+		// content should be rendered.
 		if ( isset( $query_response['results'] ) && empty( $query_response['results'] ) ) {
 			return 'empty' === $attributes['mode'];
 		}
 
-		// If there are results, it's fine to render the block.
+		// If there are results, the fallback content should not be rendered.
 		return false;
 	}
 
