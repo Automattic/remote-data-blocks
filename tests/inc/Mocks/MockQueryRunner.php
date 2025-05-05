@@ -33,7 +33,7 @@ class MockQueryRunner extends QueryRunner {
 
 	public function addResults( array $results ): void {
 		array_push( $this->query_results, [
-			'is_collection' => false,
+			'is_collection' => true,
 			'results' => $results,
 		] );
 	}
