@@ -16,6 +16,17 @@ use WP_Error;
 class BlockBindingsTest extends TestCase {
 	private const MOCK_BLOCK_NAME = 'test/block';
 
+	private const MOCK_INPUT_SCHEMA = [
+		'test_input_field' => [
+			'name' => 'Test Input Field',
+			'type' => 'string',
+		],
+		'another_input_field' => [
+			'name' => 'Another Input Field',
+			'type' => 'string',
+		],
+	];
+
 	private const MOCK_OUTPUT_SCHEMA = [
 		'is_collection' => false,
 		'type' => [
@@ -44,7 +55,7 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_unknown_mode_with_error(): void {
-		$mock_qr = $this->create_mock_query_runner( new WP_Error( 'test-error', 'Test Error' ) );
+		$mock_qr = $this->create_mock_query_runner_with_result( new WP_Error( 'test-error', 'Test Error' ) );
 		$mock_block_config = $this->create_mock_block_config( $mock_qr );
 		$this->create_mock_config_store( $mock_block_config );
 
@@ -62,7 +73,7 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_error_mode(): void {
-		$mock_qr = $this->create_mock_query_runner( new WP_Error( 'test-error', 'Test Error' ) );
+		$mock_qr = $this->create_mock_query_runner_with_result( new WP_Error( 'test-error', 'Test Error' ) );
 		$mock_block_config = $this->create_mock_block_config( $mock_qr );
 		$this->create_mock_config_store( $mock_block_config );
 
@@ -80,7 +91,7 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_results_for_error_mode(): void {
-		$mock_qr = $this->create_mock_query_runner( [ 'result' => 'test_result' ] );
+		$mock_qr = $this->create_mock_query_runner_with_result( [ 'result' => 'test_result' ] );
 		$mock_block_config = $this->create_mock_block_config( $mock_qr );
 		$this->create_mock_config_store( $mock_block_config );
 
@@ -98,7 +109,7 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_no_results_for_error_mode(): void {
-		$mock_qr = $this->create_empty_results_query_runner();
+		$mock_qr = $this->create_mock_query_runner_with_results();
 		$mock_block_config = $this->create_mock_block_config( $mock_qr );
 		$this->create_mock_config_store( $mock_block_config );
 
@@ -116,7 +127,7 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_results_for_empty_mode(): void {
-		$mock_qr = $this->create_mock_query_runner( [ 'result' => 'test_result' ] );
+		$mock_qr = $this->create_mock_query_runner_with_result( [ 'result' => 'test_result' ] );
 		$mock_block_config = $this->create_mock_block_config( $mock_qr );
 		$this->create_mock_config_store( $mock_block_config );
 
@@ -134,7 +145,7 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_error_for_empty_mode(): void {
-		$mock_qr = $this->create_mock_query_runner( new WP_Error( 'test-error', 'Test Error' ) );
+		$mock_qr = $this->create_mock_query_runner_with_result( new WP_Error( 'test-error', 'Test Error' ) );
 		$mock_block_config = $this->create_mock_block_config( $mock_qr );
 		$this->create_mock_config_store( $mock_block_config );
 
@@ -152,7 +163,7 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_empty_mode(): void {
-		$mock_qr = $this->create_empty_results_query_runner();
+		$mock_qr = $this->create_mock_query_runner_with_results();
 		$mock_block_config = $this->create_mock_block_config( $mock_qr );
 		$this->create_mock_config_store( $mock_block_config );
 
@@ -170,7 +181,7 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_unknown_mode_with_empty_results(): void {
-		$mock_qr = $this->create_empty_results_query_runner();
+		$mock_qr = $this->create_mock_query_runner_with_results();
 		$mock_block_config = $this->create_mock_block_config( $mock_qr );
 		$this->create_mock_config_store( $mock_block_config );
 
@@ -205,7 +216,7 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_get_value_with_overrides(): void {
-		$mock_qr = $this->create_mock_query_runner( self::MOCK_OUTPUT_FIELD_VALUE );
+		$mock_qr = $this->create_mock_query_runner_with_result( self::MOCK_OUTPUT_FIELD_VALUE );
 		$mock_block_config = $this->create_mock_block_config( $mock_qr );
 		$this->create_mock_config_store( $mock_block_config );
 
@@ -324,7 +335,7 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_get_value(): void {
-		$mock_qr = $this->create_mock_query_runner( self::MOCK_OUTPUT_FIELD_VALUE );
+		$mock_qr = $this->create_mock_query_runner_with_result( self::MOCK_OUTPUT_FIELD_VALUE );
 		$mock_block_config = $this->create_mock_block_config( $mock_qr );
 		$this->create_mock_config_store( $mock_block_config );
 
@@ -343,7 +354,7 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_get_value_with_non_string(): void {
-		$mock_qr = $this->create_mock_query_runner( 123 );
+		$mock_qr = $this->create_mock_query_runner_with_result( 123 );
 		$mock_block_config = $this->create_mock_block_config( $mock_qr );
 		$this->create_mock_config_store( $mock_block_config );
 
@@ -494,40 +505,21 @@ class BlockBindingsTest extends TestCase {
 	 *
 	 * @param mixed $result The result to return from the query runner.
 	 */
-	private function create_mock_query_runner( mixed $result ): MockQueryRunner {
+	private function create_mock_query_runner_with_result( mixed $result ): MockQueryRunner {
 		$mock_qr = new MockQueryRunner();
 		$mock_qr->addResult( self::MOCK_OUTPUT_FIELD_NAME, $result );
 		return $mock_qr;
 	}
 
 	/**
-	 * Creates a mock query runner that returns empty results.
+	 * Creates a mock query runner with the specified results.
+	 *
+	 * @param array $results The results to return from the query runner.
 	 */
-	private function create_empty_results_query_runner(): MockQueryRunner {
-		return new class() extends MockQueryRunner {
-			public function execute( HttpQueryInterface $query, array $input_variables ): array {
-				return [
-					'is_collection' => true,
-					'results' => [],
-				];
-			}
-		};
-	}
-
-	/**
-	 * Creates the standard input schema used in tests.
-	 */
-	private function create_input_schema(): array {
-		return [
-			'test_input_field' => [
-				'name' => 'Test Input Field',
-				'type' => 'string',
-			],
-			'another_input_field' => [
-				'name' => 'Another Input Field',
-				'type' => 'string',
-			],
-		];
+	private function create_mock_query_runner_with_results( array $results = [] ): MockQueryRunner {
+		$mock_qr = new MockQueryRunner();
+		$mock_qr->addResults( $results );
+		return $mock_qr;
 	}
 
 	/**
@@ -539,7 +531,7 @@ class BlockBindingsTest extends TestCase {
 		return [
 			'queries' => [
 				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
-					'input_schema' => $this->create_input_schema(),
+					'input_schema' => self::MOCK_INPUT_SCHEMA,
 					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
 					'query_runner' => $query_runner,
 				] ),

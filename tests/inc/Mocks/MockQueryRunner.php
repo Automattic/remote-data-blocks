@@ -31,6 +31,13 @@ class MockQueryRunner extends QueryRunner {
 		] );
 	}
 
+	public function addResults( array $results ): void {
+		array_push( $this->query_results, [
+			'is_collection' => false,
+			'results' => $results,
+		] );
+	}
+
 	public function execute( HttpQueryInterface $query, array $input_variables ): array|WP_Error {
 		array_push( $this->execute_call_inputs, $input_variables );
 		return array_shift( $this->query_results ) ?? new WP_Error( 'no-results', 'No results available.' );
