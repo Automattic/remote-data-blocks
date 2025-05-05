@@ -5,6 +5,7 @@ namespace RemoteDataBlocks\Integrations\GenericHttp;
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Validation\Types;
 use RemoteDataBlocks\Validation\Validator;
+use RemoteDataBlocks\Validation\ConfigSchemas;
 use WP_Error;
 
 class GenericHttpDataSource extends HttpDataSource {
@@ -109,5 +110,12 @@ class GenericHttpDataSource extends HttpDataSource {
 			'service_config' => $this->config['service_config'],
 			'uuid' => $this->config['uuid'],
 		];
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public static function get_config_schema(): array {
+		return ConfigSchemas::get_generic_http_data_source_config_schema();
 	}
 }
