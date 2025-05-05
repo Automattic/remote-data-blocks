@@ -40,94 +40,6 @@ class BlockBindingsTest extends TestCase {
 	}
 
 	/**
-	 * Creates a mock query runner with the specified result.
-	 *
-	 * @param mixed $result The result to return from the query runner.
-	 */
-	private function create_mock_query_runner( mixed $result ): MockQueryRunner {
-		$mock_qr = new MockQueryRunner();
-		$mock_qr->addResult( self::MOCK_OUTPUT_FIELD_NAME, $result );
-		return $mock_qr;
-	}
-
-	/**
-	 * Creates a mock query runner that returns empty results.
-	 */
-	private function create_empty_results_query_runner(): MockQueryRunner {
-		return new class() extends MockQueryRunner {
-			public function execute( HttpQueryInterface $query, array $input_variables ): array {
-				return [
-					'is_collection' => true,
-					'results' => [],
-				];
-			}
-		};
-	}
-
-	/**
-	 * Creates the standard input schema used in tests.
-	 */
-	private function create_input_schema(): array {
-		return [
-			'test_input_field' => [
-				'name' => 'Test Input Field',
-				'type' => 'string',
-			],
-			'another_input_field' => [
-				'name' => 'Another Input Field',
-				'type' => 'string',
-			],
-		];
-	}
-
-	/**
-	 * Creates a mock block configuration.
-	 *
-	 * @param MockQueryRunner $query_runner The query runner to use.
-	 */
-	private function create_mock_block_config( MockQueryRunner $query_runner ): array {
-		return [
-			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
-					'input_schema' => $this->create_input_schema(),
-					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
-					'query_runner' => $query_runner,
-				] ),
-			],
-		];
-	}
-
-	/**
-	 * Creates a mock config store.
-	 *
-	 * @param array|null $block_config The block configuration to return.
-	 */
-	private function create_mock_config_store( ?array $block_config ): \Mockery\MockInterface {
-		$mock_config_store = Mockery::namedMock( ConfigStore::class );
-		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $block_config );
-		return $mock_config_store;
-	}
-
-	/**
-	 * Creates a block context array.
-	 *
-	 * @param array $query_input The query input to use.
-	 * @param array $enabled_overrides Optional enabled overrides.
-	 */
-	private function create_block_context( array $query_input, array $enabled_overrides = [] ): array {
-		return [
-			BlockBindings::$context_name => [
-				'blockName' => self::MOCK_BLOCK_NAME,
-				'queryInput' => $query_input,
-				'enabledOverrides' => $enabled_overrides,
-			],
-		];
-	}
-
-	/**
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
 	 */
@@ -567,10 +479,6 @@ class BlockBindingsTest extends TestCase {
 		$this->assertNull( $remote_value );
 	}
 
-	/**
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 */
 	public function test_get_value_with_fallback_results_context(): void {
 		$block = [
 			'context' => [
@@ -592,10 +500,6 @@ class BlockBindingsTest extends TestCase {
 		$this->assertSame( $remote_value, 'Stored Output Value' );
 	}
 
-	/**
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 */
 	public function test_get_value_with_non_string_fallback_results_context(): void {
 		$block = [
 			'context' => [
@@ -617,10 +521,6 @@ class BlockBindingsTest extends TestCase {
 		$this->assertSame( $remote_value, '456' );
 	}
 
-	/**
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 */
 	public function test_get_value_with_null_fallback_results_context(): void {
 		$block = [
 			'context' => [
@@ -640,5 +540,93 @@ class BlockBindingsTest extends TestCase {
 
 		$remote_value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'content' );
 		$this->assertNull( $remote_value );
+	}
+
+	/**
+	 * Creates a mock query runner with the specified result.
+	 *
+	 * @param mixed $result The result to return from the query runner.
+	 */
+	private function create_mock_query_runner( mixed $result ): MockQueryRunner {
+		$mock_qr = new MockQueryRunner();
+		$mock_qr->addResult( self::MOCK_OUTPUT_FIELD_NAME, $result );
+		return $mock_qr;
+	}
+
+	/**
+	 * Creates a mock query runner that returns empty results.
+	 */
+	private function create_empty_results_query_runner(): MockQueryRunner {
+		return new class() extends MockQueryRunner {
+			public function execute( HttpQueryInterface $query, array $input_variables ): array {
+				return [
+					'is_collection' => true,
+					'results' => [],
+				];
+			}
+		};
+	}
+
+	/**
+	 * Creates the standard input schema used in tests.
+	 */
+	private function create_input_schema(): array {
+		return [
+			'test_input_field' => [
+				'name' => 'Test Input Field',
+				'type' => 'string',
+			],
+			'another_input_field' => [
+				'name' => 'Another Input Field',
+				'type' => 'string',
+			],
+		];
+	}
+
+	/**
+	 * Creates a mock block configuration.
+	 *
+	 * @param MockQueryRunner $query_runner The query runner to use.
+	 */
+	private function create_mock_block_config( MockQueryRunner $query_runner ): array {
+		return [
+			'queries' => [
+				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
+					'input_schema' => $this->create_input_schema(),
+					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
+					'query_runner' => $query_runner,
+				] ),
+			],
+		];
+	}
+
+	/**
+	 * Creates a mock config store.
+	 *
+	 * @param array|null $block_config The block configuration to return.
+	 */
+	private function create_mock_config_store( ?array $block_config ): \Mockery\MockInterface {
+		$mock_config_store = Mockery::namedMock( ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_block_configuration' )
+			->once()
+			->with( self::MOCK_BLOCK_NAME )
+			->andReturn( $block_config );
+		return $mock_config_store;
+	}
+
+	/**
+	 * Creates a block context array.
+	 *
+	 * @param array $query_input The query input to use.
+	 * @param array $enabled_overrides Optional enabled overrides.
+	 */
+	private function create_block_context( array $query_input, array $enabled_overrides = [] ): array {
+		return [
+			BlockBindings::$context_name => [
+				'blockName' => self::MOCK_BLOCK_NAME,
+				'queryInput' => $query_input,
+				'enabledOverrides' => $enabled_overrides,
+			],
+		];
 	}
 }
