@@ -327,6 +327,143 @@ class BlockBindingsTest extends TestCase {
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
 	 */
+	public function test_get_value_with_query_input_transformed_by_custom_query_runner(): void {
+		/**
+		 * Mock the QueryRunner to return a result.
+		 */
+		$mock_qr = new class() extends MockQueryRunner {
+			public function execute( HttpQueryInterface $query, array $input_variables ): array {
+				$input_variables['test_input_field'] .= ' ' . $input_variables['another_input_field'];
+				return parent::execute( $query, $input_variables );
+			}
+		};
+		$mock_qr->addResult( 'output_field', 'Test Output Value' );
+
+		$block = [
+			'context' => [
+				BlockBindings::$context_name => [
+					'blockName' => self::MOCK_BLOCK_NAME,
+					'queryInput' => [
+						'test_input_field' => 'test_value',
+						'another_input_field' => 'another_value',
+					],
+				],
+			],
+		];
+
+		$input_schema = [
+			'test_input_field' => [
+				'name' => 'Test Input Field',
+				'type' => 'string',
+			],
+			'another_input_field' => [
+				'name' => 'Another Input Field',
+				'type' => 'string',
+			],
+		];
+
+		$mock_block_config = [
+			'queries' => [
+				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
+					'input_schema' => $input_schema,
+					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
+					'query_runner' => $mock_qr,
+				] ),
+			],
+		];
+
+		$mock_config_store = Mockery::namedMock( ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_block_configuration' )
+			->once()
+			->with( self::MOCK_BLOCK_NAME )
+			->andReturn( $mock_block_config );
+
+		$value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'content' );
+
+		// Assert that the value is correct.
+		$this->assertSame( $value, 'Test Output Value' );
+
+		/**
+		 * Assert that the query runner received the correct input after transformations were applied.
+		 */
+		$this->assertSame( $mock_qr->getLastExecuteCallInput(), [
+			'test_input_field' => 'test_value another_value',
+			'another_input_field' => 'another_value',
+		] );
+	}
+
+	/**
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	public function test_get_value_with_query_input_transformations_and_overrides(): void {
+		/**
+		 * Mock the QueryRunner to return a result.
+		 */
+		$mock_qr = new class() extends MockQueryRunner {
+			public function execute( HttpQueryInterface $query, array $input_variables ): array {
+				$input_variables['test_input_field'] .= ' transformed';
+				return parent::execute( $query, $input_variables );
+			}
+		};
+		$mock_qr->addResult( 'output_field', 'Test Output Value' );
+
+		$block = [
+			'context' => [
+				BlockBindings::$context_name => [
+					'blockName' => self::MOCK_BLOCK_NAME,
+					'queryInput' => [
+						'test_input_field' => 'test_value',
+					],
+					'enabledOverrides' => [ 'test_input_field_override' ],
+				],
+			],
+		];
+
+		$input_schema = [
+			'test_input_field' => [
+				'name' => 'Test Input Field',
+				'type' => 'string',
+			],
+		];
+
+		$mock_block_config = [
+			'queries' => [
+				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
+					'input_schema' => $input_schema,
+					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
+					'query_runner' => $mock_qr,
+				] ),
+			],
+		];
+
+		MockWordPressFunctions::add_mock_filter( 'remote_data_blocks_query_input_variables', [ 'test_input_field' => 'override_value' ] );
+
+		$mock_config_store = Mockery::namedMock( ConfigStore::class );
+		$mock_config_store->shouldReceive( 'get_block_configuration' )
+			->once()
+			->with( self::MOCK_BLOCK_NAME )
+			->andReturn( $mock_block_config );
+
+		$value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'content' );
+		$this->assertSame( 'Test Output Value', $value );
+
+		// Assert that the override was applied.
+		$filter_args = MockWordPressFunctions::get_done_filter( 'remote_data_blocks_query_input_variables' );
+		$this->assertSame( 'test_input_field_override', $filter_args[0][0] ?? null );
+
+		/**
+		 * Assert that the query runner received the correct input after transformations and overrides were applied.
+		 */
+		$this->assertSame( $mock_qr->getLastExecuteCallInput(), [
+			'test_input_field' => 'override_value transformed',
+		] );
+	}
+
+	/**
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
 	public function test_get_value(): void {
 		$mock_qr = $this->create_mock_query_runner( self::MOCK_OUTPUT_FIELD_VALUE );
 		$mock_block_config = $this->create_mock_block_config( $mock_qr );
@@ -503,142 +640,5 @@ class BlockBindingsTest extends TestCase {
 
 		$remote_value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'content' );
 		$this->assertNull( $remote_value );
-	}
-
-	/**
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 */
-	public function test_get_value_with_query_input_transformed_by_custom_query_runner(): void {
-		/**
-		 * Mock the QueryRunner to return a result.
-		 */
-		$mock_qr = new class() extends MockQueryRunner {
-			public function execute( HttpQueryInterface $query, array $input_variables ): array {
-				$input_variables['test_input_field'] .= ' ' . $input_variables['another_input_field'];
-				return parent::execute( $query, $input_variables );
-			}
-		};
-		$mock_qr->addResult( 'output_field', 'Test Output Value' );
-
-		$block = [
-			'context' => [
-				BlockBindings::$context_name => [
-					'blockName' => self::MOCK_BLOCK_NAME,
-					'queryInput' => [
-						'test_input_field' => 'test_value',
-						'another_input_field' => 'another_value',
-					],
-				],
-			],
-		];
-
-		$input_schema = [
-			'test_input_field' => [
-				'name' => 'Test Input Field',
-				'type' => 'string',
-			],
-			'another_input_field' => [
-				'name' => 'Another Input Field',
-				'type' => 'string',
-			],
-		];
-
-		$mock_block_config = [
-			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
-					'input_schema' => $input_schema,
-					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
-					'query_runner' => $mock_qr,
-				] ),
-			],
-		];
-
-		$mock_config_store = Mockery::namedMock( ConfigStore::class );
-		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
-
-		$value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'content' );
-
-		// Assert that the value is correct.
-		$this->assertSame( $value, 'Test Output Value' );
-
-		/**
-		 * Assert that the query runner received the correct input after transformations were applied.
-		 */
-		$this->assertSame( $mock_qr->getLastExecuteCallInput(), [
-			'test_input_field' => 'test_value another_value',
-			'another_input_field' => 'another_value',
-		] );
-	}
-
-	/**
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 */
-	public function test_get_value_with_query_input_transformations_and_overrides(): void {
-		/**
-		 * Mock the QueryRunner to return a result.
-		 */
-		$mock_qr = new class() extends MockQueryRunner {
-			public function execute( HttpQueryInterface $query, array $input_variables ): array {
-				$input_variables['test_input_field'] .= ' transformed';
-				return parent::execute( $query, $input_variables );
-			}
-		};
-		$mock_qr->addResult( 'output_field', 'Test Output Value' );
-
-		$block = [
-			'context' => [
-				BlockBindings::$context_name => [
-					'blockName' => self::MOCK_BLOCK_NAME,
-					'queryInput' => [
-						'test_input_field' => 'test_value',
-					],
-					'enabledOverrides' => [ 'test_input_field_override' ],
-				],
-			],
-		];
-
-		$input_schema = [
-			'test_input_field' => [
-				'name' => 'Test Input Field',
-				'type' => 'string',
-			],
-		];
-
-		$mock_block_config = [
-			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
-					'input_schema' => $input_schema,
-					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
-					'query_runner' => $mock_qr,
-				] ),
-			],
-		];
-
-		MockWordPressFunctions::add_mock_filter( 'remote_data_blocks_query_input_variables', [ 'test_input_field' => 'override_value' ] );
-
-		$mock_config_store = Mockery::namedMock( ConfigStore::class );
-		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
-
-		$value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'content' );
-		$this->assertSame( 'Test Output Value', $value );
-
-		// Assert that the override was applied.
-		$filter_args = MockWordPressFunctions::get_done_filter( 'remote_data_blocks_query_input_variables' );
-		$this->assertSame( 'test_input_field_override', $filter_args[0][0] ?? null );
-
-		/**
-		 * Assert that the query runner received the correct input after transformations and overrides were applied.
-		 */
-		$this->assertSame( $mock_qr->getLastExecuteCallInput(), [
-			'test_input_field' => 'override_value transformed',
-		] );
 	}
 }
