@@ -40,17 +40,35 @@ class BlockBindingsTest extends TestCase {
 	}
 
 	/**
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
+	 * Creates a mock query runner with the specified result.
+	 *
+	 * @param mixed $result The result to return from the query runner.
 	 */
-	public function test_should_render_fallback_content_with_unknown_mode_with_error(): void {
-		/**
-		 * Mock the QueryRunner to return a result.
-		 */
+	private function create_mock_query_runner( mixed $result ): MockQueryRunner {
 		$mock_qr = new MockQueryRunner();
-		$mock_qr->addResult( 'output_field', new WP_Error( 'test-error', 'Test Error' ) );
+		$mock_qr->addResult( self::MOCK_OUTPUT_FIELD_NAME, $result );
+		return $mock_qr;
+	}
 
-		$input_schema = [
+	/**
+	 * Creates a mock query runner that returns empty results.
+	 */
+	private function create_empty_results_query_runner(): MockQueryRunner {
+		return new class() extends MockQueryRunner {
+			public function execute( HttpQueryInterface $query, array $input_variables ): array {
+				return [
+					'is_collection' => true,
+					'results' => [],
+				];
+			}
+		};
+	}
+
+	/**
+	 * Creates the standard input schema used in tests.
+	 */
+	private function create_input_schema(): array {
+		return [
 			'test_input_field' => [
 				'name' => 'Test Input Field',
 				'type' => 'string',
@@ -60,32 +78,71 @@ class BlockBindingsTest extends TestCase {
 				'type' => 'string',
 			],
 		];
+	}
 
-		$mock_block_config = [
+	/**
+	 * Creates a mock block configuration.
+	 *
+	 * @param MockQueryRunner $query_runner The query runner to use.
+	 */
+	private function create_mock_block_config( MockQueryRunner $query_runner ): array {
+		return [
 			'queries' => [
 				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
-					'input_schema' => $input_schema,
+					'input_schema' => $this->create_input_schema(),
 					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
-					'query_runner' => $mock_qr,
+					'query_runner' => $query_runner,
 				] ),
 			],
 		];
+	}
 
+	/**
+	 * Creates a mock config store.
+	 *
+	 * @param array|null $block_config The block configuration to return.
+	 */
+	private function create_mock_config_store( ?array $block_config ): \Mockery\MockInterface {
 		$mock_config_store = Mockery::namedMock( ConfigStore::class );
 		$mock_config_store->shouldReceive( 'get_block_configuration' )
 			->once()
 			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
+			->andReturn( $block_config );
+		return $mock_config_store;
+	}
 
-		$this->assertFalse( BlockBindings::should_render_fallback_content( [
+	/**
+	 * Creates a block context array.
+	 *
+	 * @param array $query_input The query input to use.
+	 * @param array $enabled_overrides Optional enabled overrides.
+	 */
+	private function create_block_context( array $query_input, array $enabled_overrides = [] ): array {
+		return [
 			BlockBindings::$context_name => [
 				'blockName' => self::MOCK_BLOCK_NAME,
-				'queryInput' => [
-					'test_input_field' => 'test_value',
-					'another_input_field' => 'another_value',
-				],
+				'queryInput' => $query_input,
+				'enabledOverrides' => $enabled_overrides,
 			],
-		], [ 'mode' => 'unknown' ] ) );
+		];
+	}
+
+	/**
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	public function test_should_render_fallback_content_with_unknown_mode_with_error(): void {
+		$mock_qr = $this->create_mock_query_runner( new WP_Error( 'test-error', 'Test Error' ) );
+		$mock_block_config = $this->create_mock_block_config( $mock_qr );
+		$this->create_mock_config_store( $mock_block_config );
+
+		$this->assertFalse( BlockBindings::should_render_fallback_content(
+			$this->create_block_context( [
+				'test_input_field' => 'test_value',
+				'another_input_field' => 'another_value',
+			] ),
+			[ 'mode' => 'unknown' ]
+		) );
 	}
 
 	/**
@@ -93,48 +150,17 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_error_mode(): void {
-		/**
-		 * Mock the QueryRunner to return a result.
-		 */
-		$mock_qr = new MockQueryRunner();
-		$mock_qr->addResult( 'output_field', new WP_Error( 'test-error', 'Test Error' ) );
+		$mock_qr = $this->create_mock_query_runner( new WP_Error( 'test-error', 'Test Error' ) );
+		$mock_block_config = $this->create_mock_block_config( $mock_qr );
+		$this->create_mock_config_store( $mock_block_config );
 
-		$input_schema = [
-			'test_input_field' => [
-				'name' => 'Test Input Field',
-				'type' => 'string',
-			],
-			'another_input_field' => [
-				'name' => 'Another Input Field',
-				'type' => 'string',
-			],
-		];
-
-		$mock_block_config = [
-			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
-					'input_schema' => $input_schema,
-					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
-					'query_runner' => $mock_qr,
-				] ),
-			],
-		];
-
-		$mock_config_store = Mockery::namedMock( ConfigStore::class );
-		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
-
-		$this->assertTrue( BlockBindings::should_render_fallback_content( [
-			BlockBindings::$context_name => [
-				'blockName' => self::MOCK_BLOCK_NAME,
-				'queryInput' => [
-					'test_input_field' => 'test_value',
-					'another_input_field' => 'another_value',
-				],
-			],
-		], [ 'mode' => 'error' ] ) );
+		$this->assertTrue( BlockBindings::should_render_fallback_content(
+			$this->create_block_context( [
+				'test_input_field' => 'test_value',
+				'another_input_field' => 'another_value',
+			] ),
+			[ 'mode' => 'error' ]
+		) );
 	}
 
 	/**
@@ -142,48 +168,17 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_results_for_error_mode(): void {
-		/**
-		 * Mock the QueryRunner to return a result.
-		 */
-		$mock_qr = new MockQueryRunner();
-		$mock_qr->addResult( 'output_field', [ 'result' => 'test_result' ] );
+		$mock_qr = $this->create_mock_query_runner( [ 'result' => 'test_result' ] );
+		$mock_block_config = $this->create_mock_block_config( $mock_qr );
+		$this->create_mock_config_store( $mock_block_config );
 
-		$input_schema = [
-			'test_input_field' => [
-				'name' => 'Test Input Field',
-				'type' => 'string',
-			],
-			'another_input_field' => [
-				'name' => 'Another Input Field',
-				'type' => 'string',
-			],
-		];
-
-		$mock_block_config = [
-			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
-					'input_schema' => $input_schema,
-					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
-					'query_runner' => $mock_qr,
-				] ),
-			],
-		];
-
-		$mock_config_store = Mockery::namedMock( ConfigStore::class );
-		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
-
-		$this->assertFalse( BlockBindings::should_render_fallback_content( [
-			BlockBindings::$context_name => [
-				'blockName' => self::MOCK_BLOCK_NAME,
-				'queryInput' => [
-					'test_input_field' => 'test_value',
-					'another_input_field' => 'another_value',
-				],
-			],
-		], [ 'mode' => 'error' ] ) );
+		$this->assertFalse( BlockBindings::should_render_fallback_content(
+			$this->create_block_context( [
+				'test_input_field' => 'test_value',
+				'another_input_field' => 'another_value',
+			] ),
+			[ 'mode' => 'error' ]
+		) );
 	}
 
 	/**
@@ -191,54 +186,17 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_no_results_for_error_mode(): void {
-		/**
-		 * Mock the QueryRunner to return a result.
-		 */
-		$mock_qr = new class() extends MockQueryRunner {
-			public function execute( HttpQueryInterface $query, array $input_variables ): array {
-				return [
-					'is_collection' => true,
-					'results' => [],
-				];
-			}
-		};
+		$mock_qr = $this->create_empty_results_query_runner();
+		$mock_block_config = $this->create_mock_block_config( $mock_qr );
+		$this->create_mock_config_store( $mock_block_config );
 
-		$input_schema = [
-			'test_input_field' => [
-				'name' => 'Test Input Field',
-				'type' => 'string',
-			],
-			'another_input_field' => [
-				'name' => 'Another Input Field',
-				'type' => 'string',
-			],
-		];
-
-		$mock_block_config = [
-			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
-					'input_schema' => $input_schema,
-					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
-					'query_runner' => $mock_qr,
-				] ),
-			],
-		];
-
-		$mock_config_store = Mockery::namedMock( ConfigStore::class );
-		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
-
-		$this->assertFalse( BlockBindings::should_render_fallback_content( [
-			BlockBindings::$context_name => [
-				'blockName' => self::MOCK_BLOCK_NAME,
-				'queryInput' => [
-					'test_input_field' => 'test_value',
-					'another_input_field' => 'another_value',
-				],
-			],
-		], [ 'mode' => 'error' ] ) );
+		$this->assertFalse( BlockBindings::should_render_fallback_content(
+			$this->create_block_context( [
+				'test_input_field' => 'test_value',
+				'another_input_field' => 'another_value',
+			] ),
+			[ 'mode' => 'error' ]
+		) );
 	}
 
 	/**
@@ -246,48 +204,17 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_results_for_empty_mode(): void {
-		/**
-		 * Mock the QueryRunner to return a result.
-		 */
-		$mock_qr = new MockQueryRunner();
-		$mock_qr->addResult( 'output_field', [ 'result' => 'test_result' ] );
+		$mock_qr = $this->create_mock_query_runner( [ 'result' => 'test_result' ] );
+		$mock_block_config = $this->create_mock_block_config( $mock_qr );
+		$this->create_mock_config_store( $mock_block_config );
 
-		$input_schema = [
-			'test_input_field' => [
-				'name' => 'Test Input Field',
-				'type' => 'string',
-			],
-			'another_input_field' => [
-				'name' => 'Another Input Field',
-				'type' => 'string',
-			],
-		];
-
-		$mock_block_config = [
-			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
-					'input_schema' => $input_schema,
-					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
-					'query_runner' => $mock_qr,
-				] ),
-			],
-		];
-
-		$mock_config_store = Mockery::namedMock( ConfigStore::class );
-		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
-
-		$this->assertFalse( BlockBindings::should_render_fallback_content( [
-			BlockBindings::$context_name => [
-				'blockName' => self::MOCK_BLOCK_NAME,
-				'queryInput' => [
-					'test_input_field' => 'test_value',
-					'another_input_field' => 'another_value',
-				],
-			],
-		], [ 'mode' => 'empty' ] ) );
+		$this->assertFalse( BlockBindings::should_render_fallback_content(
+			$this->create_block_context( [
+				'test_input_field' => 'test_value',
+				'another_input_field' => 'another_value',
+			] ),
+			[ 'mode' => 'empty' ]
+		) );
 	}
 
 	/**
@@ -295,48 +222,17 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_error_for_empty_mode(): void {
-		/**
-		 * Mock the QueryRunner to return a result.
-		 */
-		$mock_qr = new MockQueryRunner();
-		$mock_qr->addResult( 'output_field', new WP_Error( 'test-error', 'Test Error' ) );
+		$mock_qr = $this->create_mock_query_runner( new WP_Error( 'test-error', 'Test Error' ) );
+		$mock_block_config = $this->create_mock_block_config( $mock_qr );
+		$this->create_mock_config_store( $mock_block_config );
 
-		$input_schema = [
-			'test_input_field' => [
-				'name' => 'Test Input Field',
-				'type' => 'string',
-			],
-			'another_input_field' => [
-				'name' => 'Another Input Field',
-				'type' => 'string',
-			],
-		];
-
-		$mock_block_config = [
-			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
-					'input_schema' => $input_schema,
-					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
-					'query_runner' => $mock_qr,
-				] ),
-			],
-		];
-
-		$mock_config_store = Mockery::namedMock( ConfigStore::class );
-		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
-
-		$this->assertFalse( BlockBindings::should_render_fallback_content( [
-			BlockBindings::$context_name => [
-				'blockName' => self::MOCK_BLOCK_NAME,
-				'queryInput' => [
-					'test_input_field' => 'test_value',
-					'another_input_field' => 'another_value',
-				],
-			],
-		], [ 'mode' => 'empty' ] ) );
+		$this->assertFalse( BlockBindings::should_render_fallback_content(
+			$this->create_block_context( [
+				'test_input_field' => 'test_value',
+				'another_input_field' => 'another_value',
+			] ),
+			[ 'mode' => 'empty' ]
+		) );
 	}
 
 	/**
@@ -344,54 +240,17 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_empty_mode(): void {
-		/**
-		 * Mock the QueryRunner to return a result.
-		 */
-		$mock_qr = new class() extends MockQueryRunner {
-			public function execute( HttpQueryInterface $query, array $input_variables ): array {
-				return [
-					'is_collection' => true,
-					'results' => [],
-				];
-			}
-		};
+		$mock_qr = $this->create_empty_results_query_runner();
+		$mock_block_config = $this->create_mock_block_config( $mock_qr );
+		$this->create_mock_config_store( $mock_block_config );
 
-		$input_schema = [
-			'test_input_field' => [
-				'name' => 'Test Input Field',
-				'type' => 'string',
-			],
-			'another_input_field' => [
-				'name' => 'Another Input Field',
-				'type' => 'string',
-			],
-		];
-
-		$mock_block_config = [
-			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
-					'input_schema' => $input_schema,
-					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
-					'query_runner' => $mock_qr,
-				] ),
-			],
-		];
-
-		$mock_config_store = Mockery::namedMock( ConfigStore::class );
-		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
-
-		$this->assertTrue( BlockBindings::should_render_fallback_content( [
-			BlockBindings::$context_name => [
-				'blockName' => self::MOCK_BLOCK_NAME,
-				'queryInput' => [
-					'test_input_field' => 'test_value',
-					'another_input_field' => 'another_value',
-				],
-			],
-		], [ 'mode' => 'empty' ] ) );
+		$this->assertTrue( BlockBindings::should_render_fallback_content(
+			$this->create_block_context( [
+				'test_input_field' => 'test_value',
+				'another_input_field' => 'another_value',
+			] ),
+			[ 'mode' => 'empty' ]
+		) );
 	}
 
 	/**
@@ -399,54 +258,17 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_unknown_mode_with_empty_results(): void {
-		/**
-		 * Mock the QueryRunner to return a result.
-		 */
-		$mock_qr = new class() extends MockQueryRunner {
-			public function execute( HttpQueryInterface $query, array $input_variables ): array {
-				return [
-					'is_collection' => true,
-					'results' => [],
-				];
-			}
-		};
+		$mock_qr = $this->create_empty_results_query_runner();
+		$mock_block_config = $this->create_mock_block_config( $mock_qr );
+		$this->create_mock_config_store( $mock_block_config );
 
-		$input_schema = [
-			'test_input_field' => [
-				'name' => 'Test Input Field',
-				'type' => 'string',
-			],
-			'another_input_field' => [
-				'name' => 'Another Input Field',
-				'type' => 'string',
-			],
-		];
-
-		$mock_block_config = [
-			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
-					'input_schema' => $input_schema,
-					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
-					'query_runner' => $mock_qr,
-				] ),
-			],
-		];
-
-		$mock_config_store = Mockery::namedMock( ConfigStore::class );
-		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
-
-		$this->assertFalse( BlockBindings::should_render_fallback_content( [
-			BlockBindings::$context_name => [
-				'blockName' => self::MOCK_BLOCK_NAME,
-				'queryInput' => [
-					'test_input_field' => 'test_value',
-					'another_input_field' => 'another_value',
-				],
-			],
-		], [ 'mode' => 'unknown' ] ) );
+		$this->assertFalse( BlockBindings::should_render_fallback_content(
+			$this->create_block_context( [
+				'test_input_field' => 'test_value',
+				'another_input_field' => 'another_value',
+			] ),
+			[ 'mode' => 'unknown' ]
+		) );
 	}
 
 	/**
@@ -454,21 +276,10 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_get_value_with_no_config(): void {
-		/**
-		 * Mock the ConfigStore to return null.
-		 */
-		$mock_config_store = Mockery::namedMock( ConfigStore::class );
-		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( null );
+		$this->create_mock_config_store( null );
 
 		$block = [
-			'context' => [
-				BlockBindings::$context_name => [
-					'blockName' => self::MOCK_BLOCK_NAME,
-				],
-			],
+			'context' => $this->create_block_context( [] ),
 		];
 
 		$value = BlockBindings::get_value( [ 'field' => 'test' ], $block, 'content' );
@@ -482,48 +293,18 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_get_value_with_overrides(): void {
-		/**
-		 * Mock the QueryRunner to return a result.
-		 */
-		$mock_qr = new MockQueryRunner();
-		$mock_qr->addResult( self::MOCK_OUTPUT_FIELD_NAME, self::MOCK_OUTPUT_FIELD_VALUE );
+		$mock_qr = $this->create_mock_query_runner( self::MOCK_OUTPUT_FIELD_VALUE );
+		$mock_block_config = $this->create_mock_block_config( $mock_qr );
+		$this->create_mock_config_store( $mock_block_config );
 
 		$block = [
-			'context' => [
-				BlockBindings::$context_name => [
-					'blockName' => self::MOCK_BLOCK_NAME,
-					'enabledOverrides' => [ 'test_input_field_override' ],
-					'queryInput' => [
-						'test_input_field' => 'test_value',
-					],
-				],
-			],
-		];
-
-		$input_schema = [
-			'test_input_field' => [
-				'name' => 'Test Input Field',
-				'type' => 'string',
-			],
-		];
-
-		$mock_block_config = [
-			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
-					'input_schema' => $input_schema,
-					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
-					'query_runner' => $mock_qr,
-				] ),
-			],
+			'context' => $this->create_block_context(
+				[ 'test_input_field' => 'test_value' ],
+				[ 'test_input_field_override' ]
+			),
 		];
 
 		MockWordPressFunctions::add_mock_filter( 'remote_data_blocks_query_input_variables', [ 'test_input_field' => 'override_value' ] );
-
-		$mock_config_store = Mockery::namedMock( ConfigStore::class );
-		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
 
 		$value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'content' );
 
@@ -540,6 +321,188 @@ class BlockBindingsTest extends TestCase {
 		$this->assertSame( $mock_qr->getLastExecuteCallInput(), [
 			'test_input_field' => 'override_value',
 		] );
+	}
+
+	/**
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	public function test_get_value(): void {
+		$mock_qr = $this->create_mock_query_runner( self::MOCK_OUTPUT_FIELD_VALUE );
+		$mock_block_config = $this->create_mock_block_config( $mock_qr );
+		$this->create_mock_config_store( $mock_block_config );
+
+		$block = [
+			'context' => $this->create_block_context( [
+				'test_input_field' => 'test_value',
+			] ),
+		];
+
+		$remote_value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'content' );
+		$this->assertSame( $remote_value, self::MOCK_OUTPUT_FIELD_VALUE );
+	}
+
+	/**
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	public function test_get_value_with_non_string(): void {
+		$mock_qr = $this->create_mock_query_runner( 123 );
+		$mock_block_config = $this->create_mock_block_config( $mock_qr );
+		$this->create_mock_config_store( $mock_block_config );
+
+		$block = [
+			'context' => $this->create_block_context( [
+				'test_input_field' => 'test_value',
+			] ),
+		];
+
+		$remote_value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'content' );
+		$this->assertSame( $remote_value, '123' );
+	}
+
+	public function test_get_value_with_fallback_content_attribute(): void {
+		$block = [
+			'attributes' => [
+				'content' => 'Fallback Content',
+			],
+		];
+
+		$remote_value = BlockBindings::get_value( [ 'field' => 'non_existent' ], $block, 'content' );
+		$this->assertSame( $remote_value, 'Fallback Content' );
+	}
+
+	public function test_get_value_with_non_string_fallback_content_attribute(): void {
+		$block = [
+			'attributes' => [
+				'content' => 123,
+			],
+		];
+
+		$remote_value = BlockBindings::get_value( [ 'field' => 'non_existent' ], $block, 'content' );
+		$this->assertSame( $remote_value, '123' );
+	}
+
+	public function test_get_value_with_null_fallback_content_attribute(): void {
+		$block = [
+			'attributes' => [
+				'content' => null,
+			],
+		];
+
+		$remote_value = BlockBindings::get_value( [ 'field' => 'non_existent' ], $block, 'content' );
+		$this->assertNull( $remote_value );
+	}
+
+	public function test_get_value_with_fallback_url_attribute(): void {
+		$block = [
+			'attributes' => [
+				'content' => 'Fallback Content',
+				'url' => 'https://example.com/hello-world',
+			],
+		];
+
+		$remote_value = BlockBindings::get_value( [ 'field' => 'non_existent' ], $block, 'url' );
+		$this->assertSame( $remote_value, 'https://example.com/hello-world' );
+	}
+
+	public function test_get_value_with_non_string_fallback_url_attribute(): void {
+		$block = [
+			'attributes' => [
+				'content' => 'Fallback Content',
+				'url' => 123,
+			],
+		];
+
+		$remote_value = BlockBindings::get_value( [ 'field' => 'non_existent' ], $block, 'url' );
+		$this->assertSame( $remote_value, '123' );
+	}
+
+	public function test_get_value_with_null_fallback_url_attribute(): void {
+		$block = [
+			'attributes' => [
+				'content' => 'Fallback Content',
+				'url' => null,
+			],
+		];
+
+		$remote_value = BlockBindings::get_value( [ 'field' => 'non_existent' ], $block, 'url' );
+		$this->assertNull( $remote_value );
+	}
+
+	/**
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	public function test_get_value_with_fallback_results_context(): void {
+		$block = [
+			'context' => [
+				BlockBindings::$context_name => [
+					'blockName' => self::MOCK_BLOCK_NAME,
+					'queryInput' => [],
+					'results' => [
+						[
+							'result' => [
+								self::MOCK_OUTPUT_FIELD_NAME => 'Stored Output Value',
+							],
+						],
+					],
+				],
+			],
+		];
+
+		$remote_value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'content' );
+		$this->assertSame( $remote_value, 'Stored Output Value' );
+	}
+
+	/**
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	public function test_get_value_with_non_string_fallback_results_context(): void {
+		$block = [
+			'context' => [
+				BlockBindings::$context_name => [
+					'blockName' => self::MOCK_BLOCK_NAME,
+					'queryInput' => [],
+					'results' => [
+						[
+							'result' => [
+								self::MOCK_OUTPUT_FIELD_NAME => 456,
+							],
+						],
+					],
+				],
+			],
+		];
+
+		$remote_value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'content' );
+		$this->assertSame( $remote_value, '456' );
+	}
+
+	/**
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	public function test_get_value_with_null_fallback_results_context(): void {
+		$block = [
+			'context' => [
+				BlockBindings::$context_name => [
+					'blockName' => self::MOCK_BLOCK_NAME,
+					'queryInput' => [],
+					'results' => [
+						[
+							'result' => [
+								self::MOCK_OUTPUT_FIELD_NAME => null,
+							],
+						],
+					],
+				],
+			],
+		];
+
+		$remote_value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'content' );
+		$this->assertNull( $remote_value );
 	}
 
 	/**
@@ -619,9 +582,6 @@ class BlockBindingsTest extends TestCase {
 		/**
 		 * Mock the QueryRunner to return a result.
 		 */
-		/**
-		 * Mock the QueryRunner to return a result.
-		 */
 		$mock_qr = new class() extends MockQueryRunner {
 			public function execute( HttpQueryInterface $query, array $input_variables ): array {
 				$input_variables['test_input_field'] .= ' transformed';
@@ -680,247 +640,5 @@ class BlockBindingsTest extends TestCase {
 		$this->assertSame( $mock_qr->getLastExecuteCallInput(), [
 			'test_input_field' => 'override_value transformed',
 		] );
-	}
-
-	/**
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 */
-	public function test_get_value(): void {
-		/**
-		 * Mock the QueryRunner to return a result.
-		 */
-		$mock_qr = new MockQueryRunner();
-		$mock_qr->addResult( 'output_field', 'Test Output Value' );
-
-		$block_context = [
-			'blockName' => self::MOCK_BLOCK_NAME,
-			'queryInput' => [
-				'test_input_field' => 'test_value',
-			],
-		];
-
-		$input_schema = [
-			'test_input_field' => [
-				'name' => 'Test Input Field',
-				'type' => 'string',
-			],
-		];
-
-		$mock_block_config = [
-			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
-					'input_schema' => $input_schema,
-					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
-					'query_runner' => $mock_qr,
-				] ),
-			],
-		];
-
-		$mock_config_store = Mockery::namedMock( ConfigStore::class );
-		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
-
-		$source_args = [
-			'field' => self::MOCK_OUTPUT_FIELD_NAME,
-		];
-
-		$block = [
-			'context' => [
-				BlockBindings::$context_name => $block_context,
-			],
-		];
-
-		$remote_value = BlockBindings::get_value( $source_args, $block, 'content' );
-		$this->assertSame( $remote_value, self::MOCK_OUTPUT_FIELD_VALUE );
-	}
-
-	/**
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 */
-	public function test_get_value_with_non_string(): void {
-		/**
-		 * Mock the QueryRunner to return a result.
-		 */
-		$mock_qr = new MockQueryRunner();
-		$mock_qr->addResult( 'output_field', 123 );
-
-		$block_context = [
-			'blockName' => self::MOCK_BLOCK_NAME,
-			'queryInput' => [
-				'test_input_field' => 'test_value',
-			],
-		];
-
-		$input_schema = [
-			'test_input_field' => [
-				'name' => 'Test Input Field',
-				'type' => 'string',
-			],
-		];
-
-		$mock_block_config = [
-			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
-					'input_schema' => $input_schema,
-					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
-					'query_runner' => $mock_qr,
-				] ),
-			],
-		];
-
-		$mock_config_store = Mockery::namedMock( ConfigStore::class );
-		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
-
-		$source_args = [
-			'field' => self::MOCK_OUTPUT_FIELD_NAME,
-		];
-
-		$block = [
-			'context' => [
-				BlockBindings::$context_name => $block_context,
-			],
-		];
-
-		$remote_value = BlockBindings::get_value( $source_args, $block, 'content' );
-		$this->assertSame( $remote_value, '123' );
-	}
-
-	public function test_get_value_with_fallback_content_attribute(): void {
-		$block = [
-			'attributes' => [
-				'content' => 'Fallback Content',
-			],
-		];
-
-		$remote_value = BlockBindings::get_value( [ 'field' => 'non_existent' ], $block, 'content' );
-		$this->assertSame( $remote_value, 'Fallback Content' );
-	}
-
-	public function test_get_value_with_non_string_fallback_content_attribute(): void {
-		$block = [
-			'attributes' => [
-				'content' => 123,
-			],
-		];
-
-		$remote_value = BlockBindings::get_value( [ 'field' => 'non_existent' ], $block, 'content' );
-		$this->assertSame( $remote_value, '123' );
-	}
-
-	public function test_get_value_with_null_fallback_content_attribute(): void {
-		$block = [
-			'attributes' => [
-				'content' => null,
-			],
-		];
-
-		$remote_value = BlockBindings::get_value( [ 'field' => 'non_existent' ], $block, 'content' );
-		$this->assertNull( $remote_value );
-	}
-
-	public function test_get_value_with_fallback_url_attribute(): void {
-		$block = [
-			'attributes' => [
-				'content' => 'Fallback Content',
-				'url' => 'https://example.com/hello-world',
-			],
-		];
-
-		$remote_value = BlockBindings::get_value( [ 'field' => 'non_existent' ], $block, 'url' );
-		$this->assertSame( $remote_value, 'https://example.com/hello-world' );
-	}
-
-	public function test_get_value_with_non_string_fallback_url_attribute(): void {
-		$block = [
-			'attributes' => [
-				'content' => 'Fallback Content',
-				'url' => 123,
-			],
-		];
-
-		$remote_value = BlockBindings::get_value( [ 'field' => 'non_existent' ], $block, 'url' );
-		$this->assertSame( $remote_value, '123' );
-	}
-
-	public function test_get_value_with_null_fallback_url_attribute(): void {
-		$block = [
-			'attributes' => [
-				'content' => 'Fallback Content',
-				'url' => null,
-			],
-		];
-
-		$remote_value = BlockBindings::get_value( [ 'field' => 'non_existent' ], $block, 'url' );
-		$this->assertNull( $remote_value );
-	}
-
-	public function test_get_value_with_fallback_results_context(): void {
-		$block = [
-			'context' => [
-				BlockBindings::$context_name => [
-					'blockName' => self::MOCK_BLOCK_NAME,
-					'queryInput' => [],
-					'results' => [
-						[
-							'result' => [
-								self::MOCK_OUTPUT_FIELD_NAME => 'Stored Output Value',
-							],
-						],
-					],
-				],
-			],
-		];
-
-		$remote_value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'content' );
-		$this->assertSame( $remote_value, 'Stored Output Value' );
-	}
-
-	public function test_get_value_with_non_string_fallback_results_context(): void {
-		$block = [
-			'context' => [
-				BlockBindings::$context_name => [
-					'blockName' => self::MOCK_BLOCK_NAME,
-					'queryInput' => [],
-					'results' => [
-						[
-							'result' => [
-								self::MOCK_OUTPUT_FIELD_NAME => 456,
-							],
-						],
-					],
-				],
-			],
-		];
-
-		$remote_value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'content' );
-		$this->assertSame( $remote_value, '456' );
-	}
-
-	public function test_get_value_with_null_fallback_results_context(): void {
-		$block = [
-			'context' => [
-				BlockBindings::$context_name => [
-					'blockName' => self::MOCK_BLOCK_NAME,
-					'queryInput' => [],
-					'results' => [
-						[
-							'result' => [
-								self::MOCK_OUTPUT_FIELD_NAME => null,
-							],
-						],
-					],
-				],
-			],
-		];
-
-		$remote_value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'content' );
-		$this->assertNull( $remote_value );
 	}
 }
