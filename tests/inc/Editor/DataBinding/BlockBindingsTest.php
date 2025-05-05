@@ -252,43 +252,15 @@ class BlockBindingsTest extends TestCase {
 		$mock_qr->addResult( 'output_field', 'Test Output Value' );
 
 		$block = [
-			'context' => [
-				BlockBindings::$context_name => [
-					'blockName' => self::MOCK_BLOCK_NAME,
-					'queryInput' => [
-						'test_input_field' => 'test_value',
-						'another_input_field' => 'another_value',
-					],
-				],
-			],
+			'context' => $this->create_block_context( [
+				'test_input_field' => 'test_value',
+				'another_input_field' => 'another_value',
+			] ),
 		];
 
-		$input_schema = [
-			'test_input_field' => [
-				'name' => 'Test Input Field',
-				'type' => 'string',
-			],
-			'another_input_field' => [
-				'name' => 'Another Input Field',
-				'type' => 'string',
-			],
-		];
+		$mock_block_config = $this->create_mock_block_config( $mock_qr );
 
-		$mock_block_config = [
-			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
-					'input_schema' => $input_schema,
-					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
-					'query_runner' => $mock_qr,
-				] ),
-			],
-		];
-
-		$mock_config_store = Mockery::namedMock( ConfigStore::class );
-		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
+		$this->create_mock_config_store( $mock_block_config );
 
 		$value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'content' );
 
@@ -321,41 +293,16 @@ class BlockBindingsTest extends TestCase {
 		$mock_qr->addResult( 'output_field', 'Test Output Value' );
 
 		$block = [
-			'context' => [
-				BlockBindings::$context_name => [
-					'blockName' => self::MOCK_BLOCK_NAME,
-					'queryInput' => [
-						'test_input_field' => 'test_value',
-					],
-					'enabledOverrides' => [ 'test_input_field_override' ],
-				],
-			],
+			'context' => $this->create_block_context( [
+				'test_input_field' => 'test_value',
+			], [ 'test_input_field_override' ] ),
 		];
 
-		$input_schema = [
-			'test_input_field' => [
-				'name' => 'Test Input Field',
-				'type' => 'string',
-			],
-		];
-
-		$mock_block_config = [
-			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
-					'input_schema' => $input_schema,
-					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
-					'query_runner' => $mock_qr,
-				] ),
-			],
-		];
+		$mock_block_config = $this->create_mock_block_config( $mock_qr );
 
 		MockWordPressFunctions::add_mock_filter( 'remote_data_blocks_query_input_variables', [ 'test_input_field' => 'override_value' ] );
 
-		$mock_config_store = Mockery::namedMock( ConfigStore::class );
-		$mock_config_store->shouldReceive( 'get_block_configuration' )
-			->once()
-			->with( self::MOCK_BLOCK_NAME )
-			->andReturn( $mock_block_config );
+		$this->create_mock_config_store( $mock_block_config );
 
 		$value = BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'content' );
 		$this->assertSame( 'Test Output Value', $value );
