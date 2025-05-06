@@ -1,9 +1,7 @@
 name: Update AI documentation
 
 on:
-  push:
-    branches:
-      - trunk
+  workflow_dispatch:
 
 jobs:
   generate-ai-docs:
