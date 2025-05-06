@@ -14,6 +14,7 @@
   ],
   "scripts": {
     "build": "npm run cmd:build && npm run build:examples",
+    "build:docs:ai": "npx repomix --include='docs/**/*.md,example/**' --ignore='docs/for-ai.md' --style=markdown --output='docs/for-ai.md'",
     "build:examples": "EXAMPLE=airtable/leaflet-map npm run cmd:build:example",
     "check-types": "tsc --noEmit",
     "cmd:build": "wp-scripts build --experimental-modules",
