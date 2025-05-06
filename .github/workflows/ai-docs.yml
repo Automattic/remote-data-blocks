@@ -1,6 +1,9 @@
-name: Generate AI Documentation
+name: Update AI documentation
 
-on: workflow_dispatch
+on:
+  push:
+    branches:
+      - trunk
 
 jobs:
   generate-ai-docs:
@@ -12,30 +15,30 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Install repomix
-        run: npm install -g repomix@v0.2
-
       - name: Generate AI documentation
-        run: repomix --style=markdown docs/ example/ -o docs/ai.md
+        run: npm run build:docs:ai
 
       - name: Check for changes
         id: git-check
         run: |
-          git add docs/ai.md
-          git diff --staged --quiet docs/ai.md || echo "changes=true" >> $GITHUB_OUTPUT
+          git add docs/for-ai.md
+          git diff --staged --quiet docs/for-ai.md || echo "changes=true" >> $GITHUB_OUTPUT
 
       - name: Commit changes
         if: steps.git-check.outputs.changes == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_BRANCH: 'update/for-ai-${{ github.run_id }}'
+          TRUNK_BRANCH: 'trunk'
         run: |
+          git switch -c "$PR_BRANCH"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git commit -m "Docs: update AI documentation" docs/ai.md
-          git push
+          git commit -m "Update `docs/for-ai.md` with the latest documentation and examples" docs/for-ai.md
+          gh pr create -B "$TRUNK_BRANCH" -H "$PR_BRANCH" --title 'Update `docs/for-ai.md`' --body 'Update `docs/for-ai.md` with the latest documentation and examples.' --label 'documentation' --reviewer '@Automattic/vip-cafe'
