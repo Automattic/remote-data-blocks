@@ -40,5 +40,6 @@ jobs:
           git switch -c "$PR_BRANCH"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git commit -m "Update \`docs/for-ai.md\` with the latest documentation and examples" docs/for-ai.md
-          gh pr create -B "$TRUNK_BRANCH" -H "$PR_BRANCH" --title "Update \`docs/for-ai.md\`" --body "Update \`docs/for-ai.md\` with the latest documentation and examples." --label "documentation" --reviewer "@Automattic/vip-cafe"
+          git commit -m "Update docs/for-ai.md with the latest documentation and examples" docs/for-ai.md
+          git push --set-upstream origin "$PR_BRANCH"
+          gh pr create -B "$TRUNK_BRANCH" -H "$PR_BRANCH" --title "Update docs/for-ai.md" --body "Update docs/for-ai.md with the latest documentation and examples." --label "documentation" --reviewer "@Automattic/vip-cafe"
