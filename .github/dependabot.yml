@@ -1,13 +1,13 @@
+# yaml-language-server: $schema=https://json.schemastore.org/dependabot-2.0.json
 version: 2
 updates:
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
       interval: 'weekly'
-    open-pull-requests-limit: 10
-    update-types:
-      - 'minor'
-      - 'security'
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-patch']
     groups:
       wordpress:
         patterns:
@@ -17,6 +17,6 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
-    update-types:
-      - 'minor'
-      - 'security'
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-patch']
