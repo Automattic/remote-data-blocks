@@ -4,4 +4,4 @@ vendor
 *.php
 package-lock.json
 package.json
-docs/ai.md
+docs/for-ai.md
