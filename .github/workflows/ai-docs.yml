@@ -42,4 +42,4 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git commit -m "Update docs/for-ai.md with the latest documentation and examples" docs/for-ai.md
           git push --set-upstream origin "$PR_BRANCH"
-          gh pr create -B "$TRUNK_BRANCH" -H "$PR_BRANCH" --title "Update docs/for-ai.md" --body "Update docs/for-ai.md with the latest documentation and examples." --label "documentation" --reviewer "@Automattic/vip-cafe"
+          gh pr create -B "$TRUNK_BRANCH" -H "$PR_BRANCH" --title "Update docs/for-ai.md" --body "Update docs/for-ai.md with the latest documentation and examples." --label "documentation"
