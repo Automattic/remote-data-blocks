@@ -5,6 +5,9 @@ updates:
     schedule:
       interval: 'weekly'
     open-pull-requests-limit: 10
+    update-types:
+      - 'minor'
+      - 'security'
     groups:
       wordpress:
         patterns:
@@ -14,3 +17,6 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
+    update-types:
+      - 'minor'
+      - 'security'
