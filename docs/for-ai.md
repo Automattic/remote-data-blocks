@@ -1,4 +1,4 @@
-This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+This file is a merged representation of a subset of the codebase, containing specifically included files and files not matching ignore patterns, combined into a single document by Repomix.
 
 # File Summary
 
@@ -12,6 +12,7 @@ The content is organized as follows:
 1. This summary section
 2. Repository information
 3. Directory structure
+4. Repository files (if enabled)
 4. Multiple file entries, each consisting of:
   a. A header with the file path (## File: path/to/file)
   b. The full contents of the file in a code block
@@ -27,6 +28,8 @@ The content is organized as follows:
 ## Notes
 - Some files may have been excluded based on .gitignore rules and Repomix's configuration
 - Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Only files matching these patterns are included: docs/**/*.md, example/**
+- Files matching these patterns are excluded: docs/for-ai.md
 - Files matching patterns in .gitignore are excluded
 - Files matching default ignore patterns are excluded
 - Files are sorted by Git change count (files with more changes are at the bottom)
@@ -35,94 +38,96 @@ The content is organized as follows:
 
 # Directory Structure
 ```
-airtable/
-  events/
-    README.md
-    register.php
-  leaflet-map/
-    build/
-      blocks/
-        leaflet-map/
-          block.json
-          index.asset.php
-          index.js
-          render.php
-          view.asset.php
-          view.js
-    src/
-      blocks/
-        leaflet-map/
-          block.json
-          edit.js
-          index.js
-          render.php
-          view.js
-    README.md
-    register.php
-    webpack.config.js
-concepts/
-  block-bindings.md
-  field-shortcodes.md
-  helper-blocks.md
+docs/
+  concepts/
+    block-bindings.md
+    field-shortcodes.md
+    helper-blocks.md
+    index.md
+  extending/
+    block-patterns.md
+    block-registration.md
+    data-source.md
+    hooks.md
+    index.md
+    overrides.md
+    query-output_schema.md
+    query-runner.md
+    query.md
+  tutorials/
+    airtable.md
+    google-sheets.md
+    http.md
+    index.md
+    shopify.md
   index.md
-extending/
-  block-patterns.md
-  block-registration.md
-  data-source.md
-  hooks.md
-  index.md
-  overrides.md
-  query-output_schema.md
-  query-runner.md
-  query.md
-github/
-  markdown-file/
-    inc/
-      patterns/
-        file-render.html
-    github-query-runner.php
-    markdown-links.php
+  local-development.md
+  quickstart.md
+  releasing.md
+  troubleshooting.md
+example/
+  airtable/
+    events/
+      README.md
+      register.php
+    leaflet-map/
+      build/
+        blocks/
+          leaflet-map/
+            block.json
+            index.asset.php
+            index.js
+            render.php
+            view.asset.php
+            view.js
+      src/
+        blocks/
+          leaflet-map/
+            block.json
+            edit.js
+            index.js
+            render.php
+            view.js
+      README.md
+      register.php
+      webpack.config.js
+  github/
+    markdown-file/
+      inc/
+        patterns/
+          file-render.html
+      github-query-runner.php
+      markdown-links.php
+      README.md
+      register.php
+  google-sheets/
+    westeros-houses/
+      README.md
+      register.php
     README.md
-    register.php
-google-sheets/
-  westeros-houses/
+  rest-api/
+    art-institute/
+      art-institute.php
+      README.md
+    zip-code/
+      README.md
+      zip-code.php
+  shopify/
+    product/
+      README.md
+      register.php
+  theme/
+    functions.php
     README.md
-    register.php
+    style-remote-data-blocks.css
+    style.css
+    theme.json
   README.md
-rest-api/
-  art-institute/
-    art-institute.php
-    README.md
-  zip-code/
-    README.md
-    zip-code.php
-shopify/
-  product/
-    README.md
-    register.php
-theme/
-  functions.php
-  README.md
-  style-remote-data-blocks.css
-  style.css
-  theme.json
-tutorials/
-  airtable.md
-  google-sheets.md
-  http.md
-  index.md
-  shopify.md
-index.md
-local-development.md
-quickstart.md
-README.md
-releasing.md
-troubleshooting.md
 ```
 
 # Files
 
-## File: concepts/block-bindings.md
+## File: docs/concepts/block-bindings.md
 ````markdown
 # Block bindings
 
@@ -135,7 +140,7 @@ For a quick overview, the [announcement post](https://make.wordpress.org/core/20
 But if you want to dig deeper into the internals of how Remote Data Blocks works, the [public documentation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-bindings/) is available.
 ````
 
-## File: concepts/field-shortcodes.md
+## File: docs/concepts/field-shortcodes.md
 ````markdown
 # Field shortcodes
 
@@ -152,7 +157,7 @@ Clicking this button will open a modal that allows you to select a field from a 
 Field shortcodes compile to HTML, so they are portable, safe, and have a built-in fallback.
 ````
 
-## File: concepts/helper-blocks.md
+## File: docs/concepts/helper-blocks.md
 ````markdown
 # Helper Blocks
 
@@ -196,7 +201,7 @@ register_remote_data_block( [
 ```
 ````
 
-## File: concepts/index.md
+## File: docs/concepts/index.md
 ````markdown
 # Core concepts
 
@@ -296,7 +301,7 @@ The plugin supports both synced and unsynced patterns.
 If you want to understand the internals of Remote Data Blocks so that you can extend its functionality, head over to the [extending guide](../extending/index.md).
 ````
 
-## File: extending/block-patterns.md
+## File: docs/extending/block-patterns.md
 ````markdown
 # Block patterns
 
@@ -343,7 +348,7 @@ register_remote_data_block( [
 ```
 ````
 
-## File: extending/block-registration.md
+## File: docs/extending/block-registration.md
 ````markdown
 # Block registration
 
@@ -487,7 +492,7 @@ Here you can see the `search` input variable has a special type of `ui:search_in
 [Block patterns](./block-patterns.md) allow you to customize the display of your remote data.
 ````
 
-## File: extending/data-source.md
+## File: docs/extending/data-source.md
 ````markdown
 # Data source
 
@@ -568,7 +573,7 @@ class WebDavFilesDataSource implements DataSourceInterface {
 ```
 ````
 
-## File: extending/hooks.md
+## File: docs/extending/hooks.md
 ````markdown
 # Hooks
 
@@ -712,7 +717,7 @@ add_filter( 'remote_data_blocks_query_response_metadata', 'custom_query_response
 ```
 ````
 
-## File: extending/index.md
+## File: docs/extending/index.md
 ````markdown
 # Extending
 
@@ -758,7 +763,7 @@ The [examples](https://github.com/Automattic/remote-data-blocks/blob/trunk/examp
 This repository includes tools for quickly starting a [local development environment](../local-development.md).
 ````
 
-## File: extending/overrides.md
+## File: docs/extending/overrides.md
 ````markdown
 # Overrides
 
@@ -814,7 +819,7 @@ The `overrides` property in the block registration array enables a panel in the 
 <img width="276" alt="An overrides panel in a remote data block settings panel" src="https://github.com/user-attachments/assets/e701e621-99f9-4c2e-b34d-cfef352af2ae" />
 ````
 
-## File: extending/query-output_schema.md
+## File: docs/extending/query-output_schema.md
 ````markdown
 # Query `output_schema` property
 
@@ -1022,7 +1027,7 @@ If we wanted to go further and pull out more data from each item, the schema cou
 In this example you can see that `$` in the path is redfined to be the specifc entry in the collection. Similarly the `$response_data` variable contains just this single entry.
 ````
 
-## File: extending/query-runner.md
+## File: docs/extending/query-runner.md
 ````markdown
 # Query runner
 
@@ -1061,7 +1066,7 @@ The `get_response_metadata` method returns the response metadata for the query, 
 If your API uses a non-HTTP transport or you want full control over query execution, you should implement your own query that implements `QueryInterface` and provides a custom `execute` method.
 ````
 
-## File: extending/query.md
+## File: docs/extending/query.md
 ````markdown
 # Query
 
@@ -1393,7 +1398,7 @@ If you need to pre-process the response in some way before the output variables 
 Use the `query_runner` property to provide a custom [query runner](./query-runner.md) for the query. If omitted, the query will use the default query runner, which works well with most HTTP-powered APIs.
 ````
 
-## File: tutorials/airtable.md
+## File: docs/tutorials/airtable.md
 ````markdown
 # Create an Airtable remote data block
 
@@ -1443,7 +1448,7 @@ You can also configure Airtable integrations with code. These integrations appea
 This [working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/airtable/events) will replicate what we've done in this tutorial.
 ````
 
-## File: tutorials/google-sheets.md
+## File: docs/tutorials/google-sheets.md
 ````markdown
 # Create a Google Sheets remote data block
 
@@ -1500,7 +1505,7 @@ You can also configure Google Sheets integrations with code. These integrations 
 This [working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/google-sheets/westeros-houses) will replicate what we've done in this tutorial.
 ````
 
-## File: tutorials/http.md
+## File: docs/tutorials/http.md
 ````markdown
 # Create a remote data block using an HTTP data source
 
@@ -1564,7 +1569,7 @@ You can also configure HTTP integrations with code. These integrations appear in
 This [working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/rest-api/zip-code) will replicate what we've done in this tutorial.
 ````
 
-## File: tutorials/index.md
+## File: docs/tutorials/index.md
 ````markdown
 # Tutorials
 
@@ -1576,7 +1581,7 @@ This section will guide you through configuring data sources in the plugin UI an
 - [Shopify](shopify.md)
 ````
 
-## File: tutorials/shopify.md
+## File: docs/tutorials/shopify.md
 ````markdown
 # Create a Shopify remote data block
 
@@ -1625,7 +1630,7 @@ You can also configure Shopify integrations with code. These integrations appear
 This [working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/shopify/product) will replicate what we've done in this tutorial.
 ````
 
-## File: index.md
+## File: docs/index.md
 ````markdown
 # Documentation
 
@@ -1669,7 +1674,7 @@ For plugin overview and getting started guide, see [README](../README.md).
 - [Code of Conduct](https://make.wordpress.org/handbook/community-code-of-conduct/)
 ````
 
-## File: local-development.md
+## File: docs/local-development.md
 ````markdown
 # Local Development
 
@@ -1750,7 +1755,7 @@ npm run playground
 Playgrounds do not closely mirror production environments and are missing persistent object cache, debugging tools, and other important features. Use `npm run dev` for local development.
 ````
 
-## File: quickstart.md
+## File: docs/quickstart.md
 ````markdown
 # Quickstart
 
@@ -1783,7 +1788,7 @@ Try making changes to the configuration. For example, rename the block in the `r
 Go to the page where you want to use the block and add the block to the page. Click `Provide manual input`, enter a US ZIP code and then hit save. Then, choose a pattern to use to display the data on the page.
 ````
 
-## File: releasing.md
+## File: docs/releasing.md
 ````markdown
 # Releasing
 
@@ -1801,7 +1806,7 @@ Remote Data Blocks uses [Semantic Versioning](https://semver.org/).
 The release process from there is automated using GitHub Actions and will publish a new release on GitHub if the version has changed.
 ````
 
-## File: troubleshooting.md
+## File: docs/troubleshooting.md
 ````markdown
 # Troubleshooting and debugging
 
@@ -1829,7 +1834,7 @@ npm run wp-cli option delete remote_data_blocks_config
 ```
 ````
 
-## File: airtable/events/README.md
+## File: example/airtable/events/README.md
 ````markdown
 # Example: "Event Planning" Airtable blocks
 
@@ -1838,7 +1843,7 @@ This example registers remote data blocks for an Airtable base that contains inf
 For most use cases, you can register these blocks [without writing any code](../../../docs/tutorials/airtable.md). However, if you want to customize the block output or behavior, registering these blocks in code can give you more flexibility.
 ````
 
-## File: airtable/events/register.php
+## File: example/airtable/events/register.php
 ````php
 <?php declare(strict_types = 1);
 
@@ -1914,7 +1919,7 @@ function register_airtable_events_block(): void {
 add_action( 'init', __NAMESPACE__ . '\\register_airtable_events_block' );
 ````
 
-## File: airtable/leaflet-map/build/blocks/leaflet-map/block.json
+## File: example/airtable/leaflet-map/build/blocks/leaflet-map/block.json
 ````json
 {
   "$schema": "https://schemas.wp.org/trunk/block.json",
@@ -1947,17 +1952,17 @@ add_action( 'init', __NAMESPACE__ . '\\register_airtable_events_block' );
 }
 ````
 
-## File: airtable/leaflet-map/build/blocks/leaflet-map/index.asset.php
+## File: example/airtable/leaflet-map/build/blocks/leaflet-map/index.asset.php
 ````php
 <?php return array('dependencies' => array('wp-blocks', 'wp-dom-ready', 'wp-element', 'wp-server-side-render'), 'version' => '5d1f10b97d60c293e33d');
 ````
 
-## File: airtable/leaflet-map/build/blocks/leaflet-map/index.js
+## File: example/airtable/leaflet-map/build/blocks/leaflet-map/index.js
 ````javascript
 (()=>{"use strict";var e={955:(e,t,a)=>{a.d(t,{Y:()=>o});const r=window.wp.domReady;function o(e){e.forEach((e=>{const t=e?.dataset.mapCoordinates??"";let a=[];try{a=JSON.parse(t)??[]}catch(e){}delete e.dataset.mapCoordinates;const r=leaflet.map(e).setView([a[0].x,a[0].y],25),o=leaflet.layerGroup().addTo(r);leaflet.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:4}).addTo(r),a.filter((e=>e.x&&e.y)).forEach((e=>{leaflet.marker([e.x,e.y],{title:e.name}).addTo(o)})),r.flyTo([a[0].x,a[0].y])}))}a.n(r)()((()=>{o(document.querySelectorAll(".wp-block-example-leaflet-map[data-map-coordinates]"))}))}},t={};function a(r){var o=t[r];if(void 0!==o)return o.exports;var l=t[r]={exports:{}};return e[r](l,l.exports,a),l.exports}a.n=e=>{var t=e&&e.__esModule?()=>e.default:()=>e;return a.d(t,{a:t}),t},a.d=(e,t)=>{for(var r in t)a.o(t,r)&&!a.o(e,r)&&Object.defineProperty(e,r,{enumerable:!0,get:t[r]})},a.o=(e,t)=>Object.prototype.hasOwnProperty.call(e,t);const r=window.wp.blocks,o=JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"example/leaflet-map","version":"1.0.0","title":"Leaflet Map","category":"widgets","icon":"location-alt","example":{},"supports":{"html":false},"textdomain":"remote-data-blocks-examples","editorScript":["file:./index.js","leaflet-script"],"editorStyle":["leaflet-style"],"render":"file:./render.php","viewScript":["file:./view.js","leaflet-script"],"viewStyle":["leaflet-style"]}'),l=window.wp.element,n=window.wp.serverSideRender;var s=a.n(n),c=a(955);(0,r.registerBlockType)(o.name,{...o,edit:function(){return(0,l.useEffect)((()=>{const e=document.querySelector('iframe[name="editor-canvas"]')?.contentDocument??document,t=setInterval((()=>{const a=e.querySelector(".wp-block-example-leaflet-map[data-map-coordinates]");a&&((0,c.Y)([a]),clearInterval(t))}),100);return()=>clearInterval(t)}),[]),React.createElement(s(),{block:o.name})},save:()=>null})})();
 ````
 
-## File: airtable/leaflet-map/build/blocks/leaflet-map/render.php
+## File: example/airtable/leaflet-map/build/blocks/leaflet-map/render.php
 ````php
 <?php declare(strict_types = 1);
 
@@ -2038,17 +2043,17 @@ if ( ! is_wp_error( $response ) ) {
 </div>
 ````
 
-## File: airtable/leaflet-map/build/blocks/leaflet-map/view.asset.php
+## File: example/airtable/leaflet-map/build/blocks/leaflet-map/view.asset.php
 ````php
 <?php return array('dependencies' => array('wp-dom-ready'), 'version' => '5f60017d131145c81278');
 ````
 
-## File: airtable/leaflet-map/build/blocks/leaflet-map/view.js
+## File: example/airtable/leaflet-map/build/blocks/leaflet-map/view.js
 ````javascript
 (()=>{"use strict";var e={n:t=>{var a=t&&t.__esModule?()=>t.default:()=>t;return e.d(a,{a}),a},d:(t,a)=>{for(var o in a)e.o(a,o)&&!e.o(t,o)&&Object.defineProperty(t,o,{enumerable:!0,get:a[o]})},o:(e,t)=>Object.prototype.hasOwnProperty.call(e,t)};const t=window.wp.domReady;e.n(t)()((()=>{document.querySelectorAll(".wp-block-example-leaflet-map[data-map-coordinates]").forEach((e=>{const t=e?.dataset.mapCoordinates??"";let a=[];try{a=JSON.parse(t)??[]}catch(e){}delete e.dataset.mapCoordinates;const o=leaflet.map(e).setView([a[0].x,a[0].y],25),r=leaflet.layerGroup().addTo(o);leaflet.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:4}).addTo(o),a.filter((e=>e.x&&e.y)).forEach((e=>{leaflet.marker([e.x,e.y],{title:e.name}).addTo(r)})),o.flyTo([a[0].x,a[0].y])}))}))})();
 ````
 
-## File: airtable/leaflet-map/src/blocks/leaflet-map/block.json
+## File: example/airtable/leaflet-map/src/blocks/leaflet-map/block.json
 ````json
 {
   "$schema": "https://schemas.wp.org/trunk/block.json",
@@ -2071,7 +2076,7 @@ if ( ! is_wp_error( $response ) ) {
 }
 ````
 
-## File: airtable/leaflet-map/src/blocks/leaflet-map/edit.js
+## File: example/airtable/leaflet-map/src/blocks/leaflet-map/edit.js
 ````javascript
 import { useEffect } from '@wordpress/element';
 import ServerSideRender from '@wordpress/server-side-render';
@@ -2121,7 +2126,7 @@ export function Edit() {
 }
 ````
 
-## File: airtable/leaflet-map/src/blocks/leaflet-map/index.js
+## File: example/airtable/leaflet-map/src/blocks/leaflet-map/index.js
 ````javascript
 /**
  * Registers a new block provided a unique name and an object defining its behavior.
@@ -2143,7 +2148,7 @@ registerBlockType( metadata.name, {
 } );
 ````
 
-## File: airtable/leaflet-map/src/blocks/leaflet-map/render.php
+## File: example/airtable/leaflet-map/src/blocks/leaflet-map/render.php
 ````php
 <?php declare(strict_types = 1);
 
@@ -2224,7 +2229,7 @@ if ( ! is_wp_error( $response ) ) {
 </div>
 ````
 
-## File: airtable/leaflet-map/src/blocks/leaflet-map/view.js
+## File: example/airtable/leaflet-map/src/blocks/leaflet-map/view.js
 ````javascript
 import domReady from '@wordpress/dom-ready';
 
@@ -2264,7 +2269,7 @@ domReady( () => {
 } );
 ````
 
-## File: airtable/leaflet-map/README.md
+## File: example/airtable/leaflet-map/README.md
 ````markdown
 # Example: "Leaflet Map" block
 
@@ -2285,7 +2290,7 @@ Because the custom block uses JSX, it requires a build step, which is provided b
 If you copy this example code to your own repository, we recommend using [the `@wordpress/create-block` utility](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) to scaffold your custom block and configure the build step.
 ````
 
-## File: airtable/leaflet-map/register.php
+## File: example/airtable/leaflet-map/register.php
 ````php
 <?php declare(strict_types = 1);
 
@@ -2308,14 +2313,14 @@ function register_leaflet_map_block(): void {
 add_action( 'init', __NAMESPACE__ . '\\register_leaflet_map_block' );
 ````
 
-## File: airtable/leaflet-map/webpack.config.js
+## File: example/airtable/leaflet-map/webpack.config.js
 ````javascript
 const { modernize, moduleConfig, scriptConfig } = require( '../../../webpack.utils' );
 
 module.exports = [ modernize( scriptConfig ), modernize( moduleConfig ) ];
 ````
 
-## File: github/markdown-file/inc/patterns/file-render.html
+## File: example/github/markdown-file/inc/patterns/file-render.html
 ````html
 <!-- wp:group {"layout":{"type":"constrained"}} -->
 <div class="wp-block-group github-file-content">
@@ -2326,7 +2331,7 @@ module.exports = [ modernize( scriptConfig ), modernize( moduleConfig ) ];
 <!-- /wp:group -->
 ````
 
-## File: github/markdown-file/github-query-runner.php
+## File: example/github/markdown-file/github-query-runner.php
 ````php
 <?php declare(strict_types = 1);
 
@@ -2373,7 +2378,7 @@ class GitHubQueryRunner extends QueryRunner {
 }
 ````
 
-## File: github/markdown-file/markdown-links.php
+## File: example/github/markdown-file/markdown-links.php
 ````php
 <?php declare(strict_types = 1);
 
@@ -2489,7 +2494,7 @@ function adjust_markdown_file_path( string $path, string $current_file_path = ''
 }
 ````
 
-## File: github/markdown-file/README.md
+## File: example/github/markdown-file/README.md
 ````markdown
 # Example: "GitHub Markdown File" block
 
@@ -2504,7 +2509,7 @@ This plugin expects APIs to return JSON, but we instruct GitHub's API to return 
 The syntax for linking between Markdown files is different from the syntax for linking between HTML pages, so we use a `generate` function in the query's output schema to transform the HTML output and update the links. See `markdown-links.php` if you are interested in how that works.
 ````
 
-## File: github/markdown-file/register.php
+## File: example/github/markdown-file/register.php
 ````php
 <?php declare(strict_types = 1);
 
@@ -2669,7 +2674,7 @@ function handle_github_file_path_override(): void {
 add_action( 'init', __NAMESPACE__ . '\\handle_github_file_path_override' );
 ````
 
-## File: google-sheets/westeros-houses/README.md
+## File: example/google-sheets/westeros-houses/README.md
 ````markdown
 # Example: "Westeros Houses" blocks
 
@@ -2690,7 +2695,7 @@ Like the [Airtable Events example](../../airtable/events/README.md), you can reg
 4. Add some data to the sheet.
 ````
 
-## File: google-sheets/westeros-houses/register.php
+## File: example/google-sheets/westeros-houses/register.php
 ````php
 <?php declare(strict_types = 1);
 
@@ -2876,7 +2881,7 @@ function handle_westeros_house_override(): void {
 add_action( 'init', __NAMESPACE__ . '\\handle_westeros_house_override' );
 ````
 
-## File: google-sheets/README.md
+## File: example/google-sheets/README.md
 ````markdown
 # Westeros Houses Example Setup
 
@@ -2895,7 +2900,7 @@ Follow following setup steps to get the Westeros Houses example working:
 Now the blocks with name `Westeros House` and `Westeros Houses List` should be available in the editor.
 ````
 
-## File: rest-api/art-institute/art-institute.php
+## File: example/rest-api/art-institute/art-institute.php
 ````php
 <?php declare(strict_types = 1);
 
@@ -3130,7 +3135,7 @@ function register_aic_block(): void {
 add_action( 'init', __NAMESPACE__ . '\\register_aic_block' );
 ````
 
-## File: rest-api/art-institute/README.md
+## File: example/rest-api/art-institute/README.md
 ````markdown
 # Example: "Art Institute of Chicago" block
 
@@ -3139,7 +3144,7 @@ This example plugin registers a remote data block representing an artwork from t
 To enable it, simply copy the art-institute.php file to your plugins folder and activate it. This will expose a new custom block called `Art Institute of Chicago`
 ````
 
-## File: rest-api/zip-code/README.md
+## File: example/rest-api/zip-code/README.md
 ````markdown
 # Example: "Zip Code" block
 
@@ -3152,7 +3157,7 @@ This example illustrates this approach, and assumes you have configured the data
 To enable it, simply copy the zipcode.php file to your plugins folder, replace the UUID, and activate it. This will expose a new custom block called `Zip Code'
 ````
 
-## File: rest-api/zip-code/zip-code.php
+## File: example/rest-api/zip-code/zip-code.php
 ````php
 <?php declare(strict_types = 1);
 
@@ -3227,7 +3232,7 @@ function register_zipcode_block(): void {
 add_action( 'init', __NAMESPACE__ . '\\register_zipcode_block' );
 ````
 
-## File: shopify/product/README.md
+## File: example/shopify/product/README.md
 ````markdown
 # Example: "Shopify Product" block
 
@@ -3236,7 +3241,7 @@ This example a registers remote data block representing a product from a Shopify
 Like the [Airtable Events example](../../airtable/events/README.md), you can register these blocks [without writing any code](../../../docs/tutorials/shopify.md). However, if you want to customize the block output or behavior, registering this block in code can give you more flexibility.
 ````
 
-## File: shopify/product/register.php
+## File: example/shopify/product/register.php
 ````php
 <?php declare(strict_types = 1);
 
@@ -3267,7 +3272,7 @@ function register_shopify_block(): void {
 add_action( 'init', __NAMESPACE__ . '\\register_shopify_block' );
 ````
 
-## File: theme/functions.php
+## File: example/theme/functions.php
 ````php
 <?php declare(strict_types = 1);
 
@@ -3295,14 +3300,14 @@ add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\\remote_data_blocks_example_
 add_action( 'enqueue_block_assets', __NAMESPACE__ . '\\remote_data_blocks_example_theme_enqueue_block_styles', 15, 0 );
 ````
 
-## File: theme/README.md
+## File: example/theme/README.md
 ````markdown
 # Remote Data Blocks Example Theme
 
 This folder contains a simple example theme that provides custom styling of Remote Data Blocks via a `theme.json` file. It is a child theme of `twentytwentyfour` and delegates all rendering to the parent theme.
 ````
 
-## File: theme/style-remote-data-blocks.css
+## File: example/theme/style-remote-data-blocks.css
 ````css
 /**
  * This file may also contain CSS overrides that are difficult or impossible to
@@ -3322,7 +3327,7 @@ This folder contains a simple example theme that provides custom styling of Remo
 }
 ````
 
-## File: theme/style.css
+## File: example/theme/style.css
 ````css
 /*!
  * Theme Name:        Remote Data Blocks Example Theme
@@ -3341,7 +3346,7 @@ This folder contains a simple example theme that provides custom styling of Remo
 /* This file is not enqueued and exists only to provide the theme manifest. */
 ````
 
-## File: theme/theme.json
+## File: example/theme/theme.json
 ````json
 {
   "$schema": "https://schemas.wp.org/trunk/theme.json",
@@ -3452,7 +3457,7 @@ This folder contains a simple example theme that provides custom styling of Remo
 }
 ````
 
-## File: README.md
+## File: example/README.md
 ````markdown
 # Example code
 
