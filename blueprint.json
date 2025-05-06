@@ -32,7 +32,7 @@
       "pluginData": {
         "caption": "Installing Remote Data Blocks",
         "resource": "url",
-        "url": "https://github-proxy.com/proxy/?repo=Automattic/remote-data-blocks&release=latest&asset=remote-data-blocks.zip"
+        "url": "https://wordpress-playground.atomicsites.blog/plugin-proxy.php?repo=Automattic/remote-data-blocks&name=remote-data-blocks.zip"
       }
     }
   ]
