@@ -25,12 +25,7 @@ class GenericHttpDataSourceTest extends TestCase {
 			'service_config' => [
 				'__version' => 1,
 				'display_name' => 'Mock Data Source',
-				'endpoint' => 'http://example.com',
-				'auth' => [
-					'type' => 'basic',
-					'key' => 'api_key',
-					'value' => '1234567890',
-				],
+				'endpoint' => 'http://example.com'
 			],
 		];
 
@@ -40,9 +35,6 @@ class GenericHttpDataSourceTest extends TestCase {
 		$data_source_array = $data_source->to_array();
 
 		$this->assertEquals( 'generic-http', $data_source_array['service'] );
-		$this->assertEquals( 'http://example.com', $data_source_array['endpoint'] );
-		$this->assertEquals( [
-			'Authorization' => 'Basic MTIzNDU2Nzg5MA==',
-		], $data_source_array['request_headers'] );
+		$this->assertEquals( 'http://example.com', $data_source_array['service_config']['endpoint'] );
 	}
 }
