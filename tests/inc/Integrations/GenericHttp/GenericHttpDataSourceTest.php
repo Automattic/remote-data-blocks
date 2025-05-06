@@ -25,7 +25,7 @@ class GenericHttpDataSourceTest extends TestCase {
 			'service_config' => [
 				'__version' => 1,
 				'display_name' => 'Mock Data Source',
-				'endpoint' => 'http://example.com'
+				'endpoint' => 'http://example.com',
 			],
 		];
 
