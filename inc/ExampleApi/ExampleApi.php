@@ -114,13 +114,13 @@ class ExampleApi {
 
 		register_remote_data_block( [
 			'title' => self::$block_title,
-			'render_query' => [
-				'query' => $get_record_query,
+			'queries' => [
+				'display' => $get_record_query,
+				'list' => $get_table_query,
 			],
-			'selection_queries' => [
-				[
-					'query' => $get_table_query,
-					'type' => 'list',
+			'query_configurations' => [
+				'display' => [
+					'source_query' => 'list',
 				],
 			],
 		] );

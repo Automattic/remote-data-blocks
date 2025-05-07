@@ -86,12 +86,12 @@ final class ConfigSchemas {
 					] )
 				)
 			),
-			'render_query' => Types::object( [
+			'render_query' => Types::nullable(Types::object( [
 				'query' => Types::one_of(
 					Types::instance_of( QueryInterface::class ),
 					Types::serialized_config_for( HttpQueryInterface::class ),
 				),
-			] ),
+			] ) ),
 			'selection_queries' => Types::nullable(
 				Types::list_of(
 					Types::object( [
@@ -104,6 +104,21 @@ final class ConfigSchemas {
 							ConfigRegistry::LIST_QUERY_KEY,
 							ConfigRegistry::SEARCH_QUERY_KEY
 						),
+					] )
+				)
+			),
+			'queries' => Types::nullable( Types::record(
+				Types::string(),
+				Types::one_of(
+					Types::instance_of( QueryInterface::class ),
+					Types::serialized_config_for( HttpQueryInterface::class ),
+				)
+			) ),
+			'query_configurations' => Types::nullable(
+				Types::record(
+					Types::string(),
+					Types::object( [
+						'source_query' => Types::string(),
 					] )
 				)
 			),

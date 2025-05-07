@@ -48,7 +48,20 @@ class ConfigRegistry {
 			return self::create_error( $block_title, sprintf( 'Block %s has already been registered', $block_name ) );
 		}
 
-		$display_query = self::inflate_query( $user_config[ self::RENDER_QUERY_KEY ]['query'] );
+		$display_query = null;
+
+		// Throw an error if the display query isn't set.
+		if ( ! isset( $user_config['queries']['display'] ) ) {
+			return self::create_error( $block_title, 'The display query is required' );
+		}
+
+		$display_query = self::inflate_query( $user_config['queries']['display'] );
+
+		// Initialize the queries array with the display query.
+		$queries = [
+			self::DISPLAY_QUERY_KEY => $display_query,
+		];
+
 		$input_schema = $display_query->get_input_schema();
 		$output_schema = $display_query->get_output_schema();
 		$is_collection = true === ( $output_schema['is_collection'] ?? false );
@@ -70,9 +83,7 @@ class ConfigRegistry {
 			'name' => $block_name,
 			'overrides' => $user_config['overrides'] ?? [],
 			'patterns' => [],
-			'queries' => [
-				self::DISPLAY_QUERY_KEY => $display_query,
-			],
+			'queries' => $queries,
 			'selectors' => [
 				[
 					'image_url' => $display_query->get_image_url(),
@@ -85,9 +96,42 @@ class ConfigRegistry {
 			'title' => $block_title,
 		];
 
+		// Add any additional queries to the queries array.
+		foreach ( $user_config['queries'] as $query_key => $query ) {
+			// The display query is already added to the queries array.
+			if ( self::DISPLAY_QUERY_KEY === $query_key ) {
+				continue;
+			}
+
+			$query = self::inflate_query( $query );
+			$queries[ $query_key ] = $query;
+
+			// Check if this query is configured as a source for another query.
+			foreach ( $user_config['query_configurations'] ?? [] as $target_key => $target_config ) {
+				if ( $target_config['source_query'] === $query_key ) {
+
+					// ToDo: Add in the input validation check.
+					array_unshift(
+						$config['selectors'],
+						[
+							'image_url' => $query->get_image_url(),
+							'inputs' => self::map_input_variables( $query->get_input_schema() ),
+							'name' => ucfirst( $query_key ),
+							'query_key' => $query_key,
+							'type' => 'search',
+						]
+					);
+					break;
+				}
+			}
+		}
+
+		// set the queries on the config.
+		$config['queries'] = $queries;
+
 		// Register "selectors" which allow the user to use a query to assist in
 		// selecting data for display by the block.
-		foreach ( $user_config[ self::SELECTION_QUERIES_KEY ] ?? [] as $selection_query ) {
+/* 		foreach ( $user_config[ self::SELECTION_QUERIES_KEY ] ?? [] as $selection_query ) {
 			$from_query = self::inflate_query( $selection_query['query'] );
 			$from_query_type = $selection_query['type'];
 			$to_query = $display_query;
@@ -124,7 +168,7 @@ class ConfigRegistry {
 					'type' => $from_query_type,
 				]
 			);
-		}
+		} */
 
 		// Register patterns which can be used with the block.
 		foreach ( $user_config['patterns'] ?? [] as $pattern ) {

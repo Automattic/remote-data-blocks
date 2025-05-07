@@ -204,28 +204,20 @@ function register_aic_block(): void {
 		],
 	]);
 
-	register_remote_data_block( [
-		'title' => 'Art Institute of Chicago Loop',
-		'icon' => 'art',
-		'instructions' => 'This block displays a set amount of artworks based on the provided limit.',
-		'render_query' => [
-			'query' => $collection_query,
-			'loop' => true,
-		],
-	] );
-
 	register_remote_data_block([
 		'title' => 'Art Institute of Chicago',
 		'icon' => 'art',
-		'render_query' => [
-			'query' => $get_art_query,
+		'instructions' => 'This block displays a set amount of artworks based on the provided limit. This could be 1, or many.',
+		'queries' => [
+			'display' => $get_art_query,
+			'collection' => $collection_query,
+			'search' => $search_art_query,
 		],
-		'selection_queries' => [
-			[
-				'query' => $search_art_query,
-				'type' => 'search',
+		'query_configurations' => [
+			'display' => [
+				'source_query' => 'search',
 			],
 		],
-	]);
+	] );
 }
 add_action( 'init', __NAMESPACE__ . '\\register_aic_block' );
