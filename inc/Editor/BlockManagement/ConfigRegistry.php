@@ -54,15 +54,17 @@ class ConfigRegistry {
 		foreach ( $user_config['queries'] as $query_key => $query ) {
 			$query = self::inflate_query( $query );
 			$queries[ $query_key ] = $query;
+			$input_schema = $query->get_input_schema();
+			$output_schema = $query->get_output_schema();
+
 			if ( self::DISPLAY_QUERY_KEY === $query_key ) {
-				$input_schema = $query->get_input_schema();
-				$output_schema = $query->get_output_schema();
 				$is_collection = true === ( $output_schema['is_collection'] ?? false );
 				$has_required_variables = array_reduce(
 					array_column( $input_schema, 'required' ),
 					fn( $carry, $required ) => $carry || ( $required ?? true ),
 					false
 				);
+
 				$selectors[] = [
 					'image_url' => $query->get_image_url(),
 					'inputs' => self::map_input_variables( $input_schema ),
@@ -76,12 +78,12 @@ class ConfigRegistry {
 				foreach ( $user_config['query_configurations'] ?? [] as $target_key => $target_config ) {
 					if ( $target_config['source_query'] === $query_key ) {
 						$source_query_found = true;
-						// ToDo: Add in the input validation check.
+
 						array_unshift(
 							$selectors,
 							[
 								'image_url' => $query->get_image_url(),
-								'inputs' => self::map_input_variables( $query->get_input_schema() ),
+								'inputs' => self::map_input_variables( $input_schema ),
 								'name' => ucfirst( $query_key ),
 								'query_key' => $query_key,
 								'type' => 'search',
@@ -93,17 +95,16 @@ class ConfigRegistry {
 
 				// if source_query_found is false, it means we have another display query without a source query. We need to generate a selector for it.
 				if ( ! $source_query_found ) {
-					$input_schema = $query->get_input_schema();
-					$output_schema = $query->get_output_schema();
 					$is_collection = true === ( $output_schema['is_collection'] ?? false );
 					$has_required_variables = array_reduce(
 						array_column( $input_schema, 'required' ),
 						fn( $carry, $required ) => $carry || ( $required ?? true ),
 						false
 					);
+
 					$selectors[] = [
 						'image_url' => $query->get_image_url(),
-						'inputs' => self::map_input_variables( $query->get_input_schema() ),
+						'inputs' => self::map_input_variables( $input_schema ),
 						'name' => ucfirst( $query_key ),
 						'query_key' => $query_key,
 						'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
@@ -124,47 +125,6 @@ class ConfigRegistry {
 			'title' => $block_title,
 		];
 
-		// Register "selectors" which allow the user to use a query to assist in
-		// selecting data for display by the block.
-/* 		foreach ( $user_config[ self::SELECTION_QUERIES_KEY ] ?? [] as $selection_query ) {
-			$from_query = self::inflate_query( $selection_query['query'] );
-			$from_query_type = $selection_query['type'];
-			$to_query = $display_query;
-
-			$config['queries'][ $from_query::class ] = $from_query;
-
-			$from_input_schema = $from_query->get_input_schema();
-			$from_output_schema = $from_query->get_output_schema();
-
-			foreach ( array_keys( $to_query->get_input_schema() ) as $to ) {
-				if ( ! isset( $from_output_schema['type'][ $to ] ) ) {
-					return self::create_error( $block_title, sprintf( 'Cannot map key "%1$s" from %2$s query. The display query for this block requires a "%1$s" key as an input, but it is not present in the output schema for the %2$s query. Try adding a "%1$s" mapping to the output schema for the %2$s query.', esc_html( $to ), $from_query_type ) );
-				}
-			}
-
-			if ( self::SEARCH_QUERY_KEY === $from_query_type ) {
-				$search_input_count = count( array_filter( $from_input_schema, function ( array $input_var ): bool {
-					return 'ui:search_input' === $input_var['type'];
-				} ) );
-
-				if ( 1 !== $search_input_count ) {
-					return self::create_error( $block_title, 'A search query must have one input variable with type "ui:search_input"' );
-				}
-			}
-
-			// Add the selector to the configuration.
-			array_unshift(
-				$config['selectors'],
-				[
-					'image_url' => $from_query->get_image_url(),
-					'inputs' => self::map_input_variables( $input_schema ),
-					'name' => $selection_query['display_name'] ?? ucfirst( $from_query_type ),
-					'query_key' => $from_query::class,
-					'type' => $from_query_type,
-				]
-			);
-		} */
-
 		// Register patterns which can be used with the block.
 		foreach ( $user_config['patterns'] ?? [] as $pattern ) {
 			$parsed_blocks = parse_blocks( $pattern['html'] );
@@ -181,6 +141,27 @@ class ConfigRegistry {
 		}
 
 		ConfigStore::set_block_configuration( $block_name, $config );
+
+		return true;
+	}
+
+	// ToDo: The source query is the from query, and the target query is the to query when calling this. So, the display query is the to query and the source query for the data is the from query. The from query's key is the from_query_key.
+	private static function validate_query_mapping( array $to_query_input_schema, array $from_query_output_schema, string $block_title, string $from_query_key ): WP_Error|bool {
+		foreach ( array_keys( $to_query_input_schema ) as $to ) {
+			if ( ! isset( $from_query_output_schema['type'][ $to ] ) ) {
+				return self::create_error( $block_title, sprintf( 'Cannot map key "%1$s" from %2$s query. The display query for this block requires a "%1$s" key as an input, but it is not present in the output schema for the %2$s query. Try adding a "%1$s" mapping to the output schema for the %2$s query.', esc_html( $to ), $from_query_key ) );
+			}
+		}
+
+		if ( self::SEARCH_QUERY_KEY === $from_query_key ) {
+			$search_input_count = count( array_filter( $to_query_input_schema, function ( array $input_var ): bool {
+				return 'ui:search_input' === $input_var['type'];
+			} ) );
+
+			if ( 1 !== $search_input_count ) {
+				return self::create_error( $block_title, 'A search query must have one input variable with type "ui:search_input"' );
+			}
+		}
 
 		return true;
 	}
