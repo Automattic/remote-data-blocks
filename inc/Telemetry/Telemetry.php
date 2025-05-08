@@ -119,7 +119,7 @@ class Telemetry {
 			// Both fallback blocks show up as no-results, so we need to check the mode attribute to figure out which variation it is.
 			if ( 'no-results' === $match ) {
 				// The error mode attribute is present in the Error block variation.
-				$is_error_block = str_contains( $matches[0][ $index ], 'error' );
+				$is_error_block = str_contains( $matches[0][ $index ] ?? '', 'error' );
 				if ( $is_error_block ) {
 					$track_props['error_fallback_block_count'] = ( $track_props['error_fallback_block_count'] ?? 0 ) + 1;
 				} else {
