@@ -1,6 +1,13 @@
-import { BlockPattern, InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import {
+	BlockEditorStoreSelectors,
+	BlockPattern,
+	InspectorControls,
+	store as blockEditorStore,
+	useBlockProps,
+} from '@wordpress/block-editor';
 import { BlockEditProps } from '@wordpress/blocks';
 import { Spinner } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
 import { QueryInputsPanel } from './components/panels/QueryInputsPanel';
@@ -42,6 +49,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 		queryKey: DISPLAY_QUERY_KEY,
 	} );
 
+	const { hasMultiSelection } = useSelect< BlockEditorStoreSelectors >( blockEditorStore );
 	const [ showPatternSelection, setShowPatternSelection ] = useState< boolean >( false );
 
 	function refreshRemoteData(): void {
@@ -119,23 +127,25 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 
 	return (
 		<>
-			<InspectorControls>
-				<OverridesPanel
-					blockConfig={ blockConfig }
-					remoteData={ data }
-					updateRemoteData={ updateRemoteData }
-				/>
-				<DataPanel
-					refreshRemoteData={ refreshRemoteData }
-					remoteData={ data }
-					resetRemoteData={ resetRemoteData }
-				/>
-				<QueryInputsPanel
-					onUpdateQueryInputs={ onUpdateQueryInputs }
-					remoteData={ data }
-					selectors={ blockConfig.selectors }
-				/>
-			</InspectorControls>
+			{ ! hasMultiSelection() && (
+				<InspectorControls>
+					<OverridesPanel
+						blockConfig={ blockConfig }
+						remoteData={ data }
+						updateRemoteData={ updateRemoteData }
+					/>
+					<DataPanel
+						refreshRemoteData={ refreshRemoteData }
+						remoteData={ data }
+						resetRemoteData={ resetRemoteData }
+					/>
+					<QueryInputsPanel
+						onUpdateQueryInputs={ onUpdateQueryInputs }
+						remoteData={ data }
+						selectors={ blockConfig.selectors }
+					/>
+				</InspectorControls>
+			) }
 
 			<div { ...blockProps }>
 				{ loading && (

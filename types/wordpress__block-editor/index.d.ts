@@ -48,5 +48,6 @@ declare module '@wordpress/block-editor' {
 		getBlocksByName: ( name: string ) => string[];
 		getPatternsByBlockTypes: ( name: string | string[], clientId?: string ) => BlockPattern[];
 		getSettings: () => EditorSettings;
+		hasMultiSelection: () => boolean;
 	}
 }

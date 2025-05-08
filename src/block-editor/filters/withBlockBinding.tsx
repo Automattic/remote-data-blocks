@@ -1,7 +1,12 @@
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	BlockEditorStoreSelectors,
+	InspectorControls,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { BlockConfiguration, BlockEditProps } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 
 import { BlockBindingControls } from '@/blocks/remote-data-container/components/BlockBindingControls';
@@ -102,9 +107,15 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 		const { remoteData } = useRemoteDataContext( context );
 		const availableBindings = getBlockAvailableBindings( remoteData?.blockName ?? '' );
 		const hasAvailableBindings = Boolean( Object.keys( availableBindings ).length );
+		const { hasMultiSelection } = useSelect< BlockEditorStoreSelectors >( blockEditorStore );
 
 		// If the block does not have a remote data context, render it as usual.
 		if ( ! remoteData || ! hasAvailableBindings ) {
+			return <BlockEdit { ...props } />;
+		}
+
+		// If multiple blocks are being selected, render it as usual.
+		if ( hasMultiSelection() ) {
 			return <BlockEdit { ...props } />;
 		}
 
