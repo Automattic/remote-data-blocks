@@ -5,6 +5,8 @@ namespace RemoteDataBlocks\Telemetry;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use WP_Post;
 
+use function parse_blocks;
+
 defined( 'ABSPATH' ) || exit();
 
 /**
@@ -92,19 +94,20 @@ class Telemetry {
 	 * @param WP_Post $post Post object.
 	 */
 	public function track_remote_data_blocks_usage( int $post_id, WP_Post $post ): void {
+		// Skip if the post is a revision or autosave.
 		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
 			return;
 		}
 
+		// Skip if the post is not being published.
 		$post_status = $post->post_status;
 		if ( 'publish' !== $post_status ) {
 			return;
 		}
 
-		// Regular expression to match all remote data blocks present in the post content.
-		$reg_exp = '/<!--\s{1}wp:remote-data-blocks\/([^\s]+)\s.*?-->/';
-		preg_match_all( $reg_exp, $post->post_content, $matches );
-		if ( count( $matches[1] ) === 0 ) {
+		// Parse the post content into blocks, and skip if there are no blocks.
+		$blocks = parse_blocks( $post->post_content );
+		if ( empty( $blocks ) ) {
 			return;
 		}
 
@@ -114,24 +117,15 @@ class Telemetry {
 			'post_type' => $post->post_type,
 		];
 
-		foreach ( $matches[1] as $index => $match ) {
-
-			// Both fallback blocks show up as no-results, so we need to check the mode attribute to figure out which variation it is.
-			if ( 'no-results' === $match ) {
-				// The error mode attribute is present in the Error block variation.
-				$is_error_block = str_contains( $matches[0][ $index ] ?? '', 'error' );
-				if ( $is_error_block ) {
-					$track_props['error_fallback_block_count'] = ( $track_props['error_fallback_block_count'] ?? 0 ) + 1;
-				} else {
-					$track_props['no_results_fallback_block_count'] = ( $track_props['no_results_fallback_block_count'] ?? 0 ) + 1;
-				}
-
-				$track_props['remote_data_blocks_fallback_block_count'] = ( $track_props['remote_data_blocks_fallback_block_count'] ?? 0 ) + 1;
-
+		// This is done this way, to do a one pass processing of the blocks.
+		foreach ( $blocks as $block ) {
+			// Skip blocks that are not remote data blocks, or don't have the blockName set.
+			if ( ! isset( $block['blockName'] ) || ! str_starts_with( $block['blockName'], 'remote-data-blocks/' ) ) {
 				continue;
 			}
 
-			$data_source_type = ConfigStore::get_data_source_type( 'remote-data-blocks/' . $match );
+			// Skip blocks that don't have a data source type set like code-configured, etc.
+			$data_source_type = ConfigStore::get_data_source_type( $block['blockName'] );
 			if ( ! $data_source_type ) {
 				continue;
 			}
@@ -140,6 +134,23 @@ class Telemetry {
 			$key = $data_source_type . '_data_source_count';
 			$track_props[ $key ] = ( $track_props[ $key ] ?? 0 ) + 1;
 			$track_props['remote_data_blocks_total_count'] = ( $track_props['remote_data_blocks_total_count'] ?? 0 ) + 1;
+
+			// Calculate the stats of the fallback blocks.
+			if ( $block['innerBlocks'] && count( $block['innerBlocks'] ) > 0 ) {
+				foreach ( $block['innerBlocks'] as $inner_block ) {
+					// The only fallback block is the no-results block, as the error block is a variation.
+					if ( 'remote-data-blocks/no-results' !== $inner_block['blockName'] ) {
+						continue;
+					}
+
+					// check if the mode attribute is set to "error" as that means it's the error block.
+					if ( 'error' === ( $inner_block['attrs']['mode'] ?? '' ) ) {
+						$track_props['error_fallback_block_count'] = ( $track_props['error_fallback_block_count'] ?? 0 ) + 1;
+					} else {
+						$track_props['no_results_fallback_block_count'] = ( $track_props['no_results_fallback_block_count'] ?? 0 ) + 1;
+					}
+				}
+			}
 		}
 
 		$this->record_event( 'blocks_usage_stats', $track_props );

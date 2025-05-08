@@ -6,7 +6,6 @@ import { Edit } from './edit';
 import { Save } from './save';
 import './style.scss';
 
-// @ts-expect-error - WordPress registerBlockType type definition does not include variations even though this is the right way to do it.
 registerBlockType< RemoteDataNoResultsBlockAttributes >( metadata.name, {
 	edit: Edit,
 	icon: {
