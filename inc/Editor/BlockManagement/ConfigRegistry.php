@@ -48,34 +48,70 @@ class ConfigRegistry {
 			return self::create_error( $block_title, sprintf( 'Block %s has already been registered', $block_name ) );
 		}
 
-		$display_query = null;
+		$queries = [];
+		$selectors = [];
 
-		// Throw an error if the display query isn't set.
-		if ( ! isset( $user_config['queries']['display'] ) ) {
-			return self::create_error( $block_title, 'The display query is required' );
+		foreach ( $user_config['queries'] as $query_key => $query ) {
+			$query = self::inflate_query( $query );
+			$queries[ $query_key ] = $query;
+			if ( self::DISPLAY_QUERY_KEY === $query_key ) {
+				$input_schema = $query->get_input_schema();
+				$output_schema = $query->get_output_schema();
+				$is_collection = true === ( $output_schema['is_collection'] ?? false );
+				$has_required_variables = array_reduce(
+					array_column( $input_schema, 'required' ),
+					fn( $carry, $required ) => $carry || ( $required ?? true ),
+					false
+				);
+				$selectors[] = [
+					'image_url' => $query->get_image_url(),
+					'inputs' => self::map_input_variables( $input_schema ),
+					'name' => $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ),
+					'query_key' => self::DISPLAY_QUERY_KEY,
+					'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
+				];
+			} else {
+				$source_query_found = false;
+				// Check if this query is configured as a source for another query.
+				foreach ( $user_config['query_configurations'] ?? [] as $target_key => $target_config ) {
+					if ( $target_config['source_query'] === $query_key ) {
+						$source_query_found = true;
+						// ToDo: Add in the input validation check.
+						array_unshift(
+							$selectors,
+							[
+								'image_url' => $query->get_image_url(),
+								'inputs' => self::map_input_variables( $query->get_input_schema() ),
+								'name' => ucfirst( $query_key ),
+								'query_key' => $query_key,
+								'type' => 'search',
+							]
+						);
+						break;
+					}
+				}
+
+				// if source_query_found is false, it means we have another display query without a source query. We need to generate a selector for it.
+				if ( ! $source_query_found ) {
+					$input_schema = $query->get_input_schema();
+					$output_schema = $query->get_output_schema();
+					$is_collection = true === ( $output_schema['is_collection'] ?? false );
+					$has_required_variables = array_reduce(
+						array_column( $input_schema, 'required' ),
+						fn( $carry, $required ) => $carry || ( $required ?? true ),
+						false
+					);
+					$selectors[] = [
+						'image_url' => $query->get_image_url(),
+						'inputs' => self::map_input_variables( $query->get_input_schema() ),
+						'name' => ucfirst( $query_key ),
+						'query_key' => $query_key,
+						'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
+					];
+				}
+			}
 		}
 
-		$display_query = self::inflate_query( $user_config['queries']['display'] );
-
-		// Initialize the queries array with the display query.
-		$queries = [
-			self::DISPLAY_QUERY_KEY => $display_query,
-		];
-
-		$input_schema = $display_query->get_input_schema();
-		$output_schema = $display_query->get_output_schema();
-		$is_collection = true === ( $output_schema['is_collection'] ?? false );
-
-		// Check if any variables are required
-		$has_required_variables = array_reduce(
-			array_column( $input_schema, 'required' ),
-			fn( $carry, $required ) => $carry || ( $required ?? true ),
-			false
-		);
-
-		// Build the base configuration for the block. This is our own internal
-		// configuration, not what will be passed to WordPress's register_block_type.
-		// @see BlockRegistration::register_block_type::register_blocks.
 		$config = [
 			'description' => '',
 			'icon' => $user_config['icon'] ?? 'cloud',
@@ -84,50 +120,9 @@ class ConfigRegistry {
 			'overrides' => $user_config['overrides'] ?? [],
 			'patterns' => [],
 			'queries' => $queries,
-			'selectors' => [
-				[
-					'image_url' => $display_query->get_image_url(),
-					'inputs' => self::map_input_variables( $input_schema ),
-					'name' => $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ),
-					'query_key' => self::DISPLAY_QUERY_KEY,
-					'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
-				],
-			],
+			'selectors' => $selectors,
 			'title' => $block_title,
 		];
-
-		// Add any additional queries to the queries array.
-		foreach ( $user_config['queries'] as $query_key => $query ) {
-			// The display query is already added to the queries array.
-			if ( self::DISPLAY_QUERY_KEY === $query_key ) {
-				continue;
-			}
-
-			$query = self::inflate_query( $query );
-			$queries[ $query_key ] = $query;
-
-			// Check if this query is configured as a source for another query.
-			foreach ( $user_config['query_configurations'] ?? [] as $target_key => $target_config ) {
-				if ( $target_config['source_query'] === $query_key ) {
-
-					// ToDo: Add in the input validation check.
-					array_unshift(
-						$config['selectors'],
-						[
-							'image_url' => $query->get_image_url(),
-							'inputs' => self::map_input_variables( $query->get_input_schema() ),
-							'name' => ucfirst( $query_key ),
-							'query_key' => $query_key,
-							'type' => 'search',
-						]
-					);
-					break;
-				}
-			}
-		}
-
-		// set the queries on the config.
-		$config['queries'] = $queries;
 
 		// Register "selectors" which allow the user to use a query to assist in
 		// selecting data for display by the block.
