@@ -102,7 +102,7 @@ class Telemetry {
 		}
 
 		// Regular expression to match all remote data blocks present in the post content.
-		$reg_exp = '/<!--\s{1}wp:remote-data-blocks\/([^\s]+)\s/';
+		$reg_exp = '/<!--\s{1}wp:remote-data-blocks\/([^\s]+)\s.*?-->/';
 		preg_match_all( $reg_exp, $post->post_content, $matches );
 		if ( count( $matches[1] ) === 0 ) {
 			return;
@@ -113,7 +113,24 @@ class Telemetry {
 			'post_status' => $post_status,
 			'post_type' => $post->post_type,
 		];
-		foreach ( $matches[1] as $match ) {
+
+		foreach ( $matches[1] as $index => $match ) {
+
+			// Both fallback blocks show up as no-results, so we need to check the mode attribute to figure out which variation it is.
+			if ( 'no-results' === $match ) {
+				// The error mode attribute is present in the Error block variation.
+				$is_error_block = str_contains( $matches[0][ $index ], 'error' );
+				if ( $is_error_block ) {
+					$track_props['error_fallback_block_count'] = ( $track_props['error_fallback_block_count'] ?? 0 ) + 1;
+				} else {
+					$track_props['no_results_fallback_block_count'] = ( $track_props['no_results_fallback_block_count'] ?? 0 ) + 1;
+				}
+
+				$track_props['remote_data_blocks_fallback_block_count'] = ( $track_props['remote_data_blocks_fallback_block_count'] ?? 0 ) + 1;
+
+				continue;
+			}
+
 			$data_source_type = ConfigStore::get_data_source_type( 'remote-data-blocks/' . $match );
 			if ( ! $data_source_type ) {
 				continue;
