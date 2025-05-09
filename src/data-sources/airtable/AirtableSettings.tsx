@@ -52,7 +52,7 @@ export const AirtableSettings = ( {
 		state.access_token ?? '',
 		userId ?? ''
 	);
-	const { fetchingTables, tables, tablesError } = useAirtableApiTables(
+	const { tables, tablesError } = useAirtableApiTables(
 		state.access_token ?? '',
 		state.base?.id ?? ''
 	);
@@ -145,7 +145,7 @@ export const AirtableSettings = ( {
 	const shouldAllowSubmit =
 		bases !== null && tables !== null && Boolean( state.base ) && Boolean( selectedTables?.length );
 
-	let basesHelpText: React.ReactNode = 'Select a base from which to fetch data.';
+	let basesHelpText: React.ReactNode = 'Select an Airtable base.';
 	if ( userId ) {
 		if ( basesError ) {
 			basesHelpText = __(
@@ -158,19 +158,17 @@ export const AirtableSettings = ( {
 		}
 	}
 
-	let tablesHelpText: string = __( 'Auto-filled on valid base.', 'remote-data-blocks' );
+	let tablesHelpText: string = __( 'Fetching tables...', 'remote-data-blocks' );
 	if ( bases?.length && state.base ) {
 		if ( tablesError ) {
 			tablesHelpText = __(
 				'Failed to fetch tables. Please check that your access token has the `schema.tables:read` Scope.',
 				'remote-data-blocks'
 			);
-		} else if ( fetchingTables ) {
-			tablesHelpText = __( 'Fetching tables...', 'remote-data-blocks' );
 		} else if ( ! tables?.length ) {
 			tablesHelpText = __( 'No tables found', 'remote-data-blocks' );
 		} else {
-			tablesHelpText = __( 'Select tables to attach with this data source.', 'remote-data-blocks' );
+			tablesHelpText = __( 'Select one or more tables.', 'remote-data-blocks' );
 		}
 	}
 

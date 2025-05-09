@@ -35,14 +35,43 @@ export const GOOGLE_SHEETS_API_SCOPES = [
  */
 export const HTTP_SOURCE_AUTH_TYPE_SELECT_OPTIONS: SelectOption< HttpAuthTypes >[] = [
 	{ label: __( 'None', 'remote-data-blocks' ), value: 'none' },
-	{ label: __( 'Bearer', 'remote-data-blocks' ), value: 'bearer' },
 	{ label: __( 'Basic', 'remote-data-blocks' ), value: 'basic' },
-	{ label: __( 'API Key', 'remote-data-blocks' ), value: 'api-key' },
+	{ label: __( 'Bearer', 'remote-data-blocks' ), value: 'bearer' },
+	{ label: __( 'Custom', 'remote-data-blocks' ), value: 'api-key' },
 ];
 export const HTTP_SOURCE_ADD_TO_SELECT_OPTIONS: SelectOption< HttpApiKeyDestination >[] = [
-	{ label: __( 'Header', 'remote-data-blocks' ), value: 'header' },
-	{ label: __( 'Query Params', 'remote-data-blocks' ), value: 'queryparams' },
+	{ label: __( 'HTTP header', 'remote-data-blocks' ), value: 'header' },
+	{ label: __( 'Query parameter', 'remote-data-blocks' ), value: 'queryparams' },
 ];
+
+/**
+ * Data source component labels
+ */
+export const HTTP_SOURCE_AUTH_VALUE_LABELS: Record< HttpAuthTypes, string > = {
+	'api-key': __( 'Value', 'remote-data-blocks' ),
+	basic: __( 'Credentials', 'remote-data-blocks' ),
+	bearer: __( 'Bearer token', 'remote-data-blocks' ),
+	none: __( 'Ignored', 'remote-data-blocks' ),
+};
+
+/**
+ * Data source component help text
+ */
+export const HTTP_SOURCE_AUTH_TYPE_HELP_TEXT: Record< HttpAuthTypes, string > = {
+	basic: __( 'The credentials will be sent in an Authorization header.', 'remote-data-blocks' ),
+	'api-key': __( 'Construct a custom HTTP header or query parameter.', 'remote-data-blocks' ),
+	bearer: __( 'The bearer token will be sent in an Authorization header.', 'remote-data-blocks' ),
+	none: __( 'No authentication required.', 'remote-data-blocks' ),
+};
+export const HTTP_SOURCE_AUTH_VALUE_HELP_TEXT: Record< HttpAuthTypes, string > = {
+	'api-key': __( 'The value of the HTTP header or query parameter.', 'remote-data-blocks' ),
+	basic: __(
+		'The credentials are usually a string in the format “username:password”. The string will be base64-encoded and prepended with “Basic” by this plugin.',
+		'remote-data-blocks'
+	),
+	bearer: __( 'The token will be prepended with “Bearer” by this plugin.', 'remote-data-blocks' ),
+	none: __( 'Ignored', 'remote-data-blocks' ),
+};
 
 export enum ConfigSource {
 	CODE = 'code',

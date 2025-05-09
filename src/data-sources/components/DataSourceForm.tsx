@@ -3,10 +3,10 @@ import {
 	ExternalLink,
 	Icon,
 	IconType,
+	ToggleControl,
 	VisuallyHidden,
 	__experimentalInputControl as InputControl,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
-	ToggleControl,
 } from '@wordpress/components';
 import { Children, createPortal, isValidElement, useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -286,12 +286,15 @@ const DataSourceFormSetup = ( {
 						) }
 					</span>
 				) : (
-					<>{ __( 'Setup' ) }</>
+					<>{ __( 'Configuration', 'remote-data-blocks' ) }</>
 				)
 			}
 			subheading={
 				screen === 'editDataSource'
-					? __( 'Manage the source’s visibility and connection details.', 'remote-data-blocks' )
+					? __(
+							'Manage the data source’s connection details and configuration.',
+							'remote-data-blocks'
+					  )
 					: undefined
 			}
 		>
@@ -302,13 +305,7 @@ const DataSourceFormSetup = ( {
 				className={ `rdb-settings-page_data-source-form-input ${
 					errors.displayName ? 'has-error' : ''
 				}   ` }
-				help={
-					<span>
-						{ errors.displayName
-							? errors.displayName
-							: __( 'Only visible to you and other site managers. ', 'remote-data-blocks' ) }
-					</span>
-				}
+				help={ errors.displayName }
 				label={ __( 'Data Source Name' ) }
 				onChange={ onDisplayNameChange }
 				onBlur={ validateDisplayName }
@@ -341,7 +338,7 @@ const DataSourceFormScope = ( {
 		<DataSourceFormStep
 			heading={ __( 'Scope' ) }
 			subheading={ __(
-				`Choose what data should be pulled from ${ service ?? 'your data source' } to your site.`
+				`Choose which data should be pulled from ${ service ?? 'your data source' }.`
 			) }
 			{ ...props }
 		>
@@ -362,10 +359,10 @@ const DataSourceFormBlocks = ( {
 	};
 	return (
 		<DataSourceFormStep
-			heading={ __( 'Set up blocks' ) }
+			heading={ __( 'Blocks', 'remote-data-blocks' ) }
 			subheading={
 				<>
-					{ __( 'Enable or disable the auto-generation of remote data container blocks. ' ) }
+					{ __( 'Enable automatic registration of remote data blocks. ' ) }
 					<ExternalLink href="https://remotedatablocks.com/docs/extending/block-registration/">
 						{ __( 'Learn more', 'remote-data-blocks' ) }
 					</ExternalLink>
@@ -375,17 +372,24 @@ const DataSourceFormBlocks = ( {
 			<ToggleControl
 				checked={ hasEnabledBlocks }
 				help={
-					hasEnabledBlocks
-						? __(
-								'Turning this off will require you to implement your own configuration code in your site.',
+					hasEnabledBlocks ? (
+						<>
+							<strong>Recommended.</strong>{ ' ' }
+							{ __(
+								'Blocks and patterns will be registered based on your data source.',
 								'remote-data-blocks'
-						  )
-						: __(
-								'Turning this on will automatically generate blocks for your site.',
-								'remote-data-blocks'
-						  )
+							) }
+						</>
+					) : (
+						<>
+							{ __( 'Blocks must be registered with additional code.', 'remote-data-blocks' ) }{ ' ' }
+							<ExternalLink href="https://remotedatablocks.com/docs/extending/block-registration/">
+								Learn more
+							</ExternalLink>
+						</>
+					)
 				}
-				label={ __( 'Auto-generate blocks' ) }
+				label={ __( 'Auto-register blocks' ) }
 				onChange={ handleToggle }
 			/>
 		</DataSourceFormStep>
