@@ -49,6 +49,11 @@ class Telemetry {
 		];
 	}
 
+	/**
+	 * Set up tracking via WordPress hooks.
+	 *
+	 * @psalm-suppress UndefinedClass
+	 */
 	private function setup_tracking_via_hooks(): void {
 		// WordPress hooks.
 		add_action( 'activated_plugin', [ $this, 'track_plugin_activation' ], 10, 1 );
@@ -57,6 +62,11 @@ class Telemetry {
 
 		// Custom hook to allow other plugin code to track events
 		add_action( 'remote_data_blocks_track_event', [ $this, 'record_event' ], 10, 2 );
+
+		// Enable the Pendo JavaScript library for tracking.
+		if ( class_exists( 'Automattic\VIP\Telemetry\Pendo' ) ) {
+			add_action( 'admin_init', [ Automattic\VIP\Telemetry\Pendo::class, 'enable_javascript_library' ] );
+		}
 	}
 
 	/**
