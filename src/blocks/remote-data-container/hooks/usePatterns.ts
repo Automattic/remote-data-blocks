@@ -76,6 +76,9 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 			innerBlocks.push( createBlock( 'remote-data-blocks/pagination' ) );
 		}
 
+		// Add the no-results block with the empty mode.
+		innerBlocks.push( createBlock( 'remote-data-blocks/no-results', { mode: 'empty' } ) );
+
 		replaceInnerBlocks( rootClientId, innerBlocks ).catch( () => {} );
 	}
 
