@@ -1,9 +1,9 @@
 import { registerBlockType } from '@wordpress/blocks';
 
+import { SourceTypeIcon } from './SourceTypeIcon';
 import { Edit } from '@/blocks/remote-data-container/edit';
 import { Save } from '@/blocks/remote-data-container/save';
 import { getBlocksConfig } from '@/utils/localized-block-data';
-import { SourceTypeIcon } from './SourceTypeIcon';
 
 import './style.scss';
 
