@@ -24,7 +24,9 @@ interface SetValuesPayload< Context, Values > extends GetValuesPayload< Context,
 // Properly allow simplified block registration calls when register_block_type() is already called server-side.
 // Use a Partial<Block> to allow all attributes to be optional.
 // https://github.com/WordPress/gutenberg/issues/53605
-type ServerSideBlockConfiguration< T extends Record< string, any > = {} > = Partial< Block< T > > & {
+type ServerSideBlockConfiguration< T extends Record< string, any > = {} > = Partial<
+	Block< T >
+> & {
 	variations?: Array< BlockVariation< T > >;
 };
 
