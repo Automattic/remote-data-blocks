@@ -8,9 +8,14 @@ use RemoteDataBlocks\Editor\Assets\Assets;
 use RemoteDataBlocks\Telemetry\Telemetry;
 use RemoteDataBlocks\Editor\BlockPatterns\BlockPatterns;
 use RemoteDataBlocks\REST\RemoteDataController;
+use RemoteDataBlocks\Logging\Logger;
+use RemoteDataBlocks\Logging\LoggerInterface;
+
 use function register_block_type;
 
 class BlockRegistration {
+	private static LoggerInterface $logger;
+
 	/**
 	 * @var array<string, string>
 	 */
@@ -21,6 +26,8 @@ class BlockRegistration {
 	];
 
 	public static function init(): void {
+		self::$logger = new Logger();
+
 		add_action( 'init', [ __CLASS__, 'register_helper_blocks' ], 10, 0 );
 		add_action( 'init', [ __CLASS__, 'register_container_blocks' ], 50, 0 );
 		add_action( 'enqueue_block_editor_assets', [ __CLASS__, 'enqueue_block_assets' ], 10, 0 );
@@ -63,6 +70,14 @@ class BlockRegistration {
 
 		foreach ( ConfigStore::get_block_configurations() as $block_configuration ) {
 			$block_name = $block_configuration['name'];
+
+			// This is to prevent the legacy query configuration from causing errors.
+			// This does make it a breaking change for users who have not updated to the new query configuration.
+			// ToDo: Add a migration path for users who have not updated to the new query configuration.
+			if ( count( $block_configuration['queries'] ) === 0 ) {
+				self::$logger->warning( sprintf( 'Block %s has no queries and will not be registered', $block_name ) );
+				continue;
+			}
 
 			[ $config, $script_handle ] = self::register_block_configuration( $block_configuration );
 			$all_remote_block_configs[ $block_name ] = $config;
