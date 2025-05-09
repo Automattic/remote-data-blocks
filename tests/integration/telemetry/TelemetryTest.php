@@ -241,4 +241,57 @@ class TelemetryTest extends WP_UnitTestCase {
 		Telemetry::init( $this->plugin_path, $this->mock_telemetry );
 		do_action( 'save_post', $post_id, get_post( $post_id ) );
 	}
+
+	public function test_track_remote_data_blocks_usage_does_not_call_record_event_for_posts_without_remote_blocks(): void {
+		$post_id = $this->factory()->post->create( [
+			'post_status' => 'publish',
+			'post_type' => 'post',
+			'post_content' => '<!-- wp:paragraph -->
+<p>Regular content without remote data blocks</p>
+<!-- /wp:paragraph -->',
+		] );
+
+		$this->mock_telemetry
+			->expects( $this->never() )
+			->method( 'record_event' );
+
+		Telemetry::init( $this->plugin_path, $this->mock_telemetry );
+		do_action( 'save_post', $post_id, get_post( $post_id ) );
+	}
+
+	public function test_track_remote_data_blocks_usage_tracks_nested_remote_data_blocks(): void {
+		$post_id = $this->factory()->post->create( [
+			'post_status' => 'publish',
+			'post_type' => 'post',
+			'post_content' => '<!-- wp:remote-data-blocks/example -->
+<div class="wp-block-remote-data-blocks-example">
+	<!-- wp:remote-data-blocks/example -->
+	<div class="wp-block-remote-data-blocks-example"></div>
+	<!-- /wp:remote-data-blocks/example -->
+</div>
+<!-- /wp:remote-data-blocks/example -->',
+		] );
+
+		ConfigStore::set_block_configuration( 'remote-data-blocks/example', [
+			'queries' => [
+				'display' => MockQuery::create(),
+			],
+		] );
+
+		$this->mock_telemetry
+			->expects( $this->once() )
+			->method( 'record_event' )
+			->with(
+				'blocks_usage_stats',
+				$this->equalTo( [
+					'post_status' => 'publish',
+					'post_type' => 'post',
+					'remote_data_blocks_total_count' => 2,
+					'code-configured_data_source_count' => 2,
+				] ),
+			);
+
+		Telemetry::init( $this->plugin_path, $this->mock_telemetry );
+		do_action( 'save_post', $post_id, get_post( $post_id ) );
+	}
 }

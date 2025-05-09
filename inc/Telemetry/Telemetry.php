@@ -120,7 +120,10 @@ class Telemetry {
 		// Process blocks recursively
 		$this->process_blocks_recursively( $blocks, $track_props );
 
-		$this->record_event( 'blocks_usage_stats', $track_props );
+		// Only send event if we found remote data blocks
+		if ( ( $track_props['remote_data_blocks_total_count'] ?? 0 ) > 0 ) {
+			$this->record_event( 'blocks_usage_stats', $track_props );
+		}
 	}
 
 	/**
@@ -131,12 +134,13 @@ class Telemetry {
 	 */
 	private function process_blocks_recursively( array $blocks, array &$track_props ): void {
 		foreach ( $blocks as $block ) {
+			// Process inner blocks first if they exist
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$this->process_blocks_recursively( $block['innerBlocks'], $track_props );
+			}
+
 			// Skip blocks that are not remote data blocks, or don't have the blockName set.
 			if ( ! isset( $block['blockName'] ) || ! str_starts_with( $block['blockName'], 'remote-data-blocks/' ) ) {
-				// Process inner blocks if they exist
-				if ( ! empty( $block['innerBlocks'] ) ) {
-					$this->process_blocks_recursively( $block['innerBlocks'], $track_props );
-				}
 				continue;
 			}
 
