@@ -12,7 +12,8 @@
   "attributes": {
     "mode": {
       "enum": [ "empty", "error" ],
-      "default": "empty"
+      "default": "empty",
+      "type": "string"
     }
   },
   "supports": {

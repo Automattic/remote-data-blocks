@@ -77,11 +77,8 @@ class GoogleSheetsDataSource extends GenericHttpDataSource {
 
 			$response_data['values'] = array_map(
 				function ( $row, $index ) use ( $columns ) {
-					// If a sheets row has blank elements at the end of the row, it will
-					// return a shorter array and cause array_combine() to throw an error.
-					$row_padded = array_pad( $row, count( $columns ), '' );
-
-					$combined = array_combine( $columns, $row_padded );
+					$row = self::modify_row_to_match_columns( $row, $columns );
+					$combined = array_combine( $columns, $row );
 					$combined['RowId'] = $index + 1; // Add row_id field, starting from 1
 					return $combined;
 				},
@@ -110,11 +107,26 @@ class GoogleSheetsDataSource extends GenericHttpDataSource {
 
 			$raw_selected_row = $values[ $row_id - 1 ];
 			if ( is_array( $raw_selected_row ) ) {
+				$raw_selected_row = self::modify_row_to_match_columns( $raw_selected_row, $columns );
 				$selected_row = array_combine( $columns, $raw_selected_row );
 				$selected_row['RowId'] = $row_id;
 			}
 		}
 
 		return $selected_row;
+	}
+
+	private static function modify_row_to_match_columns( array $row, array $columns ): array {
+		if ( count( $row ) < count( $columns ) ) {
+			// If the selected row has fewer elements than the columns, pad the row with empty strings.
+			// This accounts for the case where more columns are added to the sheet, after it was mapped.
+			$row = array_pad( $row, count( $columns ), '' );
+		} elseif ( count( $row ) > count( $columns ) ) {
+			// If the selected row has more elements than the columns, slice the row to match the number of columns.
+			// This accounts for the case where columns are deleted from the sheet, after they were mapped.
+			$row = array_slice( $row, 0, count( $columns ) );
+		}
+
+		return $row;
 	}
 }
