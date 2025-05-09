@@ -171,6 +171,7 @@ final class ConfigSchemas {
 
 	private static function generate_http_query_config_schema(): array {
 		return Types::object( [
+			'query_name' => Types::nullable( Types::string() ),
 			'cache_ttl' => Types::nullable( Types::one_of( Types::callable(), Types::integer(), Types::null() ) ),
 			'data_source' => Types::one_of(
 				Types::instance_of( HttpDataSourceInterface::class ),

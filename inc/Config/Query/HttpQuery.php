@@ -96,6 +96,13 @@ class HttpQuery extends ArraySerializable implements HttpQueryInterface {
 	}
 
 	/**
+	 * Get the query name for this query.
+	 */
+	public function get_query_name(): ?string {
+		return $this->config['query_name'] ?? null;
+	}
+
+	/**
 	 * Get the output schema for this query.
 	 */
 	public function get_output_schema(): array {

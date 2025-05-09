@@ -38,6 +38,7 @@ interface BlockConfig {
 		inputs: InputVariable[];
 		name: string;
 		query_key: string;
+		display_name?: string;
 		type: string;
 	}[];
 	settings: {

@@ -66,6 +66,7 @@ class ConfigRegistry {
 				);
 
 				$selectors[] = [
+					'display_name' => $query->get_query_name(),
 					'image_url' => $query->get_image_url(),
 					'inputs' => self::map_input_variables( $input_schema ),
 					'name' => $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ),
@@ -82,6 +83,7 @@ class ConfigRegistry {
 						array_unshift(
 							$selectors,
 							[
+								'display_name' => $query->get_query_name(),
 								'image_url' => $query->get_image_url(),
 								'inputs' => self::map_input_variables( $input_schema ),
 								'name' => ucfirst( $query_key ),
@@ -103,6 +105,7 @@ class ConfigRegistry {
 					);
 
 					$selectors[] = [
+						'display_name' => $query->get_query_name(),
 						'image_url' => $query->get_image_url(),
 						'inputs' => self::map_input_variables( $input_schema ),
 						'name' => ucfirst( $query_key ),
