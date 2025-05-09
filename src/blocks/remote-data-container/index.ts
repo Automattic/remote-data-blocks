@@ -1,6 +1,5 @@
 import { registerBlockType } from '@wordpress/blocks';
 
-import { SourceTypeIcon } from './SourceTypeIcon';
 import { Edit } from '@/blocks/remote-data-container/edit';
 import { Save } from '@/blocks/remote-data-container/save';
 import { getBlocksConfig } from '@/utils/localized-block-data';
@@ -15,10 +14,6 @@ Object.values( getBlocksConfig() ).forEach( blockConfig => {
 			remoteData: {
 				type: 'object',
 			},
-		},
-		icon: {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-			src: SourceTypeIcon,
 		},
 		edit: Edit,
 		save: Save,
