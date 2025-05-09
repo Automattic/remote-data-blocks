@@ -117,10 +117,26 @@ class Telemetry {
 			'post_type' => $post->post_type,
 		];
 
-		// This is done this way, to do a one pass processing of the blocks.
+		// Process blocks recursively
+		$this->process_blocks_recursively( $blocks, $track_props );
+
+		$this->record_event( 'blocks_usage_stats', $track_props );
+	}
+
+	/**
+	 * Recursively process blocks to find and track Remote Data Blocks usage.
+	 *
+	 * @param array $blocks Array of blocks to process.
+	 * @param array $track_props Reference to tracking properties array to update.
+	 */
+	private function process_blocks_recursively( array $blocks, array &$track_props ): void {
 		foreach ( $blocks as $block ) {
 			// Skip blocks that are not remote data blocks, or don't have the blockName set.
 			if ( ! isset( $block['blockName'] ) || ! str_starts_with( $block['blockName'], 'remote-data-blocks/' ) ) {
+				// Process inner blocks if they exist
+				if ( ! empty( $block['innerBlocks'] ) ) {
+					$this->process_blocks_recursively( $block['innerBlocks'], $track_props );
+				}
 				continue;
 			}
 
@@ -136,7 +152,7 @@ class Telemetry {
 			$track_props['remote_data_blocks_total_count'] = ( $track_props['remote_data_blocks_total_count'] ?? 0 ) + 1;
 
 			// Calculate the stats of the fallback blocks.
-			if ( $block['innerBlocks'] && count( $block['innerBlocks'] ) > 0 ) {
+			if ( ! empty( $block['innerBlocks'] ) ) {
 				foreach ( $block['innerBlocks'] as $inner_block ) {
 					// The only fallback block is the no-results block, as the error block is a variation.
 					if ( 'remote-data-blocks/no-results' !== $inner_block['blockName'] ) {
@@ -152,8 +168,6 @@ class Telemetry {
 				}
 			}
 		}
-
-		$this->record_event( 'blocks_usage_stats', $track_props );
 	}
 
 	/**
