@@ -33,7 +33,15 @@ jobs:
         run: npm ci
 
       - name: Start up WordPress environment
+        env:
+          WP_ENV_CORE: WordPress/WordPress#6.7
+          WP_ENV_PHP_VERSION: 8.1
         run: npm run dev:build
+
+      - name: Output WordPress and PHP version
+        run: |
+          npm run wp-cli cli info
+          npm run wp-cli core version
 
       - name: Run Integration tests
         run: npm run test:integration
