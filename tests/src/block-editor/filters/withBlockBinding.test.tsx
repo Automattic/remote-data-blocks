@@ -238,4 +238,47 @@ describe( 'withBlockBinding', () => {
 		expect( hasMultiSelection ).toHaveBeenCalledTimes( 1 );
 		expect( mockSetAttributes ).not.toHaveBeenCalled();
 	} );
+
+	it( 'updates attributes even when binding ui is hidden', () => {
+		const mockSetAttributes = vi.fn();
+		const props = {
+			attributes: {
+				content: 'Old Title',
+				metadata: {
+					bindings: {
+						content: {
+							source: BLOCK_BINDING_SOURCE,
+							args: { block: 'test/block', field: 'title' },
+						},
+					},
+				},
+			},
+			context: {
+				[ REMOTE_DATA_CONTEXT_KEY ]: {
+					blockName: 'test/block',
+					results: createResults( [ { title: 'New Title' } ] ),
+				},
+			},
+			name: 'test/block',
+			setAttributes: mockSetAttributes,
+			clientId: 'test-client-id',
+			isSelected: false,
+			className: '',
+		};
+
+		hasMultiSelection.mockReturnValueOnce( true );
+
+		render( <WrappedComponent { ...props } /> );
+
+		expect( MockBlockEdit ).toHaveBeenCalledTimes( 1 );
+		expect( MockBlockEdit ).toHaveBeenCalledWith(
+			{
+				...props,
+				attributes: { ...props.attributes, content: 'New Title' },
+			},
+			{}
+		);
+		expect( hasMultiSelection ).toHaveBeenCalledTimes( 1 );
+		expect( mockSetAttributes ).not.toHaveBeenCalled();
+	} );
 } );

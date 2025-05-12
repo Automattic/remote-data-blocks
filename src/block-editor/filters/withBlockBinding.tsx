@@ -114,11 +114,6 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 			return <BlockEdit { ...props } />;
 		}
 
-		// If multiple blocks are being selected, render it as usual.
-		if ( hasMultiSelection() ) {
-			return <BlockEdit { ...props } />;
-		}
-
 		// Synced pattern overrides are provided via context and the value can be:
 		//
 		// - undefined (block is not in a synced pattern)
@@ -146,6 +141,11 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 			...attributes,
 			...getMismatchedAttributes( attributes, remoteData.results, remoteData.blockName, index ),
 		};
+
+		// If multiple blocks are being selected, render it as usual.
+		if ( hasMultiSelection() ) {
+			return <BlockEdit { ...props } attributes={ mergedAttributes } />;
+		}
 
 		// If the block is not writable, render it as usual.
 		if ( isInSyncedPattern && ! hasEnabledOverrides ) {
