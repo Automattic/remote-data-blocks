@@ -52,7 +52,7 @@ export const AirtableSettings = ( {
 		state.access_token ?? '',
 		userId ?? ''
 	);
-	const { tables, tablesError } = useAirtableApiTables(
+	const { fetchingTables, tables, tablesError } = useAirtableApiTables(
 		state.access_token ?? '',
 		state.base?.id ?? ''
 	);
@@ -149,7 +149,7 @@ export const AirtableSettings = ( {
 	if ( userId ) {
 		if ( basesError ) {
 			basesHelpText = __(
-				'Failed to fetch bases. Please check that your access token has the `schema.bases:read` Scope.'
+				'Failed to fetch bases. Please check that your access token has the `schema.bases:read` scope.'
 			);
 		} else if ( fetchingBases ) {
 			basesHelpText = __( 'Fetching bases...' );
@@ -158,13 +158,15 @@ export const AirtableSettings = ( {
 		}
 	}
 
-	let tablesHelpText: string = __( 'Fetching tables...', 'remote-data-blocks' );
+	let tablesHelpText: string = '';
 	if ( bases?.length && state.base ) {
 		if ( tablesError ) {
 			tablesHelpText = __(
-				'Failed to fetch tables. Please check that your access token has the `schema.tables:read` Scope.',
+				'Failed to fetch tables. Please check that your access token has the `schema.tables:read` scope.',
 				'remote-data-blocks'
 			);
+		} else if ( fetchingTables ) {
+			tablesHelpText = __( 'Fetching tables...', 'remote-data-blocks' );
 		} else if ( ! tables?.length ) {
 			tablesHelpText = __( 'No tables found', 'remote-data-blocks' );
 		} else {
