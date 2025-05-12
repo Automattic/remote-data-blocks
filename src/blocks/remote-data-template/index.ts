@@ -1,15 +1,15 @@
 import { registerBlockType } from '@wordpress/blocks';
-import { post } from '@wordpress/icons';
+import { layout } from '@wordpress/icons';
 
 import metadata from './block.json';
 import { Edit } from './edit';
-import { Save } from './save';
 import './filters';
+import { Save } from './save';
 
 registerBlockType< RemoteDataTemplateBlockAttributes >( metadata.name, {
 	edit: Edit,
 	icon: {
-		src: post,
+		src: layout,
 	},
 	save: Save,
 } );
