@@ -26,7 +26,6 @@ function register_aic_block(): void {
 	] );
 
 	$get_art_query = HttpQuery::from_array([
-		'query_name' => 'Get Art',
 		'data_source' => $aic_data_source,
 		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
 			$endpoint = $aic_data_source->get_endpoint();
@@ -88,7 +87,6 @@ function register_aic_block(): void {
 	]);
 
 	$collection_query = HttpQuery::from_array([
-		'query_name' => 'Get Art Collection',
 		'data_source' => $aic_data_source,
 		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
 			$endpoint = $aic_data_source->get_endpoint();
@@ -140,7 +138,6 @@ function register_aic_block(): void {
 	]);
 
 	$search_art_query = HttpQuery::from_array([
-		'query_name' => 'Search Art Collection',
 		'data_source' => $aic_data_source,
 		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
 			$endpoint = $aic_data_source->get_endpoint();

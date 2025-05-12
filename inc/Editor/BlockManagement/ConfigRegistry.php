@@ -51,13 +51,28 @@ class ConfigRegistry {
 		$queries = [];
 		$selectors = [];
 
+		$query_configurations = array_values( $user_config['query_configurations'] ?? [] );
+
 		foreach ( $user_config['queries'] as $query_key => $query ) {
 			$query = self::inflate_query( $query );
 			$queries[ $query_key ] = $query;
 			$input_schema = $query->get_input_schema();
 			$output_schema = $query->get_output_schema();
 
-			if ( self::DISPLAY_QUERY_KEY === $query_key ) {
+			// check if the query_key is present in the user_config['query_configurations'] array
+			if ( in_array( $query_key, $query_configurations, true ) ) {
+				array_unshift(
+					$selectors,
+					[
+						'display_name' => self::get_query_name_from_key( $query_key ),
+						'image_url' => $query->get_image_url(),
+						'inputs' => self::map_input_variables( $input_schema ),
+						'name' => ucfirst( $query_key ),
+						'query_key' => $query_key,
+						'type' => 'search',
+					]
+				);
+			} else {
 				$is_collection = true === ( $output_schema['is_collection'] ?? false );
 				$has_required_variables = array_reduce(
 					array_column( $input_schema, 'required' ),
@@ -66,53 +81,13 @@ class ConfigRegistry {
 				);
 
 				$selectors[] = [
-					'display_name' => $query->get_query_name(),
+					'display_name' => self::get_query_name_from_key( $query_key ),
 					'image_url' => $query->get_image_url(),
 					'inputs' => self::map_input_variables( $input_schema ),
-					'name' => $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ),
-					'query_key' => self::DISPLAY_QUERY_KEY,
+					'name' => self::DISPLAY_QUERY_KEY === $query_key ? ( $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ) ) : ucfirst( $query_key ),
+					'query_key' => $query_key,
 					'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
 				];
-			} else {
-				$source_query_found = false;
-				// Check if this query is configured as a source for another query.
-				foreach ( $user_config['query_configurations'] ?? [] as $target_key => $target_config ) {
-					if ( $target_config === $query_key ) {
-						$source_query_found = true;
-
-						array_unshift(
-							$selectors,
-							[
-								'display_name' => $query->get_query_name(),
-								'image_url' => $query->get_image_url(),
-								'inputs' => self::map_input_variables( $input_schema ),
-								'name' => ucfirst( $query_key ),
-								'query_key' => $query_key,
-								'type' => 'search',
-							]
-						);
-						break;
-					}
-				}
-
-				// if source_query_found is false, it means we have another display query without a source query. We need to generate a selector for it.
-				if ( ! $source_query_found ) {
-					$is_collection = true === ( $output_schema['is_collection'] ?? false );
-					$has_required_variables = array_reduce(
-						array_column( $input_schema, 'required' ),
-						fn( $carry, $required ) => $carry || ( $required ?? true ),
-						false
-					);
-
-					$selectors[] = [
-						'display_name' => $query->get_query_name(),
-						'image_url' => $query->get_image_url(),
-						'inputs' => self::map_input_variables( $input_schema ),
-						'name' => ucfirst( $query_key ),
-						'query_key' => $query_key,
-						'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
-					];
-				}
 			}
 		}
 
@@ -217,5 +192,10 @@ class ConfigRegistry {
 			array_keys( $input_schema ),
 			array_values( $input_schema )
 		);
+	}
+
+	private static function get_query_name_from_key( string $key ): string {
+		// Replace any non-alphanumeric characters with spaces and convert to title case
+		return ucwords( preg_replace( '/[^a-zA-Z0-9]/', ' ', $key ) );
 	}
 }

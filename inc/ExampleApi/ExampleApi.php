@@ -46,7 +46,6 @@ class ExampleApi {
 		] );
 
 		$get_record_query = HttpQuery::from_array( [
-			'query_name' => 'Get Record',
 			'data_source' => $data_source,
 			'input_schema' => [
 				'record_id' => [
@@ -82,7 +81,6 @@ class ExampleApi {
 		] );
 
 		$get_table_query = HttpQuery::from_array( [
-			'query_name' => 'Get Table',
 			'data_source' => $data_source,
 			'input_schema' => [],
 			'output_schema' => [
