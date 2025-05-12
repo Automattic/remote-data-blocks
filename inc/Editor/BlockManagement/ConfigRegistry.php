@@ -77,7 +77,7 @@ class ConfigRegistry {
 				$source_query_found = false;
 				// Check if this query is configured as a source for another query.
 				foreach ( $user_config['query_configurations'] ?? [] as $target_key => $target_config ) {
-					if ( $target_config['source_query'] === $query_key ) {
+					if ( $target_config === $query_key ) {
 						$source_query_found = true;
 
 						array_unshift(

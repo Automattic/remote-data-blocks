@@ -117,9 +117,7 @@ final class ConfigSchemas {
 			'query_configurations' => Types::nullable(
 				Types::record(
 					Types::string(),
-					Types::object( [
-						'source_query' => Types::string(),
-					] )
+					Types::string(),
 				)
 			),
 			'overrides' => Types::nullable(

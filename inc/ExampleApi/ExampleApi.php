@@ -121,9 +121,7 @@ class ExampleApi {
 				'list' => $get_table_query,
 			],
 			'query_configurations' => [
-				'display' => [
-					'source_query' => 'list',
-				],
+				'display' => 'list',
 			],
 		] );
 	}

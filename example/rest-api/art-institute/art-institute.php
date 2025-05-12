@@ -217,9 +217,7 @@ function register_aic_block(): void {
 			'search' => $search_art_query,
 		],
 		'query_configurations' => [
-			'display' => [
-				'source_query' => 'search',
-			],
+			'display' => 'search',
 		],
 	] );
 }
