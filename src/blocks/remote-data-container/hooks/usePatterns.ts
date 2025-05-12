@@ -79,9 +79,6 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 		// Add the no-results block with the empty mode.
 		innerBlocks.push( createBlock( 'remote-data-blocks/no-results', { mode: 'empty' } ) );
 
-		// Add the error fallback block variation with the error mode.
-		innerBlocks.push( createBlock( 'remote-data-blocks/no-results', { mode: 'error' } ) );
-
 		replaceInnerBlocks( rootClientId, innerBlocks ).catch( () => {} );
 	}
 

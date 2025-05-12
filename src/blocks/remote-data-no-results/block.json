@@ -8,7 +8,6 @@
   "description": "Contains the blocks to display when no remote data is found.",
   "category": "widgets",
   "example": {},
-  "icon": "media-default",
   "attributes": {
     "mode": {
       "enum": [ "empty", "error" ],
@@ -25,7 +24,6 @@
     {
       "name": "remote-data-blocks/error",
       "title": "Error",
-      "icon": "warning",
       "description": "Display an error message when the remote data fails to load.",
       "attributes": {
         "mode": "error"

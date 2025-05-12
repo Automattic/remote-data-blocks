@@ -17,8 +17,8 @@ import { usePatterns } from '@/blocks/remote-data-container/hooks/usePatterns';
 import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteData';
 import { hasRemoteDataChanged } from '@/utils/block-binding';
 import { getBlockConfig } from '@/utils/localized-block-data';
-import './editor.scss';
 import { migrateRemoteData } from '@/utils/remote-data';
+import './editor.scss';
 
 export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	const blockName = props.name;

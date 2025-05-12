@@ -4,7 +4,7 @@
   "name": "remote-data-blocks/template",
   "version": "0.1.0",
   "usesContext": [ "remote-data-blocks/remoteData" ],
-  "title": "Remote Data Template",
+  "title": "Item Template",
   "category": "widgets",
   "description": "Template block for displaying remote data collections",
   "example": {},
