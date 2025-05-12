@@ -77,6 +77,8 @@ class ExampleApi {
 					],
 				],
 			],
+			'required_query' => 'get_table',
+			'type' => 'display',
 			'query_runner' => new ExampleApiQueryRunner(),
 		] );
 
@@ -109,17 +111,15 @@ class ExampleApi {
 					],
 				],
 			],
+			'type' => 'list',
 			'query_runner' => new ExampleApiQueryRunner(),
 		] );
 
 		register_remote_data_block( [
 			'title' => self::$block_title,
 			'queries' => [
-				'display' => $get_record_query,
-				'list' => $get_table_query,
-			],
-			'query_configurations' => [
-				'display' => 'list',
+				'get_record' => $get_record_query,
+				'get_table' => $get_table_query,
 			],
 		] );
 	}

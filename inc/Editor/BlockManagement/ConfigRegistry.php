@@ -50,17 +50,25 @@ class ConfigRegistry {
 
 		$queries = [];
 		$selectors = [];
+		$required_queries = [];
 
-		$query_configurations = array_values( $user_config['query_configurations'] ?? [] );
+		// go over the queries, inflate each one, get the required query, skip if it's not present and then make a list out of it.
+		foreach ( $user_config['queries'] as $query_key => $query ) {
+			$query = self::inflate_query( $query );
+
+			// ToDo: Add a validation step to check if the required query is present in the user_config['queries'] array.
+			if ( $query->get_required_query() && ! empty( $query->get_required_query() ) ) {
+				$required_queries[] = $query->get_required_query();
+			}
+		}
 
 		foreach ( $user_config['queries'] as $query_key => $query ) {
 			$query = self::inflate_query( $query );
-			$queries[ $query_key ] = $query;
+			$queries[ self::DISPLAY_QUERY_KEY === $query->get_type() ? self::DISPLAY_QUERY_KEY : $query_key ] = $query;
 			$input_schema = $query->get_input_schema();
 			$output_schema = $query->get_output_schema();
 
-			// check if the query_key is present in the user_config['query_configurations'] array
-			if ( in_array( $query_key, $query_configurations, true ) ) {
+			if ( in_array( $query_key, $required_queries, true ) ) {
 				array_unshift(
 					$selectors,
 					[
@@ -69,7 +77,7 @@ class ConfigRegistry {
 						'inputs' => self::map_input_variables( $input_schema ),
 						'name' => ucfirst( $query_key ),
 						'query_key' => $query_key,
-						'type' => 'search',
+						'type' => $query->get_type(),
 					]
 				);
 			} else {
@@ -84,8 +92,8 @@ class ConfigRegistry {
 					'display_name' => self::get_query_name_from_key( $query_key ),
 					'image_url' => $query->get_image_url(),
 					'inputs' => self::map_input_variables( $input_schema ),
-					'name' => self::DISPLAY_QUERY_KEY === $query_key ? ( $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ) ) : ucfirst( $query_key ),
-					'query_key' => $query_key,
+					'name' => self::DISPLAY_QUERY_KEY === $query->get_type() ? ( $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ) ) : ucfirst( $query_key ),
+					'query_key' => self::DISPLAY_QUERY_KEY === $query->get_type() ? self::DISPLAY_QUERY_KEY : $query_key,
 					'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
 				];
 			}

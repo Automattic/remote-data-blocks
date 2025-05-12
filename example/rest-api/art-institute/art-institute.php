@@ -84,6 +84,8 @@ function register_aic_block(): void {
 				],
 			],
 		],
+		'required_query' => 'search_art',
+		'type' => 'display',
 	]);
 
 	$collection_query = HttpQuery::from_array([
@@ -135,6 +137,7 @@ function register_aic_block(): void {
 				],
 			],
 		],
+		'type' => 'list',
 	]);
 
 	$search_art_query = HttpQuery::from_array([
@@ -202,6 +205,7 @@ function register_aic_block(): void {
 				'type' => 'integer',
 			],
 		],
+		'type' => 'search',
 	]);
 
 	register_remote_data_block([
@@ -209,12 +213,9 @@ function register_aic_block(): void {
 		'icon' => 'art',
 		'instructions' => 'This block displays a set amount of artworks based on the provided limit. This could be 1, or many.',
 		'queries' => [
-			'display' => $get_art_query,
-			'collection' => $collection_query,
-			'search' => $search_art_query,
-		],
-		'query_configurations' => [
-			'display' => 'search',
+			'get_art' => $get_art_query,
+			'get_art_collection' => $collection_query,
+			'search_art' => $search_art_query,
 		],
 	] );
 }
