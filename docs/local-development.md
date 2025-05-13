@@ -1,14 +1,13 @@
 # Local Development
 
-This repository includes tools for starting a local development environment using [`@wordpress/env`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/), which requires Docker and Docker Compose.
+This repository includes tools for starting a local development environment using [`@wordpress/env`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/), which requires Docker and Docker Compose. In addition, both `npm` and `composer` are required to install the local dependencies.
 
 ## Set up
 
-Clone this repository and install Node.js and PHP dependencies:
+Clone this repository and install its dependencies:.
 
 ```sh
 npm install
-composer install
 ```
 
 To start a development environment with Xdebug enabled:
@@ -23,7 +22,7 @@ Stop the development environment with `Ctrl+C` and resume it by running the same
 
 ### Sharing configuration
 
-Data Sources configured via the Remote Data Blocks WordPress Admin UI are encrypted and stored as `remote_data_blocks_configs` in the Options table of the WordPress database.
+Data sources configured via the Remote Data Blocks WordPress Admin UI are encrypted and stored as `remote_data_blocks_configs` in the Options table of the WordPress database.
 
 If your local and production environments do not use the same encryption secrets, your configuration from one environment will not work in the other. Keep this in mind when migrating the database between environments.
 
@@ -32,7 +31,18 @@ If your local and production environments do not use the same encryption secrets
 Run unit tests:
 
 ```sh
+# all unit tests
 npm run test
+
+# only JavaScript unit tests
+npm run test:js
+
+# only PHP unit tests
+npm run test:php
+
+# only a specific test file
+npm run test:js some/test/file.js
+npm run test:php -- --filter SomeTestClass
 ```
 
 For e2e tests, ensure the development environment is running, then execute:
@@ -67,7 +77,7 @@ npm run dev:destroy
 
 ## Local playground
 
-While not suitable for local developement, it can sometimes be useful to quickly spin up a local WordPress playground using `@wp-now/wp-now`:
+While not suitable for local developement, it can sometimes be useful to quickly spin up a local WordPress playground:
 
 ```sh
 npm run build # or `npm start` in a separate terminal
