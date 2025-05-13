@@ -56,7 +56,7 @@ $query = HttpQuery::from_array( [
 
 - The `endpoint` property is a callback function that constructs the query endpoint. In this case, the endpoint is constructed by appending the `zip_code` input variable to the data source endpoint.
 - The `input_schema` property defines the input variables the query expects. For some queries, input variables might be used to construct a request body. In this case, the `zip_code` input variable is used to customize the query endpoint via the `endpoint` callback function.
-- The `output_schema` property defines the output data that will be extracted from the API response. The `path` property uses [JSONPath](https://jsonpath.com/) expressions to allow concise, no-code references to nested data.
+- The `output_schema` property defines the output data that will be extracted from the API response and provided to the remote data block. The `path` property uses [JSONPath](https://jsonpath.com/) expressions to allow concise, no-code references to nested data.
 
 This example features a small subset of the customization available for a query; see the full documentation below for details.
 
@@ -141,57 +141,7 @@ If omitted, `input_schema` defaults to an empty array.
 
 ### output_schema: array (required)
 
-The `output_schema` property defines how to extract data from the API response. The property should be an associative array with the following structure:
-
-- `format` (optional): A callable function that formats the output variable value.
-- `generate` (optional): A callable function that generates or extracts the output variable value from the response, as an alternative to `path`.
-- `is_collection` (optional, default `false`): A boolean indicating whether the response data is a collection. If false, only a single item will be returned.
-- `name` (optional): The human-friendly display name of the output variable.
-- `default_value` (optional): The default value for the output variable.
-- `path` (optional): A [JSONPath](https://jsonpath.com/) expression to extract the variable value.
-- `type` (required): A primitive type (e.g., `string`, `boolean`) or a nested output schema.
-
-Accepted primitive types are:
-
-- `boolean`
-- `button_url`
-- `email_address`
-- `html`
-- `id`
-- `image_alt`
-- `image_url`
-- `integer`
-- `markdown`
-- `null`
-- `number`
-- `string`
-- `url`
-- `uuid`
-
-#### Example
-
-```php
-'output_schema' => [
-    'is_collection' => false,
-    'type' => [
-        'zip_code' => [
-            'name' => 'Zip Code',
-            'path' => '$["post code"]',
-            'type' => 'string',
-        ],
-        'city_state' => [
-            'name' => 'City, State',
-            'default_value' => 'Unknown',
-            'generate' => function(array $response_data): string {
-                return $response_data['places'][0]['place name'] . ', ' . $response_data['places'][0]['state'];
-            },
-            'type' => 'string',
-        ],
-    ],
-],
-```
-
-We have more in-depth [`output_schema`](./query-output_schema.md) examples.
+The `output_schema` property defines how an API response should be transformed and provided to a remote data block. Further information and examples are provided in the [`output_schema` documentation](./query-output-schema.md).
 
 ### pagination_schema: array
 
