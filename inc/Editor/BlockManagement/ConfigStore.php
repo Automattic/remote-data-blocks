@@ -4,7 +4,6 @@ namespace RemoteDataBlocks\Editor\BlockManagement;
 
 defined( 'ABSPATH' ) || exit();
 
-use RemoteDataBlocks\Config\Query\QueryInterface;
 use RemoteDataBlocks\Integrations\GenericHttp\GenericHttpDataSource;
 use RemoteDataBlocks\Logging\Logger;
 use RemoteDataBlocks\Logging\LoggerInterface;
@@ -78,8 +77,8 @@ class ConfigStore {
 			return null;
 		}
 
-		$query = $config['queries'][ ConfigRegistry::DISPLAY_QUERY_KEY ] ?? null;
-		if ( ! ( $query instanceof QueryInterface ) ) {
+		$query = ConfigRegistry::get_display_query( $config['queries'] );
+		if ( ! $query ) {
 			return null;
 		}
 

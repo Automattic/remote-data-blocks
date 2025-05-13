@@ -3,7 +3,6 @@ import { BlockEditProps } from '@wordpress/blocks';
 import { Spinner } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
-import { QueryInputsPanel } from './components/panels/QueryInputsPanel';
 import { InnerBlocks } from '@/blocks/remote-data-container/components/InnerBlocks';
 import { DataPanel } from '@/blocks/remote-data-container/components/panels/DataPanel';
 import { OverridesPanel } from '@/blocks/remote-data-container/components/panels/OverridesPanel';
@@ -18,6 +17,7 @@ import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteDat
 import { hasRemoteDataChanged } from '@/utils/block-binding';
 import { getBlockConfig } from '@/utils/localized-block-data';
 import { migrateRemoteData } from '@/utils/remote-data';
+import { QueryInputsPanel } from './components/panels/QueryInputsPanel';
 import './editor.scss';
 
 export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {

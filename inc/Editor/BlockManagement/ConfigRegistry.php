@@ -64,7 +64,7 @@ class ConfigRegistry {
 
 		foreach ( $user_config['queries'] as $query_key => $query ) {
 			$query = self::inflate_query( $query );
-			$queries[ self::DISPLAY_QUERY_KEY === $query->get_type() ? self::DISPLAY_QUERY_KEY : $query_key ] = $query;
+			$queries[ $query_key ] = $query;
 			$input_schema = $query->get_input_schema();
 			$output_schema = $query->get_output_schema();
 
@@ -93,7 +93,7 @@ class ConfigRegistry {
 					'image_url' => $query->get_image_url(),
 					'inputs' => self::map_input_variables( $input_schema ),
 					'name' => self::DISPLAY_QUERY_KEY === $query->get_type() ? ( $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ) ) : ucfirst( $query_key ),
-					'query_key' => self::DISPLAY_QUERY_KEY === $query->get_type() ? self::DISPLAY_QUERY_KEY : $query_key,
+					'query_key' => $query_key,
 					'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
 				];
 			}
@@ -205,5 +205,15 @@ class ConfigRegistry {
 	private static function get_query_name_from_key( string $key ): string {
 		// Replace any non-alphanumeric characters with spaces and convert to title case
 		return ucwords( preg_replace( '/[^a-zA-Z0-9]/', ' ', $key ) );
+	}
+
+	public static function get_display_query( array $queries ): ?QueryInterface {
+		foreach ( $queries as $query ) {
+			if ( $query instanceof QueryInterface && $query->get_type() === self::DISPLAY_QUERY_KEY ) {
+				return $query;
+			}
+		}
+
+		return null;
 	}
 }

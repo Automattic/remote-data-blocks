@@ -99,7 +99,9 @@ class BlockRegistration {
 
 		// Set available bindings from the display query output mappings.
 		$available_bindings = [];
-		$output_schema = $config['queries'][ ConfigRegistry::DISPLAY_QUERY_KEY ]->get_output_schema();
+		// This shouldn't be null, as we'd have already validated by this point.
+		$display_query = ConfigRegistry::get_display_query( $config['queries'] );
+		$output_schema = $display_query->get_output_schema();
 		foreach ( $output_schema['type'] ?? [] as $key => $mapping ) {
 			$available_bindings[ $key ] = [
 				'name' => $mapping['name'],
@@ -133,7 +135,7 @@ class BlockRegistration {
 		$script_handle = $block_type->editor_script_handles[0] ?? '';
 
 		// Register a default pattern that simply displays the available data.
-		$default_pattern_name = BlockPatterns::register_default_block_pattern( $block_name, $config['title'], $config['queries'][ ConfigRegistry::DISPLAY_QUERY_KEY ] );
+		$default_pattern_name = BlockPatterns::register_default_block_pattern( $block_name, $config['title'], $display_query );
 		$block_config['patterns']['default'] = $default_pattern_name;
 
 		return [ $block_config, $script_handle ];

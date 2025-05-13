@@ -5,7 +5,6 @@ namespace RemoteDataBlocks\Editor\DataBinding;
 defined( 'ABSPATH' ) || exit();
 
 use RemoteDataBlocks\Config\BlockAttribute\RemoteDataBlockAttribute;
-use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\Logging\Logger;
 use RemoteDataBlocks\Logging\LoggerInterface;
@@ -140,7 +139,8 @@ class BlockBindings {
 		$remote_data = $remote_data->to_array();
 		$block_name = $source_args['block'] ?? $remote_data['blockName'];
 		$enabled_overrides = $source_args['enabledOverrides'] ?? $remote_data['enabledOverrides'];
-		$query_key = $source_args['queryKey'] ?? $remote_data['queryKey'] ?? ConfigRegistry::DISPLAY_QUERY_KEY;
+		// ToDo: Re-think the default of the display key here as that's not going to be the case.
+		$query_key = $source_args['queryKey'] ?? $remote_data['queryKey'];
 
 		// Extract the input variables. Allow the binding source args to override.
 		$array_of_input_variables = $source_args['queryInputs'] ?? $remote_data['queryInputs'];
