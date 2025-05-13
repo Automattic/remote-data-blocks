@@ -22,6 +22,16 @@ if ( defined( 'REMOTE_DATA_BLOCKS__LOADED' ) ) {
 }
 
 define( 'REMOTE_DATA_BLOCKS__LOADED', true );
+
+// Don't load the plugin if the PHP or WordPress version is not supported.
+global $wp_version;
+if ( version_compare( phpversion(), '8.1', '<' ) || version_compare( $wp_version, '6.7', '<' ) ) {
+	wp_admin_notice( __( 'Remote Data Blocks requires PHP 8.1+ and WordPress 6.7+.', 'remote-data-blocks' ), [
+		'type' => 'error',
+	] );
+	return;
+}
+
 define( 'REMOTE_DATA_BLOCKS__PLUGIN_ROOT', __FILE__ );
 define( 'REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION', '0.16.0' );
