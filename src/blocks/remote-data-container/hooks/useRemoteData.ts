@@ -101,6 +101,7 @@ export function useRemoteData( {
 	const hasResolvedData = Boolean( resolvedData );
 
 	const blockConfig = getBlockConfig( blockName );
+
 	const query = blockConfig?.selectors?.find( selector => selector.query_key === queryKey );
 
 	if ( ! query ) {
@@ -191,6 +192,8 @@ export function useRemoteData( {
 		if ( 1 === inputs.length ) {
 			inputs[ 0 ] = { ...inputs[ 0 ], ...managedQueryInput };
 		}
+
+		console.log( 'queryKey', queryKey );
 
 		const requestData: RemoteDataApiRequest = {
 			block_name: blockName,

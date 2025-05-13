@@ -1,8 +1,8 @@
 import {
 	Button,
-	TextControl,
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
+	TextControl,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
@@ -17,6 +17,7 @@ interface InputModalProps {
 	headerImage?: string;
 	inputs: InputVariable[];
 	onSelect: ( data: RemoteDataQueryInput[] ) => void;
+	queryKey?: string;
 	title: string;
 }
 

@@ -92,6 +92,7 @@ class ConfigRegistry {
 					'display_name' => self::get_query_name_from_key( $query_key ),
 					'image_url' => $query->get_image_url(),
 					'inputs' => self::map_input_variables( $input_schema ),
+					// ToDo: Could this be removed so we don't need to assume special logic for the display query?
 					'name' => self::DISPLAY_QUERY_KEY === $query->get_type() ? ( $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ) ) : ucfirst( $query_key ),
 					'query_key' => $query_key,
 					'type' => $has_required_variables ? 'manual-input' : 'load-without-input',

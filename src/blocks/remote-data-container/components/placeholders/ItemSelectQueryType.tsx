@@ -20,68 +20,56 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 		onSelect,
 	} = props;
 
-	const [ activeModal, setActiveModal ] = useState< {
-		type: 'search' | 'list' | 'manual-input';
-		selector: ( typeof selectors )[ 0 ];
-	} | null >( null );
-
-	const [ activePopover, setActivePopover ] = useState< {
-		selector: ( typeof selectors )[ 0 ];
-	} | null >( null );
+	const [ activeSelector, setActiveSelector ] = useState< ( typeof selectors )[ 0 ] | null >( null );
 
 	const handleSelectorClick = ( selector: ( typeof selectors )[ 0 ] ) => {
-		switch ( selector.type ) {
-			case 'search':
-			case 'list':
-				setActiveModal( { type: selector.type, selector } );
-				break;
-			case 'load-without-input':
-				onSelect( [ {} ] );
-				break;
-			case 'manual-input':
-				if ( selector.inputs.length === 1 && selector.inputs[ 0 ] ) {
-					setActivePopover( { selector } );
-				} else {
-					setActiveModal( { type: 'manual-input', selector } );
-				}
-				break;
-		}
+		setActiveSelector( selector );
 	};
 
-	if ( activeModal ) {
-		return activeModal.type === 'manual-input' ? (
-			<InputModal
-				key={ activeModal.selector.name }
-				inputs={ activeModal.selector.inputs }
-				blockName={ blockName }
-				headerImage={ activeModal.selector.image_url }
-				onSelect={ onSelect }
-				title={ activeModal.selector.name }
-			/>
-		) : (
-			<DataViewsModal
-				className="rdb-editor_dataviews-modal-item-select"
-				key={ activeModal.selector.name }
-				blockName={ blockName }
-				headerImage={ activeModal.selector.image_url }
-				onSelect={ onSelect }
-				queryKey={ activeModal.selector.query_key }
-				title={ activeModal.selector.name }
-			/>
-		);
-	}
+	if ( activeSelector ) {
+		const selectorProps = {
+			blockName,
+			headerImage: activeSelector.image_url,
+			inputVariables: activeSelector.inputs,
+			onSelect,
+			queryKey: activeSelector.query_key,
+			title: activeSelector.name,
+		};
 
-	if ( activePopover && activePopover.selector.inputs[ 0 ] ) {
-		return (
-			<InputPopover
-				key={ activePopover.selector.name }
-				input={ activePopover.selector.inputs[ 0 ] }
-				blockName={ blockName }
-				headerImage={ activePopover.selector.image_url }
-				onSelect={ onSelect }
-				title={ activePopover.selector.inputs[ 0 ].name ?? activePopover.selector.name }
-			/>
-		);
+		switch ( activeSelector.type ) {
+			case 'search':
+			case 'list':
+				return (
+					<DataViewsModal
+						className="rdb-editor_dataviews-modal-item-select"
+						key={ activeSelector.name }
+						{ ...selectorProps }
+					/>
+				);
+			case 'load-without-input':
+				onSelect( [ {} ] );
+				return null;
+			case 'manual-input':
+				if ( activeSelector.inputs.length === 1 && activeSelector.inputs[ 0 ] ) {
+					return (
+						<InputPopover
+							key={ activeSelector.name }
+							input={ activeSelector.inputs[ 0 ] }
+							{ ...selectorProps }
+							title={ activeSelector.inputs[ 0 ].name ?? activeSelector.name }
+						/>
+					);
+				}
+				return (
+					<InputModal
+						key={ activeSelector.name }
+						inputs={ activeSelector.inputs }
+						{ ...selectorProps }
+					/>
+				);
+			default:
+				return null;
+		}
 	}
 
 	return (
@@ -92,16 +80,14 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 			__next40pxDefaultSize
 		>
 			{ selectors.map( selector => {
-				const title = selector.name;
-
 				return (
 					<Button
-						key={ title }
+						key={ selector.query_key }
 						onClick={ () => handleSelectorClick( selector ) }
-						value={ title }
+						value={ selector.query_key }
 						variant="primary"
 					>
-						{ selector.display_name ?? title }
+						{ selector.display_name ?? selector.name }
 					</Button>
 				);
 			} ) }

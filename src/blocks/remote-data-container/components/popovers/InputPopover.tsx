@@ -1,8 +1,8 @@
 import {
 	Button,
-	Popover,
-	__experimentalInputControl as InputControl,
 	ExternalLink,
+	__experimentalInputControl as InputControl,
+	Popover,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { keyboardReturn } from '@wordpress/icons';
@@ -20,6 +20,7 @@ interface InputPopoverProps {
 	input: InputVariable;
 	onSelect: ( data: RemoteDataQueryInput[] ) => void;
 	title: string;
+	queryKey: string;
 }
 
 export function InputPopover( props: InputPopoverProps ) {
