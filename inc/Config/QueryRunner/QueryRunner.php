@@ -93,6 +93,12 @@ class QueryRunner implements QueryRunnerInterface {
 
 		$cache_headers = [];
 		if ( intval( $cache_ttl ) > 0 ) {
+			// Add a random jitter to the TTL to avoid simultaneous cache invalidation.
+			// The upper bound of the jitter should be 10% of the TTL or 20 seconds,
+			// whichever is smaller.
+			$jitter = intval( min( $cache_ttl * 0.1, 20 ) );
+			$cache_ttl = intval( $cache_ttl ) + wp_rand( 0, $jitter );
+
 			$cache_headers[ RdbCacheStrategy::CACHE_TTL_REQUEST_HEADER ] = $cache_ttl;
 		}
 		if ( intval( $cache_ttl ) < 0 ) {
