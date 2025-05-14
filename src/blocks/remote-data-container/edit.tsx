@@ -9,8 +9,6 @@ import { migrateRemoteData } from '@/utils/remote-data';
 import './editor.scss';
 
 export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
-	const [ queryKeySelected, setQueryKeySelected ] = useState< string >( '' );
-	const [ queryInputs, setQueryInputs ] = useState< RemoteDataQueryInput[] >( [] );
 	const blockName = props.name;
 	const blockConfig = getBlockConfig( blockName );
 
@@ -19,6 +17,15 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	}
 
 	const remoteDataAttribute = migrateRemoteData( props.attributes.remoteData );
+
+	const [ queryKeySelected, setQueryKeySelected ] = useState< string >(
+		remoteDataAttribute?.queryKey ?? ''
+	);
+	const [ queryInputs, setQueryInputs ] = useState< RemoteDataQueryInput[] >(
+		remoteDataAttribute?.queryInputs ?? []
+	);
+
+	console.log( 'remoteDataAttribute', remoteDataAttribute );
 
 	function initializeRemoteData( queryKey: string ): void {
 		setQueryKeySelected( queryKey );
