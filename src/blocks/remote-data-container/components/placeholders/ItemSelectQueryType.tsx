@@ -11,19 +11,22 @@ import { InputPopover } from '@/blocks/remote-data-container/components/popovers
 
 interface ItemSelectQueryTypeProps {
 	blockConfig: BlockConfig;
-	onSelect: ( data: RemoteDataQueryInput[] ) => void;
+	initializeRemoteData: ( queryKey: string ) => void;
 }
 
 export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 	const {
 		blockConfig: { name: blockName, selectors },
-		onSelect,
+		initializeRemoteData,
 	} = props;
 
-	const [ activeSelector, setActiveSelector ] = useState< ( typeof selectors )[ 0 ] | null >( null );
+	const [ activeSelector, setActiveSelector ] = useState< ( typeof selectors )[ 0 ] | null >(
+		null
+	);
 
 	const handleSelectorClick = ( selector: ( typeof selectors )[ 0 ] ) => {
 		setActiveSelector( selector );
+		initializeRemoteData( selector.query_key );
 	};
 
 	if ( activeSelector ) {
@@ -31,7 +34,7 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 			blockName,
 			headerImage: activeSelector.image_url,
 			inputVariables: activeSelector.inputs,
-			onSelect,
+			onSelect: () => {},
 			queryKey: activeSelector.query_key,
 			title: activeSelector.name,
 		};
@@ -47,7 +50,7 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 					/>
 				);
 			case 'load-without-input':
-				onSelect( [ {} ] );
+				// onSelect( [ {} ] );
 				return null;
 			case 'manual-input':
 				if ( activeSelector.inputs.length === 1 && activeSelector.inputs[ 0 ] ) {

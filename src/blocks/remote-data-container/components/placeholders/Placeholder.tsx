@@ -6,11 +6,11 @@ import { ItemSelectQueryType } from '@/blocks/remote-data-container/components/p
 
 export interface PlaceholderProps {
 	blockConfig: BlockConfig;
-	onSelect: ( input: RemoteDataQueryInput[] ) => void;
+	initializeRemoteData: ( queryKey: string ) => void;
 }
 
 export function Placeholder( props: PlaceholderProps ) {
-	const { blockConfig, onSelect } = props;
+	const { blockConfig, initializeRemoteData } = props;
 	const { instructions, settings } = blockConfig;
 
 	const iconElement: IconType = ( settings.icon as IconType ) ?? cloud;
@@ -23,7 +23,10 @@ export function Placeholder( props: PlaceholderProps ) {
 				instructions ?? __( 'This block requires selection of one or more items for display.' )
 			}
 		>
-			<ItemSelectQueryType blockConfig={ blockConfig } onSelect={ onSelect } />
+			<ItemSelectQueryType
+				blockConfig={ blockConfig }
+				initializeRemoteData={ initializeRemoteData }
+			/>
 		</PlaceholderComponent>
 	);
 }
