@@ -7,10 +7,11 @@ import { ItemSelectQueryType } from '@/blocks/remote-data-container/components/p
 export interface PlaceholderProps {
 	blockConfig: BlockConfig;
 	initializeRemoteData: ( queryKey: string ) => void;
+	onSelect: ( input: RemoteDataQueryInput[] ) => void;
 }
 
 export function Placeholder( props: PlaceholderProps ) {
-	const { blockConfig, initializeRemoteData } = props;
+	const { blockConfig, initializeRemoteData, onSelect } = props;
 	const { instructions, settings } = blockConfig;
 
 	const iconElement: IconType = ( settings.icon as IconType ) ?? cloud;
@@ -26,6 +27,7 @@ export function Placeholder( props: PlaceholderProps ) {
 			<ItemSelectQueryType
 				blockConfig={ blockConfig }
 				initializeRemoteData={ initializeRemoteData }
+				onSelect={ onSelect }
 			/>
 		</PlaceholderComponent>
 	);

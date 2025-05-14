@@ -2,8 +2,8 @@ import {
 	Button,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useState } from 'react';
 
 import { DataViewsModal } from '@/blocks/remote-data-container/components/modals/DataViewsModal';
 import { InputModal } from '@/blocks/remote-data-container/components/modals/InputModal';
@@ -12,12 +12,14 @@ import { InputPopover } from '@/blocks/remote-data-container/components/popovers
 interface ItemSelectQueryTypeProps {
 	blockConfig: BlockConfig;
 	initializeRemoteData: ( queryKey: string ) => void;
+	onSelect: ( data: RemoteDataQueryInput[] ) => void;
 }
 
 export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 	const {
 		blockConfig: { name: blockName, selectors },
 		initializeRemoteData,
+		onSelect,
 	} = props;
 
 	const [ activeSelector, setActiveSelector ] = useState< ( typeof selectors )[ 0 ] | null >(
@@ -34,7 +36,7 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 			blockName,
 			headerImage: activeSelector.image_url,
 			inputVariables: activeSelector.inputs,
-			onSelect: () => {},
+			onSelect,
 			queryKey: activeSelector.query_key,
 			title: activeSelector.name,
 		};
@@ -50,7 +52,7 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 					/>
 				);
 			case 'load-without-input':
-				// onSelect( [ {} ] );
+				onSelect( [ {} ] );
 				return null;
 			case 'manual-input':
 				if ( activeSelector.inputs.length === 1 && activeSelector.inputs[ 0 ] ) {
