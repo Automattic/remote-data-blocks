@@ -4,8 +4,21 @@ import {
 	IconType,
 	Placeholder as PlaceholderComponent,
 } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { cloud } from '@wordpress/icons';
+import { ItemSelectQueryType } from './ItemSelectQueryType';
+
+// Inline type for selector from BlockConfig
+// (could also import BlockConfig and use BlockConfig['selectors'][0] if preferred)
+type Selector = {
+	image_url?: string;
+	inputs: InputVariable[];
+	name: string;
+	query_key: string;
+	display_name?: string;
+	type: string;
+};
 
 export interface QuerySelectionPlaceholderProps {
 	blockConfig: BlockConfig;
@@ -17,6 +30,22 @@ export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps
 	const { instructions, settings, selectors } = blockConfig;
 
 	const iconElement: IconType = ( settings.icon as IconType ) ?? cloud;
+	const [ selectedSelector, setSelectedSelector ] = useState< Selector | null >( null );
+
+	if ( selectedSelector ) {
+		return (
+			<ItemSelectQueryType
+				blockName={ blockConfig.name }
+				selector={ selectedSelector }
+				onSelect={ () => {
+					setSelectedSelector( null );
+					if ( selectedSelector && typeof selectedSelector.query_key === 'string' ) {
+						onSelect( selectedSelector.query_key );
+					}
+				} }
+			/>
+		);
+	}
 
 	return (
 		<PlaceholderComponent
@@ -32,17 +61,15 @@ export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps
 				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 			>
-				{ selectors.map( selector => {
-					return (
-						<Button
-							key={ selector.query_key }
-							variant="primary"
-							onClick={ () => onSelect( selector.query_key ) }
-						>
-							{ selector.display_name ?? selector.name }
-						</Button>
-					);
-				} ) }
+				{ selectors.map( selector => (
+					<Button
+						key={ selector.query_key }
+						variant="primary"
+						onClick={ () => setSelectedSelector( selector ) }
+					>
+						{ selector.display_name ?? selector.name }
+					</Button>
+				) ) }
 			</ToggleGroupControl>
 		</PlaceholderComponent>
 	);

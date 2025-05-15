@@ -58,7 +58,8 @@ class ConfigRegistry {
 
 			// ToDo: Add a validation step to check if the required query is present in the user_config['queries'] array.
 			if ( $query->get_required_query() && ! empty( $query->get_required_query() ) ) {
-				$required_queries[] = $query->get_required_query();
+				// Add the mapping of the required query to the required queries array.
+				$required_queries[ $query->get_required_query() ] = $query_key;
 			}
 		}
 
@@ -68,7 +69,7 @@ class ConfigRegistry {
 			$input_schema = $query->get_input_schema();
 			$output_schema = $query->get_output_schema();
 
-			if ( in_array( $query_key, $required_queries, true ) ) {
+			if ( isset( $required_queries[ $query_key ] ) ) {
 				array_unshift(
 					$selectors,
 					[
@@ -78,6 +79,7 @@ class ConfigRegistry {
 						'name' => ucfirst( $query_key ),
 						'query_key' => $query_key,
 						'type' => $query->get_type(),
+						'group' => $required_queries[ $query_key ],
 					]
 				);
 			} else {
@@ -96,6 +98,7 @@ class ConfigRegistry {
 					'name' => self::DISPLAY_QUERY_KEY === $query->get_type() ? ( $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ) ) : ucfirst( $query_key ),
 					'query_key' => $query_key,
 					'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
+					'group' => $query_key,
 				];
 			}
 		}
