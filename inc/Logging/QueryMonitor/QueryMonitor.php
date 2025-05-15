@@ -14,7 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 class QueryMonitor {
 	public static function init(): void {
 		add_filter( 'qm/collectors', [ __CLASS__, 'add_collectors' ], 90, 1 );
-		add_filter( 'qm/outputter/html', [ __CLASS__, 'add_outputters' ], 90, 1 );
+		add_filter( 'qm/outputter/html', [ __CLASS__, 'add_html_outputters' ], 90, 1 );
+		add_filter( 'qm/outputter/raw', [ __CLASS__, 'add_raw_outputters' ], 90, 1 );
 		add_filter( 'qm/trace/ignore_class', [ __CLASS__, 'ignore_classes' ], 10, 1 );
 	}
 
@@ -37,13 +38,32 @@ class QueryMonitor {
 		return $collectors;
 	}
 
-	public static function add_outputters( array $outputters ): array {
+	public static function add_html_outputters( array $outputters ): array {
 		$outputter_classes = [
 			'RemoteDataBlocks\Logging\QueryMonitor\RdbMainOutputHtml',
 			'RemoteDataBlocks\Logging\QueryMonitor\RdbBlockBindingOutputHtml',
 			'RemoteDataBlocks\Logging\QueryMonitor\RdbHttpRequestOutputHtml',
 			'RemoteDataBlocks\Logging\QueryMonitor\RdbLogOutputHtml',
 			'RemoteDataBlocks\Logging\QueryMonitor\RdbValidationOutputHtml',
+		];
+
+		foreach ( $outputter_classes as $class ) {
+			if ( class_exists( $class ) ) {
+				/**
+				 * @psalm-suppress UndefinedClass
+				 */
+				$collector = QM_Collectors::get( $class::$collector_id );
+				$instance = new $class( $collector );
+				$outputters[ $collector->id ] = $instance;
+			}
+		}
+
+		return $outputters;
+	}
+
+	public static function add_raw_outputters( array $outputters ): array {
+		$outputter_classes = [
+			'RemoteDataBlocks\Logging\QueryMonitor\RdbLogOutputRaw',
 		];
 
 		foreach ( $outputter_classes as $class ) {

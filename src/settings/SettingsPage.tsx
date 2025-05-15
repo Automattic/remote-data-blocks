@@ -42,9 +42,10 @@ const SettingsPage = () => {
 							<h1>{ __( 'Data sources', 'remote-data-blocks' ) }</h1>
 							<p>
 								{ __(
-									'Add and manage data sources used for blocks and content across your site. '
-								) }
-								<ExternalLink href="https://remotedatablocks.com/">
+									'Add and manage data sources used for blocks and content across your site.',
+									'remote-data-blocks'
+								) }{ ' ' }
+								<ExternalLink href="https://remotedatablocks.com/docs/quickstart/">
 									{ __( 'Learn more', 'remote-data-blocks' ) }
 								</ExternalLink>
 							</p>

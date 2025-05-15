@@ -1,4 +1,4 @@
-import { TextControl } from '@wordpress/components';
+import { Card, CardBody, ExternalLink, TextControl, Tip } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 import { DataSourceForm } from '../components/DataSourceForm';
@@ -33,6 +33,13 @@ function computeAuthState( updatedAuth: Partial< HttpServiceConfig[ 'auth' ] > )
 }
 
 export const HttpSettings = ( { mode, uuid, config }: SettingsComponentProps< HttpConfig > ) => {
+	const cardStyles: React.CSSProperties =
+		mode === 'edit'
+			? {
+					marginTop: '16px',
+			  }
+			: {};
+
 	const { state, handleOnChange, validState } = useForm< HttpServiceConfig >( {
 		initialValues: config?.service_config ?? {
 			__version: SERVICE_CONFIG_VERSION,
@@ -83,7 +90,7 @@ export const HttpSettings = ( { mode, uuid, config }: SettingsComponentProps< Ht
 				<TextControl
 					type="url"
 					id="url"
-					label={ __( 'URL', 'remote-data-blocks' ) }
+					label={ __( 'Endpoint', 'remote-data-blocks' ) }
 					value={ state.endpoint ?? '' }
 					onChange={ value => handleOnChange( 'endpoint', value ) }
 					autoComplete="off"
@@ -94,6 +101,16 @@ export const HttpSettings = ( { mode, uuid, config }: SettingsComponentProps< Ht
 
 				<HttpAuthSettingsInput auth={ state.auth } onChange={ handleAuthOnChange } />
 			</DataSourceForm.Setup>
+			<Card style={ cardStyles }>
+				<CardBody>
+					<Tip>
+						This data source requires additional code.&nbsp;
+						<ExternalLink href="https://remotedatablocks.com/docs/extending/block-registration/">
+							Learn more
+						</ExternalLink>
+					</Tip>
+				</CardBody>
+			</Card>
 		</DataSourceForm>
 	);
 };

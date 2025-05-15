@@ -47,6 +47,11 @@ class ExampleApi {
 
 		$get_record_query = HttpQuery::from_array( [
 			'data_source' => $data_source,
+			'endpoint' => function ( array $input_variables ) use ( $data_source ): string {
+				// This is not a real API, but we want to make sure to generate
+				// valid cache keys that do not collide with other queries.
+				return sprintf( '%s/%s', $data_source->get_endpoint(), $input_variables['record_id'] ?? '' );
+			},
 			'input_schema' => [
 				'record_id' => [
 					'name' => 'Record ID',

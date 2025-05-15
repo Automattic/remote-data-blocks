@@ -4,14 +4,14 @@ Remote Data Blocks adds some accessory blocks for bindings, listed below.
 
 ## Remote HTML Block
 
-Use this block to bind to HTML from a remote data source. This block only works when placed inside a remote data block container and bound to an attribute.
+Use this block to bind to HTML from a remote data source. This block only works when placed inside a remote data block container and bound to a field containing HTML.
 
 ![Screen recording showing the insertion and binding of a Remote HTML Block in the editor](./block-insert-remote-html.gif)
 
-Bindings in the `output_schema` of a remote data container must have type `html` in order to be rendered by the Remote HTML block:
+Fields defined by a query’s `output_schema` must have type `html` in order to be available to Remote HTML blocks:
 
 ```php
-$my_query = \RemoteDataBlocks\Config\Query\HttpQuery::from_array( [
+$my_query = [
     /* ... */
     'output_schema' =>
         'is_collection' => false,
@@ -25,11 +25,11 @@ $my_query = \RemoteDataBlocks\Config\Query\HttpQuery::from_array( [
             'myHtmlContent' => [
                 'name' => 'My HTML Content',
                 'path' => '$.myHtmlContent',
-                'type' => 'html',            // Must be type 'html' for binding
+                'type' => 'html', // <-- required
             ],
         ],
     ],
-] );
+];
 
 register_remote_data_block( [
     'title' => 'My HTML API',

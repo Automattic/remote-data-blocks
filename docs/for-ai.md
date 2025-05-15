@@ -51,7 +51,8 @@ docs/
     hooks.md
     index.md
     overrides.md
-    query-output_schema.md
+    query-input-schema.md
+    query-output-schema.md
     query-runner.md
     query.md
   tutorials/
@@ -131,13 +132,9 @@ example/
 ````markdown
 # Block bindings
 
-Remote Data Blocks takes advantage of the [Block Bindings API](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-bindings/). This Core WordPress API allows you to “bind” dynamic data to the block's attributes, which are then reflected in the final HTML markup.
+Remote Data Blocks takes advantage of the [block bindings API](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-bindings/). This core WordPress API allows you to “bind” dynamic data to the attributes of core blocks, which are then reflected in the final HTML markup. Generally, this avoids the need to write and maintain custom blocks.
 
-The Block Bindings API allows Remote Data Blocks to read from different sources without needing to write custom block boilerplate, React, block registration, and other particulars of writing custom blocks from scratch for each new data source.
-
-For a quick overview, the [announcement post](https://make.wordpress.org/core/2024/03/06/new-feature-the-block-bindings-api/) is very helpful. The Block Bindings API is evolving, and an in-depth understanding isn't necessary for day-to-day use.
-
-But if you want to dig deeper into the internals of how Remote Data Blocks works, the [public documentation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-bindings/) is available.
+For a quick overview of block bindings, the [announcement post](https://make.wordpress.org/core/2024/03/06/new-feature-the-block-bindings-api/) is very helpful; for a deeper dive, consult the [public documentation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-bindings/). That said, an in-depth understanding of block bindings isn't necessary to use Remote Data Blocks: just know that the plugin is built on core, stable WordPress APIs.
 ````
 
 ## File: docs/concepts/field-shortcodes.md
@@ -146,11 +143,11 @@ But if you want to dig deeper into the internals of how Remote Data Blocks works
 
 One of the current limitations of the [block bindings API](./block-bindings.md) is that it is restricted to a small number of core blocks and attributes. For example, currently, you cannot bind to the content of a table block or a custom block. You also cannot bind to a _subset_ of a block's content.
 
-As a partial workaround, this plugin provides a way to use remote data in some places where block bindings are not supported. We call this feature "field shortcodes," and it is available in any block that uses [rich text](https://developer.wordpress.org/block-editor/reference-guides/richtext/), such as tables, lists, and custom blocks. Look for the field shortcode button in the rich text formatting toolbar:
+As a partial workaround, this plugin provides a way to use remote data in some places where block bindings are not supported. This feature is named "field shortcodes" and it is available in any block that uses [rich text](https://developer.wordpress.org/block-editor/reference-guides/richtext/), such as tables, lists, and some custom blocks. Look for the field shortcode button in the rich text formatting toolbar:
 
 <img width="535" alt="Field shortcode button" src="https://github.com/user-attachments/assets/8ce0bd18-367e-46d5-a870-22819c42ff4a" />
 
-Clicking this button will open a modal that allows you to select a field from a remote data source, resulting in an inline remote data binding. Just like remote data blocks, this binding will load the latest data from the remote source when the content is rendered.
+Clicking this button will open a modal that allows you to select a field from a remote data source, resulting in an inline remote data binding. Just like remote data blocks, this binding will resolve from the remote source when the content is rendered.
 
 <img width="684" alt="A bulleted list using several field shortcodes to describe three conference events" src="https://github.com/user-attachments/assets/6527dcc0-c0ed-42ab-9655-b8fc2510e15b" />
 
@@ -165,14 +162,14 @@ Remote Data Blocks adds some accessory blocks for bindings, listed below.
 
 ## Remote HTML Block
 
-Use this block to bind to HTML from a remote data source. This block only works when placed inside a remote data block container and bound to an attribute.
+Use this block to bind to HTML from a remote data source. This block only works when placed inside a remote data block container and bound to a field containing HTML.
 
 ![Screen recording showing the insertion and binding of a Remote HTML Block in the editor](./block-insert-remote-html.gif)
 
-Bindings in the `output_schema` of a remote data container must have type `html` in order to be rendered by the Remote HTML block:
+Fields defined by a query’s `output_schema` must have type `html` in order to be available to Remote HTML blocks:
 
 ```php
-$my_query = \RemoteDataBlocks\Config\Query\HttpQuery::from_array( [
+$my_query = [
     /* ... */
     'output_schema' =>
         'is_collection' => false,
@@ -186,11 +183,11 @@ $my_query = \RemoteDataBlocks\Config\Query\HttpQuery::from_array( [
             'myHtmlContent' => [
                 'name' => 'My HTML Content',
                 'path' => '$.myHtmlContent',
-                'type' => 'html',            // Must be type 'html' for binding
+                'type' => 'html', // <-- required
             ],
         ],
     ],
-] );
+];
 
 register_remote_data_block( [
     'title' => 'My HTML API',
@@ -341,7 +338,7 @@ register_remote_data_block( [
     'patterns' => [
         [
             'title' => 'My Pattern',
-            'content' => file_get_contents( __DIR__ . '/my-pattern.html' ),
+            'html' => file_get_contents( __DIR__ . '/my-pattern.html' ),
         ],
     ],
 ] );
@@ -496,19 +493,20 @@ Here you can see the `search` input variable has a special type of `ui:search_in
 ````markdown
 # Data source
 
-A data source defines the basic reusable properties of an API and is used by a [query](query.md) to reduce repeating code with every query. It also helps define how your data source looks in the WordPress admin.
+A data source defines the basic reusable properties of an API and is used by a [query](query.md) to reduce duplicative code. It also helps define how your data source looks in the WordPress admin.
 
 ## Example
 
-Most HTTP-powered APIs can be represented by defining a class that extends `HttpDataSource`. Here's an example of a data source for an example HTTP API:
+Most HTTP-powered APIs can be represented by defining a array that be provided to `HttpDataSource::from_array()`. Here's an example of a data source for an example HTTP API:
 
 ```php
 $data_source = HttpDataSource::from_array( [
+	'version' => 1,
 	'display_name' => 'Example API',
 	'endpoint' => 'https://api.example.com/',
 	'request_headers' => [
 		'Content-Type' => 'application/json',
-		'X-Api-Key' => MY_API_KEY_CONSTANT,
+		'X-Api-Key' => constant( 'MY_API_KEY_CONSTANT' ),
 	],
 ] );
 ```
@@ -523,36 +521,23 @@ There is no built-in versioning logic, but a version number is required for best
 
 The display name is used in the UI to identify your data source.
 
-### endpoint: string
+### endpoint: string (required)
 
-This is the default endpoint for the data source and can save repeated use in queries. We would suggest putting the root API URL here and then manipulating it as necessary in individual [queries](query.md).
+This is the default or base endpoint for the data source. [Queries](query.md) that use a data source can override or append paths to its endpoint.
+
+### image_url: string
+
+An optional image URL can be used in the UI to help identify your data source.
 
 ### request_headers: array
 
-Headers will be set according to the properties of the array. When providing authentication credentials, take care to keep them from appearing in code repositories. We strongly recommend using environment variables or other secure means for storage.
+An associative array of headers that will be sent with each HTTP request. Queries that use a data source can override or append headers.
 
-## Additional parameters
-
-You can add any additional parameters that are necessary for your data source. In our [Airtable example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/airtable/events/register.php), you can see that we are setting values for the Airtable `base` and `table`.
-
-Consider adding whatever configuration would be useful to queries. As an example, queries have an `endpoint` property. Our [Zip code example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/zip-code/zip-code.php) sets the endpoint with a function:
-
-```php
-$zipcode_query = HttpQuery::from_array( [
-    'data_source' => $zipcode_data_source,
-    'endpoint' => function ( array $input_variables ) use ( $zipcode_data_source ): string {
-        return $zipcode_data_source->get_endpoint() . $input_variables['zip_code'];
-    },
-])
-```
-
-The goal with design was to provide you with flexibility you need to represent any data source.
+When providing authentication credentials, take care to avoid committing them to code repositories. We strongly recommend using environment variables or secure storage.
 
 ## Custom data sources
 
-The configuration array passed to `from_array` is very flexible, so it's usually not necessary to extend `HttpDataSource`, but you can do so if you need to add custom behavior.
-
-For APIs that use non-HTTP transports, you can also implement `DataSourceInterface` and provide methods that define reusable properties of your API. The actual implementation of your transport will need to be provided by a [custom query runner](./query-runner.md).
+It's usually not necessary to extend `HttpDataSource`, but you can do so if you need to add custom behavior. For APIs that use non-HTTP transports, you could implement `DataSourceInterface` and provide methods that define reusable properties of your API. The actual implementation of your transport will need to be provided by a [custom query runner](./query-runner.md).
 
 Here is a theoretical example of a data source for a WebDAV server:
 
@@ -819,13 +804,85 @@ The `overrides` property in the block registration array enables a panel in the 
 <img width="276" alt="An overrides panel in a remote data block settings panel" src="https://github.com/user-attachments/assets/e701e621-99f9-4c2e-b34d-cfef352af2ae" />
 ````
 
-## File: docs/extending/query-output_schema.md
+## File: docs/extending/query-input-schema.md
+````markdown
+# Query `input_schema` property
+
+The `input_schema` property defines the input variables expected by the query. The property should be an associative array of input variable definitions. The keys of the array are machine-friendly input variable names, and the values are associative arrays with the following structure:
+
+- `name` (optional): The human-friendly display name of the input variable
+- `default_value` (optional): The default value for the input variable.
+- `type` (required): The primitive type of the input variable. Supported types are:
+  - `boolean`
+  - `id`
+  - `integer`
+  - `null`
+  - `number`
+  - `string`
+
+#### Example
+
+```php
+'input_schema' => [
+	'zip_code' => [
+		'name' => 'Zip Code',
+		'type' => 'string',
+	],
+],
+```
+
+There are also some special input variable types:
+
+- `ui:search_input`: A variable with this type indicates that the query supports searching. It must accept a `string` containing search terms.
+- `ui:pagination_offset`: A variable with this type indicates that the query supports offset pagination. It must accept an `integer` containing the requested offset. See `pagination_schema` for additional information and requirements.
+- `ui:pagination_page`: A variable with this type indicates that the query supports page-based pagination. It must accept an `integer` containing the requested results page. See `pagination_schema` for additional information and requirements.
+- `ui:pagination_per_page`: A variable with this type indicates that the query supports controlling the number of resultsper page. It must accept an `integer` containing the number of requested results.
+- `ui:pagination_cursor_next` and `ui_pagination_cursor_previous`: Variables with these types indicate that the query supports cursor pagination. They accept `string`s containing the requested cursor. See `pagination_schema` for additional information and requirements.
+- `ui:pagination_cursor`: A variable with this type indicates support for a simple variant of cursor pagination that uses a single cursor instead of a pair of forward / backward cursors. It accepts a `string` containing the requested cursor. See `pagination_schema` for additional information and requirements.
+
+#### Example with search and pagination input variables
+
+```php
+'input_schema' => [
+	'search' => [
+		'name' => 'Search terms',
+		'type' => 'ui:search_input',
+	],
+	'limit' => [
+		'default_value' => 10,
+		'name' => 'Pagination limit',
+		'type' => 'ui:pagination_per_page',
+	],
+	'page' => [
+		'default_value' => 1,
+		'name' => 'Pagination page',
+		'type' => 'ui:pagination_page',
+	],
+],
+```
+
+If omitted, `input_schema` defaults to an empty array.
+````
+
+## File: docs/extending/query-output-schema.md
 ````markdown
 # Query `output_schema` property
 
-The `output_schema` property is where your data shape definition happens. It should be created with care and requires updates whenever the incoming response changes.
+A query's `output_schema` defines how an API response should be transformed and provided to a remote data block. A typical goal is to transform the API response into a flat array of fields that can be bound to blocks, while omitting values that are not needed. Output can be nested, but nested values cannot be bound to blocks.
 
-Unless your API returns a single value, `type` will be constructed of an associative array of nested output schemas that eventually resolve to one of the accepted primitive types:
+Note that the output schema may require updates whenever the shape or schema of the API response changes. Similarly, changing the slug or `type` of a field may break existing bindings. Consider creating a new query and remote data block if you need to make breaking changes to an output schema.
+
+## Properties
+
+- `format` (optional): A callable function that formats the output variable value.
+- `generate` (optional): A callable function that generates or extracts the output variable value from the response, as an alternative to `path`.
+- `is_collection` (optional, default `false`): A boolean indicating whether the response data is a collection. If false, only a single item will be returned.
+- `name` (optional): The human-friendly display name of the output variable.
+- `default_value` (optional): The default value for the output variable.
+- `path` (optional): A [JSONPath](https://jsonpath.com/) expression to extract the variable value from the response. Note that path expressions are relative to the current item and its type; path expressions therefore "build" on each other when you nest types.
+- `type` (required): A primitive type (e.g., `string`, `boolean`) or a nested output schema.
+
+Accepted primitive types are:
 
 - `boolean`
 - `button_url`
@@ -839,11 +896,10 @@ Unless your API returns a single value, `type` will be constructed of an associa
 - `null`
 - `number`
 - `string`
-- `title`
 - `url`
 - `uuid`
 
-## Single Entry Example
+## Single entity example
 
 Using the [Zip Code example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/zip-code/README.md), the JSON response returned by the API looks like this:
 
@@ -864,7 +920,7 @@ Using the [Zip Code example](https://github.com/Automattic/remote-data-blocks/bl
 }
 ```
 
-And the `output_schema` definiton would look like this.
+And the corresponding `output_schema` definition might look like this:
 
 ```php
 'output_schema' => [
@@ -878,8 +934,12 @@ And the `output_schema` definiton would look like this.
 		'city_state' => [
 			'name' => 'City, State',
 			'default_value' => 'Unknown',
-			'generate' => function( array $response_data ): string {
-				return $response_data['places'][0]['place name'] . ', ' . $response_data['places'][0]['state'];
+			'generate' => function( array $data ): string|null {
+				if ( empty( $data['places'] ) ) {
+					return null;
+				}
+
+				return $data['places'][0]['place name'] . ', ' . $data['places'][0]['state abbreviation'];
 			},
 			'type' => 'string',
 		],
@@ -887,11 +947,22 @@ And the `output_schema` definiton would look like this.
 ],
 ```
 
-You can see how the `type` property contains a nested output schema. The `zip_code` array index starts a new definiton using `path` to find the specific value.
+- The `is_collection` property indicates whether the output represents a single entity or a collection of entities. In this case, it is set to `false` because the API returns a single entity.
+- The `type` property at the root level begins the type definition. The `zip_code` and `city_state` array keys are "slugs" that identify the field. The array values define types that describe how to extract a value for those fields.
+- The `zip_code` field is extracted via a [JSONPath](http://jsonpath.com) expression defined in the `path` property.
+- The `city_state` field provides a callable via the `generate` property. That function receives the data and combines two elements to form the value.
+- A `default_value` property provides a value that will be used if the provided `path` expression or `generate` function resolve to a null value.
 
-Where `city_state` uses the genrate function to combine two elements from inside the response. In this case we assume that the first returned place is accurate for the zip. This is a safe assumption for U.S. zip codes.
+The result of applying this output schema to the example JSON response is:
 
-## Collection Example
+```php
+[
+	zip_code => '17057',
+	city_state => 'Middletown, PA',
+]
+```
+
+## Collection example
 
 An example of collection JSON can be found in the [Chicago Institue of Art example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/art-institute/README.md). That API returns (in part):
 
@@ -952,7 +1023,7 @@ An example of collection JSON can be found in the [Chicago Institue of Art examp
 }
 ```
 
-And the output schema is defined as:
+An output schema can be defined as:
 
 ```php
 'output_schema' => [
@@ -964,14 +1035,38 @@ And the output schema is defined as:
 			'type' => 'id',
 		],
 		'title' => [
-			'name' => 'Title',
+			'name' => 'Art Title',
 			'type' => 'string',
 		],
 	],
 ],
 ```
 
-Here we can see at the top level a `path` variable is defined explictly as an array and we are capturing all elements `[*]`. From there the output variables used for each entry are named to match the property names in the JSON. This is a shortcut. This output schemea would also work:
+- The `is_collection` property is set to `true` to indicate that the output represents a collection of entities.
+- A top-level `path` expression (`$.data[*]`) indicates that the collection is contained in the `data` property of the response.
+- The `type` property defines two fields: `id` and `title`.
+  - Note that the nested type definitions do not provide a `path` expression. When omitted, the plugin will use the slug as the expected path. This is a shorthand for the following output schema with explicit `path` expressions:
+
+```php
+'output_schema' => [
+	'is_collection' => true,
+	'path' => '$.data[*]',
+	'type' => [
+		'id' => [
+			'name' => 'Art ID',
+			'path' => '$.id',
+			'type' => 'id',
+		],
+		'title' => [
+			'name' => 'Art Title',
+			'path' => '$.title',
+			'type' => 'string',
+		],
+	],
+],
+```
+
+We can enhance the output schema with additional fields and options:
 
 ```php
 'output_schema' => [
@@ -982,49 +1077,47 @@ Here we can see at the top level a `path` variable is defined explictly as an ar
 			'name' => 'Art ID',
 			'type' => 'id',
 		],
-		'name' => [
-			'path' => '$.title',
-			'name' => 'Title',
-			'type' => 'string',
-		],
-	],
-],
-```
-
-If we wanted to go further and pull out more data from each item, the schema could look like:
-
-```php
-'output_schema' => [
-	'is_collection' => true,
-	'path' => '$.data[*]',
-	'type' => [
-		'id' => [
-			'name' => 'Art ID',
-			'type' => 'id',
-		],
-		'name' => [
-			'path' => '$.title',
-			'name' => 'Title',
-			'type' => 'string',
-		],
-		'description' => [
-			'path' => '$.thumbnail.alt_text',
-			'name' => 'Description',
-			'type' => 'string',
-		],
-		'dimensions' => [
-			'generate' => function( array $response_data ): string {
-				return $response_data['thumbnail']['width'] . '×' . $response_data['thumbnail']['height'];
+		'title' => [
+			'name' => 'Art Title',
+			'format' => function ( string $value ): string {
+				return ucfirst( $value );
 			},
-			'name' => 'Demensions (px)',
 			'type' => 'string',
 		],
-
+		'thumbnail_image_alt' => [
+			'name' => 'Thumbnail alt text',
+			'path' => '$.thumbnail.alt_text',
+			'type' => 'image_alt',
+		],
+		'thumbnail_image_url' => [
+			'name' => 'Thumbnail',
+            'path' => '$.thumbnail.lqip',
+			'type' => 'image_url',
+		],
 	],
 ],
 ```
 
-In this example you can see that `$` in the path is redfined to be the specifc entry in the collection. Similarly the `$response_data` variable contains just this single entry.
+The `format` property allows you to define a callable that will be applied to the value before it is returned.
+
+Applying this output schema to the response JSON would result in the following output:
+
+```php
+[
+	[
+		'id' => 61603,
+		'title' => 'Ballet at the Paris Opéra',
+		'thumbnail_image_alt' => 'Color pastel drawing of ballerinas in tutus on stage, watched by audience.',
+		'thumbnail_image_url' => 'data:image/gif;base64,R0lGODlhCgAFAPUAADtMRVJPRFlOQlBNSFFNSEVURU1USldSS1dSTVRXTV9ZTldVUl1ZU2hbTVdkU19kVV5tX2FkUGFjVWVoVGhoVGZhW29lXGVtXG1rWmlpXW5tXmZxX3VxX1toZG5oYG5uZ3ZsY3BqZGN1a3RxYnFyZXRxZntxan19bnl9cnh7dX57doJ/dpGEeJKOhaCUjKebk6yflsGupQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAAAAAAALAAAAAAKAAUAAAYuQIjoQuGQTqhOyrEZYSQJA6AweURYrxIoxAhoMp9VywWLmRYqj6BxQFQshIEiCAA7',
+	],
+	[
+		'id' => 14572,
+		'title' => 'The Millinery Shop',
+		'thumbnail_image_alt' => 'Impressionist painting of woman wearing green dress trying on hats.',
+		'thumbnail_image_url' => 'data:image/gif;base64,R0lGODlhBgAFAPQAAEMtIk40KE83KlhHLVxELlNPN1hLMVJOP19UN1dYM1lUOVpUP2dAIWlKKHZKKXZLKWRNPGpbMGpaNGtaOkxUTF9dRlJaS15YSV5kUnZpRH12W4ZkM49uRI52VQAAAAAAACH5BAAAAAAALAAAAAAGAAUAAAUY4AUtFWZxHZIdExFEybAJQGE00sNQmqOEADs=',
+	],
+]
+```
 ````
 
 ## File: docs/extending/query-runner.md
@@ -1037,33 +1130,7 @@ A query runner executes a query and processes the results of a query. The defaul
 - Your API uses a non-HTTP transport.
 - You want to implement custom processing of the response data, which is not possible with the [provided filters](./hooks.md).
 
-## Custom QueryRunner for HTTP queries
-
-If your API transacts over HTTP and you want to customize the query runner, consider extending the `QueryRunner` class and providing an instance to your query via the `query_runner` option. Here are the methods:
-
-### execute( HttpQueryInterface $query, array $input_variables ): array|WP_Error
-
-The `execute` method executes the query and returns the parsed data. The input variables for the current request are provided as an associative array (`[ $var_name => $value ]`).
-
-### deserialize_response( string $raw_response_data, array $input_variables ): mixed
-
-By default, the `deserialize_response` assumes a JSON string and deserializes it using `json_decode`. Override this method to provide custom deserialization logic.
-
-### get_request_details( HttpQueryInterface $query, array $input_variables ): array|WP_Error
-
-The `get_request_details` method extracts and validates the request details provided by the query. The input variables for the current request are provided as an associative array (`[ $var_name => $value ]`). The return value is an associative array that provides the HTTP method, request options, origin, and URI.
-
-### get_raw_response_data( array $request_details, array $input_variables ): array|WP_Error
-
-The `get_raw_response_data` method dispatches the HTTP request and assembles the raw (pre-processed) response data. The input variables for the current request are provided as an associative array (`[ $var_name => $value ]`). The return value is an associative array that provides the response metadata and the raw response data.
-
-### get_response_metadata( HttpQueryInterface $query, array $response_metadata, array $query_results ): array
-
-The `get_response_metadata` method returns the response metadata for the query, which are available as bindings for [field shortcodes](../concepts/field-shortcodes.md).
-
-## Custom query execution
-
-If your API uses a non-HTTP transport or you want full control over query execution, you should implement your own query that implements `QueryInterface` and provides a custom `execute` method.
+If your API transacts over HTTP and you want to customize the query runner, consider extending the `QueryRunner` class and providing an instance to your query via the `query_runner` option. If your API uses a non-HTTP transport or you want full control over query execution, you should implement your own query that implements `QueryInterface` and provides a custom `execute` method.
 ````
 
 ## File: docs/extending/query.md
@@ -1126,7 +1193,7 @@ $query = HttpQuery::from_array( [
 
 - The `endpoint` property is a callback function that constructs the query endpoint. In this case, the endpoint is constructed by appending the `zip_code` input variable to the data source endpoint.
 - The `input_schema` property defines the input variables the query expects. For some queries, input variables might be used to construct a request body. In this case, the `zip_code` input variable is used to customize the query endpoint via the `endpoint` callback function.
-- The `output_schema` property defines the output data that will be extracted from the API response. The `path` property uses [JSONPath](https://jsonpath.com/) expressions to allow concise, no-code references to nested data.
+- The `output_schema` property defines the output data that will be extracted from the API response and provided to the remote data block. The `path` property uses [JSONPath](https://jsonpath.com/) expressions to allow concise, no-code references to nested data.
 
 This example features a small subset of the customization available for a query; see the full documentation below for details.
 
@@ -1154,114 +1221,11 @@ The `endpoint` property defines the query endpoint. It can be a string or a call
 
 ### input_schema: array
 
-The `input_schema` property defines the input variables expected by the query. The property should be an associative array of input variable definitions. The keys of the array are machine-friendly input variable names, and the values are associative arrays with the following structure:
-
-- `name` (optional): The human-friendly display name of the input variable
-- `default_value` (optional): The default value for the input variable.
-- `type` (required): The primitive type of the input variable. Supported types are:
-  - `boolean`
-  - `id`
-  - `integer`
-  - `null`
-  - `number`
-  - `string`
-
-#### Example
-
-```php
-'input_schema' => [
-	'zip_code' => [
-		'name' => 'Zip Code',
-		'type' => 'string',
-	],
-],
-```
-
-There are also some special input variable types:
-
-- `ui:search_input`: A variable with this type indicates that the query supports searching. It must accept a `string` containing search terms.
-- `ui:pagination_offset`: A variable with this type indicates that the query supports offset pagination. It must accept an `integer` containing the requested offset. See `pagination_schema` for additional information and requirements.
-- `ui:pagination_page`: A variable with this type indicates that the query supports page-based pagination. It must accept an `integer` containing the requested results page. See `pagination_schema` for additional information and requirements.
-- `ui:pagination_per_page`: A variable with this type indicates that the query supports controlling the number of resultsper page. It must accept an `integer` containing the number of requested results.
-- `ui:pagination_cursor_next` and `ui_pagination_cursor_previous`: Variables with these types indicate that the query supports cursor pagination. They accept `string`s containing the requested cursor. See `pagination_schema` for additional information and requirements.
-- `ui:pagination_cursor`: A variable with this type indicates support for a simple variant of cursor pagination that uses a single cursor instead of a pair of forward / backward cursors. It accepts a `string` containing the requested cursor. See `pagination_schema` for additional information and requirements.
-
-#### Example with search and pagination input variables
-
-```php
-'input_schema' => [
-	'search' => [
-		'name' => 'Search terms',
-		'type' => 'ui:search_input',
-	],
-	'limit' => [
-		'default_value' => 10,
-		'name' => 'Pagination limit',
-		'type' => 'ui:pagination_per_page',
-	],
-	'page' => [
-		'default_value' => 1,
-		'name' => 'Pagination page',
-		'type' => 'ui:pagination_page',
-	],
-],
-```
-
-If omitted, `input_schema` defaults to an empty array.
+The `input_schema` property defines the input variables expected by the query. Further information and examples are provided in the [`input_schema` documentation](./query-input-schema.md).
 
 ### output_schema: array (required)
 
-The `output_schema` property defines how to extract data from the API response. The property should be an associative array with the following structure:
-
-- `format` (optional): A callable function that formats the output variable value.
-- `generate` (optional): A callable function that generates or extracts the output variable value from the response, as an alternative to `path`.
-- `is_collection` (optional, default `false`): A boolean indicating whether the response data is a collection. If false, only a single item will be returned.
-- `name` (optional): The human-friendly display name of the output variable.
-- `default_value` (optional): The default value for the output variable.
-- `path` (optional): A [JSONPath](https://jsonpath.com/) expression to extract the variable value.
-- `type` (required): A primitive type (e.g., `string`, `boolean`) or a nested output schema.
-
-Accepted primitive types are:
-
-- `boolean`
-- `button_url`
-- `email_address`
-- `html`
-- `id`
-- `image_alt`
-- `image_url`
-- `integer`
-- `markdown`
-- `null`
-- `number`
-- `string`
-- `url`
-- `uuid`
-
-#### Example
-
-```php
-'output_schema' => [
-    'is_collection' => false,
-    'type' => [
-        'zip_code' => [
-            'name' => 'Zip Code',
-            'path' => '$["post code"]',
-            'type' => 'string',
-        ],
-        'city_state' => [
-            'name' => 'City, State',
-            'default_value' => 'Unknown',
-            'generate' => function(array $response_data): string {
-                return $response_data['places'][0]['place name'] . ', ' . $response_data['places'][0]['state'];
-            },
-            'type' => 'string',
-        ],
-    ],
-],
-```
-
-We have more in-depth [`output_schema`](./query-output_schema.md) examples.
+The `output_schema` property defines how an API response should be transformed and provided to a remote data block. Further information and examples are provided in the [`output_schema` documentation](./query-output-schema.md).
 
 ### pagination_schema: array
 
@@ -1668,7 +1632,7 @@ For plugin overview and getting started guide, see [README](../README.md).
 
 ## Additional Documentation
 
-- [AI Documentation](ai.md)
+- [AI Documentation](for-ai.md)
 - [Contributing Guidelines](../CONTRIBUTING.md)
 - [Security Policy](../SECURITY.md)
 - [Code of Conduct](https://make.wordpress.org/handbook/community-code-of-conduct/)
@@ -1678,15 +1642,14 @@ For plugin overview and getting started guide, see [README](../README.md).
 ````markdown
 # Local Development
 
-This repository includes tools for starting a local development environment using [`@wordpress/env`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/), which requires Docker and Docker Compose.
+This repository includes tools for starting a local development environment using [`@wordpress/env`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/), which requires Docker and Docker Compose. In addition, both `npm` and `composer` are required to install the local dependencies.
 
 ## Set up
 
-Clone this repository and install Node.js and PHP dependencies:
+Clone this repository and install its dependencies:.
 
 ```sh
 npm install
-composer install
 ```
 
 To start a development environment with Xdebug enabled:
@@ -1701,7 +1664,7 @@ Stop the development environment with `Ctrl+C` and resume it by running the same
 
 ### Sharing configuration
 
-Data Sources configured via the Remote Data Blocks WordPress Admin UI are encrypted and stored as `remote_data_blocks_configs` in the Options table of the WordPress database.
+Data sources configured via the Remote Data Blocks WordPress Admin UI are encrypted and stored as `remote_data_blocks_configs` in the Options table of the WordPress database.
 
 If your local and production environments do not use the same encryption secrets, your configuration from one environment will not work in the other. Keep this in mind when migrating the database between environments.
 
@@ -1710,7 +1673,18 @@ If your local and production environments do not use the same encryption secrets
 Run unit tests:
 
 ```sh
+# all unit tests
 npm run test
+
+# only JavaScript unit tests
+npm run test:js
+
+# only PHP unit tests
+npm run test:php
+
+# only a specific test file
+npm run test:js some/test/file.js
+npm run test:php -- --filter SomeTestClass
 ```
 
 For e2e tests, ensure the development environment is running, then execute:
@@ -1745,7 +1719,7 @@ npm run dev:destroy
 
 ## Local playground
 
-While not suitable for local developement, it can sometimes be useful to quickly spin up a local WordPress playground using `@wp-now/wp-now`:
+While not suitable for local developement, it can sometimes be useful to quickly spin up a local WordPress playground:
 
 ```sh
 npm run build # or `npm start` in a separate terminal
@@ -1814,12 +1788,12 @@ This plugin provides a [local development environment](local-development.md) wit
 
 ## Query monitor
 
-When the [Query Monitor plugin](https://wordpress.org/plugins/query-monitor/) is installed and activated, Remote Data Blocks will output debugging information to the Query Monitor "Logs" panel, including error details, stack traces, query execution details, and cache hit/miss status.
+When the [Query Monitor plugin](https://wordpress.org/plugins/query-monitor/) is installed and activated, Remote Data Blocks will output debugging information to a dedicated "Remote Data Blocks" panel, including error details, stack traces, query execution details, and cache hit/miss status.
 
 > [!TIP]
 > By default, the block editor is rendered in "Fullscreen mode" which hides the Admin Bar and Query Monitor. Open the three-dot menu in the top-right corner and toggle off "Fullscreen mode", or press `⇧⌥⌘F`.
 
-The provided local development environment includes Query Monitor by default. You can also install it in non-local environments, but be aware that it may expose sensitive information in production environments.
+The provided local development environment includes Query Monitor by default. You can also install it in non-local environments, but be aware that it may expose sensitive information in production environments. Query Monitor is currently not compatible with WordPress Playground and cannot be installed there.
 
 ## Debugging
 
