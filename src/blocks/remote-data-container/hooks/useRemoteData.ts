@@ -218,7 +218,6 @@ export function useRemoteData( {
 	}
 
 	function reset( err?: Error ): void {
-		console.log( 'reset', err );
 		resolvedUpdater( undefined );
 		setError( err );
 		setLoading( false );
