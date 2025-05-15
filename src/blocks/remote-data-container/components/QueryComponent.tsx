@@ -54,13 +54,17 @@ export function QueryComponent( props: QueryComponentProps ) {
 	}, [ queryInputs ] );
 
 	function onSelectRemoteData( inputs: RemoteDataQueryInput[] ): void {
+		// if the old queryInputs and new ones are the same, skip this call.
+		if ( JSON.stringify( remoteDataAttribute?.queryInputs ) === JSON.stringify( inputs ) ) {
+			return;
+		}
+
 		void fetch( inputs ).then( () => {
 			if ( innerBlocksPattern ) {
 				insertPatternBlocks( innerBlocksPattern, supportsPagination );
 				return;
 			}
 
-			console.log( 'change pattern selection to true' );
 			setShowPatternSelection( true );
 		} );
 	}
@@ -102,8 +106,6 @@ export function QueryComponent( props: QueryComponentProps ) {
 		} );
 		onQueryInputsChange?.( inputs );
 	}
-
-	console.log( showPatternSelection );
 
 	if ( showPatternSelection ) {
 		const supportedPatterns = getSupportedPatterns( data?.results[ 0 ] );

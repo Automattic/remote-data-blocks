@@ -21,7 +21,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 	const [ queryGroup, setQueryGroup ] = useState< string >( remoteDataAttribute?.queryKey ?? '' );
 
 	const [ queryInputs, setQueryInputs ] = useState< RemoteDataQueryInput[] >(
-		remoteDataAttribute?.queryInputs ?? [ {} ]
+		remoteDataAttribute?.queryInputs ?? []
 	);
 
 	function setAttributes( attributes: RemoteDataBlockAttributes ): void {
