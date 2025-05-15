@@ -16,7 +16,7 @@ import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteDat
 import { hasRemoteDataChanged } from '@/utils/block-binding';
 
 export interface QueryComponentProps {
-	queryKeySelected: string;
+	queryKey: string;
 	blockConfig: BlockConfig;
 	blockName: string;
 	rootClientId: string;
@@ -28,7 +28,7 @@ export interface QueryComponentProps {
 
 export function QueryComponent( props: QueryComponentProps ) {
 	const {
-		queryKeySelected,
+		queryKey,
 		blockConfig,
 		blockName,
 		rootClientId,
@@ -45,21 +45,25 @@ export function QueryComponent( props: QueryComponentProps ) {
 		blockName,
 		externallyManagedRemoteData: remoteDataAttribute,
 		externallyManagedUpdateRemoteData: updateRemoteData,
-		queryKey: queryKeySelected,
+		queryKey,
 	} );
 	const [ showPatternSelection, setShowPatternSelection ] = useState< boolean >( false );
 
-	// Monitor queryInputs changes from parent
 	useEffect( () => {
-		void fetch( queryInputs ).then( () => {
+		onSelectRemoteData( queryInputs );
+	}, [ queryInputs ] );
+
+	function onSelectRemoteData( inputs: RemoteDataQueryInput[] ): void {
+		void fetch( inputs ).then( () => {
 			if ( innerBlocksPattern ) {
 				insertPatternBlocks( innerBlocksPattern, supportsPagination );
 				return;
 			}
 
+			console.log( 'change pattern selection to true' );
 			setShowPatternSelection( true );
 		} );
-	}, [ queryInputs ] );
+	}
 
 	function refreshRemoteData(): void {
 		void fetch( remoteDataAttribute?.queryInputs ?? [ {} ] );
@@ -86,7 +90,7 @@ export function QueryComponent( props: QueryComponentProps ) {
 		}
 	}
 
-	function onUpdateQueryInputs( queryKey: string, inputs: RemoteDataQueryInput[] ): void {
+	function onUpdateQueryInputs( newQueryKey: string, inputs: RemoteDataQueryInput[] ): void {
 		if ( ! remoteDataAttribute ) {
 			return;
 		}
@@ -94,10 +98,12 @@ export function QueryComponent( props: QueryComponentProps ) {
 		updateRemoteData( {
 			...remoteDataAttribute,
 			queryInputs: inputs,
-			queryKey,
+			queryKey: newQueryKey,
 		} );
 		onQueryInputsChange?.( inputs );
 	}
+
+	console.log( showPatternSelection );
 
 	if ( showPatternSelection ) {
 		const supportedPatterns = getSupportedPatterns( data?.results[ 0 ] );

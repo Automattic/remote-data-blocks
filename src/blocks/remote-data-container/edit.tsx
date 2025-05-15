@@ -1,8 +1,9 @@
+import { useBlockProps, InnerBlocks } from '@wordpress/block-editor';
 import { BlockEditProps } from '@wordpress/blocks';
 import { useState } from '@wordpress/element';
 
-import { QueryComponent } from './components/QueryComponent';
-import { Placeholder } from '@/blocks/remote-data-container/components/placeholders/Placeholder';
+import { QuerySelectionPlaceholder } from '@/blocks/remote-data-container/components/placeholders/QuerySelectionPlaceholder';
+import { CONTAINER_CLASS_NAME } from '@/blocks/remote-data-container/config/constants';
 import { getBlockConfig } from '@/utils/localized-block-data';
 import { migrateRemoteData } from '@/utils/remote-data';
 
@@ -16,42 +17,31 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 		throw new Error( `Block configuration not found for block: ${ blockName }` );
 	}
 
+	const blockProps = useBlockProps( { className: CONTAINER_CLASS_NAME } );
 	const remoteDataAttribute = migrateRemoteData( props.attributes.remoteData );
+	const [ queryKey, setQueryKey ] = useState< string >( remoteDataAttribute?.queryKey ?? '' );
 
-	const [ queryKeySelected, setQueryKeySelected ] = useState< string >(
-		remoteDataAttribute?.queryKey ?? ''
-	);
-	const [ queryInputs, setQueryInputs ] = useState< RemoteDataQueryInput[] >(
-		remoteDataAttribute?.queryInputs ?? []
-	);
+	// const [ queryInputs, setQueryInputs ] = useState< RemoteDataQueryInput[] >(
+	// 	remoteDataAttribute?.queryInputs ?? [ {} ]
+	// );
 
-	console.log( 'remoteDataAttribute', remoteDataAttribute );
+	// console.log( 'remoteDataAttribute', remoteDataAttribute );
 
-	function initializeRemoteData( queryKey: string ): void {
-		setQueryKeySelected( queryKey );
-		console.log( 'Initializing remote data for query key', queryKey );
+	// function setAttributes( attributes: RemoteDataBlockAttributes ): void {
+	// 	props.setAttributes( attributes );
+	// }
+
+	console.log( 'queryKey', queryKey );
+
+	if ( ! queryKey ) {
+		return <QuerySelectionPlaceholder blockConfig={ blockConfig } onSelect={ setQueryKey } />;
 	}
 
 	return (
 		<>
-			{ queryKeySelected && (
-				<QueryComponent
-					blockConfig={ blockConfig }
-					blockName={ blockName }
-					queryKeySelected={ queryKeySelected }
-					rootClientId={ props.clientId }
-					remoteDataAttribute={ remoteDataAttribute }
-					setAttributes={ props.setAttributes }
-					queryInputs={ queryInputs }
-				/>
-			) }
-			{ ! queryKeySelected && (
-				<Placeholder
-					blockConfig={ blockConfig }
-					initializeRemoteData={ initializeRemoteData }
-					onSelect={ setQueryInputs }
-				/>
-			) }
+			<div { ...blockProps }>
+				<InnerBlocks />
+			</div>
 		</>
 	);
 }
