@@ -54,6 +54,10 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 	const selectionIds = selection.map( item => item.uuid );
 	const allIdsFromCurrentPage = data?.results?.map( result => result.uuid ) ?? [];
 
+	// This value indicates whether the modal is being used to select an entire
+	// item / result or just a specific field from the result.
+	const supportsItemSelection = Boolean( onSelect );
+
 	function setSelectionIds( uuids: string[] ): void {
 		const selectionIdsFromOtherPages = selectionIds.filter(
 			uuid => ! allIdsFromCurrentPage.includes( uuid )
@@ -73,7 +77,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 	}
 
 	function save( results: RemoteDataApiResult[] ): void {
-		if ( ! results.length ) {
+		if ( ! supportsItemSelection || ! results.length ) {
 			return;
 		}
 
@@ -99,7 +103,9 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 			{ triggerElement }
 			{ isOpen && (
 				<Modal
-					className={ `${ className } rdb-dataviews-bulk-actions-modal` }
+					className={
+						supportsItemSelection ? `${ className } rdb-dataviews-bulk-actions-modal` : className
+					}
 					isFullScreen
 					onRequestClose={ close }
 					title={ blockConfig?.settings?.title ?? title }
@@ -108,7 +114,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 						blockName={ blockName }
 						hasNextPage={ hasNextPage ?? false }
 						loading={ loading }
-						onSelect={ save }
+						onSelect={ supportsItemSelection ? save : undefined }
 						onSelectField={ onSelectField }
 						page={ page }
 						results={ loading ? undefined : data?.results }
@@ -122,7 +128,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 						totalItems={ totalItems }
 						totalPages={ totalPages }
 					/>
-					{ onSelect && ! loading && (
+					{ supportsItemSelection && ! loading && (
 						<>
 							{ selection.length > 1 && (
 								<BaseControl
