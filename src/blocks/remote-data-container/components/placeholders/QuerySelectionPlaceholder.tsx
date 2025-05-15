@@ -1,16 +1,16 @@
 import {
 	Button,
-	__experimentalToggleGroupControl as ToggleGroupControl,
 	IconType,
 	Placeholder as PlaceholderComponent,
+	__experimentalToggleGroupControl as ToggleGroupControl,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { cloud } from '@wordpress/icons';
+
 import { ItemSelectQueryType } from './ItemSelectQueryType';
 
 // Inline type for selector from BlockConfig
-// (could also import BlockConfig and use BlockConfig['selectors'][0] if preferred)
 type Selector = {
 	image_url?: string;
 	inputs: InputVariable[];
@@ -18,33 +18,38 @@ type Selector = {
 	query_key: string;
 	display_name?: string;
 	type: string;
+	query_group: string;
 };
 
 export interface QuerySelectionPlaceholderProps {
 	blockConfig: BlockConfig;
-	onSelect: ( queryKey: string ) => void;
+	onQueryGroupSelect: ( group: string ) => void;
+	onQueryInputsSelect: ( inputs: RemoteDataQueryInput[] ) => void;
 }
 
 export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps ) {
-	const { blockConfig, onSelect } = props;
+	const { blockConfig, onQueryGroupSelect, onQueryInputsSelect } = props;
 	const { instructions, settings, selectors } = blockConfig;
 
 	const iconElement: IconType = ( settings.icon as IconType ) ?? cloud;
-	const [ selectedSelector, setSelectedSelector ] = useState< Selector | null >( null );
 
-	if ( selectedSelector ) {
-		return (
-			<ItemSelectQueryType
-				blockName={ blockConfig.name }
-				selector={ selectedSelector }
-				onSelect={ () => {
-					setSelectedSelector( null );
-					if ( selectedSelector && typeof selectedSelector.query_key === 'string' ) {
-						onSelect( selectedSelector.query_key );
-					}
-				} }
-			/>
-		);
+	// Create a unique list of query groups
+	const queryGroups: string[] = [
+		...new Set( selectors.map( ( selector: Selector ) => selector.query_group ) ),
+	];
+
+	const [ selectedGroup, setSelectedGroup ] = useState< string >( '' );
+	const [ showSelectors, setShowSelectors ] = useState< boolean >( false );
+
+	function handleSelectorOnSelect( inputs: RemoteDataQueryInput[] ) {
+		setShowSelectors( false );
+		onQueryGroupSelect( selectedGroup );
+		onQueryInputsSelect( inputs );
+	}
+
+	function handleGroupOnSelect( group: string ) {
+		setSelectedGroup( group );
+		setShowSelectors( true );
 	}
 
 	return (
@@ -55,22 +60,35 @@ export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps
 				instructions ?? __( 'This block requires selection of one or more items for display.' )
 			}
 		>
-			<ToggleGroupControl
-				className="remote-data-blocks-button-group"
-				label={ __( '' ) }
-				__nextHasNoMarginBottom
-				__next40pxDefaultSize
-			>
-				{ selectors.map( selector => (
-					<Button
-						key={ selector.query_key }
-						variant="primary"
-						onClick={ () => setSelectedSelector( selector ) }
-					>
-						{ selector.display_name ?? selector.name }
-					</Button>
-				) ) }
-			</ToggleGroupControl>
+			{ ! showSelectors && (
+				<ToggleGroupControl
+					className="remote-data-blocks-button-group"
+					label={ __( '' ) }
+					__nextHasNoMarginBottom
+					__next40pxDefaultSize
+				>
+					{ queryGroups.map( ( group: string ) => (
+						<Button
+							key={ group }
+							variant="primary"
+							onClick={ () => {
+								handleGroupOnSelect( group );
+							} }
+						>
+							{ group
+								.replace( /[^a-zA-Z0-9]/g, ' ' )
+								.replace( /\b\w/g, ( initialLetter: string ) => initialLetter.toUpperCase() ) }
+						</Button>
+					) ) }
+				</ToggleGroupControl>
+			) }
+			{ showSelectors && (
+				<ItemSelectQueryType
+					blockConfig={ blockConfig }
+					queryGroup={ selectedGroup }
+					onSelect={ handleSelectorOnSelect }
+				/>
+			) }
 		</PlaceholderComponent>
 	);
 }

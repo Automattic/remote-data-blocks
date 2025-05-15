@@ -40,6 +40,7 @@ interface BlockConfig {
 		query_key: string;
 		display_name?: string;
 		type: string;
+		query_group: string;
 	}[];
 	settings: {
 		category: string;

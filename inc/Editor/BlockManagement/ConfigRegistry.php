@@ -79,7 +79,7 @@ class ConfigRegistry {
 						'name' => ucfirst( $query_key ),
 						'query_key' => $query_key,
 						'type' => $query->get_type(),
-						'group' => $required_queries[ $query_key ],
+						'query_group' => $required_queries[ $query_key ],
 					]
 				);
 			} else {
@@ -98,7 +98,7 @@ class ConfigRegistry {
 					'name' => self::DISPLAY_QUERY_KEY === $query->get_type() ? ( $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ) ) : ucfirst( $query_key ),
 					'query_key' => $query_key,
 					'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
-					'group' => $query_key,
+					'query_group' => $query_key,
 				];
 			}
 		}
