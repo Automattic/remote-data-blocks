@@ -92,6 +92,10 @@ function wp_cache_set(): bool {
 	return true;
 }
 
+function wp_rand( int $min = 0 /* ignored $max */ ): int {
+	return $min;
+}
+
 function update_option( string $option, mixed $value ): bool {
 	MockWordPressFunctions::set_mock_option( $option, $value );
 	return true;
