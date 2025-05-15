@@ -167,8 +167,8 @@ class QueryRunner implements QueryRunnerInterface {
 	}
 
 	/**
-	 * Get the response metadata for the query, which are available as bindings for
-	 * field shortcodes.
+	 * Get the response metadata for the query, which are available as targets for
+	 * inline bindings.
 	 *
 	 * @param array $response_metadata The response metadata returned by the query runner.
 	 * @param array $query_results     The results of the query.
@@ -196,8 +196,8 @@ class QueryRunner implements QueryRunnerInterface {
 		];
 
 		/**
-		 * Filters the query response metadata, which are available as bindings for
-		 * field shortcodes.
+		 * Filters the query response metadata, which are available as targets for
+		 * inline bindings.
 		 *
 		 * @param array $query_response_metadata The query response metadata.
 		 * @param HttpQueryInterface $query The query context.

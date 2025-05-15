@@ -4,7 +4,7 @@ namespace RemoteDataBlocks\Editor\DataBinding;
 
 defined( 'ABSPATH' ) || exit();
 
-class FieldShortcode {
+class InlineBindings {
 	public static function init(): void {
 		add_action( 'the_content', [ __CLASS__, 'render_frontend_fields' ] );
 	}
@@ -45,7 +45,7 @@ class FieldShortcode {
 					'type' => $query_data['type'] ?? 'field',
 				];
 
-				$value = BlockBindings::get_value( $source_args, [ 'name' => '<field-shortcode>' ], 'content' );
+				$value = BlockBindings::get_value( $source_args, [ 'name' => '<inline-binding>' ], 'content' );
 
 				if ( is_null( $value ) ) {
 					$status = 'query-error';
