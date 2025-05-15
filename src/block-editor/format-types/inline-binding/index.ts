@@ -1,10 +1,10 @@
 import { registerFormatType } from '@wordpress/rich-text';
 
-import { FieldShortcodeButton } from '@/block-editor/format-types/field-shortcode/components/FieldShortcodeButton';
-import { formatTypeSettings } from '@/block-editor/format-types/field-shortcode/settings';
+import { InlineBindingButton } from '@/block-editor/format-types/inline-binding/components/InlineBindingButton';
+import { formatTypeSettings } from '@/block-editor/format-types/inline-binding/settings';
 
-// Register the field shortcode format type.
-registerFormatType( 'remote-data-blocks/field-shortcode', {
+// Register the inline binding format type.
+registerFormatType( 'remote-data-blocks/inline-binding', {
 	...formatTypeSettings,
-	edit: FieldShortcodeButton,
+	edit: InlineBindingButton,
 } );

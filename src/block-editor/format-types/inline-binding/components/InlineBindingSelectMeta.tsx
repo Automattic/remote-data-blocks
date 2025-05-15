@@ -2,15 +2,15 @@ import { DropdownMenu, MenuGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { chevronRightSmall } from '@wordpress/icons';
 
-import { FieldSelectionFromMetaFields } from '@/block-editor/format-types/field-shortcode/components/FieldShortcodeSelection';
-import { useExistingRemoteData } from '@/block-editor/format-types/field-shortcode/hooks/useExistingRemoteData';
+import { FieldSelectionFromMetaFields } from '@/block-editor/format-types/inline-binding/components/InlineBindingSelection';
+import { useExistingRemoteData } from '@/block-editor/format-types/inline-binding/hooks/useExistingRemoteData';
 import { getBlocksConfig } from '@/utils/localized-block-data';
 
-interface FieldShortcodeSelectMetaProps {
+interface InlineBindingSelectMetaProps {
 	onSelectField: ( data: FieldSelection, fieldValue: string ) => void;
 }
 
-export function FieldShortcodeSelectMeta( props: FieldShortcodeSelectMetaProps ) {
+export function InlineBindingSelectMeta( props: InlineBindingSelectMetaProps ) {
 	const blockConfigs = getBlocksConfig();
 	const remoteDatas: RemoteData[] = useExistingRemoteData();
 
@@ -20,7 +20,7 @@ export function FieldShortcodeSelectMeta( props: FieldShortcodeSelectMetaProps )
 			label=""
 			text={ __( 'Query metadata', 'remote-data-blocks' ) }
 			popoverProps={ {
-				className: 'remote-data-blocks-field-shortcode-dropdown remote-data-blocks-select-meta',
+				className: 'remote-data-blocks-inline-binding-dropdown remote-data-blocks-select-meta',
 				placement: 'right-start',
 				offset: 0,
 			} }
