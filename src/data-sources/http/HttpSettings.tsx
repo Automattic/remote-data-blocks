@@ -33,13 +33,6 @@ function computeAuthState( updatedAuth: Partial< HttpServiceConfig[ 'auth' ] > )
 }
 
 export const HttpSettings = ( { mode, uuid, config }: SettingsComponentProps< HttpConfig > ) => {
-	const cardStyles: React.CSSProperties =
-		mode === 'edit'
-			? {
-					marginTop: '16px',
-			  }
-			: {};
-
 	const { state, handleOnChange, validState } = useForm< HttpServiceConfig >( {
 		initialValues: config?.service_config ?? {
 			__version: SERVICE_CONFIG_VERSION,
@@ -100,17 +93,17 @@ export const HttpSettings = ( { mode, uuid, config }: SettingsComponentProps< Ht
 				/>
 
 				<HttpAuthSettingsInput auth={ state.auth } onChange={ handleAuthOnChange } />
+				<Card style={ { marginTop: '16px' } }>
+					<CardBody>
+						<Tip>
+							This data source requires additional code.&nbsp;
+							<ExternalLink href="https://remotedatablocks.com/docs/extending/block-registration/">
+								Learn more
+							</ExternalLink>
+						</Tip>
+					</CardBody>
+				</Card>
 			</DataSourceForm.Setup>
-			<Card style={ cardStyles }>
-				<CardBody>
-					<Tip>
-						This data source requires additional code.&nbsp;
-						<ExternalLink href="https://remotedatablocks.com/docs/extending/block-registration/">
-							Learn more
-						</ExternalLink>
-					</Tip>
-				</CardBody>
-			</Card>
 		</DataSourceForm>
 	);
 };
