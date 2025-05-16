@@ -66,8 +66,8 @@ class Telemetry {
 		add_action( 'remote_data_blocks_track_event', [ $this, 'record_event' ], 10, 2 );
 
 		// Enable the Pendo JavaScript library for tracking.
-		if ( class_exists( 'Automattic\VIP\Telemetry\Pendo' ) ) {
-			add_action( 'admin_init', [ Automattic\VIP\Telemetry\Pendo::class, 'enable_javascript_library' ] );
+		if ( class_exists( '\Automattic\VIP\Telemetry\Pendo' ) ) {
+			add_action( 'admin_init', [ \Automattic\VIP\Telemetry\Pendo::class, 'enable_javascript_library' ] );
 		}
 	}
 
