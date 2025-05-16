@@ -198,8 +198,6 @@ export function useRemoteData( {
 			inputs[ 0 ] = { ...inputs[ 0 ], ...managedQueryInput };
 		}
 
-		console.log( 'Query key being used for fetch', queryKey );
-
 		const requestData: RemoteDataApiRequest = {
 			block_name: blockName,
 			query_group: queryGroup,

@@ -59,7 +59,10 @@ class ConfigRegistry {
 			// ToDo: Add a validation step to check if the required query is present in the user_config['queries'] array.
 			if ( $query->get_required_query() && ! empty( $query->get_required_query() ) ) {
 				// Add the mapping of the required query to the required queries array.
-				$required_queries[ $query->get_required_query() ] = $query_key;
+				$required_queries[ $query->get_required_query() ] = [
+					'query_key' => $query_key,
+					'query' => $query,
+				];
 			}
 		}
 
@@ -70,6 +73,8 @@ class ConfigRegistry {
 			$output_schema = $query->get_output_schema();
 
 			if ( isset( $required_queries[ $query_key ] ) ) {
+				$input_schema = $required_queries[ $query_key ]['query']->get_input_schema();
+
 				array_unshift(
 					$selectors,
 					[
@@ -79,7 +84,7 @@ class ConfigRegistry {
 						'name' => ucfirst( $query_key ),
 						'query_key' => $query_key,
 						'type' => $query->get_type(),
-						'query_group' => $required_queries[ $query_key ],
+						'query_group' => $required_queries[ $query_key ]['query_key'],
 					]
 				);
 			} else {
