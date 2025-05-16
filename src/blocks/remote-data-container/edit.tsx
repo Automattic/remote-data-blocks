@@ -18,10 +18,14 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 
 	const rootClientId = props.clientId;
 	const remoteDataAttribute = migrateRemoteData( props.attributes.remoteData );
-	const [ queryGroup, setQueryGroup ] = useState< string >( remoteDataAttribute?.queryKey ?? '' );
+
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+	const [ queryGroup, setQueryGroup ] = useState< string >( remoteDataAttribute?.queryGroup || '' );
+
+	const [ queryKey, setQueryKey ] = useState< string >( remoteDataAttribute?.queryKey || '' );
 
 	const [ queryInputs, setQueryInputs ] = useState< RemoteDataQueryInput[] >(
-		remoteDataAttribute?.queryInputs ?? []
+		remoteDataAttribute?.queryInputs || []
 	);
 
 	function setAttributes( attributes: RemoteDataBlockAttributes ): void {
@@ -32,6 +36,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 		return (
 			<QuerySelectionPlaceholder
 				blockConfig={ blockConfig }
+				onQueryKeySelect={ setQueryKey }
 				onQueryGroupSelect={ setQueryGroup }
 				onQueryInputsSelect={ setQueryInputs }
 			/>
@@ -43,7 +48,8 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
 			<QueryComponent
 				blockConfig={ blockConfig }
 				blockName={ blockName }
-				queryKey={ queryGroup }
+				queryGroup={ queryGroup }
+				queryKey={ queryKey }
 				queryInputs={ queryInputs }
 				setAttributes={ setAttributes }
 				rootClientId={ rootClientId }

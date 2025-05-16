@@ -31,6 +31,7 @@ async function unmemoizedfetchRemoteData(
 		blockName: body.block_name,
 		metadata: body.metadata,
 		pagination: body.pagination,
+		queryGroup: body.query_group,
 		queryKey: body.query_key,
 		queryInputs: body.query_inputs,
 		resultId: body.result_id,
@@ -70,6 +71,7 @@ interface UseRemoteDataInput {
 	initialPerPage?: number;
 	initialSearchInput?: string;
 	onSuccess?: () => void;
+	queryGroup: string;
 	queryKey: string;
 }
 
@@ -91,6 +93,7 @@ export function useRemoteData( {
 	initialSearchInput,
 	onSuccess,
 	queryKey,
+	queryGroup,
 }: UseRemoteDataInput ): UseRemoteData {
 	const [ data, setData ] = useState< RemoteData >();
 	const [ error, setError ] = useState< Error >();
@@ -102,7 +105,9 @@ export function useRemoteData( {
 
 	const blockConfig = getBlockConfig( blockName );
 
-	const query = blockConfig?.selectors?.find( selector => selector.query_key === queryKey );
+	const query = blockConfig?.selectors?.find(
+		selector => selector.query_key === queryKey && selector.query_group === queryGroup
+	);
 
 	if ( ! query ) {
 		// Here we intentionally throw an error instead of calling setError, because
@@ -197,6 +202,7 @@ export function useRemoteData( {
 
 		const requestData: RemoteDataApiRequest = {
 			block_name: blockName,
+			query_group: queryGroup,
 			query_key: queryKey,
 			query_inputs: inputs,
 		};

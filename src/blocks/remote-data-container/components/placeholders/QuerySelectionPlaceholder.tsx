@@ -24,11 +24,12 @@ type Selector = {
 export interface QuerySelectionPlaceholderProps {
 	blockConfig: BlockConfig;
 	onQueryGroupSelect: ( group: string ) => void;
+	onQueryKeySelect: ( key: string ) => void;
 	onQueryInputsSelect: ( inputs: RemoteDataQueryInput[] ) => void;
 }
 
 export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps ) {
-	const { blockConfig, onQueryGroupSelect, onQueryInputsSelect } = props;
+	const { blockConfig, onQueryGroupSelect, onQueryKeySelect, onQueryInputsSelect } = props;
 	const { instructions, settings, selectors } = blockConfig;
 
 	const iconElement: IconType = ( settings.icon as IconType ) ?? cloud;
@@ -41,9 +42,10 @@ export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps
 	const [ selectedGroup, setSelectedGroup ] = useState< string >( '' );
 	const [ showSelectors, setShowSelectors ] = useState< boolean >( false );
 
-	function handleSelectorOnSelect( inputs: RemoteDataQueryInput[] ) {
+	function handleSelectorOnSelect( queryKey: string, inputs: RemoteDataQueryInput[] ) {
 		setShowSelectors( false );
 		onQueryGroupSelect( selectedGroup );
+		onQueryKeySelect( queryKey );
 		onQueryInputsSelect( inputs );
 	}
 
@@ -84,8 +86,8 @@ export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps
 			) }
 			{ showSelectors && (
 				<ItemSelectQueryType
-					blockConfig={ blockConfig }
-					queryGroup={ selectedGroup }
+					blockName={ blockConfig.name }
+					selectors={ selectors.filter( selector => selector.query_group === selectedGroup ) }
 					onSelect={ handleSelectorOnSelect }
 				/>
 			) }

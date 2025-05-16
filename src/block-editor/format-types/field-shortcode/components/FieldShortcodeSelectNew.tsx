@@ -57,6 +57,8 @@ export function FieldShortcodeSelectNew( props: FieldShortcodeSelectNewProps ) {
 									blockName={ blockConfig.name }
 									headerImage={ compatibleSelector.image_url }
 									onSelectField={ onSelectField }
+									// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+									queryGroup={ compatibleSelector.query_group }
 									queryKey={ compatibleSelector.query_key }
 									renderTrigger={ ( { onClick } ) => (
 										<MenuItem onClick={ onClick }>

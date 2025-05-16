@@ -36,6 +36,7 @@ interface RemoteData {
 	queryInput?: RemoteDataQueryInput;
 	queryInputs: RemoteDataQueryInput[];
 	queryKey?: string;
+	queryGroup?: string;
 	resultId: string;
 	results: RemoteDataApiResult[];
 }
@@ -92,6 +93,7 @@ interface RemoteDataInnerBlockAttributes {
 
 interface RemoteDataApiRequest {
 	block_name: string;
+	query_group: string;
 	query_inputs: RemoteDataQueryInput[];
 	query_key: string;
 }
@@ -105,6 +107,7 @@ interface RemoteDataApiResponseBody {
 	block_name: string;
 	metadata: Record< string, RemoteDataResultFields >;
 	pagination?: RemoteDataPagination;
+	query_group: string;
 	query_inputs: RemoteDataQueryInput[];
 	query_key: string;
 	result_id: string;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { BaseControl, Button, Modal, __experimentalHStack as HStack } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -13,15 +14,25 @@ interface DataViewsModalProps {
 	className?: string;
 	blockName: string;
 	headerImage?: string;
-	onSelect?: ( data: RemoteDataQueryInput[] ) => void;
+	onSelect?: ( key: string, data: RemoteDataQueryInput[] ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
 	queryKey: string;
+	queryGroup: string;
 	renderTrigger?: ( props: { onClick: () => void } ) => React.ReactNode;
 	title?: string;
 }
 
 export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
-	const { className, blockName, onSelect, onSelectField, queryKey, renderTrigger, title } = props;
+	const {
+		className,
+		blockName,
+		onSelect,
+		onSelectField,
+		queryKey,
+		queryGroup,
+		renderTrigger,
+		title,
+	} = props;
 
 	const blockConfig = getBlockConfig( blockName );
 
@@ -45,7 +56,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 		supportsSearch,
 		totalItems,
 		totalPages,
-	} = useRemoteData( { blockName, fetchOnMount: true, queryKey } );
+	} = useRemoteData( { blockName, fetchOnMount: true, queryGroup, queryKey } );
 
 	// For selection, DataViews transacts only in IDs, so we provide the UUID from
 	// the API response as a synthetic ID and map them to the full result.
@@ -77,7 +88,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 			return;
 		}
 
-		onSelect?.( createQueryInputsFromRemoteDataResults( results ) );
+		onSelect?.( queryKey, createQueryInputsFromRemoteDataResults( results ) );
 		sendTracksEvent( 'add_block', {
 			action: 'select_item',
 			selected_option: 'search_from_list',

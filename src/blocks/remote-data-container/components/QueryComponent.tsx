@@ -16,6 +16,7 @@ import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteDat
 import { hasRemoteDataChanged } from '@/utils/block-binding';
 
 export interface QueryComponentProps {
+	queryGroup: string;
 	queryKey: string;
 	blockConfig: BlockConfig;
 	blockName: string;
@@ -28,6 +29,7 @@ export interface QueryComponentProps {
 
 export function QueryComponent( props: QueryComponentProps ) {
 	const {
+		queryGroup,
 		queryKey,
 		blockConfig,
 		blockName,
@@ -45,6 +47,7 @@ export function QueryComponent( props: QueryComponentProps ) {
 		blockName,
 		externallyManagedRemoteData: remoteDataAttribute,
 		externallyManagedUpdateRemoteData: updateRemoteData,
+		queryGroup,
 		queryKey,
 	} );
 	const [ showPatternSelection, setShowPatternSelection ] = useState< boolean >( false );

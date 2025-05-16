@@ -125,6 +125,7 @@ export function FieldShortcodeSelectField( props: FieldShortcodeSelectFieldProps
 	const { data, fetch, loading } = useRemoteData( {
 		blockName: props.blockName,
 		queryKey: DISPLAY_QUERY_KEY,
+		queryGroup: DISPLAY_QUERY_KEY,
 	} );
 
 	useEffect( () => {
