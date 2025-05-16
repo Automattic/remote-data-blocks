@@ -6,11 +6,14 @@ labels: feedback
 assignees: smithjw1
 ---
 
-**Summarize your feedback**
+## Summarize your feedback
+
 Provide a one-sentence summary of your feedback.
 
-**Detailed Feedback**
+## Detailed Feedback
+
 Please provide your full feedback here. Be as detailed as possible. Issues are public, so please do not share any confidential information.
 
-**Version of the plugin**
+## Version of the plugin
+
 Specify the version of the plugin you are using.
