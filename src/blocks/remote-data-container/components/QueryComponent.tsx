@@ -47,8 +47,9 @@ export function QueryComponent( props: QueryComponentProps ) {
 		blockName,
 		externallyManagedRemoteData: remoteDataAttribute,
 		externallyManagedUpdateRemoteData: updateRemoteData,
+		// This is done on purpose as we want to execute the query with the same group as the query key, aka the display query.
 		queryGroup,
-		queryKey,
+		queryKey: queryGroup,
 	} );
 	const [ showPatternSelection, setShowPatternSelection ] = useState< boolean >( false );
 
