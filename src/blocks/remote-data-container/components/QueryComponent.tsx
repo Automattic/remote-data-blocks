@@ -4,6 +4,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { Spinner } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 
 import { DataPanel } from './panels/DataPanel';
@@ -37,13 +38,12 @@ export function QueryComponent( props: QueryComponentProps ) {
 		remoteDataAttribute,
 		setAttributes,
 		queryInputs,
-		onQueryInputsChange,
 	} = props;
 
 	const blockProps = useBlockProps( { className: CONTAINER_CLASS_NAME } );
 	const { getSupportedPatterns, innerBlocksPattern, insertPatternBlocks, resetInnerBlocks } =
 		usePatterns( blockName, rootClientId );
-	const { data, fetch, reset, supportsPagination } = useRemoteData( {
+	const { data, fetch, reset, supportsPagination, loading } = useRemoteData( {
 		blockName,
 		externallyManagedRemoteData: remoteDataAttribute,
 		externallyManagedUpdateRemoteData: updateRemoteData,
@@ -87,7 +87,7 @@ export function QueryComponent( props: QueryComponentProps ) {
 	}
 
 	function onSelectPattern( pattern: BlockPattern ): void {
-		insertPatternBlocks( pattern, true );
+		insertPatternBlocks( pattern, supportsPagination );
 		setShowPatternSelection( false );
 	}
 
@@ -107,7 +107,7 @@ export function QueryComponent( props: QueryComponentProps ) {
 			queryInputs: inputs,
 			queryKey: newQueryKey,
 		} );
-		onQueryInputsChange?.( inputs );
+		refreshRemoteData();
 	}
 
 	if ( showPatternSelection ) {
@@ -142,11 +142,23 @@ export function QueryComponent( props: QueryComponentProps ) {
 					<QueryInputsPanel
 						onUpdateQueryInputs={ onUpdateQueryInputs }
 						remoteData={ data }
-						selectors={ blockConfig.selectors }
+						selectors={ blockConfig.selectors.filter(
+							selectors => selectors.query_group === queryGroup
+						) }
 					/>
 				</InspectorControls>
 			) }
 			<div { ...blockProps }>
+				{ loading && (
+					<div className="remote-data-blocks-loading-overlay">
+						<Spinner
+							style={ {
+								height: '50px',
+								width: '50px',
+							} }
+						/>
+					</div>
+				) }
 				<InnerBlocks />
 			</div>
 		</>
