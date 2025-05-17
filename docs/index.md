@@ -9,7 +9,7 @@ For plugin overview and getting started guide, see [README](../README.md).
 
   - [Block Bindings](concepts/block-bindings.md)
   - [Helper Blocks](concepts/helper-blocks.md)
-  - [Field Shortcodes](concepts/field-shortcodes.md)
+  - [Inline Bindings](concepts/inline-bindings.md)
 
 - [Extending](extending/index.md)
 
@@ -34,7 +34,7 @@ For plugin overview and getting started guide, see [README](../README.md).
 
 ## Additional Documentation
 
-- [AI Documentation](ai.md)
+- [AI Documentation](for-ai.md)
 - [Contributing Guidelines](../CONTRIBUTING.md)
 - [Security Policy](../SECURITY.md)
 - [Code of Conduct](https://make.wordpress.org/handbook/community-code-of-conduct/)

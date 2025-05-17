@@ -10,9 +10,9 @@ import {
 import { __ } from '@wordpress/i18n';
 import { WPFormat, useAnchor } from '@wordpress/rich-text';
 
-import { FieldShortcodeSelectField } from '@/block-editor/format-types/field-shortcode/components/FieldShortcodeSelection';
+import { InlineBindingSelectField } from '@/block-editor/format-types/inline-binding/components/InlineBindingSelection';
 
-interface FieldShortcodeSelectFieldPopoverProps {
+interface InlineBindingSelectFieldPopoverProps {
 	contentRef: React.RefObject< HTMLElement >;
 	fieldSelection: FieldSelection;
 	formatTypeSettings: WPFormat;
@@ -21,7 +21,7 @@ interface FieldShortcodeSelectFieldPopoverProps {
 	resetField: ( blockName?: string ) => void;
 }
 
-export function FieldShortcodeSelectFieldPopover( props: FieldShortcodeSelectFieldPopoverProps ) {
+export function InlineBindingSelectFieldPopover( props: InlineBindingSelectFieldPopoverProps ) {
 	const popoverAnchor = useAnchor( {
 		editableContentElement: props.contentRef.current,
 		settings: props.formatTypeSettings,
@@ -44,7 +44,7 @@ export function FieldShortcodeSelectFieldPopover( props: FieldShortcodeSelectFie
 					<Heading level={ 4 }>{ __( 'Select a field to bind', 'remote-data-blocks' ) }</Heading>
 				</CardHeader>
 				<CardBody>
-					<FieldShortcodeSelectField
+					<InlineBindingSelectField
 						blockName={ remoteData?.blockName ?? 'Remote Data Block' }
 						fieldType={ type ?? 'field' }
 						onSelectField={ ( data, fieldValue ) =>

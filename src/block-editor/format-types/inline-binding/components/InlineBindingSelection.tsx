@@ -113,7 +113,7 @@ export function FieldSelectionFromMetaFields( props: FieldSelectionWithFieldsPro
 	return <FieldSelection { ...props } fields={ fields } fieldType="meta" />;
 }
 
-interface FieldShortcodeSelectFieldProps {
+interface InlineBindingSelectFieldProps {
 	blockName: string;
 	fieldType: 'field' | 'meta';
 	onSelectField: ( data: FieldSelection, fieldValue: string ) => void;
@@ -121,7 +121,7 @@ interface FieldShortcodeSelectFieldProps {
 	selectedField?: string;
 }
 
-export function FieldShortcodeSelectField( props: FieldShortcodeSelectFieldProps ) {
+export function InlineBindingSelectField( props: InlineBindingSelectFieldProps ) {
 	const { data, fetch, loading } = useRemoteData( {
 		blockName: props.blockName,
 		queryKey: DISPLAY_QUERY_KEY,

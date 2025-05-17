@@ -11,6 +11,7 @@ use Kevinrob\GuzzleCache\Storage\WordPressObjectCacheStorage;
 use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use function wp_rand;
 
 class RdbCacheStrategy extends GreedyCacheStrategy {
 	public const CACHE_AGE_RESPONSE_HEADER = 'Age';
@@ -73,6 +74,12 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 			// Cache it for a short time period to prevent error floods.
 			$ttl = self::ERROR_CACHE_TTL_IN_SECONDS;
 		}
+
+		// Add a random jitter to the TTL to avoid simultaneous cache invalidation.
+		// The upper bound of the jitter should be 10% of the TTL or 20 seconds,
+		// whichever is smaller.
+		$jitter = intval( ceil( min( $ttl * 0.1, 20 ) ) );
+		$ttl = intval( $ttl ) + wp_rand( 0, $jitter );
 
 		// NOTE: We skip the vary headers '*' check from the parent method
 		// since our defined vary headers cannot accept a '*' value.

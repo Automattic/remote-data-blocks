@@ -31,24 +31,24 @@ class ConfigRegistry {
 		ConfigStore::init( self::$logger );
 	}
 
-	public static function register_block( array $user_config = [] ): bool|WP_Error {
+	public static function register_block( array $block_config = [] ): bool|WP_Error {
 		// Validate the provided user configuration.
 		$schema = ConfigSchemas::get_remote_data_block_config_schema();
-		$validator = new Validator( $schema, static::class, '$user_config' );
-		$validated = $validator->validate( $user_config );
+		$validator = new Validator( $schema, static::class, '$block_config' );
+		$validated = $validator->validate( $block_config );
 
 		if ( is_wp_error( $validated ) ) {
 			return $validated;
 		}
 
 		// Check if the block has already been registered.
-		$block_title = $user_config['title'];
+		$block_title = $block_config['title'];
 		$block_name = ConfigStore::get_block_name( $block_title );
 		if ( ConfigStore::is_registered_block( $block_name ) ) {
 			return self::create_error( $block_title, sprintf( 'Block %s has already been registered', $block_name ) );
 		}
 
-		$display_query = self::inflate_query( $user_config[ self::RENDER_QUERY_KEY ]['query'] );
+		$display_query = self::inflate_query( $block_config[ self::RENDER_QUERY_KEY ]['query'] );
 		$input_schema = $display_query->get_input_schema();
 		$output_schema = $display_query->get_output_schema();
 		$is_collection = true === ( $output_schema['is_collection'] ?? false );
@@ -65,10 +65,10 @@ class ConfigRegistry {
 		// @see BlockRegistration::register_block_type::register_blocks.
 		$config = [
 			'description' => '',
-			'icon' => $user_config['icon'] ?? 'cloud',
-			'instructions' => $user_config['instructions'] ?? null,
+			'icon' => $block_config['icon'] ?? 'cloud',
+			'instructions' => $block_config['instructions'] ?? null,
 			'name' => $block_name,
-			'overrides' => $user_config['overrides'] ?? [],
+			'overrides' => $block_config['overrides'] ?? [],
 			'patterns' => [],
 			'queries' => [
 				self::DISPLAY_QUERY_KEY => $display_query,
@@ -87,7 +87,7 @@ class ConfigRegistry {
 
 		// Register "selectors" which allow the user to use a query to assist in
 		// selecting data for display by the block.
-		foreach ( $user_config[ self::SELECTION_QUERIES_KEY ] ?? [] as $selection_query ) {
+		foreach ( $block_config[ self::SELECTION_QUERIES_KEY ] ?? [] as $selection_query ) {
 			$from_query = self::inflate_query( $selection_query['query'] );
 			$from_query_type = $selection_query['type'];
 			$to_query = $display_query;
@@ -127,7 +127,7 @@ class ConfigRegistry {
 		}
 
 		// Register patterns which can be used with the block.
-		foreach ( $user_config['patterns'] ?? [] as $pattern ) {
+		foreach ( $block_config['patterns'] ?? [] as $pattern ) {
 			$parsed_blocks = parse_blocks( $pattern['html'] );
 			$parsed_blocks = BlockPatterns::add_block_arg_to_bindings( $block_name, $parsed_blocks );
 			$pattern_content = serialize_blocks( $parsed_blocks );

@@ -8,6 +8,7 @@ use QM_Data_Logger;
 use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 use RemoteDataBlocks\Logging\Logger;
 use function get_post;
+use function wp_is_serving_rest_request;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -65,7 +66,11 @@ if ( class_exists( 'QM_Collector_Logger' ) ) {
 		public function log_event( string $_namespace, string $level, string $message, array $context ): void {
 			$event_type = $context['type'] ?? 'generic';
 
-			if ( $this->log_type !== $event_type ) {
+			// If the log type does not match the event type, do not log. Exception:
+			// During REST API requests, we want to funnel all events to the main
+			// log collector, so that we can see all logs in one place on the REST
+			// response.
+			if ( $this->log_type !== $event_type && ! wp_is_serving_rest_request() ) {
 				return;
 			}
 

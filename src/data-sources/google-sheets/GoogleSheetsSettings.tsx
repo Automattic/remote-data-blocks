@@ -1,4 +1,4 @@
-import { SelectControl, TextareaControl } from '@wordpress/components';
+import { ExternalLink, SelectControl, TextareaControl } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -148,30 +148,32 @@ export const GoogleSheetsSettings = ( {
 		handleOnChange( 'sheets', newSheets );
 	};
 
-	const credentialsHelpText = useMemo( () => {
-		if ( fetchingToken ) {
-			return __( 'Checking credentials...', 'remote-data-blocks' );
-		} else if ( errors.credentials ) {
-			return errors.credentials;
-		} else if ( tokenError ) {
-			const errorMessage = tokenError.message ?? __( 'Unknown error', 'remote-data-blocks' );
-			return getConnectionMessage(
-				'error',
-				__( 'Failed to generate token using provided credentials: ', 'remote-data-blocks' ) +
-					' ' +
-					errorMessage
-			);
-		} else if ( token ) {
-			return getConnectionMessage(
-				'success',
-				__( 'Credentials are valid. Token generated successfully.', 'remote-data-blocks' )
-			);
-		}
-		return __(
-			'Please provide credentials JSON to connect to Google Sheets.',
-			'remote-data-blocks'
+	let credentialsHelpText: React.ReactNode = (
+		<>
+			{ __( 'Please provide JSON credentials to connect to Google Sheets.', 'remote-data-blocks' ) }{ ' ' }
+			<ExternalLink href="https://remotedatablocks.com/docs/tutorials/google-sheets/">
+				{ __( 'How do I create these credentials?', 'remote-data-blocks' ) }
+			</ExternalLink>
+		</>
+	);
+	if ( fetchingToken ) {
+		credentialsHelpText = __( 'Checking credentials...', 'remote-data-blocks' );
+	} else if ( errors.credentials ) {
+		credentialsHelpText = errors.credentials;
+	} else if ( tokenError ) {
+		const errorMessage = tokenError.message ?? __( 'Unknown error', 'remote-data-blocks' );
+		credentialsHelpText = getConnectionMessage(
+			'error',
+			__( 'Failed to generate token using provided credentials: ', 'remote-data-blocks' ) +
+				' ' +
+				errorMessage
 		);
-	}, [ fetchingToken, token, tokenError, errors.credentials ] );
+	} else if ( token ) {
+		credentialsHelpText = getConnectionMessage(
+			'success',
+			__( 'Credentials are valid. Token generated successfully.', 'remote-data-blocks' )
+		);
+	}
 
 	const shouldAllowSubmit = state.spreadsheet && state.sheets?.length;
 

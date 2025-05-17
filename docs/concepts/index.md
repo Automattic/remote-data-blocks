@@ -60,7 +60,7 @@ For example, you might have a remote data block named "Shopify Product" that fet
 
 Remote data blocks are **container blocks** that contain other blocks and provide remote data to them. You retain complete control over the layout, design, and content. You can leverage patterns to enable consistent styling and customize the block's appearance using the block editor or `theme.json`.
 
-Remote data blocks are custom blocks, but they are created and registered by our plugin and don't require custom block development. Remote data is loaded via [the block bindings API](./block-bindings.md) or [field shortcodes](./field-shortcodes.md).
+Remote data blocks are custom blocks, but they are created and registered by our plugin and don't require custom block development. Remote data is loaded via [the block bindings API](./block-bindings.md) or [inline bindings](./inline-bindings.md).
 
 ## Data fetching
 

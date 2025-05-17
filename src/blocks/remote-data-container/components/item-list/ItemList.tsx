@@ -6,7 +6,6 @@ import {
 	ID_FIELD_TYPES,
 	IMAGE_URL_FIELD_TYPES,
 } from '@/blocks/remote-data-container/config/constants';
-import { usePatterns } from '@/blocks/remote-data-container/hooks/usePatterns';
 import { getRemoteDataResultValue } from '@/utils/remote-data';
 
 import type { Action, View } from '@wordpress/dataviews/wp';
@@ -52,7 +51,6 @@ export function ItemList( props: ItemListProps ) {
 		totalPages,
 	} = props;
 	const { DataViews } = window.LockedPrivateDataViews;
-	const { defaultPattern: pattern } = usePatterns( blockName );
 
 	// Get fields from the first result, if present.
 	const firstResult = results?.[ 0 ]?.result ?? {};
@@ -153,7 +151,7 @@ export function ItemList( props: ItemListProps ) {
 				defaultLayouts={ defaultLayouts }
 				fields={ fields }
 				getItemId={ ( item: RemoteDataApiResult ) => item.uuid }
-				isLoading={ loading || ! pattern || ! results }
+				isLoading={ loading || ! results }
 				isItemClickable={ () => true }
 				onChangeSelection={ setSelectionIds }
 				onChangeView={ onChangeView }

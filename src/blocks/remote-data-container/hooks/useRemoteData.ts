@@ -8,23 +8,17 @@ import { memoizeFn } from '@/utils/function';
 import { isQueryInputValid, validateQueryInput } from '@/utils/input-validation';
 import { getBlockConfig } from '@/utils/localized-block-data';
 
-export class RemoteDataFetchError extends Error {
-	constructor( message: string, public cause: unknown ) {
-		super( message );
-	}
-}
-
 async function unmemoizedfetchRemoteData(
 	requestData: RemoteDataApiRequest
-): Promise< RemoteData | null > {
-	const { body } = await apiFetch< RemoteDataApiResponse >( {
+): Promise< RemoteData > {
+	const { body, status } = await apiFetch< RemoteDataApiResponse >( {
 		url: REMOTE_DATA_REST_API_URL,
 		method: 'POST',
 		data: requestData,
 	} );
 
-	if ( ! body ) {
-		return null;
+	if ( 200 !== status || ! body ) {
+		throw new Error( String( body?.message ?? body?.code ?? 'Request for remote data failed' ) );
 	}
 
 	return {
@@ -177,12 +171,15 @@ export function useRemoteData( {
 		void fetch( [ {} ] );
 	}, [] );
 
+	if ( error && ! loading ) {
+		throw error;
+	}
+
 	async function fetch( inputs: RemoteDataQueryInput[] ): Promise< void > {
 		// If there are no inputs, there is nothing to fetch. Empty query inputs
 		// must be represented by an empty object, e.g. `[ {} ]`.
 		if ( 0 === inputs.length ) {
-			resolvedUpdater( undefined );
-			setError( new RemoteDataFetchError( 'Query input is empty', inputs ) );
+			reset( new Error( 'Query input is empty' ) );
 			return;
 		}
 
@@ -201,21 +198,17 @@ export function useRemoteData( {
 		try {
 			inputs.forEach( input => validateQueryInput( input, inputVariables ) );
 		} catch ( err: unknown ) {
-			resolvedUpdater( undefined );
-			setError( new RemoteDataFetchError( 'Query input is invalid', err ) );
+			reset( new Error( String( err ) ) );
 			return;
 		}
 
 		setLoading( true );
 
 		const remoteData = await fetchRemoteData( requestData ).catch( ( err: unknown ) => {
-			setError( new RemoteDataFetchError( 'Request for remote data failed', err ) );
-			return null;
+			reset( new Error( String( err ) ) );
 		} );
 
 		if ( ! remoteData ) {
-			resolvedUpdater( undefined );
-			setLoading( false );
 			return;
 		}
 
@@ -224,9 +217,9 @@ export function useRemoteData( {
 		onSuccess?.();
 	}
 
-	function reset(): void {
+	function reset( err?: Error ): void {
 		resolvedUpdater( undefined );
-		setError( undefined );
+		setError( err );
 		setLoading( false );
 	}
 
