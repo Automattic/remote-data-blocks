@@ -1,10 +1,12 @@
 import {
+	BlockEditorStoreSelectors,
 	BlockPattern,
 	InnerBlocks,
 	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 
 import { DataPanel } from './panels/DataPanel';
@@ -31,6 +33,8 @@ export interface QueryComponentProps {
 export function QueryComponent( props: QueryComponentProps ) {
 	const {
 		queryGroup,
+		// ToDo: See if this is actually needed.
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		queryKey,
 		blockConfig,
 		blockName,
@@ -51,6 +55,9 @@ export function QueryComponent( props: QueryComponentProps ) {
 		queryGroup,
 		queryKey: queryGroup,
 	} );
+
+	// ToDo: Fix this.
+	// const { hasMultiSelection } = useSelect< BlockEditorStoreSelectors >( blockEditorStore );
 	const [ showPatternSelection, setShowPatternSelection ] = useState< boolean >( false );
 
 	useEffect( () => {
@@ -82,6 +89,7 @@ export function QueryComponent( props: QueryComponentProps ) {
 		setShowPatternSelection( false );
 	}
 
+	// ToDo: This doesn't work.
 	function resetRemoteData(): void {
 		reset();
 		resetPatternSelection();

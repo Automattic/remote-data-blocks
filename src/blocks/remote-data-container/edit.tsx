@@ -19,10 +19,11 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 	const rootClientId = props.clientId;
 	const remoteDataAttribute = migrateRemoteData( props.attributes.remoteData );
 
+	// ToDo: Fix this.
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-	const [ queryGroup, setQueryGroup ] = useState< string >( remoteDataAttribute?.queryGroup || '' );
+	const [ queryGroup, setQueryGroup ] = useState< string >( remoteDataAttribute?.queryGroup ?? '' );
 
-	const [ queryKey, setQueryKey ] = useState< string >( remoteDataAttribute?.queryKey || '' );
+	const [ queryKey, setQueryKey ] = useState< string >( remoteDataAttribute?.queryKey ?? '' );
 
 	const [ queryInputs, setQueryInputs ] = useState< RemoteDataQueryInput[] >(
 		remoteDataAttribute?.queryInputs || []
