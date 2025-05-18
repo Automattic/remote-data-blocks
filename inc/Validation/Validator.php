@@ -21,7 +21,7 @@ final class Validator implements ValidatorInterface {
 	) {}
 
 	public function validate( mixed $data ): bool|WP_Error {
-		$validation = $this->check_type( $this->schema, $this->root_path_name, $data );
+		$validation = $this->validate_value( $this->schema, $this->root_path_name, $data );
 
 		if ( is_wp_error( $validation ) ) {
 			$error_data = $validation->get_error_data();
@@ -44,14 +44,14 @@ final class Validator implements ValidatorInterface {
 	 * @param mixed $value The value to validate.
 	 * @return bool|WP_Error Returns true if the data is valid, otherwise a WP_Error.
 	 */
-	private function check_type( array $type, string $path, mixed $value = null ): bool|WP_Error {
+	private function validate_value( array $type, string $path, mixed $value = null ): bool|WP_Error {
 		if ( Types::is_nullable( $type ) && is_null( $value ) ) {
 			return true;
 		}
 
 		if ( Types::is_primitive( $type ) ) {
 			$type_name = Types::get_type_name( $type );
-			$result = $this->check_primitive_type( $type_name, $path, $value );
+			$result = $this->validate_primitive_value( $type_name, $path, $value );
 
 			if ( true === $result ) {
 				return true;
@@ -64,7 +64,7 @@ final class Validator implements ValidatorInterface {
 			return $this->create_error( sprintf( 'must be a %s', $type_name ), $path );
 		}
 
-		return $this->check_non_primitive_type( $type, $path, $value );
+		return $this->validate_non_primitive_value( $type, $path, $value );
 	}
 
 	/**
@@ -77,7 +77,7 @@ final class Validator implements ValidatorInterface {
 	 * @param mixed $value The value to validate.
 	 * @return bool|WP_Error Returns true if the data is valid, otherwise a WP_Error.
 	 */
-	private function check_non_primitive_type( array $type, string $path, mixed $value ): bool|WP_Error {
+	private function validate_non_primitive_value( array $type, string $path, mixed $value ): bool|WP_Error {
 		switch ( Types::get_type_name( $type ) ) {
 			case 'callable':
 				if ( is_callable( $value ) ) {
@@ -119,7 +119,7 @@ final class Validator implements ValidatorInterface {
 
 				foreach ( $value as $index => $item ) {
 					$child_path = sprintf( '%s[%s]', $path, strval( $index ) );
-					$validated = $this->check_type( $member_type, $child_path, $item );
+					$validated = $this->validate_value( $member_type, $child_path, $item );
 					if ( is_wp_error( $validated ) ) {
 						return $validated;
 					}
@@ -132,7 +132,7 @@ final class Validator implements ValidatorInterface {
 				$excluded_types = Types::get_type_args( $type );
 
 				foreach ( $excluded_types as $excluded_type ) {
-					$validated = $this->check_type( $excluded_type, $path, $value );
+					$validated = $this->validate_value( $excluded_type, $path, $value );
 					if ( true === $validated ) {
 						$excluded_type_names = array_map( static function ( array $type ): string {
 							return Types::get_type_name( $type );
@@ -152,7 +152,7 @@ final class Validator implements ValidatorInterface {
 
 				$member_types = Types::get_type_args( $type );
 				foreach ( $member_types as $member_type ) {
-					$validated = $this->check_type( $member_type, $path, $value );
+					$validated = $this->validate_value( $member_type, $path, $value );
 					if ( true === $validated ) {
 						return true;
 					}
@@ -174,7 +174,7 @@ final class Validator implements ValidatorInterface {
 				foreach ( Types::get_type_args( $type ) as $key => $property_type ) {
 					$child_path = sprintf( '%s[\'%s\']', $path, $key );
 					$property_value = $this->get_object_key( $value, $key );
-					$validated = $this->check_type( $property_type, $child_path, $property_value );
+					$validated = $this->validate_value( $property_type, $child_path, $property_value );
 					if ( is_wp_error( $validated ) ) {
 						return $validated;
 					}
@@ -193,13 +193,13 @@ final class Validator implements ValidatorInterface {
 
 				foreach ( $value as $key => $record_value ) {
 					$child_path = sprintf( 'Key %s of %s', $key, $path );
-					$validated = $this->check_type( $key_type, $child_path, $key );
+					$validated = $this->validate_value( $key_type, $child_path, $key );
 					if ( is_wp_error( $validated ) ) {
 						return $validated;
 					}
 
 					$child_path = sprintf( '%s[\'%s\']', $path, $key );
-					$validated = $this->check_type( $value_type, $child_path, $record_value );
+					$validated = $this->validate_value( $value_type, $child_path, $record_value );
 					if ( is_wp_error( $validated ) ) {
 						return $validated;
 					}
@@ -208,7 +208,7 @@ final class Validator implements ValidatorInterface {
 				return true;
 
 			case 'ref':
-				return $this->check_type( Types::load_ref_type( $type ), $path, $value );
+				return $this->validate_value( Types::load_ref_type( $type ), $path, $value );
 
 			case 'serialized_config_for':
 				if ( ! self::check_iterable_object( $value ) ) {
@@ -258,7 +258,7 @@ final class Validator implements ValidatorInterface {
 			case 'string_matching':
 				$regex = Types::get_type_args( $type );
 
-				if ( $this->check_primitive_type( 'string', $path, $value ) && $this->check_primitive_type( 'string', $path, $regex ) && preg_match( $regex, $value ) ) {
+				if ( $this->validate_primitive_value( 'string', $path, $value ) && $this->validate_primitive_value( 'string', $path, $regex ) && preg_match( $regex, $value ) ) {
 					return true;
 				}
 
@@ -279,7 +279,7 @@ final class Validator implements ValidatorInterface {
 	 * @param mixed $value The value to validate.
 	 * @return bool|WP_Error Returns true if the data is valid, otherwise a WP_Error.
 	 */
-	private function check_primitive_type( string $type_name, string $path, mixed $value ): bool|WP_Error {
+	private function validate_primitive_value( string $type_name, string $path, mixed $value ): bool|WP_Error {
 		switch ( $type_name ) {
 			case 'any':
 				return true;

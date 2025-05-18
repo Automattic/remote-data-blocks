@@ -2,25 +2,25 @@ import { DropdownMenu, MenuGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { chevronRightSmall } from '@wordpress/icons';
 
-import { FieldSelectionFromMetaFields } from '@/block-editor/format-types/field-shortcode/components/FieldShortcodeSelection';
-import { useExistingRemoteData } from '@/block-editor/format-types/field-shortcode/hooks/useExistingRemoteData';
+import { FieldSelectionFromAvailableBindings } from '@/block-editor/format-types/inline-binding/components/InlineBindingSelection';
 import { getBlocksConfig } from '@/utils/localized-block-data';
 
-interface FieldShortcodeSelectMetaProps {
+interface InlineBindingSelectExistingProps {
 	onSelectField: ( data: FieldSelection, fieldValue: string ) => void;
+	remoteData: RemoteData[];
 }
 
-export function FieldShortcodeSelectMeta( props: FieldShortcodeSelectMetaProps ) {
+export function InlineBindingSelectExisting( props: InlineBindingSelectExistingProps ) {
 	const blockConfigs = getBlocksConfig();
-	const remoteDatas: RemoteData[] = useExistingRemoteData();
+	const { remoteData: remoteDatas } = props;
 
 	return remoteDatas.length > 0 ? (
 		<DropdownMenu
 			icon={ chevronRightSmall }
 			label=""
-			text={ __( 'Query metadata', 'remote-data-blocks' ) }
+			text={ __( 'Existing items', 'remote-data-blocks' ) }
 			popoverProps={ {
-				className: 'remote-data-blocks-field-shortcode-dropdown remote-data-blocks-select-meta',
+				className: 'remote-data-blocks-inline-binding-dropdown remote-data-blocks-select-existing',
 				placement: 'right-start',
 				offset: 0,
 			} }
@@ -31,9 +31,9 @@ export function FieldShortcodeSelectMeta( props: FieldShortcodeSelectMetaProps )
 						key={ remoteData.blockName }
 						label={ blockConfigs[ remoteData.blockName ]?.settings.title ?? remoteData.blockName }
 					>
-						<FieldSelectionFromMetaFields
+						<FieldSelectionFromAvailableBindings
 							onSelectField={ ( data, fieldValue ) =>
-								props.onSelectField( { ...data, selectionPath: 'select_meta_tab' }, fieldValue )
+								props.onSelectField( { ...data, selectionPath: 'select_existing_tab' }, fieldValue )
 							}
 							remoteData={ remoteData }
 						/>

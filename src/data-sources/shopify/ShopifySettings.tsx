@@ -78,14 +78,14 @@ export const ShopifySettings = ( {
 			>
 				<TextControl
 					type="url"
-					label={ __( 'myshopify.com domain name', 'remote-data-blocks' ) }
+					label={ __( 'Store', 'remote-data-blocks' ) }
 					onChange={ onShopNameChange }
 					value={ state.store_name ?? '' }
-					placeholder="your-shop-name"
+					placeholder="https://your-store.myshopify.com"
 					help={
 						<>
 							{ __( 'Example: https://' ) }
-							<strong>{ __( 'your-shop-name' ) }</strong>
+							<strong>{ __( 'your-store' ) }</strong>
 							{ __( '.myshopify.com' ) }
 						</>
 					}

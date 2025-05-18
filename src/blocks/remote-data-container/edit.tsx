@@ -8,7 +8,7 @@ import { migrateRemoteData } from '@/utils/remote-data';
 
 import './editor.scss';
 
-export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ) {
+export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.Element {
 	const blockName = props.name;
 	const blockConfig = getBlockConfig( blockName );
 

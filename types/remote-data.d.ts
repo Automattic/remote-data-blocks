@@ -105,6 +105,8 @@ interface RemoteDataApiResult {
 
 interface RemoteDataApiResponseBody {
 	block_name: string;
+	code?: number | string;
+	message?: string;
 	metadata: Record< string, RemoteDataResultFields >;
 	pagination?: RemoteDataPagination;
 	query_group: string;
@@ -114,7 +116,14 @@ interface RemoteDataApiResponseBody {
 	results: RemoteDataApiResult[];
 }
 
+// This response shape reflects the use of _envelope=true, which forces a 200
+// status code on the actual request. The actual status code is in the envelope,
+// along the with actual response body. We do this so that Query Monitor can
+// amend the response without disturbing the response body.
+//
+// https://developer.wordpress.org/rest-api/using-the-rest-api/global-parameters/#_envelope
 interface RemoteDataApiResponse {
 	body?: RemoteDataApiResponseBody;
+	qm?: QueryMonitorData;
 	status?: number;
 }

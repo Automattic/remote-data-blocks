@@ -6,12 +6,12 @@ import { chevronRightSmall } from '@wordpress/icons';
 import { DataViewsModal } from '@/blocks/remote-data-container/components/modals/DataViewsModal';
 import { getBlocksConfig } from '@/utils/localized-block-data';
 
-type FieldShortcodeSelectNewProps = Omit< DropdownMenuProps, 'label' > & {
+type InlineBindingSelectNewProps = Omit< DropdownMenuProps, 'label' > & {
 	onSelectField: ( data: FieldSelection, fieldValue: string ) => void;
 	label?: string;
 };
 
-export function FieldShortcodeSelectNew( props: FieldShortcodeSelectNewProps ) {
+export function InlineBindingSelectNew( props: InlineBindingSelectNewProps ) {
 	const { onSelectField, ...restProps } = props;
 	const blockConfigs = getBlocksConfig();
 	const blocksByType = Object.values( blockConfigs ).reduce<
@@ -31,7 +31,7 @@ export function FieldShortcodeSelectNew( props: FieldShortcodeSelectNewProps ) {
 			label=""
 			text={ __( 'Select an item', 'remote-data-blocks' ) }
 			popoverProps={ {
-				className: 'remote-data-blocks-field-shortcode-dropdown remote-data-blocks-select-new',
+				className: 'remote-data-blocks-inline-binding-dropdown remote-data-blocks-select-new',
 				placement: 'right-start',
 				offset: 0,
 			} }

@@ -13,5 +13,5 @@ export const formatTypeSettings: WPFormat = {
 	name: formatName,
 	object: false,
 	tagName: 'remote-data-blocks-inline-field',
-	title: 'Field Shortcode',
+	title: 'Block Bindings',
 } as WPFormat;

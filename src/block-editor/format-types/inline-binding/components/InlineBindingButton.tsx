@@ -4,18 +4,18 @@ import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { RichTextFormat, insertObject, WPFormatEditProps } from '@wordpress/rich-text';
 
-import { FieldShortcodeSelectExisting } from '@/block-editor/format-types/field-shortcode/components/FieldShortcodeSelectExisting';
-import { FieldShortcodeSelectFieldPopover } from '@/block-editor/format-types/field-shortcode/components/FieldShortcodeSelectFieldPopover';
-import { FieldShortcodeSelectMeta } from '@/block-editor/format-types/field-shortcode/components/FieldShortcodeSelectMeta';
-import { FieldShortcodeSelectNew } from '@/block-editor/format-types/field-shortcode/components/FieldShortcodeSelectNew';
-import { useExistingRemoteData } from '@/block-editor/format-types/field-shortcode/hooks/useExistingRemoteData';
+import { InlineBindingSelectExisting } from '@/block-editor/format-types/inline-binding/components/InlineBindingSelectExisting';
+import { InlineBindingSelectFieldPopover } from '@/block-editor/format-types/inline-binding/components/InlineBindingSelectFieldPopover';
+import { InlineBindingSelectMeta } from '@/block-editor/format-types/inline-binding/components/InlineBindingSelectMeta';
+import { InlineBindingSelectNew } from '@/block-editor/format-types/inline-binding/components/InlineBindingSelectNew';
+import { useExistingRemoteData } from '@/block-editor/format-types/inline-binding/hooks/useExistingRemoteData';
 import {
 	formatName,
 	formatTypeSettings,
-} from '@/block-editor/format-types/field-shortcode/settings';
+} from '@/block-editor/format-types/inline-binding/settings';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
 import { getBlockDataSourceType } from '@/utils/localized-block-data';
-import '@/block-editor/format-types/field-shortcode/components/FieldShortcode.scss';
+import '@/block-editor/format-types/inline-binding/components/InlineBinding.scss';
 
 function parseDataQuery( dataQuery?: string ): FieldSelection | null {
 	if ( ! dataQuery ) {
@@ -29,7 +29,7 @@ function parseDataQuery( dataQuery?: string ): FieldSelection | null {
 	}
 }
 
-export function FieldShortcodeButton( props: WPFormatEditProps ) {
+export function InlineBindingButton( props: WPFormatEditProps ) {
 	const { onChange, onFocus, value, isObjectActive, activeObjectAttributes, contentRef } = props;
 	const fieldSelection = parseDataQuery( activeObjectAttributes?.[ 'data-query' ] );
 	const [ showUI, setShowUI ] = useState< boolean >( false );
@@ -99,21 +99,21 @@ export function FieldShortcodeButton( props: WPFormatEditProps ) {
 							className="remote-data-blocks-select-new"
 							icon="shortcode"
 							label={ __( 'Select block bindings', 'remote-data-blocks' ) }
-							popoverProps={ { className: 'rdb-field-shortcode_dropdown', offset: 8 } }
+							popoverProps={ { className: 'rdb-inline-binding_dropdown', offset: 8 } }
 						>
 							{ () => (
 								<ToolbarGroup>
-									<FieldShortcodeSelectNew onSelectField={ onSelectField } />
-									<FieldShortcodeSelectExisting
+									<InlineBindingSelectNew onSelectField={ onSelectField } />
+									<InlineBindingSelectExisting
 										onSelectField={ onSelectField }
 										remoteData={ remoteData }
 									/>
-									<FieldShortcodeSelectMeta onSelectField={ onSelectField } />
+									<InlineBindingSelectMeta onSelectField={ onSelectField } />
 								</ToolbarGroup>
 							) }
 						</ToolbarDropdownMenu>
 					) : (
-						<FieldShortcodeSelectNew
+						<InlineBindingSelectNew
 							onSelectField={ onSelectField }
 							icon="shortcode"
 							label={ __( 'Select block bindings', 'remote-data-blocks' ) }
@@ -125,7 +125,7 @@ export function FieldShortcodeButton( props: WPFormatEditProps ) {
 			</BlockControls>
 
 			{ showUI && fieldSelection && (
-				<FieldShortcodeSelectFieldPopover
+				<InlineBindingSelectFieldPopover
 					contentRef={ contentRef }
 					fieldSelection={ fieldSelection }
 					formatTypeSettings={ formatTypeSettings }

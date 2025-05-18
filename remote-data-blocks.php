@@ -7,7 +7,7 @@
  * Author: WPVIP
  * Author URI: https://wpvip.com
  * Text Domain: remote-data-blocks
- * Version: 0.16.0
+ * Version: 1.0.0
  * Requires at least: 6.7
  * Requires PHP: 8.1
  */
@@ -24,7 +24,7 @@ if ( defined( 'REMOTE_DATA_BLOCKS__LOADED' ) ) {
 define( 'REMOTE_DATA_BLOCKS__LOADED', true );
 define( 'REMOTE_DATA_BLOCKS__PLUGIN_ROOT', __FILE__ );
 define( 'REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
-define( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION', '0.16.0' );
+define( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION', '1.0.0' );
 
 define( 'REMOTE_DATA_BLOCKS__REST_NAMESPACE', 'remote-data-blocks/v1' );
 
@@ -34,7 +34,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 // Other editor modifications
 Editor\AdminNotices\AdminNotices::init();
 Editor\DataBinding\BlockBindings::init();
-Editor\DataBinding\FieldShortcode::init();
+Editor\DataBinding\InlineBindings::init();
 Editor\DataBinding\Pagination::init();
 Editor\BlockManagement\BlockRegistration::init();
 Editor\BlockManagement\ConfigRegistry::init();

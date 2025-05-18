@@ -1,14 +1,22 @@
+import { DisplayableError } from '@/utils/errors';
+
 export enum QueryValidationErrorType {
 	MissingRequiredInput = 'missing_required_input',
 }
 
-export class QueryInputValidationError extends Error {
+export class QueryInputValidationError extends DisplayableError {
 	constructor(
 		message: string,
 		public type: QueryValidationErrorType,
 		public affectedInputVariables: InputVariable[]
 	) {
 		super( message );
+	}
+
+	public toString(): string {
+		return `${ this.type }: ${ this.message }\n\n\t${ this.affectedInputVariables
+			.map( input => input.slug )
+			.join( ', ' ) }`;
 	}
 }
 

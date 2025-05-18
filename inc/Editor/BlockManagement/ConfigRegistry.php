@@ -31,18 +31,18 @@ class ConfigRegistry {
 		ConfigStore::init( self::$logger );
 	}
 
-	public static function register_block( array $user_config = [] ): bool|WP_Error {
+	public static function register_block( array $block_config = [] ): bool|WP_Error {
 		// Validate the provided user configuration.
 		$schema = ConfigSchemas::get_remote_data_block_config_schema();
-		$validator = new Validator( $schema, static::class, '$user_config' );
-		$validated = $validator->validate( $user_config );
+		$validator = new Validator( $schema, static::class, '$block_config' );
+		$validated = $validator->validate( $block_config );
 
 		if ( is_wp_error( $validated ) ) {
 			return $validated;
 		}
 
 		// Check if the block has already been registered.
-		$block_title = $user_config['title'];
+		$block_title = $block_config['title'];
 		$block_name = ConfigStore::get_block_name( $block_title );
 		if ( ConfigStore::is_registered_block( $block_name ) ) {
 			return self::create_error( $block_title, sprintf( 'Block %s has already been registered', $block_name ) );
@@ -53,7 +53,7 @@ class ConfigRegistry {
 		$required_queries = [];
 
 		// go over the queries, inflate each one, get the required query, skip if it's not present and then make a list out of it.
-		foreach ( $user_config['queries'] as $query_key => $query ) {
+		foreach ( $block_config['queries'] as $query_key => $query ) {
 			$query = self::inflate_query( $query );
 
 			// ToDo: Add a validation step to check if the required query is present in the user_config['queries'] array.
@@ -66,7 +66,7 @@ class ConfigRegistry {
 			}
 		}
 
-		foreach ( $user_config['queries'] as $query_key => $query ) {
+		foreach ( $block_config['queries'] as $query_key => $query ) {
 			$query = self::inflate_query( $query );
 			$queries[ $query_key ] = $query;
 			$input_schema = $query->get_input_schema();
@@ -110,10 +110,10 @@ class ConfigRegistry {
 
 		$config = [
 			'description' => '',
-			'icon' => $user_config['icon'] ?? 'cloud',
-			'instructions' => $user_config['instructions'] ?? null,
+			'icon' => $block_config['icon'] ?? 'cloud',
+			'instructions' => $block_config['instructions'] ?? null,
 			'name' => $block_name,
-			'overrides' => $user_config['overrides'] ?? [],
+			'overrides' => $block_config['overrides'] ?? [],
 			'patterns' => [],
 			'queries' => $queries,
 			'selectors' => $selectors,
@@ -121,7 +121,7 @@ class ConfigRegistry {
 		];
 
 		// Register patterns which can be used with the block.
-		foreach ( $user_config['patterns'] ?? [] as $pattern ) {
+		foreach ( $block_config['patterns'] ?? [] as $pattern ) {
 			$parsed_blocks = parse_blocks( $pattern['html'] );
 			$parsed_blocks = BlockPatterns::add_block_arg_to_bindings( $block_name, $parsed_blocks );
 			$pattern_content = serialize_blocks( $parsed_blocks );

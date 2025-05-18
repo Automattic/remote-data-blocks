@@ -129,7 +129,7 @@ The result of this filter is not cached, and will run for every block binding.
 
 ### remote_data_blocks_query_response_metadata
 
-Filter the query response metadata, which are available as bindings for field shortcodes. In most cases, it is better to provide a custom query class and override the `get_response_metadata` method, but this filter is available in case that is not possible.
+Filter the query response metadata, which are available as targets for inline bindings. In most cases, it is better to provide a custom query class and override the `get_response_metadata` method, but this filter is available in case that is not possible.
 
 ```php
 function custom_query_response_metadata( array $metadata, HttpQueryInterface $query, array $input_variables ): array {

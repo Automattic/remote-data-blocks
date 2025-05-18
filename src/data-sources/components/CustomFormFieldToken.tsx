@@ -39,7 +39,7 @@ export const CustomFormFieldToken = ( props: CustomFormFieldTokenProps ) => {
 			className={ `form-token-field-wrapper ${ isAbove ? 'above' : 'below' }` }
 			style={ { position: 'relative' } }
 		>
-			<FormTokenField { ...formTokenFieldProps } __experimentalShowHowTo={ ! customHelpText } />
+			<FormTokenField { ...formTokenFieldProps } __experimentalShowHowTo={ false } />
 			{ customHelpText && <p className="input-help-text">{ customHelpText }</p> }
 		</div>
 	);
