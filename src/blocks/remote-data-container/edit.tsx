@@ -23,8 +23,6 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 	const [ queryGroup, setQueryGroup ] = useState< string >( remoteDataAttribute?.queryGroup ?? '' );
 
-	const [ queryKey, setQueryKey ] = useState< string >( remoteDataAttribute?.queryKey ?? '' );
-
 	const [ queryInputs, setQueryInputs ] = useState< RemoteDataQueryInput[] >(
 		remoteDataAttribute?.queryInputs || []
 	);
@@ -33,11 +31,15 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 		props.setAttributes( attributes );
 	}
 
+	function resetQuery(): void {
+		setQueryGroup( '' );
+		setQueryInputs( [] );
+	}
+
 	if ( ! queryGroup ) {
 		return (
 			<QuerySelectionPlaceholder
 				blockConfig={ blockConfig }
-				onQueryKeySelect={ setQueryKey }
 				onQueryGroupSelect={ setQueryGroup }
 				onQueryInputsSelect={ setQueryInputs }
 			/>
@@ -50,11 +52,11 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 				blockConfig={ blockConfig }
 				blockName={ blockName }
 				queryGroup={ queryGroup }
-				queryKey={ queryKey }
 				queryInputs={ queryInputs }
 				setAttributes={ setAttributes }
 				rootClientId={ rootClientId }
 				remoteDataAttribute={ remoteDataAttribute }
+				resetQuery={ resetQuery }
 			/>
 		</>
 	);

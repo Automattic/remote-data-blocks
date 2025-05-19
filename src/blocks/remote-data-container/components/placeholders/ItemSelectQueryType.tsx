@@ -42,6 +42,7 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 					headerImage: selector.image_url,
 					inputVariables: selector.inputs,
 					onSelect,
+					// ToDo: Fix this.
 					// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 					queryGroup: selector.query_group,
 					queryKey: selector.query_key,

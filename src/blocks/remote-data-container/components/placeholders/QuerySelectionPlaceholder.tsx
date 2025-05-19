@@ -24,12 +24,11 @@ type Selector = {
 export interface QuerySelectionPlaceholderProps {
 	blockConfig: BlockConfig;
 	onQueryGroupSelect: ( group: string ) => void;
-	onQueryKeySelect: ( key: string ) => void;
 	onQueryInputsSelect: ( inputs: RemoteDataQueryInput[] ) => void;
 }
 
 export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps ) {
-	const { blockConfig, onQueryGroupSelect, onQueryKeySelect, onQueryInputsSelect } = props;
+	const { blockConfig, onQueryGroupSelect, onQueryInputsSelect } = props;
 	const { instructions, settings, selectors } = blockConfig;
 
 	const iconElement: IconType = ( settings.icon as IconType ) ?? cloud;
@@ -45,7 +44,6 @@ export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps
 	function handleSelectorOnSelect( queryKey: string, inputs: RemoteDataQueryInput[] ) {
 		setShowSelectors( false );
 		onQueryGroupSelect( selectedGroup );
-		onQueryKeySelect( queryKey );
 		onQueryInputsSelect( inputs );
 	}
 

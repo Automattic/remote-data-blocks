@@ -20,7 +20,6 @@ import { hasRemoteDataChanged } from '@/utils/block-binding';
 
 export interface QueryComponentProps {
 	queryGroup: string;
-	queryKey: string;
 	blockConfig: BlockConfig;
 	blockName: string;
 	rootClientId: string;
@@ -28,20 +27,19 @@ export interface QueryComponentProps {
 	setAttributes: ( attributes: RemoteDataBlockAttributes ) => void;
 	queryInputs: RemoteDataQueryInput[];
 	onQueryInputsChange?: ( inputs: RemoteDataQueryInput[] ) => void;
+	resetQuery: () => void;
 }
 
 export function QueryComponent( props: QueryComponentProps ) {
 	const {
 		queryGroup,
-		// ToDo: See if this is actually needed.
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		queryKey,
 		blockConfig,
 		blockName,
 		rootClientId,
 		remoteDataAttribute,
 		setAttributes,
 		queryInputs,
+		resetQuery,
 	} = props;
 
 	const blockProps = useBlockProps( { className: CONTAINER_CLASS_NAME } );
@@ -89,10 +87,10 @@ export function QueryComponent( props: QueryComponentProps ) {
 		setShowPatternSelection( false );
 	}
 
-	// ToDo: This doesn't work.
 	function resetRemoteData(): void {
 		reset();
 		resetPatternSelection();
+		resetQuery();
 	}
 
 	function onSelectPattern( pattern: BlockPattern ): void {
