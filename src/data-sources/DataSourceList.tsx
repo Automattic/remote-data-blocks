@@ -319,7 +319,7 @@ const DataSourceList = () => {
 					className="rdb-settings-page_data-source-code-snippet-modal"
 					icon={ getServiceIcon( currentSource?.service ?? 'generic-http' ) }
 					title={ __(
-						`${ getDataSourceName( currentSource ) }: Data Source Code`,
+						`Code Snippets: ${ getDataSourceName( currentSource ) }`,
 						'remote-data-blocks'
 					) }
 					onClose={ () => {
@@ -330,7 +330,7 @@ const DataSourceList = () => {
 					<>
 						<p style={ { marginBottom: '16px', padding: '0 8px' } }>
 							{ __(
-								"Below, you'll find the code used to register the block(s) for this data source, which can be used as a reference for extending the data source.\nTo get started, copy the code below and add it to your plugin directory. "
+								"Below, you'll find code snippets for this data source which can be used as a reference.\nTo get started, copy the code below and add it to your plugin directory. "
 							) }
 							<ExternalLink href="https://remotedatablocks.com/docs/extending/index/">
 								{ __( 'Learn more about extending', 'remote-data-blocks' ) }
