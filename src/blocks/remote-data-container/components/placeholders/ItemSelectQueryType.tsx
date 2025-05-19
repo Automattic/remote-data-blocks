@@ -22,7 +22,7 @@ type Selector = {
 interface ItemSelectQueryTypeProps {
 	blockName: string;
 	selectors: Selector[];
-	onSelect: ( key: string, data: RemoteDataQueryInput[] ) => void;
+	onSelect: ( data: RemoteDataQueryInput[] ) => void;
 }
 
 export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
@@ -64,7 +64,7 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 							<Button
 								key={ title }
 								onClick={ () => {
-									onSelect( selector.query_key, [ {} ] );
+									onSelect( [ {} ] );
 								} }
 								variant="primary"
 							>

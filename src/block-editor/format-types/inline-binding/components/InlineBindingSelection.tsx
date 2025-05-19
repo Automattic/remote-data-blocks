@@ -2,12 +2,9 @@ import { BaseControl, Icon, MenuItem, Spinner } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 
-import {
-	DISPLAY_QUERY_KEY,
-	TEXT_FIELD_TYPES,
-} from '@/blocks/remote-data-container/config/constants';
+import { TEXT_FIELD_TYPES } from '@/blocks/remote-data-container/config/constants';
 import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteData';
-import { getBlockAvailableBindings } from '@/utils/localized-block-data';
+import { getBlockAvailableBindings, getDisplayQueryGroup } from '@/utils/localized-block-data';
 import { getRemoteDataResultValue } from '@/utils/remote-data';
 
 interface FieldSelectionProps {
@@ -122,10 +119,13 @@ interface InlineBindingSelectFieldProps {
 }
 
 export function InlineBindingSelectField( props: InlineBindingSelectFieldProps ) {
+	// ToDo: This is getting the first compatible selector under a block, just like the field selection.
+	const queryGroup = getDisplayQueryGroup( props.blockName );
+
 	const { data, fetch, loading } = useRemoteData( {
 		blockName: props.blockName,
-		queryKey: DISPLAY_QUERY_KEY,
-		queryGroup: DISPLAY_QUERY_KEY,
+		queryKey: queryGroup,
+		queryGroup,
 	} );
 
 	useEffect( () => {

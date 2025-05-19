@@ -8,6 +8,7 @@ import { migrateRemoteData } from '@/utils/remote-data';
 
 import './editor.scss';
 
+// ToDo: Need to support the new error boundary.
 export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.Element {
 	const blockName = props.name;
 	const blockConfig = getBlockConfig( blockName );

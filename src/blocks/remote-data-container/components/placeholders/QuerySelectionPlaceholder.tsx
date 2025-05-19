@@ -41,7 +41,7 @@ export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps
 	const [ selectedGroup, setSelectedGroup ] = useState< string >( '' );
 	const [ showSelectors, setShowSelectors ] = useState< boolean >( false );
 
-	function handleSelectorOnSelect( queryKey: string, inputs: RemoteDataQueryInput[] ) {
+	function handleSelectorOnSelect( inputs: RemoteDataQueryInput[] ) {
 		setShowSelectors( false );
 		onQueryGroupSelect( selectedGroup );
 		onQueryInputsSelect( inputs );

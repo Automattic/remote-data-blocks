@@ -14,6 +14,20 @@ export function getBlockDataSourceType( blockName?: string ): string {
 	return getBlockConfig( blockName )?.dataSourceType ?? '';
 }
 
+export function getDisplayQueryGroup( blockName?: string ): string {
+	if ( ! blockName ) {
+		return '';
+	}
+
+	// Todo: Fix this.
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+	return (
+		getBlockConfig( blockName )?.selectors.find(
+			selector => selector.type === 'manual-input' || selector.type === 'load-without-input'
+		)?.query_group ?? ''
+	);
+}
+
 /**
  * Get the title of a remote data block.
  *

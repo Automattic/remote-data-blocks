@@ -1,7 +1,7 @@
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
-	ButtonGroup,
+	__experimentalToggleGroupControl as ToggleGroupControl,
 	PanelBody,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
@@ -44,7 +44,12 @@ export function DataPanel( props: DataPanelProps ) {
 
 	return (
 		<PanelBody title={ __( 'Remote data management', 'remote-data-blocks' ) }>
-			<ButtonGroup>
+			<ToggleGroupControl
+				className="remote-data-blocks-button-group"
+				label={ __( '' ) }
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
+			>
 				<Button
 					onClick={ onRefreshRemoteData }
 					style={ {
@@ -67,9 +72,6 @@ export function DataPanel( props: DataPanelProps ) {
 						confirmButtonText={ __( 'Reset Block', 'remote-data-blocks' ) }
 						onCancel={ () => setResetConfirmOpen( false ) }
 						onConfirm={ resetBlock }
-						style={ {
-							maxWidth: '20em',
-						} }
 					>
 						{ __(
 							'Are you sure you want to reset the block? This will remove all remote data and reset the block to its initial state.',
@@ -77,7 +79,7 @@ export function DataPanel( props: DataPanelProps ) {
 						) }
 					</ConfirmDialog>
 				) }
-			</ButtonGroup>
+			</ToggleGroupControl>
 		</PanelBody>
 	);
 }

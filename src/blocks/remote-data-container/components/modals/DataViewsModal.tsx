@@ -14,7 +14,7 @@ interface DataViewsModalProps {
 	className?: string;
 	blockName: string;
 	headerImage?: string;
-	onSelect?: ( key: string, data: RemoteDataQueryInput[] ) => void;
+	onSelect?: ( data: RemoteDataQueryInput[] ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
 	queryKey: string;
 	queryGroup: string;
@@ -92,7 +92,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 			return;
 		}
 
-		onSelect?.( queryKey, createQueryInputsFromRemoteDataResults( results ) );
+		onSelect?.( createQueryInputsFromRemoteDataResults( results ) );
 		sendTracksEvent( 'add_block', {
 			action: 'select_item',
 			selected_option: 'search_from_list',

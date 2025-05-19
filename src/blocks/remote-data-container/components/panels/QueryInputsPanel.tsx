@@ -2,8 +2,6 @@ import { Button, PanelBody, TextControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { DISPLAY_QUERY_KEY } from '@/blocks/remote-data-container/config/constants';
-
 interface QueryInputsPanelProps {
 	onUpdateQueryInputs: ( queryKey: string, inputs: RemoteDataQueryInput[] ) => void;
 	remoteData: RemoteData;
@@ -15,7 +13,13 @@ export function QueryInputsPanel( {
 	remoteData,
 	selectors,
 }: QueryInputsPanelProps ) {
-	const { queryInputs = [], queryKey = DISPLAY_QUERY_KEY } = remoteData;
+	const { queryInputs = [], queryKey } = remoteData;
+
+	// throw an error if the queryKey is empty.
+	if ( ! queryKey ) {
+		throw new Error( 'Query key should not be empty, when using the QueryInputsPanel' );
+	}
+
 	const [ localInputs, setLocalInputs ] = useState( queryInputs );
 	const inputDefinitions =
 		selectors?.find( selector => selector.query_key === queryKey )?.inputs ?? [];
