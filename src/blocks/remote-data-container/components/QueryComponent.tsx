@@ -1,10 +1,13 @@
 import {
+	BlockEditorStoreSelectors,
 	BlockPattern,
 	InnerBlocks,
 	InspectorControls,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 
 import { DataPanel } from './panels/DataPanel';
@@ -52,8 +55,7 @@ export function QueryComponent( props: QueryComponentProps ) {
 		queryKey: queryGroup,
 	} );
 
-	// ToDo: Fix this.
-	// const { hasMultiSelection } = useSelect< BlockEditorStoreSelectors >( blockEditorStore );
+	const { hasMultiSelection } = useSelect< BlockEditorStoreSelectors >( blockEditorStore );
 	const [ showPatternSelection, setShowPatternSelection ] = useState< boolean >( false );
 
 	useEffect( () => {
@@ -132,7 +134,7 @@ export function QueryComponent( props: QueryComponentProps ) {
 
 	return (
 		<>
-			{ data && (
+			{ ! hasMultiSelection && data && (
 				<InspectorControls>
 					<OverridesPanel
 						blockConfig={ blockConfig }

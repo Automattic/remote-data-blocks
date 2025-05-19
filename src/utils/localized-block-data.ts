@@ -18,14 +18,20 @@ export function getDisplayQueryGroup( blockName?: string ): string {
 	if ( ! blockName ) {
 		return '';
 	}
+	const config = getBlockConfig( blockName );
+	if ( ! config?.selectors ) {
+		return '';
+	}
 
-	// Todo: Fix this.
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-	return (
-		getBlockConfig( blockName )?.selectors.find(
-			selector => selector.type === 'manual-input' || selector.type === 'load-without-input'
-		)?.query_group ?? ''
+	const displaySelector = config.selectors.find(
+		selector => selector.type === 'manual-input' || selector.type === 'load-without-input'
 	);
+
+	if ( ! displaySelector ) {
+		return '';
+	}
+
+	return displaySelector.query_group;
 }
 
 /**

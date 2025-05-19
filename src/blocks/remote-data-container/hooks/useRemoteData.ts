@@ -25,8 +25,6 @@ async function unmemoizedfetchRemoteData(
 		blockName: body.block_name,
 		metadata: body.metadata,
 		pagination: body.pagination,
-		// ToDo: Fix this.
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		queryGroup: body.query_group,
 		queryKey: body.query_key,
 		queryInputs: body.query_inputs,

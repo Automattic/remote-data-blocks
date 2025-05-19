@@ -1,6 +1,7 @@
 import { BlockEditProps } from '@wordpress/blocks';
 import { useState } from '@wordpress/element';
 
+import { EditErrorBoundary } from './components/EditErrorBoundary';
 import { QueryComponent } from './components/QueryComponent';
 import { QuerySelectionPlaceholder } from '@/blocks/remote-data-container/components/placeholders/QuerySelectionPlaceholder';
 import { getBlockConfig } from '@/utils/localized-block-data';
@@ -8,7 +9,6 @@ import { migrateRemoteData } from '@/utils/remote-data';
 
 import './editor.scss';
 
-// ToDo: Need to support the new error boundary.
 export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.Element {
 	const blockName = props.name;
 	const blockConfig = getBlockConfig( blockName );
@@ -20,12 +20,10 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 	const rootClientId = props.clientId;
 	const remoteDataAttribute = migrateRemoteData( props.attributes.remoteData );
 
-	// ToDo: Fix this.
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 	const [ queryGroup, setQueryGroup ] = useState< string >( remoteDataAttribute?.queryGroup ?? '' );
 
 	const [ queryInputs, setQueryInputs ] = useState< RemoteDataQueryInput[] >(
-		remoteDataAttribute?.queryInputs || []
+		remoteDataAttribute?.queryInputs ?? []
 	);
 
 	function setAttributes( attributes: RemoteDataBlockAttributes ): void {
@@ -49,16 +47,18 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 
 	return (
 		<>
-			<QueryComponent
-				blockConfig={ blockConfig }
-				blockName={ blockName }
-				queryGroup={ queryGroup }
-				queryInputs={ queryInputs }
-				setAttributes={ setAttributes }
-				rootClientId={ rootClientId }
-				remoteDataAttribute={ remoteDataAttribute }
-				resetQuery={ resetQuery }
-			/>
+			<EditErrorBoundary blockTitle={ blockName }>
+				<QueryComponent
+					blockConfig={ blockConfig }
+					blockName={ blockName }
+					queryGroup={ queryGroup }
+					queryInputs={ queryInputs }
+					setAttributes={ setAttributes }
+					rootClientId={ rootClientId }
+					remoteDataAttribute={ remoteDataAttribute }
+					resetQuery={ resetQuery }
+				/>
+			</EditErrorBoundary>
 		</>
 	);
 }
