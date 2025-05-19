@@ -56,8 +56,12 @@ class ConfigRegistry {
 		foreach ( $block_config['queries'] as $query_key => $query ) {
 			$query = self::inflate_query( $query );
 
-			// ToDo: Add a validation step to check if the required query is present in the user_config['queries'] array.
 			if ( $query->get_required_query() && ! empty( $query->get_required_query() ) ) {
+
+				if ( ! isset( $block_config['queries'][ $query->get_required_query() ] ) ) {
+					return self::create_error( $block_title, sprintf( 'Required query "%s" not found', $query->get_required_query() ) );
+				}
+
 				// Add the mapping of the required query to the required queries array.
 				$required_queries[ $query->get_required_query() ] = [
 					'query_key' => $query_key,
@@ -74,6 +78,11 @@ class ConfigRegistry {
 
 			if ( isset( $required_queries[ $query_key ] ) ) {
 				$input_schema = $required_queries[ $query_key ]['query']->get_input_schema();
+
+				$validation_result = self::validate_query_mapping( $input_schema, $output_schema, $block_title, $query_key );
+				if ( is_wp_error( $validation_result ) ) {
+					return $validation_result;
+				}
 
 				array_unshift(
 					$selectors,
@@ -140,7 +149,6 @@ class ConfigRegistry {
 		return true;
 	}
 
-	// ToDo: The source query is the from query, and the target query is the to query when calling this. So, the display query is the to query and the source query for the data is the from query. The from query's key is the from_query_key.
 	private static function validate_query_mapping( array $to_query_input_schema, array $from_query_output_schema, string $block_title, string $from_query_key ): WP_Error|bool {
 		foreach ( array_keys( $to_query_input_schema ) as $to ) {
 			if ( ! isset( $from_query_output_schema['type'][ $to ] ) ) {
