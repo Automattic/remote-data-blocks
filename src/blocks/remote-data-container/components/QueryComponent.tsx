@@ -134,7 +134,7 @@ export function QueryComponent( props: QueryComponentProps ) {
 
 	return (
 		<>
-			{ ! hasMultiSelection && data && (
+			{ ! hasMultiSelection() && data && (
 				<InspectorControls>
 					<OverridesPanel
 						blockConfig={ blockConfig }
