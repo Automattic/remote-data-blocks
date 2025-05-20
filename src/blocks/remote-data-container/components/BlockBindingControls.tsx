@@ -36,6 +36,8 @@ export function BlockBindingFieldControl( props: BlockBindingFieldControlProps )
 			options={ [ { label: 'Select a field', value: '' }, ...options ] }
 			onChange={ ( field: string ) => updateFieldBinding( target, field ) }
 			value={ value }
+			__next40pxDefaultSize
+			__nextHasNoMarginBottom
 		/>
 	);
 }
@@ -116,6 +118,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 						label="Show label"
 						name="show_label"
 						onChange={ updateFieldLabel }
+						__nextHasNoMarginBottom
 					/>
 				</>
 			);
