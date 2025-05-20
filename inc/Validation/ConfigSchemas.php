@@ -86,27 +86,6 @@ final class ConfigSchemas {
 					] )
 				)
 			),
-			'render_query' => Types::nullable(Types::object( [
-				'query' => Types::one_of(
-					Types::instance_of( QueryInterface::class ),
-					Types::serialized_config_for( HttpQueryInterface::class ),
-				),
-			] ) ),
-			'selection_queries' => Types::nullable(
-				Types::list_of(
-					Types::object( [
-						'display_name' => Types::nullable( Types::string() ),
-						'query' => Types::one_of(
-							Types::instance_of( QueryInterface::class ),
-							Types::serialized_config_for( HttpQueryInterface::class ),
-						),
-						'type' => Types::enum(
-							ConfigRegistry::LIST_QUERY_KEY,
-							ConfigRegistry::SEARCH_QUERY_KEY
-						),
-					] )
-				)
-			),
 			'queries' => Types::nullable( Types::record(
 				Types::string(),
 				Types::one_of(
@@ -114,12 +93,6 @@ final class ConfigSchemas {
 					Types::serialized_config_for( HttpQueryInterface::class ),
 				)
 			) ),
-			'query_configurations' => Types::nullable(
-				Types::record(
-					Types::string(),
-					Types::string(),
-				)
-			),
 			'overrides' => Types::nullable(
 				Types::list_of(
 					Types::object( [
@@ -170,11 +143,11 @@ final class ConfigSchemas {
 	private static function generate_http_query_config_schema(): array {
 		return Types::object( [
 			'required_query' => Types::nullable( Types::string() ),
-			'type' => Types::enum(
+			'type' => Types::nullable( Types::enum(
 				ConfigRegistry::LIST_QUERY_KEY,
 				ConfigRegistry::SEARCH_QUERY_KEY,
 				ConfigRegistry::DISPLAY_QUERY_KEY,
-			),
+			) ),
 			'cache_ttl' => Types::nullable( Types::one_of( Types::callable(), Types::integer(), Types::null() ) ),
 			'data_source' => Types::one_of(
 				Types::instance_of( HttpDataSourceInterface::class ),

@@ -16,7 +16,9 @@ interface QueryInterface extends ArraySerializableInterface {
 	public function get_data_source(): DataSourceInterface;
 	public function get_image_url(): ?string;
 	public function get_required_query(): ?string;
-	public function get_type(): string;
+	public function set_required_query( string $required_query ): void;
+	public function get_type(): ?string;
+	public function set_type( string $type ): void;
 	public function get_input_schema(): array;
 	public function get_output_schema(): array;
 	public function get_pagination_schema(): ?array;

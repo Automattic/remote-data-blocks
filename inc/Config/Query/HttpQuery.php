@@ -70,10 +70,28 @@ class HttpQuery extends ArraySerializable implements HttpQueryInterface {
 	}
 
 	/**
+	 * Set the required query for this query.
+	 *
+	 * @param string $required_query The required query for this query.
+	 */
+	public function set_required_query( string $required_query ): void {
+		$this->config['required_query'] = $required_query;
+	}
+
+	/**
 	 * Get the type of this query.
 	 */
-	public function get_type(): string {
+	public function get_type(): ?string {
 		return $this->config['type'];
+	}
+
+	/**
+	 * Set the type of this query.
+	 *
+	 * @param string $type The type of this query.
+	 */
+	public function set_type( string $type ): void {
+		$this->config['type'] = $type;
 	}
 
 	/**
@@ -166,15 +184,5 @@ class HttpQuery extends ArraySerializable implements HttpQueryInterface {
 	 */
 	public function preprocess_response( mixed $response_data, array $input_variables ): mixed {
 		return $this->get_or_call_from_config( 'preprocess_response', $response_data, $input_variables ) ?? $response_data;
-	}
-
-	/**
-	 * Migrate the config from the old render_queries and selection_queries format to the new single queries format.
-	 *
-	 * @param array<string, mixed> $config The config to migrate.
-	 * @return array<string, mixed> The migrated config.
-	 */
-	public static function migrate_config( array $config ): array|WP_Error {
-		return $config;
 	}
 }
