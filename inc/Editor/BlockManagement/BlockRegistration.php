@@ -71,14 +71,6 @@ class BlockRegistration {
 		foreach ( ConfigStore::get_block_configurations() as $block_configuration ) {
 			$block_name = $block_configuration['name'];
 
-			// This is to prevent the legacy query configuration from causing errors.
-			// This does make it a breaking change for users who have not updated to the new query configuration.
-			// ToDo: Add a migration path for users who have not updated to the new query configuration.
-			if ( count( $block_configuration['queries'] ) === 0 ) {
-				self::$logger->warning( sprintf( 'Block %s has no queries and will not be registered', $block_name ) );
-				continue;
-			}
-
 			[ $config, $script_handle ] = self::register_block_configuration( $block_configuration );
 			$all_remote_block_configs[ $block_name ] = $config;
 			$scripts_to_localize[] = $script_handle;

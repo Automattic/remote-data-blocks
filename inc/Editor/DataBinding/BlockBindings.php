@@ -139,7 +139,6 @@ class BlockBindings {
 		$remote_data = $remote_data->to_array();
 		$block_name = $source_args['block'] ?? $remote_data['blockName'];
 		$enabled_overrides = $source_args['enabledOverrides'] ?? $remote_data['enabledOverrides'];
-		// ToDo: Re-think the default of the display key here as that's not going to be the case.
 		$query_key = $source_args['queryKey'] ?? $remote_data['queryKey'];
 
 		// Extract the input variables. Allow the binding source args to override.

@@ -143,6 +143,8 @@ final class ConfigSchemas {
 	private static function generate_http_query_config_schema(): array {
 		return Types::object( [
 			'required_query' => Types::nullable( Types::string() ),
+			// This is nullable, to account for the old query format.
+			// It's set based on looking at the query's location in selection_queries or render_query.
 			'type' => Types::nullable( Types::enum(
 				ConfigRegistry::LIST_QUERY_KEY,
 				ConfigRegistry::SEARCH_QUERY_KEY,
