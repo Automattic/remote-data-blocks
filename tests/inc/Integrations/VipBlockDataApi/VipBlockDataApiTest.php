@@ -22,6 +22,7 @@ class VipBlockDataApiTest extends TestCase {
 				'queryInput' => [
 					'record_id' => 'rec9H65WdbaeuxxaU',
 				],
+				'queryKey' => ConfigRegistry::DISPLAY_QUERY_KEY,
 			],
 		],
 		'innerBlocks' => [
@@ -70,6 +71,7 @@ class VipBlockDataApiTest extends TestCase {
 				'queryInput' => [
 					'record_id' => 'rec9H65WdbaeuxxaU',
 				],
+				'queryKey' => ConfigRegistry::DISPLAY_QUERY_KEY,
 			],
 		],
 		'innerBlocks' => [

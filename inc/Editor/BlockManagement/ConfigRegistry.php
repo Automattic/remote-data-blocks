@@ -269,8 +269,14 @@ class ConfigRegistry {
 
 	// ToDo: This will not get the first display query, as we register block bindings with the first display query only.
 	public static function get_display_query( array $queries ): ?QueryInterface {
-		foreach ( $queries as $query ) {
-			if ( $query instanceof QueryInterface && $query->get_type() === self::DISPLAY_QUERY_KEY ) {
+		foreach ( $queries as $query_key => $query ) {
+			if ( ! $query instanceof QueryInterface ) {
+				continue;
+			}
+
+			// The migration system in the config store will always handle setting the type to display.
+			// Looking at the query key is a fallback, which really should not be needed.
+			if ( $query->get_type() === self::DISPLAY_QUERY_KEY || self::DISPLAY_QUERY_KEY === $query_key ) {
 				return $query;
 			}
 		}
