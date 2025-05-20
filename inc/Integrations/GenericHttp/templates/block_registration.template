@@ -36,4 +36,3 @@ function register_http_remote_data_block(): void {
 }
 
 add_action( 'init', __NAMESPACE__ . '\\register_http_remote_data_block' );
-
