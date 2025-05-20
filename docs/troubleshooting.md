@@ -15,6 +15,12 @@ The provided local development environment includes Query Monitor by default. Yo
 
 The [local development environment](local-development.md) includes Xdebug for debugging PHP code and a Node.js debugging port for debugging block editor scripts.
 
+## Support
+
+Our goal is to ensure that Remote Data Blocks works with as many APIs as possible. While we cannot guarantee that we can support every API, we are happy to receive detailed reports of any issues you encounter. Please [create a GitHub issue using the "API integration issue" template](https://github.com/Automattic/remote-data-blocks/issues/new?template=api_integration_issue.md) and we will do our best to assist you.
+
+For general bugs, please [use the "General bug report" template](https://github.com/Automattic/remote-data-blocks/issues/new?template=bug_report.md). If you have feedback or suggestions for improvement, please [use the "Feedback" template](https://github.com/Automattic/remote-data-blocks/issues/new?template=general_feedback.md).
+
 ## Resetting config
 
 If you need to reset the Remote Data Blocks configuration in your local development environment, you can use WP-CLI to delete the configuration option. This will permanently delete all configuration values, including access tokens and API keys.
