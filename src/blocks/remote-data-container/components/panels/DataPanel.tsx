@@ -72,6 +72,9 @@ export function DataPanel( props: DataPanelProps ) {
 						confirmButtonText={ __( 'Reset Block', 'remote-data-blocks' ) }
 						onCancel={ () => setResetConfirmOpen( false ) }
 						onConfirm={ resetBlock }
+						style={ {
+							marginTop: '20em',
+						} }
 					>
 						{ __(
 							'Are you sure you want to reset the block? This will remove all remote data and reset the block to its initial state.',

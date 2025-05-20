@@ -1,8 +1,8 @@
 import {
 	Button,
-	ExternalLink,
-	__experimentalInputControl as InputControl,
 	Popover,
+	__experimentalInputControl as InputControl,
+	ExternalLink,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { keyboardReturn } from '@wordpress/icons';

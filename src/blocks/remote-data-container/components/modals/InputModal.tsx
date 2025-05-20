@@ -1,8 +1,8 @@
 import {
 	Button,
+	TextControl,
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
-	TextControl,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
