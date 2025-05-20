@@ -40,7 +40,7 @@ class ZipCodeBlockTest extends RDBTestCase {
 		$this->register_mocked_data_block( 'Test ZIP API', $test_api_response, $test_output_schema );
 
 		$result_html = do_blocks('
-			<!-- wp:remote-data-blocks/test-zip-api {"remoteData":{"blockName":"remote-data-blocks/test-zip-api","queryInput":{"zip_code":"12345"}}} -->
+			<!-- wp:remote-data-blocks/test-zip-api {"remoteData":{"blockName":"remote-data-blocks/test-zip-api","queryGroup":"display","queryKey":"display","queryInput":{"zip_code":"12345"}}} -->
 			<div class="wp-block-remote-data-blocks-test-zip-api rdb-container">
 				<!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"block":"remote-data-blocks/test-zip-api","field":"zip_code"}}},"name":"Zip Code"}} -->
 				<h2 id="field-zip-code" class="wp-block-heading"></h2>

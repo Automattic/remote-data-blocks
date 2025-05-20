@@ -30,7 +30,7 @@ class RemoteHtmlBlockTest extends RDBTestCase {
 		$this->register_mocked_data_block( 'test-html-render', $test_api_response, $test_output_schema );
 
 		$result_html = do_blocks('
-			<!-- wp:remote-data-blocks/test-html-render {"remoteData":{"blockName":"remote-data-blocks/test-html-render"}} -->
+			<!-- wp:remote-data-blocks/test-html-render {"remoteData":{"blockName":"remote-data-blocks/test-html-render","queryGroup":"display","queryKey":"display"}} -->
 			<div>
 				<!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"block":"remote-data-blocks/test-html-render","field":"title"}}},"name":"Title"}} -->
 				<h2 id="field-title" class="wp-block-heading">Fallback title</h2>
@@ -51,7 +51,7 @@ class RemoteHtmlBlockTest extends RDBTestCase {
 		$this->register_failed_query_data_block( 'test-html-failure' );
 
 		$result_html = do_blocks('
-			<!-- wp:remote-data-blocks/test-html-failure {"remoteData":{"blockName":"remote-data-blocks/test-html-failure"}} -->
+			<!-- wp:remote-data-blocks/test-html-failure {"remoteData":{"blockName":"remote-data-blocks/test-html-failure","queryGroup":"display","queryKey":"display"}} -->
 			<div>
 				<!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"block":"remote-data-blocks/test-html-failure","field":"title"}}},"name":"Title"}} -->
 				<h2 id="field-title" class="wp-block-heading">Fallback title</h2>
