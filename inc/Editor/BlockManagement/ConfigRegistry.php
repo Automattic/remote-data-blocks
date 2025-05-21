@@ -94,70 +94,75 @@ class ConfigRegistry {
 
 		$queries = [];
 		$selectors = [];
-		$required_queries = [];
 
-		// go over the queries, inflate each one, get the required query, skip if it's not present and then make a list out of it.
+		// This ensures we process everything in one pass, and that we don't process the same query twice.
 		foreach ( $block_config[ self::QUERIES_KEY ] as $query_key => $query ) {
-			$query = self::inflate_query( $query );
-
-			if ( $query->get_required_query() && ! empty( $query->get_required_query() ) ) {
-
-				if ( ! isset( $block_config[ self::QUERIES_KEY ][ $query->get_required_query() ] ) ) {
-					return self::create_error( $block_title, sprintf( 'Required query "%s" not found', $query->get_required_query() ) );
-				}
-
-				// Add the mapping of the required query to the required queries array.
-				$required_queries[ $query->get_required_query() ] = [
-					'query_key' => $query_key,
-					'query' => $query,
-				];
+			// Skip if its already in queries.
+			if ( isset( $queries[ $query_key ] ) ) {
+				continue;
 			}
-		}
 
-		foreach ( $block_config[ self::QUERIES_KEY ] as $query_key => $query ) {
+			// Inflate the query, so it's an HttpQuery and add it to the queries array.
 			$query = self::inflate_query( $query );
 			$queries[ $query_key ] = $query;
 			$input_schema = $query->get_input_schema();
 			$output_schema = $query->get_output_schema();
 
-			if ( isset( $required_queries[ $query_key ] ) ) {
-				$required_query_input_schema = $required_queries[ $query_key ]['query']->get_input_schema();
+			// This is a 1:1 mapping at the moment, between the required query and the display query that requires it.
+			if ( $query->get_required_query() && ! empty( $query->get_required_query() ) ) {
 
-				$validation_result = self::validate_query_mapping( $required_query_input_schema, $input_schema, $output_schema, $block_title, $query_key, $query->get_type() );
+				// Ensure the required query exists.
+				if ( ! isset( $block_config[ self::QUERIES_KEY ][ $query->get_required_query() ] ) ) {
+					return self::create_error( $block_title, sprintf( 'Required query "%s" not found', $query->get_required_query() ) );
+				}
+
+				// Inflate the required query, so it's an HttpQuery.
+				$required_query = self::inflate_query( $block_config[ self::QUERIES_KEY ][ $query->get_required_query() ] );
+
+				$required_query_key = $query->get_required_query();
+				$required_query_type = $required_query->get_type();
+				$required_query_input_schema = $required_query->get_input_schema();
+				$required_query_output_schema = $required_query->get_output_schema();
+
+				// Validate the required query mapping.
+				$validation_result = self::validate_query_mapping( $input_schema, $required_query_input_schema, $required_query_output_schema, $block_title, $required_query_key, $required_query_type );
 				if ( is_wp_error( $validation_result ) ) {
 					return $validation_result;
 				}
 
-				array_unshift(
-					$selectors,
-					[
-						'display_name' => self::get_query_name_from_key( $query_key ),
-						'image_url' => $query->get_image_url(),
-						'inputs' => self::map_input_variables( $required_query_input_schema ),
-						'name' => ucfirst( $query_key ),
-						'query_key' => $query_key,
-						'type' => $query->get_type(),
-						'query_group' => $required_queries[ $query_key ]['query_key'],
-					]
-				);
-			} else {
-				$is_collection = true === ( $output_schema['is_collection'] ?? false );
-				$has_required_variables = array_reduce(
-					array_column( $input_schema, 'required' ),
-					fn( $carry, $required ) => $carry || ( $required ?? true ),
-					false
-				);
-
+				// Add the selector for the required query, noting that the input schema is the display query's input schema.
 				$selectors[] = [
-					'display_name' => self::get_query_name_from_key( $query_key ),
-					'image_url' => $query->get_image_url(),
+					'display_name' => self::get_query_name_from_key( $required_query_key ),
+					'image_url' => $required_query->get_image_url(),
 					'inputs' => self::map_input_variables( $input_schema ),
-					'name' => self::DISPLAY_QUERY_KEY === $query->get_type() ? ( $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ) ) : ucfirst( $query_key ),
-					'query_key' => $query_key,
-					'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
+					'name' => ucfirst( $required_query_key ),
+					'query_key' => $required_query_key,
+					'type' => $required_query_type,
 					'query_group' => $query_key,
 				];
+
+				// Add the required query to the queries array, so it won't be processed again.
+				$queries[ $required_query_key ] = $required_query;
 			}
+
+			// The query is either a display, or a list query.
+			$is_collection = true === ( $output_schema['is_collection'] ?? false );
+			$has_required_variables = array_reduce(
+				array_column( $input_schema, 'required' ),
+				fn( $carry, $required ) => $carry || ( $required ?? true ),
+				false
+			);
+
+			// Generate the selector for the query.
+			$selectors[] = [
+				'display_name' => self::get_query_name_from_key( $query_key ),
+				'image_url' => $query->get_image_url(),
+				'inputs' => self::map_input_variables( $input_schema ),
+				'name' => self::DISPLAY_QUERY_KEY === $query->get_type() ? ( $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ) ) : ucfirst( $query_key ),
+				'query_key' => $query_key,
+				'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
+				'query_group' => $query_key,
+			];
 		}
 
 		$config = [
