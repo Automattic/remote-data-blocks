@@ -94,6 +94,7 @@ class ConfigRegistry {
 
 		$queries = [];
 		$selectors = [];
+		$display_query_found = false;
 
 		// This ensures we process everything in one pass, and that we don't process the same query twice.
 		foreach ( $block_config[ self::QUERIES_KEY ] as $query_key => $query ) {
@@ -163,6 +164,16 @@ class ConfigRegistry {
 				'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
 				'query_group' => $query_key,
 			];
+
+			// If the query is a display query, set the display query found flag.
+			if ( self::DISPLAY_QUERY_KEY === $query->get_type() ) {
+				$display_query_found = true;
+			}
+		}
+
+		// If no display query was found, throw an error.
+		if ( ! $display_query_found ) {
+			return self::create_error( $block_title, 'No display query found' );
 		}
 
 		$config = [
@@ -272,7 +283,7 @@ class ConfigRegistry {
 		return ucwords( preg_replace( '/[^a-zA-Z0-9]/', ' ', $key ) );
 	}
 
-	// ToDo: This will not get the first display query, as we register block bindings with the first display query only.
+	// ToDo: This will only get the first display query, as we register block bindings with the first display query only.
 	public static function get_display_query( array $queries ): ?QueryInterface {
 		foreach ( $queries as $query_key => $query ) {
 			if ( ! $query instanceof QueryInterface ) {
