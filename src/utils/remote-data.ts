@@ -96,8 +96,16 @@ export function migrateRemoteData( remoteData?: RemoteData ): RemoteData | undef
 		return createRemoteDataResult( resultValue, `${ num }` );
 	} );
 
+	// By default, the query key used to be display. So if it's not set, we can assume it's display.
+	const queryKey = remoteData.queryKey ?? 'display';
+
+	// The query group is new, and so if its not set, we can assume it's the same as the query key.
+	const queryGroup = remoteData.queryGroup ?? queryKey;
+
 	return {
 		...rest,
+		queryGroup,
+		queryKey,
 		queryInputs: remoteData.queryInputs ?? ( queryInput ? [ queryInput ] : [ {} ] ),
 		results: migratedResults,
 	};

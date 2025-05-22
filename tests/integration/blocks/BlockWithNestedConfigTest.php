@@ -52,7 +52,7 @@ class BlockWithNestedConfigTest extends RDBTestCase {
 		$this->register_remote_data_block_from_block_title( 'Test Product API' );
 
 		$result_html = do_blocks('
-			<!-- wp:remote-data-blocks/test-product-api {"remoteData":{"blockName":"remote-data-blocks/test-product-api","queryGroup":"display","queryKey":"display","queryInput":{}}} -->
+			<!-- wp:remote-data-blocks/test-product-api {"remoteData":{"blockName":"remote-data-blocks/test-product-api","queryKey":"display","queryInput":{}}} -->
 			<div class="wp-block-remote-data-blocks-test-product-api rdb-container">
 				<!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"block":"remote-data-blocks/test-product-api","field":"name"}}},"name":"Name"}} -->
 				<h2 id="field-name" class="wp-block-heading"></h2>
