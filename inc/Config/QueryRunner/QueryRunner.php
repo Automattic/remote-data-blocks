@@ -284,7 +284,6 @@ class QueryRunner implements QueryRunnerInterface {
 			'metadata' => $metadata,
 			'pagination' => Pagination::format_pagination_data_for_query_response( $pagination, $input_schema, $input_variables ),
 			'results' => $results,
-			'query_id' => $query->get_id(),
 			'query_inputs' => [ $input_variables ],
 		];
 
@@ -342,7 +341,6 @@ class QueryRunner implements QueryRunnerInterface {
 			'metadata' => $this->get_response_metadata( $query, [ 'batch' => true ], $merged_results ),
 			'pagination' => null, // Pagination is always disabled for batch executions.
 			'results' => $merged_results,
-			'query_id' => $query->get_id(),
 			'query_inputs' => $merged_query_inputs,
 		];
 	}

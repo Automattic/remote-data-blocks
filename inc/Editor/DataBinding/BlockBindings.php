@@ -139,6 +139,7 @@ class BlockBindings {
 		// args to override.
 		$remote_data = $remote_data->to_array();
 		$block_name = $source_args['block'] ?? $remote_data['blockName'];
+		$block_id = $remote_data['blockId'] ?? null;
 		$enabled_overrides = $source_args['enabledOverrides'] ?? $remote_data['enabledOverrides'];
 		$query_key = $source_args['queryKey'] ?? $remote_data['queryKey'] ?? ConfigRegistry::DISPLAY_QUERY_KEY;
 
@@ -155,7 +156,7 @@ class BlockBindings {
 		// If there is a single array of input variables, fetch pagination variables.
 		// Pagination is disabled for batch execution.
 		if ( 1 === count( $array_of_input_variables ) ) {
-			$pagination_input_variables = Pagination::get_pagination_input_variables_for_current_request( $query );
+			$pagination_input_variables = Pagination::get_pagination_input_variables_for_current_request( $query, $block_id );
 			$array_of_input_variables[0] = array_merge( $array_of_input_variables[0] ?? [], $pagination_input_variables );
 		}
 
@@ -236,10 +237,10 @@ class BlockBindings {
 			return [];
 		}
 
+		$block_id = $block_context['block_id'] ?? null;
 		$pagination_data = $query_response['pagination'] ?? null;
-		$query_id = $query_response['query_id'] ?? null;
 
-		if ( null === $pagination_data || null === $query_id ) {
+		if ( null === $pagination_data || null === $block_id ) {
 			return [];
 		}
 
@@ -248,11 +249,11 @@ class BlockBindings {
 
 		// Create pagination links.
 		if ( isset( $pagination_data['input_variables']['next_page'] ) ) {
-			$next_link = Pagination::create_query_var( $query_id, $pagination_data['input_variables']['next_page'] );
+			$next_link = Pagination::create_query_var( $block_id, $pagination_data['input_variables']['next_page'] );
 		}
 
 		if ( isset( $pagination_data['input_variables']['previous_page'] ) ) {
-			$previous_link = Pagination::create_query_var( $query_id, $pagination_data['input_variables']['previous_page'] );
+			$previous_link = Pagination::create_query_var( $block_id, $pagination_data['input_variables']['previous_page'] );
 		}
 
 		return [
