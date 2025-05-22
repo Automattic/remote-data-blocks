@@ -119,7 +119,7 @@ interface InlineBindingSelectFieldProps {
 }
 
 export function InlineBindingSelectField( props: InlineBindingSelectFieldProps ) {
-	// ToDo: This is getting the first compatible selector under a block, just like the field selection.
+	// This is getting the first compatible selector under a block, just like the field selection worked like before.
 	const queryGroup = getDisplayQueryGroup( props.blockName );
 
 	const { data, fetch, loading } = useRemoteData( {

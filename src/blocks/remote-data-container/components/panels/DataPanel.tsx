@@ -73,7 +73,7 @@ export function DataPanel( props: DataPanelProps ) {
 						onCancel={ () => setResetConfirmOpen( false ) }
 						onConfirm={ resetBlock }
 						style={ {
-							marginTop: '20em',
+							maxWidth: '20em',
 						} }
 					>
 						{ __(
