@@ -129,6 +129,8 @@ describe( 'remote-data utils', () => {
 			const migrated = migrateRemoteData( remoteData );
 
 			expect( migrated ).toEqual( {
+				queryKey: 'display',
+				queryGroup: 'display',
 				queryInputs: [ { title: 'Title 1' } ],
 				results: [
 					{

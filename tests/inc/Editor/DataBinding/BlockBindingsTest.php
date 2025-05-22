@@ -565,7 +565,6 @@ class BlockBindingsTest extends TestCase {
 				'blockName' => self::MOCK_BLOCK_NAME,
 				'queryInput' => $query_input,
 				'enabledOverrides' => $enabled_overrides,
-				'queryKey' => ConfigRegistry::DISPLAY_QUERY_KEY,
 			],
 		];
 	}
