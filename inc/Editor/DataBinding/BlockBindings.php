@@ -23,12 +23,13 @@ class BlockBindings {
 	public static string $context_name = 'remote-data-blocks/remoteData';
 	public static string $binding_source = 'remote-data/binding';
 
-	protected static string $hydrated_results_key = 'hydrated_results';
 	protected static string $prerendered_content_key = 'prerendered_content';
+	protected static array $in_memory_cache = [];
 
 	protected static ?LoggerInterface $logger = null;
 
 	public static function init( ?LoggerInterface $logger = null ): void {
+		self::$in_memory_cache = [];
 		self::$logger = $logger ?? new Logger();
 
 		add_action( 'init', [ __CLASS__, 'register_block_bindings' ], 50, 0 );
@@ -120,13 +121,7 @@ class BlockBindings {
 		return $block_type_args;
 	}
 
-	private static function execute_queries( array $block_context, array $source_args ): array|WP_Error {
-		// If this binding is inside a remote data block, we should have hydrated
-		// results already present. Use them.
-		if ( isset( $source_args[ self::$hydrated_results_key ] ) ) {
-			return $source_args[ self::$hydrated_results_key ];
-		}
-
+	private static function execute_queries( array $block_context, string $block_id ): array|WP_Error {
 		// Load the attribute data and validate it.
 		$remote_data = RemoteDataBlockAttribute::from_array( $block_context );
 
@@ -134,17 +129,12 @@ class BlockBindings {
 			return $remote_data;
 		}
 
-		// Extract block and query information. In cases where the binding has become
-		// disconencted from the ancestor remote data block, allow the binding source
-		// args to override.
+		// Extract block and query information.
 		$remote_data = $remote_data->to_array();
-		$block_name = $source_args['block'] ?? $remote_data['blockName'];
-		$block_id = $remote_data['blockId'] ?? null;
-		$enabled_overrides = $source_args['enabledOverrides'] ?? $remote_data['enabledOverrides'];
-		$query_key = $source_args['queryKey'] ?? $remote_data['queryKey'] ?? ConfigRegistry::DISPLAY_QUERY_KEY;
-
-		// Extract the input variables. Allow the binding source args to override.
-		$array_of_input_variables = $source_args['queryInputs'] ?? $remote_data['queryInputs'];
+		$block_name = $remote_data['blockName'];
+		$enabled_overrides = $remote_data['enabledOverrides'] ?? [];
+		$query_key = $remote_data['queryKey'] ?? ConfigRegistry::DISPLAY_QUERY_KEY;
+		$array_of_input_variables = $remote_data['queryInputs'];
 
 		$block_config = ConfigStore::get_block_configuration( $block_name );
 		$query = $block_config['queries'][ $query_key ] ?? null;
@@ -205,11 +195,27 @@ class BlockBindings {
 		}
 	}
 
+	private static function execute_queries_with_cache( array $block_context ): array|WP_Error {
+		$block_id = md5( wp_json_encode( [
+			'blockName' => $block_context['blockName'] ?? null,
+			'enabledOverrides' => $block_context['enabledOverrides'] ?? [],
+			'queryKey' => $block_context['queryKey'] ?? null,
+			'queryInputs' => $block_context['queryInputs'] ?? [],
+		] ) );
+
+		if ( ! isset( self::$in_memory_cache[ $block_id ] ) ) {
+			self::$in_memory_cache[ $block_id ] = self::execute_queries( $block_context, $block_id );
+		}
+
+		return self::$in_memory_cache[ $block_id ];
+	}
+
 	public static function should_render_fallback_content( array $context, array $attributes ): bool {
 		$block_context = $context[ self::$context_name ] ?? [];
+
 		// Re-execute the query to get the latest results, rather than using the
 		// stale results from the block.
-		$query_response = self::execute_queries( $block_context, [] );
+		$query_response = self::execute_queries_with_cache( $block_context );
 
 		// If there is an error, and it's the error block variation, the fallback
 		// content should be rendered.
@@ -229,9 +235,10 @@ class BlockBindings {
 
 	public static function get_pagination_links( WP_Block $block ): array {
 		$block_context = $block->context[ self::$context_name ] ?? [];
+
 		// Re-execute the query to get the latest results, rather than using the
 		// stale results from the block.
-		$query_response = self::execute_queries( $block_context, [] );
+		$query_response = self::execute_queries_with_cache( $block_context );
 
 		if ( is_wp_error( $query_response ) ) {
 			return [];
@@ -275,9 +282,8 @@ class BlockBindings {
 			$bound_block_name = $block['name'] ?? 'unknown';
 		}
 
-		// Provide some flexibility for external callers to pass the block name.
-		$block_name = $source_args['block'] ?? $block_context['blockName'] ?? null;
-		$block_context['blockName'] = $block_name;
+		// Migrate the config early so that we can access and use values without defensive checks.
+		$block_context = RemoteDataBlockAttribute::migrate_config( $block_context, $source_args );
 
 		// Extract field information from the binding source args.
 		$field_label = $source_args['label'] ?? null;
@@ -298,7 +304,7 @@ class BlockBindings {
 			'block_info' => [
 				'source_args' => $source_args,
 			],
-			'remote_data_block_name' => $block_name,
+			'remote_data_block_name' => $block_context['blockName'] ?? 'unknown',
 		];
 
 		if ( empty( $field_name ) ) {
@@ -309,7 +315,7 @@ class BlockBindings {
 			return $fallback_content;
 		}
 
-		$query_response = self::execute_queries( $block_context, $source_args );
+		$query_response = self::execute_queries_with_cache( $block_context );
 
 		if ( is_wp_error( $query_response ) ) {
 			self::log_error( $log_context, $query_response );
@@ -414,7 +420,7 @@ class BlockBindings {
 			return $content;
 		}
 
-		$query_response = self::execute_queries( $block_context, [] );
+		$query_response = self::execute_queries_with_cache( $block_context );
 
 		if ( is_wp_error( $query_response ) ) {
 			self::log_error( $log_context, $query_response );
@@ -427,11 +433,8 @@ class BlockBindings {
 			return $content;
 		}
 
-		$source_args_for_each_item = array_map( function ( $index ) use ( $query_response ): array {
-			return [
-				self::$hydrated_results_key => $query_response,
-				'index' => $index,
-			];
+		$source_args_for_each_item = array_map( function ( $index ): array {
+			return [ 'index' => $index ];
 		}, array_keys( $query_response['results'] ) );
 
 		$loop_template = $block->parsed_block['innerBlocks'];
@@ -508,11 +511,6 @@ class BlockBindings {
 			return;
 		}
 
-		// Remove key "hydrated_results" if it exists.
-		if ( isset( $log_context['block_info']['source_args'][ self::$hydrated_results_key ] ) ) {
-			unset( $log_context['block_info']['source_args'][ self::$hydrated_results_key ] );
-		}
-
 		$log_context['error'] = $error;
 		$log_context['type'] = 'block-binding';
 
@@ -522,11 +520,6 @@ class BlockBindings {
 	protected static function log_success( array $log_context ): void {
 		if ( null === self::$logger ) {
 			return;
-		}
-
-		// Remove key "hydrated_results" if it exists.
-		if ( isset( $log_context['block_info']['source_args'][ self::$hydrated_results_key ] ) ) {
-			unset( $log_context['block_info']['source_args'][ self::$hydrated_results_key ] );
 		}
 
 		$log_context['type'] = 'block-binding';

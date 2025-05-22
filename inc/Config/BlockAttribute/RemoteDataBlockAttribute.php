@@ -23,7 +23,7 @@ class RemoteDataBlockAttribute extends ArraySerializable {
 	/**
 	 * @inheritDoc
 	 */
-	public static function migrate_config( array $config ): array|WP_Error {
+	public static function migrate_config( array $config, array $source_args = [] ): array|WP_Error {
 		// Provide some defaults to prevent constant defensive checks.
 		$defaults = [
 			'enabledOverrides' => [],
@@ -63,6 +63,28 @@ class RemoteDataBlockAttribute extends ArraySerializable {
 				),
 			];
 		}, $config['results'] ?? [] );
+
+		// Provide some flexibility for external callers to pass config via source
+		// args. This also helps with cases where the binding has become disconencted
+		// from the ancestor remote data block.
+		//
+		// Source args will not be present during normal instantiation, but can be
+		// passed in when this static method is called externally.
+		if ( isset( $source_args['block'] ) ) {
+			$config['blockName'] = $source_args['block'];
+		}
+
+		if ( isset( $source_args['enabledOverrides'] ) ) {
+			$config['enabledOverrides'] = $source_args['enabledOverrides'];
+		}
+
+		if ( isset( $source_args['queryInputs'] ) ) {
+			$config['queryInputs'] = $source_args['queryInputs'];
+		}
+
+		if ( isset( $source_args['queryKey'] ) ) {
+			$config['queryKey'] = $source_args['queryKey'];
+		}
 
 		return $config;
 	}
