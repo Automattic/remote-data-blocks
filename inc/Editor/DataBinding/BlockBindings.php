@@ -280,7 +280,7 @@ class BlockBindings {
 
 		// Extract field information from the binding source args.
 		$field_label = $source_args['label'] ?? null;
-		$field_name = $source_args['field'] ?? null;
+		$field_name = $source_args['field'] ?? '';
 		$field_type = $source_args['type'] ?? 'field';
 		$result_index = $source_args['index'] ?? 0;
 
@@ -300,7 +300,7 @@ class BlockBindings {
 			'remote_data_block_name' => $block_name,
 		];
 
-		if ( null === $field_name ) {
+		if ( empty( $field_name ) ) {
 			self::log_error( $log_context, new WP_Error(
 				'remote_data_blocks_binding_get_value_error',
 				'Missing field mapping for block binding',
