@@ -137,7 +137,7 @@ function register_aic_block(): void {
 				],
 			],
 		],
-		'type' => 'list',
+		'type' => 'display',
 	]);
 
 	$search_art_query = HttpQuery::from_array([
@@ -209,12 +209,19 @@ function register_aic_block(): void {
 	]);
 
 	register_remote_data_block([
+		'title' => 'Art Institute of Chicago Loop',
+		'icon' => 'art',
+		'instructions' => 'This block displays a set amount of artworks based on the provided limit.',
+		'queries' => [
+			'display' => $collection_query,
+		],
+	]);
+
+	register_remote_data_block([
 		'title' => 'Art Institute of Chicago',
 		'icon' => 'art',
-		'instructions' => 'This block displays a set amount of artworks based on the provided limit. This could be 1, or many.',
 		'queries' => [
-			'get_art' => $get_art_query,
-			'get_art_collection' => $collection_query,
+			'display' => $get_art_query,
 			'search_art' => $search_art_query,
 		],
 	] );
