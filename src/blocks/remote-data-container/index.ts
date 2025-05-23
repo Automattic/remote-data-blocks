@@ -1,4 +1,4 @@
-import { registerBlockType } from '@wordpress/blocks';
+import { registerBlockType, registerBlockVariation } from '@wordpress/blocks';
 
 import { Edit } from '@/blocks/remote-data-container/edit';
 import { Save } from '@/blocks/remote-data-container/save';
@@ -14,8 +14,21 @@ Object.values( getBlocksConfig() ).forEach( blockConfig => {
 			remoteData: {
 				type: 'object',
 			},
+			displayQuery: {
+				type: 'string',
+			},
 		},
 		edit: Edit,
 		save: Save,
+	} );
+
+	blockConfig.selectors.forEach( selector => {
+		registerBlockVariation( blockConfig.name, {
+			name: `${ blockConfig.name }-${ selector.name }`,
+			title: `${ blockConfig.settings.title } - ${ selector.display_name }`,
+			attributes: {
+				displayQuery: selector.query_key,
+			},
+		} );
 	} );
 } );

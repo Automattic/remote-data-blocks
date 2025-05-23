@@ -13,6 +13,8 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 	const blockName = props.name;
 	const blockConfig = getBlockConfig( blockName );
 
+	const { displayQuery } = props.attributes;
+
 	if ( ! blockConfig ) {
 		throw new Error( `Block configuration not found for block: ${ blockName }` );
 	}
@@ -20,27 +22,24 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 	const rootClientId = props.clientId;
 	const remoteDataAttribute = migrateRemoteData( props.attributes.remoteData );
 
-	const [ queryGroup, setQueryGroup ] = useState< string >( remoteDataAttribute?.queryGroup ?? '' );
+	// const [ queryGroup, setQueryGroup ] = useState< string >( remoteDataAttribute?.queryGroup ?? '' );
 
 	const [ queryInputs, setQueryInputs ] = useState< RemoteDataQueryInput[] >(
 		remoteDataAttribute?.queryInputs ?? []
 	);
 
-	function setAttributes( attributes: RemoteDataBlockAttributes ): void {
-		props.setAttributes( attributes );
-	}
-
 	function resetQuery(): void {
-		setQueryGroup( '' );
+		// setQueryGroup( '' );
 		setQueryInputs( [] );
 	}
 
-	if ( ! queryGroup ) {
+	if ( ! displayQuery ) {
 		return (
 			<QuerySelectionPlaceholder
 				blockConfig={ blockConfig }
-				onQueryGroupSelect={ setQueryGroup }
-				onQueryInputsSelect={ setQueryInputs }
+				onDisplayQuerySelected={ newDisplayQuery =>
+					props.setAttributes( { displayQuery: newDisplayQuery } )
+				}
 			/>
 		);
 	}
@@ -51,9 +50,9 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 				<QueryComponent
 					blockConfig={ blockConfig }
 					blockName={ blockName }
-					queryGroup={ queryGroup }
+					queryGroup={ '' }
 					queryInputs={ queryInputs }
-					setAttributes={ setAttributes }
+					setAttributes={ props.setAttributes }
 					rootClientId={ rootClientId }
 					remoteDataAttribute={ remoteDataAttribute }
 					resetQuery={ resetQuery }

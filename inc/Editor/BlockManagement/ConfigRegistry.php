@@ -71,26 +71,31 @@ class ConfigRegistry {
 	}
 
 	public static function register_block( array $block_config = [] ): bool|WP_Error {
+		if ( ! isset( $block_config['display_queries'] ) ) {
+			return true;
+		}
+
+		
 		// Migrate the block config to the new format.
 		// Note: This will not handle the case where the required query is not present in the queries array.
 		// That has to be done manually for now.
-		$block_config = self::migrate_block_config( $block_config );
+		// $block_config = self::migrate_block_config( $block_config );
 
 		// Validate the provided user configuration.
-		$schema = ConfigSchemas::get_remote_data_block_config_schema();
-		$validator = new Validator( $schema, static::class, '$block_config' );
-		$validated = $validator->validate( $block_config );
+		// $schema = ConfigSchemas::get_remote_data_block_config_schema();
+		// $validator = new Validator( $schema, static::class, '$block_config' );
+		// $validated = $validator->validate( $block_config );
 
-		if ( is_wp_error( $validated ) ) {
-			return $validated;
-		}
+		// if ( is_wp_error( $validated ) ) {
+		// 	return $validated;
+		// }
 
 		// Check if the block has already been registered.
 		$block_title = $block_config['title'];
 		$block_name = ConfigStore::get_block_name( $block_title );
-		if ( ConfigStore::is_registered_block( $block_name ) ) {
-			return self::create_error( $block_title, sprintf( 'Block %s has already been registered', $block_name ) );
-		}
+		// if ( ConfigStore::is_registered_block( $block_name ) ) {
+		// 	return self::create_error( $block_title, sprintf( 'Block %s has already been registered', $block_name ) );
+		// }
 
 		$queries = [];
 		$selectors = [];
@@ -126,10 +131,10 @@ class ConfigRegistry {
 				$required_query_output_schema = $required_query->get_output_schema();
 
 				// Validate the required query mapping.
-				$validation_result = self::validate_query_mapping( $input_schema, $required_query_input_schema, $required_query_output_schema, $block_title, $required_query_key, $required_query_type );
-				if ( is_wp_error( $validation_result ) ) {
-					return $validation_result;
-				}
+				// $validation_result = self::validate_query_mapping( $input_schema, $required_query_input_schema, $required_query_output_schema, $block_title, $required_query_key, $required_query_type );
+				// if ( is_wp_error( $validation_result ) ) {
+				// 	return $validation_result;
+				// }
 
 				// Add the selector for the required query, noting that the input schema is the display query's input schema.
 				$selectors[] = [

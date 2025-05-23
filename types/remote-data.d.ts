@@ -43,6 +43,7 @@ interface RemoteData {
 
 interface RemoteDataBlockAttributes {
 	remoteData?: RemoteData;
+	displayQuery?: string;
 }
 
 interface RemoteDataNoResultsBlockAttributes {
