@@ -86,6 +86,16 @@ class RemoteDataBlockAttribute extends ArraySerializable {
 			$config['queryKey'] = $source_args['queryKey'];
 		}
 
+		// Generate a key for the block instance based on relevant query input. This
+		// is used to semi-uniquely identify the block instance for in-memory caching
+		// and URL query variables that attempt to target a specific block on a page.
+		$config['blockKey'] = md5( wp_json_encode( [
+			'blockName' => $config['blockName'] ?? null,
+			'enabledOverrides' => $config['enabledOverrides'] ?? [],
+			'queryKey' => $config['queryKey'] ?? null,
+			'queryInputs' => $config['queryInputs'] ?? [],
+		] ) );
+
 		return $config;
 	}
 }

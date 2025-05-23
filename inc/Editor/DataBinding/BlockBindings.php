@@ -121,7 +121,7 @@ class BlockBindings {
 		return $block_type_args;
 	}
 
-	private static function execute_queries( array $block_context, string $block_id ): array|WP_Error {
+	private static function execute_queries( array $block_context ): array|WP_Error {
 		// Load the attribute data and validate it.
 		$remote_data = RemoteDataBlockAttribute::from_array( $block_context );
 
@@ -146,7 +146,7 @@ class BlockBindings {
 		// If there is a single array of input variables, fetch pagination variables.
 		// Pagination is disabled for batch execution.
 		if ( 1 === count( $array_of_input_variables ) ) {
-			$pagination_input_variables = Pagination::get_pagination_input_variables_for_current_request( $query, $block_id );
+			$pagination_input_variables = Pagination::get_pagination_input_variables_for_current_request( $query, $remote_data['blockKey'] );
 			$array_of_input_variables[0] = array_merge( $array_of_input_variables[0] ?? [], $pagination_input_variables );
 		}
 
@@ -195,19 +195,20 @@ class BlockBindings {
 		}
 	}
 
-	private static function execute_queries_with_cache( array $block_context ): array|WP_Error {
-		$block_id = md5( wp_json_encode( [
-			'blockName' => $block_context['blockName'] ?? null,
-			'enabledOverrides' => $block_context['enabledOverrides'] ?? [],
-			'queryKey' => $block_context['queryKey'] ?? null,
-			'queryInputs' => $block_context['queryInputs'] ?? [],
-		] ) );
+	private static function execute_queries_with_cache( array $block_context, array $source_args = [] ): array|WP_Error {
+		// Migrate the config early so that we can access and use values without defensive checks.
+		$block_context = RemoteDataBlockAttribute::migrate_config( $block_context, $source_args );
 
-		if ( ! isset( self::$in_memory_cache[ $block_id ] ) ) {
-			self::$in_memory_cache[ $block_id ] = self::execute_queries( $block_context, $block_id );
+		$block_key = $block_context['blockKey'];
+
+		if ( ! isset( self::$in_memory_cache[ $block_key ] ) ) {
+			self::$in_memory_cache[ $block_key ] = self::execute_queries( $block_context );
 		}
 
-		return self::$in_memory_cache[ $block_id ];
+		return [
+			'block_key' => $block_key,
+			'response' => self::$in_memory_cache[ $block_key ],
+		];
 	}
 
 	public static function should_render_fallback_content( array $context, array $attributes ): bool {
@@ -215,7 +216,8 @@ class BlockBindings {
 
 		// Re-execute the query to get the latest results, rather than using the
 		// stale results from the block.
-		$query_response = self::execute_queries_with_cache( $block_context );
+		$execution_result = self::execute_queries_with_cache( $block_context );
+		$query_response = $execution_result['response'];
 
 		// If there is an error, and it's the error block variation, the fallback
 		// content should be rendered.
@@ -238,16 +240,17 @@ class BlockBindings {
 
 		// Re-execute the query to get the latest results, rather than using the
 		// stale results from the block.
-		$query_response = self::execute_queries_with_cache( $block_context );
+		$execution_result = self::execute_queries_with_cache( $block_context );
+		$query_response = $execution_result['response'];
 
 		if ( is_wp_error( $query_response ) ) {
 			return [];
 		}
 
-		$block_id = $block_context['block_id'] ?? null;
+		$block_key = $execution_result['block_key'] ?? null;
 		$pagination_data = $query_response['pagination'] ?? null;
 
-		if ( null === $pagination_data || null === $block_id ) {
+		if ( null === $pagination_data || null === $block_key ) {
 			return [];
 		}
 
@@ -256,11 +259,11 @@ class BlockBindings {
 
 		// Create pagination links.
 		if ( isset( $pagination_data['input_variables']['next_page'] ) ) {
-			$next_link = Pagination::create_query_var( $block_id, $pagination_data['input_variables']['next_page'] );
+			$next_link = Pagination::create_query_var( $block_key, $pagination_data['input_variables']['next_page'] );
 		}
 
 		if ( isset( $pagination_data['input_variables']['previous_page'] ) ) {
-			$previous_link = Pagination::create_query_var( $block_id, $pagination_data['input_variables']['previous_page'] );
+			$previous_link = Pagination::create_query_var( $block_key, $pagination_data['input_variables']['previous_page'] );
 		}
 
 		return [
@@ -282,9 +285,6 @@ class BlockBindings {
 			$bound_block_name = $block['name'] ?? 'unknown';
 		}
 
-		// Migrate the config early so that we can access and use values without defensive checks.
-		$block_context = RemoteDataBlockAttribute::migrate_config( $block_context, $source_args );
-
 		// Extract field information from the binding source args.
 		$field_label = $source_args['label'] ?? null;
 		$field_name = $source_args['field'] ?? '';
@@ -304,7 +304,7 @@ class BlockBindings {
 			'block_info' => [
 				'source_args' => $source_args,
 			],
-			'remote_data_block_name' => $block_context['blockName'] ?? 'unknown',
+			'remote_data_block_name' => $source_args['block'] ?? $block_context['blockName'] ?? 'unknown',
 		];
 
 		if ( empty( $field_name ) ) {
@@ -315,7 +315,8 @@ class BlockBindings {
 			return $fallback_content;
 		}
 
-		$query_response = self::execute_queries_with_cache( $block_context );
+		$execution_result = self::execute_queries_with_cache( $block_context, $source_args );
+		$query_response = $execution_result['response'];
 
 		if ( is_wp_error( $query_response ) ) {
 			self::log_error( $log_context, $query_response );
@@ -420,7 +421,8 @@ class BlockBindings {
 			return $content;
 		}
 
-		$query_response = self::execute_queries_with_cache( $block_context );
+		$execution_result = self::execute_queries_with_cache( $block_context );
+		$query_response = $execution_result['response'];
 
 		if ( is_wp_error( $query_response ) ) {
 			self::log_error( $log_context, $query_response );
@@ -433,8 +435,8 @@ class BlockBindings {
 			return $content;
 		}
 
-		$source_args_for_each_item = array_map( function ( $index ): array {
-			return [ 'index' => $index ];
+		$source_args_for_each_item = array_map( function ( $index ) use ( $block_context ): array {
+			return array_merge( $block_context, [ 'index' => $index ] );
 		}, array_keys( $query_response['results'] ) );
 
 		$loop_template = $block->parsed_block['innerBlocks'];

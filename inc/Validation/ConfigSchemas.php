@@ -367,6 +367,7 @@ final class ConfigSchemas {
 
 	private static function generate_remote_data_block_attribute_config_schema(): array {
 		return Types::object( [
+			'blockKey' => Types::string(),
 			'blockName' => Types::string(),
 			'enabledOverrides' => Types::list_of( Types::string() ),
 			'metadata' => Types::record(
