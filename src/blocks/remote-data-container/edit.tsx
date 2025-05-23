@@ -6,8 +6,11 @@ import { QueryComponent } from './components/QueryComponent';
 import { QuerySelectionPlaceholder } from '@/blocks/remote-data-container/components/placeholders/QuerySelectionPlaceholder';
 import { getBlockConfig } from '@/utils/localized-block-data';
 import { migrateRemoteData } from '@/utils/remote-data';
+import { cloud } from '@wordpress/icons';
 
 import './editor.scss';
+import { ItemSelectQueryType } from './components/placeholders/ItemSelectQueryType';
+import { Placeholder } from '@wordpress/components';
 
 export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.Element {
 	const blockName = props.name;
@@ -41,6 +44,24 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 					props.setAttributes( { displayQuery: newDisplayQuery } )
 				}
 			/>
+		);
+	}
+
+	if ( displayQuery ) {
+		return (
+			<Placeholder
+				icon={ cloud }
+				label={ blockConfig.settings.title }
+				instructions={
+					blockConfig.instructions ?? __( 'This block requires selection of one or more items for display.' )
+				}
+			>
+				<ItemSelectQueryType
+					blockName={ blockConfig.name }
+					selectors={ blockConfig.selectors }
+					onSelect={ () => {} }
+				/>
+			</Placeholder>
 		);
 	}
 
