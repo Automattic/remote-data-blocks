@@ -113,7 +113,7 @@ class BlockBindingsTest extends TestCase {
 		$mock_block_config = $this->create_mock_block_config( $mock_qr );
 		$this->create_mock_config_store( $mock_block_config );
 
-		$this->assertFalse( BlockBindings::should_render_fallback_content(
+		$this->assertTrue( BlockBindings::should_render_fallback_content(
 			$this->create_block_context( [
 				'test_input_field' => 'test_value',
 				'another_input_field' => 'another_value',
