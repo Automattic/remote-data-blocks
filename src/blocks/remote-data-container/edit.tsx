@@ -72,7 +72,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 				<QueryComponent
 					blockConfig={ blockConfig }
 					blockName={ blockName }
-					queryGroup={ '' }
+					queryGroup={ displayQuery }
 					queryInputs={ queryInputs }
 					setAttributes={ props.setAttributes }
 					rootClientId={ rootClientId }
