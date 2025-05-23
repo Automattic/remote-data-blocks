@@ -214,8 +214,44 @@ function register_aic_block(): void {
 		'instructions' => 'This block displays a set amount of artworks based on the provided limit.',
 		'queries' => [
 			// Changing the name of this query to anything but display will break existing blocks content.
-			'get_art' => $get_art_query,
-			'search_art' => $search_art_query,
+			'get_art' => [ 
+				'query' => $get_art_query,
+				'name' => 'Get Art',
+				'inputs' => [
+					'id' => [
+						'name' => 'Artwork',
+						'sources' => [
+							[ 'display_name' => 'Search Art', 'type' => 'id:list', 'query_key' => 'search_art' ],
+							[ 'display_name' => 'Manual ID', 'type' => 'manual', 'data_type' => 'string' ],
+						]
+					]
+				] 
+			],
+			'search_art' => [
+				'query' => $search_art_query,
+				'name' => 'Search Art',
+				'inputs' => [
+					'search' => [
+						'name' => 'Search',
+						'sources' => [
+							[ 'display_name' => 'Manual Input', 'type' => 'manual', 'data_type' => 'string' ],
+						]
+					],
+					'category' => [
+						'name' => 'Category',
+						'sources' => [
+							[ 'display_name' => 'Pick from list', 'type' => 'id:list', 'query_key' => 'search_art' ],
+							[ 'display_name' => 'Manual Input', 'type' => 'manual', 'data_type' => 'string' ],
+						]
+					],
+					'limit' => [
+						'name' => 'Limit',
+						'sources' => [
+							[ 'display_name' => 'Manual Input', 'type' => 'manual', 'data_type' => 'number' ],
+						]
+					]
+				] 
+			],
 		],
 		'display_queries' => [ 'get_art', 'search_art' ],
 	] );

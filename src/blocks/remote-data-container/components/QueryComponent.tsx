@@ -20,7 +20,7 @@ import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteDat
 import { hasRemoteDataChanged } from '@/utils/block-binding';
 
 export interface QueryComponentProps {
-	queryGroup: string;
+	queryKey: string;
 	blockConfig: BlockConfig;
 	blockName: string;
 	rootClientId: string;
@@ -33,7 +33,7 @@ export interface QueryComponentProps {
 
 export function QueryComponent( props: QueryComponentProps ) {
 	const {
-		queryGroup,
+		queryKey,
 		blockConfig,
 		blockName,
 		rootClientId,
@@ -50,9 +50,7 @@ export function QueryComponent( props: QueryComponentProps ) {
 		blockName,
 		externallyManagedRemoteData: remoteDataAttribute,
 		externallyManagedUpdateRemoteData: updateRemoteData,
-		// This is done on purpose as we want to execute the query with the same group as the query key, aka the display query.
-		queryGroup,
-		queryKey: queryGroup,
+		queryKey,
 	} );
 
 	const { hasMultiSelection } = useSelect< BlockEditorStoreSelectors >( blockEditorStore );
@@ -150,7 +148,7 @@ export function QueryComponent( props: QueryComponentProps ) {
 						onUpdateQueryInputs={ onUpdateQueryInputs }
 						remoteData={ data }
 						selectors={ blockConfig.selectors.filter(
-							selectors => selectors.query_group === queryGroup
+							selectors => selectors.query_key === queryKey
 						) }
 					/>
 				</InspectorControls>

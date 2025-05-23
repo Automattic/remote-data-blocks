@@ -77,7 +77,8 @@ class ConfigStore {
 			return null;
 		}
 
-		$query = ConfigRegistry::get_display_query( $config['queries'] );
+		$query = array_values(array_values($config['variations'])[0]['queries'])[0];
+		// ConfigRegistry::get_display_query( $config['queries'][$config['display_queries'][0]] );
 		if ( ! $query ) {
 			return null;
 		}

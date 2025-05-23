@@ -57,7 +57,6 @@ export function InlineBindingSelectNew( props: InlineBindingSelectNewProps ) {
 									blockName={ blockConfig.name }
 									headerImage={ compatibleSelector.image_url }
 									onSelectField={ onSelectField }
-									queryGroup={ compatibleSelector.query_group }
 									queryKey={ compatibleSelector.query_key }
 									renderTrigger={ ( { onClick } ) => (
 										<MenuItem onClick={ onClick }>

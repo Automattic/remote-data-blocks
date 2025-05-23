@@ -14,26 +14,6 @@ export function getBlockDataSourceType( blockName?: string ): string {
 	return getBlockConfig( blockName )?.dataSourceType ?? '';
 }
 
-export function getDisplayQueryGroup( blockName?: string ): string {
-	if ( ! blockName ) {
-		return '';
-	}
-	const config = getBlockConfig( blockName );
-	if ( ! config?.selectors ) {
-		return '';
-	}
-
-	const displaySelector = config.selectors.find(
-		selector => selector.type === 'manual-input' || selector.type === 'load-without-input'
-	);
-
-	if ( ! displaySelector ) {
-		return '';
-	}
-
-	return displaySelector.query_group;
-}
-
 /**
  * Get the title of a remote data block.
  *

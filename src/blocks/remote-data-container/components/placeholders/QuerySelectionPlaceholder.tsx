@@ -17,7 +17,6 @@ import { cloud } from '@wordpress/icons';
 // 	query_key: string;
 // 	display_name?: string;
 // 	type: string;
-// 	query_group: string;
 // };
 
 export interface QuerySelectionPlaceholderProps {
@@ -29,31 +28,15 @@ export function QuerySelectionPlaceholder( {
 	blockConfig,
 	onDisplayQuerySelected,
 }: QuerySelectionPlaceholderProps ) {
-	const { instructions, settings, selectors } = blockConfig;
+	const { instructions, settings, variations } = blockConfig;
 
 	const iconElement: IconType = ( settings.icon as IconType ) ?? cloud;
-
-	// const [ selectedDisplayQuery, setSelectedDisplayQuery ] = useState< string | null >(  );
-	// const [ showSelectors, setShowSelectors ] = useState< boolean >( false );
-
-	// function handleSelectorOnSelect( inputs: RemoteDataQueryInput[] ) {
-	// 	setShowSelectors( false );
-	// 	onQueryGroupSelect( selectedGroup );
-	// 	onQueryInputsSelect( inputs );
-	// }
-
-	// function handleGroupOnSelect( group: string ) {
-	// 	// setSelectedGroup( group );
-	// 	setShowSelectors( true );
-	// }
 
 	return (
 		<PlaceholderComponent
 			icon={ iconElement }
 			label={ settings.title }
-			instructions={
-				instructions ?? __( 'This block requires selection of one or more items for display.' )
-			}
+			instructions={ instructions ?? __( 'Pick the query you want to use.' ) }
 		>
 			<ToggleGroupControl
 				className="remote-data-blocks-button-group"
@@ -61,25 +44,16 @@ export function QuerySelectionPlaceholder( {
 				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 			>
-				{ selectors.map( selector => (
+				{ Object.entries( variations ).map( ( [ queryKey, config ] ) => (
 					<Button
-						key={ selector.name }
+						key={ queryKey }
 						variant="primary"
-						onClick={ () => {
-							onDisplayQuerySelected( selector.query_key );
-						} }
+						onClick={ () => onDisplayQuerySelected( queryKey ) }
 					>
-						{ selector.display_name }
+						{ config.name }
 					</Button>
 				) ) }
 			</ToggleGroupControl>
-			{ /* { showSelectors && (
-				<ItemSelectQueryType
-					blockName={ blockConfig.name }
-					selectors={ selectors }
-					onSelect={ handleSelectorOnSelect }
-				/>
-			) } */ }
 		</PlaceholderComponent>
 	);
 }

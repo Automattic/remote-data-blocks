@@ -22,13 +22,12 @@ Object.values( getBlocksConfig() ).forEach( blockConfig => {
 		save: Save,
 	} );
 
-	blockConfig.selectors.forEach( selector => {
+	Object.entries( blockConfig.variations ).forEach( ( [ queryKey, config ] ) => {
 		registerBlockVariation( blockConfig.name, {
-			name: `${ blockConfig.name }-${ selector.name }`,
-			title: `${ blockConfig.settings.title } - ${ selector.display_name }`,
-			attributes: {
-				displayQuery: selector.query_key,
-			},
+			name: config.name,
+			title: config.settings?.title ?? config.name,
+			attributes: { displayQuery: queryKey },
+			isActive: [ 'displayQuery' ],
 		} );
 	} );
 } );

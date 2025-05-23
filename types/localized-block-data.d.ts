@@ -24,30 +24,40 @@ interface InputVariableOverride {
 }
 
 interface BlockConfig {
-	availableBindings: AvailableBindings;
-	availableOverrides: InputVariableOverride[];
-	dataSourceType: string;
-	instructions?: string;
 	name: string;
-	patterns: {
-		default: string;
-		inner_blocks?: string;
-	};
-	selectors: {
-		image_url?: string;
-		inputs: InputVariable[];
-		name: string;
-		query_key: string;
-		display_name?: string;
-		type: string;
-		query_group: string;
-	}[];
 	settings: {
 		category: string;
 		description?: string;
 		icon?: ReactElement | IconType | ComponentType;
 		title: string;
 	};
+	instructions?: string;
+	variations: {
+		availableBindings: AvailableBindings;
+		availableOverrides: InputVariableOverride[];
+		dataSourceType: string;
+		instructions?: string;
+		name: string;
+		patterns: {
+			default: string;
+			inner_blocks?: string;
+		};
+		selectors: {
+			image_url?: string;
+			inputs: InputVariable[];
+			name: string;
+			query_key: string;
+			display_name?: string;
+			type: string;
+			query_group: string;
+		}[];
+		settings: {
+			category: string;
+			description?: string;
+			icon?: ReactElement | IconType | ComponentType;
+			title: string;
+		};
+	}[]
 }
 
 interface BlocksConfig {

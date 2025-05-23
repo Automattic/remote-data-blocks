@@ -11,6 +11,7 @@ import { cloud } from '@wordpress/icons';
 import './editor.scss';
 import { ItemSelectQueryType } from './components/placeholders/ItemSelectQueryType';
 import { Placeholder } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.Element {
 	const blockName = props.name;
@@ -25,14 +26,11 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 	const rootClientId = props.clientId;
 	const remoteDataAttribute = migrateRemoteData( props.attributes.remoteData );
 
-	// const [ queryGroup, setQueryGroup ] = useState< string >( remoteDataAttribute?.queryGroup ?? '' );
-
 	const [ queryInputs, setQueryInputs ] = useState< RemoteDataQueryInput[] >(
 		remoteDataAttribute?.queryInputs ?? []
 	);
 
 	function resetQuery(): void {
-		// setQueryGroup( '' );
 		setQueryInputs( [] );
 	}
 
@@ -54,12 +52,12 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 				label={ blockConfig.settings.title }
 				instructions={
 					blockConfig.instructions ??
-					__( 'This block requires selection of one or more items for display.' )
+					__( 'This query requires input values.' )
 				}
 			>
 				<ItemSelectQueryType
 					blockName={ blockConfig.name }
-					selectors={ blockConfig.selectors }
+					variationConfig={ blockConfig.variations[ displayQuery ] }
 					onSelect={ setQueryInputs }
 				/>
 			</Placeholder>
@@ -72,7 +70,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 				<QueryComponent
 					blockConfig={ blockConfig }
 					blockName={ blockName }
-					queryGroup={ displayQuery }
+					queryKey={ displayQuery }
 					queryInputs={ queryInputs }
 					setAttributes={ props.setAttributes }
 					rootClientId={ rootClientId }
