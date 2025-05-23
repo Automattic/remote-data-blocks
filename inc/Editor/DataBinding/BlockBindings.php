@@ -436,7 +436,13 @@ class BlockBindings {
 		}
 
 		$source_args_for_each_item = array_map( function ( $index ) use ( $block_context ): array {
-			return array_merge( $block_context, [ 'index' => $index ] );
+			return [
+				'block' => $block_context['blockName'],
+				'enabledOverrides' => $block_context['enabledOverrides'] ?? [],
+				'index' => $index,
+				'queryKey' => $block_context['queryKey'] ?? null,
+				'queryInputs' => $block_context['queryInputs'] ?? null,
+			];
 		}, array_keys( $query_response['results'] ) );
 
 		$loop_template = $block->parsed_block['innerBlocks'];
