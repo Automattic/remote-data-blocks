@@ -45,7 +45,7 @@ export function QueryComponent( props: QueryComponentProps ) {
 
 	const blockProps = useBlockProps( { className: CONTAINER_CLASS_NAME } );
 	const { getSupportedPatterns, innerBlocksPattern, insertPatternBlocks, resetInnerBlocks } =
-		usePatterns( blockName, rootClientId );
+		usePatterns( blockName, rootClientId, queryGroup );
 	const { data, fetch, reset, supportsPagination, loading } = useRemoteData( {
 		blockName,
 		externallyManagedRemoteData: remoteDataAttribute,

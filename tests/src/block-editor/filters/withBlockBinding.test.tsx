@@ -42,7 +42,7 @@ describe( 'withBlockBinding', () => {
 	const testBlockConfig: LocalizedBlockData = {
 		config: {
 			'test/block': {
-				availableBindings: { field1: { name: 'Field 1', type: 'string' } },
+				availableBindings: { display: { field1: { name: 'Field 1', type: 'string' } } },
 				availableOverrides: [],
 				dataSourceType: 'test-source',
 				name: 'test/block',

@@ -8,14 +8,10 @@ use RemoteDataBlocks\Editor\Assets\Assets;
 use RemoteDataBlocks\Telemetry\Telemetry;
 use RemoteDataBlocks\Editor\BlockPatterns\BlockPatterns;
 use RemoteDataBlocks\REST\RemoteDataController;
-use RemoteDataBlocks\Logging\Logger;
-use RemoteDataBlocks\Logging\LoggerInterface;
 
 use function register_block_type;
 
 class BlockRegistration {
-	private static LoggerInterface $logger;
-
 	/**
 	 * @var array<string, string>
 	 */
@@ -26,8 +22,6 @@ class BlockRegistration {
 	];
 
 	public static function init(): void {
-		self::$logger = new Logger();
-
 		add_action( 'init', [ __CLASS__, 'register_helper_blocks' ], 10, 0 );
 		add_action( 'init', [ __CLASS__, 'register_container_blocks' ], 50, 0 );
 		add_action( 'enqueue_block_editor_assets', [ __CLASS__, 'enqueue_block_assets' ], 10, 0 );
@@ -90,20 +84,39 @@ class BlockRegistration {
 		$block_path = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-container';
 
 		// Set available bindings from the display query output mappings.
-		$available_bindings = [];
-		// This shouldn't be null, as we'd have already validated by this point.
-		$display_query = ConfigRegistry::get_display_query( $config['queries'] );
-		$output_schema = $display_query->get_output_schema();
-		foreach ( $output_schema['type'] ?? [] as $key => $mapping ) {
-			$available_bindings[ $key ] = [
-				'name' => $mapping['name'],
-				'type' => $mapping['type'],
-			];
+		//$available_bindings = [];
+		$display_query_key = null;
+		$display_query = null;
+
+		// ToDo: Once support for multiple display queries has been added on the front-end, switch to using this.
+		$available_bindings_for_queries = [];
+		$display_queries = ConfigRegistry::get_display_queries( $config['queries'] );
+		foreach ( $display_queries as $display_query_key => $display_query ) {
+			$available_bindings_for_query = [];
+			$output_schema = $display_query->get_output_schema();
+			foreach ( $output_schema['type'] ?? [] as $key => $mapping ) {
+				$available_bindings_for_query[ $key ] = [
+					'name' => $mapping['name'],
+					'type' => $mapping['type'],
+				];
+			}
+
+			$available_bindings_for_queries[ $display_query_key ] = $available_bindings_for_query;
 		}
+
+		//This shouldn't be null, as we'd have already validated by this point.
+		// $display_query = ConfigRegistry::get_display_query( $config['queries'] );
+		// $output_schema = $display_query->get_output_schema();
+		// foreach ( $output_schema['type'] ?? [] as $key => $mapping ) {
+		// 	$available_bindings[ $key ] = [
+		// 		'name' => $mapping['name'],
+		// 		'type' => $mapping['type'],
+		// 	];
+		// }
 
 		// Create the localized data that will be used by our block editor script.
 		$block_config = [
-			'availableBindings' => $available_bindings,
+			'availableBindings' => $available_bindings_for_queries,
 			'availableOverrides' => $config['overrides'] ?? [],
 			'instructions' => $config['instructions'],
 			'name' => $block_name,
@@ -127,8 +140,8 @@ class BlockRegistration {
 		$script_handle = $block_type->editor_script_handles[0] ?? '';
 
 		// Register a default pattern that simply displays the available data.
-		$default_pattern_name = BlockPatterns::register_default_block_pattern( $block_name, $config['title'], $display_query );
-		$block_config['patterns']['default'] = $default_pattern_name;
+		$patterns = BlockPatterns::register_block_patterns( $block_name, $config['title'], $display_queries );
+		$block_config['patterns'] = $patterns;
 
 		return [ $block_config, $script_handle ];
 	}

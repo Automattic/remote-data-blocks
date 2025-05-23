@@ -299,4 +299,20 @@ class ConfigRegistry {
 
 		return null;
 	}
+
+	public static function get_display_queries( array $queries ): array {
+		return array_filter(
+			$queries,
+			function ( $query, $query_key ) {
+				return (
+					$query instanceof QueryInterface &&
+					(
+						$query->get_type() === self::DISPLAY_QUERY_KEY ||
+						self::DISPLAY_QUERY_KEY === $query_key
+					)
+				);
+			},
+			ARRAY_FILTER_USE_BOTH
+		);
+	}
 }

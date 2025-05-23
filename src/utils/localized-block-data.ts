@@ -1,5 +1,12 @@
-export function getBlockAvailableBindings( blockName: string ): AvailableBindings {
-	return getBlockConfig( blockName )?.availableBindings ?? {};
+// export function getBlockAvailableBindings( blockName: string ): AvailableBindings {
+// 	return getBlockConfig( blockName )?.availableBindings ?? {};
+// }
+
+export function getBlockAvailableBindingsForQuery(
+	blockName: string,
+	queryKey: string
+): AvailableBindingsForQuery {
+	return getBlockConfig( blockName )?.availableBindings?.[ queryKey ] ?? {};
 }
 
 export function getBlockConfig( blockName: string ): BlockConfig | undefined {

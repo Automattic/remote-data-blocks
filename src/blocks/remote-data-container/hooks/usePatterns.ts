@@ -15,7 +15,11 @@ import {
 } from '@/utils/block-binding';
 import { getBlockConfig } from '@/utils/localized-block-data';
 
-export function usePatterns( remoteDataBlockName: string, rootClientId: string = '' ) {
+export function usePatterns(
+	remoteDataBlockName: string,
+	rootClientId: string = '',
+	queryGroup: string = ''
+) {
 	const { patterns } = getBlockConfig( remoteDataBlockName ) ?? {};
 	const { replaceInnerBlocks } = useDispatch< BlockEditorStoreActions >( blockEditorStore );
 	const { getPatternsByBlockTypes, allowedPatterns } = useSelect<
@@ -87,8 +91,9 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 		getSupportedPatterns: ( result?: RemoteDataApiResult ): BlockPattern[] => {
 			const supportedPatterns = allowedPatterns.filter(
 				pattern =>
-					pattern?.blockTypes?.includes( remoteDataBlockName ) ||
-					pattern.blocks.some( block => hasBlockBinding( block, remoteDataBlockName ) )
+					( pattern?.blockTypes?.includes( remoteDataBlockName ) ||
+						pattern.blocks.some( block => hasBlockBinding( block, remoteDataBlockName ) ) ) &&
+					( ! pattern.keywords || pattern.keywords.includes( queryGroup ) )
 			);
 
 			// If no result is provided, return the supported patterns as is.

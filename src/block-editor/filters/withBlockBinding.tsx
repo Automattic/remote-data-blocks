@@ -17,11 +17,11 @@ import {
 	PATTERN_OVERRIDES_CONTEXT_KEY,
 } from '@/config/constants';
 import { getBoundBlockClassName, getMismatchedAttributes } from '@/utils/block-binding';
-import { getBlockAvailableBindings, getBlockTitle } from '@/utils/localized-block-data';
+import { getBlockAvailableBindingsForQuery, getBlockTitle } from '@/utils/localized-block-data';
 
 interface BoundBlockEditProps {
 	attributes: RemoteDataInnerBlockAttributes;
-	availableBindings: AvailableBindings;
+	availableBindings: AvailableBindingsForQuery;
 	blockName: string;
 	children: JSX.Element;
 	remoteDataName: string;
@@ -105,12 +105,24 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 	) => {
 		const { attributes, context, name, previewIndex: index = 0, setAttributes } = props;
 		const { remoteData } = useRemoteDataContext( context );
-		const availableBindings = getBlockAvailableBindings( remoteData?.blockName ?? '' );
-		const hasAvailableBindings = Boolean( Object.keys( availableBindings ).length );
 		const { hasMultiSelection } = useSelect< BlockEditorStoreSelectors >( blockEditorStore );
 
 		// If the block does not have a remote data context, render it as usual.
-		if ( ! remoteData || ! hasAvailableBindings ) {
+		if ( ! remoteData ) {
+			return <BlockEdit { ...props } />;
+		}
+
+		const queryKey = remoteData.queryKey;
+
+		const availableBindings = getBlockAvailableBindingsForQuery(
+			remoteData?.blockName ?? '',
+			queryKey ?? ''
+		);
+
+		const hasAvailableBindings = Boolean( Object.keys( availableBindings ).length );
+
+		// If the block does not have any bindings, render it as usual.
+		if ( ! hasAvailableBindings ) {
 			return <BlockEdit { ...props } />;
 		}
 

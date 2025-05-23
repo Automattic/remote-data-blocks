@@ -4,7 +4,7 @@ import { check } from '@wordpress/icons';
 
 import { TEXT_FIELD_TYPES } from '@/blocks/remote-data-container/config/constants';
 import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteData';
-import { getBlockAvailableBindings, getDisplayQueryGroup } from '@/utils/localized-block-data';
+import { getBlockAvailableBindingsForQuery } from '@/utils/localized-block-data';
 import { getRemoteDataResultValue } from '@/utils/remote-data';
 
 interface FieldSelectionProps {
@@ -73,7 +73,10 @@ export function FieldSelection( props: FieldSelectionProps ) {
 type FieldSelectionWithFieldsProps = Omit< FieldSelectionProps, 'fields' | 'fieldType' >;
 
 export function FieldSelectionFromAvailableBindings( props: FieldSelectionWithFieldsProps ) {
-	const availableBindings = getBlockAvailableBindings( props.remoteData.blockName );
+	const availableBindings = getBlockAvailableBindingsForQuery(
+		props.remoteData.blockName,
+		props.remoteData.queryKey ?? ''
+	);
 
 	const fields = Object.entries( availableBindings ).reduce< FieldSelectionProps[ 'fields' ] >(
 		( acc, [ fieldName, binding ] ) => {
@@ -116,16 +119,17 @@ interface InlineBindingSelectFieldProps {
 	onSelectField: ( data: FieldSelection, fieldValue: string ) => void;
 	queryInputs: RemoteDataQueryInput[];
 	selectedField?: string;
+	queryKey: string;
 }
 
 export function InlineBindingSelectField( props: InlineBindingSelectFieldProps ) {
 	// This is getting the first compatible selector under a block, just like the field selection worked like before.
-	const queryGroup = getDisplayQueryGroup( props.blockName );
+	// const queryGroup = getDisplayQueryGroup( props.blockName );
 
 	const { data, fetch, loading } = useRemoteData( {
 		blockName: props.blockName,
-		queryKey: queryGroup,
-		queryGroup,
+		queryKey: props.queryKey,
+		queryGroup: props.queryKey,
 	} );
 
 	useEffect( () => {

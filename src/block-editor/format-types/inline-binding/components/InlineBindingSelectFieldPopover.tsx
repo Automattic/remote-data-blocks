@@ -46,6 +46,7 @@ export function InlineBindingSelectFieldPopover( props: InlineBindingSelectField
 				<CardBody>
 					<InlineBindingSelectField
 						blockName={ remoteData?.blockName ?? 'Remote Data Block' }
+						queryKey={ remoteData?.queryKey ?? '' }
 						fieldType={ type ?? 'field' }
 						onSelectField={ ( data, fieldValue ) =>
 							props.onSelectField( { ...data, action: 'update_field_shortcode' }, fieldValue )

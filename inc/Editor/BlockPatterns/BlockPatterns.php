@@ -64,6 +64,16 @@ class BlockPatterns {
 		return sprintf( self::$templates[ $template_name ], wp_json_encode( $attributes ) );
 	}
 
+	public static function register_block_patterns( string $block_name, string $block_title, array $display_queries_mappings ): array {
+		$registered_patterns = [];
+		foreach ( $display_queries_mappings as $display_query_key => $display_query ) {
+			$pattern_name = self::register_default_block_pattern( $block_name, $block_title, $display_query_key, $display_query );
+			$registered_patterns[ $display_query_key ] = $pattern_name;
+		}
+
+		return $registered_patterns;
+	}
+
 	/**
 	 * Register a default block pattern for a remote data block that can be used
 	 * even when no other patterns are available (e.g., in the item list view).
@@ -73,7 +83,7 @@ class BlockPatterns {
 	 * @param QueryInterface $display_query The display query.
 	 * @return string The registered pattern name.
 	 */
-	public static function register_default_block_pattern( string $block_name, string $block_title, QueryInterface $display_query ): string {
+	public static function register_default_block_pattern( string $block_name, string $block_title, string $display_query_key, QueryInterface $display_query ): string {
 		self::load_templates();
 
 		// Loop through output variables and generate a pattern. Each text field will
@@ -112,7 +122,7 @@ class BlockPatterns {
 						$bindings['heading']['content'] = [ $field, $name ];
 						break;
 					}
-					
+
 					$bindings['paragraphs'][] = [
 						'content' => [ $field, $name ],
 					];
@@ -177,7 +187,8 @@ class BlockPatterns {
 			$content = self::populate_template( 'empty', [] );
 		}
 
-		$pattern_name = sprintf( '%s/pattern', $block_name );
+		// ToDo: Ensure this name is compliant with what's expected by the block editor.
+		$pattern_name = sprintf( '%s/%s-pattern', $block_name, $display_query_key );
 
 		register_block_pattern(
 			$pattern_name,
@@ -188,6 +199,7 @@ class BlockPatterns {
 				'content' => $content,
 				'inserter' => true,
 				'source' => 'plugin',
+				'keywords' => [ $display_query_key ],
 			]
 		);
 
