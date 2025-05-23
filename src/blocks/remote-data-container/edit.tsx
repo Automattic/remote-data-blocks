@@ -47,19 +47,20 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 		);
 	}
 
-	if ( displayQuery ) {
+	if ( displayQuery && ! queryInputs.length ) {
 		return (
 			<Placeholder
 				icon={ cloud }
 				label={ blockConfig.settings.title }
 				instructions={
-					blockConfig.instructions ?? __( 'This block requires selection of one or more items for display.' )
+					blockConfig.instructions ??
+					__( 'This block requires selection of one or more items for display.' )
 				}
 			>
 				<ItemSelectQueryType
 					blockName={ blockConfig.name }
 					selectors={ blockConfig.selectors }
-					onSelect={ () => {} }
+					onSelect={ setQueryInputs }
 				/>
 			</Placeholder>
 		);
