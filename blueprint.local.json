@@ -9,7 +9,7 @@
   "features": {
     "networking": true
   },
-  "landingPage": "/wp-admin/post.php?post=1&action=edit",
+  "landingPage": "/wp-admin/post.php?post=4&action=edit",
   "login": true,
   "preferredVersions": {
     "php": "8.2",
