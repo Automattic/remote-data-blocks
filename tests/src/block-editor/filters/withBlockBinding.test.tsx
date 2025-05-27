@@ -42,12 +42,20 @@ describe( 'withBlockBinding', () => {
 	const testBlockConfig: LocalizedBlockData = {
 		config: {
 			'test/block': {
-				availableBindings: { display: { field1: { name: 'Field 1', type: 'string' } } },
+				availableBindings: { key: { field1: { name: 'Field 1', type: 'string' } } },
 				availableOverrides: [],
 				dataSourceType: 'test-source',
 				name: 'test/block',
-				patterns: { default: 'test/block/pattern' },
-				selectors: [],
+				patterns: { key: 'test/block/pattern' },
+				selectors: [
+					{
+						query_group: 'key',
+						query_key: 'key',
+						type: 'manual-input',
+						inputs: [],
+						name: 'test-name',
+					},
+				],
 				settings: {
 					category: 'widget',
 					title: 'Test block',
@@ -94,6 +102,8 @@ describe( 'withBlockBinding', () => {
 		const remoteData = {
 			blockName: 'test/block',
 			results: createResults( [ { field1: 'value1' } ] ),
+			queryKey: 'key',
+			queryGroup: 'key',
 		};
 
 		render(
@@ -117,6 +127,8 @@ describe( 'withBlockBinding', () => {
 		const remoteData = {
 			blockName: 'test/block',
 			results: createResults( [ { field1: 'value1' } ] ),
+			queryKey: 'key',
+			queryGroup: 'key',
 		};
 		render(
 			<WrappedComponent
@@ -142,6 +154,8 @@ describe( 'withBlockBinding', () => {
 		const remoteData = {
 			blockName: 'test/block',
 			results: createResults( [ { field1: 'value1' } ] ),
+			queryKey: 'key',
+			queryGroup: 'key',
 		};
 		render(
 			<WrappedComponent
@@ -181,6 +195,8 @@ describe( 'withBlockBinding', () => {
 				[ REMOTE_DATA_CONTEXT_KEY ]: {
 					blockName: 'test/block',
 					results: createResults( [ { title: 'New Title' } ] ),
+					queryKey: 'key',
+					queryGroup: 'key',
 				},
 			},
 			name: 'test/block',
@@ -222,6 +238,8 @@ describe( 'withBlockBinding', () => {
 				[ REMOTE_DATA_CONTEXT_KEY ]: {
 					blockName: 'test/block',
 					results: createResults( [ { title: 'Matching Title' } ] ),
+					queryKey: 'key',
+					queryGroup: 'key',
 				},
 			},
 			name: 'test/block',
@@ -257,6 +275,8 @@ describe( 'withBlockBinding', () => {
 				[ REMOTE_DATA_CONTEXT_KEY ]: {
 					blockName: 'test/block',
 					results: createResults( [ { title: 'New Title' } ] ),
+					queryKey: 'key',
+					queryGroup: 'key',
 				},
 			},
 			name: 'test/block',
