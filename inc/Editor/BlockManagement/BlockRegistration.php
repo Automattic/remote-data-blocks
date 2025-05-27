@@ -84,11 +84,6 @@ class BlockRegistration {
 		$block_path = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-container';
 
 		// Set available bindings from the display query output mappings.
-		//$available_bindings = [];
-		$display_query_key = null;
-		$display_query = null;
-
-		// ToDo: Once support for multiple display queries has been added on the front-end, switch to using this.
 		$available_bindings_for_queries = [];
 		$display_queries = ConfigRegistry::get_display_queries( $config['queries'] );
 		foreach ( $display_queries as $display_query_key => $display_query ) {
@@ -103,16 +98,6 @@ class BlockRegistration {
 
 			$available_bindings_for_queries[ $display_query_key ] = $available_bindings_for_query;
 		}
-
-		//This shouldn't be null, as we'd have already validated by this point.
-		// $display_query = ConfigRegistry::get_display_query( $config['queries'] );
-		// $output_schema = $display_query->get_output_schema();
-		// foreach ( $output_schema['type'] ?? [] as $key => $mapping ) {
-		// 	$available_bindings[ $key ] = [
-		// 		'name' => $mapping['name'],
-		// 		'type' => $mapping['type'],
-		// 	];
-		// }
 
 		// Create the localized data that will be used by our block editor script.
 		$block_config = [
