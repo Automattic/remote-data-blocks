@@ -1,7 +1,7 @@
 type RemoteDataBinding = Pick< RemoteDataResultFields, 'name' | 'type' >;
 //type AvailableBindings = Record< string, RemoteDataBinding >;
 type AvailableBindingsForQueries = Record< string, AvailableBindingsForQuery >;
-type AvailableBindingsForQuery = Record<string, RemoteDataBinding>;
+type AvailableBindingsForQuery = Record< string, RemoteDataBinding >;
 
 /**
  * This corresponds directly to the input schema defined by a query.
