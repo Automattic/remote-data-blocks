@@ -55,7 +55,7 @@ interface RemoteDataTemplateBlockAttributes {}
 
 interface FieldSelection {
 	action: 'add_field_shortcode' | 'update_field_shortcode' | 'reset_field_shortcode';
-	remoteData?: Pick< RemoteData, 'blockName' | 'metadata' | 'queryInputs' | 'queryKey' >;
+	remoteData?: Pick< RemoteData, 'blockName' | 'metadata' | 'queryInputs' | 'queryKey' | 'queryGroup' >;
 	selectedField: string;
 	selectionPath: 'select_new_tab' | 'select_existing_tab' | 'select_meta_tab' | 'popover';
 	type: 'field' | 'meta';

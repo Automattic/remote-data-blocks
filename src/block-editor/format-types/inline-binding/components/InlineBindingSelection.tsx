@@ -120,16 +120,14 @@ interface InlineBindingSelectFieldProps {
 	queryInputs: RemoteDataQueryInput[];
 	selectedField?: string;
 	queryKey: string;
+	queryGroup: string;
 }
 
 export function InlineBindingSelectField( props: InlineBindingSelectFieldProps ) {
-	// This is getting the first compatible selector under a block, just like the field selection worked like before.
-	// const queryGroup = getDisplayQueryGroup( props.blockName );
-
 	const { data, fetch, loading } = useRemoteData( {
 		blockName: props.blockName,
-		queryKey: props.queryKey,
-		queryGroup: props.queryKey,
+		queryKey: props.queryGroup,
+		queryGroup: props.queryGroup,
 	} );
 
 	useEffect( () => {

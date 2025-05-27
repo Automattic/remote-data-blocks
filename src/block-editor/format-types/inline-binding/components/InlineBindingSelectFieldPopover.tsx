@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { WPFormat, useAnchor } from '@wordpress/rich-text';
 
 import { InlineBindingSelectField } from '@/block-editor/format-types/inline-binding/components/InlineBindingSelection';
+import { getBlockConfig } from '@/utils/localized-block-data';
 
 interface InlineBindingSelectFieldPopoverProps {
 	contentRef: React.RefObject< HTMLElement >;
@@ -27,6 +28,15 @@ export function InlineBindingSelectFieldPopover( props: InlineBindingSelectField
 		settings: props.formatTypeSettings,
 	} );
 	const { remoteData, selectedField, type } = props.fieldSelection;
+
+	// For now, we will use the first compatible selector, but this should be improved.
+	// Same as InlineBindingSelection.tsx
+	const compatibleSelector = getBlockConfig( remoteData?.blockName ?? '' )?.selectors.find(
+		selector => [ 'list', 'search' ].includes( selector.type )
+	);
+
+	const queryKey = remoteData?.queryKey ?? compatibleSelector?.query_key ?? '';
+	const queryGroup = remoteData?.queryGroup ?? compatibleSelector?.query_group ?? '';
 
 	return (
 		<Popover
@@ -46,7 +56,8 @@ export function InlineBindingSelectFieldPopover( props: InlineBindingSelectField
 				<CardBody>
 					<InlineBindingSelectField
 						blockName={ remoteData?.blockName ?? 'Remote Data Block' }
-						queryKey={ remoteData?.queryKey ?? '' }
+						queryKey={ queryKey }
+						queryGroup={ queryGroup }
 						fieldType={ type ?? 'field' }
 						onSelectField={ ( data, fieldValue ) =>
 							props.onSelectField( { ...data, action: 'update_field_shortcode' }, fieldValue )
