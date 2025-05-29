@@ -1,33 +1,31 @@
-<?php declare(strict_types = 1);
-
-namespace RemoteDataBlocks\Example\Airtable\Events;
+<?php
 
 use RemoteDataBlocks\Integrations\Airtable\AirtableDataSource;
 use RemoteDataBlocks\Integrations\Airtable\AirtableIntegration;
 
-function register_airtable_events_block(): void {
-	if ( ! defined( 'EXAMPLE_AIRTABLE_EVENTS_ACCESS_TOKEN' ) ) {
-		return;
-	}
-
-	$access_token = constant( 'EXAMPLE_AIRTABLE_EVENTS_ACCESS_TOKEN' );
-	$base_id = 'appVQ2PAl95wQSo9S'; // Airtable base ID
-	$table_id = 'tblyGtuxblLtmoqMI'; // Airtable table ID
-
-	// Define the data source
+/**
+ * Registers a remote data block representing a row from a Airtable base. This
+ * task can be completed in the plugin settings screen without writing code, but
+ * this template shows how to register it programmatically -- possibly
+ * customizing the fields and their mappings.
+ *
+ * Replace the placeholders with your Airtable configuration details.
+ */
+function register_airtable_remote_data_block(): void {
 	$airtable_data_source = AirtableDataSource::from_array( [
 		'service_config' => [
 			'__version' => 1,
-			'access_token' => $access_token,
+			'access_token' => '{{ Access Token }}', // Airtable access token ("pat...")
 			'base' => [
-				'id' => $base_id,
+				'id' => '{{ Base ID }}', // Airtable base ID ("app...")
 				'name' => 'Conference Events',
 			],
 			'display_name' => 'Conference Events',
 			'tables' => [
 				[
-					'id' => $table_id,
+					'id' => '{{ Table ID }}', // Airtable table ID ("tbl...")
 					'name' => 'Conference Events',
+					// These mappings correspond to the columns of the table.
 					'output_query_mappings' => [
 						[
 							'key' => 'record_id',
@@ -66,7 +64,5 @@ function register_airtable_events_block(): void {
 	] );
 
 	AirtableIntegration::register_blocks_for_airtable_data_source( $airtable_data_source );
-	AirtableIntegration::register_loop_blocks_for_airtable_data_source( $airtable_data_source );
 }
-
-add_action( 'init', __NAMESPACE__ . '\\register_airtable_events_block' );
+add_action( 'init', 'register_airtable_remote_data_block' );

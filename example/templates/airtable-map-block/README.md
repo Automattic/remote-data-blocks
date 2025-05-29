@@ -12,6 +12,6 @@ The result is a registered "Leaflet Map" block that renders remote data in the b
 
 ## Build step
 
-Because the custom block uses JSX, it requires a build step, which is provided by this repository. You can rebuild the example after changes by running `npm run build:examples`.
+Because the custom block uses JSX, it requires a build step: `npm run build`.
 
-If you copy this example code to your own repository, we recommend using [the `@wordpress/create-block` utility](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) to scaffold your custom block and configure the build step.
+If you want to adapt this example code in your own codebase, we recommend using [the `@wordpress/create-block` utility](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) to scaffold your custom block.

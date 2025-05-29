@@ -1,13 +1,12 @@
-<?php declare(strict_types = 1);
+<?php
 
-namespace RemoteDataBlocks\Example\Airtable\LeafletMap;
-
+use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Integrations\Airtable\AirtableDataSource;
 use RemoteDataBlocks\Integrations\Airtable\AirtableIntegration;
 
-$access_token = constant( 'EXAMPLE_AIRTABLE_LEAFLET_MAP_ACCESS_TOKEN' );
-$base_id = 'appqI3sJ9R2NcML8Y';
-$table_id = 'tblc82R9msH4Yh6ZX';
+$access_token = 'patXXXXXXXXXXXXXXXX'; // Airtable access token
+$base_id = 'appXXXXXXXXXXXXX'; // Airtable base ID
+$table_id = 'tblXXXXXXXXXXXXX'; // Airtable table ID
 
 $table = [
 	'id' => $table_id,
@@ -53,7 +52,7 @@ $map_data_source = AirtableDataSource::from_array( [
 	],
 ] );
 
-$get_locations_query = AirtableIntegration::get_list_query( $map_data_source, $table );
+$get_locations_query = HttpQuery::from_array( AirtableIntegration::get_list_query( $map_data_source, $table ) );
 $response = $get_locations_query->execute( [] );
 $coordinates = [];
 
