@@ -9,7 +9,7 @@ export function getBlockConfig( blockName: string ): BlockConfig | undefined {
 	return window.REMOTE_DATA_BLOCKS?.config?.[ blockName ];
 }
 
-export function getDisplayKeyFromQueryKey( blockName: string, queryKey: string ): string {
+export function getDisplayQueryKeyFromQueryKey( blockName: string, queryKey: string ): string {
 	const displayQueriesToSelectors = getBlockConfig( blockName )?.displayQueriesToSelectors ?? {};
 
 	// iterate over the keys of the display_queries_to_selectors object.

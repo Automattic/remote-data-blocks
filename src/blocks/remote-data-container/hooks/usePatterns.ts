@@ -18,7 +18,7 @@ import { getBlockConfig } from '@/utils/localized-block-data';
 export function usePatterns(
 	remoteDataBlockName: string,
 	rootClientId: string = '',
-	queryGroup: string = ''
+	displayQueryKey: string = ''
 ) {
 	const { patterns } = getBlockConfig( remoteDataBlockName ) ?? {};
 	const { replaceInnerBlocks } = useDispatch< BlockEditorStoreActions >( blockEditorStore );
@@ -93,7 +93,7 @@ export function usePatterns(
 				pattern =>
 					( pattern?.blockTypes?.includes( remoteDataBlockName ) ||
 						pattern.blocks.some( block => hasBlockBinding( block, remoteDataBlockName ) ) ) &&
-					( ! pattern.keywords || pattern.keywords.includes( queryGroup ) )
+					( ! pattern.keywords || pattern.keywords.includes( displayQueryKey ) )
 			);
 
 			// If no result is provided, return the supported patterns as is.

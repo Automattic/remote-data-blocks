@@ -20,7 +20,7 @@ import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteDat
 import { hasRemoteDataChanged } from '@/utils/block-binding';
 
 export interface QueryComponentProps {
-	queryGroup: string;
+	displayQueryKey: string;
 	blockConfig: BlockConfig;
 	blockName: string;
 	rootClientId: string;
@@ -33,7 +33,7 @@ export interface QueryComponentProps {
 
 export function QueryComponent( props: QueryComponentProps ) {
 	const {
-		queryGroup,
+		displayQueryKey,
 		blockConfig,
 		blockName,
 		rootClientId,
@@ -45,12 +45,12 @@ export function QueryComponent( props: QueryComponentProps ) {
 
 	const blockProps = useBlockProps( { className: CONTAINER_CLASS_NAME } );
 	const { getSupportedPatterns, innerBlocksPattern, insertPatternBlocks, resetInnerBlocks } =
-		usePatterns( blockName, rootClientId, queryGroup );
+		usePatterns( blockName, rootClientId, displayQueryKey );
 	const { data, fetch, reset, supportsPagination, loading } = useRemoteData( {
 		blockName,
 		externallyManagedRemoteData: remoteDataAttribute,
 		externallyManagedUpdateRemoteData: updateRemoteData,
-		queryKey: queryGroup,
+		queryKey: displayQueryKey,
 	} );
 
 	const { hasMultiSelection } = useSelect< BlockEditorStoreSelectors >( blockEditorStore );
@@ -115,8 +115,8 @@ export function QueryComponent( props: QueryComponentProps ) {
 		refreshRemoteData();
 	}
 
-	function getSelectorsForGroup( group: string ): Selector[] {
-		const selectorKeys = blockConfig.displayQueriesToSelectors[ group ] ?? [];
+	function getSelectorsForDisplayQueryKey(): Selector[] {
+		const selectorKeys = blockConfig.displayQueriesToSelectors[ displayQueryKey ] ?? [];
 		return blockConfig.selectors.filter( selector => selectorKeys?.includes( selector.query_key ) );
 	}
 
@@ -152,7 +152,7 @@ export function QueryComponent( props: QueryComponentProps ) {
 					<QueryInputsPanel
 						onUpdateQueryInputs={ onUpdateQueryInputs }
 						remoteData={ data }
-						selectors={ getSelectorsForGroup( queryGroup ) }
+						selectors={ getSelectorsForDisplayQueryKey() }
 					/>
 				</InspectorControls>
 			) }

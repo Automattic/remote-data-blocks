@@ -7,7 +7,6 @@ use RemoteDataBlocks\Config\DataSource\HttpDataSourceInterface;
 use RemoteDataBlocks\Config\Query\HttpQueryInterface;
 use RemoteDataBlocks\Config\Query\QueryInterface;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
-use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 
 /**
  * ConfigSchemas class.

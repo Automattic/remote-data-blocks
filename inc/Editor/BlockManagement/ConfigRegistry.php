@@ -121,7 +121,6 @@ class ConfigRegistry {
 				);
 
 				$selectors[] = [
-					'display_name' => self::get_query_name_from_key( $query_key ),
 					'image_url' => $query->get_image_url(),
 					'inputs' => self::map_input_variables( $input_schema ),
 					'name' => $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ),
@@ -166,10 +165,9 @@ class ConfigRegistry {
 
 				// Add the selector for the query.
 				$selectors[] = [
-					'display_name' => self::get_query_name_from_key( $query_key ),
 					'image_url' => $query->get_image_url(),
 					'inputs' => self::map_input_variables( $input_schema ),
-					'name' => ucfirst( $query_key ),
+					'name' => self::get_query_name_from_key( $query_key ),
 					'query_key' => $query_key,
 					'type' => $inferred_type,
 				];

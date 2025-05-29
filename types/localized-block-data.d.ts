@@ -23,7 +23,6 @@ interface Selector {
 	inputs: InputVariable[];
 	name: string;
 	query_key: string;
-	display_name?: string;
 	type: string;
 }
 
@@ -39,9 +38,9 @@ interface BlockConfig {
 	dataSourceType: string;
 	instructions?: string;
 	name: string;
-	patterns: Record<string, string>;
+	patterns: Record< string, string >;
 	selectors: Selector[];
-	displayQueriesToSelectors: Record<string, string[]>;
+	displayQueriesToSelectors: Record< string, string[] >;
 	settings: {
 		category: string;
 		description?: string;

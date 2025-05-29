@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { WPFormat, useAnchor } from '@wordpress/rich-text';
 
 import { InlineBindingSelectField } from '@/block-editor/format-types/inline-binding/components/InlineBindingSelection';
-import { getBlockConfig, getDisplayKeyFromQueryKey } from '@/utils/localized-block-data';
+import { getBlockConfig, getDisplayQueryKeyFromQueryKey } from '@/utils/localized-block-data';
 
 interface InlineBindingSelectFieldPopoverProps {
 	contentRef: React.RefObject< HTMLElement >;
@@ -36,7 +36,7 @@ export function InlineBindingSelectFieldPopover( props: InlineBindingSelectField
 	);
 
 	const queryKey = remoteData?.queryKey ?? compatibleSelector?.query_key ?? '';
-	const queryGroup = getDisplayKeyFromQueryKey( remoteData?.blockName ?? '', queryKey );
+	const displayQueryKey = getDisplayQueryKeyFromQueryKey( remoteData?.blockName ?? '', queryKey );
 
 	return (
 		<Popover
@@ -57,7 +57,7 @@ export function InlineBindingSelectFieldPopover( props: InlineBindingSelectField
 					<InlineBindingSelectField
 						blockName={ remoteData?.blockName ?? 'Remote Data Block' }
 						queryKey={ queryKey }
-						queryGroup={ queryGroup }
+						displayQueryKey={ displayQueryKey }
 						fieldType={ type ?? 'field' }
 						onSelectField={ ( data, fieldValue ) =>
 							props.onSelectField( { ...data, action: 'update_field_shortcode' }, fieldValue )

@@ -103,7 +103,6 @@ describe( 'withBlockBinding', () => {
 			blockName: 'test/block',
 			results: createResults( [ { field1: 'value1' } ] ),
 			queryKey: 'key',
-			queryGroup: 'key',
 		};
 
 		render(
@@ -128,7 +127,6 @@ describe( 'withBlockBinding', () => {
 			blockName: 'test/block',
 			results: createResults( [ { field1: 'value1' } ] ),
 			queryKey: 'key',
-			queryGroup: 'key',
 		};
 		render(
 			<WrappedComponent
@@ -155,7 +153,6 @@ describe( 'withBlockBinding', () => {
 			blockName: 'test/block',
 			results: createResults( [ { field1: 'value1' } ] ),
 			queryKey: 'key',
-			queryGroup: 'key',
 		};
 		render(
 			<WrappedComponent
@@ -196,7 +193,6 @@ describe( 'withBlockBinding', () => {
 					blockName: 'test/block',
 					results: createResults( [ { title: 'New Title' } ] ),
 					queryKey: 'key',
-					queryGroup: 'key',
 				},
 			},
 			name: 'test/block',
@@ -239,7 +235,6 @@ describe( 'withBlockBinding', () => {
 					blockName: 'test/block',
 					results: createResults( [ { title: 'Matching Title' } ] ),
 					queryKey: 'key',
-					queryGroup: 'key',
 				},
 			},
 			name: 'test/block',
@@ -276,7 +271,6 @@ describe( 'withBlockBinding', () => {
 					blockName: 'test/block',
 					results: createResults( [ { title: 'New Title' } ] ),
 					queryKey: 'key',
-					queryGroup: 'key',
 				},
 			},
 			name: 'test/block',

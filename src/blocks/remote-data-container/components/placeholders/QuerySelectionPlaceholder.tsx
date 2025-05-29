@@ -12,35 +12,35 @@ import { ItemSelectQueryType } from './ItemSelectQueryType';
 
 export interface QuerySelectionPlaceholderProps {
 	blockConfig: BlockConfig;
-	onQueryGroupSelect: ( group: string ) => void;
+	onDisplayQueryKeySelect: ( displayQueryKey: string ) => void;
 	onQueryInputsSelect: ( inputs: RemoteDataQueryInput[] ) => void;
 }
 
 export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps ) {
-	const { blockConfig, onQueryGroupSelect, onQueryInputsSelect } = props;
+	const { blockConfig, onDisplayQueryKeySelect, onQueryInputsSelect } = props;
 	const { instructions, settings, selectors, displayQueriesToSelectors } = blockConfig;
 
 	const iconElement: IconType = ( settings.icon as IconType ) ?? cloud;
 
 	// The keys represent the display query keys.
-	const queryGroups: string[] = Object.keys( displayQueriesToSelectors );
+	const displayQueryKeys: string[] = Object.keys( displayQueriesToSelectors );
 
-	const [ selectedGroup, setSelectedGroup ] = useState< string >( '' );
+	const [ selectedDisplayQueryKey, setSelectedDisplayQueryKey ] = useState< string >( '' );
 	const [ showSelectors, setShowSelectors ] = useState< boolean >( false );
 
 	function handleSelectorOnSelect( inputs: RemoteDataQueryInput[] ) {
 		setShowSelectors( false );
-		onQueryGroupSelect( selectedGroup );
+		onDisplayQueryKeySelect( selectedDisplayQueryKey );
 		onQueryInputsSelect( inputs );
 	}
 
-	function handleGroupOnSelect( group: string ) {
-		setSelectedGroup( group );
+	function handleDisplayQueryKeyOnSelect( displayQueryKey: string ) {
+		setSelectedDisplayQueryKey( displayQueryKey );
 		setShowSelectors( true );
 	}
 
-	function getSelectorsForGroup( group: string ): Selector[] {
-		const selectorKeys = displayQueriesToSelectors[ group ] ?? [];
+	function getSelectorsForDisplayQueryKey(): Selector[] {
+		const selectorKeys = displayQueriesToSelectors[ selectedDisplayQueryKey ] ?? [];
 		return selectors.filter( selector => selectorKeys?.includes( selector.query_key ) );
 	}
 
@@ -59,15 +59,15 @@ export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps
 					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 				>
-					{ queryGroups.map( ( group: string ) => (
+					{ displayQueryKeys.map( ( displayQueryKey: string ) => (
 						<Button
-							key={ group }
+							key={ displayQueryKey }
 							variant="primary"
 							onClick={ () => {
-								handleGroupOnSelect( group );
+								handleDisplayQueryKeyOnSelect( displayQueryKey );
 							} }
 						>
-							{ group
+							{ displayQueryKey
 								.replace( /[^a-zA-Z0-9]/g, ' ' )
 								.replace( /\b\w/g, ( initialLetter: string ) => initialLetter.toUpperCase() ) }
 						</Button>
@@ -77,7 +77,7 @@ export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps
 			{ showSelectors && (
 				<ItemSelectQueryType
 					blockName={ blockConfig.name }
-					selectors={ getSelectorsForGroup( selectedGroup ) }
+					selectors={ getSelectorsForDisplayQueryKey() }
 					onSelect={ handleSelectorOnSelect }
 				/>
 			) }

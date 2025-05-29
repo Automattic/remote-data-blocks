@@ -4,7 +4,7 @@ import { useState } from '@wordpress/element';
 import { EditErrorBoundary } from './components/EditErrorBoundary';
 import { QueryComponent } from './components/QueryComponent';
 import { QuerySelectionPlaceholder } from '@/blocks/remote-data-container/components/placeholders/QuerySelectionPlaceholder';
-import { getBlockConfig, getDisplayKeyFromQueryKey } from '@/utils/localized-block-data';
+import { getBlockConfig, getDisplayQueryKeyFromQueryKey } from '@/utils/localized-block-data';
 import { migrateRemoteData } from '@/utils/remote-data';
 
 import './editor.scss';
@@ -20,13 +20,9 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 	const rootClientId = props.clientId;
 	const remoteDataAttribute = migrateRemoteData( props.attributes.remoteData );
 
-	const displayQueryKey = getDisplayKeyFromQueryKey(
-		blockName,
-		remoteDataAttribute?.queryKey ?? ''
+	const [ displayQueryKey, setDisplayQueryKey ] = useState< string >(
+		getDisplayQueryKeyFromQueryKey( blockName, remoteDataAttribute?.queryKey ?? '' )
 	);
-
-	// ToDo: Rename this, it's been left as is to avoid a massive refactor for prototyping a new idea.
-	const [ queryGroup, setQueryGroup ] = useState< string >( displayQueryKey );
 
 	const [ queryInputs, setQueryInputs ] = useState< RemoteDataQueryInput[] >(
 		remoteDataAttribute?.queryInputs ?? []
@@ -37,15 +33,15 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 	}
 
 	function resetQuery(): void {
-		setQueryGroup( '' );
+		setDisplayQueryKey( '' );
 		setQueryInputs( [] );
 	}
 
-	if ( ! queryGroup ) {
+	if ( ! displayQueryKey ) {
 		return (
 			<QuerySelectionPlaceholder
 				blockConfig={ blockConfig }
-				onQueryGroupSelect={ setQueryGroup }
+				onDisplayQueryKeySelect={ setDisplayQueryKey }
 				onQueryInputsSelect={ setQueryInputs }
 			/>
 		);
@@ -57,7 +53,7 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 				<QueryComponent
 					blockConfig={ blockConfig }
 					blockName={ blockName }
-					queryGroup={ queryGroup }
+					displayQueryKey={ displayQueryKey }
 					queryInputs={ queryInputs }
 					setAttributes={ setAttributes }
 					rootClientId={ rootClientId }

@@ -87,8 +87,7 @@ class BlockRegistration {
 		$available_bindings_for_queries = [];
 		$display_queries_to_selectors = $config['display_queries_to_selectors'] ?? [];
 
-		// ToDo: Need to set the patterns provided by an existing data source. Ignored on purpose right now.
-		$patterns = [];
+		$patterns = $config['patterns'] ?? [];
 
 		foreach ( array_keys( $display_queries_to_selectors ) as $display_query_key ) {
 			$display_query = $config['queries'][ $display_query_key ];

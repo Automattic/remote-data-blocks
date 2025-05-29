@@ -120,13 +120,13 @@ interface InlineBindingSelectFieldProps {
 	queryInputs: RemoteDataQueryInput[];
 	selectedField?: string;
 	queryKey: string;
-	queryGroup: string;
+	displayQueryKey: string;
 }
 
 export function InlineBindingSelectField( props: InlineBindingSelectFieldProps ) {
 	const { data, fetch, loading } = useRemoteData( {
 		blockName: props.blockName,
-		queryKey: props.queryGroup,
+		queryKey: props.displayQueryKey,
 	} );
 
 	useEffect( () => {

@@ -130,7 +130,6 @@ describe( 'remote-data utils', () => {
 
 			expect( migrated ).toEqual( {
 				queryKey: 'display',
-				queryGroup: 'display',
 				queryInputs: [ { title: 'Title 1' } ],
 				results: [
 					{
