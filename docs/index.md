@@ -1,7 +1,5 @@
 # Documentation
 
-For plugin overview and getting started guide, see [README](../README.md).
-
 ## Table of Contents
 
 - [Quickstart](quickstart.md)
@@ -28,13 +26,10 @@ For plugin overview and getting started guide, see [README](../README.md).
   - [HTTP](tutorials/http.md)
   - [Shopify](tutorials/shopify.md)
 
-- [Development](local-development.md)
+- [Local development](local-development.md)
 - [Troubleshooting](troubleshooting.md)
-- [Releasing](releasing.md)
 
 ## Additional Documentation
 
 - [AI Documentation](for-ai.md)
-- [Contributing Guidelines](../CONTRIBUTING.md)
-- [Security Policy](../SECURITY.md)
-- [Code of Conduct](https://make.wordpress.org/handbook/community-code-of-conduct/)
+- [Contributing Guidelines](https://github.com/Automattic/remote-data-blocks/blob/trunk/CONTRIBUTING.md)

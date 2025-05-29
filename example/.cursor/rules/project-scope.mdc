@@ -1,0 +1,11 @@
+---
+description: Project scope
+globs: 
+alwaysApply: true
+---
+
+- You are writing code that integrates with the Remote Data Blocks WordPress plugin. This plugin allows you to create Gutenberg blocks that display data from remote data sources, such as Airtable, Google Sheets, Shopify, or your own API.
+- You are not contributing to the plugin directly. You are writing code that will be used in a separate plugin or theme.
+- You do not need to develop custom Gutenberg blocks. Instead, you will write simple PHP code to describe how your API should be queried, then call registration functions provided by the Remote Data Blocks plugin.
+- Your goal is to register a remote data block that display remote data in an organized, visually appealing way.
+- The Remote Data Blocks plugin provides a default block pattern for displaying data, but it is very basic. You may need to create a custom block pattern to achieve your goal, but please ask before doing so.
