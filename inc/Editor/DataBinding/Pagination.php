@@ -27,9 +27,9 @@ class Pagination {
 		);
 	}
 
-	public static function create_query_var( string $block_key, array $pagination_input_variables ): string {
+	public static function create_query_var( string $config_id, array $pagination_input_variables ): string {
 		$value = [
-			$block_key => $pagination_input_variables,
+			$config_id => $pagination_input_variables,
 		];
 
 		return add_query_arg( self::$variable_name, self::encode_query_var( $value ) );
@@ -43,7 +43,7 @@ class Pagination {
 		return base64_encode( wp_json_encode( $query_var_value ) );
 	}
 
-	public static function get_pagination_input_variables_for_current_request( QueryInterface $query, ?string $block_key ): array {
+	public static function get_pagination_input_variables_for_current_request( QueryInterface $query, ?string $config_id ): array {
 		$untrusted_variables = self::decode_query_var( get_query_var( self::$variable_name, '' ) );
 
 		if ( empty( $untrusted_variables ) || ! is_array( $untrusted_variables ) ) {
@@ -52,9 +52,9 @@ class Pagination {
 
 		// The query var value is an associative array.
 		//
-		// The keys are block instance IDs as persisted by the remote data block
+		// The keys are configuration IDs as persisted by the remote data block
 		// attribute. The values that are an associative array of input variables.
-		$untrusted_variables = $untrusted_variables[ $block_key ] ?? [];
+		$untrusted_variables = $untrusted_variables[ $config_id ] ?? [];
 
 		if ( empty( $untrusted_variables ) || ! is_array( $untrusted_variables ) ) {
 			return [];

@@ -146,7 +146,7 @@ class BlockBindings {
 		// If there is a single array of input variables, fetch pagination variables.
 		// Pagination is disabled for batch execution.
 		if ( 1 === count( $array_of_input_variables ) ) {
-			$pagination_input_variables = Pagination::get_pagination_input_variables_for_current_request( $query, $remote_data['blockKey'] );
+			$pagination_input_variables = Pagination::get_pagination_input_variables_for_current_request( $query, $remote_data['configId'] );
 			$array_of_input_variables[0] = array_merge( $array_of_input_variables[0] ?? [], $pagination_input_variables );
 		}
 
@@ -199,15 +199,15 @@ class BlockBindings {
 		// Migrate the config early so that we can access and use values without defensive checks.
 		$block_context = RemoteDataBlockAttribute::migrate_config( $block_context, $source_args );
 
-		$block_key = $block_context['blockKey'];
+		$config_id = $block_context['configId'];
 
-		if ( ! isset( self::$in_memory_cache[ $block_key ] ) ) {
-			self::$in_memory_cache[ $block_key ] = self::execute_queries( $block_context );
+		if ( ! isset( self::$in_memory_cache[ $config_id ] ) ) {
+			self::$in_memory_cache[ $config_id ] = self::execute_queries( $block_context );
 		}
 
 		return [
-			'block_key' => $block_key,
-			'response' => self::$in_memory_cache[ $block_key ],
+			'config_id' => $config_id,
+			'response' => self::$in_memory_cache[ $config_id ],
 		];
 	}
 
@@ -247,10 +247,10 @@ class BlockBindings {
 			return [];
 		}
 
-		$block_key = $execution_result['block_key'] ?? null;
+		$config_id = $execution_result['config_id'] ?? null;
 		$pagination_data = $query_response['pagination'] ?? null;
 
-		if ( null === $pagination_data || null === $block_key ) {
+		if ( null === $pagination_data || null === $config_id ) {
 			return [];
 		}
 
@@ -259,11 +259,11 @@ class BlockBindings {
 
 		// Create pagination links.
 		if ( isset( $pagination_data['input_variables']['next_page'] ) ) {
-			$next_link = Pagination::create_query_var( $block_key, $pagination_data['input_variables']['next_page'] );
+			$next_link = Pagination::create_query_var( $config_id, $pagination_data['input_variables']['next_page'] );
 		}
 
 		if ( isset( $pagination_data['input_variables']['previous_page'] ) ) {
-			$previous_link = Pagination::create_query_var( $block_key, $pagination_data['input_variables']['previous_page'] );
+			$previous_link = Pagination::create_query_var( $config_id, $pagination_data['input_variables']['previous_page'] );
 		}
 
 		return [
