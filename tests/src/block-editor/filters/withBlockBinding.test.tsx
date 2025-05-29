@@ -47,9 +47,9 @@ describe( 'withBlockBinding', () => {
 				dataSourceType: 'test-source',
 				name: 'test/block',
 				patterns: { key: 'test/block/pattern' },
+				displayQueriesToSelectors: { key: [ 'key' ] },
 				selectors: [
 					{
-						query_group: 'key',
 						query_key: 'key',
 						type: 'manual-input',
 						inputs: [],

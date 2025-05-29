@@ -26,7 +26,6 @@ describe( 'QueryInputsPanel', () => {
 			name: 'test_selector',
 			query_key: 'test_query_key',
 			type: 'manual',
-			query_group: 'test_query_group',
 		},
 	];
 

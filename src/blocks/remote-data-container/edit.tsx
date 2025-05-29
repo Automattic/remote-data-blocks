@@ -4,7 +4,7 @@ import { useState } from '@wordpress/element';
 import { EditErrorBoundary } from './components/EditErrorBoundary';
 import { QueryComponent } from './components/QueryComponent';
 import { QuerySelectionPlaceholder } from '@/blocks/remote-data-container/components/placeholders/QuerySelectionPlaceholder';
-import { getBlockConfig } from '@/utils/localized-block-data';
+import { getBlockConfig, getDisplayKeyFromQueryKey } from '@/utils/localized-block-data';
 import { migrateRemoteData } from '@/utils/remote-data';
 
 import './editor.scss';
@@ -20,7 +20,13 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 	const rootClientId = props.clientId;
 	const remoteDataAttribute = migrateRemoteData( props.attributes.remoteData );
 
-	const [ queryGroup, setQueryGroup ] = useState< string >( remoteDataAttribute?.queryGroup ?? '' );
+	const displayQueryKey = getDisplayKeyFromQueryKey(
+		blockName,
+		remoteDataAttribute?.queryKey ?? ''
+	);
+
+	// ToDo: Rename this, it's been left as is to avoid a massive refactor for prototyping a new idea.
+	const [ queryGroup, setQueryGroup ] = useState< string >( displayQueryKey );
 
 	const [ queryInputs, setQueryInputs ] = useState< RemoteDataQueryInput[] >(
 		remoteDataAttribute?.queryInputs ?? []

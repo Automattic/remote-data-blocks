@@ -10,17 +10,6 @@ import { cloud } from '@wordpress/icons';
 
 import { ItemSelectQueryType } from './ItemSelectQueryType';
 
-// Inline type for selector from BlockConfig
-type Selector = {
-	image_url?: string;
-	inputs: InputVariable[];
-	name: string;
-	query_key: string;
-	display_name?: string;
-	type: string;
-	query_group: string;
-};
-
 export interface QuerySelectionPlaceholderProps {
 	blockConfig: BlockConfig;
 	onQueryGroupSelect: ( group: string ) => void;
@@ -29,14 +18,12 @@ export interface QuerySelectionPlaceholderProps {
 
 export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps ) {
 	const { blockConfig, onQueryGroupSelect, onQueryInputsSelect } = props;
-	const { instructions, settings, selectors } = blockConfig;
+	const { instructions, settings, selectors, displayQueriesToSelectors } = blockConfig;
 
 	const iconElement: IconType = ( settings.icon as IconType ) ?? cloud;
 
-	// Create a unique list of query groups
-	const queryGroups: string[] = [
-		...new Set( selectors.map( ( selector: Selector ) => selector.query_group ) ),
-	];
+	// The keys represent the display query keys.
+	const queryGroups: string[] = Object.keys( displayQueriesToSelectors );
 
 	const [ selectedGroup, setSelectedGroup ] = useState< string >( '' );
 	const [ showSelectors, setShowSelectors ] = useState< boolean >( false );
@@ -50,6 +37,11 @@ export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps
 	function handleGroupOnSelect( group: string ) {
 		setSelectedGroup( group );
 		setShowSelectors( true );
+	}
+
+	function getSelectorsForGroup( group: string ): Selector[] {
+		const selectorKeys = displayQueriesToSelectors[ group ] ?? [];
+		return selectors.filter( selector => selectorKeys?.includes( selector.query_key ) );
 	}
 
 	return (
@@ -85,7 +77,7 @@ export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps
 			{ showSelectors && (
 				<ItemSelectQueryType
 					blockName={ blockConfig.name }
-					selectors={ selectors.filter( selector => selector.query_group === selectedGroup ) }
+					selectors={ getSelectorsForGroup( selectedGroup ) }
 					onSelect={ handleSelectorOnSelect }
 				/>
 			) }

@@ -36,7 +36,6 @@ interface RemoteData {
 	queryInput?: RemoteDataQueryInput;
 	queryInputs: RemoteDataQueryInput[];
 	queryKey?: string;
-	queryGroup?: string;
 	resultId: string;
 	results: RemoteDataApiResult[];
 }
@@ -57,7 +56,7 @@ interface FieldSelection {
 	action: 'add_field_shortcode' | 'update_field_shortcode' | 'reset_field_shortcode';
 	remoteData?: Pick<
 		RemoteData,
-		'blockName' | 'metadata' | 'queryInputs' | 'queryKey' | 'queryGroup'
+		'blockName' | 'metadata' | 'queryInputs' | 'queryKey'
 	>;
 	selectedField: string;
 	selectionPath: 'select_new_tab' | 'select_existing_tab' | 'select_meta_tab' | 'popover';
@@ -96,7 +95,6 @@ interface RemoteDataInnerBlockAttributes {
 
 interface RemoteDataApiRequest {
 	block_name: string;
-	query_group: string;
 	query_inputs: RemoteDataQueryInput[];
 	query_key: string;
 }
@@ -112,7 +110,6 @@ interface RemoteDataApiResponseBody {
 	message?: string;
 	metadata: Record< string, RemoteDataResultFields >;
 	pagination?: RemoteDataPagination;
-	query_group: string;
 	query_inputs: RemoteDataQueryInput[];
 	query_key: string;
 	result_id: string;

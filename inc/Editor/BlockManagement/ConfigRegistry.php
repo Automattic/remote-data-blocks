@@ -23,6 +23,7 @@ class ConfigRegistry {
 	public const RENDER_QUERY_KEY = 'render_query';
 	public const SELECTION_QUERIES_KEY = 'selection_queries';
 	public const DISPLAY_QUERY_KEY = 'display';
+	public const DISPLAY_QUERIES_KEY = 'display_queries';
 	public const LIST_QUERY_KEY = 'list';
 	public const SEARCH_QUERY_KEY = 'search';
 	public const QUERIES_KEY = 'queries';
@@ -33,6 +34,7 @@ class ConfigRegistry {
 	}
 
 	private static function migrate_block_config( array $block_config = [] ): array|WP_Error {
+		// Nothing to migrate, return the block config as is.
 		if ( isset( $block_config[ self::QUERIES_KEY ] ) ) {
 			return $block_config;
 		}
@@ -47,17 +49,15 @@ class ConfigRegistry {
 
 		// Get the render query, inflate it, and set the type to display.
 		$render_query = self::inflate_query( $block_config[ self::RENDER_QUERY_KEY ]['query'] );
-		$render_query->set_type( self::DISPLAY_QUERY_KEY );
 		$queries[ self::DISPLAY_QUERY_KEY ] = $render_query;
+		$block_config[ self::DISPLAY_QUERIES_KEY ] = [ self::DISPLAY_QUERY_KEY ];
 
 		unset( $block_config[ self::RENDER_QUERY_KEY ] );
 
 		if ( isset( $block_config[ self::SELECTION_QUERIES_KEY ] ) ) {
-			// Get the selection queries, inflate them, add them to the required_query field on the render query and correctly set the type based on the type field in the selection query.
+			// Get the selection queries, inflate them, and add them to the queries array using the type as the key.
 			foreach ( $block_config[ self::SELECTION_QUERIES_KEY ] as $selection_query ) {
 				$query = self::inflate_query( $selection_query['query'] );
-				$query->set_type( $selection_query['type'] );
-				$render_query->set_required_query( $selection_query['type'] );
 				$queries[ $selection_query['type'] ] = $query;
 			}
 
@@ -72,8 +72,6 @@ class ConfigRegistry {
 
 	public static function register_block( array $block_config = [] ): bool|WP_Error {
 		// Migrate the block config to the new format.
-		// Note: This will not handle the case where the required query is not present in the queries array.
-		// That has to be done manually for now.
 		$block_config = self::migrate_block_config( $block_config );
 
 		// Validate the provided user configuration.
@@ -92,88 +90,95 @@ class ConfigRegistry {
 			return self::create_error( $block_title, sprintf( 'Block %s has already been registered', $block_name ) );
 		}
 
+		// Pre-validate the display queries, to ensure they exist.
+		foreach ( $block_config['display_queries'] as $display_query_key ) {
+			if ( ! isset( $block_config[ self::QUERIES_KEY ][ $display_query_key ] ) ) {
+				return self::create_error( $block_title, sprintf( 'Display query "%s" not found', $display_query_key ) );
+			}
+		}
+
 		$queries = [];
 		$selectors = [];
-		$display_query_found = false;
+		$display_queries_to_selectors_map = [];
 
-		// This ensures we process everything in one pass, and that we don't process the same query twice.
+		// Generate the selectors for the selector queries.
 		foreach ( $block_config[ self::QUERIES_KEY ] as $query_key => $query ) {
-			// Skip if its already in queries.
-			if ( isset( $queries[ $query_key ] ) ) {
-				continue;
-			}
-
-			// Inflate the query, so it's an HttpQuery and add it to the queries array.
+			// Inflate the query.
 			$query = self::inflate_query( $query );
-			$queries[ $query_key ] = $query;
 			$input_schema = $query->get_input_schema();
 			$output_schema = $query->get_output_schema();
 
-			// This is a 1:1 mapping at the moment, between the required query and the display query that requires it.
-			if ( $query->get_required_query() && ! empty( $query->get_required_query() ) ) {
+			// This is only done because of ConfigStore::get_data_sources_as_array() needing it.
+			$queries[ $query_key ] = $query;
 
-				// Ensure the required query exists.
-				if ( ! isset( $block_config[ self::QUERIES_KEY ][ $query->get_required_query() ] ) ) {
-					return self::create_error( $block_title, sprintf( 'Required query "%s" not found', $query->get_required_query() ) );
+			// Generate the selector for the display query, and then continue on to the next query.
+			if ( in_array( $query_key, $block_config['display_queries'], true ) ) {
+				$is_collection = true === ( $output_schema['is_collection'] ?? false );
+				$has_required_variables = array_reduce(
+					array_column( $input_schema, 'required' ),
+					fn( $carry, $required ) => $carry || ( $required ?? true ),
+					false
+				);
+
+				$selectors[] = [
+					'display_name' => self::get_query_name_from_key( $query_key ),
+					'image_url' => $query->get_image_url(),
+					'inputs' => self::map_input_variables( $input_schema ),
+					'name' => $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ),
+					'query_key' => $query_key,
+					'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
+				];
+
+				$display_queries_to_selectors_map[ $query_key ][] = $query_key;
+
+				continue;
+			}
+
+			foreach ( $block_config['display_queries'] as $display_query_key ) {
+				$display_query = self::inflate_query( $block_config[ self::QUERIES_KEY ][ $display_query_key ] );
+				$display_query_input_schema = $display_query->get_input_schema();
+
+				// Check if the query's output schema intersects with the display query's input schema.
+				$intersecting_keys = array_intersect_key( $output_schema['type'], $display_query_input_schema );
+
+				// Skip this, if they don't intersect.
+				if ( empty( $intersecting_keys ) ) {
+					continue;
 				}
 
-				// Inflate the required query, so it's an HttpQuery.
-				$required_query = self::inflate_query( $block_config[ self::QUERIES_KEY ][ $query->get_required_query() ] );
+				// Ensure the name and type of the schemas are truly valid.
+				$valid_intersecting_keys = self::validate_selector_query_mapping( $intersecting_keys, $display_query_input_schema, $output_schema );
+				if ( empty( $valid_intersecting_keys ) ) {
+					continue;
+				}
 
-				$required_query_key = $query->get_required_query();
-				$required_query_type = $required_query->get_type();
-				$required_query_input_schema = $required_query->get_input_schema();
-				$required_query_output_schema = $required_query->get_output_schema();
-
-				// Validate the required query mapping.
-				$validation_result = self::validate_query_mapping( $input_schema, $required_query_input_schema, $required_query_output_schema, $block_title, $required_query_key, $required_query_type );
+				// Validate the query mapping.
+				$validation_result = self::validate_query_mapping( $display_query_input_schema, $input_schema, $output_schema, $block_title, $query_key );
 				if ( is_wp_error( $validation_result ) ) {
 					return $validation_result;
 				}
 
-				// Add the selector for the required query, noting that the input schema is the display query's input schema.
+				// Infer the type of the query.
+				$inferred_type = self::infer_query_type( $input_schema, $output_schema );
+				if ( is_wp_error( $inferred_type ) ) {
+					return $inferred_type;
+				}
+
+				// Add the selector for the query.
 				$selectors[] = [
-					'display_name' => self::get_query_name_from_key( $required_query_key ),
-					'image_url' => $required_query->get_image_url(),
+					'display_name' => self::get_query_name_from_key( $query_key ),
+					'image_url' => $query->get_image_url(),
 					'inputs' => self::map_input_variables( $input_schema ),
-					'name' => ucfirst( $required_query_key ),
-					'query_key' => $required_query_key,
-					'type' => $required_query_type,
-					'query_group' => $query_key,
+					'name' => ucfirst( $query_key ),
+					'query_key' => $query_key,
+					'type' => $inferred_type,
 				];
 
-				// Add the required query to the queries array, so it won't be processed again.
-				$queries[ $required_query_key ] = $required_query;
+				$display_queries_to_selectors_map[ $display_query_key ][] = $query_key;
+
+				// We have found the relevant display query, so we can break out of the loop.
+				break;
 			}
-
-			// The query is either a display, or a list query.
-			$is_collection = true === ( $output_schema['is_collection'] ?? false );
-			$has_required_variables = array_reduce(
-				array_column( $input_schema, 'required' ),
-				fn( $carry, $required ) => $carry || ( $required ?? true ),
-				false
-			);
-
-			// Generate the selector for the query.
-			$selectors[] = [
-				'display_name' => self::get_query_name_from_key( $query_key ),
-				'image_url' => $query->get_image_url(),
-				'inputs' => self::map_input_variables( $input_schema ),
-				'name' => self::DISPLAY_QUERY_KEY === $query->get_type() ? ( $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ) ) : ucfirst( $query_key ),
-				'query_key' => $query_key,
-				'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
-				'query_group' => $query_key,
-			];
-
-			// If the query is a display query, set the display query found flag.
-			if ( self::DISPLAY_QUERY_KEY === $query->get_type() ) {
-				$display_query_found = true;
-			}
-		}
-
-		// If no display query was found, throw an error.
-		if ( ! $display_query_found ) {
-			return self::create_error( $block_title, 'No display query found' );
 		}
 
 		$config = [
@@ -185,6 +190,7 @@ class ConfigRegistry {
 			'patterns' => [],
 			'queries' => $queries,
 			'selectors' => $selectors,
+			'display_queries_to_selectors' => $display_queries_to_selectors_map,
 			'title' => $block_title,
 		];
 
@@ -208,20 +214,34 @@ class ConfigRegistry {
 		return true;
 	}
 
-	private static function validate_query_mapping( array $to_query_input_schema, array $from_query_input_schema, array $from_query_output_schema, string $block_title, string $from_query_key, string $from_query_type ): WP_Error|bool {
+	private static function validate_selector_query_mapping( array $intersecting_keys, array $display_query_input_schema, array $output_schema ): array {
+		return array_filter( $intersecting_keys, function ( $key ) use ( $display_query_input_schema, $output_schema ) {
+			$display_query_fields = $display_query_input_schema[ $key ];
+
+			// If the name doesn't match, skip.
+			if ( $display_query_fields['name'] !== $output_schema['type'][ $key ]['name'] ) {
+				return false;
+			}
+
+			// If the display query field is an id:list and the output schema field is an id, allow it as that's valid.
+			if ( 'id:list' === $display_query_fields['type'] && 'id' === $output_schema['type'][ $key ]['type'] ) {
+				return true;
+			}
+
+			// If the types don't match, skip.
+			if ( $display_query_fields['type'] !== $output_schema['type'][ $key ]['type'] ) {
+				return false;
+			}
+
+			// If the types match, allow it.
+			return true;
+		}, ARRAY_FILTER_USE_KEY );
+	}
+
+	private static function validate_query_mapping( array $to_query_input_schema, array $from_query_input_schema, array $from_query_output_schema, string $block_title, string $from_query_key ): WP_Error|bool {
 		foreach ( array_keys( $to_query_input_schema ) as $to ) {
 			if ( ! isset( $from_query_output_schema['type'][ $to ] ) ) {
 				return self::create_error( $block_title, sprintf( 'Cannot map key "%1$s" from %2$s query. The display query for this block requires a "%1$s" key as an input, but it is not present in the output schema for the %2$s query. Try adding a "%1$s" mapping to the output schema for the %2$s query.', esc_html( $to ), $from_query_key ) );
-			}
-		}
-
-		if ( self::SEARCH_QUERY_KEY === $from_query_type ) {
-			$search_input_count = count( array_filter( $from_query_input_schema, function ( array $input_var ): bool {
-				return 'ui:search_input' === $input_var['type'];
-			} ) );
-
-			if ( 1 !== $search_input_count ) {
-				return self::create_error( $block_title, 'A search query must have one input variable with type "ui:search_input"' );
 			}
 		}
 
@@ -283,36 +303,20 @@ class ConfigRegistry {
 		return ucwords( preg_replace( '/[^a-zA-Z0-9]/', ' ', $key ) );
 	}
 
-	// ToDo: This will only get the first display query, as we register block bindings with the first display query only.
-	public static function get_display_query( array $queries ): ?QueryInterface {
-		foreach ( $queries as $query_key => $query ) {
-			if ( ! $query instanceof QueryInterface ) {
-				continue;
-			}
-
-			// The migration system in the config store will always handle setting the type to display.
-			// Looking at the query key is a fallback, which really should not be needed.
-			if ( $query->get_type() === self::DISPLAY_QUERY_KEY || self::DISPLAY_QUERY_KEY === $query_key ) {
-				return $query;
+	private static function infer_query_type( array $input_schema, array $output_schema ): string|WP_Error {
+		// If any input variable has type 'ui:search_input', it's a search query.
+		foreach ( $input_schema as $input_var ) {
+			if ( isset( $input_var['type'] ) && 'ui:search_input' === $input_var['type'] ) {
+				return self::SEARCH_QUERY_KEY;
 			}
 		}
 
-		return null;
-	}
+		// If output_schema has 'is_collection' true, it's a list query.
+		if ( isset( $output_schema['is_collection'] ) && true === $output_schema['is_collection'] ) {
+			return self::LIST_QUERY_KEY;
+		}
 
-	public static function get_display_queries( array $queries ): array {
-		return array_filter(
-			$queries,
-			function ( $query, $query_key ) {
-				return (
-					$query instanceof QueryInterface &&
-					(
-						$query->get_type() === self::DISPLAY_QUERY_KEY ||
-						self::DISPLAY_QUERY_KEY === $query_key
-					)
-				);
-			},
-			ARRAY_FILTER_USE_BOTH
-		);
+		// This should never happen, but if it does, we need to error out.
+		return self::create_error( 'Unknown query type', 'Could not infer the type of the query' );
 	}
 }

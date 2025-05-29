@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { WPFormat, useAnchor } from '@wordpress/rich-text';
 
 import { InlineBindingSelectField } from '@/block-editor/format-types/inline-binding/components/InlineBindingSelection';
-import { getBlockConfig } from '@/utils/localized-block-data';
+import { getBlockConfig, getDisplayKeyFromQueryKey } from '@/utils/localized-block-data';
 
 interface InlineBindingSelectFieldPopoverProps {
 	contentRef: React.RefObject< HTMLElement >;
@@ -36,7 +36,7 @@ export function InlineBindingSelectFieldPopover( props: InlineBindingSelectField
 	);
 
 	const queryKey = remoteData?.queryKey ?? compatibleSelector?.query_key ?? '';
-	const queryGroup = remoteData?.queryGroup ?? compatibleSelector?.query_group ?? '';
+	const queryGroup = getDisplayKeyFromQueryKey( remoteData?.blockName ?? '', queryKey );
 
 	return (
 		<Popover

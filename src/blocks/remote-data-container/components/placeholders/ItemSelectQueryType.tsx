@@ -8,17 +8,6 @@ import { DataViewsModal } from '@/blocks/remote-data-container/components/modals
 import { InputModal } from '@/blocks/remote-data-container/components/modals/InputModal';
 import { InputPopover } from '@/blocks/remote-data-container/components/popovers/InputPopover';
 
-// Inline type for selector from BlockConfig
-type Selector = {
-	image_url?: string;
-	inputs: InputVariable[];
-	name: string;
-	query_key: string;
-	display_name?: string;
-	type: string;
-	query_group: string;
-};
-
 interface ItemSelectQueryTypeProps {
 	blockName: string;
 	selectors: Selector[];
@@ -42,7 +31,6 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 					headerImage: selector.image_url,
 					inputVariables: selector.inputs,
 					onSelect,
-					queryGroup: selector.query_group,
 					queryKey: selector.query_key,
 					title,
 				};

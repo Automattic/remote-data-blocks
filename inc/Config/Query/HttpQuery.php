@@ -63,38 +63,6 @@ class HttpQuery extends ArraySerializable implements HttpQueryInterface {
 	}
 
 	/**
-	 * Get the required query for this query.
-	 */
-	public function get_required_query(): ?string {
-		return $this->config['required_query'] ?? null;
-	}
-
-	/**
-	 * Set the required query for this query.
-	 *
-	 * @param string $required_query The required query for this query.
-	 */
-	public function set_required_query( string $required_query ): void {
-		$this->config['required_query'] = $required_query;
-	}
-
-	/**
-	 * Get the type of this query.
-	 */
-	public function get_type(): ?string {
-		return $this->config['type'];
-	}
-
-	/**
-	 * Set the type of this query.
-	 *
-	 * @param string $type The type of this query.
-	 */
-	public function set_type( string $type ): void {
-		$this->config['type'] = $type;
-	}
-
-	/**
 	 * Get the data source associated with this query.
 	 */
 	public function get_data_source(): HttpDataSourceInterface {

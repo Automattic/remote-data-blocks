@@ -64,16 +64,6 @@ class BlockPatterns {
 		return sprintf( self::$templates[ $template_name ], wp_json_encode( $attributes ) );
 	}
 
-	public static function register_block_patterns( string $block_name, string $block_title, array $display_queries_mappings ): array {
-		$registered_patterns = [];
-		foreach ( $display_queries_mappings as $display_query_key => $display_query ) {
-			$pattern_name = self::register_default_block_pattern( $block_name, $block_title, $display_query_key, $display_query );
-			$registered_patterns[ $display_query_key ] = $pattern_name;
-		}
-
-		return $registered_patterns;
-	}
-
 	/**
 	 * Register a default block pattern for a remote data block that can be used
 	 * even when no other patterns are available (e.g., in the item list view).

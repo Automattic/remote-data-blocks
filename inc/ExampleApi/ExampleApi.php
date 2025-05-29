@@ -82,8 +82,6 @@ class ExampleApi {
 					],
 				],
 			],
-			'required_query' => 'get_table',
-			'type' => 'display',
 			'query_runner' => new ExampleApiQueryRunner(),
 		] );
 
@@ -116,7 +114,6 @@ class ExampleApi {
 					],
 				],
 			],
-			'type' => 'list',
 			'query_runner' => new ExampleApiQueryRunner(),
 		] );
 
@@ -127,6 +124,7 @@ class ExampleApi {
 				'display' => $get_record_query,
 				'get_table' => $get_table_query,
 			],
+			'display_queries' => [ 'display' ],
 		] );
 	}
 }

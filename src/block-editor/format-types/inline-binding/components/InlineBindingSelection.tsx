@@ -127,7 +127,6 @@ export function InlineBindingSelectField( props: InlineBindingSelectFieldProps )
 	const { data, fetch, loading } = useRemoteData( {
 		blockName: props.blockName,
 		queryKey: props.queryGroup,
-		queryGroup: props.queryGroup,
 	} );
 
 	useEffect( () => {

@@ -50,8 +50,6 @@ export function QueryComponent( props: QueryComponentProps ) {
 		blockName,
 		externallyManagedRemoteData: remoteDataAttribute,
 		externallyManagedUpdateRemoteData: updateRemoteData,
-		// This is done on purpose as we want to execute the query with the same group as the query key, aka the display query.
-		queryGroup,
 		queryKey: queryGroup,
 	} );
 
@@ -117,6 +115,11 @@ export function QueryComponent( props: QueryComponentProps ) {
 		refreshRemoteData();
 	}
 
+	function getSelectorsForGroup( group: string ): Selector[] {
+		const selectorKeys = blockConfig.displayQueriesToSelectors[ group ] ?? [];
+		return blockConfig.selectors.filter( selector => selectorKeys?.includes( selector.query_key ) );
+	}
+
 	if ( showPatternSelection ) {
 		const supportedPatterns = getSupportedPatterns( data?.results[ 0 ] );
 
@@ -149,9 +152,7 @@ export function QueryComponent( props: QueryComponentProps ) {
 					<QueryInputsPanel
 						onUpdateQueryInputs={ onUpdateQueryInputs }
 						remoteData={ data }
-						selectors={ blockConfig.selectors.filter(
-							selectors => selectors.query_group === queryGroup
-						) }
+						selectors={ getSelectorsForGroup( queryGroup ) }
 					/>
 				</InspectorControls>
 			) }

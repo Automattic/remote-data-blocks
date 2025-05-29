@@ -86,13 +86,14 @@ final class ConfigSchemas {
 					] )
 				)
 			),
-			'queries' => Types::nullable( Types::record(
+			'display_queries' => Types::list_of( Types::string() ),
+			'queries' => Types::record(
 				Types::string(),
 				Types::one_of(
 					Types::instance_of( QueryInterface::class ),
 					Types::serialized_config_for( HttpQueryInterface::class ),
 				)
-			) ),
+			),
 			'overrides' => Types::nullable(
 				Types::list_of(
 					Types::object( [
@@ -142,14 +143,6 @@ final class ConfigSchemas {
 
 	private static function generate_http_query_config_schema(): array {
 		return Types::object( [
-			'required_query' => Types::nullable( Types::string() ),
-			// This is nullable, to account for the old query format.
-			// It's set based on looking at the query's location in selection_queries or render_query.
-			'type' => Types::nullable( Types::enum(
-				ConfigRegistry::LIST_QUERY_KEY,
-				ConfigRegistry::SEARCH_QUERY_KEY,
-				ConfigRegistry::DISPLAY_QUERY_KEY,
-			) ),
 			'cache_ttl' => Types::nullable( Types::one_of( Types::callable(), Types::integer(), Types::null() ) ),
 			'data_source' => Types::one_of(
 				Types::instance_of( HttpDataSourceInterface::class ),

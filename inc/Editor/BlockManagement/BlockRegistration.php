@@ -85,8 +85,13 @@ class BlockRegistration {
 
 		// Set available bindings from the display query output mappings.
 		$available_bindings_for_queries = [];
-		$display_queries = ConfigRegistry::get_display_queries( $config['queries'] );
-		foreach ( $display_queries as $display_query_key => $display_query ) {
+		$display_queries_to_selectors = $config['display_queries_to_selectors'] ?? [];
+
+		// ToDo: Need to set the patterns provided by an existing data source. Ignored on purpose right now.
+		$patterns = [];
+
+		foreach ( array_keys( $display_queries_to_selectors ) as $display_query_key ) {
+			$display_query = $config['queries'][ $display_query_key ];
 			$available_bindings_for_query = [];
 			$output_schema = $display_query->get_output_schema();
 			foreach ( $output_schema['type'] ?? [] as $key => $mapping ) {
@@ -97,6 +102,9 @@ class BlockRegistration {
 			}
 
 			$available_bindings_for_queries[ $display_query_key ] = $available_bindings_for_query;
+
+			$default_pattern_name = BlockPatterns::register_default_block_pattern( $block_name, $config['title'], $display_query_key, $display_query );
+			$patterns[ $display_query_key ] = $default_pattern_name;
 		}
 
 		// Create the localized data that will be used by our block editor script.
@@ -106,8 +114,9 @@ class BlockRegistration {
 			'instructions' => $config['instructions'],
 			'name' => $block_name,
 			'dataSourceType' => ConfigStore::get_data_source_type( $block_name ),
-			'patterns' => $config['patterns'],
+			'patterns' => $patterns,
 			'selectors' => $config['selectors'],
+			'displayQueriesToSelectors' => $display_queries_to_selectors,
 			'settings' => [
 				'category' => self::$block_category['slug'],
 				'icon' => $config['icon'] ?? 'cloud',
@@ -123,10 +132,6 @@ class BlockRegistration {
 		$block_type = register_block_type( $block_path, $block_options );
 
 		$script_handle = $block_type->editor_script_handles[0] ?? '';
-
-		// Register a default pattern that simply displays the available data.
-		$patterns = BlockPatterns::register_block_patterns( $block_name, $config['title'], $display_queries );
-		$block_config['patterns'] = $patterns;
 
 		return [ $block_config, $script_handle ];
 	}

@@ -1,7 +1,3 @@
-// export function getBlockAvailableBindings( blockName: string ): AvailableBindings {
-// 	return getBlockConfig( blockName )?.availableBindings ?? {};
-// }
-
 export function getBlockAvailableBindingsForQuery(
 	blockName: string,
 	queryKey: string
@@ -13,32 +9,25 @@ export function getBlockConfig( blockName: string ): BlockConfig | undefined {
 	return window.REMOTE_DATA_BLOCKS?.config?.[ blockName ];
 }
 
+export function getDisplayKeyFromQueryKey( blockName: string, queryKey: string ): string {
+	const displayQueriesToSelectors = getBlockConfig( blockName )?.displayQueriesToSelectors ?? {};
+
+	// iterate over the keys of the display_queries_to_selectors object.
+	for ( const [ displayQueryKey, selectors ] of Object.entries( displayQueriesToSelectors ) ) {
+		if ( selectors.includes( queryKey ) ) {
+			return displayQueryKey;
+		}
+	}
+
+	return '';
+}
+
 export function getBlockDataSourceType( blockName?: string ): string {
 	if ( ! blockName ) {
 		return '';
 	}
 
 	return getBlockConfig( blockName )?.dataSourceType ?? '';
-}
-
-export function getDisplayQueryGroup( blockName?: string ): string {
-	if ( ! blockName ) {
-		return '';
-	}
-	const config = getBlockConfig( blockName );
-	if ( ! config?.selectors ) {
-		return '';
-	}
-
-	const displaySelector = config.selectors.find(
-		selector => selector.type === 'manual-input' || selector.type === 'load-without-input'
-	);
-
-	if ( ! displaySelector ) {
-		return '';
-	}
-
-	return displaySelector.query_group;
 }
 
 /**

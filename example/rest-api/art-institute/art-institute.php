@@ -84,8 +84,6 @@ function register_aic_block(): void {
 				],
 			],
 		],
-		'required_query' => 'search_art',
-		'type' => 'display',
 	]);
 
 	$collection_query = HttpQuery::from_array([
@@ -137,7 +135,6 @@ function register_aic_block(): void {
 				],
 			],
 		],
-		'type' => 'display',
 	]);
 
 	$search_art_query = HttpQuery::from_array([
@@ -205,7 +202,6 @@ function register_aic_block(): void {
 				'type' => 'integer',
 			],
 		],
-		'type' => 'search',
 	]);
 
 	register_remote_data_block( [
@@ -216,6 +212,7 @@ function register_aic_block(): void {
 			// Changing the name of this query to anything but display will break existing blocks content.
 			'display' => $collection_query,
 		],
+		'display_queries' => [ 'display' ],
 	] );
 
 	register_remote_data_block( [
@@ -226,6 +223,7 @@ function register_aic_block(): void {
 			'display' => $get_art_query,
 			'search_art' => $search_art_query,
 		],
+		'display_queries' => [ 'display' ],
 	] );
 }
 add_action( 'init', __NAMESPACE__ . '\\register_aic_block' );

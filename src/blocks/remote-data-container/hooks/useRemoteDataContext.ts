@@ -28,7 +28,6 @@ export function useRemoteDataContext( context: Record< string, unknown > ): Remo
 					blockName: remoteDataBlockName,
 					metadata: {},
 					queryInputs: [],
-					queryGroup: 'Example Query Group',
 					queryKey: 'Example Query Key',
 					resultId: '',
 					results: [
