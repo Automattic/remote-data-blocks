@@ -35,8 +35,12 @@ export function InlineBindingSelectFieldPopover( props: InlineBindingSelectField
 		selector => [ 'list', 'search' ].includes( selector.type )
 	);
 
-	const queryKey = remoteData?.queryKey ?? compatibleSelector?.query_key ?? '';
-	const displayQueryKey = getDisplayQueryKeyFromQueryKey( remoteData?.blockName ?? '', queryKey );
+	const queryKey: string =
+		remoteData?.queryKey ??
+		getDisplayQueryKeyFromQueryKey(
+			remoteData?.blockName ?? '',
+			compatibleSelector?.query_key ?? ''
+		);
 
 	return (
 		<Popover
@@ -57,7 +61,6 @@ export function InlineBindingSelectFieldPopover( props: InlineBindingSelectField
 					<InlineBindingSelectField
 						blockName={ remoteData?.blockName ?? 'Remote Data Block' }
 						queryKey={ queryKey }
-						displayQueryKey={ displayQueryKey }
 						fieldType={ type ?? 'field' }
 						onSelectField={ ( data, fieldValue ) =>
 							props.onSelectField( { ...data, action: 'update_field_shortcode' }, fieldValue )

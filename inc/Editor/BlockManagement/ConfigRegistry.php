@@ -137,6 +137,11 @@ class ConfigRegistry {
 				$display_query = self::inflate_query( $block_config[ self::QUERIES_KEY ][ $display_query_key ] );
 				$display_query_input_schema = $display_query->get_input_schema();
 
+				// If the type is not set, or is not an array, skip.
+				if ( ! is_array( $output_schema['type'] ) || empty( $output_schema['type'] ) ) {
+					continue;
+				}
+
 				// Check if the query's output schema intersects with the display query's input schema.
 				$intersecting_keys = array_intersect_key( $output_schema['type'], $display_query_input_schema );
 

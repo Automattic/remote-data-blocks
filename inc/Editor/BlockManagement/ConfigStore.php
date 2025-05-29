@@ -77,7 +77,7 @@ class ConfigStore {
 			return null;
 		}
 
-		$display_queries_to_selectors = $config['display_queries_to_selectors'];
+		$display_queries_to_selectors = $config['display_queries_to_selectors'] ?? [];
 		if ( empty( $display_queries_to_selectors ) ) {
 			return null;
 		}
