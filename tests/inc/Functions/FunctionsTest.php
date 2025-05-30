@@ -197,6 +197,6 @@ class FunctionsTest extends TestCase {
 
 		$this->assertTrue( $this->mock_logger->hasLoggedLevel( LogLevel::ERROR ) );
 		$error_logs = $this->mock_logger->getLogsByLevel( LogLevel::ERROR );
-		$this->assertStringContainsString( 'Error registering block Unknown query type: Could not infer the type of the query', $error_logs[0]['message'] );
+		$this->assertStringContainsString( 'Error registering block Unknown query type: Could not infer the type of the query. Valid query types are "search" and "list".', $error_logs[0]['message'] );
 	}
 }

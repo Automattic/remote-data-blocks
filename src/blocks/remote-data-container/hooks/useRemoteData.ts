@@ -95,7 +95,6 @@ export function useRemoteData( {
 	const hasResolvedData = Boolean( resolvedData );
 
 	const blockConfig = getBlockConfig( blockName );
-
 	const query = blockConfig?.selectors?.find( selector => selector.query_key === queryKey );
 
 	if ( ! query ) {

@@ -177,7 +177,6 @@ class BlockPatterns {
 			$content = self::populate_template( 'empty', [] );
 		}
 
-		// ToDo: Ensure this name is compliant with what's expected by the block editor.
 		$pattern_name = sprintf( '%s/%s-pattern', $block_name, $display_query_key );
 
 		register_block_pattern(

@@ -324,6 +324,6 @@ class ConfigRegistry {
 
 		// This will happen if a query has not been configured correctly as a search or list query.
 		// So we error out, to replace the previous way of validating when the type was set.
-		return self::create_error( 'Unknown query type', 'Could not infer the type of the query' );
+		return self::create_error( 'Unknown query type', 'Could not infer the type of the query. Valid query types are "search" and "list".' );
 	}
 }
