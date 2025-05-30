@@ -30,6 +30,10 @@ class MockQuery extends HttpQuery {
 		return $response_data;
 	}
 
+	public function set_input_schema( array $input_schema ): void {
+		$this->config['input_schema'] = $input_schema;
+	}
+
 	public function set_output_schema( array $output_schema ): void {
 		$this->config['output_schema'] = $output_schema;
 	}

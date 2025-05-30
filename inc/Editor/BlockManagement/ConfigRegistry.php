@@ -103,13 +103,12 @@ class ConfigRegistry {
 
 		// Generate the selectors for the selector queries.
 		foreach ( $block_config[ self::QUERIES_KEY ] as $query_key => $query ) {
-			// Inflate the query.
+			// Inflate the query, and add it to the queries array.
 			$query = self::inflate_query( $query );
+			$queries[ $query_key ] = $query;
+
 			$input_schema = $query->get_input_schema();
 			$output_schema = $query->get_output_schema();
-
-			// This is only done because of ConfigStore::get_data_sources_as_array() needing it.
-			$queries[ $query_key ] = $query;
 
 			// Generate the selector for the display query, and then continue on to the next query.
 			if ( in_array( $query_key, $block_config['display_queries'], true ) ) {
@@ -133,14 +132,21 @@ class ConfigRegistry {
 				continue;
 			}
 
+			// Infer the type of the query, for selector generation and to validate the non-display queries.
+			$inferred_type = self::infer_query_type( $input_schema, $output_schema );
+			if ( is_wp_error( $inferred_type ) ) {
+				return $inferred_type;
+			}
+
+			// If the output schema's type is not an array, then skip selector generation as that'll not work.
+			// This has been done because some output schemas have the type set to string.
+			if ( ! is_array( $output_schema['type'] ) ) {
+				continue;
+			}
+
 			foreach ( $block_config['display_queries'] as $display_query_key ) {
 				$display_query = self::inflate_query( $block_config[ self::QUERIES_KEY ][ $display_query_key ] );
 				$display_query_input_schema = $display_query->get_input_schema();
-
-				// If the type is not set, or is not an array, skip.
-				if ( ! is_array( $output_schema['type'] ) || empty( $output_schema['type'] ) ) {
-					continue;
-				}
 
 				// Check if the query's output schema intersects with the display query's input schema.
 				$intersecting_keys = array_intersect_key( $output_schema['type'], $display_query_input_schema );
@@ -157,25 +163,22 @@ class ConfigRegistry {
 				}
 
 				// Validate the query mapping.
-				$validation_result = self::validate_query_mapping( $display_query_input_schema, $input_schema, $output_schema, $block_title, $query_key );
+				$validation_result = self::validate_query_mapping( $display_query_input_schema, $output_schema, $block_title, $query_key );
 				if ( is_wp_error( $validation_result ) ) {
 					return $validation_result;
 				}
 
-				// Infer the type of the query.
-				$inferred_type = self::infer_query_type( $input_schema, $output_schema );
-				if ( is_wp_error( $inferred_type ) ) {
-					return $inferred_type;
-				}
-
-				// Add the selector for the query.
-				$selectors[] = [
-					'image_url' => $query->get_image_url(),
-					'inputs' => self::map_input_variables( $input_schema ),
-					'name' => self::get_query_name_from_key( $query_key ),
-					'query_key' => $query_key,
-					'type' => $inferred_type,
-				];
+				// Add the selector for the query to the beginning of the selectors array.
+				array_unshift(
+					$selectors,
+					[
+						'image_url' => $query->get_image_url(),
+						'inputs' => self::map_input_variables( $input_schema ),
+						'name' => self::get_query_name_from_key( $query_key ),
+						'query_key' => $query_key,
+						'type' => $inferred_type,
+					]
+				);
 
 				$display_queries_to_selectors_map[ $display_query_key ][] = $query_key;
 
@@ -241,7 +244,7 @@ class ConfigRegistry {
 		}, ARRAY_FILTER_USE_KEY );
 	}
 
-	private static function validate_query_mapping( array $to_query_input_schema, array $from_query_input_schema, array $from_query_output_schema, string $block_title, string $from_query_key ): WP_Error|bool {
+	private static function validate_query_mapping( array $to_query_input_schema, array $from_query_output_schema, string $block_title, string $from_query_key ): WP_Error|bool {
 		foreach ( array_keys( $to_query_input_schema ) as $to ) {
 			if ( ! isset( $from_query_output_schema['type'][ $to ] ) ) {
 				return self::create_error( $block_title, sprintf( 'Cannot map key "%1$s" from %2$s query. The display query for this block requires a "%1$s" key as an input, but it is not present in the output schema for the %2$s query. Try adding a "%1$s" mapping to the output schema for the %2$s query.', esc_html( $to ), $from_query_key ) );
@@ -319,7 +322,8 @@ class ConfigRegistry {
 			return self::LIST_QUERY_KEY;
 		}
 
-		// This should never happen, but if it does, we need to error out.
+		// This will happen if a query has not been configured correctly as a search or list query.
+		// So we error out, to replace the previous way of validating when the type was set.
 		return self::create_error( 'Unknown query type', 'Could not infer the type of the query' );
 	}
 }

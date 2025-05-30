@@ -20,15 +20,38 @@ class FunctionsTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->mock_logger = new MockLogger();
-		$this->mock_query = MockQuery::create();
+		$this->mock_query = MockQuery::create( [
+			'input_schema' => [
+				'id' => [
+					'name' => 'ID',
+					'type' => 'id',
+				],
+			],
+		] );
 		$this->mock_list_query = MockQuery::create( [
 			'output_schema' => [
 				'is_collection' => true,
+				'type' => [
+					'id' => [
+						'name' => 'ID',
+						'path' => '$.id',
+						'type' => 'id',
+					],
+				],
 			],
 		] );
 		$this->mock_search_query = MockQuery::create( [
 			'input_schema' => [
 				'search' => [ 'type' => 'ui:search_input' ],
+			],
+			'output_schema' => [
+				'type' => [
+					'id' => [
+						'name' => 'ID',
+						'path' => '$.id',
+						'type' => 'id',
+					],
+				],
 			],
 		] );
 
@@ -174,6 +197,6 @@ class FunctionsTest extends TestCase {
 
 		$this->assertTrue( $this->mock_logger->hasLoggedLevel( LogLevel::ERROR ) );
 		$error_logs = $this->mock_logger->getLogsByLevel( LogLevel::ERROR );
-		$this->assertStringContainsString( 'ui:search_input', $error_logs[0]['message'] );
+		$this->assertStringContainsString( 'Error registering block Unknown query type: Could not infer the type of the query', $error_logs[0]['message'] );
 	}
 }

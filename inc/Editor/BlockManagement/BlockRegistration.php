@@ -89,7 +89,10 @@ class BlockRegistration {
 
 		$patterns = $config['patterns'] ?? [];
 
-		foreach ( array_keys( $display_queries_to_selectors ) as $display_query_key ) {
+		// Using array_keys here triggers a psalm error, so it's set to $_ instead.
+		// Supressing the psalm error is a not a good idea, so instead this is the better solution.
+		// ToDo: Fix the psalm error, and see if array_keys could be used here again.
+		foreach ( $display_queries_to_selectors as $display_query_key => $_ ) {
 			$display_query = $config['queries'][ $display_query_key ];
 			$available_bindings_for_query = [];
 			$output_schema = $display_query->get_output_schema();

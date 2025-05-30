@@ -1,6 +1,5 @@
 <?php declare(strict_types = 1);
 
-use WP_UnitTestCase;
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
