@@ -17,7 +17,7 @@ import {
 	PATTERN_OVERRIDES_CONTEXT_KEY,
 } from '@/config/constants';
 import { getBoundBlockClassName, getMismatchedAttributes } from '@/utils/block-binding';
-import { getBlockAvailableBindingsForQuery, getBlockTitle } from '@/utils/localized-block-data';
+import { getAvailableBindingsForQuery, getBlockTitle } from '@/utils/localized-block-data';
 
 interface BoundBlockEditProps {
 	attributes: RemoteDataInnerBlockAttributes;
@@ -114,7 +114,7 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 
 		const queryKey = remoteData.queryKey;
 
-		const availableBindings = getBlockAvailableBindingsForQuery(
+		const availableBindings = getAvailableBindingsForQuery(
 			remoteData?.blockName ?? '',
 			queryKey ?? ''
 		);

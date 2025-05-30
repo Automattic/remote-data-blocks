@@ -4,7 +4,7 @@ import { check } from '@wordpress/icons';
 
 import { TEXT_FIELD_TYPES } from '@/blocks/remote-data-container/config/constants';
 import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteData';
-import { getBlockAvailableBindingsForQuery } from '@/utils/localized-block-data';
+import { getAvailableBindingsForQuery } from '@/utils/localized-block-data';
 import { getRemoteDataResultValue } from '@/utils/remote-data';
 
 interface FieldSelectionProps {
@@ -73,7 +73,7 @@ export function FieldSelection( props: FieldSelectionProps ) {
 type FieldSelectionWithFieldsProps = Omit< FieldSelectionProps, 'fields' | 'fieldType' >;
 
 export function FieldSelectionFromAvailableBindings( props: FieldSelectionWithFieldsProps ) {
-	const availableBindings = getBlockAvailableBindingsForQuery(
+	const availableBindings = getAvailableBindingsForQuery(
 		props.remoteData.blockName,
 		props.remoteData.queryKey ?? ''
 	);

@@ -1,4 +1,4 @@
-export function getBlockAvailableBindingsForQuery(
+export function getAvailableBindingsForQuery(
 	blockName: string,
 	queryKey: string
 ): AvailableBindingsForQuery {
