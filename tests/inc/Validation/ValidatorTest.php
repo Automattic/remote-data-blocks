@@ -713,6 +713,18 @@ class ValidatorTest extends TestCase {
 
 		$this->assertInstanceOf( WP_Error::class, $result );
 		$this->assertSame( "\$serialized_config['config']['extra_value'] must be a string", $result->get_error_message() );
+
+		$result = $validator->validate( [
+			'config' => [
+				'__class' => WP_Error::class, // not a subclass of MockSerializableClass
+				'boolean_value' => true,
+				'enum_value' => 'foo',
+				'string_value' => 'hello, world!',
+			],
+		] );
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertSame( "\$serialized_config['config'] targets subclass \"WP_Error\" that does not match or extend target class \"RemoteDataBlocks\Tests\Mocks\MockSerializableClass\"", $result->get_error_message() );
 	}
 
 	public function testStringMatching(): void {
