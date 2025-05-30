@@ -199,4 +199,49 @@ class FunctionsTest extends TestCase {
 		$error_logs = $this->mock_logger->getLogsByLevel( LogLevel::ERROR );
 		$this->assertStringContainsString( 'Error registering block Unknown query type: Could not infer the type of the query. Valid query types are "search" and "list".', $error_logs[0]['message'] );
 	}
+
+	public function testRegisterBlockWithOldSchemaFormatNoRenderQuery(): void {
+		register_remote_data_block( [
+			'title' => 'Test Block with Old Schema Format No Render Query',
+		] );
+
+		$this->assertTrue( $this->mock_logger->hasLoggedLevel( LogLevel::ERROR ) );
+		$error_logs = $this->mock_logger->getLogsByLevel( LogLevel::ERROR );
+		$this->assertStringContainsString( 'Error registering block Test Block with Old Schema Format No Render Query: Render query is required', $error_logs[0]['message'] );
+	}
+
+	public function testRegisterBlockWithNewConfigSchema(): void {
+		register_remote_data_block( [
+			'title' => 'Test Block with New Config Schema',
+			'queries' => [
+				'display' => $this->mock_query,
+				'search' => $this->mock_search_query,
+				'list' => $this->mock_list_query,
+			],
+			'display_queries' => [ 'display', 'list' ],
+		] );
+
+		$block_name = 'remote-data-blocks/test-block-with-new-config-schema';
+		$config = ConfigStore::get_block_configuration( $block_name );
+
+		// Ensure that display is in the display_queries_to_selectors for display along with search.
+		$this->assertSame( [ 'display', 'search' ], $config['display_queries_to_selectors']['display'] );
+
+		// Ensure that list is in the display_queries_to_selectors for list along with display and search.
+		$this->assertSame( [ 'list' ], $config['display_queries_to_selectors']['list'] );
+	}
+
+	public function testRegisterBlockWithBadDisplayQueries(): void {
+		register_remote_data_block( [
+			'title' => 'Test Block with Bad Display Queries',
+			'queries' => [
+				'display' => $this->mock_query,
+			],
+			'display_queries' => [ 'display', 'list', 'test' ],
+		] );
+
+		$this->assertTrue( $this->mock_logger->hasLoggedLevel( LogLevel::ERROR ) );
+		$error_logs = $this->mock_logger->getLogsByLevel( LogLevel::ERROR );
+		$this->assertStringContainsString( 'Error registering block Test Block with Bad Display Queries: Display query "list" not found', $error_logs[0]['message'] );
+	}
 }
