@@ -146,8 +146,12 @@ class VipBlockDataApiTest extends TestCase {
 		$expected2 = 'Comedor del Presidente';
 
 		$mock_qr = new MockQueryRunner();
-		$mock_qr->addResult( 'title', $expected1 );
-		$mock_qr->addResult( 'location', $expected2 );
+		$mock_qr->setResults( [
+			[
+				'title' => [ 'value' => $expected1 ],
+				'location' => [ 'value' => $expected2 ],
+			],
+		] );
 
 		$mock_query = MockQuery::create( [ 'query_runner' => $mock_qr ] );
 		register_remote_data_block( [
@@ -168,13 +172,12 @@ class VipBlockDataApiTest extends TestCase {
 		$this->assertSame( "President's dining hall", $result['innerBlocks'][1]['attributes']['content'] );
 	}
 
-	public function testResolveRemoteDataFallsBackToDbOnQuery(): void {
+	public function testResolveRemoteDataFallsBackToSerializedDataOnError(): void {
 		$error = new \WP_Error( 'rdb-uh-oh', 'uh-oh!' );
 		$mock_qr = new MockQueryRunner();
-		$mock_qr->addResult( 'title', 'Happy happy hour! No networking!' );
-		$mock_qr->addResult( 'location', $error );
-
+		$mock_qr->setResults( $error );
 		$mock_query = MockQuery::create( [ 'query_runner' => $mock_qr ] );
+
 		register_remote_data_block( [
 			'title' => 'Events',
 			'render_query' => [
@@ -189,11 +192,11 @@ class VipBlockDataApiTest extends TestCase {
 		$result = VipBlockDataApi::resolve_remote_data( self::$sourced_block1, 'remote-data-blocks/events', 12, self::$parsed_block1 );
 		$logs = $mock_logger->getLogs();
 
-		// The first binding is successful.
+		// The binding callback results in an error.
 		$this->assertSame(
 			[
-				'level' => 'info',
-				'message' => 'Successfully resolved block binding',
+				'level' => 'error',
+				'message' => 'uh-oh!',
 				'context' => [
 					'block_name' => 'core/paragraph',
 					'block_info' => [
@@ -202,32 +205,13 @@ class VipBlockDataApiTest extends TestCase {
 						],
 					],
 					'remote_data_block_name' => 'remote-data-blocks/events',
+					'error' => $error,
 					'type' => 'block-binding',
 				],
 			],
 			$logs[0]
 		);
-
-		// The first binding results in an error.
-		$this->assertSame(
-			[
-				'level' => 'error',
-				'message' => 'uh-oh!',
-				'context' => [
-					'block_name' => 'core/heading',
-					'block_info' => [
-						'source_args' => [
-							'field' => 'location',
-						],
-					],
-					'remote_data_block_name' => 'remote-data-blocks/events',
-					'error' => $error,
-					'type' => 'block-binding',
-				],
-			],
-			$logs[1]
-		);
-		$this->assertSame( 'Happy happy hour! No networking!', $result['innerBlocks'][0]['attributes']['content'] );
+		$this->assertSame( 'Happy hour &amp;amp; networking', $result['innerBlocks'][0]['attributes']['content'] );
 		$this->assertSame( 'President&#039;s dining hall', $result['innerBlocks'][1]['attributes']['content'] );
 	}
 }

@@ -42,7 +42,7 @@ class RemoteDataTemplateBlockTest extends RDBTestCase {
 		$result_html = do_blocks('
 			<!-- wp:remote-data-blocks/test-template-render {"remoteData":{"blockName":"remote-data-blocks/test-template-render"}} -->
 			<div>
-				<!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"block":"remote-data-blocks/test-template-render","field":"title"}}},"name":"Title"}} -->
+				<!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"title"}}},"name":"Title"}} -->
 				<h2 id="field-title" class="wp-block-heading">Fallback title</h2>
 				<!-- /wp:heading -->
 

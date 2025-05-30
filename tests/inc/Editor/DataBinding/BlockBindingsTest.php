@@ -55,7 +55,7 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_unknown_mode_with_error(): void {
-		$mock_qr = $this->create_mock_query_runner_with_result( new WP_Error( 'test-error', 'Test Error' ) );
+		$mock_qr = $this->create_mock_query_runner_with_error( new WP_Error( 'test-error', 'Test Error' ) );
 		$mock_block_config = $this->create_mock_block_config( $mock_qr );
 		$this->create_mock_config_store( $mock_block_config );
 
@@ -73,7 +73,7 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_error_mode(): void {
-		$mock_qr = $this->create_mock_query_runner_with_result( new WP_Error( 'test-error', 'Test Error' ) );
+		$mock_qr = $this->create_mock_query_runner_with_error( new WP_Error( 'test-error', 'Test Error' ) );
 		$mock_block_config = $this->create_mock_block_config( $mock_qr );
 		$this->create_mock_config_store( $mock_block_config );
 
@@ -109,11 +109,11 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_no_results_for_error_mode(): void {
-		$mock_qr = $this->create_mock_query_runner_with_results();
+		$mock_qr = new MockQueryRunner();
 		$mock_block_config = $this->create_mock_block_config( $mock_qr );
 		$this->create_mock_config_store( $mock_block_config );
 
-		$this->assertFalse( BlockBindings::should_render_fallback_content(
+		$this->assertTrue( BlockBindings::should_render_fallback_content(
 			$this->create_block_context( [
 				'test_input_field' => 'test_value',
 				'another_input_field' => 'another_value',
@@ -145,7 +145,7 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_error_for_empty_mode(): void {
-		$mock_qr = $this->create_mock_query_runner_with_result( new WP_Error( 'test-error', 'Test Error' ) );
+		$mock_qr = $this->create_mock_query_runner_with_error( new WP_Error( 'test-error', 'Test Error' ) );
 		$mock_block_config = $this->create_mock_block_config( $mock_qr );
 		$this->create_mock_config_store( $mock_block_config );
 
@@ -163,7 +163,8 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_empty_mode(): void {
-		$mock_qr = $this->create_mock_query_runner_with_results();
+		$mock_qr = new MockQueryRunner();
+		$mock_qr->setResults( [] );
 		$mock_block_config = $this->create_mock_block_config( $mock_qr );
 		$this->create_mock_config_store( $mock_block_config );
 
@@ -181,7 +182,7 @@ class BlockBindingsTest extends TestCase {
 	 * @preserveGlobalState disabled
 	 */
 	public function test_should_render_fallback_content_with_unknown_mode_with_empty_results(): void {
-		$mock_qr = $this->create_mock_query_runner_with_results();
+		$mock_qr = new MockQueryRunner();
 		$mock_block_config = $this->create_mock_block_config( $mock_qr );
 		$this->create_mock_config_store( $mock_block_config );
 
@@ -260,7 +261,11 @@ class BlockBindingsTest extends TestCase {
 				return parent::execute( $query, $input_variables );
 			}
 		};
-		$mock_qr->addResult( 'output_field', 'Test Output Value' );
+		$mock_qr->setResults( [
+			[
+				self::MOCK_OUTPUT_FIELD_NAME => [ 'value' => 'Test Output Value' ],
+			],
+		] );
 
 		$block = [
 			'context' => $this->create_block_context( [
@@ -301,7 +306,11 @@ class BlockBindingsTest extends TestCase {
 				return parent::execute( $query, $input_variables );
 			}
 		};
-		$mock_qr->addResult( 'output_field', 'Test Output Value' );
+		$mock_qr->setResults( [
+			[
+				self::MOCK_OUTPUT_FIELD_NAME => [ 'value' => 'Test Output Value' ],
+			],
+		] );
 
 		$block = [
 			'context' => $this->create_block_context( [
@@ -501,24 +510,28 @@ class BlockBindingsTest extends TestCase {
 	}
 
 	/**
-	 * Creates a mock query runner with the specified result.
+	 * Creates a mock query runner that will return a result once.
 	 *
-	 * @param mixed $result The result to return from the query runner.
+	 * @param mixed $value The result value to return from the query runner.
 	 */
-	private function create_mock_query_runner_with_result( mixed $result ): MockQueryRunner {
+	private function create_mock_query_runner_with_result( mixed $value = null ): MockQueryRunner {
 		$mock_qr = new MockQueryRunner();
-		$mock_qr->addResult( self::MOCK_OUTPUT_FIELD_NAME, $result );
+		$mock_qr->setResults( [
+			[
+				self::MOCK_OUTPUT_FIELD_NAME => [ 'value' => $value ],
+			],
+		] );
 		return $mock_qr;
 	}
 
 	/**
-	 * Creates a mock query runner with the specified results.
+	 * Creates a mock query runner that will return an error once.
 	 *
-	 * @param array $results The results to return from the query runner.
+	 * @param WP_Error $error The error to return from the query runner.
 	 */
-	private function create_mock_query_runner_with_results( array $results = [] ): MockQueryRunner {
+	private function create_mock_query_runner_with_error( WP_Error $error ): MockQueryRunner {
 		$mock_qr = new MockQueryRunner();
-		$mock_qr->addResults( $results );
+		$mock_qr->setResults( $error );
 		return $mock_qr;
 	}
 

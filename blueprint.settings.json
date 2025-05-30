@@ -1,15 +1,15 @@
 {
   "$schema": "https://wordpress-playground.atomicsites.blog/blueprint-schema.json",
   "meta": {
-    "title": "Remote Data Blocks local playground",
-    "description": "Runs Remote Data Blocks plugin in a local WordPress Playground",
+    "title": "Remote Data Blocks latest",
+    "description": "Installs the latest release of remote-data-blocks plugin to WordPress Playground",
     "author": "WordPress VIP",
     "categories": [ "Content" ]
   },
   "features": {
     "networking": true
   },
-  "landingPage": "/wp-admin/post.php?post=4&action=edit",
+  "landingPage": "/wp-admin/admin.php?page=remote-data-blocks-settings",
   "login": true,
   "preferredVersions": {
     "php": "8.2",
@@ -24,8 +24,16 @@
       }
     },
     {
-      "step": "activatePlugin",
-      "pluginPath": "remote-data-blocks/remote-data-blocks.php"
+      "step": "installPlugin",
+      "options": {
+        "activate": true,
+        "targetFolderName": "remote-data-blocks"
+      },
+      "pluginData": {
+        "caption": "Installing Remote Data Blocks",
+        "resource": "url",
+        "url": "https://wordpress-playground.atomicsites.blog/plugin-proxy.php?repo=Automattic/remote-data-blocks&name=remote-data-blocks.zip"
+      }
     },
     {
       "step": "importWxr",

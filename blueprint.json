@@ -9,7 +9,7 @@
   "features": {
     "networking": true
   },
-  "landingPage": "/wp-admin/admin.php?page=remote-data-blocks-settings",
+  "landingPage": "/wp-admin/post.php?post=4&action=edit",
   "login": true,
   "preferredVersions": {
     "php": "8.2",
@@ -33,6 +33,13 @@
         "caption": "Installing Remote Data Blocks",
         "resource": "url",
         "url": "https://wordpress-playground.atomicsites.blog/plugin-proxy.php?repo=Automattic/remote-data-blocks&name=remote-data-blocks.zip"
+      }
+    },
+    {
+      "step": "importWxr",
+      "file": {
+        "resource": "url",
+        "url": "https://raw.githubusercontent.com/Automattic/remote-data-blocks/refs/heads/trunk/example/assets/blueprint-content.wxr"
       }
     }
   ]

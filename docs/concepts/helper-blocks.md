@@ -6,7 +6,7 @@ Remote Data Blocks adds some accessory blocks for bindings, listed below.
 
 Use this block to bind to HTML from a remote data source. This block only works when placed inside a remote data block container and bound to a field containing HTML.
 
-![Screen recording showing the insertion and binding of a Remote HTML Block in the editor](./block-insert-remote-html.gif)
+![Screen recording showing the insertion and binding of a Remote HTML Block in the editor](https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/docs/concepts/block-insert-remote-html.gif)
 
 Fields defined by a query’s `output_schema` must have type `html` in order to be available to Remote HTML blocks:
 
