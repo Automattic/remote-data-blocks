@@ -13,13 +13,7 @@ export function QueryInputsPanel( {
 	remoteData,
 	selectors,
 }: QueryInputsPanelProps ) {
-	const { queryInputs = [], queryKey } = remoteData;
-
-	// throw an error if the queryKey is empty.
-	if ( ! queryKey ) {
-		throw new Error( 'Query key should not be empty, when using the QueryInputsPanel' );
-	}
-
+	const { queryInputs = [], queryKey = '' } = remoteData;
 	const [ localInputs, setLocalInputs ] = useState( queryInputs );
 	const inputDefinitions =
 		selectors?.find( selector => selector.query_key === queryKey )?.inputs ?? [];
