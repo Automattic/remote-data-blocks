@@ -99,6 +99,11 @@
 		<exclude-pattern>/tests/*</exclude-pattern>
 	</rule>
 
+	<!-- Exclude strict types for example templates -->
+	<rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes.DeclareStrictTypesMissing">
+		<exclude-pattern>/example/templates/*</exclude-pattern>
+	</rule>
+
 	<!-- Exclude PSR12.Files.FileHeader.IncorrectOrder for specific files -->
 	<rule ref="PSR12.Files.FileHeader.IncorrectOrder">
 		<exclude-pattern>remote-data-blocks.php</exclude-pattern>

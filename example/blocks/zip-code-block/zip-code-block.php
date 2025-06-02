@@ -57,4 +57,3 @@ function register_zip_code_remote_data_block(): void {
 	] );
 }
 add_action( 'init', __NAMESPACE__ . '\\register_zip_code_remote_data_block' );
-

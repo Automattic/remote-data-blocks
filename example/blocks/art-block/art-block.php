@@ -138,4 +138,3 @@ function register_art_remote_data_block(): void {
 	] );
 }
 add_action( 'init', __NAMESPACE__ . '\\register_art_remote_data_block' );
-

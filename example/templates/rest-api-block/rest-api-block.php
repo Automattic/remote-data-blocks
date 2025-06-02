@@ -148,7 +148,7 @@ function register_basic_rest_api_remote_data_block(): void {
 			[
 				'query' => $list_items_query,
 				'type' => 'search',
-			]
+			],
 		],
 		// TODO: Uncomment and implement if you want to use a custom block pattern.
 		// 'pattern' => file_get_contents( __DIR__ . '/patterns/default-pattern.html' ),

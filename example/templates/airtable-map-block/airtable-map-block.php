@@ -1,6 +1,6 @@
 <?php
 
-function register_leaflet_map_remote_data_block() {
+function register_leaflet_map_remote_data_block(): void {
 	// Register the Leaflet script and stylesheet. The handles are referenced in
 	// `block.json` for use in the block editor and the WordPress frontend.
 	wp_register_style( 'leaflet-style', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css', [], '1.9.4' );
