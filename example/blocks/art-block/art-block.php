@@ -85,6 +85,7 @@ function register_art_remote_data_block(): void {
 		// the base endpoint from the data source and the input variables.
 		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
 			$endpoint = $aic_data_source['endpoint'] . '/search';
+			$search_terms = $input_variables['search'] ?? '';
 
 			if ( ! empty( $search_terms ) ) {
 				$endpoint = add_query_arg( [ 'q' => $search_terms ], $endpoint . '/search' );
