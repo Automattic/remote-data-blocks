@@ -2,7 +2,8 @@ import { TextControl } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { DataSourceForm } from '../components/DataSourceForm';
+import { MOCK_SHOP_STORE } from '@/data-sources/api-clients/shopify';
+import { DataSourceForm } from '@/data-sources/components/DataSourceForm';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import { ConfigSource } from '@/data-sources/constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
@@ -33,6 +34,10 @@ export const ShopifySettings = ( {
 	);
 
 	const shouldAllowSubmit = useMemo( () => {
+		if ( MOCK_SHOP_STORE === state.store_name ) {
+			return true;
+		}
+
 		return state.store_name && state.access_token;
 	}, [ state.store_name, state.access_token ] );
 
@@ -45,10 +50,11 @@ export const ShopifySettings = ( {
 			handleOnChange( 'store_name', '' );
 			return;
 		}
-		const urlPattern = /^https?:\/\/([^.]+)\.myshopify\.com$/;
-		const match = shopNameInput.match( urlPattern );
-		const extractedShopName = match ? match[ 1 ] : shopNameInput;
-		handleOnChange( 'store_name', extractedShopName ?? '' );
+
+		// Extract hostname
+		const url = new URL( `https://${ shopNameInput.trim().replace( /^https?:\/\//, '' ) }` );
+
+		handleOnChange( 'store_name', url.hostname );
 	};
 
 	const onSaveClick = async () => {
@@ -81,10 +87,10 @@ export const ShopifySettings = ( {
 					label={ __( 'Store', 'remote-data-blocks' ) }
 					onChange={ onShopNameChange }
 					value={ state.store_name ?? '' }
-					placeholder="https://your-store.myshopify.com"
+					placeholder="your-store.myshopify.com"
 					help={
 						<>
-							{ __( 'Example: https://' ) }
+							{ __( 'Example: ' ) }
 							<strong>{ __( 'your-store' ) }</strong>
 							{ __( '.myshopify.com' ) }
 						</>
@@ -94,8 +100,10 @@ export const ShopifySettings = ( {
 					__nextHasNoMarginBottom
 				/>
 				<PasswordInputControl
+					disabled={ MOCK_SHOP_STORE === state.store_name }
 					label={ __( 'Access Token', 'remote-data-blocks' ) }
 					onChange={ onTokenInputChange }
+					placeholder={ MOCK_SHOP_STORE === state.store_name ? 'No token required' : undefined }
 					value={ state.access_token }
 					help={ connectionMessage }
 				/>

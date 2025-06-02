@@ -1,16 +1,35 @@
 import { __, sprintf } from '@wordpress/i18n';
 
+export const MOCK_SHOP_STORE = 'mock.shop';
+
 export class ShopifyApi {
-	constructor( private store: string, private token: string ) {}
+	constructor( private store: string, private token?: string ) {
+		if ( ! token && store !== MOCK_SHOP_STORE ) {
+			throw new Error( 'Access token is required' );
+		}
+	}
 
 	private getGraphqlEndpointUrl() {
-		if ( ! this.store ) {
-			throw new Error( 'No store provided' );
+		// Special case for the Shopify Mock Store, which uses a different endpoint.
+		if ( MOCK_SHOP_STORE === this.store ) {
+			return 'https://mock.shop/api';
 		}
+
+		if ( this.store.endsWith( '.myshopify.com' ) ) {
+			// If the store already has the .myshopify.com domain, use it directly.
+			return `https://${ this.store }/api/2024-07/graphql.json`;
+		}
+
 		return `https://${ this.store }.myshopify.com/api/2024-07/graphql.json`;
 	}
 
-	private getAuthHeaders() {
+	private getAuthHeaders(): Record< string, string > {
+		if ( MOCK_SHOP_STORE === this.store ) {
+			return {
+				'Content-Type': 'application/json',
+			};
+		}
+
 		if ( ! this.token ) {
 			throw new Error( 'No token provided' );
 		}
@@ -45,10 +64,10 @@ export class ShopifyApi {
 	public async shopName(): Promise< string > {
 		const result = await this.query< { data?: { shop?: { name: string } } } >(
 			`query {
-                shop {
-                    name
-                }
-            }`
+				shop {
+					name
+				}
+			}`
 		);
 		return result.data?.shop?.name ?? '';
 	}
