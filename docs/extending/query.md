@@ -6,7 +6,7 @@ A common approach is to define a data source on the settings screen and then com
 
 ## HttpQuery
 
-Most HTTP-powered APIs can be queried using an `HttpQuery`. Here's an example of a query for US ZIP code data. This examples assumes you have configured the data source in the UI, and have the UUID.
+Most HTTP-powered APIs can be queried using `HttpQuery`. Queries are instantiated with configuration options, described below.
 
 ```php
 if ( ! defined( 'REMOTE_DATA_BLOCKS_EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID' ) ) {
@@ -19,7 +19,7 @@ if ( ! $data_source instanceof HttpDataSource ) {
 	return;
 }
 
-$query = HttpQuery::from_array( [
+$query = [
 	'display_name' => 'Get location by Zip code',
 	'data_source' => $data_source,
 	'endpoint' => function( array $input_variables ) use ( $data_source ): string {
@@ -51,7 +51,7 @@ $query = HttpQuery::from_array( [
 			],
 		],
 	],
-] );
+];
 ```
 
 - The `endpoint` property is a callback function that constructs the query endpoint. In this case, the endpoint is constructed by appending the `zip_code` input variable to the data source endpoint.
@@ -84,7 +84,7 @@ The `endpoint` property defines the query endpoint. It can be a string or a call
 
 ### input_schema: array
 
-The `input_schema` property defines the input variables expected by the query. Further information and examples are provided in the [`input_schema` documentation](./query-input-schema.md).
+The `input_schema` property defines the input variables expected by the query, which can be used to formulate the endpoint, the request headers, or the request body. Further specification and examples are provided in the [`input_schema` documentation](./query-input-schema.md).
 
 ### output_schema: array (required)
 
@@ -221,3 +221,7 @@ If you need to pre-process the response in some way before the output variables 
 ### query_runner: QueryRunnerInterface
 
 Use the `query_runner` property to provide a custom [query runner](./query-runner.md) for the query. If omitted, the query will use the default query runner, which works well with most HTTP-powered APIs.
+
+## GraphqlQuery
+
+## GraphqlMutation

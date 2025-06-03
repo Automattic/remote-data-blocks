@@ -1,6 +1,6 @@
 # Inline bindings
 
-One of the current limitations of the [block bindings API](./block-bindings.md) is that it is restricted to a small number of core blocks and attributes. For example, currently, you cannot bind to the content of a table block or a custom block. You also cannot bind to a _subset_ of a block's content.
+One of the current limitations of the [block bindings API](block-bindings.md) is that it is restricted to a small number of core blocks and attributes. For example, currently, you cannot bind to the content of a table block or a custom block. You also cannot bind to a _subset_ of a block's content.
 
 As a partial workaround, this plugin provides a way to use remote data in some places where block bindings are not supported. This feature is named "inline bindings" and it is available in any block that uses [rich text](https://developer.wordpress.org/block-editor/reference-guides/richtext/), such as tables, lists, and some custom blocks. Look for the inline binding button in the rich text formatting toolbar:
 

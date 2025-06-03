@@ -1,4 +1,4 @@
-# Query `output_schema` property
+# HttpQuery `output_schema` property
 
 A query's `output_schema` defines how an API response should be transformed and provided to a remote data block. A typical goal is to transform the API response into a flat array of fields that can be bound to blocks, while omitting values that are not needed. Output can be nested, but nested values cannot be bound to blocks.
 

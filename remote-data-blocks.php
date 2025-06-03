@@ -66,4 +66,7 @@ do_action( 'remote_data_blocks_loaded' );
 
 // Plugin developers: If you need to register additional code for testing, you
 // can do so here, e.g.:
-// require_once __DIR__ . '/example/shopify/register.php';
+// require_once __DIR__ . '/example/blocks/art-block/art-block.php';
+// require_once __DIR__ . '/example/blocks/github-markdown-block/github-markdown-block.php';
+// require_once __DIR__ . '/example/blocks/shopify-mock-store-block/shopify-mock-store-block.php';
+// require_once __DIR__ . '/example/blocks/zip-code-block/zip-code-block.php';

@@ -13,6 +13,9 @@ coverage
 # Build output (only at root)
 /build/
 
+# Private examples
+/examples/private
+
 # Testing
 /artifacts/
 /test-results/

@@ -13,12 +13,10 @@
     "remote-data-blocks.php"
   ],
   "scripts": {
-    "build": "npm run cmd:build && npm run build:examples",
+    "build": "npm run cmd:build",
     "build:docs:ai": "npx repomix --include='docs/**/*.md,example/**' --ignore='docs/for-ai.md' --style=markdown --output='docs/for-ai.md'",
-    "build:examples": "EXAMPLE=airtable/leaflet-map npm run cmd:build:example",
     "check-types": "tsc --noEmit",
     "cmd:build": "wp-scripts build --experimental-modules",
-    "cmd:build:example": "npm run cmd:build -- --config=example/$EXAMPLE/webpack.config.js --output-path=example/$EXAMPLE/build --webpack-src-dir=example/$EXAMPLE/src",
     "cmd:format": "prettier '**/*.(js|json|jsx|md|ts|tsx|yml|yaml)'",
     "cmd:lint": "eslint --ext 'js,jsx,ts,tsx' --quiet",
     "dev": "./bin/start",

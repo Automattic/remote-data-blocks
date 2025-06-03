@@ -33,9 +33,11 @@ Once you've defined your data source and queries, you can [register a remote dat
 - [Hooks (actions and filters)](hooks.md)
 - [Query runner](query-runner.md)
 
-## Examples
+## Examples and Templates
 
 The [examples](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/README.md) provide detailed code samples of interacting with the plugin various methods of extending the plugin.
+
+For quick development, use the [templates](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/templates/README.md) and [AI prompts](../ai-prompts.md) to scaffold new integrations rapidly.
 
 ## Create a local development environment
 

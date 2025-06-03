@@ -1,8 +1,8 @@
 import { useDebounce } from '@wordpress/compose';
-import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { ShopifyApi } from '@/data-sources/api-clients/shopify';
+import { ShopifyApi, MOCK_SHOP_STORE } from '@/data-sources/api-clients/shopify';
 import { getConnectionMessage } from '@/data-sources/utils';
 import { useQuery } from '@/hooks/useQuery';
 
@@ -14,13 +14,18 @@ export interface ShopifyConnection {
 export const useShopifyShopName = ( store: string, token: string ): ShopifyConnection => {
 	const [ connectionMessage, setConnectionMessage ] = useState< null | JSX.Element >( null );
 
-	const api = useMemo( () => new ShopifyApi( store, token ), [ store, token ] );
 	const queryFn = useCallback( async () => {
-		if ( ! ( store && token ) ) {
+		if ( ! store ) {
 			return null;
 		}
-		return api.shopName();
-	}, [ api, store, token ] );
+
+		if ( ! token && store !== MOCK_SHOP_STORE ) {
+			return null;
+		}
+
+		const api = new ShopifyApi( store, token );
+		return await api.shopName();
+	}, [ store, token ] );
 
 	const {
 		data: shopName,

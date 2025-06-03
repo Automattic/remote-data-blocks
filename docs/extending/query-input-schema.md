@@ -1,4 +1,4 @@
-# Query `input_schema` property
+# HttpQuery `input_schema` property
 
 The `input_schema` property defines the input variables expected by the query. The property should be an associative array of input variable definitions. The keys of the array are machine-friendly input variable names, and the values are associative arrays with the following structure:
 
