@@ -6,7 +6,7 @@ A common approach is to define a data source on the settings screen and then com
 
 ## HttpQuery
 
-Most HTTP-powered APIs can be queried using `HttpQuery`. Queries are instantiated with configuration optiona, described below.
+Most HTTP-powered APIs can be queried using `HttpQuery`. Queries are instantiated with configuration options, described below.
 
 ```php
 if ( ! defined( 'REMOTE_DATA_BLOCKS_EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID' ) ) {
