@@ -3,8 +3,8 @@
 namespace RemoteDataBlocks\Validation;
 
 use RemoteDataBlocks\Validation\Types;
-use RemoteDataBlocks\Config\DataSource\HttpDataSourceInterface;
-use RemoteDataBlocks\Config\Query\HttpQueryInterface;
+use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Config\Query\QueryInterface;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
 
@@ -90,8 +90,8 @@ final class ConfigSchemas {
 				Types::string(),
 				Types::one_of(
 					Types::instance_of( QueryInterface::class ),
-					Types::serialized_config_for( HttpQueryInterface::class ),
-				)
+					Types::serialized_config_for( HttpQuery::class ),
+				),
 			),
 			'overrides' => Types::nullable(
 				Types::list_of(
@@ -144,8 +144,8 @@ final class ConfigSchemas {
 		return Types::object( [
 			'cache_ttl' => Types::nullable( Types::one_of( Types::callable(), Types::integer(), Types::null() ) ),
 			'data_source' => Types::one_of(
-				Types::instance_of( HttpDataSourceInterface::class ),
-				Types::serialized_config_for( HttpDataSourceInterface::class ),
+				Types::instance_of( HttpDataSource::class ),
+				Types::serialized_config_for( HttpDataSource::class ),
 			),
 			'endpoint' => Types::nullable( Types::one_of( Types::callable(), Types::url() ) ),
 			'image_url' => Types::nullable( Types::image_url() ),
