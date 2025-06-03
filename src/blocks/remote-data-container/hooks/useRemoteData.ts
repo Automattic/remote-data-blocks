@@ -4,6 +4,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { REMOTE_DATA_REST_API_URL } from '@/blocks/remote-data-container/config/constants';
 import { usePaginationVariables } from '@/blocks/remote-data-container/hooks/usePaginationVariables';
 import { useSearchVariables } from '@/blocks/remote-data-container/hooks/useSearchVariables';
+import { ensureError } from '@/utils/errors';
 import { memoizeFn } from '@/utils/function';
 import { isQueryInputValid, validateQueryInput } from '@/utils/input-validation';
 import { getBlockConfig } from '@/utils/localized-block-data';
@@ -198,14 +199,14 @@ export function useRemoteData( {
 		try {
 			inputs.forEach( input => validateQueryInput( input, inputVariables ) );
 		} catch ( err: unknown ) {
-			reset( new Error( String( err ) ) );
+			reset( ensureError( err ) );
 			return;
 		}
 
 		setLoading( true );
 
 		const remoteData = await fetchRemoteData( requestData ).catch( ( err: unknown ) => {
-			reset( new Error( String( err ) ) );
+			reset( ensureError( err ) );
 		} );
 
 		if ( ! remoteData ) {
