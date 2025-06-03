@@ -1,12 +1,11 @@
 <?php
 
-use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Integrations\Airtable\AirtableDataSource;
 use RemoteDataBlocks\Integrations\Airtable\AirtableIntegration;
 
-$access_token = 'patXXXXXXXXXXXXXXXX'; // Airtable access token
-$base_id = 'appXXXXXXXXXXXXX'; // Airtable base ID
-$table_id = 'tblXXXXXXXXXXXXX'; // Airtable table ID
+$access_token = '{{ Airtable access token }}'; // Airtable access token ("pat...")
+$base_id = '{{ Airtable base ID }}'; // Airtable base ID ("app...")
+$table_id = '{{ Airtable table ID }}'; // Airtable table ID ("tbl...")
 
 $table = [
 	'id' => $table_id,
@@ -52,7 +51,7 @@ $map_data_source = AirtableDataSource::from_array( [
 	],
 ] );
 
-$get_locations_query = HttpQuery::from_array( AirtableIntegration::get_list_query( $map_data_source, $table ) );
+$get_locations_query = AirtableIntegration::get_list_query( $map_data_source, $table );
 $response = $get_locations_query->execute( [] );
 $coordinates = [];
 
