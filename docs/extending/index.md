@@ -3,7 +3,31 @@
 > [!TIP]
 > Make sure you've read the [core concepts](../concepts/index.md) behind Remote Data Blocks before extending the plugin.
 
-Data sources and queries can be configured in the plugin UI, but sometimes, you need to extend the plugin to implement custom functionality. Remote Data Blocks provides extendable classes, global functions, hooks, and filters to help you connect to any data source, parse responses, and customize the display of data.
+Data sources and queries can be configured in the plugin UI but, sometimes, you need to write code to implement custom functionality or connect with data sources that aren't fully supported. Remote Data Blocks provides flexible configuration, extendable classes, hooks, and filters to help you connect to any remote data source and customize the output.
+
+## Customization
+
+Defining a data source or query in code gives you complete control over how data is fetched, processed, and rendered. In the case of unsupported APIs, it's a necessary step to define the schema and logic for fetching data.
+
+- [Data source](data-source.md)
+- [Query](query.md)
+- [Block registration](block-registration.md)
+
+## Advanced customization
+
+- [Block patterns](block-patterns.md)
+- [Hooks (actions and filters)](hooks.md)
+- [Overrides](overrides.md)
+
+## Examples and AI prompts
+
+The included [examples](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/README.md) provide detailed code samples and templates.
+
+For quick development, we highly recommend [leveraging AI](ai-prompts.md) to scaffold and iterate on new integrations.
+
+## Local development environment
+
+This repository includes tools for quickly starting a [local development environment](../local-development.md).
 
 ## Data Flow
 
@@ -11,34 +35,8 @@ Here's a short overview of how data flows through the plugin when a post with a 
 
 1. WordPress core loads the post content, parses the blocks, and recognizes that a paragraph block has a [block binding](../concepts/block-bindings.md).
 2. WordPress core calls the block binding callback function: `BlockBindings::get_value()`.
-3. The callback function inspects the paragraph block. Using the block context supplied by the parent remote data block, it determines which [query](./query.md) to execute.
-4. The query is executed: `$query->execute()` (usually by delegating to a [query runner](./query-runner.md)).
+3. The callback function inspects the paragraph block. Using the block context supplied by the parent remote data block, it determines which [query](query.md) to execute.
+4. The query is executed: `$query->execute()`.
 5. Various properties of the query are requested by the query runner, including the endpoint, request headers, request method, and request body. Some of these properties are delegated to the data source (`$query->get_data_source()`).
 6. The query is dispatched, and the response data is inspected, formatted into a consistent shape, and returned to the block binding callback function.
 7. The callback function extracts the requested field from the response data and returns it to WordPress core for rendering.
-
-## Customization
-
-Providing a custom data source, query, or query runner gives you complete control over how data is fetched, processed, and rendered. In most cases, you only need to extend one of these classes to implement custom behavior. A common approach is to define a data source on the settings screen and then commit a custom query in code to fetch and process the data.
-
-Here are some detailed overviews of these classes with notes on how and why to extend them:
-
-- [Data Source](data-source.md)
-- [Query](query.md)
-
-Once you've defined your data source and queries, you can [register a remote data block](block-registration.md) that uses them. That block can use a [pattern](block-patterns.md) for display. You can also use [overrides](./overrides.md) to dynamically select the displayed content.
-
-### Additional customization
-
-- [Hooks (actions and filters)](hooks.md)
-- [Query runner](query-runner.md)
-
-## Examples and Templates
-
-The [examples](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/README.md) provide detailed code samples of interacting with the plugin various methods of extending the plugin.
-
-For quick development, use the [templates](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/templates/README.md) and [AI prompts](../ai-prompts.md) to scaffold new integrations rapidly.
-
-## Create a local development environment
-
-This repository includes tools for quickly starting a [local development environment](../local-development.md).

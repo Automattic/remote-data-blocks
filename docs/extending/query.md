@@ -2,28 +2,23 @@
 
 A query defines a request for data from a [data source](data-source.md). It defines input and output variables so that the Remote Data Blocks plugin knows how to interact with it.
 
-A common approach is to define a data source on the settings screen and then commit a custom query in code to fetch and process the data. The following example code does just that.
+## Example
 
-## HttpQuery
-
-Most HTTP-powered APIs can be queried using `HttpQuery`. Queries are instantiated with configuration options, described below.
+Here is an example of a query that fetches Zip code data:
 
 ```php
-if ( ! defined( 'REMOTE_DATA_BLOCKS_EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID' ) ) {
-	return;
-}
+$zip_code_data_source = [
+	'display_name' => 'Zip Code API',
+	'endpoint' => 'https://api.zippopotam.us/us/',
+];
 
-$data_source = HttpDataSource::from_uuid( REMOTE_DATA_BLOCKS_EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID );
-
-if ( ! $data_source instanceof HttpDataSource ) {
-	return;
-}
-
-$query = [
+$zip_code_query = [
+	'data_source' => $zip_code_data_source,
 	'display_name' => 'Get location by Zip code',
-	'data_source' => $data_source,
-	'endpoint' => function( array $input_variables ) use ( $data_source ): string {
-		return $data_source->get_endpoint() . $input_variables['zip_code'];
+	// Provide a callable (closure) to dynamically generate the endpoint using
+	// the base endpoint from the data source and the input variables.
+	'endpoint' => function ( array $input_variables ) use ( $zip_code_data_source ): string {
+		return $zip_code_data_source['endpoint'] . $input_variables['zip_code'];
 	},
 	'input_schema' => [
 		'zip_code' => [
@@ -32,19 +27,19 @@ $query = [
 		],
 	],
 	'output_schema' => [
-		'is_collection' => false,
+		'is_collection' => false, // This query returns a single record.
 		'type' => [
 			'zip_code' => [
 				'name' => 'Zip Code',
-				'path' => '$["post code"]',
+				'path' => '$["post code"]', // JSON property with space requires brackets and quotes.
 				'type' => 'string',
 			],
-			'city'     => [
+			'city' => [
 				'name' => 'City',
-				'path' => '$.places[0]["place name"]',
+				'path' => '$.places[0]["place name"]', // JSON property with space requires brackets and quotes.
 				'type' => 'string',
 			],
-			'state'    => [
+			'state' => [
 				'name' => 'State',
 				'path' => '$.places[0].state',
 				'type' => 'string',
@@ -60,15 +55,15 @@ $query = [
 
 This example features a small subset of the customization available for a query; see the full documentation below for details.
 
-## HttpQuery configuration
+## Configuration
 
-### display_name: string (required)
+### display_name: string
 
 The `display_name` property defines the query's human-friendly name.
 
-### data_source: HttpDataSourceInterface (required)
+### data_source: array|HttpDataSourceInterface (required)
 
-The `data_source` property provides the [data source](./data-source.md) the query uses.
+The `data_source` property provides the [data source](./data-source.md) the query uses. It can be an array containing configuration (as in the example above) or an instance of a class that implements `HttpDataSourceInterface`.
 
 ### endpoint: string|callable
 
@@ -78,7 +73,7 @@ The `endpoint` property defines the query endpoint. It can be a string or a call
 
 ```php
 'endpoint' => function( array $input_variables ) use ( $data_source ): string {
-	return $data_source->get_endpoint() . $input_variables['zip_code'];
+	return $data_source-['endpoint'] . $input_variables['zip_code'];
 },
 ```
 
@@ -161,40 +156,7 @@ Note that error responses are cached for 30 seconds to avoid overwhelming the re
 #### Example
 
 ```php
-$query = HttpQuery::from_array( [
-	'display_name' => 'Get location by Zip code',
-	'data_source' => $data_source,
-	'endpoint' => function( array $input_variables ) use ( $data_source ): string {
-		return $data_source->get_endpoint() . $input_variables['zip_code'];
-	},
-	'cache_ttl' => 3600, // Set the cache TTL to 1 hour
-	'input_schema' => [
-		'zip_code' => [
-			'name' => 'Zip Code',
-			'type' => 'string',
-		],
-	],
-	'output_schema' => [
-		'is_collection' => false,
-		'type' => [
-			'zip_code' => [
-				'name' => 'Zip Code',
-				'path' => '$["post code"]',
-				'type' => 'string',
-			],
-			'city'     => [
-				'name' => 'City',
-				'path' => '$.places[0]["place name"]',
-				'type' => 'string',
-			],
-			'state'    => [
-				'name' => 'State',
-				'path' => '$.places[0].state',
-				'type' => 'string',
-			],
-		],
-	],
-] );
+'cache_ttl' => 3600, // Set the cache TTL to 1 hour
 ```
 
 ### image_url: string|null
@@ -220,8 +182,69 @@ If you need to pre-process the response in some way before the output variables 
 
 ### query_runner: QueryRunnerInterface
 
-Use the `query_runner` property to provide a custom [query runner](./query-runner.md) for the query. If omitted, the query will use the default query runner, which works well with most HTTP-powered APIs.
+By default, the query will use the default query runner, which works for almost every HTTP-powered API. Provide a custom query runner in the very rare cases where:
 
-## GraphqlQuery
+- Your API does not respond with JSON or requires custom deserialization logic.
+- Your API uses a non-HTTP transport.
+- You want to implement highly custom processing of the response data which is not possible with the [provided filters](hooks.md).
 
-## GraphqlMutation
+## GraphQL queries and mutations
+
+This plugin provides `GraphqlQuery` and `GraphqlMutation` classes that makes it easier to work with GraphQL APIs.
+
+```php
+$graphql_query = [
+	'__class' => 'RemoteDataBlocks\\Config\\Query\\GraphqlQuery',
+	'data_source' => $graphql_data_source,
+	'display_name' => 'Get a list of products',
+	'graphql_query' => 'query GetProducts($first: Int) {
+		products(first: $first) {
+			nodes {
+				id
+				name
+				price
+			}
+		}
+	}',
+	'input_schema' => [
+		'first' => [
+			'name' => 'First',
+			'type' => 'integer',
+			'default' => 10,
+		],
+	],
+	'output_schema' => [
+		'is_collection' => true,
+		'path' => '$.data.products.nodes[*]',
+		'type' => [
+			'id' => [
+				'name' => 'ID',
+				'path' => '$.id',
+				'type' => 'id',
+			],
+			'name' => [
+				'name' => 'Name',
+				'path' => '$.name',
+				'type' => 'string',
+			],
+			'price' => [
+				'name' => 'Price',
+				'path' => '$.price',
+				'type' => 'currency_in_current_locale',
+			],
+		],
+	],
+];
+```
+
+### Configuration
+
+The `GraphqlQuery` and `GraphqlMutation` classes extend the base query class, so they support all the properties defined above. Additionally, they have the following specific properties:
+
+#### graphql_query: string
+
+The `graphql_query` property defines the GraphQL query or mutation to execute. The variables should match the It should be a valid GraphQL query string, including any variables that the query expects.
+
+#### request_method: string
+
+The `request_method` property defines the HTTP request method used by the query or mutation. By default, it is `'POST'`.

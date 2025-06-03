@@ -35,7 +35,7 @@ Accepted primitive types are:
 
 ## Single entity example
 
-Using the [Zip Code example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/zip-code/README.md), the JSON response returned by the API looks like this:
+Using the [Zip Code block](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/blocks/zip-code-block/zip-code-block.php), the JSON response returned by the API looks like this:
 
 ```json
 {
@@ -98,7 +98,7 @@ The result of applying this output schema to the example JSON response is:
 
 ## Collection example
 
-An example of collection JSON can be found in the [Chicago Institue of Art example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/art-institute/README.md). That API returns (in part):
+An example of collection JSON can be found in the [Art block example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/blocks/art-block/art-block.php). That API returns (in part):
 
 ```json
 {

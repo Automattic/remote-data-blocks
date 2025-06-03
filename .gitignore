@@ -14,7 +14,7 @@ coverage
 /build/
 
 # Private examples
-/examples/private
+/example/private
 
 # Testing
 /artifacts/

@@ -91,7 +91,7 @@ Example:
 
 #### Search queries
 
-Search queries must return a collection and must accept an input variable with the special type `ui:search_input`. The [Art Institute of Chicago](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/art-institute/README.md) example looks like this:
+Search queries must return a collection and must accept an input variable with the special type `ui:search_input`. The [Art block](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/blocks/art-block/art-block.php) example looks like this:
 
 ```php
 $search_art_query = [
@@ -127,7 +127,7 @@ $search_art_query = [
 
 Here you can see the `search` input variable has a special type of `ui:search_input` and is used in the endpoint method to populate a query string. You can read more about [queries](./query.md) and how to construct them. End users enter the search term to find the specific item.
 
-![Screenshot showing the search input in the WordPress Editor](https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/docs/extending/search-input.png)
+![Screenshot showing the search input in the WordPress Editor](https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/docs/assets/search-input.png)
 
 **Note:** The same search box appears for `list` query types. For this type, the form is only filtering the results returned by the initial list query. For `search` queries, an additional query is made for every search.
 

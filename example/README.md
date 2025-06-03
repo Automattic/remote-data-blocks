@@ -9,22 +9,16 @@ These blocks communicate with APIs that do not require authentication. Uncomment
 - [Zip Code block](./blocks/zip-code-block/zip-code-block.php)
 - [Art block](./blocks/art-block/art-block.php)
 - [Shopify Mock Store block](./blocks/shopify-mock-store-block/shopify-mock-store-block.php)
-- [GitHub Markdown File block](./blocks/github-markdown-file/github-markdown-file.php)
+- [GitHub Markdown File block](./blocks/github-markdown-block/github-markdown-block.php)
 
 ## Templates
 
 These code templates require credentials and other customization to work. They are a useful starting point for exploration and are especially useful as context for AI agents.
 
-- Airtable
-  - ["Event Planning" Airtable blocks](./airtable/events/README.md)
-  - ["Leaflet Map" Airtable block](./airtable/leaflet-map/README.md)
-- Google Sheets
-  - ["Westeros Houses" blocks](./google-sheets/westeros-houses/README.md)
-- GitHub
-  - ["GitHub Markdown File" block](./github/markdown-file/README.md)
-- Shopify
-  - ["Shopify Product" block](./shopify/product/README.md)
-- REST API
-  - ["Art Institute of Chicago" block](./rest-api/art-institute/README.md)
-  - ["Zip Code" block](./rest-api/zip-code/README.md)
-- [Theme example](./theme/README.md)
+- [REST API block](templates/rest-api-block)
+- [REST API block from UI-created data source](templates/rest-api-block-from-ui-data-source)
+- [Airtable block](templates/airtable-block)
+- [Airtable map block](templates/airtable-map-block)
+- [Google Sheets block](templates/google-sheets-block)
+- [Shopify Product block](templates/shopify-product-block)
+- [Example child theme](templates/theme)

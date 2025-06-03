@@ -30,16 +30,16 @@ If the credentials are correct, you can save the data source. If you receive an 
 
 Create or edit a page or post, then using the Block Inserter, search for the block using the name you provided in step four.
 
-![How inserting a Shopify block looks in the WordPress Editor](https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/docs/tutorials/insert-shopify-block.gif)
+![How inserting a Shopify block looks in the WordPress Editor](https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/docs/assets/insert-shopify-block.gif)
 
 ## Patterns and styling
 
 You can use patterns to create a consistent, reusable layout for your remote data. You can read more about [patterns and other Core Concepts](../concepts/index.md#patterns).
 
-Remote data blocks can be styled using the block editor's style settings, `theme.json`, or custom stylesheets. See the [example child theme](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/theme) for more details.
+Remote data blocks can be styled using the block editor's style settings, `theme.json`, or custom stylesheets. See the [example child theme](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/templates/theme) for more details.
 
 ## Code reference
 
 You can also configure Shopify integrations with code. These integrations appear in the WordPress admin but can not be modified. You may wish to do this to have more control over the data source or because you have more advanced data processing needs.
 
-This [working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/shopify/product) will replicate what we've done in this tutorial.
+This [working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/templates/shopify-product-block) will replicate what we've done in this tutorial.
