@@ -86,6 +86,52 @@ final class QueryResponseParserTest extends TestCase {
 		$this->assertEquals( 'Charlie Brown', $result[0]['result']['fullName']['value'] );
 	}
 
+	public function test_generate_callback_with_raw_response_data(): void {
+		$data = [
+			[
+				'firstName' => 'Charlie',
+				'lastName' => 'Brown',
+			],
+		];
+		$raw_response_data = [
+			'input_variables' => [
+				'comic' => 'Peanuts',
+			],
+			'metadata' => [
+				'request_id' => '12345',
+			],
+			'response_data' => [
+				'data' => $data,
+			],
+		];
+
+		$schema = [
+			'is_collection' => true,
+			'type' => [
+				'fullName' => [
+					'type' => 'string',
+					'generate' => function ( $item, $raw_response_data ) {
+						return sprintf(
+							'%s %s (from %s, request ID: %s)',
+							$item['firstName'],
+							$item['lastName'],
+							$raw_response_data['input_variables']['comic'] ?? 'Unknown Comic',
+							$raw_response_data['metadata']['request_id'] ?? 'Unknown Request ID'
+						);
+					},
+				],
+			],
+		];
+
+		$result = $this->parser->parse( $data, $schema, $raw_response_data );
+
+		$this->assertIsArray( $result );
+		$this->assertCount( 1, $result );
+		$this->assertArrayHasKey( 'result', $result[0] );
+		$this->assertArrayHasKey( 'uuid', $result[0] );
+		$this->assertEquals( 'Charlie Brown (from Peanuts, request ID: 12345)', $result[0]['result']['fullName']['value'] );
+	}
+
 	public function test_format_callback(): void {
 		$data = [
 			[ 'price' => 1234.56 ],
