@@ -53,6 +53,17 @@ function update_markdown_links( string $html, string $current_file_path = '' ): 
 		}
 	}
 
+	// Remove the data attributes that GitHub uses for click-to-copy functionality.
+	// The DOM parser is unable to keep them encoded correctly.
+	$click_to_copy_attribute = 'data-snippet-clipboard-copy-content';
+	$nodes = $xpath->query( sprintf( '//*[@%s]', $click_to_copy_attribute ) );
+	foreach ( $nodes as $node ) {
+		if ( ! $node instanceof DOMElement ) {
+			continue;
+		}
+		$node->removeAttribute( $click_to_copy_attribute );
+	}
+
 	// Save and return the updated HTML without the XML declaration.
 	return preg_replace( '/^<\?xml[^>]+\?>/', '', $dom->saveHTML() );
 }
