@@ -89,6 +89,7 @@ export function InputPopover( props: InputPopoverProps ) {
 							onChange={ ( value: string | undefined ) => onChange( input.slug, value ?? '' ) }
 							help={ getDataSourceLabels( dataSourceType ).helpText }
 							suffix={ <Button icon={ keyboardReturn } label={ __( 'Save' ) } type="submit" /> }
+							__next40pxDefaultSize
 						/>
 					</form>
 				</Popover>

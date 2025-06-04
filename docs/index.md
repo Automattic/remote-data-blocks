@@ -3,33 +3,29 @@
 ## Table of Contents
 
 - [Quickstart](quickstart.md)
-- [Core Concepts](concepts/index.md)
+- [Core concepts](concepts/index.md)
 
-  - [Block Bindings](concepts/block-bindings.md)
-  - [Helper Blocks](concepts/helper-blocks.md)
-  - [Inline Bindings](concepts/inline-bindings.md)
+  - [Block bindings](concepts/block-bindings.md)
+  - [Helper blocks](concepts/helper-blocks.md)
+  - [Inline bindings](concepts/inline-bindings.md)
 
 - [Extending](extending/index.md)
 
-  - [Data Source](extending/data-source.md)
+  - [Data source](extending/data-source.md)
   - [Query](extending/query.md)
-  - [Block Registration](extending/block-registration.md)
-  - [Block Patterns](extending/block-patterns.md)
+    - [Query input schema](extending/query-input-schema.md)
+    - [Query output schema](extending/query-output-schema.md)
+  - [Block registration](extending/block-registration.md)
+  - [Block patterns](extending/block-patterns.md)
   - [Overrides](extending/overrides.md)
   - [Hooks](extending/hooks.md)
-  - [Query Runner](extending/query-runner.md)
 
 - [Tutorials](tutorials/index.md)
 
   - [Airtable](tutorials/airtable.md)
   - [Google Sheets integration](tutorials/google-sheets.md)
-  - [HTTP](tutorials/http.md)
   - [Shopify](tutorials/shopify.md)
+  - [HTTP](tutorials/http.md)
 
 - [Local development](local-development.md)
 - [Troubleshooting](troubleshooting.md)
-
-## Additional Documentation
-
-- [AI Documentation](for-ai.md)
-- [Contributing Guidelines](https://github.com/Automattic/remote-data-blocks/blob/trunk/CONTRIBUTING.md)

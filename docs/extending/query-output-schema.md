@@ -7,7 +7,9 @@ Note that the output schema may require updates whenever the shape or schema of 
 ## Properties
 
 - `format` (optional): A callable function that formats the output variable value.
-- `generate` (optional): A callable function that generates or extracts the output variable value from the response, as an alternative to `path`.
+- `generate` (optional): A callable function that generates or extracts the output variable value from the response, as an alternative to `path`. It receives two parameters:
+  - `array $data`: The data returned by the API, which is contains the data returned from the API at the current "level" (e.g., after the root `path` has been applied, if present).
+  - `array $raw_response_data`: The "raw" response data returned by the API, which includes the input variables (`$raw_response_data['input_variables']`), response metadata (`$raw_response_data['metadata']`), and the entire API response before any preprocessing.
 - `is_collection` (optional, default `false`): A boolean indicating whether the response data is a collection. If false, only a single item will be returned.
 - `name` (optional): The human-friendly display name of the output variable.
 - `default_value` (optional): The default value for the output variable.
@@ -33,7 +35,7 @@ Accepted primitive types are:
 
 ## Single entity example
 
-Using the [Zip Code example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/zip-code/README.md), the JSON response returned by the API looks like this:
+Using the [Zip Code block](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/blocks/zip-code-block/zip-code-block.php), the JSON response returned by the API looks like this:
 
 ```json
 {
@@ -66,7 +68,7 @@ And the corresponding `output_schema` definition might look like this:
 		'city_state' => [
 			'name' => 'City, State',
 			'default_value' => 'Unknown',
-			'generate' => function( array $data ): string|null {
+			'generate' => function( array $data, array $raw_response_data ): string|null {
 				if ( empty( $data['places'] ) ) {
 					return null;
 				}
@@ -82,7 +84,7 @@ And the corresponding `output_schema` definition might look like this:
 - The `is_collection` property indicates whether the output represents a single entity or a collection of entities. In this case, it is set to `false` because the API returns a single entity.
 - The `type` property at the root level begins the type definition. The `zip_code` and `city_state` array keys are "slugs" that identify the field. The array values define types that describe how to extract a value for those fields.
 - The `zip_code` field is extracted via a [JSONPath](http://jsonpath.com) expression defined in the `path` property.
-- The `city_state` field provides a callable via the `generate` property. That function receives the data and combines two elements to form the value.
+- The `city_state` field provides a callable via the `generate` property. That function receives the response data and combines two elements to form the value.
 - A `default_value` property provides a value that will be used if the provided `path` expression or `generate` function resolve to a null value.
 
 The result of applying this output schema to the example JSON response is:
@@ -96,7 +98,7 @@ The result of applying this output schema to the example JSON response is:
 
 ## Collection example
 
-An example of collection JSON can be found in the [Chicago Institue of Art example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/art-institute/README.md). That API returns (in part):
+An example of collection JSON can be found in the [Art block example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/blocks/art-block/art-block.php). That API returns (in part):
 
 ```json
 {

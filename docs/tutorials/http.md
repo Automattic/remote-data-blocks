@@ -10,51 +10,14 @@ This page will walk you through registering a remote data block that loads data 
 4. Fill in the following details:
    - Data Source Name: Zip Code API
    - URL: https://api.zippopotam.us/us/
-
-_Note: The `endpoint` function in the code below will append the provided Zip Code (by the user) to the "URL" value defined here, to form the final endpoint of this example_
-
 5. If your API requires authentication, enter those details. This API does not.
 6. Save the data source and return the data source list.
 7. In the Actions column, click the three-dot menu, then "Copy UUID" to copy the data source's UUID to your clipboard.
 
 ## Register the block
 
-In code, we'll define a query using the data source we just created. We'll use the UUID we copied from the configuration page to reference the data source in our query.
+In code, we'll define a query using the data source we just created. Follow the [Zip code block example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/blocks/zip-code-block/zip-code-block.php), but remove the data source definition. In its place, use this code to load the data source we just created by its UUID:
 
 ```php
-$data_source = HttpDataSource::from_uuid( $uuid );
-
-$query = HttpQuery::from_array( [
-   'data_source' => $data_source,
-   'endpoint' => function ( array $input_variables ) use ( $data_source ): string {
-		return $data_source->get_endpoint() . $input_variables['foo'];
-   },
-   'input_schema' => [ ... ],
-   'output_schema' => [ ... ],
-] );
+$data_source = HttpDataSource::from_uuid( '{{ Data source UUID }}' );
 ```
-
-And then register a block using the query.
-
-```php
-register_remote_data_block( [
-   'title' => 'Block Title',
-   'render_query' => [
-      'query' => $query,
-   ],
-] );
-```
-
-Check out [a working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/rest-api/zip-code) of the concepts above in the Remote Data Blocks GitHub repository.
-
-## Patterns and styling
-
-You can use patterns to create a consistent, reusable layout for your remote data. You can read more about [patterns and other Core Concepts](../concepts/index.md#patterns).
-
-Remote data blocks can be styled using the block editor's style settings, `theme.json`, or custom stylesheets. See the [example child theme](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/theme) for more details.
-
-## Code reference
-
-You can also configure HTTP integrations with code. These integrations appear in the WordPress admin but can not be modified. You may wish to do this to have more control over the data source or because you have more advanced data processing needs.
-
-This [working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/rest-api/zip-code) will replicate what we've done in this tutorial.

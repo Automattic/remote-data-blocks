@@ -60,10 +60,14 @@ function register_basic_rest_api_remote_data_block(): void {
 					// Instead of a `path`, we provide a `generate` function to create the
 					// image URL. The `$data` parameter contains the data returned from the
 					// API at this "level" (e.g., after the root `path` has been applied).
-					'generate' => static function ( $data ): string {
-						return 'https://example.com/images/' . $data['image_id'] . '.jpg';
+					//
+					// It also receives the raw response data, which can be useful if you
+					// need to access input variables or other data not available in the
+					// response.
+					'generate' => static function ( array $data, array $raw_response_data ): string {
+						$item_id = $data['id'] ?? $raw_response_data['input_variables']['id'];
+						return 'https://example.com/images/items/' . $item_id . '.jpg';
 					},
-					'path' => '$.image_url',
 				],
 				// TODO: Add more fields as needed.
 			],

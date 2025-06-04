@@ -11,7 +11,7 @@ Google Sheets API access is required to connect to Google Sheets. The plugin use
 - [Create a service account](https://cloud.google.com/iam/docs/service-accounts-create), which will be used to authenticate the requests to the Google Sheets API. You will need to enable the IAM API first, and then if you scroll down further on the page linked above, you can click the button to "Go to Create service account."
 - Select the "Owner" role and note the service account email address.
 - You will need to create the JSON key for this account. You can access the key by clicking on the three dots under Actions in the Service account table and choosing "Manage Keys."
-  ![Screenshot showing a portion of the Google Console](https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/docs/tutorials/google-console.png)
+  ![Screenshot showing a portion of the Google Console](https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/docs/assets/google-console.png)
 - Click on "Add Key" and choose the JSON type. The file will be automatically downloaded. Keep this file safe, as it will be used to authenticate the block.
 - Grant access to the service account email to the Google Sheet. The service account will authenticate the requests to the Google Sheets API for the given sheet.
 
@@ -44,10 +44,10 @@ The loop block will return all the entries in the spreadsheet.
 
 You can use patterns to create a consistent, reusable layout for your remote data. You can read more about [patterns and other Core Concepts](../concepts/index.md#patterns).
 
-Remote data blocks can be styled using the block editor's style settings, `theme.json`, or custom stylesheets. See the [example child theme](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/theme) for more details.
+Remote data blocks can be styled using the block editor's style settings, `theme.json`, or custom stylesheets. See the [example child theme](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/templates/theme) for more details.
 
 ## Code reference
 
 You can also configure Google Sheets integrations with code. These integrations appear in the WordPress admin but can not be modified. You may wish to do this to have more control over the data source or because you have more advanced data processing needs.
 
-This [working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/google-sheets/westeros-houses) will replicate what we've done in this tutorial.
+This [example template](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/templates/google-sheets-block) will replicate what we've done in this tutorial.

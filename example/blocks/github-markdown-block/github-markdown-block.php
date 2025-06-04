@@ -15,7 +15,7 @@ require_once __DIR__ . '/inc/markdown-links.php';
  * HTML (converted from Markdown). To handle this, we provide a custom query
  * runner to hangle the HTML response and update Markdown links.
  *
- * @docs /docs/extending/query-runner.md
+ * @docs /docs/extending/query.md
  */
 function register_github_markdown_remote_data_block(): void {
 	$repo_owner = 'Automattic';
