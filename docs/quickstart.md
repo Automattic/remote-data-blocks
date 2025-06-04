@@ -10,6 +10,4 @@
 
 ## I want to create my own remote data block against a custom API.
 
-If you're comfortable with writing some WordPress code, [our documentation will guide you](./tutorials/http.md) through registering a remote data block that can work with your custom API.
-
-You will need a [local development environment](./local-development.md) and [the latest release of the plugin](https://github.com/Automattic/remote-data-blocks/releases/latest/download/remote-data-blocks.zip).
+If you're comfortable with writing some WordPress code, [our documentation will guide you](extending/index.md) through registering a remote data block that can work with your custom API. We also provide [working examples](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/README.md) and [AI prompts](extending/ai-prompts.md) that help you get started quickly.

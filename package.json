@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "build": "npm run cmd:build",
-    "build:docs:ai": "npx repomix --include='docs/**/*.md,example/**' --ignore='docs/for-ai.md' --style=markdown --output='docs/for-ai.md'",
+    "build:docs:ai": "npx repomix --include='docs/**/*.md,example/**' --ignore='docs/extending/ai-prompts.md,docs/for-ai.md,docs/index.md,docs/quickstart.md' --style=markdown --output='docs/for-ai.md'",
     "check-types": "tsc --noEmit",
     "cmd:build": "wp-scripts build --experimental-modules",
     "cmd:format": "prettier '**/*.(js|json|jsx|md|ts|tsx|yml|yaml)'",
