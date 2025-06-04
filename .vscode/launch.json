@@ -7,8 +7,7 @@
       "request": "launch",
       "port": 9003,
       "pathMappings": {
-        "/var/www/html/wp-content/plugins/remote-data-blocks": "${workspaceFolder}/",
-        "/var/www/html/wp-content/plugins/example": "${workspaceFolder}/example"
+        "/var/www/html/wp-content/plugins/remote-data-blocks": "${workspaceFolder}/"
       }
     },
     {
