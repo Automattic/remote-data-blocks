@@ -543,7 +543,7 @@ class BlockBindingsTest extends TestCase {
 	private function create_mock_block_config( MockQueryRunner $query_runner ): array {
 		return [
 			'queries' => [
-				ConfigRegistry::DISPLAY_QUERY_KEY => MockQuery::create( [
+				ConfigRegistry::DEPRECATED_DISPLAY_QUERY_KEY => MockQuery::create( [
 					'input_schema' => self::MOCK_INPUT_SCHEMA,
 					'output_schema' => self::MOCK_OUTPUT_SCHEMA,
 					'query_runner' => $query_runner,

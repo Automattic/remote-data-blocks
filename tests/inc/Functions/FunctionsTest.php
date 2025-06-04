@@ -207,7 +207,7 @@ class FunctionsTest extends TestCase {
 
 		$this->assertTrue( $this->mock_logger->hasLoggedLevel( LogLevel::ERROR ) );
 		$error_logs = $this->mock_logger->getLogsByLevel( LogLevel::ERROR );
-		$this->assertStringContainsString( 'Error registering block Test Block with Old Schema Format No Render Query: Render query is required', $error_logs[0]['message'] );
+		$this->assertStringContainsString( 'Error registering block Test Block with Old Schema Format No Render Query: Block configuration must have a non-empty "display_queries" array', $error_logs[0]['message'] );
 	}
 
 	public function testRegisterBlockWithNewConfigSchema(): void {

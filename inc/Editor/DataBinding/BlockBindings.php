@@ -133,7 +133,7 @@ class BlockBindings {
 		$remote_data = $remote_data->to_array();
 		$block_name = $remote_data['blockName'];
 		$enabled_overrides = $remote_data['enabledOverrides'] ?? [];
-		$query_key = $remote_data['queryKey'] ?? ConfigRegistry::DISPLAY_QUERY_KEY;
+		$query_key = $remote_data['queryKey'] ?? ConfigRegistry::DEPRECATED_DISPLAY_QUERY_KEY;
 		$array_of_input_variables = $remote_data['queryInputs'];
 
 		$block_config = ConfigStore::get_block_configuration( $block_name );

@@ -4,13 +4,12 @@ namespace RemoteDataBlocks\Editor\BlockManagement;
 
 defined( 'ABSPATH' ) || exit();
 
+use RemoteDataBlocks\Config\Block\RemoteDataBlock;
 use RemoteDataBlocks\Logging\Logger;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Config\Query\QueryInterface;
 use RemoteDataBlocks\Editor\BlockPatterns\BlockPatterns;
 use RemoteDataBlocks\Logging\LoggerInterface;
-use RemoteDataBlocks\Validation\ConfigSchemas;
-use RemoteDataBlocks\Validation\Validator;
 use WP_Error;
 
 use function parse_blocks;
@@ -20,9 +19,7 @@ use function serialize_blocks;
 class ConfigRegistry {
 	private static LoggerInterface $logger;
 
-	public const RENDER_QUERY_KEY = 'render_query';
-	public const SELECTION_QUERIES_KEY = 'selection_queries';
-	public const DISPLAY_QUERY_KEY = 'display';
+	public const DEPRECATED_DISPLAY_QUERY_KEY = 'display';
 	public const DISPLAY_QUERIES_KEY = 'display_queries';
 	public const LIST_QUERY_KEY = 'list';
 	public const SEARCH_QUERY_KEY = 'search';
@@ -33,61 +30,25 @@ class ConfigRegistry {
 		ConfigStore::init( self::$logger );
 	}
 
-	private static function migrate_block_config( array $block_config = [] ): array|WP_Error {
-		// Nothing to migrate, return the block config as is.
-		if ( isset( $block_config[ self::QUERIES_KEY ] ) ) {
+	public static function register_block( array $block_config = [] ): bool|WP_Error {
+		// Validate the provided block configuration.
+		$block_config = RemoteDataBlock::from_array( $block_config );
+
+		if ( is_wp_error( $block_config ) ) {
+			self::$logger->error( $block_config->get_error_message() );
 			return $block_config;
 		}
 
-		// if render_query is not set, error out.
-		if ( ! isset( $block_config['render_query'] ) ) {
-			return self::create_error( $block_config['title'], 'Render query is required' );
-		}
-
-		// Migrate from the old format, that conformed to the render_queries and selection_queries format, to the new single queries format.
-		$queries = [];
-
-		// Get the render query, inflate it, and set the type to display.
-		$render_query = self::inflate_query( $block_config[ self::RENDER_QUERY_KEY ]['query'] );
-		$queries[ self::DISPLAY_QUERY_KEY ] = $render_query;
-		$block_config[ self::DISPLAY_QUERIES_KEY ] = [ self::DISPLAY_QUERY_KEY ];
-
-		unset( $block_config[ self::RENDER_QUERY_KEY ] );
-
-		if ( isset( $block_config[ self::SELECTION_QUERIES_KEY ] ) ) {
-			// Get the selection queries, inflate them, and add them to the queries array using the type as the key.
-			foreach ( $block_config[ self::SELECTION_QUERIES_KEY ] as $selection_query ) {
-				$query = self::inflate_query( $selection_query['query'] );
-				$queries[ $selection_query['type'] ] = $query;
-			}
-
-			unset( $block_config[ self::SELECTION_QUERIES_KEY ] );
-		}
-
-		// set the new keys.
-		$block_config[ self::QUERIES_KEY ] = $queries;
-
-		return $block_config;
-	}
-
-	public static function register_block( array $block_config = [] ): bool|WP_Error {
-		// Migrate the block config to the new format.
-		$block_config = self::migrate_block_config( $block_config );
-
-		// Validate the provided user configuration.
-		$schema = ConfigSchemas::get_remote_data_block_config_schema();
-		$validator = new Validator( $schema, static::class, '$block_config' );
-		$validated = $validator->validate( $block_config );
-
-		if ( is_wp_error( $validated ) ) {
-			return $validated;
-		}
-
 		// Check if the block has already been registered.
+		$block_config = $block_config->to_array();
 		$block_title = $block_config['title'];
 		$block_name = ConfigStore::get_block_name( $block_title );
 		if ( ConfigStore::is_registered_block( $block_name ) ) {
 			return self::create_error( $block_title, sprintf( 'Block %s has already been registered', $block_name ) );
+		}
+
+		if ( empty( $block_config['display_queries'] ) ) {
+			return self::create_error( $block_title, 'Block configuration must have a non-empty "display_queries" array' );
 		}
 
 		// Pre-validate the display queries, to ensure they exist.
