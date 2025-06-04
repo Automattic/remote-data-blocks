@@ -1,7 +1,7 @@
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
-	ButtonGroup,
+	__experimentalToggleGroupControl as ToggleGroupControl,
 	PanelBody,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
@@ -44,7 +44,12 @@ export function DataPanel( props: DataPanelProps ) {
 
 	return (
 		<PanelBody title={ __( 'Remote data management', 'remote-data-blocks' ) }>
-			<ButtonGroup>
+			<ToggleGroupControl
+				className="remote-data-blocks-button-group"
+				label={ __( '' ) }
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
+			>
 				<Button
 					onClick={ onRefreshRemoteData }
 					style={ {
@@ -77,7 +82,7 @@ export function DataPanel( props: DataPanelProps ) {
 						) }
 					</ConfirmDialog>
 				) }
-			</ButtonGroup>
+			</ToggleGroupControl>
 		</PanelBody>
 	);
 }

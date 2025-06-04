@@ -48,6 +48,8 @@ export function PatternEditorSettingsPanel() {
 					options={ [ { label: __( 'Select a block' ), value: '' }, ...options ] }
 					onChange={ updateBlockTypes }
 					value={ blockType }
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				/>
 			</>
 		</PluginDocumentSettingPanel>

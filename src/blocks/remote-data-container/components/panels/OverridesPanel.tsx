@@ -53,6 +53,7 @@ export function OverridesPanel( props: OverridesPanelProps ) {
 					key={ override.name }
 					label={ override.display_name || override.name }
 					onChange={ enabled => updateOverrides( override.name, enabled ) }
+					__nextHasNoMarginBottom
 				/>
 			) ) }
 		</PanelBody>
