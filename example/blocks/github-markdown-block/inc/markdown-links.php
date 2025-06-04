@@ -23,7 +23,7 @@ function update_markdown_links( string $html, string $current_file_path = '' ): 
 	$dom = new DOMDocument();
 
 	// Convert HTML to UTF-8 using htmlspecialchars instead of mb_convert_encoding
-	$html = '<?xml encoding="UTF-8">' . $html;
+	$html = '<?xml encoding="UTF-8"?>' . $html;
 
 	// Suppress errors due to malformed HTML
 	// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
@@ -53,8 +53,8 @@ function update_markdown_links( string $html, string $current_file_path = '' ): 
 		}
 	}
 
-	// Save and return the updated HTML
-	return $dom->saveHTML();
+	// Save and return the updated HTML without the XML declaration.
+	return preg_replace( '/^<\?xml[^>]+\?>/', '', $dom->saveHTML() );
 }
 
 
