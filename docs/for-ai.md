@@ -59,10 +59,8 @@ docs/
     http.md
     index.md
     shopify.md
-  ai-prompts.md
   index.md
   local-development.md
-  quick-start-extension.md
   quickstart.md
   troubleshooting.md
 example/
@@ -119,6 +117,628 @@ example/
 
 # Files
 
+## File: docs/concepts/block-bindings.md
+````markdown
+# Block bindings
+
+Remote Data Blocks takes advantage of the [block bindings API](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-bindings/). This core WordPress API allows you to “bind” dynamic data to the attributes of core blocks, which are then reflected in the final HTML markup. Generally, this avoids the need to write and maintain custom blocks.
+
+For a quick overview of block bindings, the [announcement post](https://make.wordpress.org/core/2024/03/06/new-feature-the-block-bindings-api/) is very helpful; for a deeper dive, consult the [public documentation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-bindings/). That said, an in-depth understanding of block bindings isn't necessary to use Remote Data Blocks: just know that the plugin is built on core, stable WordPress APIs.
+````
+
+## File: docs/concepts/helper-blocks.md
+````markdown
+# Helper Blocks
+
+Remote Data Blocks adds some accessory blocks for bindings, listed below.
+
+## Remote HTML Block
+
+Use this block to bind to HTML from a remote data source. This block only works when placed inside a remote data block container and bound to a field containing HTML.
+
+![Screen recording showing the insertion and binding of a Remote HTML Block in the editor](https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/docs/concepts/block-insert-remote-html.gif)
+
+Fields defined by a query’s `output_schema` must have type `html` in order to be available to Remote HTML blocks:
+
+```php
+$my_query = [
+    /* ... */
+    'output_schema' =>
+        'is_collection' => false,
+        'output_schema' => [
+        'type' => [
+            'header' => [
+                'name' => 'Header',
+                'path' => '$.header',
+                'type' => 'string',
+            ],
+            'myHtmlContent' => [
+                'name' => 'My HTML Content',
+                'path' => '$.myHtmlContent',
+                'type' => 'html', // <-- required
+            ],
+        ],
+    ],
+];
+
+register_remote_data_block( [
+    'title' => 'My HTML API',
+    'render_query' => [
+        'query' => $my_query,
+    ],
+] );
+```
+````
+
+## File: docs/concepts/index.md
+````markdown
+# Core concepts
+
+Remote Data Blocks allows you to integrate remote data into posts, pages, patterns, or anywhere else on your site where you use the block editor. This guide will help you understand the core concepts of the plugin and how they work.
+
+## Supported use cases
+
+Like WordPress, Remote Data Blocks is flexible. It can be used to enable advanced integrations with external data.
+
+Below, you'll find specific use cases where Remote Data Blocks shines. We are working to expand these use cases, but before you start, consider if Remote Data Blocks is the right tool for the job.
+
+### Remote Data Blocks is a good fit if:
+
+- Your remote data represents entities with a consistent schema.
+  - **Example:** Product data representing items of clothing with defined attributes like “Name,” “Price,” “Color,” “Size,” etc.
+- You want humans to select specific entities for display within the block editor.
+  - **Example:** Select and display an item of clothing within a marketing post.
+- You want to display arbitrary remote data based on a URL parameter and are willing to write a small amount of code.
+  - **Example:** Create a page and rewrite rule for /products/{product_id}/ and configure a Remote Data Block on that page to display the referenced product.
+- Your presentation of remote data aligns with the capabilities of Block Bindings.
+  - **Example:** Display an item of clothing using a core paragraph, heading, image, and button blocks.
+- You do not require complex filtering.
+  - **Example:** To select an item of clothing, load a list of top-selling products or search all products by a specific term.
+- Your data is denormalized and relatively flat.
+  - **Example:** A row from a Google Sheet with no references to external entities.
+
+### Remote Data Blocks may not be a good fit if:
+
+- Your remote data is schema-less, or the schema changes over time.
+  - Queries for remote data must define a schema for their return data. Schema changes result in broken blocks.
+- You want to display remote data outside the context of the block editor.
+  - Block bindings are only available in block content—posts, pages, or full-site editing. Using our plugin may still provide some benefit (e.g., caching) but could require significant custom PHP code.
+- Your data is normalized (and cannot be denormalized automatically by your API).
+  - Some APIs can denormalize data by automatically “inflating” referenced records for you. For example, data representing an item of clothing might reference a color by ID instead of a renderable string like “forest green.” If your API does not denormalize this relationship automatically, you will need to write custom code to perform additional queries and stitch the responses together.
+  - This can lead to a large number of API requests that your API may not tolerate. Airtable’s API, for example, imposes a rate limit of five requests per second, making multiple calls impractical.
+- You have multiple remote data sources that require interaction. Or, you want to implement a complex content architecture using Remote Data Blocks instead of leveraging WordPress custom post types and/or taxonomies.
+  - These two challenges are directly related to the issues with normalized data. If you have data sources that relate to one another, you have to write custom code to query missing data and stitch them together.
+  - Judging complexity is difficult, but implementing large applications using Remote Data Blocks is not advisable.
+- You require complex filtering or have complex pagination needs.
+  - Our UI components for filtering are pagination still under development.
+
+Over time, Remote Data Blocks will grow and improve and these guidelines will change.
+
+## Remote data source
+
+**Remote data source** refers to data that is fetched from an external source, such as an API or a third-party service. This might be a product in your Shopify store, data in an Airtable or Google Sheet, or a file in a GitHub repository. Remote data is usually fetched via HTTP requests, but you can [extend the plugin](../extending/index.md) to support other transports.
+
+Simple data sources can be configured via the plugin's settings screen, while others may require custom PHP code (see [extending](../extending/index.md)).
+
+## Queries
+
+**Queries** define how data is fetched, processed, and displayed. Queries delegate some logic to a **data source**, which can be reused by multiple queries. For example, one query to retrieve a single item, and one to retrieve a list.
+
+Simple queries can be configured via the plugin's settings screen, while others may require custom PHP code (see [extending](../extending/index.md)).
+
+## Remote data block
+
+A **remote data block** is a custom block connected to a specific query. Each remote data block has a unique name and is strictly tied to a data source.
+
+For example, you might have a remote data block named "Shopify Product" that fetches a product from your Shopify store and displays the product's name, description, price, and image. Or, you might have a remote data block named "Conference event" that displays rows from an Airtable and displays the event's name, location, and type.
+
+Remote data blocks are **container blocks** that contain other blocks and provide remote data to them. You retain complete control over the layout, design, and content. You can leverage patterns to enable consistent styling and customize the block's appearance using the block editor or `theme.json`.
+
+Remote data blocks are custom blocks, but they are created and registered by our plugin and don't require custom block development. Remote data is loaded via [the block bindings API](./block-bindings.md) or [inline bindings](./inline-bindings.md).
+
+## Data fetching
+
+The plugin handles data fetching and wraps [`wp_remote_request`](https://developer.wordpress.org/reference/functions/wp_remote_request/).
+
+When a request to your site renders one or more remote data blocks, our plugin will fetch and potentially cache the remote data. Multiple requests for the same data within a single page load will be deduped, even if the requests are not cacheable.
+
+### Caching
+
+The plugin offers a caching layer for optimal performance and helps avoid rate limiting from remote data sources. It will be used if your WordPress environment configures a [persistent object cache](https://developer.wordpress.org/reference/classes/wp_object_cache/#persistent-cache-plugins). Otherwise, the plugin will utilize in-memory (per-page-load) caching. Deploying to production without a persistent object cache is not recommended.
+
+The default TTL for all cache objects is 5 minutes, but it can be [configured per query or request](../extending/query.md#cache_ttl-intnullcallable). Error responses are cached for 30 seconds to avoid overwhelming the remote data source with repeated requests under error conditions.
+
+## Theming
+
+Remote data blocks can be styled using the block editor's style settings, `theme.json`, or custom stylesheets. See the [example child theme](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/theme) for more details.
+
+## Patterns
+
+Since remote data blocks are container blocks, you can associate a remote data block with a pattern to create reusable layouts. You link a pattern to a particular remote data block in the Site Editor. You will see a new Remote Data Blocks section in the right-hand panel when editing a pattern.
+
+![Screenshot showing the right hand panel of the WordPress Site Editor](https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/docs/concepts/patterns-right-panel.png)
+
+Select the specific block that is appropriate for this pattern. Once saved, content creators can select this pattern when adding the associated remote data block.
+
+You can also create a pattern directly from the content.
+<video src="https://github.com/user-attachments/assets/358d9d40-557b-4f39-b943-ed73d6f18adb"></video>
+
+The plugin supports both synced and unsynced patterns.
+
+## Technical concepts
+
+If you want to understand the internals of Remote Data Blocks so that you can extend its functionality, head over to the [extending guide](../extending/index.md).
+````
+
+## File: docs/concepts/inline-bindings.md
+````markdown
+# Inline bindings
+
+One of the current limitations of the [block bindings API](block-bindings.md) is that it is restricted to a small number of core blocks and attributes. For example, currently, you cannot bind to the content of a table block or a custom block. You also cannot bind to a _subset_ of a block's content.
+
+As a partial workaround, this plugin provides a way to use remote data in some places where block bindings are not supported. This feature is named "inline bindings" and it is available in any block that uses [rich text](https://developer.wordpress.org/block-editor/reference-guides/richtext/), such as tables, lists, and some custom blocks. Look for the inline binding button in the rich text formatting toolbar:
+
+<img width="535" alt="Inline binding button" src="https://github.com/user-attachments/assets/8ce0bd18-367e-46d5-a870-22819c42ff4a" />
+
+Clicking this button will open a modal that allows you to select a field from a remote data source, resulting in an inline remote data binding. Just like remote data blocks, this binding will resolve from the remote source when the content is rendered.
+
+<img width="684" alt="A bulleted list using several inline bindings to describe three conference events" src="https://github.com/user-attachments/assets/6527dcc0-c0ed-42ab-9655-b8fc2510e15b" />
+
+Inline bindings compile to HTML, so they are portable, safe, and have a built-in fallback.
+````
+
+## File: docs/extending/block-patterns.md
+````markdown
+# Block patterns
+
+Patterns allow you to represent your remote data in different ways.
+
+The plugin registers an unstyled block pattern any time you register a remote data block either in the WordPress admin or with `register_remote_data_block`.
+
+You can create additional patterns in the WordPress Site Editor or programmatically by passing a `patterns` property to your block options.
+
+You cannot edit the default pattern, but you can duplicate it and make changes.
+
+We recommend duplicating the default pattern and then making changes in the Site Editor. Once you've created your preferred pattern, you can associate it with the block in the `register_remote_data_block` call.
+
+If you want to make the pattern uneditable in the Site Editor, you can copy the block markup to a file and commit it to your repository.
+
+## Example
+
+```html
+<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group">
+	<!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"title"}}}}} -->
+	<h2 class="wp-block-heading"></h2>
+	<!-- /wp:heading -->
+	<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"description"}}}}} -->
+	<p></p>
+	<!-- /wp:paragraph -->
+</div>
+<!-- /wp:group -->
+```
+
+You could save this file as `my-pattern.html` in the same directory as the code that registers your block.
+
+```php
+register_remote_data_block( [
+    'title' => 'My Remote Data Block',
+    'render_query' => [ /* ... */ ],
+    'patterns' => [
+        [
+            'title' => 'My Pattern',
+            'html' => file_get_contents( __DIR__ . '/my-pattern.html' ),
+        ],
+    ],
+] );
+```
+````
+
+## File: docs/extending/block-registration.md
+````markdown
+# Block registration
+
+Use the `register_remote_data_block` function to register your remote data block and associate it with your query and data source. This example:
+
+1. Creates a [data source](data-source.md).
+2. Associates the data source with a query.
+3. Defines the output schema of a query, which tells the plugin how to map the query response to blocks.
+4. Registers a remote data block.
+
+We are assuming `https://api.example.com/` returns JSON that has a shape like:
+
+```json
+{
+	"id": 12345,
+	"title": "An awesome title"
+}
+```
+
+```php
+function register_your_custom_block() {
+	$data_source = [
+		'display_name' => 'Example API',
+		'endpoint' => 'https://api.example.com/',
+	];
+
+	$render_query = [
+		'display_name' => 'Example Query',
+		'data_source' => $data_source,
+		'output_schema' => [
+			'type' => [
+				'id' => [
+					'name' => 'ID',
+					'path' => '$.id',
+					'type' => 'id',
+				],
+				'title' => [
+					'name' => 'Title',
+					'path' => '$.title',
+					'type' => 'string',
+				],
+			],
+		],
+	];
+
+	register_remote_data_block( [
+		'title' => 'My Block',
+		'render_query' => [
+			'query' => $render_query,
+		],
+	] );
+}
+add_action( 'init', 'register_your_custom_block', 10, 0 );
+```
+
+## Configuration options
+
+### `title`: string (required)
+
+The human-friendly name of the block. It is also used to construct the block's name; a title of "My Block" will result in a block name of `remote-data-blocks/my-block`.
+
+### `render_query`: array (required)
+
+The render query is executed when the block is rendered and fetches the data that will be provided to block bindings. It is an array with the following properties:
+
+- `query` (required): An instance of [`QueryInterface`](./query.md) that fetches the data.
+
+### `selection_queries`: array (optional)
+
+Selection queries are used by content creators to select or curate remote data in the block editor. For example, you may wish to provide a list of products to users and allow them to select one to include in their post, or you may want to allow a user to search for a specific item. Selection queries are an array of objects with the following properties:
+
+- `display_name`: A human-friendly name for the selection query.
+- `query` (required): An instance of `QueryInterface` that fetches the data.
+- `type`: A string that determines the type of selection query. Accepted values are currently `list` or `search`.
+
+Example:
+
+```php
+'selection_queries' => [
+    [
+        'display_name' => 'Select a product',
+        'query' => $list_products_query,
+        'type' => 'list',
+    ],
+    [
+        'display_name' => 'Search for a product',
+        'query' => $search_products_query,
+        'type' => 'search',
+    ],
+],
+```
+
+#### Search queries
+
+Search queries must return a collection and must accept an input variable with the special type `ui:search_input`. The [Art Institute of Chicago](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/art-institute/README.md) example looks like this:
+
+```php
+$search_art_query = [
+	'data_source' => $aic_data_source,
+	'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
+		$query = $input_variables['search'];
+		$endpoint = $aic_data_source->get_endpoint() . '/search';
+
+		return add_query_arg( [ 'q' => $query ], $endpoint );
+	},
+	'input_schema' => [
+		'search' => [
+			'name' => 'Search terms',
+			'type' => 'ui:search_input',
+		],
+	],
+	'output_schema' => [
+		'is_collection' => true,
+		'path' => '$.data[*]',
+		'type' => [
+			'id' => [
+				'name' => 'Art ID',
+				'type' => 'id',
+			],
+			'title' => [
+				'name' => 'Title',
+				'type' => 'string',
+			],
+		],
+	],
+];
+```
+
+Here you can see the `search` input variable has a special type of `ui:search_input` and is used in the endpoint method to populate a query string. You can read more about [queries](./query.md) and how to construct them. End users enter the search term to find the specific item.
+
+![Screenshot showing the search input in the WordPress Editor](https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/docs/extending/search-input.png)
+
+**Note:** The same search box appears for `list` query types. For this type, the form is only filtering the results returned by the initial list query. For `search` queries, an additional query is made for every search.
+
+### `overrides`: array (optional)
+
+[Overrides](overrides.md) are used to customize the behavior of the block on a per-block basis.
+
+### `patterns`: array (optional)
+
+[Block patterns](block-patterns.md) allow you to customize the display of your remote data.
+````
+
+## File: docs/extending/data-source.md
+````markdown
+# Data source
+
+A data source defines the basic reusable properties of an API and is used by a [query](query.md) to reduce duplicative code. It also helps define how your data source looks in the WordPress admin.
+
+## Example
+
+Most HTTP-powered APIs can be represented by defining a array that be provided to `HttpDataSource::from_array()`. Here's an example of a data source for an example HTTP API:
+
+```php
+$data_source = HttpDataSource::from_array( [
+	'version' => 1,
+	'display_name' => 'Example API',
+	'endpoint' => 'https://api.example.com/',
+	'request_headers' => [
+		'Content-Type' => 'application/json',
+		'X-Api-Key' => constant( 'MY_API_KEY_CONSTANT' ),
+	],
+] );
+```
+
+## HttpDataSource configuration
+
+### **version**: number (required)
+
+There is no built-in versioning logic, but a version number is required for best practice reasons. Changes to the data source could significantly affect [queries](query.md). Checking the data source version is a sensible defensive practice.
+
+### display_name: string (required)
+
+The display name is used in the UI to identify your data source.
+
+### endpoint: string (required)
+
+This is the default or base endpoint for the data source. [Queries](query.md) that use a data source can override or append paths to its endpoint.
+
+### image_url: string
+
+An optional image URL can be used in the UI to help identify your data source.
+
+### request_headers: array
+
+An associative array of headers that will be sent with each HTTP request. Queries that use a data source can override or append headers.
+
+When providing authentication credentials, take care to avoid committing them to code repositories. We strongly recommend using environment variables or secure storage.
+
+## Custom data sources
+
+It's usually not necessary to extend `HttpDataSource`, but you can do so if you need to add custom behavior. For APIs that use non-HTTP transports, you could implement `DataSourceInterface` and provide methods that define reusable properties of your API. The actual implementation of your transport will need to be provided by a [custom query runner](./query-runner.md).
+
+Here is a theoretical example of a data source for a WebDAV server:
+
+```php
+class WebDavFilesDataSource implements DataSourceInterface {
+    public function get_display_name(): string {
+        return 'My WebDAV Files';
+    }
+
+    public function get_image_url(): string {
+        return 'https://example.com/webdav-icon.png';
+    }
+
+    public function get_webdav_root(): string {
+        return 'webdavs://webdav.example.com/';
+    }
+}
+```
+````
+
+## File: docs/extending/hooks.md
+````markdown
+# Hooks
+
+Hooks are a way for one piece of code to interact/modify another piece of code at specific, pre-defined spots.
+
+There are two types of hooks: Actions and Filters. To use either, you need to write a custom function known as a Callback, and then register it with a WordPress hook for a specific action or filter.
+
+[Read more about Hooks](https://developer.wordpress.org/plugins/hooks/)
+
+## Actions
+
+Actions allow you to add data or change how WordPress operates. Actions will run at a specific point in the execution of plugin. Callback functions for an Action do not return anything back to the calling Action hook.
+
+### remote_data_blocks_loaded
+
+This action fires when Remote Data Blocks is fully loaded and ready for use. Plugins that depend on Remote Data Blocks should use this hook to defer their initialization until Remote Data Blocks is fully loaded.
+
+```php
+function my_plugin_init() {
+	// Initialize your plugin that depends on Remote Data Blocks here
+	// All Remote Data Blocks classes and functionality are now available
+}
+
+if ( defined( 'REMOTE_DATA_BLOCKS__LOADED' ) ) {
+	// Immediately init the plugin since remote data blocks is already loaded
+	my_plugin_init()
+} else {
+	// Defer the init until the remote data block is loaded
+	add_action( 'remote_data_blocks_loaded', 'my_plugin_init' );
+}
+```
+
+### remote_data_blocks_log
+
+If you want to send debugging information to another source besides [Query Monitor](../troubleshooting.md#query-monitor), use the `remote_data_blocks_log` action.
+
+```php
+function custom_log( string $namespace, string $level, string $message, array $context ): void {
+    // Send the log to a custom destination.
+}
+add_action( 'remote_data_blocks_log', 'custom_log', 10, 4 );
+```
+
+## Filters
+
+Filters give you the ability to change data during the execution of the plugin. Callback functions for Filters will accept a variable, modify it, and return it. They are meant to work in an isolated manner, and should never have side effects such as affecting global variables and output.
+
+### remote_data_blocks_register_example_block
+
+Filter whether to register the included example API block ("Conference Event") (default: `true`).
+
+```php
+add_filter( 'remote_data_blocks_register_example_block', '__return_false' );
+```
+
+### remote_data_blocks_allowed_url_schemes
+
+Filter the allowed URL schemes for this request. Only HTTPS is allowed by default, but it might be useful to relax this restriction in local environments.
+
+```php
+function custom_allowed_url_schemes( array $allowed_url_schemes, HttpQueryInterface $query ): array {
+	// Modify the allowed URL schemes.
+	return $allowed_url_schemes;
+}
+add_filter( 'remote_data_blocks_allowed_url_schemes', 'custom_allowed_url_schemes', 10, 2 );
+```
+
+### remote_data_blocks_pagination_query_var_name
+
+Filter the query variable name used for pagination (default: `rdb-pagination`).
+
+```php
+function custom_pagination_query_var_name(): string {
+	return 'paginate';
+}
+add_filter( 'remote_data_blocks_pagination_query_var_name', 'custom_pagination_query_var_name', 10, 0 );
+```
+
+### remote_data_blocks_request_details
+
+Filter the request details (method, options, url) before the HTTP request is dispatched.
+
+```php
+function custom_request_details( array $request_details, HttpQueryInterface $query, array $input_variables ): array {
+	// Modify the request details.
+	return $request_details;
+}
+add_filter( 'remote_data_blocks_request_details', 'custom_request_details', 10, 3 );
+```
+
+### remote_data_blocks_query_input_variables
+
+Filter the query input variables prior to query execution. This filter is useful for modifying the input variables for the current page-load, e.g., by pulling in data from query variables or other context. See [Overrides](overrides.md) for more information.
+
+```php
+add_filter( 'remote_data_blocks_query_input_variables', function ( array $input_variables, array $enabled_overrides, string $block_name, array $block_context ): array {
+	if ( true === in_array( 'my_override', $enabled_overrides, true ) ) {
+		$override_value = get_query_var( 'override_id' );
+
+		if ( ! empty( $override_value ) ) {
+			$input_variables['id'] = $override_value;
+		}
+	}
+
+	return $input_variables;
+}, 10, 4 );
+```
+
+Keep in mind that modifying query input variables will affect the object cache key used for query execution. This could result in a cache miss.
+
+### remote_data_blocks_query_response
+
+Filter the query response just after query execution. This filter is useful for modifying the query response for the current page-load, e.g., by pulling in data from query variables or other context. See [Overrides](overrides.md) for more information.
+
+```php
+add_filter( 'remote_data_blocks_query_response', function ( array $query_response, array $enabled_overrides, string $block_name, array $block_context ): array {
+	if ( true === in_array( 'alternate_date_format', $enabled_overrides, true ) ) {
+		$query_response['results'] = array_map( function ( array $result ) {
+			$date = new DateTime( $result['date'] );
+			$result['date'] = $date->format( 'Y F d' );
+			return $result;
+		}, $query_response['results'] );
+	}
+
+	return $input_variables;
+}, 10, 4 );
+```
+
+The result of this filter is not cached, and will run for every block binding.
+
+### remote_data_blocks_query_response_metadata
+
+Filter the query response metadata, which are available as targets for inline bindings. In most cases, it is better to provide a custom query class and override the `get_response_metadata` method, but this filter is available in case that is not possible.
+
+```php
+function custom_query_response_metadata( array $metadata, HttpQueryInterface $query, array $input_variables ): array {
+	// Modify the response metadata.
+	return $metadata;
+}
+add_filter( 'remote_data_blocks_query_response_metadata', 'custom_query_response_metadata', 10, 3 );
+```
+````
+
+## File: docs/extending/index.md
+````markdown
+# Extending
+
+> [!TIP]
+> Make sure you've read the [core concepts](../concepts/index.md) behind Remote Data Blocks before extending the plugin.
+
+Data sources and queries can be configured in the plugin UI, but sometimes, you need to extend the plugin to implement custom functionality. Remote Data Blocks provides extendable classes, global functions, hooks, and filters to help you connect to any data source, parse responses, and customize the display of data.
+
+## Data Flow
+
+Here's a short overview of how data flows through the plugin when a post with a remote data block is rendered:
+
+1. WordPress core loads the post content, parses the blocks, and recognizes that a paragraph block has a [block binding](../concepts/block-bindings.md).
+2. WordPress core calls the block binding callback function: `BlockBindings::get_value()`.
+3. The callback function inspects the paragraph block. Using the block context supplied by the parent remote data block, it determines which [query](./query.md) to execute.
+4. The query is executed: `$query->execute()` (usually by delegating to a [query runner](./query-runner.md)).
+5. Various properties of the query are requested by the query runner, including the endpoint, request headers, request method, and request body. Some of these properties are delegated to the data source (`$query->get_data_source()`).
+6. The query is dispatched, and the response data is inspected, formatted into a consistent shape, and returned to the block binding callback function.
+7. The callback function extracts the requested field from the response data and returns it to WordPress core for rendering.
+
+## Customization
+
+Providing a custom data source, query, or query runner gives you complete control over how data is fetched, processed, and rendered. In most cases, you only need to extend one of these classes to implement custom behavior. A common approach is to define a data source on the settings screen and then commit a custom query in code to fetch and process the data.
+
+Here are some detailed overviews of these classes with notes on how and why to extend them:
+
+- [Data Source](data-source.md)
+- [Query](query.md)
+
+Once you've defined your data source and queries, you can [register a remote data block](block-registration.md) that uses them. That block can use a [pattern](block-patterns.md) for display. You can also use [overrides](./overrides.md) to dynamically select the displayed content.
+
+### Additional customization
+
+- [Hooks (actions and filters)](hooks.md)
+- [Query runner](query-runner.md)
+
+## Examples and Templates
+
+The [examples](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/README.md) provide detailed code samples of interacting with the plugin various methods of extending the plugin.
+
+For quick development, use the [templates](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/templates/README.md) and [AI prompts](../ai-prompts.md) to scaffold new integrations rapidly.
+
+## Create a local development environment
+
+This repository includes tools for quickly starting a [local development environment](../local-development.md).
+````
+
 ## File: docs/extending/overrides.md
 ````markdown
 # Overrides
@@ -173,6 +793,568 @@ As you can see, the `remote_data_blocks_query_input_variables` filter is passed 
 The `overrides` property in the block registration array enables a panel in the block settings that allows content authors to enable or disable the override:
 
 <img width="276" alt="An overrides panel in a remote data block settings panel" src="https://github.com/user-attachments/assets/e701e621-99f9-4c2e-b34d-cfef352af2ae" />
+````
+
+## File: docs/extending/query-input-schema.md
+````markdown
+# HttpQuery `input_schema` property
+
+The `input_schema` property defines the input variables expected by the query. The property should be an associative array of input variable definitions. The keys of the array are machine-friendly input variable names, and the values are associative arrays with the following structure:
+
+- `name` (optional): The human-friendly display name of the input variable
+- `default_value` (optional): The default value for the input variable.
+- `type` (required): The primitive type of the input variable. Supported types are:
+  - `boolean`
+  - `id`
+  - `integer`
+  - `null`
+  - `number`
+  - `string`
+
+#### Example
+
+```php
+'input_schema' => [
+	'zip_code' => [
+		'name' => 'Zip Code',
+		'type' => 'string',
+	],
+],
+```
+
+There are also some special input variable types:
+
+- `ui:search_input`: A variable with this type indicates that the query supports searching. It must accept a `string` containing search terms.
+- `ui:pagination_offset`: A variable with this type indicates that the query supports offset pagination. It must accept an `integer` containing the requested offset. See `pagination_schema` for additional information and requirements.
+- `ui:pagination_page`: A variable with this type indicates that the query supports page-based pagination. It must accept an `integer` containing the requested results page. See `pagination_schema` for additional information and requirements.
+- `ui:pagination_per_page`: A variable with this type indicates that the query supports controlling the number of resultsper page. It must accept an `integer` containing the number of requested results.
+- `ui:pagination_cursor_next` and `ui_pagination_cursor_previous`: Variables with these types indicate that the query supports cursor pagination. They accept `string`s containing the requested cursor. See `pagination_schema` for additional information and requirements.
+- `ui:pagination_cursor`: A variable with this type indicates support for a simple variant of cursor pagination that uses a single cursor instead of a pair of forward / backward cursors. It accepts a `string` containing the requested cursor. See `pagination_schema` for additional information and requirements.
+
+#### Example with search and pagination input variables
+
+```php
+'input_schema' => [
+	'search' => [
+		'name' => 'Search terms',
+		'type' => 'ui:search_input',
+	],
+	'limit' => [
+		'default_value' => 10,
+		'name' => 'Pagination limit',
+		'type' => 'ui:pagination_per_page',
+	],
+	'page' => [
+		'default_value' => 1,
+		'name' => 'Pagination page',
+		'type' => 'ui:pagination_page',
+	],
+],
+```
+
+If omitted, `input_schema` defaults to an empty array.
+````
+
+## File: docs/extending/query-output-schema.md
+````markdown
+# HttpQuery `output_schema` property
+
+A query's `output_schema` defines how an API response should be transformed and provided to a remote data block. A typical goal is to transform the API response into a flat array of fields that can be bound to blocks, while omitting values that are not needed. Output can be nested, but nested values cannot be bound to blocks.
+
+Note that the output schema may require updates whenever the shape or schema of the API response changes. Similarly, changing the slug or `type` of a field may break existing bindings. Consider creating a new query and remote data block if you need to make breaking changes to an output schema.
+
+## Properties
+
+- `format` (optional): A callable function that formats the output variable value.
+- `generate` (optional): A callable function that generates or extracts the output variable value from the response, as an alternative to `path`. It receives two parameters:
+  - `array $data`: The data returned by the API, which is contains the data returned from the API at the current "level" (e.g., after the root `path` has been applied, if present).
+  - `array $raw_response_data`: The "raw" response data returned by the API, which includes the input variables (`$raw_response_data['input_variables']`), response metadata (`$raw_response_data['metadata']`), and the entire API response before any preprocessing.
+- `is_collection` (optional, default `false`): A boolean indicating whether the response data is a collection. If false, only a single item will be returned.
+- `name` (optional): The human-friendly display name of the output variable.
+- `default_value` (optional): The default value for the output variable.
+- `path` (optional): A [JSONPath](https://jsonpath.com/) expression to extract the variable value from the response. Note that path expressions are relative to the current item and its type; path expressions therefore "build" on each other when you nest types.
+- `type` (required): A primitive type (e.g., `string`, `boolean`) or a nested output schema.
+
+Accepted primitive types are:
+
+- `boolean`
+- `button_url`
+- `email_address`
+- `html`
+- `id`
+- `image_alt`
+- `image_url`
+- `integer`
+- `markdown`
+- `null`
+- `number`
+- `string`
+- `url`
+- `uuid`
+
+## Single entity example
+
+Using the [Zip Code example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/zip-code/README.md), the JSON response returned by the API looks like this:
+
+```json
+{
+	"post code": "17057",
+	"country": "United States",
+	"country abbreviation": "US",
+	"places": [
+		{
+			"place name": "Middletown",
+			"longitude": "-76.7331",
+			"state": "Pennsylvania",
+			"state abbreviation": "PA",
+			"latitude": "40.2041"
+		}
+	]
+}
+```
+
+And the corresponding `output_schema` definition might look like this:
+
+```php
+'output_schema' => [
+	'is_collection' => false,
+	'type' => [
+		'zip_code' => [
+			'name' => 'Zip Code',
+			'path' => '$["post code"]',
+			'type' => 'string',
+		],
+		'city_state' => [
+			'name' => 'City, State',
+			'default_value' => 'Unknown',
+			'generate' => function( array $data, array $raw_response_data ): string|null {
+				if ( empty( $data['places'] ) ) {
+					return null;
+				}
+
+				return $data['places'][0]['place name'] . ', ' . $data['places'][0]['state abbreviation'];
+			},
+			'type' => 'string',
+		],
+	],
+],
+```
+
+- The `is_collection` property indicates whether the output represents a single entity or a collection of entities. In this case, it is set to `false` because the API returns a single entity.
+- The `type` property at the root level begins the type definition. The `zip_code` and `city_state` array keys are "slugs" that identify the field. The array values define types that describe how to extract a value for those fields.
+- The `zip_code` field is extracted via a [JSONPath](http://jsonpath.com) expression defined in the `path` property.
+- The `city_state` field provides a callable via the `generate` property. That function receives the response data and combines two elements to form the value.
+- A `default_value` property provides a value that will be used if the provided `path` expression or `generate` function resolve to a null value.
+
+The result of applying this output schema to the example JSON response is:
+
+```php
+[
+	zip_code => '17057',
+	city_state => 'Middletown, PA',
+]
+```
+
+## Collection example
+
+An example of collection JSON can be found in the [Chicago Institue of Art example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/art-institute/README.md). That API returns (in part):
+
+```json
+{
+	"preference": null,
+	"pagination": {
+		"total": 183,
+		"limit": 10,
+		"offset": 0,
+		"total_pages": 19,
+		"current_page": 1
+	},
+	"data": [
+		{
+			"_score": 155.49371,
+			"thumbnail": {
+				"alt_text": "Color pastel drawing of ballerinas in tutus on stage, watched by audience.",
+				"width": 3000,
+				"lqip": "data:image/gif;base64,R0lGODlhCgAFAPUAADtMRVJPRFlOQlBNSFFNSEVURU1USldSS1dSTVRXTV9ZTldVUl1ZU2hbTVdkU19kVV5tX2FkUGFjVWVoVGhoVGZhW29lXGVtXG1rWmlpXW5tXmZxX3VxX1toZG5oYG5uZ3ZsY3BqZGN1a3RxYnFyZXRxZntxan19bnl9cnh7dX57doJ/dpGEeJKOhaCUjKebk6yflsGupQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAAAAAAALAAAAAAKAAUAAAYuQIjoQuGQTqhOyrEZYSQJA6AweURYrxIoxAhoMp9VywWLmRYqj6BxQFQshIEiCAA7",
+				"height": 1502
+			},
+			"api_model": "artworks",
+			"is_boosted": true,
+			"api_link": "https://api.artic.edu/api/v1/artworks/61603",
+			"id": 61603,
+			"title": "Ballet at the Paris Opéra",
+			"timestamp": "2025-01-14T22:26:21-06:00"
+		},
+		{
+			"_score": 152.35487,
+			"thumbnail": {
+				"alt_text": "Impressionist painting of woman wearing green dress trying on hats.",
+				"width": 5003,
+				"lqip": "data:image/gif;base64,R0lGODlhBgAFAPQAAEMtIk40KE83KlhHLVxELlNPN1hLMVJOP19UN1dYM1lUOVpUP2dAIWlKKHZKKXZLKWRNPGpbMGpaNGtaOkxUTF9dRlJaS15YSV5kUnZpRH12W4ZkM49uRI52VQAAAAAAACH5BAAAAAAALAAAAAAGAAUAAAUY4AUtFWZxHZIdExFEybAJQGE00sNQmqOEADs=",
+				"height": 4543
+			},
+			"api_model": "artworks",
+			"is_boosted": true,
+			"api_link": "https://api.artic.edu/api/v1/artworks/14572",
+			"id": 14572,
+			"title": "The Millinery Shop",
+			"timestamp": "2025-01-14T23:26:12-06:00"
+		}
+	],
+	"info": {
+		"license_text": "The `description` field in this response is licensed under a Creative Commons Attribution 4.0 Generic License (CC-By) and the Terms and Conditions of artic.edu. All other data in this response is licensed under a Creative Commons Zero (CC0) 1.0 designation and the Terms and Conditions of artic.edu.",
+		"license_links": [
+			"https://creativecommons.org/publicdomain/zero/1.0/",
+			"https://www.artic.edu/terms"
+		],
+		"version": "1.10"
+	},
+	"config": {
+		"iiif_url": "https://www.artic.edu/iiif/2",
+		"website_url": "http://www.artic.edu"
+	}
+}
+```
+
+An output schema can be defined as:
+
+```php
+'output_schema' => [
+	'is_collection' => true,
+	'path' => '$.data[*]',
+	'type' => [
+		'id' => [
+			'name' => 'Art ID',
+			'type' => 'id',
+		],
+		'title' => [
+			'name' => 'Art Title',
+			'type' => 'string',
+		],
+	],
+],
+```
+
+- The `is_collection` property is set to `true` to indicate that the output represents a collection of entities.
+- A top-level `path` expression (`$.data[*]`) indicates that the collection is contained in the `data` property of the response.
+- The `type` property defines two fields: `id` and `title`.
+  - Note that the nested type definitions do not provide a `path` expression. When omitted, the plugin will use the slug as the expected path. This is a shorthand for the following output schema with explicit `path` expressions:
+
+```php
+'output_schema' => [
+	'is_collection' => true,
+	'path' => '$.data[*]',
+	'type' => [
+		'id' => [
+			'name' => 'Art ID',
+			'path' => '$.id',
+			'type' => 'id',
+		],
+		'title' => [
+			'name' => 'Art Title',
+			'path' => '$.title',
+			'type' => 'string',
+		],
+	],
+],
+```
+
+We can enhance the output schema with additional fields and options:
+
+```php
+'output_schema' => [
+	'is_collection' => true,
+	'path' => '$.data[*]',
+	'type' => [
+		'id' => [
+			'name' => 'Art ID',
+			'type' => 'id',
+		],
+		'title' => [
+			'name' => 'Art Title',
+			'format' => function ( string $value ): string {
+				return ucfirst( $value );
+			},
+			'type' => 'string',
+		],
+		'thumbnail_image_alt' => [
+			'name' => 'Thumbnail alt text',
+			'path' => '$.thumbnail.alt_text',
+			'type' => 'image_alt',
+		],
+		'thumbnail_image_url' => [
+			'name' => 'Thumbnail',
+            'path' => '$.thumbnail.lqip',
+			'type' => 'image_url',
+		],
+	],
+],
+```
+
+The `format` property allows you to define a callable that will be applied to the value before it is returned.
+
+Applying this output schema to the response JSON would result in the following output:
+
+```php
+[
+	[
+		'id' => 61603,
+		'title' => 'Ballet at the Paris Opéra',
+		'thumbnail_image_alt' => 'Color pastel drawing of ballerinas in tutus on stage, watched by audience.',
+		'thumbnail_image_url' => 'data:image/gif;base64,R0lGODlhCgAFAPUAADtMRVJPRFlOQlBNSFFNSEVURU1USldSS1dSTVRXTV9ZTldVUl1ZU2hbTVdkU19kVV5tX2FkUGFjVWVoVGhoVGZhW29lXGVtXG1rWmlpXW5tXmZxX3VxX1toZG5oYG5uZ3ZsY3BqZGN1a3RxYnFyZXRxZntxan19bnl9cnh7dX57doJ/dpGEeJKOhaCUjKebk6yflsGupQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAAAAAAALAAAAAAKAAUAAAYuQIjoQuGQTqhOyrEZYSQJA6AweURYrxIoxAhoMp9VywWLmRYqj6BxQFQshIEiCAA7',
+	],
+	[
+		'id' => 14572,
+		'title' => 'The Millinery Shop',
+		'thumbnail_image_alt' => 'Impressionist painting of woman wearing green dress trying on hats.',
+		'thumbnail_image_url' => 'data:image/gif;base64,R0lGODlhBgAFAPQAAEMtIk40KE83KlhHLVxELlNPN1hLMVJOP19UN1dYM1lUOVpUP2dAIWlKKHZKKXZLKWRNPGpbMGpaNGtaOkxUTF9dRlJaS15YSV5kUnZpRH12W4ZkM49uRI52VQAAAAAAACH5BAAAAAAALAAAAAAGAAUAAAUY4AUtFWZxHZIdExFEybAJQGE00sNQmqOEADs=',
+	],
+]
+```
+````
+
+## File: docs/extending/query-runner.md
+````markdown
+# Query runner
+
+A query runner executes a query and processes the results of a query. The default `QueryRunner` used by the [`HttpQuery` class](query.md) is designed to work with most APIs that transact over HTTP and return JSON, but you may want to provide a custom query runner if:
+
+- Your API does not respond with JSON or requires custom deserialization logic.
+- Your API uses a non-HTTP transport.
+- You want to implement custom processing of the response data, which is not possible with the [provided filters](./hooks.md).
+
+If your API transacts over HTTP and you want to customize the query runner, consider extending the `QueryRunner` class and providing an instance to your query via the `query_runner` option. If your API uses a non-HTTP transport or you want full control over query execution, you should implement your own query that implements `QueryInterface` and provides a custom `execute` method.
+````
+
+## File: docs/extending/query.md
+````markdown
+# Query
+
+A query defines a request for data from a [data source](data-source.md). It defines input and output variables so that the Remote Data Blocks plugin knows how to interact with it.
+
+A common approach is to define a data source on the settings screen and then commit a custom query in code to fetch and process the data. The following example code does just that.
+
+## HttpQuery
+
+Most HTTP-powered APIs can be queried using `HttpQuery`. Queries are instantiated with configuration options, described below.
+
+```php
+if ( ! defined( 'REMOTE_DATA_BLOCKS_EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID' ) ) {
+	return;
+}
+
+$data_source = HttpDataSource::from_uuid( REMOTE_DATA_BLOCKS_EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID );
+
+if ( ! $data_source instanceof HttpDataSource ) {
+	return;
+}
+
+$query = [
+	'display_name' => 'Get location by Zip code',
+	'data_source' => $data_source,
+	'endpoint' => function( array $input_variables ) use ( $data_source ): string {
+		return $data_source->get_endpoint() . $input_variables['zip_code'];
+	},
+	'input_schema' => [
+		'zip_code' => [
+			'name' => 'Zip Code',
+			'type' => 'string',
+		],
+	],
+	'output_schema' => [
+		'is_collection' => false,
+		'type' => [
+			'zip_code' => [
+				'name' => 'Zip Code',
+				'path' => '$["post code"]',
+				'type' => 'string',
+			],
+			'city'     => [
+				'name' => 'City',
+				'path' => '$.places[0]["place name"]',
+				'type' => 'string',
+			],
+			'state'    => [
+				'name' => 'State',
+				'path' => '$.places[0].state',
+				'type' => 'string',
+			],
+		],
+	],
+];
+```
+
+- The `endpoint` property is a callback function that constructs the query endpoint. In this case, the endpoint is constructed by appending the `zip_code` input variable to the data source endpoint.
+- The `input_schema` property defines the input variables the query expects. For some queries, input variables might be used to construct a request body. In this case, the `zip_code` input variable is used to customize the query endpoint via the `endpoint` callback function.
+- The `output_schema` property defines the output data that will be extracted from the API response and provided to the remote data block. The `path` property uses [JSONPath](https://jsonpath.com/) expressions to allow concise, no-code references to nested data.
+
+This example features a small subset of the customization available for a query; see the full documentation below for details.
+
+## HttpQuery configuration
+
+### display_name: string (required)
+
+The `display_name` property defines the query's human-friendly name.
+
+### data_source: HttpDataSourceInterface (required)
+
+The `data_source` property provides the [data source](./data-source.md) the query uses.
+
+### endpoint: string|callable
+
+The `endpoint` property defines the query endpoint. It can be a string or a callable function that constructs the endpoint. The callable function accepts an associative array of input variables (`[ $var_name => $value ]`). If omitted, the query will use the endpoint defined by the data source.
+
+#### Example
+
+```php
+'endpoint' => function( array $input_variables ) use ( $data_source ): string {
+	return $data_source->get_endpoint() . $input_variables['zip_code'];
+},
+```
+
+### input_schema: array
+
+The `input_schema` property defines the input variables expected by the query, which can be used to formulate the endpoint, the request headers, or the request body. Further specification and examples are provided in the [`input_schema` documentation](./query-input-schema.md).
+
+### output_schema: array (required)
+
+The `output_schema` property defines how an API response should be transformed and provided to a remote data block. Further information and examples are provided in the [`output_schema` documentation](./query-output-schema.md).
+
+### pagination_schema: array
+
+If your query supports pagination, the `pagination_schema` property defines how to extract pagination-related values from the query response. If defined, the property should be an associative array with the following structure:
+
+- `total_items`: A variable definition that extracts the total number of items across every page of results.
+- `has_next_page`: A variable definition that extracts a boolean indicating whether there are more pages of results. Useful for APIs that do not report the total number of items.
+- `cursor_next`: If your query supports cursor pagination, a variable definition that extracts the cursor for the next page of results. This output variable will also be mapped to `ui:pagination_cursor`, if present.
+- `cursor_previous`: If your query supports cursor pagination, a variable definition that extracts the cursor for the previous page of results.
+
+Note that one of `has_next_page` or `total_items` is required for all pagination types.
+
+A pagination block will automatically be added to remote data blocks that support pagination.
+
+#### Example
+
+```php
+'pagination_schema' => [
+	'total_items' => [
+		'name' => 'Total items',
+		'path' => '$.pagination.totalItems',
+		'type' => 'integer',
+	],
+	'cursor_next' => [
+		'name' => 'Next page cursor',
+		'path' => '$.pagination.nextCursor',
+		'type' => 'string',
+	],
+	'cursor_previous' => [
+		'name' => 'Previous page cursor',
+		'path' => '$.pagination.previousCursor',
+		'type' => 'string',
+	],
+],
+```
+
+### request_method: string
+
+The `request_method` property defines the HTTP request method used by the query. By default, it is `'GET'`.
+
+### request_headers: array|callable
+
+The `request_headers` property defines the request headers for the query. It can be an associative array or a callable function that returns an associative array. The callable function accepts an associative array of input variables (`[ $var_name => $value ]`). If omitted, the query will use the request headers defined by the data source.
+
+### Example
+
+```php
+'request_headers' => function( array $input_variables ) use ( $data_source ): array {
+	return array_merge(
+		$data_source->get_request_headers(),
+		[ 'X-Foo' => $input_variables['foo'] ]
+	);
+},
+```
+
+### request_body: array|callable
+
+The `request_body` property defines the request body for the query. It can be an associative array or a callable function that returns an associative array. The callable function accepts an associative array of input variables (`[ $var_name => $value ]`). If omitted, the query will not have a request body.
+
+### cache_ttl: int|null|callable
+
+The `cache_ttl` property defines how long the query response should be cached in seconds. It can be an integer, a callable function that returns an integer, or `null`. The callable function accepts an associative array of input variables (`[ $var_name => $value ]`).
+
+A value of `-1` indicates the query should not be cached. A value of `null` indicates the default TTL should be used (300 seconds). If omitted, the default TTL is used.
+
+Remote data blocks utilize the WordPress object cache (`wp_cache_get()` / `wp_cache_set()`) for response caching. Ensure that your platform provides or installs a persistent object cache plugin so that this value is respected. If you do not have a peristent object cache, this property will be ignored and responses will only be cached in-memory. We do not recommend running the Remote Data Blocks plugin in this configuration.
+
+Note that error responses are cached for 30 seconds to avoid overwhelming the remote data source with repeated requests under error conditions. Additionally, a small random jitter is added to the cache TTL to avoid cache stampedes.
+
+#### Example
+
+```php
+$query = HttpQuery::from_array( [
+	'display_name' => 'Get location by Zip code',
+	'data_source' => $data_source,
+	'endpoint' => function( array $input_variables ) use ( $data_source ): string {
+		return $data_source->get_endpoint() . $input_variables['zip_code'];
+	},
+	'cache_ttl' => 3600, // Set the cache TTL to 1 hour
+	'input_schema' => [
+		'zip_code' => [
+			'name' => 'Zip Code',
+			'type' => 'string',
+		],
+	],
+	'output_schema' => [
+		'is_collection' => false,
+		'type' => [
+			'zip_code' => [
+				'name' => 'Zip Code',
+				'path' => '$["post code"]',
+				'type' => 'string',
+			],
+			'city'     => [
+				'name' => 'City',
+				'path' => '$.places[0]["place name"]',
+				'type' => 'string',
+			],
+			'state'    => [
+				'name' => 'State',
+				'path' => '$.places[0].state',
+				'type' => 'string',
+			],
+		],
+	],
+] );
+```
+
+### image_url: string|null
+
+The `image_url` property defines an image URL that represents the query in the UI. If omitted, the query will use the image URL defined by the data source.
+
+### preprocess_response: callable
+
+If you need to pre-process the response in some way before the output variables are extracted, provide a `preprocess_response` function. The function will receive the deserialized response.
+
+#### Example
+
+```php
+'preprocess_response' => function( mixed $response_data, array $input_variables ): array {
+	$some_computed_property = compute_property( $response_data['foo']['bar'] ?? '' );
+
+	return array_merge(
+		$response_data,
+		[ 'computed_property' => $some_computed_property ]
+	);
+},
+```
+
+### query_runner: QueryRunnerInterface
+
+Use the `query_runner` property to provide a custom [query runner](./query-runner.md) for the query. If omitted, the query will use the default query runner, which works well with most HTTP-powered APIs.
+
+## GraphqlQuery
+
+## GraphqlMutation
 ````
 
 ## File: docs/tutorials/airtable.md
@@ -282,6 +1464,70 @@ You can also configure Google Sheets integrations with code. These integrations 
 This [working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/google-sheets/westeros-houses) will replicate what we've done in this tutorial.
 ````
 
+## File: docs/tutorials/http.md
+````markdown
+# Create a remote data block using an HTTP data source
+
+This page will walk you through registering a remote data block that loads data from a Zip code REST API. It will require you to commit code to a WordPress theme or plugin.
+
+## Create the data source
+
+1. Go to Settings > Remote Data Blocks in your WordPress admin.
+2. Click on the "Connect new" button.
+3. Choose "HTTP" from the dropdown menu as the data source type.
+4. Fill in the following details:
+   - Data Source Name: Zip Code API
+   - URL: https://api.zippopotam.us/us/
+
+_Note: The `endpoint` function in the code below will append the provided Zip Code (by the user) to the "URL" value defined here, to form the final endpoint of this example_
+
+5. If your API requires authentication, enter those details. This API does not.
+6. Save the data source and return the data source list.
+7. In the Actions column, click the three-dot menu, then "Copy UUID" to copy the data source's UUID to your clipboard.
+
+## Register the block
+
+In code, we'll define a query using the data source we just created. We'll use the UUID we copied from the configuration page to reference the data source in our query.
+
+```php
+$data_source = HttpDataSource::from_uuid( $uuid );
+
+$query = HttpQuery::from_array( [
+   'data_source' => $data_source,
+   'endpoint' => function ( array $input_variables ) use ( $data_source ): string {
+		return $data_source->get_endpoint() . $input_variables['foo'];
+   },
+   'input_schema' => [ ... ],
+   'output_schema' => [ ... ],
+] );
+```
+
+And then register a block using the query.
+
+```php
+register_remote_data_block( [
+   'title' => 'Block Title',
+   'render_query' => [
+      'query' => $query,
+   ],
+] );
+```
+
+Check out [a working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/rest-api/zip-code) of the concepts above in the Remote Data Blocks GitHub repository.
+
+## Patterns and styling
+
+You can use patterns to create a consistent, reusable layout for your remote data. You can read more about [patterns and other Core Concepts](../concepts/index.md#patterns).
+
+Remote data blocks can be styled using the block editor's style settings, `theme.json`, or custom stylesheets. See the [example child theme](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/theme) for more details.
+
+## Code reference
+
+You can also configure HTTP integrations with code. These integrations appear in the WordPress admin but can not be modified. You may wish to do this to have more control over the data source or because you have more advanced data processing needs.
+
+This [working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/rest-api/zip-code) will replicate what we've done in this tutorial.
+````
+
 ## File: docs/tutorials/index.md
 ````markdown
 # Tutorials
@@ -343,578 +1589,43 @@ You can also configure Shopify integrations with code. These integrations appear
 This [working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/shopify/product) will replicate what we've done in this tutorial.
 ````
 
-## File: docs/ai-prompts.md
+## File: docs/index.md
 ````markdown
-# AI Prompts for Remote Data Blocks Extension
+# Documentation
 
-This file contains AI prompts and templates to help you extend the Remote Data Blocks WordPress plugin. These prompts are designed to work with AI coding assistants like Claude, ChatGPT, or GitHub Copilot.
+## Table of Contents
 
-## Quick Start Prompts
-
-### Basic REST API Integration
-
-```
-I want to create a Remote Data Blocks integration for [API_NAME]. Here are the details:
-
-- API endpoint: [YOUR_API_ENDPOINT]
-- Authentication: [API_KEY/BEARER_TOKEN/NONE]
-- Data I want to display: [LIST_THE_FIELDS]
-- Expected response format: [JSON_STRUCTURE_OR_EXAMPLE]
-
-Please create a WordPress plugin that registers a remote data block for this API following the Remote Data Blocks plugin patterns. Use the Art Institute example as a reference but adapt it for my API.
-```
-
-### Database/Custom Post Type Integration
-
-```
-I want to create a Remote Data Blocks integration that displays data from:
-- Source: [WordPress database/Custom post type/External database]
-- Table/Post type: [TABLE_OR_POST_TYPE_NAME]
-- Fields to display: [LIST_THE_FIELDS]
-- Filtering options: [SEARCH/CATEGORY/DATE/etc.]
-
-Please create a custom query runner and data source that integrates with Remote Data Blocks to display this data.
-```
-
-### E-commerce Integration
-
-```
-I want to integrate Remote Data Blocks with [SHOPIFY/WOOCOMMERCE/MAGENTO/etc.] to display:
-- Product information
-- Inventory data
-- Customer reviews
-- [OTHER_SPECIFIC_DATA]
-
-Please create a Remote Data Blocks integration that can display this e-commerce data with proper authentication and error handling.
-```
-
-## Advanced Prompts
-
-### Custom Block Pattern
-
-```
-I have a working Remote Data Blocks integration, but I need a custom block pattern that displays the data in a specific layout:
-
-- Layout type: [GRID/LIST/CARD/TABLE/CUSTOM]
-- Visual requirements: [DESCRIBE_THE_DESIGN]
-- Interactive features: [PAGINATION/SEARCH/FILTERING/etc.]
-- Responsive behavior: [MOBILE_REQUIREMENTS]
-
-My current query output schema is:
-[PASTE_YOUR_OUTPUT_SCHEMA]
-
-Please create a custom block pattern that renders this data according to my requirements.
-```
-
-### Custom Query Runner
-
-```
-I need a custom query runner for Remote Data Blocks that handles:
-- Special authentication: [OAUTH/JWT/CUSTOM_HEADERS]
-- Data transformation: [DESCRIBE_TRANSFORMATIONS]
-- Caching requirements: [CACHE_DURATION/INVALIDATION_RULES]
-- Error handling: [SPECIFIC_ERROR_SCENARIOS]
-
-Please create a custom query runner class that extends the base Remote Data Blocks query runner with these capabilities.
-```
-
-### Multi-Source Data Aggregation
-
-```
-I want to create a Remote Data Blocks integration that combines data from multiple sources:
-
-Source 1: [API/DATABASE/SERVICE_NAME]
-- Endpoint/Connection: [DETAILS]
-- Data fields: [LIST_FIELDS]
-
-Source 2: [API/DATABASE/SERVICE_NAME]
-- Endpoint/Connection: [DETAILS]
-- Data fields: [LIST_FIELDS]
-
-Relationship: [HOW_THE_DATA_CONNECTS]
-Display format: [HOW_TO_COMBINE_AND_SHOW]
-
-Please create a solution that aggregates this data into a single Remote Data Blocks integration.
-```
-
-## Template Prompts by Use Case
-
-### Content Management
-
-```
-Create a Remote Data Blocks integration for a headless CMS:
-- CMS: [CONTENTFUL/STRAPI/SANITY/etc.]
-- Content types: [BLOG_POSTS/PRODUCTS/EVENTS/etc.]
-- Required fields: [TITLE/DESCRIPTION/IMAGE/etc.]
-- Filtering: [BY_CATEGORY/DATE/AUTHOR/etc.]
-
-Include proper authentication and content preview capabilities.
-```
-
-### Analytics & Reporting
-
-```
-Create a Remote Data Blocks integration for displaying analytics data:
-- Source: [GOOGLE_ANALYTICS/CUSTOM_ANALYTICS/etc.]
-- Metrics: [PAGEVIEWS/CONVERSIONS/etc.]
-- Time periods: [DAILY/WEEKLY/MONTHLY]
-- Visualization: [CHARTS/TABLES/CARDS]
-
-Include data caching and refresh capabilities.
-```
-
-### Social Media
-
-```
-Create a Remote Data Blocks integration for social media content:
-- Platform: [TWITTER/INSTAGRAM/LINKEDIN/etc.]
-- Content type: [POSTS/STORIES/VIDEOS/etc.]
-- Display format: [FEED/GRID/CAROUSEL]
-- Filtering: [HASHTAGS/MENTIONS/DATES]
-
-Handle rate limiting and authentication properly.
-```
-
-## Code Generation Guidelines
-
-When using these prompts, include these instructions for the AI:
-
-### Required Context
-
-```
-Please follow these guidelines when generating code:
-
-1. Use the Remote Data Blocks plugin coding standards (WordPress VIP standards)
-2. Follow PSR-4 autoloading and provide proper type hints
-3. Include comprehensive docblock comments
-4. Use the HttpDataSource and HttpQuery classes from Remote Data Blocks
-5. Follow the plugin's established patterns from the examples directory
-6. Include proper error handling and validation
-7. Make the code production-ready with security considerations
-
-Reference files to study:
-- example/rest-api/art-institute/art-institute.php (basic REST API)
-- example/shopify/product/register.php (e-commerce integration)
-- docs/extending/query.md (query customization)
-- docs/extending/data-source.md (data source creation)
-```
-
-### File Structure Template
-
-```
-Create the following file structure:
-- Main plugin file with proper WordPress plugin headers
-- README.md with installation and usage instructions
-- Separate files for complex query runners or data sources if needed
-- Include activation/deactivation hooks if required
-```
-
-## Debugging Prompts
-
-### Troubleshooting
-
-```
-I'm having issues with my Remote Data Blocks integration:
-
-Error message: [PASTE_ERROR_MESSAGE]
-Current code: [PASTE_RELEVANT_CODE]
-Expected behavior: [DESCRIBE_WHAT_SHOULD_HAPPEN]
-Actual behavior: [DESCRIBE_WHAT_IS_HAPPENING]
-
-Please help me debug and fix this issue.
-```
-
-### Performance Optimization
-
-```
-My Remote Data Blocks integration is working but has performance issues:
-
-- Response time: [CURRENT_RESPONSE_TIME]
-- Data volume: [AMOUNT_OF_DATA]
-- Caching: [CURRENT_CACHING_SETUP]
-- Bottlenecks: [IDENTIFIED_ISSUES]
-
-Please suggest optimizations for better performance.
-```
-
-## Example Prompt Usage
-
-Here's how to use these prompts effectively:
-
-1. **Choose the appropriate prompt** based on your use case
-2. **Fill in the bracketed placeholders** with your specific details
-3. **Add any additional context** about your requirements
-4. **Include relevant API documentation** or data samples
-5. **Specify your WordPress environment** (version, other plugins, etc.)
-
-## Additional Resources
-
-- [Plugin Documentation](../extending/index.md)
-- [Working Examples](../../example/README.md)
-- [Local Development Setup](../local-development.md)
-- [Troubleshooting Guide](../troubleshooting.md)
-````
-
-## File: docs/quick-start-extension.md
-````markdown
-# Quick Start: Extending Remote Data Blocks
-
-This guide shows you the fastest ways to create custom Remote Data Blocks integrations. Choose the approach that best fits your workflow and technical comfort level.
-
-## 🚀 Method 1: AI-Assisted Development (Recommended)
-
-Perfect for developers who want to leverage AI coding assistants.
-
-### Step 1: Choose Your AI Prompt
-
-Browse the [AI prompts collection](ai-prompts.md) and select the prompt that matches your integration type:
-
-- **REST API Integration**: Use the "Basic REST API Integration" prompt
-- **E-commerce**: Use the "E-commerce Integration" prompt
-- **CMS**: Use the "Content Management" prompt
-- **Database**: Use the "Database/Custom Post Type Integration" prompt
-- **Social Media**: Use the "Social Media" prompt
-
-### Step 2: Customize the Prompt
-
-Fill in the bracketed placeholders with your specific details:
-
-```
-I want to create a Remote Data Blocks integration for [Weather API]. Here are the details:
-
-- API endpoint: https://api.openweathermap.org/data/2.5
-- Authentication: API_KEY
-- Data I want to display: temperature, humidity, description, city name
-- Expected response format: {"main":{"temp":20,"humidity":65},"weather":[{"description":"clear sky"}],"name":"London"}
-
-Please create a WordPress plugin that registers a remote data block for this API following the Remote Data Blocks plugin patterns. Use the Art Institute example as a reference but adapt it for my API.
-```
-
-### Step 3: Include Context
-
-Add this context to your AI prompt:
-
-```
-Please follow these guidelines when generating code:
-
-1. Use the Remote Data Blocks plugin coding standards (WordPress VIP standards)
-2. Follow PSR-4 autoloading and provide proper type hints
-3. Include comprehensive docblock comments
-4. Use the HttpDataSource and HttpQuery classes from Remote Data Blocks
-5. Follow the plugin's established patterns from the examples directory
-6. Include proper error handling and validation
-7. Make the code production-ready with security considerations
-
-Reference files to study:
-- example/rest-api/art-institute/art-institute.php (basic REST API)
-- example/shopify/product/register.php (e-commerce integration)
-- docs/extending/query.md (query customization)
-- docs/extending/data-source.md (data source creation)
-```
-
-### Step 4: Generate and Test
-
-1. Submit your prompt to your AI assistant
-2. Review the generated code
-3. Save it as a WordPress plugin
-4. Test in your development environment
-
-## 🛠️ Method 2: Template-Based Development
-
-Perfect for developers who prefer starting with working code templates.
-
-### Step 1: Choose a Template
-
-Browse the [templates directory](../example/templates/) and select the template that best matches your needs:
-
-- `basic-rest-api/` - Generic REST API integration
-- `ecommerce/` - E-commerce platform integration
-- `cms-integration/` - Headless CMS integration
-- `database/` - Database or WordPress integration
-- `social-media/` - Social media platform integration
-
-### Step 2: Copy and Customize
-
-```bash
-# Copy the template
-cp -r example/templates/basic-rest-api/ my-weather-integration/
-
-# Rename the main file
-mv my-weather-integration/basic-rest-api.php my-weather-integration/weather-api.php
-
-# Edit the files to customize for your API
-```
-
-### Step 3: Follow the TODO Comments
-
-Each template includes comprehensive TODO comments guiding you through customization:
-
-```php
-// TODO: Replace with your API details
-$api_data_source = HttpDataSource::from_array([
-    'display_name' => 'Your API Name', // TODO: Change this
-    'endpoint' => 'https://api.example.com/v1', // TODO: Change this
-    // ...
-]);
-```
-
-### Step 4: Test Your Integration
-
-1. Install the Remote Data Blocks plugin
-2. Activate your custom integration plugin
-3. Create a new post/page
-4. Add your custom remote data block
-5. Configure and test
-
-## ⚡ Method 3: Interactive Generator
-
-Perfect for developers who want a guided setup process.
-
-### Step 1: Run the Generator
-
-```bash
-cd example/templates/
-php generate.php
-```
-
-### Step 2: Answer the Prompts
-
-The generator will ask you questions about your integration:
-
-```
-🚀 Remote Data Blocks Template Generator
-========================================
-
-Plugin Name (e.g., "Weather API Integration"): Weather Dashboard
-Plugin Slug (e.g., "weather-api"): weather-dashboard
-Description: Display weather data from OpenWeatherMap API
-Author Name: Your Name
-PHP Namespace (e.g., "MyCompany\WeatherAPI"): MyCompany\WeatherDashboard
-API Display Name: OpenWeatherMap
-API Base Endpoint: https://api.openweathermap.org/data/2.5
-```
-
-### Step 3: Customize Generated Files
-
-The generator creates a working plugin with your configuration. Review and customize:
-
-1. Update API endpoints and parameters
-2. Modify data mapping in the output schema
-3. Add custom styling if needed
-4. Test the integration
-
-## 📚 Method 4: Manual Development
-
-Perfect for developers who want full control and understanding.
-
-### Step 1: Study the Documentation
-
-Read the core concepts and extension guides:
-
+- [Quickstart](quickstart.md)
 - [Core Concepts](concepts/index.md)
-- [Extending Overview](extending/index.md)
-- [Data Sources](extending/data-source.md)
-- [Queries](extending/query.md)
-- [Block Registration](extending/block-registration.md)
 
-### Step 2: Study Working Examples
+  - [Block Bindings](concepts/block-bindings.md)
+  - [Helper Blocks](concepts/helper-blocks.md)
+  - [Inline Bindings](concepts/inline-bindings.md)
 
-Examine the existing examples to understand patterns:
+- [Extending](extending/index.md)
 
-- [Art Institute API](../example/rest-api/art-institute/) - Basic REST API
-- [Shopify Integration](../example/shopify/product/) - E-commerce
-- [GitHub Integration](../example/github/markdown-file/) - Custom query runner
+  - [Data Source](extending/data-source.md)
+  - [Query](extending/query.md)
+  - [Block Registration](extending/block-registration.md)
+  - [Block Patterns](extending/block-patterns.md)
+  - [Overrides](extending/overrides.md)
+  - [Hooks](extending/hooks.md)
+  - [Query Runner](extending/query-runner.md)
 
-### Step 3: Build Your Integration
+- [Tutorials](tutorials/index.md)
 
-Create your plugin following the established patterns:
+  - [Airtable](tutorials/airtable.md)
+  - [Google Sheets integration](tutorials/google-sheets.md)
+  - [HTTP](tutorials/http.md)
+  - [Shopify](tutorials/shopify.md)
 
-```php
-<?php declare(strict_types = 1);
+- [Local development](local-development.md)
+- [Troubleshooting](troubleshooting.md)
 
-/**
- * Plugin Name: My Custom Integration
- * Requires Plugins: remote-data-blocks
- */
+## Additional Documentation
 
-namespace MyCompany\MyIntegration;
-
-use RemoteDataBlocks\Config\DataSource\HttpDataSource;
-use RemoteDataBlocks\Config\Query\HttpQuery;
-
-function register_my_block(): void {
-    // Create data source
-    $data_source = HttpDataSource::from_array([
-        'display_name' => 'My API',
-        'endpoint' => 'https://api.example.com',
-        // ...
-    ]);
-
-    // Create query
-    $query = HttpQuery::from_array([
-        'data_source' => $data_source,
-        // ...
-    ]);
-
-    // Register block
-    register_remote_data_block([
-        'title' => 'My Custom Block',
-        'render_query' => ['query' => $query],
-    ]);
-}
-
-add_action('init', __NAMESPACE__ . '\register_my_block');
-```
-
-## 🔧 Development Tips
-
-### Testing Your Integration
-
-1. **Enable Debug Mode**:
-
-   ```php
-   // wp-config.php
-   define('WP_DEBUG', true);
-   define('WP_DEBUG_LOG', true);
-   ```
-
-2. **Test API Endpoints**: Use tools like Postman or curl to verify your API responses
-
-3. **Check WordPress Logs**: Look for errors in `/wp-content/debug.log`
-
-4. **Use Browser DevTools**: Inspect network requests and console errors
-
-### Common Customizations
-
-- **Authentication**: Add API keys, bearer tokens, or OAuth
-- **Data Transformation**: Use `generate` functions in output schema
-- **Custom Styling**: Add CSS files and enqueue them
-- **Error Handling**: Implement custom query runners for complex logic
-- **Caching**: Add caching strategies for better performance
-
-### Getting Help
-
-- **Documentation**: Check the [extending guides](extending/index.md)
-- **Examples**: Browse [working examples](../example/README.md)
-- **AI Assistance**: Use the [AI prompts](ai-prompts.md)
-- **Community**: Join discussions and ask questions
-
-## 🎯 Next Steps
-
-After creating your integration:
-
-1. **Test thoroughly** with different data scenarios
-2. **Add error handling** for edge cases
-3. **Optimize performance** with caching if needed
-4. **Create custom block patterns** for better visual presentation
-5. **Document your integration** for future maintenance
-6. **Consider contributing** your template back to the project
-
-Choose the method that works best for your workflow and start building amazing Remote Data Blocks integrations!
-````
-
-## File: docs/concepts/block-bindings.md
-````markdown
-# Block bindings
-
-Remote Data Blocks takes advantage of the [block bindings API](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-bindings/). This core WordPress API allows you to “bind” dynamic data to the attributes of core blocks, which are then reflected in the final HTML markup. Generally, this avoids the need to write and maintain custom blocks.
-
-For a quick overview of block bindings, the [announcement post](https://make.wordpress.org/core/2024/03/06/new-feature-the-block-bindings-api/) is very helpful; for a deeper dive, consult the [public documentation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-bindings/). That said, an in-depth understanding of block bindings isn't necessary to use Remote Data Blocks: just know that the plugin is built on core, stable WordPress APIs.
-````
-
-## File: docs/extending/block-patterns.md
-````markdown
-# Block patterns
-
-Patterns allow you to represent your remote data in different ways.
-
-The plugin registers an unstyled block pattern any time you register a remote data block either in the WordPress admin or with `register_remote_data_block`.
-
-You can create additional patterns in the WordPress Site Editor or programmatically by passing a `patterns` property to your block options.
-
-You cannot edit the default pattern, but you can duplicate it and make changes.
-
-We recommend duplicating the default pattern and then making changes in the Site Editor. Once you've created your preferred pattern, you can associate it with the block in the `register_remote_data_block` call.
-
-If you want to make the pattern uneditable in the Site Editor, you can copy the block markup to a file and commit it to your repository.
-
-## Example
-
-```html
-<!-- wp:group {"layout":{"type":"constrained"}} -->
-<div class="wp-block-group">
-	<!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"title"}}}}} -->
-	<h2 class="wp-block-heading"></h2>
-	<!-- /wp:heading -->
-	<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"description"}}}}} -->
-	<p></p>
-	<!-- /wp:paragraph -->
-</div>
-<!-- /wp:group -->
-```
-
-You could save this file as `my-pattern.html` in the same directory as the code that registers your block.
-
-```php
-register_remote_data_block( [
-    'title' => 'My Remote Data Block',
-    'render_query' => [ /* ... */ ],
-    'patterns' => [
-        [
-            'title' => 'My Pattern',
-            'html' => file_get_contents( __DIR__ . '/my-pattern.html' ),
-        ],
-    ],
-] );
-```
-````
-
-## File: docs/extending/index.md
-````markdown
-# Extending
-
-> [!TIP]
-> Make sure you've read the [core concepts](../concepts/index.md) behind Remote Data Blocks before extending the plugin.
-
-Data sources and queries can be configured in the plugin UI, but sometimes, you need to extend the plugin to implement custom functionality. Remote Data Blocks provides extendable classes, global functions, hooks, and filters to help you connect to any data source, parse responses, and customize the display of data.
-
-## Data Flow
-
-Here's a short overview of how data flows through the plugin when a post with a remote data block is rendered:
-
-1. WordPress core loads the post content, parses the blocks, and recognizes that a paragraph block has a [block binding](../concepts/block-bindings.md).
-2. WordPress core calls the block binding callback function: `BlockBindings::get_value()`.
-3. The callback function inspects the paragraph block. Using the block context supplied by the parent remote data block, it determines which [query](./query.md) to execute.
-4. The query is executed: `$query->execute()` (usually by delegating to a [query runner](./query-runner.md)).
-5. Various properties of the query are requested by the query runner, including the endpoint, request headers, request method, and request body. Some of these properties are delegated to the data source (`$query->get_data_source()`).
-6. The query is dispatched, and the response data is inspected, formatted into a consistent shape, and returned to the block binding callback function.
-7. The callback function extracts the requested field from the response data and returns it to WordPress core for rendering.
-
-## Customization
-
-Providing a custom data source, query, or query runner gives you complete control over how data is fetched, processed, and rendered. In most cases, you only need to extend one of these classes to implement custom behavior. A common approach is to define a data source on the settings screen and then commit a custom query in code to fetch and process the data.
-
-Here are some detailed overviews of these classes with notes on how and why to extend them:
-
-- [Data Source](data-source.md)
-- [Query](query.md)
-
-Once you've defined your data source and queries, you can [register a remote data block](block-registration.md) that uses them. That block can use a [pattern](block-patterns.md) for display. You can also use [overrides](./overrides.md) to dynamically select the displayed content.
-
-### Additional customization
-
-- [Hooks (actions and filters)](hooks.md)
-- [Query runner](query-runner.md)
-
-## Examples and Templates
-
-The [examples](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/README.md) provide detailed code samples of interacting with the plugin various methods of extending the plugin.
-
-For quick development, use the [templates](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/templates/README.md) and [AI prompts](../ai-prompts.md) to scaffold new integrations rapidly.
-
-## Create a local development environment
-
-This repository includes tools for quickly starting a [local development environment](../local-development.md).
+- [AI Documentation](for-ai.md)
+- [Contributing Guidelines](https://github.com/Automattic/remote-data-blocks/blob/trunk/CONTRIBUTING.md)
 ````
 
 ## File: docs/local-development.md
@@ -1006,6 +1717,74 @@ npm run playground
 ```
 
 Playgrounds do not closely mirror production environments and are missing persistent object cache, debugging tools, and other important features. Use `npm run dev` for local development.
+````
+
+## File: docs/quickstart.md
+````markdown
+# Quickstart
+
+## I want to explore the plugin without configuring anything.
+
+[Launch the plugin in WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/blueprint.json) and explore. An example remote data block ("Conference Event") has been registered.
+
+## I want to create my own remote data block without writing any code.
+
+[Launch the plugin in WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/blueprint.settings.json) and use one of the supported services like Airtable, Google Sheets, and Shopify to configure remote data blocks for your use case. Follow our [tutorials](./tutorials/index.md) to create a data source and register a remote data block.
+
+## I want to create my own remote data block against a custom API.
+
+If you're comfortable with writing some WordPress code, [our documentation will guide you](./tutorials/http.md) through registering a remote data block that can work with your custom API.
+
+You will need a [local development environment](./local-development.md) and [the latest release of the plugin](https://github.com/Automattic/remote-data-blocks/releases/latest/download/remote-data-blocks.zip).
+````
+
+## File: docs/troubleshooting.md
+````markdown
+# Troubleshooting and debugging
+
+This plugin provides a [local development environment](local-development.md) with built-in debugging tools.
+
+## Query monitor
+
+When the [Query Monitor plugin](https://wordpress.org/plugins/query-monitor/) is installed and activated, Remote Data Blocks will output debugging information to a dedicated "Remote Data Blocks" panel, including error details, stack traces, query execution details, and cache hit/miss status.
+
+> [!TIP]
+> By default, the block editor is rendered in "Fullscreen mode" which hides the Admin Bar and Query Monitor. Open the three-dot menu in the top-right corner and toggle off "Fullscreen mode", or press `⇧⌥⌘F`.
+
+The provided local development environment includes Query Monitor by default. You can also install it in non-local environments, but be aware that it may expose sensitive information in production environments. Query Monitor is currently not compatible with WordPress Playground and cannot be installed there.
+
+## Debugging
+
+The [local development environment](local-development.md) includes Xdebug for debugging PHP code and a Node.js debugging port for debugging block editor scripts.
+
+## Support
+
+Our goal is to ensure that Remote Data Blocks works with as many APIs as possible. While we cannot guarantee that we can support every API, we are happy to receive detailed reports of any issues you encounter. Please [create a GitHub issue using the "API integration issue" template](https://github.com/Automattic/remote-data-blocks/issues/new?template=api_integration_issue.md) and we will do our best to assist you.
+
+For general bugs, please [use the "General bug report" template](https://github.com/Automattic/remote-data-blocks/issues/new?template=bug_report.md). If you have feedback or suggestions for improvement, please [use the "Feedback" template](https://github.com/Automattic/remote-data-blocks/issues/new?template=general_feedback.md).
+
+## Resetting config
+
+If you need to reset the Remote Data Blocks configuration in your local development environment, you can use WP-CLI to delete the configuration option. This will permanently delete all configuration values, including access tokens and API keys.
+
+```sh
+npm run wp-cli option delete remote_data_blocks_config
+```
+````
+
+## File: example/.cursor/rules/project-scope.mdc
+````
+---
+description: Project scope
+globs:
+alwaysApply: true
+---
+
+- You are writing code that integrates with the Remote Data Blocks WordPress plugin. This plugin allows you to create Gutenberg blocks that display data from remote data sources, such as Airtable, Google Sheets, Shopify, or your own API.
+- You are not contributing to the plugin directly. You are writing code that will be used in a separate plugin or theme.
+- You do not need to develop custom Gutenberg blocks. Instead, you will write simple PHP code to describe how your API should be queried, then call registration functions provided by the Remote Data Blocks plugin.
+- Your goal is to configure and register a remote data block that displays remote data in an organized, visually appealing way.
+- The Remote Data Blocks plugin provides a default block pattern for displaying data, but it is very basic. You may need to create a custom block pattern to achieve your goal, but please ask before doing so.
 ````
 
 ## File: example/assets/blueprint-content.wxr
@@ -1208,6 +1987,7 @@ function register_art_remote_data_block(): void {
 		// the base endpoint from the data source and the input variables.
 		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
 			$endpoint = $aic_data_source['endpoint'] . '/search';
+			$search_terms = $input_variables['search'] ?? '';
 
 			if ( ! empty( $search_terms ) ) {
 				$endpoint = add_query_arg( [ 'q' => $search_terms ], $endpoint . '/search' );
@@ -1627,26 +2407,23 @@ add_action( 'init', __NAMESPACE__ . '\\handle_github_file_path_override' );
 ````php
 <?php declare(strict_types = 1);
 
-/**
- * Plugin Name: Shopify Mock Store RDB Example
- * Description: Creates a custom block to be used with Remote Data Blocks to retrieve products from Shopify's mock store API.
- * Author: WPVIP
- * Author URI: https://remotedatablocks.com/
- * Text Domain: remote-data-blocks
- * Version: 1.0.0
- * Requires Plugins: remote-data-blocks
- */
-
 namespace RemoteDataBlocks\Example\ShopifyMockStore;
 
 use RemoteDataBlocks\Integrations\Shopify\ShopifyDataSource;
 use RemoteDataBlocks\Integrations\Shopify\ShopifyIntegration;
 
+/**
+ * Registers a remote data block representing a product from Shopify's Mock Shop.
+ * This task can be completed in the plugin settings screen without writing code,
+ * but this template shows how to register it programmatically.
+ *
+ * @see https://mock.shop/
+ */
 function register_shopify_mock_store_blocks(): void {
 	$shopify_data_source = ShopifyDataSource::from_array( [
 		'service_config' => [
 			'__version' => 1,
-			'access_token' => '',
+			'access_token' => '', // No access token needed for the mock store.
 			'display_name' => 'Shopify Mock Store',
 			'store_name' => 'mock.shop',
 		],
@@ -1891,13 +2668,12 @@ registerBlockType( metadata.name, {
 ````php
 <?php
 
-use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Integrations\Airtable\AirtableDataSource;
 use RemoteDataBlocks\Integrations\Airtable\AirtableIntegration;
 
-$access_token = 'patXXXXXXXXXXXXXXXX'; // Airtable access token
-$base_id = 'appXXXXXXXXXXXXX'; // Airtable base ID
-$table_id = 'tblXXXXXXXXXXXXX'; // Airtable table ID
+$access_token = '{{ Airtable access token }}'; // Airtable access token ("pat...")
+$base_id = '{{ Airtable base ID }}'; // Airtable base ID ("app...")
+$table_id = '{{ Airtable table ID }}'; // Airtable table ID ("tbl...")
 
 $table = [
 	'id' => $table_id,
@@ -1943,7 +2719,7 @@ $map_data_source = AirtableDataSource::from_array( [
 	],
 ] );
 
-$get_locations_query = HttpQuery::from_array( AirtableIntegration::get_list_query( $map_data_source, $table ) );
+$get_locations_query = AirtableIntegration::get_list_query( $map_data_source, $table );
 $response = $get_locations_query->execute( [] );
 $coordinates = [];
 
@@ -2018,7 +2794,7 @@ domReady( () => {
 ````php
 <?php
 
-function register_leaflet_map_remote_data_block() {
+function register_leaflet_map_remote_data_block(): void {
 	// Register the Leaflet script and stylesheet. The handles are referenced in
 	// `block.json` for use in the block editor and the WordPress frontend.
 	wp_register_style( 'leaflet-style', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css', [], '1.9.4' );
@@ -2055,6 +2831,8 @@ add_action( 'init', 'register_leaflet_map_remote_data_block' );
 		"start": "wp-scripts start --blocks-manifest"
 	},
 	"devDependencies": {
+		"@wordpress/blocks": "14.13.0",
+		"@wordpress/dom-ready": "4.24.0",
 		"@wordpress/scripts": "^30.17.0"
 	}
 }
@@ -2232,10 +3010,14 @@ function register_basic_rest_api_remote_data_block(): void {
 					// Instead of a `path`, we provide a `generate` function to create the
 					// image URL. The `$data` parameter contains the data returned from the
 					// API at this "level" (e.g., after the root `path` has been applied).
-					'generate' => static function ( $data ): string {
-						return 'https://example.com/images/' . $data['image_id'] . '.jpg';
+					//
+					// It also receives the raw response data, which can be useful if you
+					// need to access input variables or other data not available in the
+					// response.
+					'generate' => static function ( array $data, array $raw_response_data ): string {
+						$item_id = $data['id'] ?? $raw_response_data['input_variables']['id'];
+						return 'https://example.com/images/items/' . $item_id . '.jpg';
 					},
-					'path' => '$.image_url',
 				],
 				// TODO: Add more fields as needed.
 			],
@@ -2320,7 +3102,7 @@ function register_basic_rest_api_remote_data_block(): void {
 			[
 				'query' => $list_items_query,
 				'type' => 'search',
-			]
+			],
 		],
 		// TODO: Uncomment and implement if you want to use a custom block pattern.
 		// 'pattern' => file_get_contents( __DIR__ . '/patterns/default-pattern.html' ),
@@ -2474,7 +3256,7 @@ function register_basic_rest_api_remote_data_block_from_uuid(): void {
 			[
 				'query' => $list_items_query,
 				'type' => 'search',
-			]
+			],
 		],
 		// TODO: Uncomment and implement if you want to use a custom block pattern.
 		// 'pattern' => file_get_contents( __DIR__ . '/patterns/default-pattern.html' ),
@@ -2729,1253 +3511,4 @@ These code templates require credentials and other customization to work. They a
   - ["Art Institute of Chicago" block](./rest-api/art-institute/README.md)
   - ["Zip Code" block](./rest-api/zip-code/README.md)
 - [Theme example](./theme/README.md)
-````
-
-## File: docs/concepts/helper-blocks.md
-````markdown
-# Helper Blocks
-
-Remote Data Blocks adds some accessory blocks for bindings, listed below.
-
-## Remote HTML Block
-
-Use this block to bind to HTML from a remote data source. This block only works when placed inside a remote data block container and bound to a field containing HTML.
-
-![Screen recording showing the insertion and binding of a Remote HTML Block in the editor](https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/docs/concepts/block-insert-remote-html.gif)
-
-Fields defined by a query’s `output_schema` must have type `html` in order to be available to Remote HTML blocks:
-
-```php
-$my_query = [
-    /* ... */
-    'output_schema' =>
-        'is_collection' => false,
-        'output_schema' => [
-        'type' => [
-            'header' => [
-                'name' => 'Header',
-                'path' => '$.header',
-                'type' => 'string',
-            ],
-            'myHtmlContent' => [
-                'name' => 'My HTML Content',
-                'path' => '$.myHtmlContent',
-                'type' => 'html', // <-- required
-            ],
-        ],
-    ],
-];
-
-register_remote_data_block( [
-    'title' => 'My HTML API',
-    'render_query' => [
-        'query' => $my_query,
-    ],
-] );
-```
-````
-
-## File: docs/concepts/inline-bindings.md
-````markdown
-# Inline bindings
-
-One of the current limitations of the [block bindings API](block-bindings.md) is that it is restricted to a small number of core blocks and attributes. For example, currently, you cannot bind to the content of a table block or a custom block. You also cannot bind to a _subset_ of a block's content.
-
-As a partial workaround, this plugin provides a way to use remote data in some places where block bindings are not supported. This feature is named "inline bindings" and it is available in any block that uses [rich text](https://developer.wordpress.org/block-editor/reference-guides/richtext/), such as tables, lists, and some custom blocks. Look for the inline binding button in the rich text formatting toolbar:
-
-<img width="535" alt="Inline binding button" src="https://github.com/user-attachments/assets/8ce0bd18-367e-46d5-a870-22819c42ff4a" />
-
-Clicking this button will open a modal that allows you to select a field from a remote data source, resulting in an inline remote data binding. Just like remote data blocks, this binding will resolve from the remote source when the content is rendered.
-
-<img width="684" alt="A bulleted list using several inline bindings to describe three conference events" src="https://github.com/user-attachments/assets/6527dcc0-c0ed-42ab-9655-b8fc2510e15b" />
-
-Inline bindings compile to HTML, so they are portable, safe, and have a built-in fallback.
-````
-
-## File: docs/extending/block-registration.md
-````markdown
-# Block registration
-
-Use the `register_remote_data_block` function to register your remote data block and associate it with your query and data source. This example:
-
-1. Creates a [data source](data-source.md).
-2. Associates the data source with a query.
-3. Defines the output schema of a query, which tells the plugin how to map the query response to blocks.
-4. Registers a remote data block.
-
-We are assuming `https://api.example.com/` returns JSON that has a shape like:
-
-```json
-{
-	"id": 12345,
-	"title": "An awesome title"
-}
-```
-
-```php
-function register_your_custom_block() {
-	$data_source = [
-		'display_name' => 'Example API',
-		'endpoint' => 'https://api.example.com/',
-	];
-
-	$render_query = [
-		'display_name' => 'Example Query',
-		'data_source' => $data_source,
-		'output_schema' => [
-			'type' => [
-				'id' => [
-					'name' => 'ID',
-					'path' => '$.id',
-					'type' => 'id',
-				],
-				'title' => [
-					'name' => 'Title',
-					'path' => '$.title',
-					'type' => 'string',
-				],
-			],
-		],
-	];
-
-	register_remote_data_block( [
-		'title' => 'My Block',
-		'render_query' => [
-			'query' => $render_query,
-		],
-	] );
-}
-add_action( 'init', 'register_your_custom_block', 10, 0 );
-```
-
-## Configuration options
-
-### `title`: string (required)
-
-The human-friendly name of the block. It is also used to construct the block's name; a title of "My Block" will result in a block name of `remote-data-blocks/my-block`.
-
-### `render_query`: array (required)
-
-The render query is executed when the block is rendered and fetches the data that will be provided to block bindings. It is an array with the following properties:
-
-- `query` (required): An instance of [`QueryInterface`](./query.md) that fetches the data.
-
-### `selection_queries`: array (optional)
-
-Selection queries are used by content creators to select or curate remote data in the block editor. For example, you may wish to provide a list of products to users and allow them to select one to include in their post, or you may want to allow a user to search for a specific item. Selection queries are an array of objects with the following properties:
-
-- `display_name`: A human-friendly name for the selection query.
-- `query` (required): An instance of `QueryInterface` that fetches the data.
-- `type`: A string that determines the type of selection query. Accepted values are currently `list` or `search`.
-
-Example:
-
-```php
-'selection_queries' => [
-    [
-        'display_name' => 'Select a product',
-        'query' => $list_products_query,
-        'type' => 'list',
-    ],
-    [
-        'display_name' => 'Search for a product',
-        'query' => $search_products_query,
-        'type' => 'search',
-    ],
-],
-```
-
-#### Search queries
-
-Search queries must return a collection and must accept an input variable with the special type `ui:search_input`. The [Art Institute of Chicago](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/art-institute/README.md) example looks like this:
-
-```php
-$search_art_query = [
-	'data_source' => $aic_data_source,
-	'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
-		$query = $input_variables['search'];
-		$endpoint = $aic_data_source->get_endpoint() . '/search';
-
-		return add_query_arg( [ 'q' => $query ], $endpoint );
-	},
-	'input_schema' => [
-		'search' => [
-			'name' => 'Search terms',
-			'type' => 'ui:search_input',
-		],
-	],
-	'output_schema' => [
-		'is_collection' => true,
-		'path' => '$.data[*]',
-		'type' => [
-			'id' => [
-				'name' => 'Art ID',
-				'type' => 'id',
-			],
-			'title' => [
-				'name' => 'Title',
-				'type' => 'string',
-			],
-		],
-	],
-];
-```
-
-Here you can see the `search` input variable has a special type of `ui:search_input` and is used in the endpoint method to populate a query string. You can read more about [queries](./query.md) and how to construct them. End users enter the search term to find the specific item.
-
-![Screenshot showing the search input in the WordPress Editor](https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/docs/extending/search-input.png)
-
-**Note:** The same search box appears for `list` query types. For this type, the form is only filtering the results returned by the initial list query. For `search` queries, an additional query is made for every search.
-
-### `overrides`: array (optional)
-
-[Overrides](overrides.md) are used to customize the behavior of the block on a per-block basis.
-
-### `patterns`: array (optional)
-
-[Block patterns](block-patterns.md) allow you to customize the display of your remote data.
-````
-
-## File: docs/extending/query-input-schema.md
-````markdown
-# HttpQuery `input_schema` property
-
-The `input_schema` property defines the input variables expected by the query. The property should be an associative array of input variable definitions. The keys of the array are machine-friendly input variable names, and the values are associative arrays with the following structure:
-
-- `name` (optional): The human-friendly display name of the input variable
-- `default_value` (optional): The default value for the input variable.
-- `type` (required): The primitive type of the input variable. Supported types are:
-  - `boolean`
-  - `id`
-  - `integer`
-  - `null`
-  - `number`
-  - `string`
-
-#### Example
-
-```php
-'input_schema' => [
-	'zip_code' => [
-		'name' => 'Zip Code',
-		'type' => 'string',
-	],
-],
-```
-
-There are also some special input variable types:
-
-- `ui:search_input`: A variable with this type indicates that the query supports searching. It must accept a `string` containing search terms.
-- `ui:pagination_offset`: A variable with this type indicates that the query supports offset pagination. It must accept an `integer` containing the requested offset. See `pagination_schema` for additional information and requirements.
-- `ui:pagination_page`: A variable with this type indicates that the query supports page-based pagination. It must accept an `integer` containing the requested results page. See `pagination_schema` for additional information and requirements.
-- `ui:pagination_per_page`: A variable with this type indicates that the query supports controlling the number of resultsper page. It must accept an `integer` containing the number of requested results.
-- `ui:pagination_cursor_next` and `ui_pagination_cursor_previous`: Variables with these types indicate that the query supports cursor pagination. They accept `string`s containing the requested cursor. See `pagination_schema` for additional information and requirements.
-- `ui:pagination_cursor`: A variable with this type indicates support for a simple variant of cursor pagination that uses a single cursor instead of a pair of forward / backward cursors. It accepts a `string` containing the requested cursor. See `pagination_schema` for additional information and requirements.
-
-#### Example with search and pagination input variables
-
-```php
-'input_schema' => [
-	'search' => [
-		'name' => 'Search terms',
-		'type' => 'ui:search_input',
-	],
-	'limit' => [
-		'default_value' => 10,
-		'name' => 'Pagination limit',
-		'type' => 'ui:pagination_per_page',
-	],
-	'page' => [
-		'default_value' => 1,
-		'name' => 'Pagination page',
-		'type' => 'ui:pagination_page',
-	],
-],
-```
-
-If omitted, `input_schema` defaults to an empty array.
-````
-
-## File: docs/extending/query-output-schema.md
-````markdown
-# HttpQuery `output_schema` property
-
-A query's `output_schema` defines how an API response should be transformed and provided to a remote data block. A typical goal is to transform the API response into a flat array of fields that can be bound to blocks, while omitting values that are not needed. Output can be nested, but nested values cannot be bound to blocks.
-
-Note that the output schema may require updates whenever the shape or schema of the API response changes. Similarly, changing the slug or `type` of a field may break existing bindings. Consider creating a new query and remote data block if you need to make breaking changes to an output schema.
-
-## Properties
-
-- `format` (optional): A callable function that formats the output variable value.
-- `generate` (optional): A callable function that generates or extracts the output variable value from the response, as an alternative to `path`.
-- `is_collection` (optional, default `false`): A boolean indicating whether the response data is a collection. If false, only a single item will be returned.
-- `name` (optional): The human-friendly display name of the output variable.
-- `default_value` (optional): The default value for the output variable.
-- `path` (optional): A [JSONPath](https://jsonpath.com/) expression to extract the variable value from the response. Note that path expressions are relative to the current item and its type; path expressions therefore "build" on each other when you nest types.
-- `type` (required): A primitive type (e.g., `string`, `boolean`) or a nested output schema.
-
-Accepted primitive types are:
-
-- `boolean`
-- `button_url`
-- `email_address`
-- `html`
-- `id`
-- `image_alt`
-- `image_url`
-- `integer`
-- `markdown`
-- `null`
-- `number`
-- `string`
-- `url`
-- `uuid`
-
-## Single entity example
-
-Using the [Zip Code example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/zip-code/README.md), the JSON response returned by the API looks like this:
-
-```json
-{
-	"post code": "17057",
-	"country": "United States",
-	"country abbreviation": "US",
-	"places": [
-		{
-			"place name": "Middletown",
-			"longitude": "-76.7331",
-			"state": "Pennsylvania",
-			"state abbreviation": "PA",
-			"latitude": "40.2041"
-		}
-	]
-}
-```
-
-And the corresponding `output_schema` definition might look like this:
-
-```php
-'output_schema' => [
-	'is_collection' => false,
-	'type' => [
-		'zip_code' => [
-			'name' => 'Zip Code',
-			'path' => '$["post code"]',
-			'type' => 'string',
-		],
-		'city_state' => [
-			'name' => 'City, State',
-			'default_value' => 'Unknown',
-			'generate' => function( array $data ): string|null {
-				if ( empty( $data['places'] ) ) {
-					return null;
-				}
-
-				return $data['places'][0]['place name'] . ', ' . $data['places'][0]['state abbreviation'];
-			},
-			'type' => 'string',
-		],
-	],
-],
-```
-
-- The `is_collection` property indicates whether the output represents a single entity or a collection of entities. In this case, it is set to `false` because the API returns a single entity.
-- The `type` property at the root level begins the type definition. The `zip_code` and `city_state` array keys are "slugs" that identify the field. The array values define types that describe how to extract a value for those fields.
-- The `zip_code` field is extracted via a [JSONPath](http://jsonpath.com) expression defined in the `path` property.
-- The `city_state` field provides a callable via the `generate` property. That function receives the data and combines two elements to form the value.
-- A `default_value` property provides a value that will be used if the provided `path` expression or `generate` function resolve to a null value.
-
-The result of applying this output schema to the example JSON response is:
-
-```php
-[
-	zip_code => '17057',
-	city_state => 'Middletown, PA',
-]
-```
-
-## Collection example
-
-An example of collection JSON can be found in the [Chicago Institue of Art example](https://github.com/Automattic/remote-data-blocks/blob/trunk/example/rest-api/art-institute/README.md). That API returns (in part):
-
-```json
-{
-	"preference": null,
-	"pagination": {
-		"total": 183,
-		"limit": 10,
-		"offset": 0,
-		"total_pages": 19,
-		"current_page": 1
-	},
-	"data": [
-		{
-			"_score": 155.49371,
-			"thumbnail": {
-				"alt_text": "Color pastel drawing of ballerinas in tutus on stage, watched by audience.",
-				"width": 3000,
-				"lqip": "data:image/gif;base64,R0lGODlhCgAFAPUAADtMRVJPRFlOQlBNSFFNSEVURU1USldSS1dSTVRXTV9ZTldVUl1ZU2hbTVdkU19kVV5tX2FkUGFjVWVoVGhoVGZhW29lXGVtXG1rWmlpXW5tXmZxX3VxX1toZG5oYG5uZ3ZsY3BqZGN1a3RxYnFyZXRxZntxan19bnl9cnh7dX57doJ/dpGEeJKOhaCUjKebk6yflsGupQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAAAAAAALAAAAAAKAAUAAAYuQIjoQuGQTqhOyrEZYSQJA6AweURYrxIoxAhoMp9VywWLmRYqj6BxQFQshIEiCAA7",
-				"height": 1502
-			},
-			"api_model": "artworks",
-			"is_boosted": true,
-			"api_link": "https://api.artic.edu/api/v1/artworks/61603",
-			"id": 61603,
-			"title": "Ballet at the Paris Opéra",
-			"timestamp": "2025-01-14T22:26:21-06:00"
-		},
-		{
-			"_score": 152.35487,
-			"thumbnail": {
-				"alt_text": "Impressionist painting of woman wearing green dress trying on hats.",
-				"width": 5003,
-				"lqip": "data:image/gif;base64,R0lGODlhBgAFAPQAAEMtIk40KE83KlhHLVxELlNPN1hLMVJOP19UN1dYM1lUOVpUP2dAIWlKKHZKKXZLKWRNPGpbMGpaNGtaOkxUTF9dRlJaS15YSV5kUnZpRH12W4ZkM49uRI52VQAAAAAAACH5BAAAAAAALAAAAAAGAAUAAAUY4AUtFWZxHZIdExFEybAJQGE00sNQmqOEADs=",
-				"height": 4543
-			},
-			"api_model": "artworks",
-			"is_boosted": true,
-			"api_link": "https://api.artic.edu/api/v1/artworks/14572",
-			"id": 14572,
-			"title": "The Millinery Shop",
-			"timestamp": "2025-01-14T23:26:12-06:00"
-		}
-	],
-	"info": {
-		"license_text": "The `description` field in this response is licensed under a Creative Commons Attribution 4.0 Generic License (CC-By) and the Terms and Conditions of artic.edu. All other data in this response is licensed under a Creative Commons Zero (CC0) 1.0 designation and the Terms and Conditions of artic.edu.",
-		"license_links": [
-			"https://creativecommons.org/publicdomain/zero/1.0/",
-			"https://www.artic.edu/terms"
-		],
-		"version": "1.10"
-	},
-	"config": {
-		"iiif_url": "https://www.artic.edu/iiif/2",
-		"website_url": "http://www.artic.edu"
-	}
-}
-```
-
-An output schema can be defined as:
-
-```php
-'output_schema' => [
-	'is_collection' => true,
-	'path' => '$.data[*]',
-	'type' => [
-		'id' => [
-			'name' => 'Art ID',
-			'type' => 'id',
-		],
-		'title' => [
-			'name' => 'Art Title',
-			'type' => 'string',
-		],
-	],
-],
-```
-
-- The `is_collection` property is set to `true` to indicate that the output represents a collection of entities.
-- A top-level `path` expression (`$.data[*]`) indicates that the collection is contained in the `data` property of the response.
-- The `type` property defines two fields: `id` and `title`.
-  - Note that the nested type definitions do not provide a `path` expression. When omitted, the plugin will use the slug as the expected path. This is a shorthand for the following output schema with explicit `path` expressions:
-
-```php
-'output_schema' => [
-	'is_collection' => true,
-	'path' => '$.data[*]',
-	'type' => [
-		'id' => [
-			'name' => 'Art ID',
-			'path' => '$.id',
-			'type' => 'id',
-		],
-		'title' => [
-			'name' => 'Art Title',
-			'path' => '$.title',
-			'type' => 'string',
-		],
-	],
-],
-```
-
-We can enhance the output schema with additional fields and options:
-
-```php
-'output_schema' => [
-	'is_collection' => true,
-	'path' => '$.data[*]',
-	'type' => [
-		'id' => [
-			'name' => 'Art ID',
-			'type' => 'id',
-		],
-		'title' => [
-			'name' => 'Art Title',
-			'format' => function ( string $value ): string {
-				return ucfirst( $value );
-			},
-			'type' => 'string',
-		],
-		'thumbnail_image_alt' => [
-			'name' => 'Thumbnail alt text',
-			'path' => '$.thumbnail.alt_text',
-			'type' => 'image_alt',
-		],
-		'thumbnail_image_url' => [
-			'name' => 'Thumbnail',
-            'path' => '$.thumbnail.lqip',
-			'type' => 'image_url',
-		],
-	],
-],
-```
-
-The `format` property allows you to define a callable that will be applied to the value before it is returned.
-
-Applying this output schema to the response JSON would result in the following output:
-
-```php
-[
-	[
-		'id' => 61603,
-		'title' => 'Ballet at the Paris Opéra',
-		'thumbnail_image_alt' => 'Color pastel drawing of ballerinas in tutus on stage, watched by audience.',
-		'thumbnail_image_url' => 'data:image/gif;base64,R0lGODlhCgAFAPUAADtMRVJPRFlOQlBNSFFNSEVURU1USldSS1dSTVRXTV9ZTldVUl1ZU2hbTVdkU19kVV5tX2FkUGFjVWVoVGhoVGZhW29lXGVtXG1rWmlpXW5tXmZxX3VxX1toZG5oYG5uZ3ZsY3BqZGN1a3RxYnFyZXRxZntxan19bnl9cnh7dX57doJ/dpGEeJKOhaCUjKebk6yflsGupQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAAAAAAALAAAAAAKAAUAAAYuQIjoQuGQTqhOyrEZYSQJA6AweURYrxIoxAhoMp9VywWLmRYqj6BxQFQshIEiCAA7',
-	],
-	[
-		'id' => 14572,
-		'title' => 'The Millinery Shop',
-		'thumbnail_image_alt' => 'Impressionist painting of woman wearing green dress trying on hats.',
-		'thumbnail_image_url' => 'data:image/gif;base64,R0lGODlhBgAFAPQAAEMtIk40KE83KlhHLVxELlNPN1hLMVJOP19UN1dYM1lUOVpUP2dAIWlKKHZKKXZLKWRNPGpbMGpaNGtaOkxUTF9dRlJaS15YSV5kUnZpRH12W4ZkM49uRI52VQAAAAAAACH5BAAAAAAALAAAAAAGAAUAAAUY4AUtFWZxHZIdExFEybAJQGE00sNQmqOEADs=',
-	],
-]
-```
-````
-
-## File: docs/extending/query-runner.md
-````markdown
-# Query runner
-
-A query runner executes a query and processes the results of a query. The default `QueryRunner` used by the [`HttpQuery` class](query.md) is designed to work with most APIs that transact over HTTP and return JSON, but you may want to provide a custom query runner if:
-
-- Your API does not respond with JSON or requires custom deserialization logic.
-- Your API uses a non-HTTP transport.
-- You want to implement custom processing of the response data, which is not possible with the [provided filters](./hooks.md).
-
-If your API transacts over HTTP and you want to customize the query runner, consider extending the `QueryRunner` class and providing an instance to your query via the `query_runner` option. If your API uses a non-HTTP transport or you want full control over query execution, you should implement your own query that implements `QueryInterface` and provides a custom `execute` method.
-````
-
-## File: docs/tutorials/http.md
-````markdown
-# Create a remote data block using an HTTP data source
-
-This page will walk you through registering a remote data block that loads data from a Zip code REST API. It will require you to commit code to a WordPress theme or plugin.
-
-## Create the data source
-
-1. Go to Settings > Remote Data Blocks in your WordPress admin.
-2. Click on the "Connect new" button.
-3. Choose "HTTP" from the dropdown menu as the data source type.
-4. Fill in the following details:
-   - Data Source Name: Zip Code API
-   - URL: https://api.zippopotam.us/us/
-
-_Note: The `endpoint` function in the code below will append the provided Zip Code (by the user) to the "URL" value defined here, to form the final endpoint of this example_
-
-5. If your API requires authentication, enter those details. This API does not.
-6. Save the data source and return the data source list.
-7. In the Actions column, click the three-dot menu, then "Copy UUID" to copy the data source's UUID to your clipboard.
-
-## Register the block
-
-In code, we'll define a query using the data source we just created. We'll use the UUID we copied from the configuration page to reference the data source in our query.
-
-```php
-$data_source = HttpDataSource::from_uuid( $uuid );
-
-$query = HttpQuery::from_array( [
-   'data_source' => $data_source,
-   'endpoint' => function ( array $input_variables ) use ( $data_source ): string {
-		return $data_source->get_endpoint() . $input_variables['foo'];
-   },
-   'input_schema' => [ ... ],
-   'output_schema' => [ ... ],
-] );
-```
-
-And then register a block using the query.
-
-```php
-register_remote_data_block( [
-   'title' => 'Block Title',
-   'render_query' => [
-      'query' => $query,
-   ],
-] );
-```
-
-Check out [a working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/rest-api/zip-code) of the concepts above in the Remote Data Blocks GitHub repository.
-
-## Patterns and styling
-
-You can use patterns to create a consistent, reusable layout for your remote data. You can read more about [patterns and other Core Concepts](../concepts/index.md#patterns).
-
-Remote data blocks can be styled using the block editor's style settings, `theme.json`, or custom stylesheets. See the [example child theme](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/theme) for more details.
-
-## Code reference
-
-You can also configure HTTP integrations with code. These integrations appear in the WordPress admin but can not be modified. You may wish to do this to have more control over the data source or because you have more advanced data processing needs.
-
-This [working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/rest-api/zip-code) will replicate what we've done in this tutorial.
-````
-
-## File: docs/quickstart.md
-````markdown
-# Quickstart
-
-## I want to explore the plugin without configuring anything.
-
-[Launch the plugin in WordPress Playground](https://wordpress-playground.atomicsites.blog/?blueprint-url=https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/blueprint.json) and explore. An example remote data block ("Conference Event") has been registered.
-
-## I want to create my own remote data block without writing any code.
-
-[Launch the plugin in WordPress Playground](https://wordpress-playground.atomicsites.blog/?blueprint-url=https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/blueprint.settings.json) and use one of the supported services like Airtable, Google Sheets, and Shopify to configure remote data blocks for your use case. Follow our [tutorials](./tutorials/index.md) to create a data source and register a remote data block.
-
-## I want to create my own remote data block against a custom API.
-
-If you're comfortable with writing some WordPress code, [our documentation will guide you](./tutorials/http.md) through registering a remote data block that can work with your custom API.
-
-You will need a [local development environment](./local-development.md) and [the latest release of the plugin](https://github.com/Automattic/remote-data-blocks/releases/latest/download/remote-data-blocks.zip).
-````
-
-## File: docs/troubleshooting.md
-````markdown
-# Troubleshooting and debugging
-
-This plugin provides a [local development environment](local-development.md) with built-in debugging tools.
-
-## Query monitor
-
-When the [Query Monitor plugin](https://wordpress.org/plugins/query-monitor/) is installed and activated, Remote Data Blocks will output debugging information to a dedicated "Remote Data Blocks" panel, including error details, stack traces, query execution details, and cache hit/miss status.
-
-> [!TIP]
-> By default, the block editor is rendered in "Fullscreen mode" which hides the Admin Bar and Query Monitor. Open the three-dot menu in the top-right corner and toggle off "Fullscreen mode", or press `⇧⌥⌘F`.
-
-The provided local development environment includes Query Monitor by default. You can also install it in non-local environments, but be aware that it may expose sensitive information in production environments. Query Monitor is currently not compatible with WordPress Playground and cannot be installed there.
-
-## Debugging
-
-The [local development environment](local-development.md) includes Xdebug for debugging PHP code and a Node.js debugging port for debugging block editor scripts.
-
-## Support
-
-Our goal is to ensure that Remote Data Blocks works with as many APIs as possible. While we cannot guarantee that we can support every API, we are happy to receive detailed reports of any issues you encounter. Please [create a GitHub issue using the "API integration issue" template](https://github.com/Automattic/remote-data-blocks/issues/new?template=api_integration_issue.md) and we will do our best to assist you.
-
-For general bugs, please [use the "General bug report" template](https://github.com/Automattic/remote-data-blocks/issues/new?template=bug_report.md). If you have feedback or suggestions for improvement, please [use the "Feedback" template](https://github.com/Automattic/remote-data-blocks/issues/new?template=general_feedback.md).
-
-## Resetting config
-
-If you need to reset the Remote Data Blocks configuration in your local development environment, you can use WP-CLI to delete the configuration option. This will permanently delete all configuration values, including access tokens and API keys.
-
-```sh
-npm run wp-cli option delete remote_data_blocks_config
-```
-````
-
-## File: example/.cursor/rules/project-scope.mdc
-````
----
-description: Project scope
-globs:
-alwaysApply: true
----
-
-- You are writing code that integrates with the Remote Data Blocks WordPress plugin. This plugin allows you to create Gutenberg blocks that display data from remote data sources, such as Airtable, Google Sheets, Shopify, or your own API.
-- You are not contributing to the plugin directly. You are writing code that will be used in a separate plugin or theme.
-- You do not need to develop custom Gutenberg blocks. Instead, you will write simple PHP code to describe how your API should be queried, then call registration functions provided by the Remote Data Blocks plugin.
-- Your goal is to configure and register a remote data block that displays remote data in an organized, visually appealing way.
-- The Remote Data Blocks plugin provides a default block pattern for displaying data, but it is very basic. You may need to create a custom block pattern to achieve your goal, but please ask before doing so.
-````
-
-## File: docs/extending/data-source.md
-````markdown
-# Data source
-
-A data source defines the basic reusable properties of an API and is used by a [query](query.md) to reduce duplicative code. It also helps define how your data source looks in the WordPress admin.
-
-## Example
-
-Most HTTP-powered APIs can be represented by defining a array that be provided to `HttpDataSource::from_array()`. Here's an example of a data source for an example HTTP API:
-
-```php
-$data_source = HttpDataSource::from_array( [
-	'version' => 1,
-	'display_name' => 'Example API',
-	'endpoint' => 'https://api.example.com/',
-	'request_headers' => [
-		'Content-Type' => 'application/json',
-		'X-Api-Key' => constant( 'MY_API_KEY_CONSTANT' ),
-	],
-] );
-```
-
-## HttpDataSource configuration
-
-### **version**: number (required)
-
-There is no built-in versioning logic, but a version number is required for best practice reasons. Changes to the data source could significantly affect [queries](query.md). Checking the data source version is a sensible defensive practice.
-
-### display_name: string (required)
-
-The display name is used in the UI to identify your data source.
-
-### endpoint: string (required)
-
-This is the default or base endpoint for the data source. [Queries](query.md) that use a data source can override or append paths to its endpoint.
-
-### image_url: string
-
-An optional image URL can be used in the UI to help identify your data source.
-
-### request_headers: array
-
-An associative array of headers that will be sent with each HTTP request. Queries that use a data source can override or append headers.
-
-When providing authentication credentials, take care to avoid committing them to code repositories. We strongly recommend using environment variables or secure storage.
-
-## Custom data sources
-
-It's usually not necessary to extend `HttpDataSource`, but you can do so if you need to add custom behavior. For APIs that use non-HTTP transports, you could implement `DataSourceInterface` and provide methods that define reusable properties of your API. The actual implementation of your transport will need to be provided by a [custom query runner](./query-runner.md).
-
-Here is a theoretical example of a data source for a WebDAV server:
-
-```php
-class WebDavFilesDataSource implements DataSourceInterface {
-    public function get_display_name(): string {
-        return 'My WebDAV Files';
-    }
-
-    public function get_image_url(): string {
-        return 'https://example.com/webdav-icon.png';
-    }
-
-    public function get_webdav_root(): string {
-        return 'webdavs://webdav.example.com/';
-    }
-}
-```
-````
-
-## File: docs/index.md
-````markdown
-# Documentation
-
-## Table of Contents
-
-- [Quickstart](quickstart.md)
-- [Core Concepts](concepts/index.md)
-
-  - [Block Bindings](concepts/block-bindings.md)
-  - [Helper Blocks](concepts/helper-blocks.md)
-  - [Inline Bindings](concepts/inline-bindings.md)
-
-- [Extending](extending/index.md)
-
-  - [Data Source](extending/data-source.md)
-  - [Query](extending/query.md)
-  - [Block Registration](extending/block-registration.md)
-  - [Block Patterns](extending/block-patterns.md)
-  - [Overrides](extending/overrides.md)
-  - [Hooks](extending/hooks.md)
-  - [Query Runner](extending/query-runner.md)
-
-- [Tutorials](tutorials/index.md)
-
-  - [Airtable](tutorials/airtable.md)
-  - [Google Sheets integration](tutorials/google-sheets.md)
-  - [HTTP](tutorials/http.md)
-  - [Shopify](tutorials/shopify.md)
-
-- [Local development](local-development.md)
-- [Troubleshooting](troubleshooting.md)
-
-## Additional Documentation
-
-- [AI Documentation](for-ai.md)
-- [Contributing Guidelines](https://github.com/Automattic/remote-data-blocks/blob/trunk/CONTRIBUTING.md)
-````
-
-## File: docs/concepts/index.md
-````markdown
-# Core concepts
-
-Remote Data Blocks allows you to integrate remote data into posts, pages, patterns, or anywhere else on your site where you use the block editor. This guide will help you understand the core concepts of the plugin and how they work.
-
-## Supported use cases
-
-Like WordPress, Remote Data Blocks is flexible. It can be used to enable advanced integrations with external data.
-
-Below, you'll find specific use cases where Remote Data Blocks shines. We are working to expand these use cases, but before you start, consider if Remote Data Blocks is the right tool for the job.
-
-### Remote Data Blocks is a good fit if:
-
-- Your remote data represents entities with a consistent schema.
-  - **Example:** Product data representing items of clothing with defined attributes like “Name,” “Price,” “Color,” “Size,” etc.
-- You want humans to select specific entities for display within the block editor.
-  - **Example:** Select and display an item of clothing within a marketing post.
-- You want to display arbitrary remote data based on a URL parameter and are willing to write a small amount of code.
-  - **Example:** Create a page and rewrite rule for /products/{product_id}/ and configure a Remote Data Block on that page to display the referenced product.
-- Your presentation of remote data aligns with the capabilities of Block Bindings.
-  - **Example:** Display an item of clothing using a core paragraph, heading, image, and button blocks.
-- You do not require complex filtering.
-  - **Example:** To select an item of clothing, load a list of top-selling products or search all products by a specific term.
-- Your data is denormalized and relatively flat.
-  - **Example:** A row from a Google Sheet with no references to external entities.
-
-### Remote Data Blocks may not be a good fit if:
-
-- Your remote data is schema-less, or the schema changes over time.
-  - Queries for remote data must define a schema for their return data. Schema changes result in broken blocks.
-- You want to display remote data outside the context of the block editor.
-  - Block bindings are only available in block content—posts, pages, or full-site editing. Using our plugin may still provide some benefit (e.g., caching) but could require significant custom PHP code.
-- Your data is normalized (and cannot be denormalized automatically by your API).
-  - Some APIs can denormalize data by automatically “inflating” referenced records for you. For example, data representing an item of clothing might reference a color by ID instead of a renderable string like “forest green.” If your API does not denormalize this relationship automatically, you will need to write custom code to perform additional queries and stitch the responses together.
-  - This can lead to a large number of API requests that your API may not tolerate. Airtable’s API, for example, imposes a rate limit of five requests per second, making multiple calls impractical.
-- You have multiple remote data sources that require interaction. Or, you want to implement a complex content architecture using Remote Data Blocks instead of leveraging WordPress custom post types and/or taxonomies.
-  - These two challenges are directly related to the issues with normalized data. If you have data sources that relate to one another, you have to write custom code to query missing data and stitch them together.
-  - Judging complexity is difficult, but implementing large applications using Remote Data Blocks is not advisable.
-- You require complex filtering or have complex pagination needs.
-  - Our UI components for filtering are pagination still under development.
-
-Over time, Remote Data Blocks will grow and improve and these guidelines will change.
-
-## Remote data source
-
-**Remote data source** refers to data that is fetched from an external source, such as an API or a third-party service. This might be a product in your Shopify store, data in an Airtable or Google Sheet, or a file in a GitHub repository. Remote data is usually fetched via HTTP requests, but you can [extend the plugin](../extending/index.md) to support other transports.
-
-Simple data sources can be configured via the plugin's settings screen, while others may require custom PHP code (see [extending](../extending/index.md)).
-
-## Queries
-
-**Queries** define how data is fetched, processed, and displayed. Queries delegate some logic to a **data source**, which can be reused by multiple queries. For example, one query to retrieve a single item, and one to retrieve a list.
-
-Simple queries can be configured via the plugin's settings screen, while others may require custom PHP code (see [extending](../extending/index.md)).
-
-## Remote data block
-
-A **remote data block** is a custom block connected to a specific query. Each remote data block has a unique name and is strictly tied to a data source.
-
-For example, you might have a remote data block named "Shopify Product" that fetches a product from your Shopify store and displays the product's name, description, price, and image. Or, you might have a remote data block named "Conference event" that displays rows from an Airtable and displays the event's name, location, and type.
-
-Remote data blocks are **container blocks** that contain other blocks and provide remote data to them. You retain complete control over the layout, design, and content. You can leverage patterns to enable consistent styling and customize the block's appearance using the block editor or `theme.json`.
-
-Remote data blocks are custom blocks, but they are created and registered by our plugin and don't require custom block development. Remote data is loaded via [the block bindings API](./block-bindings.md) or [inline bindings](./inline-bindings.md).
-
-## Data fetching
-
-The plugin handles data fetching and wraps [`wp_remote_request`](https://developer.wordpress.org/reference/functions/wp_remote_request/).
-
-When a request to your site renders one or more remote data blocks, our plugin will fetch and potentially cache the remote data. Multiple requests for the same data within a single page load will be deduped, even if the requests are not cacheable.
-
-### Caching
-
-The plugin offers a caching layer for optimal performance and helps avoid rate limiting from remote data sources. It will be used if your WordPress environment configures a [persistent object cache](https://developer.wordpress.org/reference/classes/wp_object_cache/#persistent-cache-plugins). Otherwise, the plugin will utilize in-memory (per-page-load) caching. Deploying to production without a persistent object cache is not recommended.
-
-The default TTL for all cache objects is 5 minutes, but it can be [configured per query or request](../extending/query.md#cache_ttl-intnullcallable). Error responses are cached for 30 seconds to avoid overwhelming the remote data source with repeated requests under error conditions.
-
-## Theming
-
-Remote data blocks can be styled using the block editor's style settings, `theme.json`, or custom stylesheets. See the [example child theme](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/theme) for more details.
-
-## Patterns
-
-Since remote data blocks are container blocks, you can associate a remote data block with a pattern to create reusable layouts. You link a pattern to a particular remote data block in the Site Editor. You will see a new Remote Data Blocks section in the right-hand panel when editing a pattern.
-
-![Screenshot showing the right hand panel of the WordPress Site Editor](https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/docs/concepts/patterns-right-panel.png)
-
-Select the specific block that is appropriate for this pattern. Once saved, content creators can select this pattern when adding the associated remote data block.
-
-You can also create a pattern directly from the content.
-<video src="https://github.com/user-attachments/assets/358d9d40-557b-4f39-b943-ed73d6f18adb"></video>
-
-The plugin supports both synced and unsynced patterns.
-
-## Technical concepts
-
-If you want to understand the internals of Remote Data Blocks so that you can extend its functionality, head over to the [extending guide](../extending/index.md).
-````
-
-## File: docs/extending/hooks.md
-````markdown
-# Hooks
-
-Hooks are a way for one piece of code to interact/modify another piece of code at specific, pre-defined spots.
-
-There are two types of hooks: Actions and Filters. To use either, you need to write a custom function known as a Callback, and then register it with a WordPress hook for a specific action or filter.
-
-[Read more about Hooks](https://developer.wordpress.org/plugins/hooks/)
-
-## Actions
-
-Actions allow you to add data or change how WordPress operates. Actions will run at a specific point in the execution of plugin. Callback functions for an Action do not return anything back to the calling Action hook.
-
-### remote_data_blocks_loaded
-
-This action fires when Remote Data Blocks is fully loaded and ready for use. Plugins that depend on Remote Data Blocks should use this hook to defer their initialization until Remote Data Blocks is fully loaded.
-
-```php
-function my_plugin_init() {
-	// Initialize your plugin that depends on Remote Data Blocks here
-	// All Remote Data Blocks classes and functionality are now available
-}
-
-if ( defined( 'REMOTE_DATA_BLOCKS__LOADED' ) ) {
-	// Immediately init the plugin since remote data blocks is already loaded
-	my_plugin_init()
-} else {
-	// Defer the init until the remote data block is loaded
-	add_action( 'remote_data_blocks_loaded', 'my_plugin_init' );
-}
-```
-
-### remote_data_blocks_log
-
-If you want to send debugging information to another source besides [Query Monitor](../troubleshooting.md#query-monitor), use the `remote_data_blocks_log` action.
-
-```php
-function custom_log( string $namespace, string $level, string $message, array $context ): void {
-    // Send the log to a custom destination.
-}
-add_action( 'remote_data_blocks_log', 'custom_log', 10, 4 );
-```
-
-## Filters
-
-Filters give you the ability to change data during the execution of the plugin. Callback functions for Filters will accept a variable, modify it, and return it. They are meant to work in an isolated manner, and should never have side effects such as affecting global variables and output.
-
-### remote_data_blocks_register_example_block
-
-Filter whether to register the included example API block ("Conference Event") (default: `true`).
-
-```php
-add_filter( 'remote_data_blocks_register_example_block', '__return_false' );
-```
-
-### remote_data_blocks_allowed_url_schemes
-
-Filter the allowed URL schemes for this request. Only HTTPS is allowed by default, but it might be useful to relax this restriction in local environments.
-
-```php
-function custom_allowed_url_schemes( array $allowed_url_schemes, HttpQueryInterface $query ): array {
-	// Modify the allowed URL schemes.
-	return $allowed_url_schemes;
-}
-add_filter( 'remote_data_blocks_allowed_url_schemes', 'custom_allowed_url_schemes', 10, 2 );
-```
-
-### remote_data_blocks_pagination_query_var_name
-
-Filter the query variable name used for pagination (default: `rdb-pagination`).
-
-```php
-function custom_pagination_query_var_name(): string {
-	return 'paginate';
-}
-add_filter( 'remote_data_blocks_pagination_query_var_name', 'custom_pagination_query_var_name', 10, 0 );
-```
-
-### remote_data_blocks_request_details
-
-Filter the request details (method, options, url) before the HTTP request is dispatched.
-
-```php
-function custom_request_details( array $request_details, HttpQueryInterface $query, array $input_variables ): array {
-	// Modify the request details.
-	return $request_details;
-}
-add_filter( 'remote_data_blocks_request_details', 'custom_request_details', 10, 3 );
-```
-
-### remote_data_blocks_query_input_variables
-
-Filter the query input variables prior to query execution. This filter is useful for modifying the input variables for the current page-load, e.g., by pulling in data from query variables or other context. See [Overrides](overrides.md) for more information.
-
-```php
-add_filter( 'remote_data_blocks_query_input_variables', function ( array $input_variables, array $enabled_overrides, string $block_name, array $block_context ): array {
-	if ( true === in_array( 'my_override', $enabled_overrides, true ) ) {
-		$override_value = get_query_var( 'override_id' );
-
-		if ( ! empty( $override_value ) ) {
-			$input_variables['id'] = $override_value;
-		}
-	}
-
-	return $input_variables;
-}, 10, 4 );
-```
-
-Keep in mind that modifying query input variables will affect the object cache key used for query execution. This could result in a cache miss.
-
-### remote_data_blocks_query_response
-
-Filter the query response just after query execution. This filter is useful for modifying the query response for the current page-load, e.g., by pulling in data from query variables or other context. See [Overrides](overrides.md) for more information.
-
-```php
-add_filter( 'remote_data_blocks_query_response', function ( array $query_response, array $enabled_overrides, string $block_name, array $block_context ): array {
-	if ( true === in_array( 'alternate_date_format', $enabled_overrides, true ) ) {
-		$query_response['results'] = array_map( function ( array $result ) {
-			$date = new DateTime( $result['date'] );
-			$result['date'] = $date->format( 'Y F d' );
-			return $result;
-		}, $query_response['results'] );
-	}
-
-	return $input_variables;
-}, 10, 4 );
-```
-
-The result of this filter is not cached, and will run for every block binding.
-
-### remote_data_blocks_query_response_metadata
-
-Filter the query response metadata, which are available as targets for inline bindings. In most cases, it is better to provide a custom query class and override the `get_response_metadata` method, but this filter is available in case that is not possible.
-
-```php
-function custom_query_response_metadata( array $metadata, HttpQueryInterface $query, array $input_variables ): array {
-	// Modify the response metadata.
-	return $metadata;
-}
-add_filter( 'remote_data_blocks_query_response_metadata', 'custom_query_response_metadata', 10, 3 );
-```
-````
-
-## File: docs/extending/query.md
-````markdown
-# Query
-
-A query defines a request for data from a [data source](data-source.md). It defines input and output variables so that the Remote Data Blocks plugin knows how to interact with it.
-
-A common approach is to define a data source on the settings screen and then commit a custom query in code to fetch and process the data. The following example code does just that.
-
-## HttpQuery
-
-Most HTTP-powered APIs can be queried using `HttpQuery`. Queries are instantiated with configuration optiona, described below.
-
-```php
-if ( ! defined( 'REMOTE_DATA_BLOCKS_EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID' ) ) {
-	return;
-}
-
-$data_source = HttpDataSource::from_uuid( REMOTE_DATA_BLOCKS_EXAMPLE_ZIP_CODE_DATA_SOURCE_UUID );
-
-if ( ! $data_source instanceof HttpDataSource ) {
-	return;
-}
-
-$query = [
-	'display_name' => 'Get location by Zip code',
-	'data_source' => $data_source,
-	'endpoint' => function( array $input_variables ) use ( $data_source ): string {
-		return $data_source->get_endpoint() . $input_variables['zip_code'];
-	},
-	'input_schema' => [
-		'zip_code' => [
-			'name' => 'Zip Code',
-			'type' => 'string',
-		],
-	],
-	'output_schema' => [
-		'is_collection' => false,
-		'type' => [
-			'zip_code' => [
-				'name' => 'Zip Code',
-				'path' => '$["post code"]',
-				'type' => 'string',
-			],
-			'city'     => [
-				'name' => 'City',
-				'path' => '$.places[0]["place name"]',
-				'type' => 'string',
-			],
-			'state'    => [
-				'name' => 'State',
-				'path' => '$.places[0].state',
-				'type' => 'string',
-			],
-		],
-	],
-];
-```
-
-- The `endpoint` property is a callback function that constructs the query endpoint. In this case, the endpoint is constructed by appending the `zip_code` input variable to the data source endpoint.
-- The `input_schema` property defines the input variables the query expects. For some queries, input variables might be used to construct a request body. In this case, the `zip_code` input variable is used to customize the query endpoint via the `endpoint` callback function.
-- The `output_schema` property defines the output data that will be extracted from the API response and provided to the remote data block. The `path` property uses [JSONPath](https://jsonpath.com/) expressions to allow concise, no-code references to nested data.
-
-This example features a small subset of the customization available for a query; see the full documentation below for details.
-
-## HttpQuery configuration
-
-### display_name: string (required)
-
-The `display_name` property defines the query's human-friendly name.
-
-### data_source: HttpDataSourceInterface (required)
-
-The `data_source` property provides the [data source](./data-source.md) the query uses.
-
-### endpoint: string|callable
-
-The `endpoint` property defines the query endpoint. It can be a string or a callable function that constructs the endpoint. The callable function accepts an associative array of input variables (`[ $var_name => $value ]`). If omitted, the query will use the endpoint defined by the data source.
-
-#### Example
-
-```php
-'endpoint' => function( array $input_variables ) use ( $data_source ): string {
-	return $data_source->get_endpoint() . $input_variables['zip_code'];
-},
-```
-
-### input_schema: array
-
-The `input_schema` property defines the input variables expected by the query, which can be used to formulate the endpoint, the request headers, or the request body. Further specification and examples are provided in the [`input_schema` documentation](./query-input-schema.md).
-
-### output_schema: array (required)
-
-The `output_schema` property defines how an API response should be transformed and provided to a remote data block. Further information and examples are provided in the [`output_schema` documentation](./query-output-schema.md).
-
-### pagination_schema: array
-
-If your query supports pagination, the `pagination_schema` property defines how to extract pagination-related values from the query response. If defined, the property should be an associative array with the following structure:
-
-- `total_items`: A variable definition that extracts the total number of items across every page of results.
-- `has_next_page`: A variable definition that extracts a boolean indicating whether there are more pages of results. Useful for APIs that do not report the total number of items.
-- `cursor_next`: If your query supports cursor pagination, a variable definition that extracts the cursor for the next page of results. This output variable will also be mapped to `ui:pagination_cursor`, if present.
-- `cursor_previous`: If your query supports cursor pagination, a variable definition that extracts the cursor for the previous page of results.
-
-Note that one of `has_next_page` or `total_items` is required for all pagination types.
-
-A pagination block will automatically be added to remote data blocks that support pagination.
-
-#### Example
-
-```php
-'pagination_schema' => [
-	'total_items' => [
-		'name' => 'Total items',
-		'path' => '$.pagination.totalItems',
-		'type' => 'integer',
-	],
-	'cursor_next' => [
-		'name' => 'Next page cursor',
-		'path' => '$.pagination.nextCursor',
-		'type' => 'string',
-	],
-	'cursor_previous' => [
-		'name' => 'Previous page cursor',
-		'path' => '$.pagination.previousCursor',
-		'type' => 'string',
-	],
-],
-```
-
-### request_method: string
-
-The `request_method` property defines the HTTP request method used by the query. By default, it is `'GET'`.
-
-### request_headers: array|callable
-
-The `request_headers` property defines the request headers for the query. It can be an associative array or a callable function that returns an associative array. The callable function accepts an associative array of input variables (`[ $var_name => $value ]`). If omitted, the query will use the request headers defined by the data source.
-
-### Example
-
-```php
-'request_headers' => function( array $input_variables ) use ( $data_source ): array {
-	return array_merge(
-		$data_source->get_request_headers(),
-		[ 'X-Foo' => $input_variables['foo'] ]
-	);
-},
-```
-
-### request_body: array|callable
-
-The `request_body` property defines the request body for the query. It can be an associative array or a callable function that returns an associative array. The callable function accepts an associative array of input variables (`[ $var_name => $value ]`). If omitted, the query will not have a request body.
-
-### cache_ttl: int|null|callable
-
-The `cache_ttl` property defines how long the query response should be cached in seconds. It can be an integer, a callable function that returns an integer, or `null`. The callable function accepts an associative array of input variables (`[ $var_name => $value ]`).
-
-A value of `-1` indicates the query should not be cached. A value of `null` indicates the default TTL should be used (300 seconds). If omitted, the default TTL is used.
-
-Remote data blocks utilize the WordPress object cache (`wp_cache_get()` / `wp_cache_set()`) for response caching. Ensure that your platform provides or installs a persistent object cache plugin so that this value is respected. If you do not have a peristent object cache, this property will be ignored and responses will only be cached in-memory. We do not recommend running the Remote Data Blocks plugin in this configuration.
-
-Note that error responses are cached for 30 seconds to avoid overwhelming the remote data source with repeated requests under error conditions. Additionally, a small random jitter is added to the cache TTL to avoid cache stampedes.
-
-#### Example
-
-```php
-$query = HttpQuery::from_array( [
-	'display_name' => 'Get location by Zip code',
-	'data_source' => $data_source,
-	'endpoint' => function( array $input_variables ) use ( $data_source ): string {
-		return $data_source->get_endpoint() . $input_variables['zip_code'];
-	},
-	'cache_ttl' => 3600, // Set the cache TTL to 1 hour
-	'input_schema' => [
-		'zip_code' => [
-			'name' => 'Zip Code',
-			'type' => 'string',
-		],
-	],
-	'output_schema' => [
-		'is_collection' => false,
-		'type' => [
-			'zip_code' => [
-				'name' => 'Zip Code',
-				'path' => '$["post code"]',
-				'type' => 'string',
-			],
-			'city'     => [
-				'name' => 'City',
-				'path' => '$.places[0]["place name"]',
-				'type' => 'string',
-			],
-			'state'    => [
-				'name' => 'State',
-				'path' => '$.places[0].state',
-				'type' => 'string',
-			],
-		],
-	],
-] );
-```
-
-### image_url: string|null
-
-The `image_url` property defines an image URL that represents the query in the UI. If omitted, the query will use the image URL defined by the data source.
-
-### preprocess_response: callable
-
-If you need to pre-process the response in some way before the output variables are extracted, provide a `preprocess_response` function. The function will receive the deserialized response.
-
-#### Example
-
-```php
-'preprocess_response' => function( mixed $response_data, array $input_variables ): array {
-	$some_computed_property = compute_property( $response_data['foo']['bar'] ?? '' );
-
-	return array_merge(
-		$response_data,
-		[ 'computed_property' => $some_computed_property ]
-	);
-},
-```
-
-### query_runner: QueryRunnerInterface
-
-Use the `query_runner` property to provide a custom [query runner](./query-runner.md) for the query. If omitted, the query will use the default query runner, which works well with most HTTP-powered APIs.
-
-## GraphqlQuery
-
-## GraphqlMutation
 ````
