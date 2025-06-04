@@ -2,11 +2,11 @@
 
 ## I want to explore the plugin without configuring anything.
 
-[Launch the plugin in WordPress Playground](https://wordpress-playground.atomicsites.blog/?blueprint-url=https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/blueprint.json) and explore. An example remote data block ("Conference Event") has been registered.
+[Launch the plugin in WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/blueprint.json) and explore. An example remote data block ("Conference Event") has been registered.
 
 ## I want to create my own remote data block without writing any code.
 
-[Launch the plugin in WordPress Playground](https://wordpress-playground.atomicsites.blog/?blueprint-url=https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/blueprint.settings.json) and use one of the supported services like Airtable, Google Sheets, and Shopify to configure remote data blocks for your use case. Follow our [tutorials](./tutorials/index.md) to create a data source and register a remote data block.
+[Launch the plugin in WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/Automattic/remote-data-blocks/trunk/blueprint.settings.json) and use one of the supported services like Airtable, Google Sheets, and Shopify to configure remote data blocks for your use case. Follow our [tutorials](./tutorials/index.md) to create a data source and register a remote data block.
 
 ## I want to create my own remote data block against a custom API.
 

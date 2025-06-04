@@ -1,5 +1,5 @@
 {
-  "$schema": "https://wordpress-playground.atomicsites.blog/blueprint-schema.json",
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
   "meta": {
     "title": "Remote Data Blocks local playground",
     "description": "Runs Remote Data Blocks plugin in a local WordPress Playground",
