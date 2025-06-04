@@ -20,6 +20,7 @@ function register_art_remote_data_block(): void {
 	];
 
 	$get_art_query = [
+		'display_name' => 'Get artwork by ID',
 		'data_source' => $aic_data_source,
 		// Provide a callable (closure) to dynamically generate the endpoint using
 		// the base endpoint from the data source and the input variables.
@@ -80,6 +81,7 @@ function register_art_remote_data_block(): void {
 	];
 
 	$search_art_query = [
+		'display_name' => 'Search artworks',
 		'data_source' => $aic_data_source,
 		// Provide a callable (closure) to dynamically generate the endpoint using
 		// the base endpoint from the data source and the input variables.

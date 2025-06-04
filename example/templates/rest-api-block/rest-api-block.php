@@ -18,6 +18,7 @@ function register_basic_rest_api_remote_data_block(): void {
 
 	// Get item query: Fetch one record by ID.
 	$get_item_query = [
+		'display_name' => 'Get item by ID',
 		'data_source' => $api_data_source,
 		// Provide a callable (closure) to dynamically generate the endpoint using
 		// the base endpoint from the data source and the input variables.
@@ -72,6 +73,7 @@ function register_basic_rest_api_remote_data_block(): void {
 
 	// List items query: Fetch multiple records with pagination and search.
 	$list_items_query = [
+		'display_name' => 'List items',
 		'data_source' => $api_data_source,
 		// Provide a callable (closure) to dynamically generate the endpoint using
 		// the base endpoint from the data source and the input variables.
