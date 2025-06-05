@@ -69,4 +69,5 @@ do_action( 'remote_data_blocks_loaded' );
 // require_once __DIR__ . '/example/blocks/art-block/art-block.php';
 // require_once __DIR__ . '/example/blocks/github-markdown-block/github-markdown-block.php';
 // require_once __DIR__ . '/example/blocks/shopify-mock-store-block/shopify-mock-store-block.php';
+// require_once __DIR__ . '/example/blocks/weather-block/weather-block.php';
 // require_once __DIR__ . '/example/blocks/zip-code-block/zip-code-block.php';
