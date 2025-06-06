@@ -38,6 +38,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 		hasNextPage,
 		loading,
 		page,
+		perPage,
 		searchInput,
 		setPage,
 		setPerPage,
@@ -117,6 +118,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 						onSelect={ supportsItemSelection ? save : undefined }
 						onSelectField={ onSelectField }
 						page={ page }
+						perPage={ perPage }
 						results={ loading ? undefined : data?.results }
 						searchInput={ searchInput }
 						selectionIds={ selectionIds }
