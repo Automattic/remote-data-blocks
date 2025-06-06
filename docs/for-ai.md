@@ -78,6 +78,10 @@ example/
       github-markdown-block.php
     shopify-mock-store-block/
       shopify-mock-store-block.php
+    weather-block/
+      patterns/
+        weather-block-pattern.html
+      weather-block.php
     zip-code-block/
       zip-code-block.php
   templates/
@@ -799,122 +803,6 @@ class GitHubQueryRunner extends QueryRunner {
 }
 ````
 
-## File: example/blocks/github-markdown-block/inc/markdown-links.php
-````php
-<?php declare(strict_types = 1);
-
-namespace RemoteDataBlocks\Example\GitHub;
-
-use DOMDocument;
-use DOMElement;
-use DOMXPath;
-
-/**
- * Updates the relative/absolute markdown links in href attributes.
- * This adjusts the links so they work correctly when the file structure changes.
- * - All relative paths go one level up.
- * - All absolute paths are converted to relative paths one level up.
- * - Handles URLs with fragment identifiers (e.g., '#section').
- * - Removes the '.md' extension from the paths.
- *
- * @param string $html The HTML response data.
- * @param string $current_file_path The current file's path.
- * @return string The updated HTML response data.
- */
-function update_markdown_links( string $html, string $current_file_path = '' ): string {
-	// Load the HTML into a DOMDocument
-	$dom = new DOMDocument();
-
-	// Convert HTML to UTF-8 using htmlspecialchars instead of mb_convert_encoding
-	$html = '<?xml encoding="UTF-8">' . $html;
-
-	// Suppress errors due to malformed HTML
-	// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-	@$dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
-
-	// Create an XPath to query href attributes
-	$xpath = new DOMXPath( $dom );
-
-	// Query all elements with href attributes
-	$nodes = $xpath->query( '//*[@href]' );
-	foreach ( $nodes as $node ) {
-		if ( ! $node instanceof DOMElement ) {
-			continue;
-		}
-		$href = $node->getAttribute( 'href' );
-
-		// Check if the href is non-empty, points to a markdown file, and is a local path
-		if ( $href &&
-			preg_match( '/\.md($|#)/', $href ) &&
-			! preg_match( '/^(https?:)?\/\//', $href )
-		) {
-			// Adjust the path
-			$new_href = adjust_markdown_file_path( $href, $current_file_path );
-
-			// Set the new href
-			$node->setAttribute( 'href', $new_href );
-		}
-	}
-
-	// Save and return the updated HTML
-	return $dom->saveHTML();
-}
-
-
-/**
- * Adjusts the markdown file path by resolving relative paths to absolute paths.
- * Preserves fragment identifiers (anchors) in the URL.
- *
- * @param string $path The original path.
- * @param string $current_file_path The current file's path.
- * @return string The adjusted path.
- */
-function adjust_markdown_file_path( string $path, string $current_file_path = '' ): string {
-	global $post;
-	$page_slug = $post->post_name;
-
-	// Parse the URL to separate the path and fragment
-	$parts = wp_parse_url( $path );
-
-	// Extract the path and fragment
-	$original_path = isset( $parts['path'] ) ? $parts['path'] : '';
-	$fragment = isset( $parts['fragment'] ) ? '#' . $parts['fragment'] : '';
-
-	// Get the directory of the current file
-	$current_dir = dirname( $current_file_path );
-
-	// Resolve the absolute path based on the current directory
-	if ( str_starts_with( $original_path, '/' ) ) {
-		// Already an absolute path from root, just remove leading slash
-		$absolute_path = ltrim( $original_path, '/' );
-	} else {
-		// Use realpath to resolve relative paths
-		$temp_path = $current_dir . '/' . $original_path;
-		$parts = explode( '/', $temp_path );
-		$absolute_parts = [];
-
-		foreach ( $parts as $part ) {
-			if ( '.' === $part || '' === $part ) {
-				continue;
-			}
-			if ( '..' === $part ) {
-				array_pop( $absolute_parts );
-			} else {
-				$absolute_parts[] = $part;
-			}
-		}
-
-		$absolute_path = implode( '/', $absolute_parts );
-	}
-
-	// Remove the .md extension
-	$absolute_path = preg_replace( '/\.md$/', '', $absolute_path );
-
-	// Ensure the path starts with a forward slash and includes the page slug
-	return '/' . $page_slug . '/' . $absolute_path . $fragment;
-}
-````
-
 ## File: example/blocks/shopify-mock-store-block/shopify-mock-store-block.php
 ````php
 <?php declare(strict_types = 1);
@@ -946,6 +834,29 @@ function register_shopify_mock_store_blocks(): void {
 add_action( 'init', __NAMESPACE__ . '\\register_shopify_mock_store_blocks' );
 ````
 
+## File: example/blocks/weather-block/patterns/weather-block-pattern.html
+````html
+<!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"block":"remote-data-blocks/weather","field":"location_name"}}},"name":"Location"}} -->
+<h2 class="wp-block-heading"></h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"block":"remote-data-blocks/weather","field":"temperature_celsius","label":"Temperature (°C)"}}},"name":"Temperature (°C)"},"className":"rdb-block-data-temperature-celsius"} -->
+<p class="rdb-block-data-temperature-celsius"></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"block":"remote-data-blocks/weather","field":"humidity","label":"Humidity (%)"}}},"name":"Humidity (%)"},"className":"rdb-block-data-humidity"} -->
+<p class="rdb-block-data-humidity"></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"block":"remote-data-blocks/weather","field":"weather_description"}}},"name":"Weather Description"},"className":"rdb-block-data-weather-description"} -->
+<p class="rdb-block-data-weather-description"></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"block":"remote-data-blocks/weather","field":"rain_prediction"}}},"name":"Rain Prediction"},"className":"rdb-block-data-rain-prediction"} -->
+<p class="rdb-block-data-rain-prediction"></p>
+<!-- /wp:paragraph -->
+````
+
 ## File: example/blocks/zip-code-block/zip-code-block.php
 ````php
 <?php declare(strict_types = 1);
@@ -966,7 +877,6 @@ function register_zip_code_remote_data_block(): void {
 
 	$zip_code_query = [
 		'data_source' => $zip_code_data_source,
-		'display_name' => 'Get location by Zip code',
 		// Provide a callable (closure) to dynamically generate the endpoint using
 		// the base endpoint from the data source and the input variables.
 		'endpoint' => function ( array $input_variables ) use ( $zip_code_data_source ): string {
@@ -1457,167 +1367,6 @@ function register_google_sheets_remote_data_block(): void {
 	GoogleSheetsIntegration::register_blocks_for_google_sheets_data_source( $westeros_houses_data_source );
 }
 add_action( 'init', 'register_google_sheets_remote_data_block' );
-````
-
-## File: example/templates/rest-api-block/rest-api-block.php
-````php
-<?php
-
-/**
- * Register a remote data block that uses a basic REST API. Customize the data
- * source, queries, and schemas to match your specific API requirements.
- */
-function register_basic_rest_api_remote_data_block(): void {
-	$api_data_source = [
-		'display_name' => '{{ API Name }}',
-		'endpoint' => '{{ API Base URL }}',
-		'request_headers' => [
-			'Content-Type' => 'application/json',
-			// TODO: Add authentication headers, if needed.
-			// 'Authorization' => 'Bearer {{ API token }}',
-			// 'X-API-Key' => '{{ API key }}',
-		],
-	];
-
-	// Get item query: Fetch one record by ID.
-	$get_item_query = [
-		'data_source' => $api_data_source,
-		// Provide a callable (closure) to dynamically generate the endpoint using
-		// the base endpoint from the data source and the input variables.
-		'endpoint' => function ( array $input_variables ) use ( $api_data_source ): string {
-			$endpoint = $api_data_source['endpoint'];
-			$item_id = $input_variables['id'] ?? '';
-
-			return $endpoint . '/items/' . $item_id;
-		},
-		'input_schema' => [
-			'id' => [
-				'name' => 'Item ID',
-				'type' => 'id',
-			],
-		],
-		'output_schema' => [
-			// TODO: Adjust the field names, types, and paths based on your API
-			// response structure.
-			'is_collection' => false, // This query returns a single record.
-			'path' => '$.data',
-			'type' => [
-				'id' => [
-					'name' => 'ID',
-					'type' => 'id',
-					'path' => '$.id',
-				],
-				'title' => [
-					'name' => 'Title',
-					'type' => 'title',
-					'path' => '$.title',
-				],
-				'description' => [
-					'name' => 'Description',
-					'type' => 'string',
-					'path' => '$.description',
-				],
-				'image_url' => [
-					'name' => 'Image URL',
-					'type' => 'image_url',
-					// Instead of a `path`, we provide a `generate` function to create the
-					// image URL. The `$data` parameter contains the data returned from the
-					// API at this "level" (e.g., after the root `path` has been applied).
-					'generate' => static function ( $data ): string {
-						return 'https://example.com/images/' . $data['image_id'] . '.jpg';
-					},
-					'path' => '$.image_url',
-				],
-				// TODO: Add more fields as needed.
-			],
-		],
-	];
-
-	// List items query: Fetch multiple records with pagination and search.
-	$list_items_query = [
-		'data_source' => $api_data_source,
-		// Provide a callable (closure) to dynamically generate the endpoint using
-		// the base endpoint from the data source and the input variables.
-		'endpoint' => function ( array $input_variables ) use ( $api_data_source ): string {
-			$endpoint = $api_data_source['endpoint'] . '/items';
-
-			$query_params = [];
-
-			// TODO: Apply pagination input variables according to your API or remove
-			// if your API does not support pagination.
-			if ( ! empty( $input_variables['limit'] ) ) {
-				$query_params['limit'] = $input_variables['limit'];
-			}
-
-			if ( ! empty( $input_variables['page'] ) ) {
-				$query_params['page'] = $input_variables['page'];
-			}
-
-			// TODO: Apply search input variable according to your API or remove if
-			// your API does not support search.
-			if ( ! empty( $input_variables['search'] ) ) {
-				$query_params['q'] = $input_variables['search'];
-			}
-
-			return add_query_arg( $query_params, $endpoint );
-		},
-		'input_schema' => [
-			'search' => [
-				'name' => 'Search Terms',
-				'type' => 'ui:search_input',
-			],
-			'limit' => [
-				'default_value' => 10,
-				'name' => 'Items per page',
-				'type' => 'ui:pagination_per_page',
-			],
-			'page' => [
-				'default_value' => 1,
-				'name' => 'Page',
-				'type' => 'ui:pagination_page',
-			],
-		],
-		// Reuse the output schema from the single item query.
-		'output_schema' => array_merge(
-			$get_item_query['output_schema'],
-			[ 'is_collection' => true ]
-		),
-		'pagination_schema' => [
-			// TODO: Adjust the field names, types, and paths based on your API
-			// response structure, or set `pagination_schema` to `null` if your API
-			// does not support pagination.
-			'total_items' => [
-				'name' => 'Total Items',
-				'path' => '$.meta.total',
-			],
-			'total_pages' => [
-				'name' => 'Total Pages',
-				'path' => '$.meta.total_pages',
-			],
-			'current_page' => [
-				'name' => 'Current Page',
-				'path' => '$.meta.current_page',
-			],
-		],
-	];
-
-	// Register the remote data block.
-	register_remote_data_block( [
-		'title' => '{{ Block name }}',
-		'render_query' => [
-			'query' => $get_item_query,
-		],
-		'selection_queries' => [
-			[
-				'query' => $list_items_query,
-				'type' => 'search',
-			],
-		],
-		// TODO: Uncomment and implement if you want to use a custom block pattern.
-		// 'pattern' => file_get_contents( __DIR__ . '/patterns/default-pattern.html' ),
-	] );
-}
-add_action( 'init', 'register_basic_rest_api_remote_data_block' );
 ````
 
 ## File: example/templates/rest-api-block-from-ui-data-source/rest-api-block-from-ui-data-source.php
@@ -2160,6 +1909,133 @@ alwaysApply: true
 - The Remote Data Blocks plugin provides a default block pattern for displaying data, but it is very basic. You may need to create a custom block pattern to achieve your goal, but please ask before doing so.
 ````
 
+## File: example/blocks/github-markdown-block/inc/markdown-links.php
+````php
+<?php declare(strict_types = 1);
+
+namespace RemoteDataBlocks\Example\GitHub;
+
+use DOMDocument;
+use DOMElement;
+use DOMXPath;
+
+/**
+ * Updates the relative/absolute markdown links in href attributes.
+ * This adjusts the links so they work correctly when the file structure changes.
+ * - All relative paths go one level up.
+ * - All absolute paths are converted to relative paths one level up.
+ * - Handles URLs with fragment identifiers (e.g., '#section').
+ * - Removes the '.md' extension from the paths.
+ *
+ * @param string $html The HTML response data.
+ * @param string $current_file_path The current file's path.
+ * @return string The updated HTML response data.
+ */
+function update_markdown_links( string $html, string $current_file_path = '' ): string {
+	// Load the HTML into a DOMDocument
+	$dom = new DOMDocument();
+
+	// Convert HTML to UTF-8 using htmlspecialchars instead of mb_convert_encoding
+	$html = '<?xml encoding="UTF-8"?>' . $html;
+
+	// Suppress errors due to malformed HTML
+	// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+	@$dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+
+	// Create an XPath to query href attributes
+	$xpath = new DOMXPath( $dom );
+
+	// Query all elements with href attributes
+	$nodes = $xpath->query( '//*[@href]' );
+	foreach ( $nodes as $node ) {
+		if ( ! $node instanceof DOMElement ) {
+			continue;
+		}
+		$href = $node->getAttribute( 'href' );
+
+		// Check if the href is non-empty, points to a markdown file, and is a local path
+		if ( $href &&
+			preg_match( '/\.md($|#)/', $href ) &&
+			! preg_match( '/^(https?:)?\/\//', $href )
+		) {
+			// Adjust the path
+			$new_href = adjust_markdown_file_path( $href, $current_file_path );
+
+			// Set the new href
+			$node->setAttribute( 'href', $new_href );
+		}
+	}
+
+	// Remove the data attributes that GitHub uses for click-to-copy functionality.
+	// The DOM parser is unable to keep them encoded correctly.
+	$click_to_copy_attribute = 'data-snippet-clipboard-copy-content';
+	$nodes = $xpath->query( sprintf( '//*[@%s]', $click_to_copy_attribute ) );
+	foreach ( $nodes as $node ) {
+		if ( ! $node instanceof DOMElement ) {
+			continue;
+		}
+		$node->removeAttribute( $click_to_copy_attribute );
+	}
+
+	// Save and return the updated HTML without the XML declaration.
+	return preg_replace( '/^<\?xml[^>]+\?>/', '', $dom->saveHTML() );
+}
+
+
+/**
+ * Adjusts the markdown file path by resolving relative paths to absolute paths.
+ * Preserves fragment identifiers (anchors) in the URL.
+ *
+ * @param string $path The original path.
+ * @param string $current_file_path The current file's path.
+ * @return string The adjusted path.
+ */
+function adjust_markdown_file_path( string $path, string $current_file_path = '' ): string {
+	global $post;
+	$page_slug = $post->post_name;
+
+	// Parse the URL to separate the path and fragment
+	$parts = wp_parse_url( $path );
+
+	// Extract the path and fragment
+	$original_path = isset( $parts['path'] ) ? $parts['path'] : '';
+	$fragment = isset( $parts['fragment'] ) ? '#' . $parts['fragment'] : '';
+
+	// Get the directory of the current file
+	$current_dir = dirname( $current_file_path );
+
+	// Resolve the absolute path based on the current directory
+	if ( str_starts_with( $original_path, '/' ) ) {
+		// Already an absolute path from root, just remove leading slash
+		$absolute_path = ltrim( $original_path, '/' );
+	} else {
+		// Use realpath to resolve relative paths
+		$temp_path = $current_dir . '/' . $original_path;
+		$parts = explode( '/', $temp_path );
+		$absolute_parts = [];
+
+		foreach ( $parts as $part ) {
+			if ( '.' === $part || '' === $part ) {
+				continue;
+			}
+			if ( '..' === $part ) {
+				array_pop( $absolute_parts );
+			} else {
+				$absolute_parts[] = $part;
+			}
+		}
+
+		$absolute_path = implode( '/', $absolute_parts );
+	}
+
+	// Remove the .md extension
+	$absolute_path = preg_replace( '/\.md$/', '', $absolute_path );
+
+	// Ensure the path starts with a forward slash and includes the page slug
+	return '/' . $page_slug . '/' . $absolute_path . $fragment;
+}
+````
+
 ## File: example/blocks/github-markdown-block/github-markdown-block.php
 ````php
 <?php declare(strict_types = 1);
@@ -2344,6 +2220,401 @@ function handle_github_file_path_override(): void {
 	}, 10, 2 );
 }
 add_action( 'init', __NAMESPACE__ . '\\handle_github_file_path_override' );
+````
+
+## File: example/blocks/weather-block/weather-block.php
+````php
+<?php declare(strict_types = 1);
+
+namespace RemoteDataBlocks\Example\Weather;
+
+use RemoteDataBlocks\Config\Query\HttpQuery;
+
+defined( 'ABSPATH' ) || exit();
+
+/**
+ * Convert weather code to human-readable description
+ * Based on OpenMeteo weather codes: https://open-meteo.com/en/docs
+ */
+function get_weather_description( int $code ): string {
+	$weather_codes = [
+		0 => 'Clear sky',
+		1 => 'Mainly clear',
+		2 => 'Partly cloudy',
+		3 => 'Overcast',
+		45 => 'Fog',
+		48 => 'Depositing rime fog',
+		51 => 'Light drizzle',
+		53 => 'Moderate drizzle',
+		55 => 'Dense drizzle',
+		56 => 'Light freezing drizzle',
+		57 => 'Dense freezing drizzle',
+		61 => 'Slight rain',
+		63 => 'Moderate rain',
+		65 => 'Heavy rain',
+		66 => 'Light freezing rain',
+		67 => 'Heavy freezing rain',
+		71 => 'Slight snow fall',
+		73 => 'Moderate snow fall',
+		75 => 'Heavy snow fall',
+		77 => 'Snow grains',
+		80 => 'Slight rain showers',
+		81 => 'Moderate rain showers',
+		82 => 'Violent rain showers',
+		85 => 'Slight snow showers',
+		86 => 'Heavy snow showers',
+		95 => 'Thunderstorm',
+		96 => 'Thunderstorm with slight hail',
+		99 => 'Thunderstorm with heavy hail',
+	];
+
+	return $weather_codes[ $code ] ?? 'Unknown';
+}
+
+/**
+ * Generate rain prediction based on precipitation probability
+ */
+function generate_rain_prediction( int $probability ): string {
+	if ( $probability >= 80 ) {
+		return 'It definitely looks like rain today!';
+	} elseif ( $probability >= 20 ) {
+		return 'It might rain today.';
+	} else {
+		return 'Rain is unlikely today.';
+	}
+}
+
+/**
+ * Registers a remote data block for fetching weather data from the OpenMeteo API.
+ * This block accepts a city name as input and returns current weather information
+ * including temperature, humidity, weather description, and rain prediction.
+ *
+ * @see https://open-meteo.com/en/docs
+ */
+function register_weather_remote_data_block(): void {
+	$openmeteo_data_source = [
+		'display_name' => 'OpenMeteo Weather API',
+		'endpoint' => 'https://api.open-meteo.com/v1/',
+		'request_headers' => [
+			'Content-Type' => 'application/json',
+		],
+	];
+
+	$get_geo_data_from_city_query = [
+		'data_source' => $openmeteo_data_source,
+		'display_name' => 'Get latitude and longitude from city name',
+		'endpoint' => function ( array $input_variables ): string {
+			return add_query_arg( [
+				'name' => $input_variables['city'],
+				'count' => 1,
+				'language' => 'en',
+				'format' => 'json',
+			], 'https://geocoding-api.open-meteo.com/v1/search' );
+		},
+		'input_schema' => [
+			'city' => [
+				'name' => 'City Name',
+				'type' => 'string',
+				'required' => true,
+			],
+		],
+		'output_schema' => [
+			'is_collection' => false,
+			'path' => '$.results[0]',
+			'type' => [
+				'country' => [
+					'name' => 'Country',
+					'path' => '$.country',
+					'type' => 'string',
+				],
+				'lat' => [
+					'name' => 'Latitude',
+					'path' => '$.latitude',
+					'type' => 'number',
+				],
+				'long' => [
+					'name' => 'Longitude',
+					'path' => '$.longitude',
+					'type' => 'number',
+				],
+				'name' => [
+					'name' => 'Name',
+					'path' => '$.name',
+					'type' => 'string',
+				],
+			],
+		],
+	];
+
+	$get_weather_query = [
+		'data_source' => $openmeteo_data_source,
+		'display_name' => 'Get weather by city name',
+		'endpoint' => function ( array $input_variables ) use ( $openmeteo_data_source, $get_geo_data_from_city_query ): string {
+			// Get latitude and longitude from the city name by executing a dependent
+			// query. This approach can avoid the need for a custom query runner or
+			// other complicated configuration.
+			//
+			// Using `HttpQuery` allows us to benefit from the caching layer, which is
+			// important since this code runs on every request before the object cache
+			// is checked.
+			$geo_data_query = HttpQuery::from_array( $get_geo_data_from_city_query );
+			$geo_data = $geo_data_query->execute( [ 'city' => $input_variables['city'] ] );
+
+			$latitude = $geo_data['results'][0]['result']['lat']['value'] ?? 'invalid';
+			$longitude = $geo_data['results'][0]['result']['long']['value'] ?? 'invalid';
+
+			// Construct and return weather API URL
+			return add_query_arg( [
+				'latitude' => $latitude,
+				'longitude' => $longitude,
+				'current' => 'temperature_2m,relative_humidity_2m,weather_code,precipitation_probability',
+				'timezone' => 'auto',
+				'temperature_unit' => 'celsius',
+			], $openmeteo_data_source['endpoint'] . 'forecast' );
+		},
+		'input_schema' => [
+			'city' => [
+				'name' => 'City Name',
+				'type' => 'string',
+				'required' => true,
+			],
+		],
+		'output_schema' => [
+			'is_collection' => false, // This query returns a single weather record
+			'type' => [
+				'location_name' => [
+					'name' => 'Location',
+					'type' => 'string',
+					'generate' => function ( array $_data, array $response_data ): string {
+						return $response_data['input_variables']['city'] ?? 'Unknown';
+					},
+				],
+				'temperature_celsius' => [
+					'name' => 'Temperature (°C)',
+					'type' => 'number',
+					'path' => '$.current.temperature_2m',
+				],
+				'temperature_fahrenheit' => [
+					'name' => 'Temperature (°F)',
+					'type' => 'number',
+					'generate' => function ( array $data ): float {
+						$temp_c = $data['current']['temperature_2m'] ?? 0;
+						return round( ( $temp_c * 9 / 5 ) + 32, 1 );
+					},
+				],
+				'weather_description' => [
+					'name' => 'Weather Description',
+					'type' => 'string',
+					'generate' => function ( array $data ): string {
+						$weather_code = $data['current']['weather_code'] ?? 0;
+						return get_weather_description( (int) $weather_code );
+					},
+				],
+				'humidity' => [
+					'name' => 'Humidity (%)',
+					'type' => 'integer',
+					'path' => '$.current.relative_humidity_2m',
+				],
+				'precipitation_probability' => [
+					'name' => 'Precipitation Probability (%)',
+					'type' => 'integer',
+					'path' => '$.current.precipitation_probability',
+				],
+				'rain_prediction' => [
+					'name' => 'Rain Prediction',
+					'type' => 'string',
+					'generate' => function ( array $data ): string {
+						$probability = $data['current']['precipitation_probability'] ?? 0;
+						return generate_rain_prediction( (int) $probability );
+					},
+				],
+			],
+		],
+	];
+
+	register_remote_data_block( [
+		'title' => 'Weather',
+		'icon' => 'cloud',
+		'render_query' => [
+			'query' => $get_weather_query,
+		],
+		// Supply a pattern for the block that will be used to display the weather
+		// data. This takes the place of the default pattern provided by the plugin.
+		'patterns' => [
+			[
+				'title' => 'Weather for city',
+				'html' => file_get_contents( __DIR__ . '/patterns/weather-block-pattern.html' ),
+				'role' => 'inner_blocks', // Bypass the pattern selection step.
+			],
+		],
+	] );
+}
+add_action( 'init', __NAMESPACE__ . '\\register_weather_remote_data_block' );
+````
+
+## File: example/templates/rest-api-block/rest-api-block.php
+````php
+<?php
+
+/**
+ * Register a remote data block that uses a basic REST API. Customize the data
+ * source, queries, and schemas to match your specific API requirements.
+ */
+function register_basic_rest_api_remote_data_block(): void {
+	$api_data_source = [
+		'display_name' => '{{ API Name }}',
+		'endpoint' => '{{ API Base URL }}',
+		'request_headers' => [
+			'Content-Type' => 'application/json',
+			// TODO: Add authentication headers, if needed.
+			// 'Authorization' => 'Bearer {{ API token }}',
+			// 'X-API-Key' => '{{ API key }}',
+		],
+	];
+
+	// Get item query: Fetch one record by ID.
+	$get_item_query = [
+		'data_source' => $api_data_source,
+		// Provide a callable (closure) to dynamically generate the endpoint using
+		// the base endpoint from the data source and the input variables.
+		'endpoint' => function ( array $input_variables ) use ( $api_data_source ): string {
+			$endpoint = $api_data_source['endpoint'];
+			$item_id = $input_variables['id'] ?? '';
+
+			return $endpoint . '/items/' . $item_id;
+		},
+		'input_schema' => [
+			'id' => [
+				'name' => 'Item ID',
+				'type' => 'id',
+			],
+		],
+		'output_schema' => [
+			// TODO: Adjust the field names, types, and paths based on your API
+			// response structure.
+			'is_collection' => false, // This query returns a single record.
+			'path' => '$.data',
+			'type' => [
+				'id' => [
+					'name' => 'ID',
+					'type' => 'id',
+					'path' => '$.id',
+				],
+				'title' => [
+					'name' => 'Title',
+					'type' => 'title',
+					'path' => '$.title',
+				],
+				'description' => [
+					'name' => 'Description',
+					'type' => 'string',
+					'path' => '$.description',
+				],
+				'image_url' => [
+					'name' => 'Image URL',
+					'type' => 'image_url',
+					// Instead of a `path`, we provide a `generate` function to create the
+					// image URL. The `$data` parameter contains the data returned from the
+					// API at this "level" (e.g., after the root `path` has been applied).
+					//
+					// It also receives the raw response data, which can be useful if you
+					// need to access input variables or other data not available in the
+					// response.
+					'generate' => static function ( array $data, array $raw_response_data ): string {
+						$item_id = $data['id'] ?? $raw_response_data['input_variables']['id'];
+						return 'https://example.com/images/items/' . $item_id . '.jpg';
+					},
+				],
+				// TODO: Add more fields as needed.
+			],
+		],
+	];
+
+	// List items query: Fetch multiple records with pagination and search.
+	$list_items_query = [
+		'data_source' => $api_data_source,
+		// Provide a callable (closure) to dynamically generate the endpoint using
+		// the base endpoint from the data source and the input variables.
+		'endpoint' => function ( array $input_variables ) use ( $api_data_source ): string {
+			$endpoint = $api_data_source['endpoint'] . '/items';
+
+			$query_params = [];
+
+			// TODO: Apply pagination input variables according to your API or remove
+			// if your API does not support pagination.
+			if ( ! empty( $input_variables['limit'] ) ) {
+				$query_params['limit'] = $input_variables['limit'];
+			}
+
+			if ( ! empty( $input_variables['page'] ) ) {
+				$query_params['page'] = $input_variables['page'];
+			}
+
+			// TODO: Apply search input variable according to your API or remove if
+			// your API does not support search.
+			if ( ! empty( $input_variables['search'] ) ) {
+				$query_params['q'] = $input_variables['search'];
+			}
+
+			return add_query_arg( $query_params, $endpoint );
+		},
+		'input_schema' => [
+			'search' => [
+				'name' => 'Search Terms',
+				'type' => 'ui:search_input',
+			],
+			'limit' => [
+				'default_value' => 10,
+				'name' => 'Items per page',
+				'type' => 'ui:pagination_per_page',
+			],
+			'page' => [
+				'default_value' => 1,
+				'name' => 'Page',
+				'type' => 'ui:pagination_page',
+			],
+		],
+		// Reuse the output schema from the single item query.
+		'output_schema' => array_merge(
+			$get_item_query['output_schema'],
+			[ 'is_collection' => true ]
+		),
+		'pagination_schema' => [
+			// TODO: Adjust the field names, types, and paths based on your API
+			// response structure, or set `pagination_schema` to `null` if your API
+			// does not support pagination.
+			'total_items' => [
+				'name' => 'Total Items',
+				'path' => '$.meta.total',
+			],
+			'total_pages' => [
+				'name' => 'Total Pages',
+				'path' => '$.meta.total_pages',
+			],
+			'current_page' => [
+				'name' => 'Current Page',
+				'path' => '$.meta.current_page',
+			],
+		],
+	];
+
+	// Register the remote data block.
+	register_remote_data_block( [
+		'title' => '{{ Block name }}',
+		'render_query' => [
+			'query' => $get_item_query,
+		],
+		'selection_queries' => [
+			[
+				'query' => $list_items_query,
+				'type' => 'search',
+			],
+		],
+		// TODO: Uncomment and implement if you want to use a custom block pattern.
+		// 'pattern' => file_get_contents( __DIR__ . '/patterns/default-pattern.html' ),
+	] );
+}
+add_action( 'init', 'register_basic_rest_api_remote_data_block' );
 ````
 
 ## File: example/README.md
@@ -2710,6 +2981,83 @@ add_filter( 'remote_data_blocks_query_response_metadata', 'custom_query_response
 ```
 ````
 
+## File: docs/tutorials/http.md
+````markdown
+# Create a remote data block using an HTTP data source
+
+This page will walk you through registering a remote data block that loads data from a Zip code REST API. It will require you to commit code to a WordPress theme or plugin.
+
+## Create the data source
+
+1. Go to Settings > Remote Data Blocks in your WordPress admin.
+2. Click on the "Connect new" button.
+3. Choose "HTTP" from the dropdown menu as the data source type.
+4. Fill in the following details:
+   - Data Source Name: Zip Code API
+   - URL: https://api.zippopotam.us/us/
+5. If your API requires authentication, enter those details. This API does not.
+6. Save the data source and return the data source list.
+7. In the Actions column, click the three-dot menu, then "Copy UUID" to copy the data source's UUID to your clipboard.
+
+## Register the block
+
+In code, we'll define a query using the data source we just created. Follow the [Zip code block example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/blocks/zip-code-block/zip-code-block.php), but remove the data source definition. In its place, use this code to load the data source we just created by its UUID:
+
+```php
+$data_source = HttpDataSource::from_uuid( '{{ Data source UUID }}' );
+```
+````
+
+## File: docs/extending/data-source.md
+````markdown
+# Data source
+
+A data source defines the basic reusable properties of an API and is used by a [query](query.md) to reduce duplicative code. It also helps define how your data source looks in the WordPress admin.
+
+Simple data sources can be configured via the plugin's settings screen, while others may require custom PHP code.
+
+## Example
+
+Here's an example of a data source configuration for an HTTP API:
+
+```php
+$data_source = [
+	'display_name' => 'Example API',
+	'endpoint' => 'https://api.example.com/',
+	'request_headers' => [
+		'Content-Type' => 'application/json',
+		'X-Api-Key' => constant( 'MY_API_KEY_CONSTANT' ),
+	],
+];
+```
+
+And here is an example of a data source that was defined in the plugin settings screen, loaded by its UUID:
+
+```php
+$data_source = HttpDataSource::from_uuid( '{{ Data source UUID }}' );
+```
+
+## Configuration
+
+### display_name: string (required)
+
+The display name is used in the UI to identify your data source.
+
+### endpoint: string (required)
+
+This is the default or base endpoint for the data source. [Queries](query.md) that use a data source can override or append paths to its endpoint.
+
+### image_url: string
+
+An optional image URL can be used in the UI to help identify your data source.
+
+### request_headers: array
+
+An associative array of headers that will be sent with each HTTP request. Queries that use a data source can override or append headers.
+
+When providing authentication credentials, take care to avoid committing them to code repositories. We strongly recommend using environment variables or secure storage.
+````
+
 ## File: docs/extending/query-output-schema.md
 ````markdown
 # HttpQuery `output_schema` property
@@ -2721,7 +3069,9 @@ Note that the output schema may require updates whenever the shape or schema of 
 ## Properties
 
 - `format` (optional): A callable function that formats the output variable value.
-- `generate` (optional): A callable function that generates or extracts the output variable value from the response, as an alternative to `path`.
+- `generate` (optional): A callable function that generates or extracts the output variable value from the response, as an alternative to `path`. It receives two parameters:
+  - `array $data`: The data returned by the API, which is contains the data returned from the API at the current "level" (e.g., after the root `path` has been applied, if present).
+  - `array $raw_response_data`: The "raw" response data returned by the API, which includes the input variables (`$raw_response_data['input_variables']`), response metadata (`$raw_response_data['metadata']`), and the entire API response before any preprocessing.
 - `is_collection` (optional, default `false`): A boolean indicating whether the response data is a collection. If false, only a single item will be returned.
 - `name` (optional): The human-friendly display name of the output variable.
 - `default_value` (optional): The default value for the output variable.
@@ -2780,7 +3130,7 @@ And the corresponding `output_schema` definition might look like this:
 		'city_state' => [
 			'name' => 'City, State',
 			'default_value' => 'Unknown',
-			'generate' => function( array $data ): string|null {
+			'generate' => function( array $data, array $raw_response_data ): string|null {
 				if ( empty( $data['places'] ) ) {
 					return null;
 				}
@@ -2796,7 +3146,7 @@ And the corresponding `output_schema` definition might look like this:
 - The `is_collection` property indicates whether the output represents a single entity or a collection of entities. In this case, it is set to `false` because the API returns a single entity.
 - The `type` property at the root level begins the type definition. The `zip_code` and `city_state` array keys are "slugs" that identify the field. The array values define types that describe how to extract a value for those fields.
 - The `zip_code` field is extracted via a [JSONPath](http://jsonpath.com) expression defined in the `path` property.
-- The `city_state` field provides a callable via the `generate` property. That function receives the data and combines two elements to form the value.
+- The `city_state` field provides a callable via the `generate` property. That function receives the response data and combines two elements to form the value.
 - A `default_value` property provides a value that will be used if the provided `path` expression or `generate` function resolve to a null value.
 
 The result of applying this output schema to the example JSON response is:
@@ -2964,83 +3314,6 @@ Applying this output schema to the response JSON would result in the following o
 	],
 ]
 ```
-````
-
-## File: docs/tutorials/http.md
-````markdown
-# Create a remote data block using an HTTP data source
-
-This page will walk you through registering a remote data block that loads data from a Zip code REST API. It will require you to commit code to a WordPress theme or plugin.
-
-## Create the data source
-
-1. Go to Settings > Remote Data Blocks in your WordPress admin.
-2. Click on the "Connect new" button.
-3. Choose "HTTP" from the dropdown menu as the data source type.
-4. Fill in the following details:
-   - Data Source Name: Zip Code API
-   - URL: https://api.zippopotam.us/us/
-5. If your API requires authentication, enter those details. This API does not.
-6. Save the data source and return the data source list.
-7. In the Actions column, click the three-dot menu, then "Copy UUID" to copy the data source's UUID to your clipboard.
-
-## Register the block
-
-In code, we'll define a query using the data source we just created. Follow the [Zip code block example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/blocks/zip-code-block/zip-code-block.php), but remove the data source definition. In its place, use this code to load the data source we just created by its UUID:
-
-```php
-$data_source = HttpDataSource::from_uuid( '{{ Data source UUID }}' );
-```
-````
-
-## File: docs/extending/data-source.md
-````markdown
-# Data source
-
-A data source defines the basic reusable properties of an API and is used by a [query](query.md) to reduce duplicative code. It also helps define how your data source looks in the WordPress admin.
-
-Simple data sources can be configured via the plugin's settings screen, while others may require custom PHP code.
-
-## Example
-
-Here's an example of a data source configuration for an HTTP API:
-
-```php
-$data_source = [
-	'display_name' => 'Example API',
-	'endpoint' => 'https://api.example.com/',
-	'request_headers' => [
-		'Content-Type' => 'application/json',
-		'X-Api-Key' => constant( 'MY_API_KEY_CONSTANT' ),
-	],
-];
-```
-
-And here is an example of a data source that was defined in the plugin settings screen, loaded by its UUID:
-
-```php
-$data_source = HttpDataSource::from_uuid( '{{ Data source UUID }}' );
-```
-
-## Configuration
-
-### display_name: string (required)
-
-The display name is used in the UI to identify your data source.
-
-### endpoint: string (required)
-
-This is the default or base endpoint for the data source. [Queries](query.md) that use a data source can override or append paths to its endpoint.
-
-### image_url: string
-
-An optional image URL can be used in the UI to help identify your data source.
-
-### request_headers: array
-
-An associative array of headers that will be sent with each HTTP request. Queries that use a data source can override or append headers.
-
-When providing authentication credentials, take care to avoid committing them to code repositories. We strongly recommend using environment variables or secure storage.
 ````
 
 ## File: docs/concepts/index.md
