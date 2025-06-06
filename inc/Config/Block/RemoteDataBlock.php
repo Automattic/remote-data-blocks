@@ -28,7 +28,7 @@ class RemoteDataBlock extends ArraySerializable {
 	 */
 	public static function migrate_config( array $config = [] ): array|WP_Error {
 		// Nothing to migrate, return the block config as is.
-		if ( isset( $config[ ConfigRegistry::PLACEHOLDERS_KEY ] ) ) {
+		if ( isset( $config[ ConfigRegistry::QUERIES_KEY ] ) ) {
 			return $config;
 		}
 

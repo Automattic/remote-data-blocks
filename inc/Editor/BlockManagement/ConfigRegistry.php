@@ -47,110 +47,180 @@ class ConfigRegistry {
 			return self::create_error( $block_title, sprintf( 'Block %s has already been registered', $block_name ) );
 		}
 
-		// ToDo: This is optional, so we should generate it in the event that it's not present.
-		if ( empty( $block_config[ self::PLACEHOLDERS_KEY ] ) ) {
-			return self::create_error( $block_title, 'Block configuration must have a non-empty "placeholders" array' );
-		}
-
-		// Pre-validate the placeholders, to ensure they exist.
-		foreach ( $block_config[ self::PLACEHOLDERS_KEY ] as $placeholder ) {
-			if ( ! isset( $block_config[ self::QUERIES_KEY ][ $placeholder['query_key'] ] ) ) {
-				return self::create_error( $block_title, sprintf( 'Query "%s" not found for placeholder "%s"', $placeholder['query_key'], $placeholder['name'] ) );
-			}
-		}
-
 		$queries = [];
 		$selectors = [];
 		$display_queries_to_selectors_map = [];
 
-		// Generate the selectors for the selector queries.
-		foreach ( $block_config[ self::QUERIES_KEY ] as $query_key => $query ) {
-			// Inflate the query, and add it to the queries array.
-			$query = self::inflate_query( $query );
-			$queries[ $query_key ] = $query;
+		if ( ! empty( $block_config[ self::PLACEHOLDERS_KEY ] ) ) {
+			// Pre-validate the placeholders, to ensure they exist.
+			foreach ( $block_config[ self::PLACEHOLDERS_KEY ] as $placeholder ) {
+				if ( ! isset( $block_config[ self::QUERIES_KEY ][ $placeholder['query_key'] ] ) ) {
+					return self::create_error( $block_title, sprintf( 'Query "%s" not found for placeholder "%s"', $placeholder['query_key'], $placeholder['name'] ) );
+				}
+			}
 
-			$input_schema = $query->get_input_schema();
-			$output_schema = $query->get_output_schema();
+			// Generate the selectors for the selector queries.
+			foreach ( $block_config[ self::QUERIES_KEY ] as $query_key => $query ) {
+				// Inflate the query, and add it to the queries array.
+				$query = self::inflate_query( $query );
+				$queries[ $query_key ] = $query;
 
-			// match the query_key against the query_key property in a placeholder entry.
-			$filtered_placeholders = array_filter( $block_config[ self::PLACEHOLDERS_KEY ], fn( $placeholder ) => $placeholder['query_key'] === $query_key );
+				$input_schema = $query->get_input_schema();
+				$output_schema = $query->get_output_schema();
 
-			// Generate the selector for the display query, and then continue on to the next query.
-			if ( ! empty( $filtered_placeholders ) ) {
-				$is_collection = true === ( $output_schema['is_collection'] ?? false );
+				// match the query_key against the query_key property in a placeholder entry.
+				$filtered_placeholders = array_filter( $block_config[ self::PLACEHOLDERS_KEY ], fn( $placeholder ) => $placeholder['query_key'] === $query_key );
+
+				// Generate the selector for the display query, and then continue on to the next query.
+				if ( ! empty( $filtered_placeholders ) ) {
+					$is_collection = true === ( $output_schema['is_collection'] ?? false );
+					$has_required_variables = array_reduce(
+						array_column( $input_schema, 'required' ),
+						fn( $carry, $required ) => $carry || ( $required ?? true ),
+						false
+					);
+
+					$selectors[] = [
+						'image_url' => $query->get_image_url(),
+						'inputs' => self::map_input_variables( $input_schema ),
+						'name' => $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ),
+						'query_key' => $query_key,
+						'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
+					];
+
+					$display_queries_to_selectors_map[ $query_key ][] = $query_key;
+
+					continue;
+				}
+
+				// ToDo: Should switch this to be an array of types instead.
+				// Infer the type of the query, for selector generation and to validate the non-display queries.
+				$inferred_type = self::infer_query_type( $input_schema, $output_schema );
+				if ( 'unknown' === $inferred_type ) {
+					return self::create_error( 'Unknown query type', 'Could not infer the type of the query. Valid query types are "search" and "list".' );
+				}
+
+				// If the output schema's type is not an array, then skip selector generation as that'll not work.
+				// This has been done because some output schemas have the type set to string.
+				if ( ! is_array( $output_schema['type'] ) ) {
+					continue;
+				}
+
+				foreach ( $block_config[ self::PLACEHOLDERS_KEY ] as $placeholder ) {
+					$display_query = self::inflate_query( $block_config[ self::QUERIES_KEY ][ $placeholder['query_key'] ] );
+					$display_query_input_schema = $display_query->get_input_schema();
+
+					// Check if the query's output schema intersects with the display query's input schema.
+					$intersecting_keys = array_intersect_key( $output_schema['type'], $display_query_input_schema );
+
+					// Skip this, if they don't intersect.
+					if ( empty( $intersecting_keys ) ) {
+						continue;
+					}
+
+					// Ensure the name and type of the schemas are truly valid.
+					$valid_intersecting_keys = self::validate_selector_query_mapping( $intersecting_keys, $display_query_input_schema, $output_schema );
+					if ( empty( $valid_intersecting_keys ) ) {
+						continue;
+					}
+
+					// Validate the query mapping.
+					$validation_result = self::validate_query_mapping( $display_query_input_schema, $output_schema, $block_title, $query_key );
+					if ( is_wp_error( $validation_result ) ) {
+						return $validation_result;
+					}
+
+					// Add the selector for the query to the beginning of the selectors array.
+					array_unshift(
+						$selectors,
+						[
+							'image_url' => $query->get_image_url(),
+							'inputs' => self::map_input_variables( $input_schema ),
+							'name' => self::get_query_name_from_key( $query_key ),
+							'query_key' => $query_key,
+							'type' => $inferred_type,
+						]
+					);
+
+					$display_queries_to_selectors_map[ $placeholder['query_key'] ][] = $query_key;
+
+					// We have found the relevant display query, so we can break out of the loop.
+					break;
+				}
+			}
+		} else {
+			foreach ( $block_config[ self::QUERIES_KEY ] as $placeholder_query_key => $placeholder_query ) {
+				$placeholder_query = self::inflate_query( $placeholder_query );
+				$queries[ $placeholder_query_key ] = $placeholder_query;
+
+				// Skip if this query key is already mapped as a selector for any display query.
+				if ( in_array( $placeholder_query_key, array_merge( ...array_values( $display_queries_to_selectors_map ) ), true ) ) {
+					continue;
+				}
+
+				$placeholder_query_input_schema = $placeholder_query->get_input_schema();
+				$placeholder_query_output_schema = $placeholder_query->get_output_schema();
+
+				$is_collection = true === ( $placeholder_query_output_schema['is_collection'] ?? false );
 				$has_required_variables = array_reduce(
-					array_column( $input_schema, 'required' ),
+					array_column( $placeholder_query_input_schema, 'required' ),
 					fn( $carry, $required ) => $carry || ( $required ?? true ),
 					false
 				);
 
 				$selectors[] = [
-					'image_url' => $query->get_image_url(),
-					'inputs' => self::map_input_variables( $input_schema ),
+					'image_url' => $placeholder_query->get_image_url(),
+					'inputs' => self::map_input_variables( $placeholder_query_input_schema ),
 					'name' => $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ),
-					'query_key' => $query_key,
+					'query_key' => $placeholder_query_key,
 					'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
 				];
 
-				// ToDo: Should consider inserting the icon here along with the name.
-				$display_queries_to_selectors_map[ $query_key ][] = $query_key;
+				$display_queries_to_selectors_map[ $placeholder_query_key ][] = $placeholder_query_key;
 
-				continue;
-			}
+				foreach ( $block_config[ self::QUERIES_KEY ] as $selector_query_key => $selector_query ) {
+					$selector_query = self::inflate_query( $selector_query );
+					$queries[ $selector_query_key ] = $selector_query;
 
-			// ToDo: Should switch this to be an array of types instead.
-			// Infer the type of the query, for selector generation and to validate the non-display queries.
-			$inferred_type = self::infer_query_type( $input_schema, $output_schema );
-			if ( is_wp_error( $inferred_type ) ) {
-				return $inferred_type;
-			}
+					$selector_query_input_schema = $selector_query->get_input_schema();
+					$selector_query_output_schema = $selector_query->get_output_schema();
 
-			// If the output schema's type is not an array, then skip selector generation as that'll not work.
-			// This has been done because some output schemas have the type set to string.
-			if ( ! is_array( $output_schema['type'] ) ) {
-				continue;
-			}
+					$inferred_selector_query_type = self::infer_query_type( $selector_query_input_schema, $selector_query_output_schema );
+					if ( 'unknown' === $inferred_selector_query_type ) {
+						continue;
+					}
 
-			foreach ( $block_config[ self::PLACEHOLDERS_KEY ] as $placeholder ) {
-				$display_query = self::inflate_query( $block_config[ self::QUERIES_KEY ][ $placeholder['query_key'] ] );
-				$display_query_input_schema = $display_query->get_input_schema();
+					if ( ! is_array( $selector_query_output_schema['type'] ) ) {
+						continue;
+					}
 
-				// Check if the query's output schema intersects with the display query's input schema.
-				$intersecting_keys = array_intersect_key( $output_schema['type'], $display_query_input_schema );
+					$intersecting_keys = array_intersect_key( $selector_query_output_schema['type'], $placeholder_query_input_schema );
 
-				// Skip this, if they don't intersect.
-				if ( empty( $intersecting_keys ) ) {
-					continue;
+					// Skip this, if they don't intersect.
+					if ( empty( $intersecting_keys ) ) {
+						continue;
+					}
+
+					$validation_result = self::validate_query_mapping( $placeholder_query_input_schema, $selector_query_output_schema, $block_title, $placeholder_query_key );
+					if ( is_wp_error( $validation_result ) ) {
+						return $validation_result;
+					}
+
+
+					// Add the selector for the query to the beginning of the selectors array.
+					array_unshift(
+						$selectors,
+						[
+							'image_url' => $selector_query->get_image_url(),
+							'inputs' => self::map_input_variables( $selector_query_input_schema ),
+							'name' => self::get_query_name_from_key( $selector_query_key ),
+							'query_key' => $selector_query_key,
+							'type' => $inferred_selector_query_type,
+						]
+					);
+
+					$display_queries_to_selectors_map[ $placeholder_query_key ][] = $selector_query_key;
 				}
-
-				// Ensure the name and type of the schemas are truly valid.
-				$valid_intersecting_keys = self::validate_selector_query_mapping( $intersecting_keys, $display_query_input_schema, $output_schema );
-				if ( empty( $valid_intersecting_keys ) ) {
-					continue;
-				}
-
-				// Validate the query mapping.
-				$validation_result = self::validate_query_mapping( $display_query_input_schema, $output_schema, $block_title, $query_key );
-				if ( is_wp_error( $validation_result ) ) {
-					return $validation_result;
-				}
-
-				// Add the selector for the query to the beginning of the selectors array.
-				array_unshift(
-					$selectors,
-					[
-						'image_url' => $query->get_image_url(),
-						'inputs' => self::map_input_variables( $input_schema ),
-						'name' => self::get_query_name_from_key( $query_key ),
-						'query_key' => $query_key,
-						'type' => $inferred_type,
-					]
-				);
-
-				$display_queries_to_selectors_map[ $placeholder['query_key'] ][] = $query_key;
-
-				// We have found the relevant display query, so we can break out of the loop.
-				break;
 			}
 		}
 
@@ -276,7 +346,7 @@ class ConfigRegistry {
 		return ucwords( preg_replace( '/[^a-zA-Z0-9]/', ' ', $key ) );
 	}
 
-	private static function infer_query_type( array $input_schema, array $output_schema ): string|WP_Error {
+	private static function infer_query_type( array $input_schema, array $output_schema ): string {
 		// If any input variable has type 'ui:search_input', it's a search query.
 		foreach ( $input_schema as $input_var ) {
 			if ( isset( $input_var['type'] ) && 'ui:search_input' === $input_var['type'] ) {
@@ -291,6 +361,6 @@ class ConfigRegistry {
 
 		// This will happen if a query has not been configured correctly as a search or list query.
 		// So we error out, to replace the previous way of validating when the type was set.
-		return self::create_error( 'Unknown query type', 'Could not infer the type of the query. Valid query types are "search" and "list".' );
+		return 'unknown';
 	}
 }

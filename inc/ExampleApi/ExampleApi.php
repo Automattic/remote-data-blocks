@@ -124,12 +124,6 @@ class ExampleApi {
 				'display' => $get_record_query,
 				'get_table' => $get_table_query,
 			],
-			'placeholders' => [
-				[
-					'name' => 'Get Record',
-					'query_key' => 'display',
-				],
-			],
 		] );
 	}
 }
