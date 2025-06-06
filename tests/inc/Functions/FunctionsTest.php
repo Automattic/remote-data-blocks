@@ -218,7 +218,16 @@ class FunctionsTest extends TestCase {
 				'search' => $this->mock_search_query,
 				'list' => $this->mock_list_query,
 			],
-			'display_queries' => [ 'display', 'list' ],
+			'placeholders' => [
+				[
+					'name' => 'Get',
+					'query_key' => 'display',
+				],
+				[
+					'name' => 'List',
+					'query_key' => 'list',
+				],
+			],
 		] );
 
 		$block_name = 'remote-data-blocks/test-block-with-new-config-schema';
@@ -237,7 +246,20 @@ class FunctionsTest extends TestCase {
 			'queries' => [
 				'display' => $this->mock_query,
 			],
-			'display_queries' => [ 'display', 'list', 'test' ],
+			'placeholders' => [
+				[
+					'name' => 'Get',
+					'query_key' => 'display',
+				],
+				[
+					'name' => 'List',
+					'query_key' => 'list',
+				],
+				[
+					'name' => 'Test',
+					'query_key' => 'test',
+				],
+			],
 		] );
 
 		$this->assertTrue( $this->mock_logger->hasLoggedLevel( LogLevel::ERROR ) );

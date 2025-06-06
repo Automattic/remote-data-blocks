@@ -132,7 +132,13 @@ function register_art_remote_data_block(): void {
 			'display' => $get_art_query,
 			'search_art' => $search_art_query,
 		],
-		'display_queries' => [ 'display' ],
+		'placeholders' => [
+			[
+				'name' => 'Get Art',
+				'query_key' => 'display',
+				'icon' => 'art',
+			],
+		],
 	] );
 }
 add_action( 'init', __NAMESPACE__ . '\\register_art_remote_data_block' );

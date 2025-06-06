@@ -85,7 +85,15 @@ final class ConfigSchemas {
 					] )
 				)
 			),
-			'display_queries' => Types::list_of( Types::string() ),
+			'placeholders' => Types::nullable(
+				Types::list_of(
+					Types::object( [
+						'name' => Types::string(),
+						'query_key' => Types::string(),
+						'icon' => Types::nullable( Types::string() ),
+					] ),
+				)
+			),
 			'queries' => Types::record(
 				Types::string(),
 				Types::one_of(

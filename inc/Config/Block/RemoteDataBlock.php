@@ -28,16 +28,19 @@ class RemoteDataBlock extends ArraySerializable {
 	 */
 	public static function migrate_config( array $config = [] ): array|WP_Error {
 		// Nothing to migrate, return the block config as is.
-		if ( isset( $config[ ConfigRegistry::QUERIES_KEY ] ) ) {
+		if ( isset( $config[ ConfigRegistry::PLACEHOLDERS_KEY ] ) ) {
 			return $config;
 		}
 
 		$queries = [];
-		$display_queries = [];
+		$placeholders = [];
 
 		if ( isset( $config[ self::DEPRECATED_RENDER_QUERY_KEY ]['query'] ) ) {
 			$queries[ ConfigRegistry::DEPRECATED_DISPLAY_QUERY_KEY ] = $config[ self::DEPRECATED_RENDER_QUERY_KEY ]['query'];
-			$display_queries = [ ConfigRegistry::DEPRECATED_DISPLAY_QUERY_KEY ];
+			$placeholders[] = [
+				'name' => 'Display',
+				'query_key' => ConfigRegistry::DEPRECATED_DISPLAY_QUERY_KEY,
+			];
 			unset( $config[ self::DEPRECATED_RENDER_QUERY_KEY ] );
 		}
 
@@ -52,7 +55,7 @@ class RemoteDataBlock extends ArraySerializable {
 
 		// Set queries.
 		$config[ ConfigRegistry::QUERIES_KEY ] = $queries;
-		$config[ ConfigRegistry::DISPLAY_QUERIES_KEY ] = $display_queries;
+		$config[ ConfigRegistry::PLACEHOLDERS_KEY ] = $placeholders;
 
 		return $config;
 	}

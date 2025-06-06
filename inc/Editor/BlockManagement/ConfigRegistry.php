@@ -20,7 +20,7 @@ class ConfigRegistry {
 	private static LoggerInterface $logger;
 
 	public const DEPRECATED_DISPLAY_QUERY_KEY = 'display';
-	public const DISPLAY_QUERIES_KEY = 'display_queries';
+	public const PLACEHOLDERS_KEY = 'placeholders';
 	public const LIST_QUERY_KEY = 'list';
 	public const SEARCH_QUERY_KEY = 'search';
 	public const QUERIES_KEY = 'queries';
@@ -47,14 +47,15 @@ class ConfigRegistry {
 			return self::create_error( $block_title, sprintf( 'Block %s has already been registered', $block_name ) );
 		}
 
-		if ( empty( $block_config['display_queries'] ) ) {
-			return self::create_error( $block_title, 'Block configuration must have a non-empty "display_queries" array' );
+		// ToDo: This is optional, so we should generate it in the event that it's not present.
+		if ( empty( $block_config[ self::PLACEHOLDERS_KEY ] ) ) {
+			return self::create_error( $block_title, 'Block configuration must have a non-empty "placeholders" array' );
 		}
 
-		// Pre-validate the display queries, to ensure they exist.
-		foreach ( $block_config['display_queries'] as $display_query_key ) {
-			if ( ! isset( $block_config[ self::QUERIES_KEY ][ $display_query_key ] ) ) {
-				return self::create_error( $block_title, sprintf( 'Display query "%s" not found', $display_query_key ) );
+		// Pre-validate the placeholders, to ensure they exist.
+		foreach ( $block_config[ self::PLACEHOLDERS_KEY ] as $placeholder ) {
+			if ( ! isset( $block_config[ self::QUERIES_KEY ][ $placeholder['query_key'] ] ) ) {
+				return self::create_error( $block_title, sprintf( 'Query "%s" not found for placeholder "%s"', $placeholder['query_key'], $placeholder['name'] ) );
 			}
 		}
 
@@ -71,8 +72,11 @@ class ConfigRegistry {
 			$input_schema = $query->get_input_schema();
 			$output_schema = $query->get_output_schema();
 
+			// match the query_key against the query_key property in a placeholder entry.
+			$filtered_placeholders = array_filter( $block_config[ self::PLACEHOLDERS_KEY ], fn( $placeholder ) => $placeholder['query_key'] === $query_key );
+
 			// Generate the selector for the display query, and then continue on to the next query.
-			if ( in_array( $query_key, $block_config['display_queries'], true ) ) {
+			if ( ! empty( $filtered_placeholders ) ) {
 				$is_collection = true === ( $output_schema['is_collection'] ?? false );
 				$has_required_variables = array_reduce(
 					array_column( $input_schema, 'required' ),
@@ -88,11 +92,13 @@ class ConfigRegistry {
 					'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
 				];
 
+				// ToDo: Should consider inserting the icon here along with the name.
 				$display_queries_to_selectors_map[ $query_key ][] = $query_key;
 
 				continue;
 			}
 
+			// ToDo: Should switch this to be an array of types instead.
 			// Infer the type of the query, for selector generation and to validate the non-display queries.
 			$inferred_type = self::infer_query_type( $input_schema, $output_schema );
 			if ( is_wp_error( $inferred_type ) ) {
@@ -105,8 +111,8 @@ class ConfigRegistry {
 				continue;
 			}
 
-			foreach ( $block_config['display_queries'] as $display_query_key ) {
-				$display_query = self::inflate_query( $block_config[ self::QUERIES_KEY ][ $display_query_key ] );
+			foreach ( $block_config[ self::PLACEHOLDERS_KEY ] as $placeholder ) {
+				$display_query = self::inflate_query( $block_config[ self::QUERIES_KEY ][ $placeholder['query_key'] ] );
 				$display_query_input_schema = $display_query->get_input_schema();
 
 				// Check if the query's output schema intersects with the display query's input schema.
@@ -141,7 +147,7 @@ class ConfigRegistry {
 					]
 				);
 
-				$display_queries_to_selectors_map[ $display_query_key ][] = $query_key;
+				$display_queries_to_selectors_map[ $placeholder['query_key'] ][] = $query_key;
 
 				// We have found the relevant display query, so we can break out of the loop.
 				break;
