@@ -88,7 +88,7 @@ function register_art_remote_data_block(): void {
 			$search_terms = $input_variables['search'] ?? '';
 
 			if ( ! empty( $search_terms ) ) {
-				$endpoint = add_query_arg( [ 'q' => $search_terms ], $endpoint . '/search' );
+				$endpoint = add_query_arg( [ 'q' => $search_terms ], $endpoint );
 			}
 
 			return add_query_arg( [
