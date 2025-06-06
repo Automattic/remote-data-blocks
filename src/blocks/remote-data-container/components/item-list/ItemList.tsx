@@ -88,12 +88,15 @@ export function ItemList( props: ItemListProps ) {
 		enableSorting: field !== mediaField,
 	} ) );
 
+	// Calculate a default perPage value and avoid setting it to 0.
+	const defaultPerPage = perPage ?? Math.max( results.length, 10 );
+
 	// hide media and title fields from table view if defined to avoid duplication
 	const tableFields = fieldNames.filter( field => field !== mediaField && field !== titleField );
 
 	const [ view, setView ] = useState< View >( {
 		type: 'table' as const,
-		perPage: perPage ?? results.length,
+		perPage: defaultPerPage,
 		page,
 		search: searchInput,
 		fields: tableFields,
@@ -114,7 +117,7 @@ export function ItemList( props: ItemListProps ) {
 
 	function onChangeView( newView: View ) {
 		setPage( newView.page ?? 1 );
-		setPerPage( newView.perPage ?? perPage ?? results.length );
+		setPerPage( newView.perPage ?? defaultPerPage );
 		setSearchInput( newView.search ?? '' );
 		setView( newView );
 	}
