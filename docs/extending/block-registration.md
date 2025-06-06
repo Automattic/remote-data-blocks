@@ -3,7 +3,7 @@
 Use the `register_remote_data_block` function to register your remote data block and associate it with your query and data source. This example:
 
 1. Creates a [data source](data-source.md).
-2. Associates the data source with a query.
+2. Associates the data source with a [query](query.md).
 3. Defines the output schema of a query, which tells the plugin how to map the query response to blocks.
 4. Registers a remote data block.
 
