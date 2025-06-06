@@ -1,6 +1,6 @@
 # Query
 
-A query defines a request for data from a [data source](data-source.md). It defines input and output variables so that the Remote Data Blocks plugin knows how to interact with it. [Supported data sources](data-source.md#supported-data-sources) offer automatic query registration.
+A query defines a request for data from a [data source](data-source.md). It defines input and output variables so that the Remote Data Blocks plugin knows how to interact with it. [Built-in services](data-source.md#built-in-services) offer automatic query registration.
 
 ## Code example
 

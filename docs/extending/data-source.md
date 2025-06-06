@@ -2,9 +2,9 @@
 
 A data source defines the basic reusable properties of an API and is used by a [query](query.md) to reduce duplicative code. It also helps define how your data source looks in the WordPress admin.
 
-## Supported data sources
+## Built-in services
 
-The plugin provides built-in support for a small number of data sources: Airtable, Google Sheets, and Shopify. Supported data sources can be configured via the plugin's settings screen and offer automatic query and block registration. They can also be configured via code using dedicated classes with simplified configuration:
+The plugin provides built-in support for a small number of services: Airtable, Google Sheets, and Shopify. Data sources for built-in services can be configured via the plugin's settings screen and offer automatic query and block registration. They can also be configured via code using dedicated classes with simplified configuration:
 
 ```php
 $shopify_data_source = ShopifyDataSource::from_array( [
