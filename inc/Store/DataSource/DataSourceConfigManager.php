@@ -258,7 +258,7 @@ class DataSourceConfigManager {
 
 	/**
 	 * Delete a data source.
-	 *
+	 * 
 	 * @param string $uuid The UUID of the data source to delete.
 	 * @return true|WP_Error True on success, WP_Error on failure.
 	 */
