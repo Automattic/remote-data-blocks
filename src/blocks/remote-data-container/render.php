@@ -6,10 +6,5 @@ use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
 // $attributes (array): The block attributes.
 // $content (string): The block default content.
 // $block (WP_Block): The block instance.
-global $attributes, $content, $block;
-
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
-}
 
 echo wp_kses_post( BlockBindings::render_remote_data_block( $attributes, $content, $block ) );
