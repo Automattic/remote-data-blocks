@@ -9,6 +9,8 @@ These blocks communicate with APIs that do not require authentication. Uncomment
 - [Zip Code block](./blocks/zip-code-block/zip-code-block.php)
 - [Art block](./blocks/art-block/art-block.php)
 - [Shopify Mock Store block](./blocks/shopify-mock-store-block/shopify-mock-store-block.php)
+- [Book block](./blocks/book-block/book-block.php)
+- [Weather block](./blocks/weather-block/weather-block.php)
 - [GitHub Markdown File block](./blocks/github-markdown-block/github-markdown-block.php)
 
 ## Templates
