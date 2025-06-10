@@ -18,12 +18,13 @@ interface InputPopoverProps {
 	blockName: string;
 	headerImage?: string;
 	input: InputVariable;
-	onSelect: ( data: RemoteDataQueryInput[] ) => void;
+	onSelect: ( data: RemoteDataQueryInput[], selectorQueryKey?: string ) => void;
+	selectorQueryKey: string;
 	title: string;
 }
 
 export function InputPopover( props: InputPopoverProps ) {
-	const { input, onSelect, title } = props;
+	const { input, onSelect, selectorQueryKey, title } = props;
 
 	const dataSourceType = getBlockDataSourceType( props.blockName );
 
@@ -37,7 +38,7 @@ export function InputPopover( props: InputPopoverProps ) {
 	}
 
 	function onSelectItem(): void {
-		onSelect( [ inputState ] );
+		onSelect( [ inputState ], selectorQueryKey );
 		close();
 		sendTracksEvent( 'add_block', {
 			action: 'select_item',

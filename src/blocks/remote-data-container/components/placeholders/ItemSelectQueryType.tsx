@@ -11,11 +11,12 @@ import { InputPopover } from '@/blocks/remote-data-container/components/popovers
 interface ItemSelectQueryTypeProps {
 	blockName: string;
 	selectors: Selector[];
-	onSelect: ( data: RemoteDataQueryInput[] ) => void;
+	displayQueryKey: string;
+	onSelect: ( data: RemoteDataQueryInput[], selectorQueryKey?: string ) => void;
 }
 
 export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
-	const { blockName, selectors, onSelect } = props;
+	const { blockName, selectors, displayQueryKey, onSelect } = props;
 
 	return (
 		<ToggleGroupControl
@@ -31,7 +32,8 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 					headerImage: selector.image_url,
 					inputVariables: selector.inputs,
 					onSelect,
-					queryKey: selector.query_key,
+					selectorQueryKey: selector.query_key,
+					displayQueryKey,
 					title,
 				};
 
@@ -50,7 +52,7 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 							<Button
 								key={ title }
 								onClick={ () => {
-									onSelect( [ {} ] );
+									onSelect( [ {} ], selector.query_key );
 								} }
 								variant="primary"
 							>

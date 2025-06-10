@@ -112,11 +112,11 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 			return <BlockEdit { ...props } />;
 		}
 
-		const queryKey = remoteData.queryKey;
+		const displayQueryKey = remoteData.displayQueryKey;
 
 		const availableBindings = getAvailableBindingsForQuery(
 			remoteData?.blockName ?? '',
-			queryKey ?? ''
+			displayQueryKey ?? ''
 		);
 
 		const hasAvailableBindings = Boolean( Object.keys( availableBindings ).length );

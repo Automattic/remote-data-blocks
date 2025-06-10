@@ -19,7 +19,7 @@ describe( 'InputModal', () => {
 		onSelect: mockOnSelect,
 		onKeySelect: vi.fn(),
 		title: 'Test Modal',
-		queryKey: 'test-key',
+		selectorQueryKey: 'test-key',
 	};
 
 	afterEach( cleanup );

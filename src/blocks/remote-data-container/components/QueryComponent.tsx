@@ -50,7 +50,8 @@ export function QueryComponent( props: QueryComponentProps ) {
 		blockName,
 		externallyManagedRemoteData: remoteDataAttribute,
 		externallyManagedUpdateRemoteData: updateRemoteData,
-		queryKey: displayQueryKey,
+		displayQueryKey,
+		selectorQueryKey: displayQueryKey,
 	} );
 
 	const { hasMultiSelection } = useSelect< BlockEditorStoreSelectors >( blockEditorStore );
@@ -102,7 +103,10 @@ export function QueryComponent( props: QueryComponentProps ) {
 		}
 	}
 
-	function onUpdateQueryInputs( newQueryKey: string, inputs: RemoteDataQueryInput[] ): void {
+	function onUpdateQueryInputs(
+		newSelectorQueryKey: string,
+		inputs: RemoteDataQueryInput[]
+	): void {
 		if ( ! remoteDataAttribute ) {
 			return;
 		}
@@ -110,14 +114,10 @@ export function QueryComponent( props: QueryComponentProps ) {
 		updateRemoteData( {
 			...remoteDataAttribute,
 			queryInputs: inputs,
-			queryKey: newQueryKey,
+			selectorQueryKey: newSelectorQueryKey,
+			displayQueryKey,
 		} );
 		refreshRemoteData();
-	}
-
-	function getSelectorsForDisplayQueryKey(): Selector[] {
-		const selectorKeys = blockConfig.displayQueriesToSelectors[ displayQueryKey ] ?? [];
-		return blockConfig.selectors.filter( selector => selectorKeys?.includes( selector.query_key ) );
 	}
 
 	if ( showPatternSelection ) {
@@ -152,7 +152,7 @@ export function QueryComponent( props: QueryComponentProps ) {
 					<QueryInputsPanel
 						onUpdateQueryInputs={ onUpdateQueryInputs }
 						remoteData={ data }
-						selectors={ getSelectorsForDisplayQueryKey() }
+						selectors={ blockConfig.displayQueriesToSelectors[ displayQueryKey ] ?? [] }
 					/>
 				</InspectorControls>
 			) }

@@ -13,15 +13,25 @@ interface DataViewsModalProps {
 	className?: string;
 	blockName: string;
 	headerImage?: string;
-	onSelect?: ( data: RemoteDataQueryInput[] ) => void;
+	onSelect?: ( data: RemoteDataQueryInput[], selectorQueryKey?: string ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
-	queryKey: string;
+	selectorQueryKey: string;
+	displayQueryKey: string;
 	renderTrigger?: ( props: { onClick: () => void } ) => React.ReactNode;
 	title?: string;
 }
 
 export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
-	const { className, blockName, onSelect, onSelectField, queryKey, renderTrigger, title } = props;
+	const {
+		className,
+		blockName,
+		onSelect,
+		onSelectField,
+		selectorQueryKey,
+		displayQueryKey,
+		renderTrigger,
+		title,
+	} = props;
 
 	const blockConfig = getBlockConfig( blockName );
 
@@ -45,7 +55,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 		supportsSearch,
 		totalItems,
 		totalPages,
-	} = useRemoteData( { blockName, fetchOnMount: true, queryKey } );
+	} = useRemoteData( { blockName, fetchOnMount: true, displayQueryKey, selectorQueryKey } );
 
 	// For selection, DataViews transacts only in IDs, so we provide the UUID from
 	// the API response as a synthetic ID and map them to the full result.
@@ -81,7 +91,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 			return;
 		}
 
-		onSelect?.( createQueryInputsFromRemoteDataResults( results ) );
+		onSelect?.( createQueryInputsFromRemoteDataResults( results ), selectorQueryKey );
 		sendTracksEvent( 'add_block', {
 			action: 'select_item',
 			selected_option: 'search_from_list',

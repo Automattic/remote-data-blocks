@@ -96,12 +96,10 @@ export function migrateRemoteData( remoteData?: RemoteData ): RemoteData | undef
 		return createRemoteDataResult( resultValue, `${ num }` );
 	} );
 
-	// By default, the query key used to be display. So if it's not set, we can assume it's display.
-	const queryKey = remoteData.queryKey ?? 'display';
-
 	return {
 		...rest,
-		queryKey,
+		displayQueryKey: remoteData.displayQueryKey ?? 'display',
+		selectorQueryKey: remoteData.selectorQueryKey ?? 'display',
 		queryInputs: remoteData.queryInputs ?? ( queryInput ? [ queryInput ] : [ {} ] ),
 		results: migratedResults,
 	};

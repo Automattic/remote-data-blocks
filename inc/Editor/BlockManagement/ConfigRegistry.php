@@ -48,9 +48,10 @@ class ConfigRegistry {
 		}
 
 		$queries = [];
-		$selectors = [];
+		// ToDo: Add support for name, and icon.
 		$display_queries_to_selectors_map = [];
 
+		// ToDo: Refactor to not be this crazy.
 		if ( ! empty( $block_config[ self::PLACEHOLDERS_KEY ] ) ) {
 			// Pre-validate the placeholders, to ensure they exist.
 			foreach ( $block_config[ self::PLACEHOLDERS_KEY ] as $placeholder ) {
@@ -80,7 +81,7 @@ class ConfigRegistry {
 						false
 					);
 
-					$selectors[] = [
+					$selector_config = [
 						'image_url' => $query->get_image_url(),
 						'inputs' => self::map_input_variables( $input_schema ),
 						'name' => $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ),
@@ -88,7 +89,7 @@ class ConfigRegistry {
 						'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
 					];
 
-					$display_queries_to_selectors_map[ $query_key ][] = $query_key;
+					$display_queries_to_selectors_map[ $query_key ][] = $selector_config;
 
 					continue;
 				}
@@ -131,18 +132,18 @@ class ConfigRegistry {
 					}
 
 					// Add the selector for the query to the beginning of the selectors array.
-					array_unshift(
-						$selectors,
-						[
-							'image_url' => $query->get_image_url(),
-							'inputs' => self::map_input_variables( $input_schema ),
-							'name' => self::get_query_name_from_key( $query_key ),
-							'query_key' => $query_key,
-							'type' => $inferred_type,
-						]
-					);
+					$selector_config = [
+						'image_url' => $query->get_image_url(),
+						'inputs' => self::map_input_variables( $input_schema ),
+						'name' => self::get_query_name_from_key( $query_key ),
+						'query_key' => $query_key,
+						'type' => $inferred_type,
+					];
 
-					$display_queries_to_selectors_map[ $placeholder['query_key'] ][] = $query_key;
+					array_unshift(
+						$display_queries_to_selectors_map[ $placeholder['query_key'] ],
+						$selector_config
+					);
 
 					// We have found the relevant display query, so we can break out of the loop.
 					break;
@@ -152,11 +153,6 @@ class ConfigRegistry {
 			foreach ( $block_config[ self::QUERIES_KEY ] as $placeholder_query_key => $placeholder_query ) {
 				$placeholder_query = self::inflate_query( $placeholder_query );
 				$queries[ $placeholder_query_key ] = $placeholder_query;
-
-				// Skip if this query key is already mapped as a selector for any display query.
-				if ( in_array( $placeholder_query_key, array_merge( ...array_values( $display_queries_to_selectors_map ) ), true ) ) {
-					continue;
-				}
 
 				$placeholder_query_input_schema = $placeholder_query->get_input_schema();
 				$placeholder_query_output_schema = $placeholder_query->get_output_schema();
@@ -168,7 +164,7 @@ class ConfigRegistry {
 					false
 				);
 
-				$selectors[] = [
+				$selector_config = [
 					'image_url' => $placeholder_query->get_image_url(),
 					'inputs' => self::map_input_variables( $placeholder_query_input_schema ),
 					'name' => $has_required_variables ? 'Manual input' : ( $is_collection ? 'Load collection' : 'Load item' ),
@@ -176,7 +172,7 @@ class ConfigRegistry {
 					'type' => $has_required_variables ? 'manual-input' : 'load-without-input',
 				];
 
-				$display_queries_to_selectors_map[ $placeholder_query_key ][] = $placeholder_query_key;
+				$display_queries_to_selectors_map[ $placeholder_query_key ][] = $selector_config;
 
 				foreach ( $block_config[ self::QUERIES_KEY ] as $selector_query_key => $selector_query ) {
 					$selector_query = self::inflate_query( $selector_query );
@@ -206,20 +202,18 @@ class ConfigRegistry {
 						return $validation_result;
 					}
 
+					$selector_config = [
+						'image_url' => $selector_query->get_image_url(),
+						'inputs' => self::map_input_variables( $selector_query_input_schema ),
+						'name' => self::get_query_name_from_key( $selector_query_key ),
+						'query_key' => $selector_query_key,
+						'type' => $inferred_selector_query_type,
+					];
 
-					// Add the selector for the query to the beginning of the selectors array.
 					array_unshift(
-						$selectors,
-						[
-							'image_url' => $selector_query->get_image_url(),
-							'inputs' => self::map_input_variables( $selector_query_input_schema ),
-							'name' => self::get_query_name_from_key( $selector_query_key ),
-							'query_key' => $selector_query_key,
-							'type' => $inferred_selector_query_type,
-						]
+						$display_queries_to_selectors_map[ $placeholder_query_key ],
+						$selector_config
 					);
-
-					$display_queries_to_selectors_map[ $placeholder_query_key ][] = $selector_query_key;
 				}
 			}
 		}
@@ -232,7 +226,6 @@ class ConfigRegistry {
 			'overrides' => $block_config['overrides'] ?? [],
 			'patterns' => [],
 			'queries' => $queries,
-			'selectors' => $selectors,
 			'display_queries_to_selectors' => $display_queries_to_selectors_map,
 			'title' => $block_title,
 		];

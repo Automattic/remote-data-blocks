@@ -47,15 +47,16 @@ describe( 'withBlockBinding', () => {
 				dataSourceType: 'test-source',
 				name: 'test/block',
 				patterns: { key: 'test/block/pattern' },
-				displayQueriesToSelectors: { key: [ 'key' ] },
-				selectors: [
-					{
-						query_key: 'key',
-						type: 'manual-input',
-						inputs: [],
-						name: 'test-name',
-					},
-				],
+				displayQueriesToSelectors: {
+					key: [
+						{
+							query_key: 'key',
+							type: 'manual-input',
+							inputs: [],
+							name: 'test-name',
+						},
+					],
+				},
 				settings: {
 					category: 'widget',
 					title: 'Test block',
@@ -102,7 +103,8 @@ describe( 'withBlockBinding', () => {
 		const remoteData = {
 			blockName: 'test/block',
 			results: createResults( [ { field1: 'value1' } ] ),
-			queryKey: 'key',
+			displayQueryKey: 'key',
+			selectorQueryKey: 'key',
 		};
 
 		render(
@@ -126,7 +128,8 @@ describe( 'withBlockBinding', () => {
 		const remoteData = {
 			blockName: 'test/block',
 			results: createResults( [ { field1: 'value1' } ] ),
-			queryKey: 'key',
+			displayQueryKey: 'key',
+			selectorQueryKey: 'key',
 		};
 		render(
 			<WrappedComponent
@@ -152,7 +155,8 @@ describe( 'withBlockBinding', () => {
 		const remoteData = {
 			blockName: 'test/block',
 			results: createResults( [ { field1: 'value1' } ] ),
-			queryKey: 'key',
+			displayQueryKey: 'key',
+			selectorQueryKey: 'key',
 		};
 		render(
 			<WrappedComponent
@@ -192,7 +196,8 @@ describe( 'withBlockBinding', () => {
 				[ REMOTE_DATA_CONTEXT_KEY ]: {
 					blockName: 'test/block',
 					results: createResults( [ { title: 'New Title' } ] ),
-					queryKey: 'key',
+					displayQueryKey: 'key',
+					selectorQueryKey: 'key',
 				},
 			},
 			name: 'test/block',
@@ -234,7 +239,8 @@ describe( 'withBlockBinding', () => {
 				[ REMOTE_DATA_CONTEXT_KEY ]: {
 					blockName: 'test/block',
 					results: createResults( [ { title: 'Matching Title' } ] ),
-					queryKey: 'key',
+					displayQueryKey: 'key',
+					selectorQueryKey: 'key',
 				},
 			},
 			name: 'test/block',
@@ -270,7 +276,8 @@ describe( 'withBlockBinding', () => {
 				[ REMOTE_DATA_CONTEXT_KEY ]: {
 					blockName: 'test/block',
 					results: createResults( [ { title: 'New Title' } ] ),
-					queryKey: 'key',
+					displayQueryKey: 'key',
+					selectorQueryKey: 'key',
 				},
 			},
 			name: 'test/block',

@@ -13,12 +13,14 @@ import { ItemSelectQueryType } from './ItemSelectQueryType';
 export interface QuerySelectionPlaceholderProps {
 	blockConfig: BlockConfig;
 	onDisplayQueryKeySelect: ( displayQueryKey: string ) => void;
+	onSelectorQueryKeySelect: ( selectorQueryKey: string ) => void;
 	onQueryInputsSelect: ( inputs: RemoteDataQueryInput[] ) => void;
 }
 
 export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps ) {
-	const { blockConfig, onDisplayQueryKeySelect, onQueryInputsSelect } = props;
-	const { instructions, settings, selectors, displayQueriesToSelectors } = blockConfig;
+	const { blockConfig, onDisplayQueryKeySelect, onSelectorQueryKeySelect, onQueryInputsSelect } =
+		props;
+	const { instructions, settings, displayQueriesToSelectors } = blockConfig;
 
 	const iconElement: IconType = ( settings.icon as IconType ) ?? cloud;
 
@@ -28,20 +30,17 @@ export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps
 	const [ selectedDisplayQueryKey, setSelectedDisplayQueryKey ] = useState< string >( '' );
 	const [ showSelectors, setShowSelectors ] = useState< boolean >( false );
 
-	function handleSelectorOnSelect( inputs: RemoteDataQueryInput[] ) {
+	function handleSelectorOnSelect( inputs: RemoteDataQueryInput[], selectorQueryKey?: string ) {
 		setShowSelectors( false );
 		onDisplayQueryKeySelect( selectedDisplayQueryKey );
+		// ToDo: Should the selector key be set to the display query key if no selector query key is provided?
+		onSelectorQueryKeySelect( selectorQueryKey ?? selectedDisplayQueryKey );
 		onQueryInputsSelect( inputs );
 	}
 
 	function handleDisplayQueryKeyOnSelect( displayQueryKey: string ) {
 		setSelectedDisplayQueryKey( displayQueryKey );
 		setShowSelectors( true );
-	}
-
-	function getSelectorsForDisplayQueryKey(): Selector[] {
-		const selectorKeys = displayQueriesToSelectors[ selectedDisplayQueryKey ] ?? [];
-		return selectors.filter( selector => selectorKeys?.includes( selector.query_key ) );
 	}
 
 	return (
@@ -77,7 +76,8 @@ export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps
 			{ showSelectors && (
 				<ItemSelectQueryType
 					blockName={ blockConfig.name }
-					selectors={ getSelectorsForDisplayQueryKey() }
+					selectors={ displayQueriesToSelectors[ selectedDisplayQueryKey ] ?? [] }
+					displayQueryKey={ selectedDisplayQueryKey }
 					onSelect={ handleSelectorOnSelect }
 				/>
 			) }

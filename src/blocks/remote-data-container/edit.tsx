@@ -4,7 +4,7 @@ import { useState } from '@wordpress/element';
 import { EditErrorBoundary } from './components/EditErrorBoundary';
 import { QueryComponent } from './components/QueryComponent';
 import { QuerySelectionPlaceholder } from '@/blocks/remote-data-container/components/placeholders/QuerySelectionPlaceholder';
-import { getBlockConfig, getDisplayQueryKeyFromQueryKey } from '@/utils/localized-block-data';
+import { getBlockConfig } from '@/utils/localized-block-data';
 import { migrateRemoteData } from '@/utils/remote-data';
 
 import './editor.scss';
@@ -21,7 +21,10 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 	const remoteDataAttribute = migrateRemoteData( props.attributes.remoteData );
 
 	const [ displayQueryKey, setDisplayQueryKey ] = useState< string >(
-		getDisplayQueryKeyFromQueryKey( blockName, remoteDataAttribute?.queryKey ?? '' )
+		remoteDataAttribute?.displayQueryKey ?? ''
+	);
+	const [ selectorQueryKey, setSelectorQueryKey ] = useState< string >(
+		remoteDataAttribute?.selectorQueryKey ?? ''
 	);
 
 	const [ queryInputs, setQueryInputs ] = useState< RemoteDataQueryInput[] >(
@@ -34,14 +37,16 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 
 	function resetQuery(): void {
 		setDisplayQueryKey( '' );
+		setSelectorQueryKey( '' );
 		setQueryInputs( [] );
 	}
 
-	if ( ! displayQueryKey ) {
+	if ( ! displayQueryKey && ! selectorQueryKey ) {
 		return (
 			<QuerySelectionPlaceholder
 				blockConfig={ blockConfig }
 				onDisplayQueryKeySelect={ setDisplayQueryKey }
+				onSelectorQueryKeySelect={ setSelectorQueryKey }
 				onQueryInputsSelect={ setQueryInputs }
 			/>
 		);

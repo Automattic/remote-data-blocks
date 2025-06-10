@@ -39,8 +39,7 @@ interface BlockConfig {
 	instructions?: string;
 	name: string;
 	patterns: Record< string, string >;
-	selectors: Selector[];
-	displayQueriesToSelectors: Record< string, string[] >;
+	displayQueriesToSelectors: Record< string, Selector[] >;
 	settings: {
 		category: string;
 		description?: string;

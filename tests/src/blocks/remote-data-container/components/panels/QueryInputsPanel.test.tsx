@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { QueryInputsPanel } from '@/blocks/remote-data-container/components/panels/QueryInputsPanel';
 
 describe( 'QueryInputsPanel', () => {
-	const selectors: BlockConfig[ 'selectors' ] = [
+	const selectors: Selector[] = [
 		{
 			inputs: [
 				{
@@ -32,7 +32,8 @@ describe( 'QueryInputsPanel', () => {
 	const remoteData: RemoteData = {
 		blockName: 'test/block',
 		metadata: {},
-		queryKey: 'test_query_key',
+		selectorQueryKey: 'test_query_key',
+		displayQueryKey: 'test_display_key',
 		queryInputs: [],
 		resultId: 'test',
 		results: [],

@@ -16,7 +16,8 @@ interface InputModalProps {
 	blockName: string;
 	headerImage?: string;
 	inputs: InputVariable[];
-	onSelect: ( data: RemoteDataQueryInput[] ) => void;
+	onSelect: ( data: RemoteDataQueryInput[], selectorQueryKey?: string ) => void;
+	selectorQueryKey: string;
 	title: string;
 }
 
@@ -34,7 +35,7 @@ export function InputModal( props: InputModalProps ) {
 	}
 
 	function onSelectItem(): void {
-		props.onSelect( [ inputState ] );
+		props.onSelect( [ inputState ], props.selectorQueryKey );
 		close();
 		sendTracksEvent( 'add_block', {
 			action: 'select_item',

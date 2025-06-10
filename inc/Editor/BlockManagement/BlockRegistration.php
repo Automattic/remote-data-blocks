@@ -117,7 +117,6 @@ class BlockRegistration {
 			'name' => $block_name,
 			'dataSourceType' => ConfigStore::get_data_source_type( $block_name ),
 			'patterns' => $patterns,
-			'selectors' => $config['selectors'],
 			'displayQueriesToSelectors' => $display_queries_to_selectors,
 			'settings' => [
 				'category' => self::$block_category['slug'],
