@@ -9,7 +9,7 @@
       "pathMappings": {
         "/var/www/html/wp-content/plugins/remote-data-blocks": "${workspaceFolder}/",
         "/var/www/html/wp-content/plugins/wp-feature-api": "${workspaceFolder}/../wp-feature-api",
-        "/var/www/html/wp-content/plugins/wordpress-mcp": "${workspaceFolder}/../wordpress-mcp",
+        "/var/www/html/wp-content/plugins/wordpress-mcp": "${workspaceFolder}/../wordpress-mcp"
       }
     },
     {
