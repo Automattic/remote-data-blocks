@@ -29,16 +29,12 @@ export function InlineBindingSelectFieldPopover( props: InlineBindingSelectField
 	} );
 	const { remoteData, selectedField, type } = props.fieldSelection;
 
-	// ToDo: Store this within the fieldSelection object. This is only set this way to stop compilation errors.
-	const displayQueryKey = remoteData?.displayQueryKey ?? 'display';
-	const selectors =
-		getBlockConfig( remoteData?.blockName ?? '' )?.displayQueriesToSelectors[ displayQueryKey ] ??
-		[];
-	// For now, we will use the first compatible selector, but this should be improved.
-	// Same as InlineBindingSelection.tsx
-	const selectorQueryKey =
-		remoteData?.selectorQueryKey ??
-		selectors.find( selector => [ 'list', 'search' ].includes( selector.type ) )?.query_key ??
+	// ToDo: Store this within the fieldSelection object.
+	const displayQueryKey =
+		remoteData?.displayQueryKey ??
+		Object.keys(
+			getBlockConfig( remoteData?.blockName ?? '' )?.displayQueriesToSelectors ?? {}
+		)[ 0 ] ??
 		'';
 
 	return (
@@ -60,7 +56,7 @@ export function InlineBindingSelectFieldPopover( props: InlineBindingSelectField
 					<InlineBindingSelectField
 						blockName={ remoteData?.blockName ?? 'Remote Data Block' }
 						displayQueryKey={ displayQueryKey }
-						selectorQueryKey={ selectorQueryKey }
+						selectorQueryKey={ displayQueryKey }
 						fieldType={ type ?? 'field' }
 						onSelectField={ ( data, fieldValue ) =>
 							props.onSelectField( { ...data, action: 'update_field_shortcode' }, fieldValue )

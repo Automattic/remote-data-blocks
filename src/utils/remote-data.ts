@@ -99,7 +99,6 @@ export function migrateRemoteData( remoteData?: RemoteData ): RemoteData | undef
 	return {
 		...rest,
 		displayQueryKey: remoteData.displayQueryKey ?? 'display',
-		// ToDo: This may not be correct when it comes to inline bindings as that assumes a key of the first selector with type of list, search.
 		selectorQueryKey: remoteData.selectorQueryKey ?? 'display',
 		queryInputs: remoteData.queryInputs ?? ( queryInput ? [ queryInput ] : [ {} ] ),
 		results: migratedResults,
