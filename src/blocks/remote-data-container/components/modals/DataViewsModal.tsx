@@ -13,7 +13,7 @@ interface DataViewsModalProps {
 	className?: string;
 	blockName: string;
 	headerImage?: string;
-	onSelect?: ( data: RemoteDataQueryInput[], selectorQueryKey?: string ) => void;
+	onSelect?: ( data: RemoteDataQueryInput[] ) => void;
 	onSelectField?: ( data: FieldSelection, fieldValue: string ) => void;
 	selectorQueryKey: string;
 	displayQueryKey: string;
@@ -43,6 +43,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 		selection.length > 1 ? __( 'items selected in total' ) : __( 'item selected in total' );
 
 	const { close, isOpen, open } = useModalState();
+
 	const {
 		data,
 		hasNextPage,
@@ -91,7 +92,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 			return;
 		}
 
-		onSelect?.( createQueryInputsFromRemoteDataResults( results ), selectorQueryKey );
+		onSelect?.( createQueryInputsFromRemoteDataResults( results ) );
 		sendTracksEvent( 'add_block', {
 			action: 'select_item',
 			selected_option: 'search_from_list',

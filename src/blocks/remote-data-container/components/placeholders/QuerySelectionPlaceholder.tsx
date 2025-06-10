@@ -13,13 +13,11 @@ import { ItemSelectQueryType } from './ItemSelectQueryType';
 export interface QuerySelectionPlaceholderProps {
 	blockConfig: BlockConfig;
 	onDisplayQueryKeySelect: ( displayQueryKey: string ) => void;
-	onSelectorQueryKeySelect: ( selectorQueryKey: string ) => void;
 	onQueryInputsSelect: ( inputs: RemoteDataQueryInput[] ) => void;
 }
 
 export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps ) {
-	const { blockConfig, onDisplayQueryKeySelect, onSelectorQueryKeySelect, onQueryInputsSelect } =
-		props;
+	const { blockConfig, onDisplayQueryKeySelect, onQueryInputsSelect } = props;
 	const { instructions, settings, displayQueriesToSelectors } = blockConfig;
 
 	const iconElement: IconType = ( settings.icon as IconType ) ?? cloud;
@@ -30,11 +28,9 @@ export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps
 	const [ selectedDisplayQueryKey, setSelectedDisplayQueryKey ] = useState< string >( '' );
 	const [ showSelectors, setShowSelectors ] = useState< boolean >( false );
 
-	function handleSelectorOnSelect( inputs: RemoteDataQueryInput[], selectorQueryKey?: string ) {
+	function handleSelectorOnSelect( inputs: RemoteDataQueryInput[] ) {
 		setShowSelectors( false );
 		onDisplayQueryKeySelect( selectedDisplayQueryKey );
-		// ToDo: Should the selector key be set to the display query key if no selector query key is provided?
-		onSelectorQueryKeySelect( selectorQueryKey ?? selectedDisplayQueryKey );
 		onQueryInputsSelect( inputs );
 	}
 

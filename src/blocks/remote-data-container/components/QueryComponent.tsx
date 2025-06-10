@@ -50,6 +50,8 @@ export function QueryComponent( props: QueryComponentProps ) {
 		blockName,
 		externallyManagedRemoteData: remoteDataAttribute,
 		externallyManagedUpdateRemoteData: updateRemoteData,
+		// This is done on purpose, as the selector query is the input to the display query.
+		// So the real query being executed is the display query.
 		displayQueryKey,
 		selectorQueryKey: displayQueryKey,
 	} );

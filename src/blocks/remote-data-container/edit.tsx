@@ -23,9 +23,6 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 	const [ displayQueryKey, setDisplayQueryKey ] = useState< string >(
 		remoteDataAttribute?.displayQueryKey ?? ''
 	);
-	const [ selectorQueryKey, setSelectorQueryKey ] = useState< string >(
-		remoteDataAttribute?.selectorQueryKey ?? ''
-	);
 
 	const [ queryInputs, setQueryInputs ] = useState< RemoteDataQueryInput[] >(
 		remoteDataAttribute?.queryInputs ?? []
@@ -37,16 +34,14 @@ export function Edit( props: BlockEditProps< RemoteDataBlockAttributes > ): JSX.
 
 	function resetQuery(): void {
 		setDisplayQueryKey( '' );
-		setSelectorQueryKey( '' );
 		setQueryInputs( [] );
 	}
 
-	if ( ! displayQueryKey && ! selectorQueryKey ) {
+	if ( ! displayQueryKey ) {
 		return (
 			<QuerySelectionPlaceholder
 				blockConfig={ blockConfig }
 				onDisplayQueryKeySelect={ setDisplayQueryKey }
-				onSelectorQueryKeySelect={ setSelectorQueryKey }
 				onQueryInputsSelect={ setQueryInputs }
 			/>
 		);
