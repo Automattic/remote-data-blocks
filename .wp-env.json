@@ -13,6 +13,8 @@
   "plugins": [
     ".",
     "https://downloads.wordpress.org/plugin/query-monitor.latest-stable.zip",
-    "https://downloads.wordpress.org/plugin/redis-cache.latest-stable.zip"
+    "https://downloads.wordpress.org/plugin/redis-cache.latest-stable.zip",
+    "https://github.com/Automattic/wp-feature-api/releases/download/0.1.5/wp-feature-api.zip",
+    "https://github.com/Automattic/wordpress-mcp/releases/download/v0.2.0/wordpress-mcp.zip"
   ]
 }
