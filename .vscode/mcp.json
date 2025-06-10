@@ -1,0 +1,14 @@
+{
+  "servers": {
+    "rdb-local": {
+      "command": "npx",
+      "args": [ "-y", "@automattic/mcp-wordpress-remote@latest" ],
+      "env": {
+        "WP_API_URL": "http://localhost:8888/",
+        "JWT_TOKEN": "{{ JWT token from WordPress MCP settings }}",
+        "LOG_FILE": "/tmp/mcp-remote-data-blocks-local.log"
+      }
+    }
+  }
+}
+

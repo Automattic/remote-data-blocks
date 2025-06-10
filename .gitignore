@@ -51,4 +51,5 @@ vendor/
 !.idea/runConfigurations/
 .vscode/*
 !.vscode/launch.json
+!.vscode/mcp.json
 .zed
