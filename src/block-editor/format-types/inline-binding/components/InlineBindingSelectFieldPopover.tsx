@@ -29,13 +29,11 @@ export function InlineBindingSelectFieldPopover( props: InlineBindingSelectField
 	} );
 	const { remoteData, selectedField, type } = props.fieldSelection;
 
-	// ToDo: Make a dropdown menu picker for this.
+	// ToDo: Store this within the fieldSelection object. This is only set this way to stop compilation errors.
 	const displayQueryKey = remoteData?.displayQueryKey ?? 'display';
-
 	const selectors =
 		getBlockConfig( remoteData?.blockName ?? '' )?.displayQueriesToSelectors[ displayQueryKey ] ??
 		[];
-
 	// For now, we will use the first compatible selector, but this should be improved.
 	// Same as InlineBindingSelection.tsx
 	const selectorQueryKey =

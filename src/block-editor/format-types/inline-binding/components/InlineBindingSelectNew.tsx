@@ -40,39 +40,46 @@ export function InlineBindingSelectNew( props: InlineBindingSelectNewProps ) {
 			{ () =>
 				Object.entries( blocksByType ).map( ( [ dataSourceType, configs ] ) => (
 					<MenuGroup key={ dataSourceType } label={ dataSourceType }>
-						{ configs.map( blockConfig => {
+						{ configs.map( blockConfig => (
+							<MenuGroup
+								key={ blockConfig.name }
+								label={ blockConfig.settings?.title ?? blockConfig.name }
+							>
+								{ Object.keys( blockConfig.displayQueriesToSelectors ).map( displayQueryKey => {
+									const selectors = blockConfig.displayQueriesToSelectors[ displayQueryKey ] ?? [];
 
-							// ToDo: Make a dropdown menu picker for this.
-							const displayQueryKey = 'display';
+									// For now, we will use the first compatible selector, but this
+									// should be improved.
+									const compatibleSelector = selectors.find( selector =>
+										[ 'list', 'search' ].includes( selector.type )
+									);
 
-							const selectors = blockConfig.displayQueriesToSelectors[ displayQueryKey ] ?? [];
+									if ( ! compatibleSelector ) {
+										return null;
+									}
 
-							// For now, we will use the first compatible selector, but this
-							// should be improved.
-							const compatibleSelector = selectors.find( selector =>
-								[ 'list', 'search' ].includes( selector.type )
-							);
-
-							if ( ! compatibleSelector ) {
-								return null;
-							}
-
-							return (
-								<DataViewsModal
-									key={ blockConfig.name }
-									blockName={ blockConfig.name }
-									headerImage={ compatibleSelector.image_url }
-									onSelectField={ onSelectField }
-									selectorQueryKey={ compatibleSelector.query_key }
-									displayQueryKey={ displayQueryKey }
-									renderTrigger={ ( { onClick } ) => (
-										<MenuItem onClick={ onClick }>
-											{ blockConfig.settings?.title ?? blockConfig.name }
-										</MenuItem>
-									) }
-								/>
-							);
-						} ) }
+									return (
+										<DataViewsModal
+											key={ blockConfig.name }
+											blockName={ blockConfig.name }
+											headerImage={ compatibleSelector.image_url }
+											onSelectField={ onSelectField }
+											selectorQueryKey={ compatibleSelector.query_key }
+											displayQueryKey={ displayQueryKey }
+											renderTrigger={ ( { onClick } ) => (
+												<MenuItem onClick={ onClick }>
+													{ displayQueryKey
+														.replace( /[^a-zA-Z0-9]/g, ' ' )
+														.replace( /\b\w/g, ( initialLetter: string ) =>
+															initialLetter.toUpperCase()
+														) }
+												</MenuItem>
+											) }
+										/>
+									);
+								} ) }
+							</MenuGroup>
+						) ) }
 					</MenuGroup>
 				) )
 			}
