@@ -87,8 +87,10 @@ function register_art_remote_data_block(): void {
 			$endpoint = $aic_data_source['endpoint'] . '/search';
 			$search_terms = $input_variables['search'] ?? '';
 
+			// Do not include the `q` parameter if the search terms are empty.
+			// Otherwise, this will result in an error from the API.
 			if ( ! empty( $search_terms ) ) {
-				$endpoint = add_query_arg( [ 'q' => $search_terms ], $endpoint . '/search' );
+				$endpoint = add_query_arg( [ 'q' => $search_terms ], $endpoint );
 			}
 
 			return add_query_arg( [
