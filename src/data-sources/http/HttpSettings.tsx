@@ -97,7 +97,7 @@ export const HttpSettings = ( { mode, uuid, config }: SettingsComponentProps< Ht
 					<CardBody>
 						<Tip>
 							This data source requires additional code.&nbsp;
-							<ExternalLink href="https://remotedatablocks.com/docs/extending/block-registration/">
+							<ExternalLink href="https://remotedatablocks.com/docs/extending/data-source/">
 								Learn more
 							</ExternalLink>
 						</Tip>

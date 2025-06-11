@@ -1,8 +1,8 @@
 # Query
 
-A query defines a request for data from a [data source](data-source.md). It defines input and output variables so that the Remote Data Blocks plugin knows how to interact with it.
+A query defines a request for data from a [data source](data-source.md). It defines input and output variables so that the Remote Data Blocks plugin knows how to interact with it. [Built-in services](data-source.md#built-in-services) offer automatic query registration.
 
-## Example
+## Code example
 
 Here is an example of a query that fetches Zip code data:
 
@@ -237,7 +237,7 @@ $graphql_query = [
 ];
 ```
 
-### Configuration
+### GraphQL
 
 The `GraphqlQuery` and `GraphqlMutation` classes extend the base query class, so they support all the properties defined above. Additionally, they have the following specific properties:
 
@@ -248,3 +248,7 @@ The `graphql_query` property defines the GraphQL query or mutation to execute. T
 #### request_method: string
 
 The `request_method` property defines the HTTP request method used by the query or mutation. By default, it is `'POST'`.
+
+### Next steps
+
+Once you have defined your queries, you can use them to [register remote data blocks](block-registration.md).

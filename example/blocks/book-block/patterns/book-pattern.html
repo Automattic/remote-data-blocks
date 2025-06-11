@@ -1,0 +1,31 @@
+<!-- wp:columns {"align":"wide"} -->
+<div class="wp-block-columns alignwide">
+	<!-- wp:column {"width":"25%"} -->
+	<div class="wp-block-column" style="flex-basis:25%">
+		<!-- wp:image {"metadata":{"bindings":{"url":{"source":"remote-data/binding","args":{"field":"cover_image_url"}},"alt":{"source":"remote-data/binding","args":{"field":"title","label":"Cover of"}}},"name":"Book Cover"},"className":"rdb-block-data-cover-image-url"} -->
+		<figure class="wp-block-image rdb-block-data-cover-image-url"><img alt=""/></figure>
+		<!-- /wp:image -->
+	</div>
+	<!-- /wp:column -->
+
+	<!-- wp:column {"width":"75%"} -->
+	<div class="wp-block-column" style="flex-basis:75%">
+		<!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"title"}}},"name":"Title"}} -->
+		<h2 class="wp-block-heading"></h2>
+		<!-- /wp:heading -->
+
+		<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"author_name","label":"By"}}},"name":"Author"},"className":"rdb-block-data-author-name"} -->
+		<p class="rdb-block-data-author-name"></p>
+		<!-- /wp:paragraph -->
+
+		<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"first_publish_year","label":"First published"}}},"name":"Publication year"},"className":"rdb-block-data-first-publish-year"} -->
+		<p class="rdb-block-data-first-publish-year"></p>
+		<!-- /wp:paragraph -->
+
+		<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"edition_count","label":"Edition count"}}},"name":"Edition count"},"className":"rdb-block-data-edition-count"} -->
+		<p class="rdb-block-data-edition-count"></p>
+		<!-- /wp:paragraph -->
+	</div>
+	<!-- /wp:column -->
+</div>
+<!-- /wp:columns --> 
