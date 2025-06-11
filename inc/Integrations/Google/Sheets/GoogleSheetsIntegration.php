@@ -195,7 +195,7 @@ class GoogleSheetsIntegration {
 	 * the in-memory cache will be able to differenciate each request.
 	 *
 	 * @param array<string, mixed> $request_details The request details.
-	 * @param string $query The query being executed.
+	 * @param string $_query The query being executed.
 	 * @param array<string, mixed> $input_variables The input variables for the current request.
 	 * @return array<string, array{
 	 *   method: string,
