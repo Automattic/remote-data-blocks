@@ -47,11 +47,17 @@ class ConfigRegistry {
 			return self::create_error( $block_title, sprintf( 'Block %s has already been registered', $block_name ) );
 		}
 
+		// Ensure that the block has queries.
+		if ( empty( $block_config[ self::QUERIES_KEY ] ) ) {
+			return self::create_error( $block_title, 'Block configuration must have a non-empty "queries" array' );
+		}
+
 		$queries = [];
-		// ToDo: Add support for name, and icon.
 		$display_queries_to_selectors_map = [];
 
-		// Build the $placeholders array based on config
+		// Either use the placeholders from the config, or build them from the queries.
+		// Placeholders are meant to determine the queries that'll be visually represented
+		// in the block's UI upon initial insertion.
 		if ( ! empty( $block_config[ self::PLACEHOLDERS_KEY ] ) ) {
 			$placeholders = $block_config[ self::PLACEHOLDERS_KEY ];
 			// Pre-validate the placeholders, to ensure they exist.
@@ -73,7 +79,6 @@ class ConfigRegistry {
 			}
 		}
 
-		// Now, single loop for building selectors and map
 		foreach ( $placeholders as $placeholder ) {
 			$selectors = [];
 
@@ -84,6 +89,7 @@ class ConfigRegistry {
 			$placeholder_query_input_schema = $placeholder_query->get_input_schema();
 			$placeholder_query_output_schema = $placeholder_query->get_output_schema();
 
+			// We first generate the manual input selector for the placeholder query.
 			$is_collection = true === ( $placeholder_query_output_schema['is_collection'] ?? false );
 			$has_required_variables = array_reduce(
 				array_column( $placeholder_query_input_schema, 'required' ),
@@ -101,27 +107,32 @@ class ConfigRegistry {
 
 			$selectors[] = $selector_config;
 
-			// Now, loop over all queries to find compatible selectors
+			// We run through all the queries to find compatible selectors.
 			foreach ( $block_config[ self::QUERIES_KEY ] as $selector_query_key => $selector_query ) {
-				// Don't match the placeholder to itself
+				// Don't match the placeholder to itself, as that's already been done.
 				if ( $selector_query_key === $placeholder_query_key ) {
 					continue;
 				}
+
 				$selector_query = self::inflate_query( $selector_query );
 				$queries[ $selector_query_key ] = $selector_query;
 
 				$selector_query_input_schema = $selector_query->get_input_schema();
 				$selector_query_output_schema = $selector_query->get_output_schema();
 
+				// Infer the type of the selector query.
+				// ToDo: Add support for multiple types.
 				$inferred_selector_query_type = self::infer_query_type( $selector_query_input_schema, $selector_query_output_schema );
 				if ( 'unknown' === $inferred_selector_query_type ) {
 					continue;
 				}
 
+				// If the output schema is not an array, skip.
 				if ( ! is_array( $selector_query_output_schema['type'] ) ) {
 					continue;
 				}
 
+				// Find the fields that are present in both the selector's output schema and the placeholder's input schema.
 				$intersecting_keys = array_intersect_key( $selector_query_output_schema['type'], $placeholder_query_input_schema );
 
 				// Skip this, if they don't intersect.
@@ -129,17 +140,13 @@ class ConfigRegistry {
 					continue;
 				}
 
-				// Ensure the name and type of the schemas are truly valid.
+				// Ensure the fields found have the same name and type in both the schemas.
 				$valid_intersecting_keys = self::validate_selector_query_mapping( $intersecting_keys, $placeholder_query_input_schema, $selector_query_output_schema );
 				if ( empty( $valid_intersecting_keys ) ) {
 					continue;
 				}
 
-				$validation_result = self::validate_query_mapping( $placeholder_query_input_schema, $selector_query_output_schema, $block_title, $placeholder_query_key );
-				if ( is_wp_error( $validation_result ) ) {
-					return $validation_result;
-				}
-
+				// Now we generate the selector query's config as a selector for the placeholder query.
 				$selector_config = [
 					'image_url' => $selector_query->get_image_url(),
 					'inputs' => self::map_input_variables( $selector_query_input_schema ),
@@ -148,6 +155,7 @@ class ConfigRegistry {
 					'type' => $inferred_selector_query_type,
 				];
 
+				// Add the selector to the beginning of the selectors array.
 				array_unshift(
 					$selectors,
 					$selector_config
@@ -160,6 +168,7 @@ class ConfigRegistry {
 			];
 		}
 
+		// Build the block configuration.
 		$config = [
 			'description' => '',
 			'icon' => $block_config['icon'] ?? 'cloud',
@@ -214,16 +223,6 @@ class ConfigRegistry {
 			// If the types match, allow it.
 			return true;
 		}, ARRAY_FILTER_USE_KEY );
-	}
-
-	private static function validate_query_mapping( array $to_query_input_schema, array $from_query_output_schema, string $block_title, string $from_query_key ): WP_Error|bool {
-		foreach ( array_keys( $to_query_input_schema ) as $to ) {
-			if ( ! isset( $from_query_output_schema['type'][ $to ] ) ) {
-				return self::create_error( $block_title, sprintf( 'Cannot map key "%1$s" from %2$s query. The display query for this block requires a "%1$s" key as an input, but it is not present in the output schema for the %2$s query. Try adding a "%1$s" mapping to the output schema for the %2$s query.', esc_html( $to ), $from_query_key ) );
-			}
-		}
-
-		return true;
 	}
 
 	private static function register_block_pattern( string $block_name, string $pattern_title, string $pattern_content ): string {

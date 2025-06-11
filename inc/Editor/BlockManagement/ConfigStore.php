@@ -82,14 +82,12 @@ class ConfigStore {
 			return null;
 		}
 
-		// ToDo: Should there be any verification that the display queries are all from the same data source?
-		// We are getting just the first display query in this instance, as they'd belong to the same data source.
-		foreach ( array_keys( $display_queries_to_selectors ) as $display_query_key ) {
-			$display_query = $config['queries'][ $display_query_key ];
-			$data_source = $display_query->get_data_source();
-			if ( $data_source instanceof GenericHttpDataSource ) {
-				return $data_source->get_service_name();
-			}
+		// Get the first display query's data source type.
+		$display_query_key = array_keys( $display_queries_to_selectors )[0];
+		$display_query = $config['queries'][ $display_query_key ];
+		$data_source = $display_query->get_data_source();
+		if ( $data_source instanceof GenericHttpDataSource ) {
+			return $data_source->get_service_name();
 		}
 
 		return 'code-configured';

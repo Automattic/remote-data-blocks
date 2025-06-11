@@ -58,7 +58,7 @@ class FunctionsTest extends TestCase {
 		ConfigRegistry::init( $this->mock_logger );
 	}
 
-	public function testRegisterBlock(): void {
+	public function testRegisterBlockWithOldConfigSchema(): void {
 		register_remote_data_block( [
 			'title' => 'Test Block',
 			'render_query' => [
@@ -118,7 +118,17 @@ class FunctionsTest extends TestCase {
 
 		$block_name = 'remote-data-blocks/test-block-with-list-query';
 		$config = ConfigStore::get_block_configuration( $block_name );
-		$this->assertSame( 'list', $config['selectors'][0]['type'] ?? null );
+
+		// Ensure that display query is the only key in the display_queries_to_selectors.
+		$this->assertCount( 1, $config['display_queries_to_selectors'] );
+		$this->assertSame( 'display', array_keys( $config['display_queries_to_selectors'] )[0] );
+
+		// Ensure that there are 2 selectors for the display query.
+		$this->assertCount( 2, $config['display_queries_to_selectors']['display']['selectors'] );
+
+		// Ensure that the query_key of the first selector is list, and the second one is display.
+		$this->assertSame( 'list', $config['display_queries_to_selectors']['display']['selectors'][0]['query_key'] );
+		$this->assertSame( 'display', $config['display_queries_to_selectors']['display']['selectors'][1]['query_key'] );
 	}
 
 	public function testRegisterSearchQuery(): void {
@@ -137,7 +147,17 @@ class FunctionsTest extends TestCase {
 
 		$block_name = 'remote-data-blocks/test-block-with-search-query';
 		$config = ConfigStore::get_block_configuration( $block_name );
-		$this->assertSame( 'search', $config['selectors'][0]['type'] ?? null );
+
+		// Ensure that display query is the only key in the display_queries_to_selectors.
+		$this->assertCount( 1, $config['display_queries_to_selectors'] );
+		$this->assertSame( 'display', array_keys( $config['display_queries_to_selectors'] )[0] );
+
+		// Ensure that there are 2 selectors for the display query.
+		$this->assertCount( 2, $config['display_queries_to_selectors']['display']['selectors'] );
+
+		// Ensure that the query_key of the first selector is search, and the second one is display.
+		$this->assertSame( 'search', $config['display_queries_to_selectors']['display']['selectors'][0]['query_key'] );
+		$this->assertSame( 'display', $config['display_queries_to_selectors']['display']['selectors'][1]['query_key'] );
 	}
 
 	public function testIsRegisteredBlockReturnsTrueForRegisteredBlock(): void {
@@ -195,9 +215,18 @@ class FunctionsTest extends TestCase {
 			],
 		] );
 
-		$this->assertTrue( $this->mock_logger->hasLoggedLevel( LogLevel::ERROR ) );
-		$error_logs = $this->mock_logger->getLogsByLevel( LogLevel::ERROR );
-		$this->assertStringContainsString( 'Error registering block Unknown query type: Could not infer the type of the query. Valid query types are "search" and "list".', $error_logs[0]['message'] );
+		$block_name = 'remote-data-blocks/invalid-search-block';
+		$config = ConfigStore::get_block_configuration( $block_name );
+
+		// Ensure that display query is the only key in the display_queries_to_selectors.
+		$this->assertCount( 1, $config['display_queries_to_selectors'] );
+		$this->assertSame( 'display', array_keys( $config['display_queries_to_selectors'] )[0] );
+
+		// Ensure that there is 1 selector for the display query.
+		$this->assertCount( 1, $config['display_queries_to_selectors']['display']['selectors'] );
+
+		// Ensure that the query_key of the selector is search.
+		$this->assertSame( 'display', $config['display_queries_to_selectors']['display']['selectors'][0]['query_key'] );
 	}
 
 	public function testRegisterBlockWithOldSchemaFormatNoRenderQuery(): void {
@@ -207,7 +236,7 @@ class FunctionsTest extends TestCase {
 
 		$this->assertTrue( $this->mock_logger->hasLoggedLevel( LogLevel::ERROR ) );
 		$error_logs = $this->mock_logger->getLogsByLevel( LogLevel::ERROR );
-		$this->assertStringContainsString( 'Error registering block Test Block with Old Schema Format No Render Query: Block configuration must have a non-empty "display_queries" array', $error_logs[0]['message'] );
+		$this->assertStringContainsString( 'Error registering block Test Block with Old Schema Format No Render Query: Block configuration must have a non-empty "queries" array', $error_logs[0]['message'] );
 	}
 
 	public function testRegisterBlockWithNewConfigSchema(): void {
@@ -233,11 +262,17 @@ class FunctionsTest extends TestCase {
 		$block_name = 'remote-data-blocks/test-block-with-new-config-schema';
 		$config = ConfigStore::get_block_configuration( $block_name );
 
-		// Ensure that display is in the display_queries_to_selectors for display along with search.
-		$this->assertSame( [ 'display', 'search' ], $config['display_queries_to_selectors']['display'] );
+		// Ensure that there are 2 selectors for the display query.
+		$this->assertCount( 3, $config['display_queries_to_selectors']['display']['selectors'] );
 
-		// Ensure that list is in the display_queries_to_selectors for list along with display and search.
-		$this->assertSame( [ 'list' ], $config['display_queries_to_selectors']['list'] );
+		// Ensure that the query_key of the first selector is search, the second one is list, and the third one is display.
+		$this->assertSame( 'list', $config['display_queries_to_selectors']['display']['selectors'][0]['query_key'] );
+		$this->assertSame( 'search', $config['display_queries_to_selectors']['display']['selectors'][1]['query_key'] );
+		$this->assertSame( 'display', $config['display_queries_to_selectors']['display']['selectors'][2]['query_key'] );
+
+		// Ensure that there is 1 selector for the list query.
+		$this->assertCount( 1, $config['display_queries_to_selectors']['list']['selectors'] );
+		$this->assertSame( 'list', $config['display_queries_to_selectors']['list']['selectors'][0]['query_key'] );
 	}
 
 	public function testRegisterBlockWithBadDisplayQueries(): void {
@@ -264,6 +299,6 @@ class FunctionsTest extends TestCase {
 
 		$this->assertTrue( $this->mock_logger->hasLoggedLevel( LogLevel::ERROR ) );
 		$error_logs = $this->mock_logger->getLogsByLevel( LogLevel::ERROR );
-		$this->assertStringContainsString( 'Error registering block Test Block with Bad Display Queries: Display query "list" not found', $error_logs[0]['message'] );
+		$this->assertStringContainsString( 'Error registering block Test Block with Bad Display Queries: Query "list" not found for placeholder "List"', $error_logs[0]['message'] );
 	}
 }
