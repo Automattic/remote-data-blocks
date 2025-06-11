@@ -62,7 +62,10 @@ class ConfigRegistry {
 			}
 		} else {
 			$placeholders = [];
-			foreach ( $block_config[ self::QUERIES_KEY ] as $query_key => $query ) {
+			// Using array_keys here triggers a psalm error, so it's set to $_ instead.
+			// Supressing the psalm error is a not a good idea, so instead this is the better solution.
+			// ToDo: Fix the psalm error, and see if array_keys could be used here again.
+			foreach ( $block_config[ self::QUERIES_KEY ] as $query_key => $_ ) {
 				$placeholders[] = [
 					'name' => self::get_query_name_from_key( $query_key ),
 					'query_key' => $query_key,

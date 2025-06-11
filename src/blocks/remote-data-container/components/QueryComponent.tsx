@@ -110,7 +110,6 @@ export function QueryComponent( props: QueryComponentProps ) {
 		newSelectorQueryKey: string,
 		inputs: RemoteDataQueryInput[]
 	): void {
-
 		if ( ! remoteDataAttribute ) {
 			return;
 		}

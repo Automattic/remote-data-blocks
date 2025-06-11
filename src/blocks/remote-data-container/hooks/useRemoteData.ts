@@ -7,7 +7,7 @@ import { useSearchVariables } from '@/blocks/remote-data-container/hooks/useSear
 import { ensureError } from '@/utils/errors';
 import { memoizeFn } from '@/utils/function';
 import { isQueryInputValid, validateQueryInput } from '@/utils/input-validation';
-import { getBlockConfig, getSelectorsForDisplayQuery } from '@/utils/localized-block-data';
+import { getSelectorsForDisplayQuery } from '@/utils/localized-block-data';
 
 async function unmemoizedfetchRemoteData(
 	requestData: RemoteDataApiRequest
