@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { WPFormat, useAnchor } from '@wordpress/rich-text';
 
 import { InlineBindingSelectField } from '@/block-editor/format-types/inline-binding/components/InlineBindingSelection';
-import { getBlockConfig } from '@/utils/localized-block-data';
+import { getFirstDisplayQueryKey } from '@/utils/localized-block-data';
 
 interface InlineBindingSelectFieldPopoverProps {
 	contentRef: React.RefObject< HTMLElement >;
@@ -29,13 +29,9 @@ export function InlineBindingSelectFieldPopover( props: InlineBindingSelectField
 	} );
 	const { remoteData, selectedField, type } = props.fieldSelection;
 
-	// ToDo: Store this within the fieldSelection object.
+	// ToDo: We are picking the first display query for now.
 	const displayQueryKey =
-		remoteData?.displayQueryKey ??
-		Object.keys(
-			getBlockConfig( remoteData?.blockName ?? '' )?.displayQueriesToSelectors ?? {}
-		)[ 0 ] ??
-		'';
+		remoteData?.displayQueryKey ?? getFirstDisplayQueryKey( remoteData?.blockName ?? '' );
 
 	return (
 		<Popover
