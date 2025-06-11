@@ -7,7 +7,7 @@ import { useSearchVariables } from '@/blocks/remote-data-container/hooks/useSear
 import { ensureError } from '@/utils/errors';
 import { memoizeFn } from '@/utils/function';
 import { isQueryInputValid, validateQueryInput } from '@/utils/input-validation';
-import { getBlockConfig } from '@/utils/localized-block-data';
+import { getBlockConfig, getSelectorsForDisplayQuery } from '@/utils/localized-block-data';
 
 async function unmemoizedfetchRemoteData(
 	requestData: RemoteDataApiRequest
@@ -98,8 +98,7 @@ export function useRemoteData( {
 	const resolvedUpdater = externallyManagedUpdateRemoteData ?? setData;
 	const hasResolvedData = Boolean( resolvedData );
 
-	const blockConfig = getBlockConfig( blockName );
-	const selectors = blockConfig?.displayQueriesToSelectors[ displayQueryKey ] ?? [];
+	const selectors = getSelectorsForDisplayQuery( blockName, displayQueryKey );
 	const query = selectors.find( selector => selector.query_key === selectorQueryKey );
 
 	if ( ! query ) {

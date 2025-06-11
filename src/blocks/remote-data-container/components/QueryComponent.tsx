@@ -18,6 +18,7 @@ import { CONTAINER_CLASS_NAME } from '@/blocks/remote-data-container/config/cons
 import { usePatterns } from '@/blocks/remote-data-container/hooks/usePatterns';
 import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteData';
 import { hasRemoteDataChanged } from '@/utils/block-binding';
+import { getSelectorsForDisplayQuery } from '@/utils/localized-block-data';
 
 export interface QueryComponentProps {
 	displayQueryKey: string;
@@ -154,7 +155,7 @@ export function QueryComponent( props: QueryComponentProps ) {
 					<QueryInputsPanel
 						onUpdateQueryInputs={ onUpdateQueryInputs }
 						remoteData={ data }
-						selectors={ blockConfig.displayQueriesToSelectors[ displayQueryKey ] ?? [] }
+						selectors={ getSelectorsForDisplayQuery( blockName, displayQueryKey ) }
 					/>
 				</InspectorControls>
 			) }

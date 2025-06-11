@@ -18,6 +18,11 @@ interface InputVariable {
 	type: string;
 }
 
+interface DisplayQueryConfig {
+	name: string;
+	selectors: Selector[];
+}
+
 interface Selector {
 	image_url?: string;
 	inputs: InputVariable[];
@@ -39,7 +44,7 @@ interface BlockConfig {
 	instructions?: string;
 	name: string;
 	patterns: Record< string, string >;
-	displayQueriesToSelectors: Record< string, Selector[] >;
+	displayQueriesToSelectors: Record< string, DisplayQueryConfig >;
 	settings: {
 		category: string;
 		description?: string;

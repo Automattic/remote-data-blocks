@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
 import { cloud } from '@wordpress/icons';
 
 import { ItemSelectQueryType } from './ItemSelectQueryType';
+import { getSelectorsForDisplayQuery } from '@/utils/localized-block-data';
 
 export interface QuerySelectionPlaceholderProps {
 	blockConfig: BlockConfig;
@@ -21,9 +22,6 @@ export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps
 	const { instructions, settings, displayQueriesToSelectors } = blockConfig;
 
 	const iconElement: IconType = ( settings.icon as IconType ) ?? cloud;
-
-	// The keys represent the display query keys.
-	const displayQueryKeys: string[] = Object.keys( displayQueriesToSelectors );
 
 	const [ selectedDisplayQueryKey, setSelectedDisplayQueryKey ] = useState< string >( '' );
 	const [ showSelectors, setShowSelectors ] = useState< boolean >( false );
@@ -54,25 +52,25 @@ export function QuerySelectionPlaceholder( props: QuerySelectionPlaceholderProps
 					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 				>
-					{ displayQueryKeys.map( ( displayQueryKey: string ) => (
-						<Button
-							key={ displayQueryKey }
-							variant="primary"
-							onClick={ () => {
-								handleDisplayQueryKeyOnSelect( displayQueryKey );
-							} }
-						>
-							{ displayQueryKey
-								.replace( /[^a-zA-Z0-9]/g, ' ' )
-								.replace( /\b\w/g, ( initialLetter: string ) => initialLetter.toUpperCase() ) }
-						</Button>
-					) ) }
+					{ Object.entries( displayQueriesToSelectors ).map(
+						( [ displayQueryKey, displayQueryConfig ] ) => (
+							<Button
+								key={ displayQueryKey }
+								variant="primary"
+								onClick={ () => {
+									handleDisplayQueryKeyOnSelect( displayQueryKey );
+								} }
+							>
+								{ displayQueryConfig.name }
+							</Button>
+						)
+					) }
 				</ToggleGroupControl>
 			) }
 			{ showSelectors && (
 				<ItemSelectQueryType
 					blockName={ blockConfig.name }
-					selectors={ displayQueriesToSelectors[ selectedDisplayQueryKey ] ?? [] }
+					selectors={ getSelectorsForDisplayQuery( blockConfig.name, selectedDisplayQueryKey ) }
 					displayQueryKey={ selectedDisplayQueryKey }
 					onSelect={ handleSelectorOnSelect }
 				/>

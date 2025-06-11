@@ -138,7 +138,6 @@ function register_art_remote_data_block(): void {
 			[
 				'name' => 'Get Art',
 				'query_key' => 'display',
-				'icon' => 'art',
 			],
 		],
 	] );

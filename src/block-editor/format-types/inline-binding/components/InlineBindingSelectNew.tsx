@@ -4,7 +4,11 @@ import { __ } from '@wordpress/i18n';
 import { chevronRightSmall } from '@wordpress/icons';
 
 import { DataViewsModal } from '@/blocks/remote-data-container/components/modals/DataViewsModal';
-import { getBlocksConfig } from '@/utils/localized-block-data';
+import {
+	getBlocksConfig,
+	getFirstDisplayQueryKey,
+	getSelectorsForDisplayQuery,
+} from '@/utils/localized-block-data';
 
 type InlineBindingSelectNewProps = Omit< DropdownMenuProps, 'label' > & {
 	onSelectField: ( data: FieldSelection, fieldValue: string ) => void;
@@ -42,9 +46,8 @@ export function InlineBindingSelectNew( props: InlineBindingSelectNewProps ) {
 					<MenuGroup key={ dataSourceType } label={ dataSourceType }>
 						{ configs.map( blockConfig => {
 							// ToDo: We are picking the first display query, and the first compatible selector for now.
-							const displayQueryKey =
-								Object.keys( blockConfig.displayQueriesToSelectors )[ 0 ] ?? '';
-							const selectors = blockConfig.displayQueriesToSelectors[ displayQueryKey ] ?? [];
+							const displayQueryKey = getFirstDisplayQueryKey( blockConfig.name );
+							const selectors = getSelectorsForDisplayQuery( blockConfig.name, displayQueryKey );
 							const compatibleSelector = selectors.find( selector =>
 								[ 'list', 'search' ].includes( selector.type )
 							);

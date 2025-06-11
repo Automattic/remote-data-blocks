@@ -48,14 +48,17 @@ describe( 'withBlockBinding', () => {
 				name: 'test/block',
 				patterns: { key: 'test/block/pattern' },
 				displayQueriesToSelectors: {
-					key: [
-						{
-							query_key: 'key',
-							type: 'manual-input',
-							inputs: [],
-							name: 'test-name',
-						},
-					],
+					key: {
+						name: 'test-name',
+						selectors: [
+							{
+								query_key: 'key',
+								type: 'manual-input',
+								inputs: [],
+								name: 'test-name',
+							},
+						],
+					},
 				},
 				settings: {
 					category: 'widget',

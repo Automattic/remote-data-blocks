@@ -90,7 +90,6 @@ final class ConfigSchemas {
 					Types::object( [
 						'name' => Types::string(),
 						'query_key' => Types::string(),
-						'icon' => Types::nullable( Types::string() ),
 					] ),
 				)
 			),
