@@ -204,7 +204,7 @@ class GoogleSheetsIntegration {
 	 *   uri: string,
 	 * }>
 	 */
-	public static function enhance_request_details( array $request_details, string $query, array $input_variables ): array {
+	public static function enhance_request_details( array $request_details, string $_query, array $input_variables ): array {
 		if ( isset( $request_details['origin'] ) && 'https://sheets.googleapis.com' === $request_details['origin'] && ! empty( $input_variables ) ) {
 			$request_details['input_variables'] = $input_variables;
 		}
