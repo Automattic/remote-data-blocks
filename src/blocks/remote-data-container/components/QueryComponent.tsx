@@ -10,6 +10,7 @@ import { Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 
+import { EditErrorBoundary } from './EditErrorBoundary';
 import { DataPanel } from './panels/DataPanel';
 import { OverridesPanel } from './panels/OverridesPanel';
 import { QueryInputsPanel } from './panels/QueryInputsPanel';
@@ -18,7 +19,7 @@ import { CONTAINER_CLASS_NAME } from '@/blocks/remote-data-container/config/cons
 import { usePatterns } from '@/blocks/remote-data-container/hooks/usePatterns';
 import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteData';
 import { hasRemoteDataChanged } from '@/utils/block-binding';
-import { getSelectorsForDisplayQuery } from '@/utils/localized-block-data';
+import { getBlockTitle, getSelectorsForDisplayQuery } from '@/utils/localized-block-data';
 
 export interface QueryComponentProps {
 	displayQueryKey: string;
@@ -32,7 +33,7 @@ export interface QueryComponentProps {
 	resetQuery: () => void;
 }
 
-export function QueryComponent( props: QueryComponentProps ) {
+export function RemoteDataBlockComponent( props: QueryComponentProps ) {
 	const {
 		displayQueryKey,
 		blockConfig,
@@ -44,7 +45,6 @@ export function QueryComponent( props: QueryComponentProps ) {
 		resetQuery,
 	} = props;
 
-	const blockProps = useBlockProps( { className: CONTAINER_CLASS_NAME } );
 	const { getSupportedPatterns, innerBlocksPattern, insertPatternBlocks, resetInnerBlocks } =
 		usePatterns( blockName, rootClientId, displayQueryKey );
 	const { data, fetch, reset, supportsPagination, loading } = useRemoteData( {
@@ -128,14 +128,12 @@ export function QueryComponent( props: QueryComponentProps ) {
 		const supportedPatterns = getSupportedPatterns( data?.results[ 0 ] );
 
 		return (
-			<div { ...blockProps }>
-				<PatternSelection
-					blockName={ blockName }
-					onCancel={ resetPatternSelection }
-					onSelectPattern={ onSelectPattern }
-					supportedPatterns={ supportedPatterns }
-				/>
-			</div>
+			<PatternSelection
+				blockName={ blockName }
+				onCancel={ resetPatternSelection }
+				onSelectPattern={ onSelectPattern }
+				supportedPatterns={ supportedPatterns }
+			/>
 		);
 	}
 
@@ -160,18 +158,30 @@ export function QueryComponent( props: QueryComponentProps ) {
 					/>
 				</InspectorControls>
 			) }
+			{ loading && (
+				<div className="remote-data-blocks-loading-overlay">
+					<Spinner
+						style={ {
+							height: '50px',
+							width: '50px',
+						} }
+					/>
+				</div>
+			) }
+			<InnerBlocks />
+		</>
+	);
+}
+
+export function QueryComponent( props: QueryComponentProps ) {
+	const blockProps = useBlockProps( { className: CONTAINER_CLASS_NAME } );
+
+	return (
+		<>
 			<div { ...blockProps }>
-				{ loading && (
-					<div className="remote-data-blocks-loading-overlay">
-						<Spinner
-							style={ {
-								height: '50px',
-								width: '50px',
-							} }
-						/>
-					</div>
-				) }
-				<InnerBlocks />
+				<EditErrorBoundary blockTitle={ getBlockTitle( props.blockName ) }>
+					<RemoteDataBlockComponent { ...props } />
+				</EditErrorBoundary>
 			</div>
 		</>
 	);

@@ -123,13 +123,14 @@ function register_github_markdown_remote_data_block(): void {
 
 	register_remote_data_block( [
 		'title' => $block_title,
-		'render_query' => [
-			'query' => $get_file_as_html_query,
+		'queries' => [
+			'display' => $get_file_as_html_query,
+			'list' => $get_list_files_query,
 		],
-		'selection_queries' => [
+		'placeholders' => [
 			[
-				'query' => $get_list_files_query,
-				'type' => 'list',
+				'name' => 'Get GitHub File',
+				'query_key' => 'display',
 			],
 		],
 		'overrides' => [

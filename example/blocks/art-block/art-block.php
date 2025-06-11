@@ -130,7 +130,6 @@ function register_art_remote_data_block(): void {
 		'title' => 'Art Institute of Chicago',
 		'icon' => 'art',
 		'queries' => [
-			// Changing the name of this query to anything but display will break existing blocks content.
 			'display' => $get_art_query,
 			'search_art' => $search_art_query,
 		],

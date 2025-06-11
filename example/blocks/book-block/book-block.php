@@ -189,13 +189,14 @@ function register_open_library_remote_data_block(): void {
 	register_remote_data_block( [
 		'title' => 'Open Library Book',
 		'icon' => 'book',
-		'render_query' => [
-			'query' => $get_book_query,
+		'queries' => [
+			'display' => $get_book_query,
+			'search' => $search_books_query,
 		],
-		'selection_queries' => [
+		'placeholders' => [
 			[
-				'query' => $search_books_query,
-				'type' => 'search',
+				'name' => 'Get Book',
+				'query_key' => 'display',
 			],
 		],
 		'patterns' => [

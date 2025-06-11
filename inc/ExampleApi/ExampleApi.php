@@ -120,7 +120,6 @@ class ExampleApi {
 		register_remote_data_block( [
 			'title' => self::$block_title,
 			'queries' => [
-				// Changing the name of this query to anything but display will break existing blocks content.
 				'display' => $get_record_query,
 				'get_table' => $get_table_query,
 			],

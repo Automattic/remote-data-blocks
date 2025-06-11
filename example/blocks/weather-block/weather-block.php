@@ -209,8 +209,14 @@ function register_weather_remote_data_block(): void {
 	register_remote_data_block( [
 		'title' => 'Weather',
 		'icon' => 'cloud',
-		'render_query' => [
-			'query' => $get_weather_query,
+		'queries' => [
+			'display' => $get_weather_query,
+		],
+		'placeholders' => [
+			[
+				'name' => 'Get Weather',
+				'query_key' => 'display',
+			],
 		],
 		// Supply a pattern for the block that will be used to display the weather
 		// data. This takes the place of the default pattern provided by the plugin.
