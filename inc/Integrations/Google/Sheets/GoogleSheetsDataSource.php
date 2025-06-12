@@ -90,9 +90,8 @@ class GoogleSheetsDataSource extends GenericHttpDataSource {
 		return $response_data;
 	}
 
-	public static function preprocess_get_response( array $response_data, array $request_details ): array {
+	public static function preprocess_get_response( array $response_data, ?string $row_id = null ): array {
 		$selected_row = null;
-		$row_id = $request_details['headers']['X-Row-ID'];
 
 		if ( isset( $response_data['values'] ) && is_array( $response_data['values'] ) ) {
 			$values = $response_data['values'];
