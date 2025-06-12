@@ -165,17 +165,26 @@ The `image_url` property defines an image URL that represents the query in the U
 
 ### preprocess_response: callable
 
-If you need to pre-process the response in some way before the output variables are extracted, provide a `preprocess_response` function. The function will receive the deserialized response.
+If you need to pre-process the response in some way before the output schema is applied, provide a `preprocess_response` function. The function will receive the deserialized response and an array of `$request_details` which describes the HTTP request that was just executed. The function should return an associative array that will be passed to the output schema for extraction.
+
+If you need to use an input variable in the pre-processing logic, first set it via the `request_headers` property and then access it via `$request_details['options']['headers']`.
 
 #### Example
 
 ```php
-'preprocess_response' => function( mixed $response_data, array $input_variables ): array {
-	$some_computed_property = compute_property( $response_data['foo']['bar'] ?? '' );
+'request_headers' => function( array $input_variables ): array {
+	return [
+		'X-Record-ID' => $input_variables['record_id'],
+	];
+},
+'preprocess_response' => function( mixed $response_data, array $request_details ): array {
+	$record_id = $request_details['options']['headers']['X-Record-ID'] ?? '';
 
-	return array_merge(
-		$response_data,
-		[ 'computed_property' => $some_computed_property ]
+	return array_filter(
+		$response_data['data'] ?? [],
+		static function( mixed $record ) use ( $record_id ): bool {
+			return $record['id'] === $record_id;
+		}
 	);
 },
 ```
