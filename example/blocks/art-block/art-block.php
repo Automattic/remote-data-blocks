@@ -129,14 +129,13 @@ function register_art_remote_data_block(): void {
 	register_remote_data_block( [
 		'title' => 'Art Institute of Chicago',
 		'icon' => 'art',
-		'queries' => [
-			'display' => $get_art_query,
-			'search_art' => $search_art_query,
+		'render_query' => [
+			'query' => $get_art_query,
 		],
-		'placeholders' => [
+		'selection_queries' => [
 			[
-				'name' => 'Get Art',
-				'query_key' => 'display',
+				'query' => $search_art_query,
+				'type' => 'search',
 			],
 		],
 	] );
