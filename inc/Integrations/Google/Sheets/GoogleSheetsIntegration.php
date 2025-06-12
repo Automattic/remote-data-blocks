@@ -4,6 +4,7 @@ namespace RemoteDataBlocks\Integrations\Google\Sheets;
 
 use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
 use RemoteDataBlocks\Config\Query\HttpQuery;
+use RemoteDataBlocks\Config\Query\HttpQueryInterface;
 use RemoteDataBlocks\Formatting\StringFormatter;
 use RemoteDataBlocks\Snippet\Snippet;
 use WP_Error;
@@ -103,8 +104,8 @@ class GoogleSheetsIntegration {
 			'endpoint' => $data_source->get_endpoint() . '/values/' . rawurlencode( $sheet['name'] ),
 			'input_schema' => $input_schema,
 			'output_schema' => $output_schema,
-			'preprocess_response' => function ( mixed $response_data, array $input_variables ): array {
-				return GoogleSheetsDataSource::preprocess_get_response( $response_data, $input_variables );
+			'preprocess_response' => function ( mixed $response_data, array $request_details ): array {
+				return GoogleSheetsDataSource::preprocess_get_response( $response_data, $request_details );
 			},
 		] );
 	}
@@ -124,8 +125,8 @@ class GoogleSheetsIntegration {
 			'endpoint' => $data_source->get_endpoint() . '/values/' . rawurlencode( $sheet['name'] ),
 			'input_schema' => [],
 			'output_schema' => $output_schema,
-			'preprocess_response' => function ( mixed $response_data ): array {
-				return GoogleSheetsDataSource::preprocess_list_response( $response_data );
+			'preprocess_response' => function ( mixed $response_data, array $request_details ): array {
+				return GoogleSheetsDataSource::preprocess_list_response( $response_data, $request_details );
 			},
 		] );
 	}
@@ -191,11 +192,11 @@ class GoogleSheetsIntegration {
 	/**
 	 * Due to the fact that we are using the same query for both the get and list queries, and
 	 * only filtering out the results based on the input variables, the in-memory cache will not
-	 * work as expected. This enhances the request details to include the input variables, so that
-	 * the in-memory cache will be able to differenciate each request.
+	 * work as expected. This enhances the request details to include the row ID in a special
+	 * header X-Row-ID, so that the in-memory cache will be able to differentiate each request.
 	 *
 	 * @param array<string, mixed> $request_details The request details.
-	 * @param string $_query The query being executed.
+	 * @param HttpQueryInterface $query The query being executed.
 	 * @param array<string, mixed> $input_variables The input variables for the current request.
 	 * @return array<string, array{
 	 *   method: string,
@@ -204,9 +205,11 @@ class GoogleSheetsIntegration {
 	 *   uri: string,
 	 * }>
 	 */
-	public static function enhance_request_details( array $request_details, string $_query, array $input_variables ): array {
-		if ( isset( $request_details['origin'] ) && 'https://sheets.googleapis.com' === $request_details['origin'] && ! empty( $input_variables ) ) {
-			$request_details['input_variables'] = $input_variables;
+	public static function enhance_request_details( array $request_details, HttpQueryInterface $query, array $input_variables ): array {
+		$query_input_schema = $query->get_input_schema();
+
+		if ( $query->get_data_source() instanceof GoogleSheetsDataSource && isset( $query_input_schema['row_id'] ) ) {
+			$request_details['headers']['X-Row-ID'] = $input_variables['row_id'];
 		}
 
 		return $request_details;

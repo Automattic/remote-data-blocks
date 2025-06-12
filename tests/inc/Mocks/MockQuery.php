@@ -22,7 +22,7 @@ class MockQuery extends HttpQuery {
 		], $validator ?? new MockValidator() );
 	}
 
-	public function preprocess_response( mixed $response_data, array $input_variables ): mixed {
+	public function preprocess_response( mixed $response_data, array $request_details ): mixed {
 		if ( null !== $this->response_data ) {
 			return $this->response_data;
 		}
