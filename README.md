@@ -25,7 +25,9 @@ A [persistent object cache](https://developer.wordpress.org/reference/classes/wp
 
 ## Installation
 
-Download [the latest release of the plugin](https://github.com/Automattic/remote-data-blocks/releases/latest/download/remote-data-blocks.zip), unzip, and add it to the `plugins/` directory of your WordPress site.
+On WordPress VIP, you can install the plugin, and configure data sources in the Integration Center. Detailed instructions are available [on the WordPress VIP docs](https://docs.wpvip.com/integrations/center/).
+
+For other WordPress environments, download [the latest release of the plugin](https://github.com/Automattic/remote-data-blocks/releases/latest/download/remote-data-blocks.zip), unzip, and add it to the `plugins/` directory of your WordPress site.
 
 ## License
 
