@@ -97,9 +97,9 @@ class GoogleSheetsDataSource extends GenericHttpDataSource {
 			$values = $response_data['values'];
 			$columns = array_shift( $values ); // Get column names from first row
 
-			// if the values are now empty, give back $selected_row as empty array
-			// This can happen if rows are deleted in the sheet after they
-			// have been used in a remote data block.
+			// if the values are now empty, give back $selected_row as an
+			// empty array. This can happen if rows are deleted in the
+			// sheet after they have been used in a remote data block.
 			if ( empty( $values ) ) {
 				return [];
 			}
