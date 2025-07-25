@@ -10,7 +10,8 @@
     "inc/",
     "vendor/",
     "functions.php",
-    "remote-data-blocks.php"
+    "remote-data-blocks.php",
+    "composer.json"
   ],
   "scripts": {
     "build": "npm run cmd:build",
