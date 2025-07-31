@@ -3,7 +3,7 @@ name: General bug report
 about: Report an issue not related to integrating an API.
 title: ''
 labels: bug
-assignees: smithjw1
+assignees:
 ---
 
 ## Describe the bug

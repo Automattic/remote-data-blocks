@@ -13,7 +13,7 @@ require_once __DIR__ . '/inc/markdown-links.php';
  *
  * HttpQuery expects APIs to return JSON, but we instruct GitHub's API to return
  * HTML (converted from Markdown). To handle this, we provide a custom query
- * runner to hangle the HTML response and update Markdown links.
+ * runner to handle the HTML response and update Markdown links.
  *
  * @docs /docs/extending/query.md
  */

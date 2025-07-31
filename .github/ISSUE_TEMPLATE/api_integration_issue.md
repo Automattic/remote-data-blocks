@@ -3,7 +3,7 @@ name: API integration issue
 about: Report an issue integrating an API with Remote Data Blocks.
 title: ''
 labels: bug
-assignees: smithjw1
+assignees:
 ---
 
 ## API information

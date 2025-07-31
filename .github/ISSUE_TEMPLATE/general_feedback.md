@@ -3,7 +3,7 @@ name: Feedback
 about: Let us know what you think.
 title: ''
 labels: feedback
-assignees: smithjw1
+assignees:
 ---
 
 ## Summarize your feedback
