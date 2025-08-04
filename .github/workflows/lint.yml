@@ -45,7 +45,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
+          php-version: '8.2'
 
       - name: Install dependencies
         run: composer install
@@ -64,7 +64,7 @@ jobs:
         uses: docker://ghcr.io/psalm/psalm-github-actions:6.5.1
         with:
           composer_require_dev: true
-          php-version: '8.1'
+          php-version: '8.2'
 
   dependaban:
     name: Dependaban

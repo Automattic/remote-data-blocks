@@ -28,7 +28,7 @@ jobs:
         if: steps.version_check.outputs.new_version
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
+          php-version: '8.2'
 
       - name: Build plugin zip
         if: steps.version_check.outputs.new_version
