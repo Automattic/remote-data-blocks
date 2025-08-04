@@ -33,7 +33,7 @@
     "guzzlehttp/guzzle": "^7.8",
     "kevinrob/guzzle-cache-middleware": "^6.0",
     "erusev/parsedown": "^1.7",
-    "symfony/var-exporter": "^7.0"
+    "symfony/var-exporter": "^6"
   },
   "require-dev": {
     "automattic/vipwpcs": "^3.0",
