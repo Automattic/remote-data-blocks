@@ -1,6 +1,6 @@
 {
   "name": "remote-data-blocks",
-  "author": "WPVIP",
+  "author": "Automattic",
   "description": "Remote Data Blocks plugin",
   "license": "GPL-2.0-or-later",
   "private": true,
