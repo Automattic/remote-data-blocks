@@ -159,7 +159,6 @@ class BlockRegistrationTest extends TestCase {
 
 		// Debug: Check what block names are actually registered
 		$all_blocks = ConfigStore::get_block_configurations();
-		$actual_block_names = array_keys( $all_blocks );
 
 		// Find the block that was just registered
 		$registered_block = null;
