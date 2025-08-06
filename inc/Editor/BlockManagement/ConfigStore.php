@@ -68,6 +68,20 @@ class ConfigStore {
 	}
 
 	/**
+	 * Check is a block is registered by its title.
+	 *
+	 * @param string $block_title Title of the block.
+	 * @return bool True if the block is registered, false otherwise.
+	 */
+	public static function is_registered_block_by_title( string $block_title ): bool {
+		$block = array_filter(
+			self::$blocks,
+			fn( $config ) => $config['title'] === $block_title
+		);
+		return ! empty( $block );
+	}
+
+	/**
 	 * Get data source type from block name.
 	 *
 	 * @param string $block_name Name of the block.

@@ -117,6 +117,7 @@ final class ConfigSchemas {
 				)
 			),
 			'title' => Types::string(),
+			'name' => Types::nullable( Types::string() ),
 		] );
 	}
 

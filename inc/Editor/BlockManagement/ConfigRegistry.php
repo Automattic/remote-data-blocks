@@ -41,10 +41,14 @@ class ConfigRegistry {
 			return $validated;
 		}
 
-		// Check if the block has already been registered.
 		$block_title = $block_config['title'];
-		$block_name = ConfigStore::get_block_name( $block_title );
-		if ( ConfigStore::is_registered_block( $block_name ) ) {
+
+		// If block name not informed, build it from the title.
+		$block_name_seed = $block_config['name'] ?? $block_title;
+		$block_name = ConfigStore::get_block_name( $block_name_seed );
+
+		// Check if the block has already been registered.
+		if ( ConfigStore::is_registered_block( $block_name ) || ConfigStore::is_registered_block_by_title( $block_title ) ) {
 			return self::create_error( $block_title, sprintf( 'Block %s has already been registered', $block_name ) );
 		}
 
