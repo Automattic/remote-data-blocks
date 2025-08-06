@@ -229,6 +229,60 @@ class BlockRegistrationTest extends TestCase {
 	}
 
 	/**
+	 * Test that block registration with explicit name removes slashes correctly.
+	 */
+	public function test_register_block_with_explicit_name_removes_slashes(): void {
+		$test_query_runner = $this->get_query_runner_with_response( [] );
+
+		$test_data_source = HttpDataSource::from_array( [
+			'__version' => 1,
+			'display_name' => 'Test API',
+			'endpoint' => 'https://example.com/test-api',
+		] );
+
+		$test_query = HttpQuery::from_array( [
+			'data_source' => $test_data_source,
+			'query_runner' => $test_query_runner,
+			'output_schema' => [
+				'is_collection' => false,
+				'type' => [
+					'title' => [
+						'name' => 'Title',
+						'path' => '$.title',
+						'type' => 'string',
+					],
+				],
+			],
+		] );
+
+		// Register block with explicit name containing slashes
+		$registration_result = register_remote_data_block( [
+			'title' => 'Slash Test Block',
+			'name' => 'category/subcategory/block-name',
+			'render_query' => [
+				'query' => $test_query,
+			],
+		] );
+
+		$this->assertTrue( $registration_result );
+
+		// Verify the block was registered with slashes removed and proper prefix
+		$expected_block_name = 'remote-data-blocks/category-subcategory-block-name';
+		$this->assertTrue( ConfigStore::is_registered_block( $expected_block_name ) );
+
+		// Verify the block configuration is accessible
+		$block_config = ConfigStore::get_block_configuration( $expected_block_name );
+		$this->assertIsArray( $block_config );
+		$this->assertEquals( 'Slash Test Block', $block_config['title'] );
+		$this->assertEquals( $expected_block_name, $block_config['name'] );
+
+		// Verify there are no additional slashes in the final name
+		$this->assertStringNotContainsString( '//', $block_config['name'], 'Block name should not contain double slashes' );
+		$this->assertStringStartsWith( 'remote-data-blocks/', $block_config['name'], 'Block name should start with remote-data-blocks/' );
+		$this->assertStringNotContainsString( '/', substr( $block_config['name'], 20 ), 'Block name should not contain slashes after the prefix' );
+	}
+
+	/**
 	 * Test that block registration fails when trying to register the same explicit name twice.
 	 */
 	public function test_register_block_duplicate_explicit_name_fails(): void {
