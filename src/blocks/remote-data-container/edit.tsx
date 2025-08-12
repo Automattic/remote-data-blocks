@@ -101,9 +101,30 @@ function RemoteDataBlockEdit( props: BlockEditProps< RemoteDataBlockAttributes >
 		refreshRemoteData();
 	}
 
+	function renderLoadingOverlay( isClickable = false ): JSX.Element {
+		return (
+			<div
+				className="remote-data-blocks-loading-overlay"
+				style={ isClickable ? { pointerEvents: 'auto' } : undefined }
+			>
+				<Spinner
+					style={ {
+						height: '50px',
+						width: '50px',
+					} }
+				/>
+			</div>
+		);
+	}
+
 	// No remote data has been selected yet, show a placeholder.
 	if ( ! data ) {
-		return <Placeholder blockConfig={ blockConfig } onSelect={ onSelectRemoteData } />;
+		return (
+			<>
+				<Placeholder blockConfig={ blockConfig } onSelect={ onSelectRemoteData } />
+				{ loading && renderLoadingOverlay( true ) }
+			</>
+		);
 	}
 
 	if ( showPatternSelection ) {
@@ -141,16 +162,7 @@ function RemoteDataBlockEdit( props: BlockEditProps< RemoteDataBlockAttributes >
 				</InspectorControls>
 			) }
 
-			{ loading && (
-				<div className="remote-data-blocks-loading-overlay">
-					<Spinner
-						style={ {
-							height: '50px',
-							width: '50px',
-						} }
-					/>
-				</div>
-			) }
+			{ loading && renderLoadingOverlay() }
 			<InnerBlocks />
 		</>
 	);
