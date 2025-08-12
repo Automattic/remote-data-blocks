@@ -153,7 +153,7 @@ class ConfigRegistry {
 		// Create the pattern properties, allowing overrides via pattern options.
 		$pattern_properties = [
 			'blockTypes' => [ $block_name ],
-			'categories' => [ 'Remote Data' ],
+			'categories' => [ 'remote-data-blocks' ],
 			'content' => $pattern_content,
 			'inserter' => true,
 			'source' => 'plugin',
