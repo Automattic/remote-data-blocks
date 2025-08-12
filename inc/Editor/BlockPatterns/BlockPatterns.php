@@ -112,6 +112,7 @@ class BlockPatterns {
 						$bindings['heading']['content'] = [ $field, $name ];
 						break;
 					}
+
 					$bindings['paragraphs'][] = [
 						'content' => [ $field, $name ],
 					];
