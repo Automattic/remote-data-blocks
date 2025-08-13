@@ -27,3 +27,16 @@ For other WordPress environments, download the latest release of the plugin, unz
 
 ## License
 Remote Data Blocks is licensed under the <a href="https://github.com/Automattic/remote-data-blocks/blob/trunk/LICENSE">GPLv2 (or later)</a>.
+
+== External services ==
+
+This plugin can connect to one of several API endpoints under your direction. It does not connect to these services if you do not attempt to add a data source.
+
+It sends user provided inputs to retrieve Google Sheets data from the Google Workspace API.
+This service is provided by Google Workspace: <a href="https://developers.google.com/workspace/terms">terms of use</a>, <a href="https://policies.google.com/privacy">privacy policy</a>.
+
+It sends user provided inputs to retrieve Airtable data from the Airtable API.
+This service is provided by Airtable: <a href="https://www.airtable.com/company/developer-terms">terms of use</a>, <a href="https://airtable.com/privacy">privacy policy</a>.
+
+It sends user provided inputs to retrieve Shopify products from the Shopify GraphQL API.
+This service is provided by Shopify: <a href="https://www.shopify.com/legal/api-terms">terms of use</a>, <a href="https://www.shopify.com/legal/privacy">privacy policy</a>.
