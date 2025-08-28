@@ -28,10 +28,6 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 	// Multi-selected items
 	const [ selection, setSelection ] = useState< RemoteDataApiResult[] >( [] );
 
-	// Total selected items
-	const itemCountLabel =
-		selection.length > 1 ? __( 'items selected in total' ) : __( 'item selected in total' );
-
 	const { close, isOpen, open } = useModalState();
 	const {
 		data,
@@ -94,8 +90,8 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 	const triggerElement = renderTrigger ? (
 		renderTrigger( { onClick: open } )
 	) : (
-		<Button variant="primary" onClick={ open }>
-			{ __( 'Choose' ) }
+		<Button variant="primary" onClick={ open } __next40pxDefaultSize>
+			{ __( 'Select items' ) }
 		</Button>
 	);
 
@@ -131,35 +127,25 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 						totalPages={ totalPages }
 					/>
 					{ supportsItemSelection && ! loading && (
-						<>
-							{ selection.length > 1 && (
-								<BaseControl
-									className="rdb-dataviews-bulk-actions-footer__item-count-total"
-									__nextHasNoMarginBottom
-								>
-									<BaseControl.VisualLabel style={ { marginBottom: '0' } }>
-										{ selection.length } { itemCountLabel }
-									</BaseControl.VisualLabel>
-								</BaseControl>
-							) }
-
-							<HStack className="rdb-dataviews-bulk-actions-footer__selection-total">
-								<Button
-									disabled={ selection.length === 0 }
-									onClick={ () => setSelectionIds( [] ) }
-									variant="secondary"
-								>
-									{ __( 'Cancel' ) }
-								</Button>
-								<Button
-									disabled={ selection.length === 0 }
-									onClick={ () => save( selection ) }
-									variant="primary"
-								>
-									{ __( 'Save' ) }
-								</Button>
-							</HStack>
-						</>
+						<HStack className="rdb-dataviews-bulk-actions-footer__selection-total" justify="flex-end" spacing={ 3 }>
+							<Button
+								disabled={ selection.length === 0 }
+								onClick={ () => setSelectionIds( [] ) }
+								variant="tertiary"
+								isDestructive
+								__next40pxDefaultSize
+							>
+								{ __( 'Clear selection' ) }
+							</Button>
+							<Button
+								disabled={ selection.length === 0 }
+								onClick={ () => save( selection ) }
+								variant="primary"
+								__next40pxDefaultSize
+							>
+								{ __( 'Select items' ) }
+							</Button>
+						</HStack>
 					) }
 				</Modal>
 			) }

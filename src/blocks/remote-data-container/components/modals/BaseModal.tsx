@@ -47,7 +47,7 @@ export function ModalWithButtonTrigger( props: ModalWithButtonTriggerProps ) {
 
 	return (
 		<>
-			<Button variant={ buttonVariant } onClick={ onOpen }>
+			<Button variant={ buttonVariant } onClick={ onOpen } __next40pxDefaultSize>
 				{ __( props.buttonText ) }
 			</Button>
 

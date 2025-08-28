@@ -121,46 +121,45 @@ remote-data-blocks-inline-field {
 // align padding with designs
 
 .rdb-dataviews-bulk-actions-modal .components-modal__content {
-	scroll-padding-bottom: 72px;
-	max-height: calc(100% - 116px);
+	scroll-padding-bottom: 121px;
+	max-height: calc(100% - 121px);
 
-	// custom total item count label
-	.rdb-dataviews-bulk-actions-footer__item-count-total {
-		position: fixed;
-		bottom: 80px;
-		left: 50%;
-		transform: translate(-50%);
-		width: max-content;
-		text-align: center;
-		color: #1e1e1e;
-		z-index: 4;
+	@media screen and (min-width: 782px) {
+		scroll-padding-bottom: 88px;
+		max-height: calc(100% - 88px);
+	}
+
+	.dataviews-view-table tr td:first-child,
+	.dataviews-view-table tr th:first-child {
+		padding-left: 32px;
 	}
 
 	// custom total item count actions
 	.rdb-dataviews-bulk-actions-footer__selection-total {
-		background: #fff;
 		position: fixed;
 		bottom: 0;
-		left: 0;
 		right: 0;
-		padding: 0 24px 24px;
-		gap: 20px;
+		padding: 0 32px 24px;
 		z-index: 3;
 
-		.components-button {
-			width: 100%;
-			display: block;
-			text-align: center;
+		@media screen and (min-width: 782px) {
+			width: auto;
 		}
 	}
 
 	// hide bulk actions in footer
 	.dataviews-footer {
+		padding: 24px 32px 0;
 		position: fixed;
-		bottom: 60px;
+		bottom: 64px;
 		left: 0;
 		right: 0;
-		background-color: transparent;
+
+		@media screen and (min-width: 782px) {
+			bottom: 0;
+			height: 88px;
+			padding-bottom: 24px;
+		}
 
 		.dataviews-bulk-actions-footer__container  .dataviews-bulk-actions-footer__action-buttons {
 			display: none;
@@ -176,10 +175,22 @@ remote-data-blocks-inline-field {
 
 	// keep header static
 	.components-modal__header {
-		position: static;
+		background-color: #fff;
+		position: sticky;
 	}
 
-	// align padding with designs
+	.dataviews__view-actions,
+	.dataviews-filters__container {
+		padding-left: 32px;
+		padding-right: 32px;
+	}
+
+	// align padding with modal
+	.dataviews-view-grid {
+		padding-left: 32px;
+		padding-right: 32px;
+	}
+
 	.dataviews-view-table {
 		padding: 4px 32px 32px;
 
@@ -190,8 +201,8 @@ remote-data-blocks-inline-field {
 			right: 0;
 			background: #fff;
 			z-index: 1;
-			padding-left: 24px;
-			padding-right: 24px;
+			padding-left: 32px;
+			padding-right: 32px;
 			text-align: center;
 		}
 
