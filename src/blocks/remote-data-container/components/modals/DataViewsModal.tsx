@@ -1,4 +1,4 @@
-import { BaseControl, Button, Modal, __experimentalHStack as HStack } from '@wordpress/components';
+import { Button, Modal, __experimentalHStack as HStack } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -127,7 +127,11 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 						totalPages={ totalPages }
 					/>
 					{ supportsItemSelection && ! loading && (
-						<HStack className="rdb-dataviews-bulk-actions-footer__selection-total" justify="flex-end" spacing={ 3 }>
+						<HStack
+							className="rdb-dataviews-bulk-actions-footer__selection-total"
+							justify="flex-end"
+							spacing={ 3 }
+						>
 							<Button
 								disabled={ selection.length === 0 }
 								onClick={ () => setSelectionIds( [] ) }
