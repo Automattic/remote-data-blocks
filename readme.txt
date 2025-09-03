@@ -1,5 +1,5 @@
 === Remote Data Blocks ===
-Contributors: chriszarate, maxschmeling, mhsdef and others.
+Contributors: czarate, maxschmeling, hew.
 Tested up to: 6.8
 Stable tag: 1.1.0
 License: GPLv2 or later
