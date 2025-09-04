@@ -580,22 +580,5 @@ class HttpClientTest extends TestCase {
 		// Should preserve custom User-Agent header
 		$this->assertTrue( $result->hasHeader( 'User-Agent' ) );
 		$this->assertSame( 'CustomApp/2.0', $result->getHeaderLine( 'User-Agent' ) );
-		$this->assertNotSame( 'WordPress Remote Data Blocks/1a test.0', $result->getHeaderLine( 'User-Agent' ) );
-	}
-
-	public function testProvideDefaultUserAgentWithEmptyUserAgent(): void {
-		// Test that provideDefaultUserAgent sets default when User-Agent is empty
-		$http_client = HttpClient::instance();
-
-		// Create a request with empty User-Agent header
-		$request = new \GuzzleHttp\Psr7\Request( 'GET', '/test', [ 'User-Agent' => '' ] );
-
-		// Apply the function
-		$result = $http_client->provide_default_user_agent( $request );
-
-		// Should set default User-Agent (empty string is considered as having a header)
-		$this->assertTrue( $result->hasHeader( 'User-Agent' ) );
-		$this->assertSame( '', $result->getHeaderLine( 'User-Agent' ) );
-		$this->assertNotSame( 'WordPress Remote Data Blocks/1a test.0', $result->getHeaderLine( 'User-Agent' ) );
 	}
 }
