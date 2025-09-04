@@ -560,7 +560,7 @@ class HttpClientTest extends TestCase {
 		$request = new \GuzzleHttp\Psr7\Request( 'GET', '/test' );
 
 		// Apply the function
-		$result = $http_client->provideDefaultUserAgent( $request );
+		$result = $http_client->provide_default_user_agent( $request );
 
 		// Should have added User-Agent header
 		$this->assertTrue( $result->hasHeader( 'User-Agent' ) );
@@ -575,7 +575,7 @@ class HttpClientTest extends TestCase {
 		$request = new \GuzzleHttp\Psr7\Request( 'GET', '/test', [ 'User-Agent' => 'CustomApp/2.0' ] );
 
 		// Apply the function
-		$result = $http_client->provideDefaultUserAgent( $request );
+		$result = $http_client->provide_default_user_agent( $request );
 
 		// Should preserve custom User-Agent header
 		$this->assertTrue( $result->hasHeader( 'User-Agent' ) );
@@ -591,7 +591,7 @@ class HttpClientTest extends TestCase {
 		$request = new \GuzzleHttp\Psr7\Request( 'GET', '/test', [ 'User-Agent' => '' ] );
 
 		// Apply the function
-		$result = $http_client->provideDefaultUserAgent( $request );
+		$result = $http_client->provide_default_user_agent( $request );
 
 		// Should set default User-Agent (empty string is considered as having a header)
 		$this->assertTrue( $result->hasHeader( 'User-Agent' ) );

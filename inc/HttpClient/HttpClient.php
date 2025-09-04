@@ -31,7 +31,7 @@ class HttpClient {
 		$handler_stack->push( new RdbCacheMiddleware( new RdbCacheStrategy() ), 'remote_data_blocks_cache' );
 
 		// Set our User Agent header only if one hasn't been set.
-		$handler_stack->push( Middleware::mapRequest([ $this, 'provideDefaultUserAgent' ] ), 'remote_data_blocks_user_agent' );
+		$handler_stack->push( Middleware::mapRequest( [ $this, 'provide_default_user_agent' ] ), 'remote_data_blocks_user_agent' );
 
 		$this->client = new Client( [ 'handler' => $handler_stack ] );
 	}
@@ -70,15 +70,15 @@ class HttpClient {
 	 * @param RequestInterface $request The request to provide the User-Agent header for.
 	 * @return RequestInterface The request with the User-Agent header.
 	 */
-	public function provideDefaultUserAgent( RequestInterface $request ): RequestInterface {
+	public function provide_default_user_agent( RequestInterface $request ): RequestInterface {
 		// Only set User-Agent if one hasn't already been set
 		if ( ! $request->hasHeader( 'User-Agent' ) ) {
-			return $request->withHeader( 'User-Agent', self::getUserAgentString() );
+			return $request->withHeader( 'User-Agent', self::get_user_agent_string() );
 		}
 		return $request;
 	}
 
-	private function getUserAgentString(): string {
+	private function get_user_agent_string(): string {
 		return 'WordPress Remote Data Blocks/' . PluginSettings::get_version();
 	}
 }
