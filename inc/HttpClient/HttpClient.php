@@ -13,7 +13,7 @@ use Psr\Http\Message\UriInterface;
 defined( 'ABSPATH' ) || exit();
 
 class HttpClient {
-	public const USER_AGENT_STRING = 'WordPress Remote Data Blocks/1.0';
+	public const USER_AGENT_STRING = 'WordPress Remote Data Blocks/' . REMOTE_DATA_BLOCKS__PLUGIN_VERSION;
 
 	protected Client $client;
 
