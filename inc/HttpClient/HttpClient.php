@@ -9,12 +9,11 @@ use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
+use RemoteDataBlocks\PluginSettings\PluginSettings;
 
 defined( 'ABSPATH' ) || exit();
 
 class HttpClient {
-	public const USER_AGENT_STRING = 'WordPress Remote Data Blocks/1.0';
-
 	protected Client $client;
 
 	/**
@@ -31,10 +30,8 @@ class HttpClient {
 		$handler_stack->push( new RdbLogMiddleware(), 'remote_data_blocks_logger' );
 		$handler_stack->push( new RdbCacheMiddleware( new RdbCacheStrategy() ), 'remote_data_blocks_cache' );
 
-		// Set our User Agent header.
-		$handler_stack->push( Middleware::mapRequest( function ( RequestInterface $request ) {
-			return $request->withHeader( 'User-Agent', self::USER_AGENT_STRING );
-		} ) );
+		// Set our User Agent header only if one hasn't been set.
+		$handler_stack->push( Middleware::mapRequest( [ $this, 'provide_default_user_agent' ] ), 'remote_data_blocks_user_agent' );
 
 		$this->client = new Client( [ 'handler' => $handler_stack ] );
 	}
@@ -65,5 +62,23 @@ class HttpClient {
 		] );
 
 		return $http_client->request( $method, $uri, $options );
+	}
+
+	/**
+	 * Provide the default User-Agent header.
+	 *
+	 * @param RequestInterface $request The request to provide the User-Agent header for.
+	 * @return RequestInterface The request with the User-Agent header.
+	 */
+	public function provide_default_user_agent( RequestInterface $request ): RequestInterface {
+		// Only set User-Agent if one hasn't already been set
+		if ( ! $request->hasHeader( 'User-Agent' ) ) {
+			return $request->withHeader( 'User-Agent', self::get_user_agent_string() );
+		}
+		return $request;
+	}
+
+	private function get_user_agent_string(): string {
+		return 'WordPress Remote Data Blocks/' . PluginSettings::get_version();
 	}
 }
