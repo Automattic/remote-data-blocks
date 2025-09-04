@@ -564,7 +564,7 @@ class HttpClientTest extends TestCase {
 
 		// Should have added User-Agent header
 		$this->assertTrue( $result->hasHeader( 'User-Agent' ) );
-		$this->assertSame( 'WordPress Remote Data Blocks/1a test.0', $result->getHeaderLine( 'User-Agent' ) );
+		$this->assertSame( 'WordPress Remote Data Blocks/1.0', $result->getHeaderLine( 'User-Agent' ) );
 	}
 
 	public function testProvideDefaultUserAgentPreservesExistingUserAgent(): void {

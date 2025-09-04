@@ -9,12 +9,11 @@ use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
+use RemoteDataBlocks\PluginSettings\PluginSettings;
 
 defined( 'ABSPATH' ) || exit();
 
 class HttpClient {
-	public const USER_AGENT_STRING = 'WordPress Remote Data Blocks/' . REMOTE_DATA_BLOCKS__PLUGIN_VERSION;
-
 	protected Client $client;
 
 	/**
@@ -74,8 +73,12 @@ class HttpClient {
 	public function provideDefaultUserAgent( RequestInterface $request ): RequestInterface {
 		// Only set User-Agent if one hasn't already been set
 		if ( ! $request->hasHeader( 'User-Agent' ) ) {
-			return $request->withHeader( 'User-Agent', self::USER_AGENT_STRING );
+			return $request->withHeader( 'User-Agent', self::getUserAgentString() );
 		}
 		return $request;
+	}
+
+	private function getUserAgentString(): string {
+		return 'WordPress Remote Data Blocks/' . PluginSettings::get_version();
 	}
 }
