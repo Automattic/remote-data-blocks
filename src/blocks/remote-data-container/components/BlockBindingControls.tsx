@@ -1,3 +1,4 @@
+import { useBlockBindingsUtils } from '@wordpress/block-editor';
 import { CheckboxControl, SelectControl } from '@wordpress/components';
 
 import {
@@ -9,6 +10,7 @@ import {
 	TEXT_FIELD_TYPES,
 } from '@/blocks/remote-data-container/config/constants';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
+import { BLOCK_BINDING_SOURCE } from '@/config/constants';
 import { getBlockDataSourceType } from '@/utils/localized-block-data';
 
 interface BlockBindingFieldControlProps {
@@ -17,7 +19,7 @@ interface BlockBindingFieldControlProps {
 	label: string;
 	target: string;
 	updateFieldBinding: ( target: string, field: string ) => void;
-	value: string;
+	value?: string;
 }
 
 export function BlockBindingFieldControl( props: BlockBindingFieldControlProps ) {
@@ -43,23 +45,37 @@ export function BlockBindingFieldControl( props: BlockBindingFieldControlProps )
 }
 
 interface BlockBindingControlsProps {
-	attributes: RemoteDataInnerBlockAttributes;
+	args?: RemoteDataBlockBindingArgs;
 	availableBindings: AvailableBindings;
 	blockName: string;
 	remoteDataName: string;
-	removeBinding: ( target: string ) => void;
-	updateBinding: ( target: string, args: Omit< RemoteDataBlockBindingArgs, 'block' > ) => void;
 }
 
 export function BlockBindingControls( props: BlockBindingControlsProps ) {
-	const { attributes, availableBindings, blockName, remoteDataName, removeBinding, updateBinding } =
-		props;
-	const contentArgs = attributes.metadata?.bindings?.content?.args;
-	const contentField = contentArgs?.field ?? '';
-	const imageAltField = attributes.metadata?.bindings?.alt?.args?.field ?? '';
-	const imageUrlField = attributes.metadata?.bindings?.url?.args?.field ?? '';
-	const buttonUrlField = attributes.metadata?.bindings?.url?.args?.field ?? '';
-	const buttonTextField = attributes.metadata?.bindings?.text?.args?.field ?? '';
+	const { args, availableBindings, blockName, remoteDataName } = props;
+
+	const { updateBlockBindings } = useBlockBindingsUtils();
+
+	function removeBinding( target: string ): void {
+		updateBlockBindings( {
+			[ target ]: undefined,
+		} );
+	}
+
+	function updateBinding(
+		target: string,
+		newArgs: Omit< RemoteDataBlockBindingArgs, 'block' >
+	): void {
+		updateBlockBindings( {
+			[ target ]: {
+				source: BLOCK_BINDING_SOURCE,
+				args: {
+					...newArgs,
+					block: remoteDataName,
+				},
+			},
+		} );
+	}
 
 	function updateFieldBinding( target: string, field: string ): void {
 		if ( ! field ) {
@@ -69,11 +85,9 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 				data_source_type: getBlockDataSourceType( remoteDataName ),
 				block_target_attribute: target,
 			} );
-
 			return;
 		}
 
-		const args = attributes.metadata?.bindings?.[ target ]?.args ?? {};
 		updateBinding( target, { ...args, field } );
 		sendTracksEvent( 'remote_data_container_actions', {
 			action: 'update_binding',
@@ -84,15 +98,14 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 	}
 
 	function updateFieldLabel( showLabel: boolean ): void {
-		if ( ! contentField ) {
-			// Form input should be disabled in this state, but check anyway.
+		if ( ! args?.field ) {
 			return;
 		}
 
 		const label = showLabel
-			? Object.entries( availableBindings ).find( ( [ key ] ) => key === contentField )?.[ 1 ]?.name
+			? Object.entries( availableBindings ).find( ( [ key ] ) => key === args?.field )?.[ 1 ]?.name
 			: undefined;
-		updateBinding( 'content', { ...contentArgs, field: contentField, label } );
+		updateBinding( 'content', { ...args, label } );
 		sendTracksEvent( 'remote_data_container_actions', {
 			action: showLabel ? 'show_label' : 'hide_label',
 			data_source_type: getBlockDataSourceType( remoteDataName ),
@@ -110,11 +123,11 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 						label="Content"
 						target="content"
 						updateFieldBinding={ updateFieldBinding }
-						value={ contentField }
+						value={ args?.field }
 					/>
 					<CheckboxControl
-						checked={ Boolean( contentArgs?.label ) }
-						disabled={ ! contentField }
+						checked={ Boolean( args?.label ) }
+						disabled={ ! args?.field }
 						label="Show label"
 						name="show_label"
 						onChange={ updateFieldLabel }
@@ -131,7 +144,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 						label="Image URL"
 						target="url"
 						updateFieldBinding={ updateFieldBinding }
-						value={ imageUrlField }
+						value={ args?.field }
 					/>
 					<BlockBindingFieldControl
 						availableBindings={ availableBindings }
@@ -139,7 +152,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 						label="Image alt text"
 						target="alt"
 						updateFieldBinding={ updateFieldBinding }
-						value={ imageAltField }
+						value={ args?.field }
 					/>
 				</>
 			);
@@ -152,7 +165,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 						label="Button URL"
 						target="url"
 						updateFieldBinding={ updateFieldBinding }
-						value={ buttonUrlField }
+						value={ args?.field }
 					/>
 					<BlockBindingFieldControl
 						availableBindings={ availableBindings }
@@ -160,7 +173,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 						label="Button Text"
 						target="text"
 						updateFieldBinding={ updateFieldBinding }
-						value={ buttonTextField }
+						value={ args?.field }
 					/>
 				</>
 			);
@@ -174,7 +187,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 						label="Raw HTML"
 						target="content"
 						updateFieldBinding={ updateFieldBinding }
-						value={ contentField }
+						value={ args?.field }
 					/>
 				</>
 			);

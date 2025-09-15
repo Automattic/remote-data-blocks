@@ -9,6 +9,12 @@ import { ReactElement } from '@wordpress/element/build-types/serialize';
 declare module '@wordpress/block-editor' {
 	function BlockContextProvider( props: { children: ReactElement; value: object } ): JSX.Element;
 
+	function useBlockBindingsUtils( clientId?: string ): {
+		updateBlockBindings: (
+			bindings: Record< string, { args: object; source: string } | undefined >
+		) => void;
+	};
+
 	function useBlockEditContext(): {
 		clientId: string;
 		[ key: string ]: unknown;
@@ -47,6 +53,7 @@ declare module '@wordpress/block-editor' {
 		getBlocksByClientId: < T extends BlockAttributes >( clientId: string ) => BlockInstance< T >[];
 		getBlocksByName: ( name: string ) => string[];
 		getPatternsByBlockTypes: ( name: string | string[], clientId?: string ) => BlockPattern[];
+		getSelectedBlock: < T extends BlockAttributes >() => BlockInstance< T > | undefined;
 		getSettings: () => EditorSettings;
 		hasMultiSelection: () => boolean;
 	}

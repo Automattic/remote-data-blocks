@@ -7,11 +7,13 @@
     "WP_REDIS_DISABLE_BANNERS": true,
     "WP_REDIS_HOST": "host.docker.internal"
   },
+  "core": "WordPress/WordPress#master",
   "mappings": {
     ".htaccess": "./bin/conf/htaccess"
   },
   "plugins": [
     ".",
+    "../gutenberg",
     "https://downloads.wordpress.org/plugin/query-monitor.latest-stable.zip",
     "https://downloads.wordpress.org/plugin/redis-cache.latest-stable.zip"
   ]
