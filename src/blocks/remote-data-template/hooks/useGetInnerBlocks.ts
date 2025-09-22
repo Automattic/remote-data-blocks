@@ -15,9 +15,12 @@ export function useGetInnerBlocks(
 		[ blockName, clientId ],
 	] );
 
-	return ( result: RemoteDataApiResult ): BlockInstance< RemoteDataInnerBlockAttributes >[] => {
+	return (
+		result: RemoteDataApiResult,
+		previewIndex: number
+	): BlockInstance< RemoteDataInnerBlockAttributes >[] => {
 		return getBlocks( clientId ).map( block =>
-			cloneBlockForPreview( block, result, remoteDataBlockName ?? blockName )
+			cloneBlockForPreview( block, result, remoteDataBlockName ?? blockName, previewIndex )
 		);
 	};
 }

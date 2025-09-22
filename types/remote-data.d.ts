@@ -68,6 +68,8 @@ interface RemoteDataBlockBindingArgs {
 	block: string;
 	field: string;
 	label?: string;
+	isPreview?: boolean;
+	previewIndex?: number;
 }
 
 interface RemoteDataBlockBinding {

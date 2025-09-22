@@ -1,64 +1,56 @@
 import { cloneBlock } from '@wordpress/blocks';
 
 import { BLOCK_BINDING_SOURCE } from '@/config/constants';
-import { getRemoteDataResultValue } from '@/utils/remote-data';
 import { getClassName } from '@/utils/string';
-import { isObjectWithStringKeys } from '@/utils/type-narrowing';
 
 import type { BlockPattern } from '@wordpress/block-editor';
 import type { BlockInstance } from '@wordpress/blocks';
 
 /**
  * Clone a block and inject remote data so that it can be previewed, either for
- * a pattern preview or a template preview.
+ * a pattern preview or a template preview. Template previews may be previewing
+ * a specific result from the result set, so a preview index can be provided.
  */
 export function cloneBlockForPreview(
 	block: BlockInstance< RemoteDataInnerBlockAttributes >,
 	result: RemoteDataApiResult,
-	remoteDataBlockName: string
+	remoteDataBlockName: string,
+	previewIndex?: number
 ): BlockInstance {
 	const newInnerBlocks = block.innerBlocks?.map( innerBlock =>
-		cloneBlockForPreview( innerBlock, result, remoteDataBlockName )
+		cloneBlockForPreview( innerBlock, result, remoteDataBlockName, previewIndex )
 	);
 
-	const mismatchedAttributes = getMismatchedAttributes(
-		block.attributes,
-		[ result ],
-		remoteDataBlockName
-	);
-
-	return cloneBlock( block, mismatchedAttributes, newInnerBlocks );
-}
-
-function getAttributeValue( attributes: unknown, key: string | undefined | null ): string {
-	if ( ! key || ! isObjectWithStringKeys( attributes ) ) {
-		return '';
+	let previewArgs = {};
+	if ( undefined !== previewIndex ) {
+		previewArgs = { isPreview: true, previewIndex };
 	}
 
-	// This .toString() call is important to handle RichTextData objects. We may
-	// set the attribute value as a string, but once loaded by the editor, it will
-	// be a RichTextData object. Currently, .toString() proxies to .toHTMLString():
-	//
-	// https://github.com/WordPress/gutenberg/blob/7bca2fadddde7b2b2f62823b8a4b81378f117412/packages/rich-text/src/create.js#L157
-	return attributes[ key ]?.toString() ?? '';
-}
+	const clonedAttributes = {
+		...block.attributes,
+		metadata: {
+			...block.attributes.metadata,
+			bindings: {
+				...block.attributes.metadata?.bindings,
+				...Object.fromEntries(
+					getBoundAttributeEntries( block.attributes, remoteDataBlockName ).map(
+						( [ target, binding ] ) => [
+							target,
+							{
+								...binding,
+								args: {
+									...binding.args,
+									...previewArgs,
+								},
+							},
+						]
+					)
+				),
+			},
+		},
+	};
 
-function getExpectedAttributeValue(
-	result?: RemoteDataApiResult,
-	args?: RemoteDataBlockBindingArgs
-): string | null {
-	if ( ! args?.field || ! result?.result?.[ args.field ] ) {
-		return null;
-	}
-
-	// See comment on toString() in getAttributeValue.
-	let expectedValue = getRemoteDataResultValue( result, args.field );
-	if ( args.label ) {
-		const labelClass = getClassName( 'block-label' );
-		expectedValue = `<span class="${ labelClass }">${ args.label }</span> ${ expectedValue }`;
-	}
-
-	return expectedValue;
+	return cloneBlock( block, clonedAttributes, newInnerBlocks );
 }
 
 export function getBoundAttributeEntries(
@@ -86,24 +78,6 @@ export function getBoundBlockClassName(
 	] );
 
 	return Array.from( classNames.values() ).filter( Boolean ).join( ' ' );
-}
-
-export function getMismatchedAttributes(
-	attributes: RemoteDataInnerBlockAttributes,
-	results: RemoteDataApiResult[],
-	remoteDataBlockName: string,
-	index = 0
-): Partial< RemoteDataInnerBlockAttributes > {
-	return Object.fromEntries(
-		getBoundAttributeEntries( attributes, remoteDataBlockName )
-			.map( ( [ target, binding ] ) => [
-				target,
-				getExpectedAttributeValue( results[ index ], binding.args ),
-			] )
-			.filter(
-				( [ target, value ] ) => null !== value && value !== getAttributeValue( attributes, target )
-			)
-	) as Partial< RemoteDataInnerBlockAttributes >;
 }
 
 /**

@@ -9,16 +9,15 @@ import type { Block, BlockEditProps as BlockEditPropsOriginal } from '@wordpress
  * The types provided by @wordpress/blocks are incomplete.
  */
 
-interface GetValuesPayload< Context, Values > {
-	bindings: Values;
+interface GetValuesPayload< Context, Args > {
+	bindings: Record< string, { args: Args } >;
 	clientId: string;
 	context: Context;
-	select: ( store: BlockEditorStoreDescriptor ) => BlockEditorStoreSelectors;
+	select: < Selectors >( store: StoreDescriptor ) => Selectors;
 }
 
-interface SetValuesPayload< Context, Values > extends GetValuesPayload< Context, Values > {
+interface SetValuesPayload< Context, Args > extends GetValuesPayload< Context, Args > {
 	dispatch: ( store: BlockEditorStoreDescriptor ) => BlockEditorStoreActions;
-	values: Values;
 }
 
 // Properly allow simplified block registration calls when register_block_type() is already called server-side.
@@ -35,12 +34,14 @@ declare module '@wordpress/blocks' {
 		name: string;
 	}
 
-	interface BlockBindingsSource< Context = Record< string, unknown >, Values = unknown > {
-		canUserEditValue?: ( payload: GetValuesPayload< Context, Values > ) => boolean;
-		getValues?: ( payload: GetValuesPayload< Context, Values > ) => Values;
+	interface BlockBindingsSource< Context = Record< string, {} >, Args = {} > {
+		canUserEditValue?: (
+			payload: Pick< GetValuesPayload< Context, Args >, 'context' | 'select' >
+		) => boolean;
+		getValues?: ( payload: GetValuesPayload< Context, Args > ) => Values;
 		label?: string;
 		name: string;
-		setValues?: ( payload: SetValuesPayload< Context, Values > ) => void;
+		setValues?: ( payload: SetValuesPayload< Context, Args > ) => void;
 		usesContext?: string[];
 	}
 

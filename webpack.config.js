@@ -5,6 +5,7 @@ const additionalScripts = {
 	'dataviews/index': './src/dataviews/index',
 	'pattern-editor/index': './src/pattern-editor/index',
 	'settings/index': './src/settings/index',
+	'store/index': './src/store/index',
 };
 
 const { modernize, moduleConfig, scriptConfig } = require( './webpack.utils' );
