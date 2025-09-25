@@ -9,10 +9,10 @@ interface RawRemoteDataContext {
 	[ REMOTE_DATA_CONTEXT_KEY ]?: RemoteData;
 }
 
-registerBlockBindingsSource< RawRemoteDataContext, RemoteDataBlockBindingArgs >( {
+registerBlockBindingsSource< RawRemoteDataContext, RemoteDataBlockBinding >( {
 	name: BLOCK_BINDING_SOURCE,
-	usesContext: [ REMOTE_DATA_CONTEXT_KEY ],
-	getValues( { bindings, context, select } ) {
+	usesContext: [ 'remote-data-blocks/remoteData' ],
+	getValues( { bindings, context, select } ): Record< string, string > {
 		if ( ! context[ REMOTE_DATA_CONTEXT_KEY ]?.results?.length ) {
 			return {};
 		}
@@ -20,14 +20,15 @@ registerBlockBindingsSource< RawRemoteDataContext, RemoteDataBlockBindingArgs >(
 		const remoteData = context[ REMOTE_DATA_CONTEXT_KEY ];
 		const previewIndex = select< Selectors >( rdbStore ).getPreviewIndex( remoteData.resultId );
 
-		console.log( { previewIndex, resultId: remoteData.resultId } );
 		return Object.fromEntries(
-			Object.entries( bindings ).map( ( [ targetAttribute, binding ] ) => {
+			Object.entries( bindings ).map( ( [ targetAttribute, binding ] ): [ string, string ] => {
 				const index = binding.args.previewIndex ?? previewIndex;
-				return [
-					targetAttribute,
-					remoteData.results?.[ index ?? 0 ]?.result?.[ binding.args.field ]?.value ?? '',
-				];
+				const label = binding.args.label ? `${ binding.args.label }: ` : '';
+				const value = String(
+					remoteData.results?.[ index ?? 0 ]?.result?.[ binding.args.field ]?.value ?? ''
+				);
+
+				return [ targetAttribute, `${ label }${ value }` ];
 			} )
 		);
 	},
