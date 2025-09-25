@@ -28,6 +28,13 @@ interface BaseBinding {
 	source: string;
 }
 
+interface BaseItem {
+	key?: string;
+	label: string;
+	type: string;
+	value?: string;
+}
+
 // Properly allow simplified block registration calls when register_block_type() is already called server-side.
 // Use a Partial<Block> to allow all attributes to be optional.
 // https://github.com/WordPress/gutenberg/issues/53605
@@ -45,9 +52,24 @@ declare module '@wordpress/blocks' {
 	interface BlockBindingsSource<
 		Context = Record< string, unknown >,
 		Binding extends BaseBinding,
-		Values extends Record< string, unknown >
+		Values = Record< string, unknown >
 	> {
 		canUserEditValue?: ( payload: ContextSelectPayload< Context > ) => boolean;
+		editorUI?: < Item extends BaseItem >(
+			payload: ContextSelectPayload< Context >
+		) =>
+			| {
+					mode: 'dropdown';
+					data: Item[];
+					getArgs?: ( payload: ItemCallbackPayload< Item, Binding > ) => Binding[ 'args' ];
+					isSelected?: ( payload: ItemCallbackPayload< Item, Binding > ) => boolean;
+			  }
+			| {
+					mode: 'modal';
+					data: Item[];
+					renderModalContent: ( payload: { attribute: string } ) => void;
+			  }
+			| {};
 		getValues?: ( payload: GetValuesPayload< Context, Binding > ) => Values;
 		label?: string;
 		name: string;
