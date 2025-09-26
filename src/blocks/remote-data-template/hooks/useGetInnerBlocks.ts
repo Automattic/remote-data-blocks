@@ -1,7 +1,7 @@
 import { BlockEditorStoreSelectors, store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
-import { cloneBlockForPreview } from '@/utils/block-binding';
+import { cloneBlockForTemplatePreview } from '@/utils/block-binding';
 
 import type { BlockInstance } from '@wordpress/blocks';
 
@@ -20,7 +20,7 @@ export function useGetInnerBlocks(
 		previewIndex: number
 	): BlockInstance< RemoteDataInnerBlockAttributes >[] => {
 		return getBlocks( clientId ).map( block =>
-			cloneBlockForPreview( block, result, remoteDataBlockName ?? blockName, previewIndex )
+			cloneBlockForTemplatePreview( block, result, remoteDataBlockName ?? blockName, previewIndex )
 		);
 	};
 }

@@ -11,7 +11,7 @@ interface State {
 interface SetPreviewIndexAction {
 	type: 'SET_PREVIEW_INDEX';
 	payload: {
-		resultsId: string;
+		resultId: string;
 		index: number;
 	};
 }
@@ -19,25 +19,25 @@ interface SetPreviewIndexAction {
 type ActionPayload = SetPreviewIndexAction;
 
 export interface ActionCreators extends Record< string, ActionCreator > {
-	setPreviewIndex: ( resultsId: string, index: number ) => SetPreviewIndexAction;
+	setPreviewIndex: ( resultId: string, index: number ) => SetPreviewIndexAction;
 }
 
 export interface Selectors {
-	getPreviewIndex: ( resultsId: string ) => number;
+	getPreviewIndex: ( resultId?: string ) => number;
 }
 
 const actionCreators: ActionCreators = {
-	setPreviewIndex( resultsId: string, index: number ): SetPreviewIndexAction {
+	setPreviewIndex( resultId: string, index: number ): SetPreviewIndexAction {
 		return {
 			type: 'SET_PREVIEW_INDEX',
-			payload: { resultsId, index },
+			payload: { resultId, index },
 		};
 	},
 };
 
 const selectors = {
-	getPreviewIndex( state: State = INITIAL_STATE, resultsId: string ): number {
-		return state.previewIndexes?.get( resultsId ) ?? 0;
+	getPreviewIndex( state: State = INITIAL_STATE, resultId: string ): number {
+		return state.previewIndexes?.get( resultId ) ?? 0;
 	},
 };
 
@@ -53,7 +53,7 @@ const remoteDataBlocksStoreConfig: ReduxStoreConfig< State, ActionCreators, type
 				return {
 					...state,
 					previewIndexes: new Map( state.previewIndexes ).set(
-						action.payload.resultsId,
+						action.payload.resultId,
 						action.payload.index
 					),
 				};

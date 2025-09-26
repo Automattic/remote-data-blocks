@@ -1,30 +1,26 @@
 import { cloneBlock } from '@wordpress/blocks';
 
 import { BLOCK_BINDING_SOURCE } from '@/config/constants';
+import { getRemoteDataResultValue } from '@/utils//remote-data';
 import { getClassName } from '@/utils/string';
 
 import type { BlockPattern } from '@wordpress/block-editor';
 import type { BlockInstance } from '@wordpress/blocks';
 
 /**
- * Clone a block and inject remote data so that it can be previewed, either for
- * a pattern preview or a template preview. Template previews may be previewing
- * a specific result from the result set, so a preview index can be provided.
+ * Clone a block and inject previewIndex so that it can be previewed in a
+ * template loop. Template previews are previewing a specific result from the
+ * result set, so a preview index is added to the binding args.
  */
-export function cloneBlockForPreview(
+export function cloneBlockForTemplatePreview(
 	block: BlockInstance< RemoteDataInnerBlockAttributes >,
 	result: RemoteDataApiResult,
 	remoteDataBlockName: string,
-	previewIndex?: number
+	previewIndex: number
 ): BlockInstance {
 	const newInnerBlocks = block.innerBlocks?.map( innerBlock =>
-		cloneBlockForPreview( innerBlock, result, remoteDataBlockName, previewIndex )
+		cloneBlockForTemplatePreview( innerBlock, result, remoteDataBlockName, previewIndex )
 	);
-
-	let previewArgs = {};
-	if ( undefined !== previewIndex ) {
-		previewArgs = { isPreview: true, previewIndex };
-	}
 
 	const clonedAttributes = {
 		...block.attributes,
@@ -40,7 +36,8 @@ export function cloneBlockForPreview(
 								...binding,
 								args: {
 									...binding.args,
-									...previewArgs,
+									isPreview: true,
+									previewIndex,
 								},
 							},
 						]
@@ -51,6 +48,65 @@ export function cloneBlockForPreview(
 	};
 
 	return cloneBlock( block, clonedAttributes, newInnerBlocks );
+}
+
+/**
+ * Clone a block and inject remote data so that it can be a pattern preview or a template preview. Template previews may be previewing
+ * a specific result from the result set, so a preview index can be provided.
+ */
+export function cloneBlockForPatternPreview(
+	block: BlockInstance< RemoteDataInnerBlockAttributes >,
+	result: RemoteDataApiResult,
+	remoteDataBlockName: string
+): BlockInstance {
+	const newInnerBlocks = block.innerBlocks?.map( innerBlock =>
+		cloneBlockForPatternPreview( innerBlock, result, remoteDataBlockName )
+	);
+
+	const clonedAttributes = {
+		...block.attributes,
+		metadata: {
+			...block.attributes.metadata,
+			bindings: {
+				...block.attributes.metadata?.bindings,
+				...Object.fromEntries(
+					getBoundAttributeEntries( block.attributes, remoteDataBlockName ).map(
+						( [ target, binding ] ) => [
+							target,
+							{
+								...binding,
+								args: {
+									...binding.args,
+									isPreview: true,
+									previewValue: getExpectedAttributeValue( result, binding.args ),
+								},
+							},
+						]
+					)
+				),
+			},
+		},
+	};
+
+	return cloneBlock( block, clonedAttributes, newInnerBlocks );
+}
+
+function getExpectedAttributeValue(
+	result?: RemoteDataApiResult,
+	args?: RemoteDataBlockBindingArgs
+): string | undefined {
+	if ( ! args?.field || ! result?.result?.[ args.field ] ) {
+		return;
+	}
+
+	// See comment on toString() in getAttributeValue.
+	let expectedValue = getRemoteDataResultValue( result, args.field );
+	if ( args.label ) {
+		const labelClass = getClassName( 'block-label' );
+		expectedValue = `<span class="${ labelClass }">${ args.label }</span> ${ expectedValue }`;
+	}
+
+	return expectedValue;
 }
 
 export function getBoundAttributeEntries(

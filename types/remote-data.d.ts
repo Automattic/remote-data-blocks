@@ -70,6 +70,7 @@ interface RemoteDataBlockBindingArgs {
 	label?: string;
 	isPreview?: boolean;
 	previewIndex?: number;
+	previewValue?: string;
 }
 
 interface RemoteDataBlockBinding {
