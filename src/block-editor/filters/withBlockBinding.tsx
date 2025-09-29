@@ -16,7 +16,7 @@ import {
 	PATTERN_OVERRIDES_BINDING_SOURCE,
 	PATTERN_OVERRIDES_CONTEXT_KEY,
 } from '@/config/constants';
-import { getBoundBlockClassName, getMismatchedAttributes } from '@/utils/block-binding';
+import { getBoundBlockClassName } from '@/utils/block-binding';
 import { getBlockAvailableBindings, getBlockTitle } from '@/utils/localized-block-data';
 
 interface BoundBlockEditProps {
@@ -27,12 +27,6 @@ interface BoundBlockEditProps {
 	remoteDataName: string;
 	remoteDataTitle: string;
 	setAttributes: ( attributes: RemoteDataInnerBlockAttributes ) => void;
-}
-
-// This prop is provided by the `withPreviewIndex` filter, which is bundled with
-// the Remote Data Template block.
-interface BlockEditWithPreviewIndex {
-	previewIndex?: number;
 }
 
 function BoundBlockEdit( props: BoundBlockEditProps ) {
@@ -100,10 +94,8 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 }
 
 export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
-	return (
-		props: BlockEditProps< RemoteDataInnerBlockAttributes > & BlockEditWithPreviewIndex
-	) => {
-		const { attributes, context, name, previewIndex: index = 0, setAttributes } = props;
+	return ( props: BlockEditProps< RemoteDataInnerBlockAttributes > ) => {
+		const { attributes, context, name, setAttributes } = props;
 		const { remoteData } = useRemoteDataContext( context );
 		const availableBindings = getBlockAvailableBindings( remoteData?.blockName ?? '' );
 		const hasAvailableBindings = Boolean( Object.keys( availableBindings ).length );
@@ -135,21 +127,14 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 			binding => binding.source === PATTERN_OVERRIDES_BINDING_SOURCE
 		);
 
-		// If the block has a binding and the attributes do not match their expected
-		// values, update and merge the attributes.
-		const mergedAttributes = {
-			...attributes,
-			...getMismatchedAttributes( attributes, remoteData.results, remoteData.blockName, index ),
-		};
-
 		// If multiple blocks are being selected, render it as usual.
 		if ( hasMultiSelection() ) {
-			return <BlockEdit { ...props } attributes={ mergedAttributes } />;
+			return <BlockEdit { ...props } attributes={ attributes } />;
 		}
 
 		// If the block is not writable, render it as usual.
 		if ( isInSyncedPattern && ! hasEnabledOverrides ) {
-			return <BlockEdit { ...props } attributes={ mergedAttributes } />;
+			return <BlockEdit { ...props } attributes={ attributes } />;
 		}
 
 		// lookup the title of the remote data block
@@ -157,14 +142,14 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 
 		return (
 			<BoundBlockEdit
-				attributes={ mergedAttributes }
+				attributes={ attributes }
 				availableBindings={ availableBindings }
 				blockName={ name }
 				remoteDataName={ remoteData?.blockName ?? '' }
 				remoteDataTitle={ remoteBlockTitle }
 				setAttributes={ setAttributes }
 			>
-				<BlockEdit { ...props } attributes={ mergedAttributes } />
+				<BlockEdit { ...props } attributes={ attributes } />
 			</BoundBlockEdit>
 		);
 	};

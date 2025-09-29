@@ -1,6 +1,5 @@
 import {
 	BlockEditorStoreSelectors,
-	BlockPattern,
 	InspectorControls,
 	store as blockEditorStore,
 	useBlockProps,
@@ -8,7 +7,6 @@ import {
 import { BlockEditProps } from '@wordpress/blocks';
 import { Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
 
 import { QueryInputsPanel } from './components/panels/QueryInputsPanel';
 import { EditErrorBoundary } from '@/blocks/remote-data-container/components/EditErrorBoundary';
@@ -39,9 +37,6 @@ function RemoteDataBlockEdit( props: BlockEditProps< RemoteDataBlockAttributes >
 	const rootClientId = props.clientId;
 	const remoteDataAttribute = migrateRemoteData( props.attributes.remoteData );
 
-	const { getSupportedPatterns, innerBlocksPattern, insertPatternBlocks, resetInnerBlocks } =
-		usePatterns( blockName, rootClientId );
-
 	const { data, fetch, loading, reset, supportsPagination } = useRemoteData( {
 		blockName,
 		externallyManagedRemoteData: remoteDataAttribute,
@@ -49,16 +44,18 @@ function RemoteDataBlockEdit( props: BlockEditProps< RemoteDataBlockAttributes >
 		queryKey: DISPLAY_QUERY_KEY,
 	} );
 
+	const {
+		getSupportedPatterns,
+		onSelectPattern,
+		onReadyForPatternSelection,
+		resetPatternSelection,
+		showPatternSelection,
+	} = usePatterns( blockName, rootClientId, supportsPagination );
+
 	const { hasMultiSelection } = useSelect< BlockEditorStoreSelectors >( blockEditorStore );
-	const [ showPatternSelection, setShowPatternSelection ] = useState< boolean >( false );
 
 	function refreshRemoteData(): void {
 		void fetch( remoteDataAttribute?.queryInputs ?? [ {} ] );
-	}
-
-	function resetPatternSelection(): void {
-		resetInnerBlocks();
-		setShowPatternSelection( false );
 	}
 
 	function resetRemoteData(): void {
@@ -66,19 +63,9 @@ function RemoteDataBlockEdit( props: BlockEditProps< RemoteDataBlockAttributes >
 		resetPatternSelection();
 	}
 
-	function onSelectPattern( pattern: BlockPattern ): void {
-		insertPatternBlocks( pattern, supportsPagination );
-		setShowPatternSelection( false );
-	}
-
 	function onSelectRemoteData( inputs: RemoteDataQueryInput[] ): void {
 		void fetch( inputs ).then( () => {
-			if ( innerBlocksPattern ) {
-				insertPatternBlocks( innerBlocksPattern, supportsPagination );
-				return;
-			}
-
-			setShowPatternSelection( true );
+			onReadyForPatternSelection();
 		} );
 	}
 

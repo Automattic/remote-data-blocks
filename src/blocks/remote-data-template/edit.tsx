@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useBlockProps } from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import { BlockEditProps } from '@wordpress/blocks';
 import { Placeholder } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -15,6 +15,7 @@ import './editor.scss';
 export function Edit( props: BlockEditProps< RemoteDataTemplateBlockAttributes > ): JSX.Element {
 	const { clientId, context, name } = props;
 	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps();
 
 	const { remoteData } = useRemoteDataContext( context );
 	const getInnerBlocks = useGetInnerBlocks( name, clientId, remoteData?.blockName );
@@ -36,6 +37,10 @@ export function Edit( props: BlockEditProps< RemoteDataTemplateBlockAttributes >
 	// Leave it to the no results block to handle this.
 	if ( ! remoteData.results.length ) {
 		return <div { ...blockProps } />;
+	}
+
+	if ( 1 === remoteData.results.length ) {
+		return <div { ...innerBlocksProps } />;
 	}
 
 	return <LoopTemplate getInnerBlocks={ getInnerBlocks } remoteData={ remoteData } />;

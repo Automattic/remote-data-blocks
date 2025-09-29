@@ -39,7 +39,8 @@ class BlockRegistration {
 	 */
 	public static function enqueue_block_assets(): void {
 		Assets::enqueue_build_asset( 'remote-data-blocks-dataviews', 'dataviews' );
-		Assets::enqueue_build_asset( 'remote-data-blocks-block-editor', 'block-editor', [ 'remote-data-blocks-dataviews' ] );
+		Assets::enqueue_build_asset( 'remote-data-blocks-store', 'store' );
+		Assets::enqueue_build_asset( 'remote-data-blocks-block-editor', 'block-editor', [ 'remote-data-blocks-dataviews', 'remote-data-blocks-store' ] );
 	}
 
 	public static function register_helper_blocks(): void {
