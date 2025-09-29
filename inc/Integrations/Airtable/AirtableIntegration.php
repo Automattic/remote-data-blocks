@@ -80,6 +80,7 @@ class AirtableIntegration {
 	public static function get_item_query( AirtableDataSource $data_source, array $table ): array {
 		return [
 			'__class' => HttpQuery::class,
+			'display_name' => sprintf( 'Get %s record by ID', $table['name'] ),
 			'data_source' => $data_source,
 			'endpoint' => function ( array $input_variables ) use ( $data_source, $table ): string {
 				// Build the formula
@@ -129,6 +130,7 @@ class AirtableIntegration {
 	public static function get_list_query( AirtableDataSource $data_source, array $table ): array {
 		return [
 			'__class' => HttpQuery::class,
+			'display_name' => sprintf( 'List %s records', $table['name'] ),
 			'data_source' => $data_source,
 			'endpoint' => function ( array $input_variables ) use ( $data_source, $table ): string {
 				$endpoint = $data_source->get_endpoint() . '/' . $table['id'];
