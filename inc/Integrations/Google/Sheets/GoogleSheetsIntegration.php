@@ -98,6 +98,7 @@ class GoogleSheetsIntegration {
 		];
 
 		return HttpQuery::from_array( [
+			'display_name' => sprintf( 'Get %s row by ID', $sheet['name'] ),
 			'data_source' => $data_source,
 			'endpoint' => $data_source->get_endpoint() . '/values/' . rawurlencode( $sheet['name'] ),
 			'input_schema' => $input_schema,
@@ -125,6 +126,7 @@ class GoogleSheetsIntegration {
 		];
 
 		return HttpQuery::from_array( [
+			'display_name' => sprintf( 'List %s rows', $sheet['name'] ),
 			'data_source' => $data_source,
 			'endpoint' => $data_source->get_endpoint() . '/values/' . rawurlencode( $sheet['name'] ),
 			'input_schema' => [],

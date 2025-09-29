@@ -30,6 +30,7 @@ class ShopifyIntegration {
 	public static function get_queries( ShopifyDataSource $data_source ): array {
 		return [
 			'shopify_get_product' => GraphqlQuery::from_array( [
+				'display_name' => 'Get Shopify product by ID',
 				'data_source' => $data_source,
 				'input_schema' => [
 					'id' => [
@@ -82,6 +83,7 @@ class ShopifyIntegration {
 				'graphql_query' => file_get_contents( __DIR__ . '/Queries/GetProductById.graphql' ),
 			] ),
 			'shopify_search_products' => GraphqlQuery::from_array( [
+				'display_name' => 'Search Shopify products',
 				'data_source' => $data_source,
 				'input_schema' => [
 					'search' => [

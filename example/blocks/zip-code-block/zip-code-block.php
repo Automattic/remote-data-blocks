@@ -16,6 +16,7 @@ function register_zip_code_remote_data_block(): void {
 
 	$zip_code_query = [
 		'data_source' => $zip_code_data_source,
+		'display_name' => 'Get location by Zip code',
 		// Provide a callable (closure) to dynamically generate the endpoint using
 		// the base endpoint from the data source and the input variables.
 		'endpoint' => function ( array $input_variables ) use ( $zip_code_data_source ): string {
