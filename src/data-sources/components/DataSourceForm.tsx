@@ -71,7 +71,7 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 	const steps = Children.toArray( children );
 	const singleStep = steps.length === 1 || screen === 'editDataSource';
 
-	const stepHeadings: TranslatableText<string>[] = [ __( 'Setup' ) ]; // First step is always Setup
+	const stepHeadings: TranslatableText< string >[] = [ __( 'Setup' ) ]; // First step is always Setup
 
 	if (
 		steps.some(
