@@ -69,7 +69,7 @@ export function InputPopover( props: InputPopoverProps ) {
 
 	return (
 		<>
-			<Button variant="secondary" onClick={ open }>
+			<Button variant="secondary" onClick={ open } __next40pxDefaultSize>
 				{ getDataSourceLabels( dataSourceType ).buttonText }
 			</Button>
 			{ isOpen && (

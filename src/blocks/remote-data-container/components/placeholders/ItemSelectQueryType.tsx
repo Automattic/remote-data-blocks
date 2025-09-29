@@ -1,8 +1,4 @@
-import {
-	Button,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-} from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
 
 import { DataViewsModal } from '@/blocks/remote-data-container/components/modals/DataViewsModal';
 import { InputModal } from '@/blocks/remote-data-container/components/modals/InputModal';
@@ -20,12 +16,7 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 	} = props;
 
 	return (
-		<ToggleGroupControl
-			className="remote-data-blocks-button-group"
-			label={ __( '' ) }
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
-		>
+		<>
 			{ selectors.map( selector => {
 				const title = selector.name;
 				const selectorProps = {
@@ -69,6 +60,6 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 
 				return null;
 			} ) }
-		</ToggleGroupControl>
+		</>
 	);
 }
