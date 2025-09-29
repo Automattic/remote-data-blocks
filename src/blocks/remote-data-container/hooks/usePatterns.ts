@@ -6,16 +6,21 @@ import {
 } from '@wordpress/block-editor';
 import { BlockInstance, cloneBlock, createBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 
 import {
-	cloneBlockForPreview,
+	cloneBlockForPatternPreview,
 	getBoundAttributeEntries,
 	hasBlockBinding,
 	isSyncedPattern,
 } from '@/utils/block-binding';
 import { getBlockConfig } from '@/utils/localized-block-data';
 
-export function usePatterns( remoteDataBlockName: string, rootClientId: string = '' ) {
+export function usePatterns(
+	remoteDataBlockName: string,
+	rootClientId: string = '',
+	addPaginationBlock = false
+) {
 	const { patterns } = getBlockConfig( remoteDataBlockName ) ?? {};
 	const { replaceInnerBlocks } = useDispatch< BlockEditorStoreActions >( blockEditorStore );
 	const { getPatternsByBlockTypes, allowedPatterns } = useSelect<
@@ -34,12 +39,19 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 		},
 		[ remoteDataBlockName, rootClientId ]
 	);
+	const [ showPatternSelection, setShowPatternSelection ] = useState< boolean >( false );
 
 	// Extract patterns with defined roles
 	const patternsByBlockTypes = getPatternsByBlockTypes( remoteDataBlockName );
-	const defaultPattern = patternsByBlockTypes.find( ( { name } ) => name === patterns?.default );
 	const innerBlocksPattern = patternsByBlockTypes.find(
 		( { name } ) => name === patterns?.inner_blocks
+	);
+
+	// Filter allowed patterns for those that have a relevant binding.
+	const supportedPatterns = allowedPatterns.filter(
+		pattern =>
+			pattern?.blockTypes?.includes( remoteDataBlockName ) ||
+			pattern.blocks.some( block => hasBlockBinding( block, remoteDataBlockName ) )
 	);
 
 	function getInnerBlocks( pattern: BlockPattern ): BlockInstance[] {
@@ -69,7 +81,7 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 		return [ loopTemplate ];
 	}
 
-	function insertPatternBlocks( pattern: BlockPattern, addPaginationBlock = false ): void {
+	function insertPatternBlocks( pattern: BlockPattern ): void {
 		const innerBlocks = getInnerBlocks( pattern );
 
 		if ( addPaginationBlock ) {
@@ -82,15 +94,29 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 		replaceInnerBlocks( rootClientId, innerBlocks ).catch( () => {} );
 	}
 
-	const returnValue = {
-		defaultPattern,
-		getSupportedPatterns: ( result?: RemoteDataApiResult ): BlockPattern[] => {
-			const supportedPatterns = allowedPatterns.filter(
-				pattern =>
-					pattern?.blockTypes?.includes( remoteDataBlockName ) ||
-					pattern.blocks.some( block => hasBlockBinding( block, remoteDataBlockName ) )
-			);
+	function onReadyForPatternSelection(): void {
+		if ( innerBlocksPattern ) {
+			insertPatternBlocks( innerBlocksPattern );
+			return;
+		}
 
+		setShowPatternSelection( true );
+	}
+
+	function onSelectPattern( pattern: BlockPattern ): void {
+		const realPattern = supportedPatterns.find( p => p.id === pattern.id );
+		console.log( { pattern, realPattern, supportedPatterns } );
+		insertPatternBlocks( realPattern ?? pattern );
+		setShowPatternSelection( false );
+	}
+
+	function resetPatternSelection(): void {
+		replaceInnerBlocks( rootClientId, [] ).catch( () => {} );
+		setShowPatternSelection( false );
+	}
+
+	return {
+		getSupportedPatterns: ( result?: RemoteDataApiResult ): BlockPattern[] => {
 			// If no result is provided, return the supported patterns as is.
 			if ( ! result ) {
 				return supportedPatterns;
@@ -101,16 +127,13 @@ export function usePatterns( remoteDataBlockName: string, rootClientId: string =
 			return supportedPatterns.map( pattern => ( {
 				...pattern,
 				blocks: pattern.blocks.map( block =>
-					cloneBlockForPreview( block, result, remoteDataBlockName )
+					cloneBlockForPatternPreview( block, result, remoteDataBlockName )
 				),
 			} ) );
 		},
-		innerBlocksPattern,
-		insertPatternBlocks,
-		resetInnerBlocks: (): void => {
-			replaceInnerBlocks( rootClientId, [] ).catch( () => {} );
-		},
+		onReadyForPatternSelection,
+		onSelectPattern,
+		resetPatternSelection,
+		showPatternSelection,
 	};
-
-	return returnValue;
 }

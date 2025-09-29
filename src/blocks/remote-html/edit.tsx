@@ -11,7 +11,6 @@ import {
 import { BlockEditProps } from '@wordpress/blocks';
 import { SandBox, Placeholder } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
 
 import { __ } from '@/utils/i18n';
 
@@ -33,28 +32,10 @@ const DEFAULT_STYLES = `
 	}
 `;
 
-interface RemoteHtmlAttributes extends RemoteDataInnerBlockAttributes {
-	saveContent?: string;
-}
-
-export function Edit( props: BlockEditProps< RemoteHtmlAttributes > ): JSX.Element {
-	const { attributes, setAttributes, isSelected } = props;
+export function Edit( props: BlockEditProps< RemoteDataInnerBlockAttributes > ): JSX.Element {
+	const { attributes, isSelected } = props;
 	const blockProps = useBlockProps();
-
-	// HACK:
-	// The remote data binding passes merged remote attributes into the Edit component,
-	// but the Save component does not receive the same augmented attributes. In order to
-	// persist fallback content during save, we need to store the content in an attribute
-	// (saveContent) and call setAttributes to expose it to Save.
-	//
-	// This should be removed once we replace mergedAttributes/getMismatchedAttributes()
-	// with a getValues() implementation.
 	const { content } = attributes;
-	useEffect( () => {
-		if ( content !== undefined ) {
-			setAttributes( { saveContent: content.toString() } );
-		}
-	}, [ content, setAttributes ] );
 
 	const settingStyles = useSelect< BlockEditorStoreSelectors, EditorStyle[] >(
 		select => select( blockEditorStore ).getSettings().styles,

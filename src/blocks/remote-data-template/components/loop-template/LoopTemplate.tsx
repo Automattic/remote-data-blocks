@@ -4,23 +4,30 @@ import {
 	useBlockEditContext,
 } from '@wordpress/block-editor';
 import { BlockInstance } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { Fragment, useState } from '@wordpress/element';
 
 import { ItemPreview } from '@/blocks/remote-data-template/components/item-preview/ItemPreview';
 import { LoopTemplateInnerBlocks } from '@/blocks/remote-data-template/components/loop-template/LoopTemplateInnerBlocks';
-import { PreviewIndexContext } from '@/blocks/remote-data-template/context/PreviewIndexContext';
+import { STORE_NAME as remoteDataBlocksStore } from '@/config/constants';
+
+import type { ActionCreators } from '@/store';
 
 interface LoopTemplateProps {
 	getInnerBlocks: (
-		result: RemoteDataApiResult
+		result: RemoteDataApiResult,
+		index: number
 	) => BlockInstance< RemoteDataInnerBlockAttributes >[];
 	remoteData: RemoteData;
 }
 
 export function LoopTemplate( props: LoopTemplateProps ) {
-	const [ activeBlockIndex, setActiveBlockIndex ] = useState< number >( 0 );
 	const { getInnerBlocks, remoteData } = props;
+
+	// Use local state instead of selecting the preview index from the store so
+	// that re-renders are limited to this component only.
+	const [ activeBlockIndex, setActiveBlockIndex ] = useState< number >( 0 );
+	const { setPreviewIndex } = useDispatch< ActionCreators >( remoteDataBlocksStore, [] );
 
 	// Hammer approach, forces re-render of the whole loop when user input is detected.
 	const { clientId } = useBlockEditContext();
@@ -28,6 +35,11 @@ export function LoopTemplate( props: LoopTemplateProps ) {
 		select => select( blockEditorStore ).getBlocksByClientId( clientId ),
 		[ clientId ]
 	);
+
+	function onSelect( index: number ): void {
+		setActiveBlockIndex( index );
+		setPreviewIndex( remoteData.resultId, index );
+	}
 
 	// To avoid flicker when switching active block contexts, a preview is rendered
 	// for each block context, but the preview for the active block context is hidden.
@@ -39,14 +51,14 @@ export function LoopTemplate( props: LoopTemplateProps ) {
 			{ remoteData.results.map( ( result, index ) => {
 				const isActive = index === activeBlockIndex;
 				return (
-					<PreviewIndexContext.Provider key={ index } value={ index }>
+					<Fragment key={ index }>
 						<LoopTemplateInnerBlocks isActive={ isActive } />
 						<ItemPreview
-							blocks={ getInnerBlocks( result ) }
+							blocks={ getInnerBlocks( result, index ) }
 							isHidden={ isActive }
-							onSelect={ () => setActiveBlockIndex( index ) }
+							onSelect={ () => onSelect( index ) }
 						/>
-					</PreviewIndexContext.Provider>
+					</Fragment>
 				);
 			} ) }
 		</ul>

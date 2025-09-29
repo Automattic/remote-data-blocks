@@ -1,7 +1,12 @@
 import { cleanup, render } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { LoopTemplate } from '@/blocks/remote-data-template/components/loop-template/LoopTemplate';
+
+vi.mock( '@wordpress/data', () => ( {
+	useDispatch: vi.fn( () => ( { setPreviewIndex: vi.fn() } ) ),
+	useSelect: vi.fn(),
+} ) );
 
 describe( 'LoopTemplate', () => {
 	const mockGetInnerBlocks = () => [];
@@ -32,7 +37,7 @@ describe( 'LoopTemplate', () => {
 
 	afterEach( cleanup );
 
-	it( 'renders a list when there are results', () => {
+	it( 'renders a list when there are more than one result', () => {
 		const { container } = render(
 			<LoopTemplate getInnerBlocks={ mockGetInnerBlocks } remoteData={ mockRemoteData } />
 		);

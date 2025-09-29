@@ -9,16 +9,23 @@ import type { Block, BlockEditProps as BlockEditPropsOriginal } from '@wordpress
  * The types provided by @wordpress/blocks are incomplete.
  */
 
-interface GetValuesPayload< Context, Values > {
-	bindings: Values;
-	clientId: string;
+interface ContextSelectPayload< Context > {
 	context: Context;
-	select: ( store: BlockEditorStoreDescriptor ) => BlockEditorStoreSelectors;
+	select: < Selectors >( store: StoreDescriptor ) => Selectors;
 }
 
-interface SetValuesPayload< Context, Values > extends GetValuesPayload< Context, Values > {
+interface GetValuesPayload< Context, Binding > extends ContextSelectPayload< Context > {
+	bindings: Record< string, Binding >;
+	clientId: string;
+}
+
+interface SetValuesPayload< Context, Binding > extends GetValuesPayload< Context, Binding > {
 	dispatch: ( store: BlockEditorStoreDescriptor ) => BlockEditorStoreActions;
-	values: Values;
+}
+
+interface BaseBinding {
+	args: object;
+	source: string;
 }
 
 // Properly allow simplified block registration calls when register_block_type() is already called server-side.
@@ -35,18 +42,24 @@ declare module '@wordpress/blocks' {
 		name: string;
 	}
 
-	interface BlockBindingsSource< Context = Record< string, unknown >, Values = unknown > {
-		canUserEditValue?: ( payload: GetValuesPayload< Context, Values > ) => boolean;
-		getValues?: ( payload: GetValuesPayload< Context, Values > ) => Values;
+	interface BlockBindingsSource<
+		Context = Record< string, unknown >,
+		Binding extends BaseBinding,
+		Values extends Record< string, unknown >
+	> {
+		canUserEditValue?: ( payload: ContextSelectPayload< Context > ) => boolean;
+		getValues?: ( payload: GetValuesPayload< Context, Binding > ) => Values;
 		label?: string;
 		name: string;
-		setValues?: ( payload: SetValuesPayload< Context, Values > ) => void;
+		setValues?: ( payload: SetValuesPayload< Context, Binding > ) => void;
 		usesContext?: string[];
 	}
 
-	function registerBlockBindingsSource< Context, Values >(
-		source: BlockBindingsSource< Context, Values >
-	): void;
+	function registerBlockBindingsSource<
+		Context,
+		Binding extends BaseBinding,
+		Values = Record< string, unknown >
+	>( source: BlockBindingsSource< Context, Binding, Values > ): void;
 
 	export function registerBlockType< TAttributes extends Record< string, any > = {} >(
 		name: string,
