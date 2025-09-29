@@ -9,7 +9,7 @@ import {
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
 import { Children, createPortal, isValidElement, useEffect, useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, TranslatableText } from '@wordpress/i18n';
 import { lockSmall } from '@wordpress/icons';
 
 import { DataSourceFormActions } from './DataSourceFormActions';
@@ -71,7 +71,7 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 	const steps = Children.toArray( children );
 	const singleStep = steps.length === 1 || screen === 'editDataSource';
 
-	const stepHeadings = [ __( 'Setup' ) ]; // First step is always Setup
+	const stepHeadings: TranslatableText< string >[] = [ __( 'Setup' ) ]; // First step is always Setup
 
 	if (
 		steps.some(

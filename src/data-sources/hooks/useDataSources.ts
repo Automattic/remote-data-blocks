@@ -1,7 +1,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, TranslatableText } from '@wordpress/i18n';
 import { store as noticesStore, NoticeStoreActions, WPNotice } from '@wordpress/notices';
 
 import { REST_BASE_DATA_SOURCES } from '@/data-sources/constants';
@@ -45,7 +45,7 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 				data: sourceConfig.service_config,
 			} );
 		} catch ( error ) {
-			let message = __( 'Failed to update data source.' );
+			let message: TranslatableText< string > = __( 'Failed to update data source.' );
 
 			if (
 				'object' === typeof error &&
@@ -81,7 +81,7 @@ export const useDataSources = < SourceConfig extends DataSourceConfig = DataSour
 				data: source,
 			} );
 		} catch ( error: unknown ) {
-			let message = __( 'Failed to add data source.' );
+			let message: TranslatableText< string > = __( 'Failed to add data source.' );
 
 			if (
 				'object' === typeof error &&
