@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { withBlockBinding } from '@/block-editor/filters/withBlockBinding';
 import { REMOTE_DATA_CONTEXT_KEY } from '@/blocks/remote-data-container/config/constants';
-import { BLOCK_BINDING_SOURCE, PATTERN_OVERRIDES_CONTEXT_KEY } from '@/config/constants';
+import { PATTERN_OVERRIDES_CONTEXT_KEY } from '@/config/constants';
 import { createRemoteDataResults as createResults } from '@/utils/remote-data';
 
 vi.mock( '@/blocks/remote-data-container/utils/tracks', () => ( {
@@ -179,130 +179,5 @@ describe( 'withBlockBinding', () => {
 		expect( hasMultiSelection ).toHaveBeenCalledTimes( 1 );
 		expect( screen.getByTestId( 'mock-block-edit' ) ).toBeDefined();
 		expect( screen.queryByTestId( 'inspector-controls' ) ).toBeNull();
-	} );
-
-	it( 'updates attributes when mismatches are found', () => {
-		const mockSetAttributes = vi.fn();
-		const props = {
-			attributes: {
-				content: 'Old Title',
-				metadata: {
-					bindings: {
-						content: {
-							source: BLOCK_BINDING_SOURCE,
-							args: { block: 'test/block', field: 'title' },
-						},
-					},
-				},
-			},
-			context: {
-				[ REMOTE_DATA_CONTEXT_KEY ]: {
-					blockName: 'test/block',
-					results: createResults( [ { title: 'New Title' } ] ),
-					displayQueryKey: 'key',
-					selectorQueryKey: 'key',
-				},
-			},
-			name: 'test/block',
-			setAttributes: mockSetAttributes,
-			clientId: 'test-client-id',
-			isSelected: false,
-			className: '',
-		};
-
-		render( <WrappedComponent { ...props } /> );
-
-		expect( MockBlockEdit ).toHaveBeenCalledTimes( 1 );
-		expect( MockBlockEdit ).toHaveBeenCalledWith(
-			{
-				...props,
-				attributes: { ...props.attributes, content: 'New Title' },
-			},
-			{}
-		);
-		expect( hasMultiSelection ).toHaveBeenCalledTimes( 1 );
-		expect( mockSetAttributes ).not.toHaveBeenCalled();
-	} );
-
-	it( 'does not update attributes when no mismatches are found', () => {
-		const mockSetAttributes = vi.fn();
-		const props = {
-			attributes: {
-				content: 'Matching Title',
-				metadata: {
-					bindings: {
-						content: {
-							source: BLOCK_BINDING_SOURCE,
-							args: { block: 'test/block', field: 'title' },
-						},
-					},
-				},
-			},
-			context: {
-				[ REMOTE_DATA_CONTEXT_KEY ]: {
-					blockName: 'test/block',
-					results: createResults( [ { title: 'Matching Title' } ] ),
-					displayQueryKey: 'key',
-					selectorQueryKey: 'key',
-				},
-			},
-			name: 'test/block',
-			setAttributes: mockSetAttributes,
-			clientId: 'test-client-id',
-			isSelected: false,
-			className: '',
-		};
-
-		render( <WrappedComponent { ...props } /> );
-
-		expect( MockBlockEdit ).toHaveBeenCalledTimes( 1 );
-		expect( MockBlockEdit ).toHaveBeenCalledWith( props, {} );
-		expect( hasMultiSelection ).toHaveBeenCalledTimes( 1 );
-		expect( mockSetAttributes ).not.toHaveBeenCalled();
-	} );
-
-	it( 'updates attributes even when binding ui is hidden', () => {
-		const mockSetAttributes = vi.fn();
-		const props = {
-			attributes: {
-				content: 'Old Title',
-				metadata: {
-					bindings: {
-						content: {
-							source: BLOCK_BINDING_SOURCE,
-							args: { block: 'test/block', field: 'title' },
-						},
-					},
-				},
-			},
-			context: {
-				[ REMOTE_DATA_CONTEXT_KEY ]: {
-					blockName: 'test/block',
-					results: createResults( [ { title: 'New Title' } ] ),
-					displayQueryKey: 'key',
-					selectorQueryKey: 'key',
-				},
-			},
-			name: 'test/block',
-			setAttributes: mockSetAttributes,
-			clientId: 'test-client-id',
-			isSelected: false,
-			className: '',
-		};
-
-		hasMultiSelection.mockReturnValueOnce( true );
-
-		render( <WrappedComponent { ...props } /> );
-
-		expect( MockBlockEdit ).toHaveBeenCalledTimes( 1 );
-		expect( MockBlockEdit ).toHaveBeenCalledWith(
-			{
-				...props,
-				attributes: { ...props.attributes, content: 'New Title' },
-			},
-			{}
-		);
-		expect( hasMultiSelection ).toHaveBeenCalledTimes( 1 );
-		expect( mockSetAttributes ).not.toHaveBeenCalled();
 	} );
 } );

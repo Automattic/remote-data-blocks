@@ -28,12 +28,16 @@ class BlockBindings {
 
 	protected static ?LoggerInterface $logger = null;
 
+	protected static array $template_blocks = array( 'remote-data-blocks/template' );
+
 	public static function init( ?LoggerInterface $logger = null ): void {
 		self::$in_memory_cache = [];
 		self::$logger = $logger ?? new Logger();
 
 		add_action( 'init', [ __CLASS__, 'register_block_bindings' ], 50, 0 );
 		add_filter( 'register_block_type_args', [ __CLASS__, 'inject_context_for_synced_patterns' ], 10, 2 );
+
+		self::$template_blocks = apply_filters( 'remote_data_blocks_template_blocks', self::$template_blocks );
 	}
 
 	/**
@@ -371,7 +375,7 @@ class BlockBindings {
 	 */
 	private static function has_template_block( array $parsed_block ): bool {
 		foreach ( ( $parsed_block['innerBlocks'] ?? [] ) as $inner_block ) {
-			if ( 'remote-data-blocks/template' === $inner_block['blockName'] ) {
+			if ( in_array( $inner_block['blockName'], self::$template_blocks, true ) ) {
 				return true;
 			}
 

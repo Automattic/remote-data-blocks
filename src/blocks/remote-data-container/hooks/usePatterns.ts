@@ -6,9 +6,10 @@ import {
 } from '@wordpress/block-editor';
 import { BlockInstance, cloneBlock, createBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 
 import {
-	cloneBlockForPreview,
+	cloneBlockForPatternPreview,
 	getBoundAttributeEntries,
 	hasBlockBinding,
 	isSyncedPattern,
@@ -18,7 +19,8 @@ import { getBlockConfig } from '@/utils/localized-block-data';
 export function usePatterns(
 	remoteDataBlockName: string,
 	rootClientId: string = '',
-	displayQueryKey: string = ''
+	displayQueryKey: string = '',
+	addPaginationBlock = false
 ) {
 	const { patterns } = getBlockConfig( remoteDataBlockName ) ?? {};
 	const { replaceInnerBlocks } = useDispatch< BlockEditorStoreActions >( blockEditorStore );
@@ -38,12 +40,20 @@ export function usePatterns(
 		},
 		[ remoteDataBlockName, rootClientId ]
 	);
+	const [ showPatternSelection, setShowPatternSelection ] = useState< boolean >( false );
 
 	// Extract patterns with defined roles
 	const patternsByBlockTypes = getPatternsByBlockTypes( remoteDataBlockName );
-	const defaultPattern = patternsByBlockTypes.find( ( { name } ) => name === patterns?.default );
 	const innerBlocksPattern = patternsByBlockTypes.find(
 		( { name } ) => name === patterns?.inner_blocks
+	);
+
+	// Filter allowed patterns for those that have a relevant binding.
+	const supportedPatterns = allowedPatterns.filter(
+		pattern =>
+			( pattern?.blockTypes?.includes( remoteDataBlockName ) ||
+				pattern.blocks.some( block => hasBlockBinding( block, remoteDataBlockName ) ) ) &&
+			( ! pattern.keywords || pattern.keywords.includes( displayQueryKey ) )
 	);
 
 	function getInnerBlocks( pattern: BlockPattern ): BlockInstance[] {
@@ -73,7 +83,7 @@ export function usePatterns(
 		return [ loopTemplate ];
 	}
 
-	function insertPatternBlocks( pattern: BlockPattern, addPaginationBlock = false ): void {
+	function insertPatternBlocks( pattern: BlockPattern ): void {
 		const innerBlocks = getInnerBlocks( pattern );
 
 		if ( addPaginationBlock ) {
@@ -86,16 +96,28 @@ export function usePatterns(
 		replaceInnerBlocks( rootClientId, innerBlocks ).catch( () => {} );
 	}
 
-	const returnValue = {
-		defaultPattern,
-		getSupportedPatterns: ( result?: RemoteDataApiResult ): BlockPattern[] => {
-			const supportedPatterns = allowedPatterns.filter(
-				pattern =>
-					( pattern?.blockTypes?.includes( remoteDataBlockName ) ||
-						pattern.blocks.some( block => hasBlockBinding( block, remoteDataBlockName ) ) ) &&
-					( ! pattern.keywords || pattern.keywords.includes( displayQueryKey ) )
-			);
+	function onReadyForPatternSelection(): void {
+		if ( innerBlocksPattern ) {
+			insertPatternBlocks( innerBlocksPattern );
+			return;
+		}
 
+		setShowPatternSelection( true );
+	}
+
+	function onSelectPattern( pattern: BlockPattern ): void {
+		const realPattern = supportedPatterns.find( p => p.id === pattern.id );
+		insertPatternBlocks( realPattern ?? pattern );
+		setShowPatternSelection( false );
+	}
+
+	function resetPatternSelection(): void {
+		replaceInnerBlocks( rootClientId, [] ).catch( () => {} );
+		setShowPatternSelection( false );
+	}
+
+	return {
+		getSupportedPatterns: ( result?: RemoteDataApiResult ): BlockPattern[] => {
 			// If no result is provided, return the supported patterns as is.
 			if ( ! result ) {
 				return supportedPatterns;
@@ -106,16 +128,13 @@ export function usePatterns(
 			return supportedPatterns.map( pattern => ( {
 				...pattern,
 				blocks: pattern.blocks.map( block =>
-					cloneBlockForPreview( block, result, remoteDataBlockName )
+					cloneBlockForPatternPreview( block, result, remoteDataBlockName )
 				),
 			} ) );
 		},
-		innerBlocksPattern,
-		insertPatternBlocks,
-		resetInnerBlocks: (): void => {
-			replaceInnerBlocks( rootClientId, [] ).catch( () => {} );
-		},
+		onReadyForPatternSelection,
+		onSelectPattern,
+		resetPatternSelection,
+		showPatternSelection,
 	};
-
-	return returnValue;
 }

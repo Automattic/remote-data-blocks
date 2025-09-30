@@ -46,6 +46,7 @@ class ExampleApi {
 		] );
 
 		$get_record_query = HttpQuery::from_array( [
+			'display_name' => 'Get conference event record',
 			'data_source' => $data_source,
 			'endpoint' => function ( array $input_variables ) use ( $data_source ): string {
 				// This is not a real API, but we want to make sure to generate
@@ -86,6 +87,7 @@ class ExampleApi {
 		] );
 
 		$get_table_query = HttpQuery::from_array( [
+			'display_name' => 'List conference events',
 			'data_source' => $data_source,
 			'input_schema' => [],
 			'output_schema' => [

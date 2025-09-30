@@ -112,7 +112,6 @@ class BlockPatterns {
 						$bindings['heading']['content'] = [ $field, $name ];
 						break;
 					}
-
 					$bindings['paragraphs'][] = [
 						'content' => [ $field, $name ],
 					];
@@ -184,12 +183,18 @@ class BlockPatterns {
 			[
 				'title' => sprintf( '%s Data', $block_title ),
 				'blockTypes' => [ $block_name ],
-				'categories' => [ 'Remote Data Blocks' ],
+				'categories' => [ 'remote-data-blocks' ],
 				'content' => $content,
 				'inserter' => true,
 				'source' => 'plugin',
 				'keywords' => [ $display_query_key ],
 			]
+		);
+
+		// Register block pattern category.
+		register_block_pattern_category(
+			'remote-data-blocks',
+			[ 'label' => __( 'Remote Data Blocks', 'remote-data-blocks' ) ]
 		);
 
 		return $pattern_name;

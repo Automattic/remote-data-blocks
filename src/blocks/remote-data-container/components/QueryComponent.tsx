@@ -1,6 +1,5 @@
 import {
 	BlockEditorStoreSelectors,
-	BlockPattern,
 	InnerBlocks,
 	InspectorControls,
 	useBlockProps,
@@ -8,7 +7,7 @@ import {
 } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 
 import { EditErrorBoundary } from './EditErrorBoundary';
 import { DataPanel } from './panels/DataPanel';
@@ -45,8 +44,6 @@ export function RemoteDataBlockComponent( props: QueryComponentProps ) {
 		resetQuery,
 	} = props;
 
-	const { getSupportedPatterns, innerBlocksPattern, insertPatternBlocks, resetInnerBlocks } =
-		usePatterns( blockName, rootClientId, displayQueryKey );
 	const { data, fetch, reset, supportsPagination, loading } = useRemoteData( {
 		blockName,
 		externallyManagedRemoteData: remoteDataAttribute,
@@ -57,8 +54,15 @@ export function RemoteDataBlockComponent( props: QueryComponentProps ) {
 		selectorQueryKey: displayQueryKey,
 	} );
 
+	const {
+		getSupportedPatterns,
+		onSelectPattern,
+		onReadyForPatternSelection,
+		resetPatternSelection,
+		showPatternSelection,
+	} = usePatterns( blockName, rootClientId, displayQueryKey, supportsPagination );
+
 	const { hasMultiSelection } = useSelect< BlockEditorStoreSelectors >( blockEditorStore );
-	const [ showPatternSelection, setShowPatternSelection ] = useState< boolean >( false );
 
 	useEffect( () => {
 		onSelectRemoteData( queryInputs );
@@ -71,12 +75,7 @@ export function RemoteDataBlockComponent( props: QueryComponentProps ) {
 		}
 
 		void fetch( inputs ).then( () => {
-			if ( innerBlocksPattern ) {
-				insertPatternBlocks( innerBlocksPattern, supportsPagination );
-				return;
-			}
-
-			setShowPatternSelection( true );
+			onReadyForPatternSelection();
 		} );
 	}
 
@@ -84,20 +83,10 @@ export function RemoteDataBlockComponent( props: QueryComponentProps ) {
 		void fetch( remoteDataAttribute?.queryInputs ?? [ {} ] );
 	}
 
-	function resetPatternSelection(): void {
-		resetInnerBlocks();
-		setShowPatternSelection( false );
-	}
-
 	function resetRemoteData(): void {
 		reset();
 		resetPatternSelection();
 		resetQuery();
-	}
-
-	function onSelectPattern( pattern: BlockPattern ): void {
-		insertPatternBlocks( pattern, supportsPagination );
-		setShowPatternSelection( false );
 	}
 
 	function updateRemoteData( remoteData?: RemoteData ): void {
@@ -122,6 +111,22 @@ export function RemoteDataBlockComponent( props: QueryComponentProps ) {
 			displayQueryKey,
 		} );
 		refreshRemoteData();
+	}
+
+	function renderLoadingOverlay( isClickable = false ): JSX.Element {
+		return (
+			<div
+				className="remote-data-blocks-loading-overlay"
+				style={ isClickable ? { pointerEvents: 'auto' } : undefined }
+			>
+				<Spinner
+					style={ {
+						height: '50px',
+						width: '50px',
+					} }
+				/>
+			</div>
+		);
 	}
 
 	if ( showPatternSelection ) {
@@ -158,16 +163,7 @@ export function RemoteDataBlockComponent( props: QueryComponentProps ) {
 					/>
 				</InspectorControls>
 			) }
-			{ loading && (
-				<div className="remote-data-blocks-loading-overlay">
-					<Spinner
-						style={ {
-							height: '50px',
-							width: '50px',
-						} }
-					/>
-				</div>
-			) }
+			{ loading && renderLoadingOverlay() }
 			<InnerBlocks />
 		</>
 	);

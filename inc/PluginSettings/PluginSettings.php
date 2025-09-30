@@ -112,6 +112,10 @@ class PluginSettings {
 	 * Get the plugin version from the main plugin file.
 	 */
 	public static function get_version(): string {
+		if ( ! defined( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) ) {
+			return '1.0';
+		}
+
 		return REMOTE_DATA_BLOCKS__PLUGIN_VERSION;
 	}
 

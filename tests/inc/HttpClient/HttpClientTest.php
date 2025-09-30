@@ -551,4 +551,34 @@ class HttpClientTest extends TestCase {
 
 		$this->assertEquals( 1, $this->mock_handler->count(), 'The mock handler should still have one request left after the second request' );
 	}
+
+	public function testProvideDefaultUserAgentSetsDefaultWhenNoneExists(): void {
+		// Test that provideDefaultUserAgent sets the default User-Agent when none exists
+		$http_client = HttpClient::instance();
+
+		// Create a request without User-Agent header
+		$request = new \GuzzleHttp\Psr7\Request( 'GET', '/test' );
+
+		// Apply the function
+		$result = $http_client->provide_default_user_agent( $request );
+
+		// Should have added User-Agent header
+		$this->assertTrue( $result->hasHeader( 'User-Agent' ) );
+		$this->assertSame( 'WordPress Remote Data Blocks/1.0', $result->getHeaderLine( 'User-Agent' ) );
+	}
+
+	public function testProvideDefaultUserAgentPreservesExistingUserAgent(): void {
+		// Test that provideDefaultUserAgent preserves existing User-Agent headers
+		$http_client = HttpClient::instance();
+
+		// Create a request with custom User-Agent header
+		$request = new \GuzzleHttp\Psr7\Request( 'GET', '/test', [ 'User-Agent' => 'CustomApp/2.0' ] );
+
+		// Apply the function
+		$result = $http_client->provide_default_user_agent( $request );
+
+		// Should preserve custom User-Agent header
+		$this->assertTrue( $result->hasHeader( 'User-Agent' ) );
+		$this->assertSame( 'CustomApp/2.0', $result->getHeaderLine( 'User-Agent' ) );
+	}
 }

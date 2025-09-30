@@ -32,7 +32,7 @@ class Telemetry {
 			return;
 		}
 
-		if ( null === $telemetry && class_exists( 'Automattic\VIP\Telemetry\Telemetry' ) ) {
+		if ( null === $telemetry && class_exists( '\Automattic\VIP\Telemetry\Telemetry' ) ) {
 			$telemetry = new \Automattic\VIP\Telemetry\Telemetry( self::EVENT_PREFIX, self::get_global_properties() );
 		}
 
