@@ -79,6 +79,6 @@ class RemoteDataController {
 	}
 
 	public static function permission_callback(): bool {
-		return true;
+		return current_user_can( 'edit_post' );
 	}
 }
