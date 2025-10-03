@@ -1,4 +1,6 @@
 import apiFetch from '@wordpress/api-fetch';
+import { store as editorStore } from '@wordpress/editor';
+import { select } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 
 import { REMOTE_DATA_REST_API_URL } from '@/blocks/remote-data-container/config/constants';
@@ -8,8 +10,7 @@ import { ensureError } from '@/utils/errors';
 import { memoizeFn } from '@/utils/function';
 import { isQueryInputValid, validateQueryInput } from '@/utils/input-validation';
 import { getBlockConfig } from '@/utils/localized-block-data';
-import { store as editorStore } from '@wordpress/editor';
-import { select } from '@wordpress/data';
+
 
 async function unmemoizedfetchRemoteData(
 	requestData: RemoteDataApiRequest
