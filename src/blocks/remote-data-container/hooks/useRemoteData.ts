@@ -8,6 +8,8 @@ import { ensureError } from '@/utils/errors';
 import { memoizeFn } from '@/utils/function';
 import { isQueryInputValid, validateQueryInput } from '@/utils/input-validation';
 import { getBlockConfig } from '@/utils/localized-block-data';
+import { store as editorStore } from '@wordpress/editor';
+import { select } from '@wordpress/data';
 
 async function unmemoizedfetchRemoteData(
 	requestData: RemoteDataApiRequest
@@ -177,6 +179,10 @@ export function useRemoteData( {
 	}
 
 	async function fetch( inputs: RemoteDataQueryInput[] ): Promise< void > {
+
+		const { getCurrentPostId } = select( editorStore );
+		const postId = getCurrentPostId();
+
 		// If there are no inputs, there is nothing to fetch. Empty query inputs
 		// must be represented by an empty object, e.g. `[ {} ]`.
 		if ( 0 === inputs.length ) {
@@ -194,6 +200,7 @@ export function useRemoteData( {
 			block_name: blockName,
 			query_key: queryKey,
 			query_inputs: inputs,
+			post_id: postId ?? 0,
 		};
 
 		try {

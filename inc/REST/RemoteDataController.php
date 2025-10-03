@@ -78,7 +78,8 @@ class RemoteDataController {
 		);
 	}
 
-	public static function permission_callback(): bool {
-		return current_user_can( 'edit_post' );
+	public static function permission_callback( WP_REST_Request $request ): bool {
+		$post_id = $request->get_param( 'post_id' );
+		return current_user_can( 'edit_post', $post_id );
 	}
 }
