@@ -200,7 +200,7 @@ export function useRemoteData( {
 			block_name: blockName,
 			query_key: queryKey,
 			query_inputs: inputs,
-			post_id: postId ?? 0,
+			post_id: postId ?? null,
 		};
 
 		try {
