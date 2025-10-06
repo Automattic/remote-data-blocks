@@ -97,7 +97,7 @@ interface RemoteDataApiRequest {
 	block_name: string;
 	query_inputs: RemoteDataQueryInput[];
 	query_key: string;
-	post_id: number | null;
+	post_id: number | string | null;
 	query_inputs: RemoteDataQueryInput[];
 	query_key: string;
 }
