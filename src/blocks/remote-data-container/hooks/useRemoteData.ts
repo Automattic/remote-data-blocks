@@ -197,9 +197,9 @@ export function useRemoteData( {
 
 		const requestData: RemoteDataApiRequest = {
 			block_name: blockName,
+			post_id: postId ?? null,
 			query_key: queryKey,
 			query_inputs: inputs,
-			post_id: postId ?? null,
 		};
 
 		try {
