@@ -94,7 +94,7 @@
     "@wordpress/url": "4.31.0",
     "eslint": "8.57.1",
     "fork-ts-checker-webpack-plugin": "9.1.0",
-    "happy-dom": "19.0.1",
+    "happy-dom": "20.0.7",
     "husky": "9.1.7",
     "lint-staged": "16.2.3",
     "prettier": "npm:wp-prettier@2.8.5",
