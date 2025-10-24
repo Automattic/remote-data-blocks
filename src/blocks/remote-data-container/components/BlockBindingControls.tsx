@@ -12,7 +12,7 @@ import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
 import { getBlockDataSourceType } from '@/utils/localized-block-data';
 
 interface BlockBindingFieldControlProps {
-	availableBindings: AvailableBindings;
+	availableBindings: AvailableBindingsForQuery;
 	fieldTypes: string[];
 	label: string;
 	target: string;
@@ -44,7 +44,7 @@ export function BlockBindingFieldControl( props: BlockBindingFieldControlProps )
 
 interface BlockBindingControlsProps {
 	attributes: RemoteDataInnerBlockAttributes;
-	availableBindings: AvailableBindings;
+	availableBindings: AvailableBindingsForQuery;
 	blockName: string;
 	remoteDataName: string;
 	removeBinding: ( target: string ) => void;
@@ -118,6 +118,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 						label="Show label"
 						name="show_label"
 						onChange={ updateFieldLabel }
+						__nextHasNoMarginBottom
 					/>
 				</>
 			);

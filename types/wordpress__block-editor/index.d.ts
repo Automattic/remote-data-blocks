@@ -34,6 +34,7 @@ declare module '@wordpress/block-editor' {
 		source: string;
 		syncStatus: string;
 		title: string;
+		keywords?: string[];
 	}
 
 	interface BlockEditorStoreActions {

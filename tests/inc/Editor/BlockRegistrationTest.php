@@ -379,7 +379,6 @@ class BlockRegistrationTest extends TestCase {
 		$this->assertEquals( $block_name, $block_config['name'] );
 		$this->assertEquals( 'Test Block for Registration', $block_config['title'] );
 		$this->assertArrayHasKey( 'queries', $block_config );
-		$this->assertArrayHasKey( 'selectors', $block_config );
 	}
 
 	/**

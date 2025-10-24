@@ -8,6 +8,7 @@ use RemoteDataBlocks\Editor\Assets\Assets;
 use RemoteDataBlocks\Telemetry\Telemetry;
 use RemoteDataBlocks\Editor\BlockPatterns\BlockPatterns;
 use RemoteDataBlocks\REST\RemoteDataController;
+
 use function register_block_type;
 
 class BlockRegistration {
@@ -84,24 +85,40 @@ class BlockRegistration {
 		$block_path = REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY . '/build/blocks/remote-data-container';
 
 		// Set available bindings from the display query output mappings.
-		$available_bindings = [];
-		$output_schema = $config['queries'][ ConfigRegistry::DISPLAY_QUERY_KEY ]->get_output_schema();
-		foreach ( $output_schema['type'] ?? [] as $key => $mapping ) {
-			$available_bindings[ $key ] = [
-				'name' => $mapping['name'],
-				'type' => $mapping['type'],
-			];
+		$available_bindings_for_queries = [];
+		$display_queries_to_selectors = $config['display_queries_to_selectors'] ?? [];
+
+		$patterns = $config['patterns'] ?? [];
+
+		// Using array_keys here triggers a psalm error, so it's set to $_ instead.
+		// Supressing the psalm error is a not a good idea, so instead this is the better solution.
+		// ToDo: Fix the psalm error, and see if array_keys could be used here again.
+		foreach ( $display_queries_to_selectors as $display_query_key => $_ ) {
+			$display_query = $config['queries'][ $display_query_key ];
+			$available_bindings_for_query = [];
+			$output_schema = $display_query->get_output_schema();
+			foreach ( $output_schema['type'] ?? [] as $key => $mapping ) {
+				$available_bindings_for_query[ $key ] = [
+					'name' => $mapping['name'],
+					'type' => $mapping['type'],
+				];
+			}
+
+			$available_bindings_for_queries[ $display_query_key ] = $available_bindings_for_query;
+
+			$default_pattern_name = BlockPatterns::register_default_block_pattern( $block_name, $config['title'], $display_query_key, $display_query );
+			$patterns[ $display_query_key ] = $default_pattern_name;
 		}
 
 		// Create the localized data that will be used by our block editor script.
 		$block_config = [
-			'availableBindings' => $available_bindings,
+			'availableBindings' => $available_bindings_for_queries,
 			'availableOverrides' => $config['overrides'] ?? [],
 			'instructions' => $config['instructions'],
 			'name' => $block_name,
 			'dataSourceType' => ConfigStore::get_data_source_type( $block_name ),
-			'patterns' => $config['patterns'],
-			'selectors' => $config['selectors'],
+			'patterns' => $patterns,
+			'displayQueriesToSelectors' => $display_queries_to_selectors,
 			'settings' => [
 				'category' => self::$block_category['slug'],
 				'icon' => $config['icon'] ?? 'cloud',
@@ -117,10 +134,6 @@ class BlockRegistration {
 		$block_type = register_block_type( $block_path, $block_options );
 
 		$script_handle = $block_type->editor_script_handles[0] ?? '';
-
-		// Register a default pattern that simply displays the available data.
-		$default_pattern_name = BlockPatterns::register_default_block_pattern( $block_name, $config['title'], $config['queries'][ ConfigRegistry::DISPLAY_QUERY_KEY ] );
-		$block_config['patterns']['default'] = $default_pattern_name;
 
 		return [ $block_config, $script_handle ];
 	}

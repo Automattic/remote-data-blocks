@@ -370,6 +370,7 @@ const DataSourceFormBlocks = ( {
 			}
 		>
 			<ToggleControl
+				__nextHasNoMarginBottom
 				checked={ hasEnabledBlocks }
 				help={
 					hasEnabledBlocks ? (

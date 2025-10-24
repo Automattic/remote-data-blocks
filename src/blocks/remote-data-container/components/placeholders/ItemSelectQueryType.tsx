@@ -5,15 +5,14 @@ import { InputModal } from '@/blocks/remote-data-container/components/modals/Inp
 import { InputPopover } from '@/blocks/remote-data-container/components/popovers/InputPopover';
 
 interface ItemSelectQueryTypeProps {
-	blockConfig: BlockConfig;
+	blockName: string;
+	selectors: Selector[];
+	displayQueryKey: string;
 	onSelect: ( data: RemoteDataQueryInput[] ) => void;
 }
 
 export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
-	const {
-		blockConfig: { name: blockName, selectors },
-		onSelect,
-	} = props;
+	const { blockName, selectors, displayQueryKey, onSelect } = props;
 
 	return (
 		<>
@@ -24,7 +23,8 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 					headerImage: selector.image_url,
 					inputVariables: selector.inputs,
 					onSelect,
-					queryKey: selector.query_key,
+					selectorQueryKey: selector.query_key,
+					displayQueryKey,
 					title,
 				};
 
@@ -40,7 +40,13 @@ export function ItemSelectQueryType( props: ItemSelectQueryTypeProps ) {
 						);
 					case 'load-without-input':
 						return (
-							<Button key={ title } onClick={ () => onSelect( [ {} ] ) } variant="primary">
+							<Button
+								key={ title }
+								onClick={ () => {
+									onSelect( [ {} ] );
+								} }
+								variant="primary"
+							>
 								{ selector.name }
 							</Button>
 						);

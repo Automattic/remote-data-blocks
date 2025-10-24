@@ -19,6 +19,7 @@ import { getBlockConfig } from '@/utils/localized-block-data';
 export function usePatterns(
 	remoteDataBlockName: string,
 	rootClientId: string = '',
+	displayQueryKey: string = '',
 	addPaginationBlock = false
 ) {
 	const { patterns } = getBlockConfig( remoteDataBlockName ) ?? {};
@@ -50,8 +51,9 @@ export function usePatterns(
 	// Filter allowed patterns for those that have a relevant binding.
 	const supportedPatterns = allowedPatterns.filter(
 		pattern =>
-			pattern?.blockTypes?.includes( remoteDataBlockName ) ||
-			pattern.blocks.some( block => hasBlockBinding( block, remoteDataBlockName ) )
+			( pattern?.blockTypes?.includes( remoteDataBlockName ) ||
+				pattern.blocks.some( block => hasBlockBinding( block, remoteDataBlockName ) ) ) &&
+			( ! pattern.keywords || pattern.keywords.includes( displayQueryKey ) )
 	);
 
 	function getInnerBlocks( pattern: BlockPattern ): BlockInstance[] {
@@ -105,7 +107,6 @@ export function usePatterns(
 
 	function onSelectPattern( pattern: BlockPattern ): void {
 		const realPattern = supportedPatterns.find( p => p.id === pattern.id );
-		console.log( { pattern, realPattern, supportedPatterns } );
 		insertPatternBlocks( realPattern ?? pattern );
 		setShowPatternSelection( false );
 	}

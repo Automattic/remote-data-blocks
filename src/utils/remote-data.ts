@@ -98,6 +98,8 @@ export function migrateRemoteData( remoteData?: RemoteData ): RemoteData | undef
 
 	return {
 		...rest,
+		displayQueryKey: remoteData.displayQueryKey ?? 'display',
+		selectorQueryKey: remoteData.selectorQueryKey ?? 'display',
 		queryInputs: remoteData.queryInputs ?? ( queryInput ? [ queryInput ] : [ {} ] ),
 		results: migratedResults,
 	};

@@ -4,7 +4,6 @@ namespace RemoteDataBlocks\Editor\BlockManagement;
 
 defined( 'ABSPATH' ) || exit();
 
-use RemoteDataBlocks\Config\Query\QueryInterface;
 use RemoteDataBlocks\Integrations\GenericHttp\GenericHttpDataSource;
 use RemoteDataBlocks\Logging\Logger;
 use RemoteDataBlocks\Logging\LoggerInterface;
@@ -92,12 +91,15 @@ class ConfigStore {
 			return null;
 		}
 
-		$query = $config['queries'][ ConfigRegistry::DISPLAY_QUERY_KEY ] ?? null;
-		if ( ! ( $query instanceof QueryInterface ) ) {
+		$display_queries_to_selectors = $config['display_queries_to_selectors'] ?? [];
+		if ( empty( $display_queries_to_selectors ) ) {
 			return null;
 		}
 
-		$data_source = $query->get_data_source();
+		// Get the first display query's data source type.
+		$display_query_key = array_keys( $display_queries_to_selectors )[0];
+		$display_query = $config['queries'][ $display_query_key ];
+		$data_source = $display_query->get_data_source();
 		if ( $data_source instanceof GenericHttpDataSource ) {
 			return $data_source->get_service_name();
 		}

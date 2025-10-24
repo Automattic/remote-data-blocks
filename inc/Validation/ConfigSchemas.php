@@ -7,7 +7,6 @@ use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Config\Query\QueryInterface;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunnerInterface;
-use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 
 /**
  * ConfigSchemas class.
@@ -86,26 +85,20 @@ final class ConfigSchemas {
 					] )
 				)
 			),
-			'render_query' => Types::object( [
-				'query' => Types::one_of(
+			'placeholders' => Types::nullable(
+				Types::list_of(
+					Types::object( [
+						'name' => Types::string(),
+						'query_key' => Types::string(),
+					] ),
+				)
+			),
+			'queries' => Types::record(
+				Types::string(),
+				Types::one_of(
 					Types::instance_of( QueryInterface::class ),
 					Types::serialized_config_for( HttpQuery::class ),
 				),
-			] ),
-			'selection_queries' => Types::nullable(
-				Types::list_of(
-					Types::object( [
-						'display_name' => Types::nullable( Types::string() ),
-						'query' => Types::one_of(
-							Types::instance_of( QueryInterface::class ),
-							Types::serialized_config_for( HttpQuery::class ),
-						),
-						'type' => Types::enum(
-							ConfigRegistry::LIST_QUERY_KEY,
-							ConfigRegistry::SEARCH_QUERY_KEY
-						),
-					] )
-				)
 			),
 			'overrides' => Types::nullable(
 				Types::list_of(

@@ -1,5 +1,8 @@
-export function getBlockAvailableBindings( blockName: string ): AvailableBindings {
-	return getBlockConfig( blockName )?.availableBindings ?? {};
+export function getAvailableBindingsForQuery(
+	blockName: string,
+	queryKey: string
+): AvailableBindingsForQuery {
+	return getBlockConfig( blockName )?.availableBindings?.[ queryKey ] ?? {};
 }
 
 export function getBlockConfig( blockName: string ): BlockConfig | undefined {
@@ -12,6 +15,24 @@ export function getBlockDataSourceType( blockName?: string ): string {
 	}
 
 	return getBlockConfig( blockName )?.dataSourceType ?? '';
+}
+
+export function getSelectorsForDisplayQuery(
+	blockName: string,
+	displayQueryKey: string
+): Selector[] {
+	return (
+		getBlockConfig( blockName )?.displayQueriesToSelectors?.[ displayQueryKey ]?.selectors ?? []
+	);
+}
+
+export function getFirstDisplayQueryKey( blockName?: string ): string {
+	if ( ! blockName ) {
+		return '';
+	}
+	const displayQueriesToSelectors = getBlockConfig( blockName )?.displayQueriesToSelectors ?? {};
+	const displayQueryKeys = Object.keys( displayQueriesToSelectors );
+	return displayQueryKeys[ 0 ] ?? '';
 }
 
 /**

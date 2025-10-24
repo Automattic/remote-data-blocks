@@ -7,7 +7,7 @@ import { useSearchVariables } from '@/blocks/remote-data-container/hooks/useSear
 import { ensureError } from '@/utils/errors';
 import { memoizeFn } from '@/utils/function';
 import { isQueryInputValid, validateQueryInput } from '@/utils/input-validation';
-import { getBlockConfig } from '@/utils/localized-block-data';
+import { getSelectorsForDisplayQuery } from '@/utils/localized-block-data';
 
 async function unmemoizedfetchRemoteData(
 	requestData: RemoteDataApiRequest
@@ -26,7 +26,8 @@ async function unmemoizedfetchRemoteData(
 		blockName: body.block_name,
 		metadata: body.metadata,
 		pagination: body.pagination,
-		queryKey: body.query_key,
+		displayQueryKey: body.display_query_key,
+		selectorQueryKey: body.selector_query_key,
 		queryInputs: body.query_inputs,
 		resultId: body.result_id,
 		results: body.results,
@@ -65,7 +66,8 @@ interface UseRemoteDataInput {
 	initialPerPage?: number;
 	initialSearchInput?: string;
 	onSuccess?: () => void;
-	queryKey: string;
+	displayQueryKey: string;
+	selectorQueryKey: string;
 }
 
 // This hook fetches remote data and manages state for the requests.
@@ -85,7 +87,8 @@ export function useRemoteData( {
 	initialPerPage,
 	initialSearchInput,
 	onSuccess,
-	queryKey,
+	displayQueryKey,
+	selectorQueryKey,
 }: UseRemoteDataInput ): UseRemoteData {
 	const [ data, setData ] = useState< RemoteData >();
 	const [ error, setError ] = useState< Error >();
@@ -95,14 +98,16 @@ export function useRemoteData( {
 	const resolvedUpdater = externallyManagedUpdateRemoteData ?? setData;
 	const hasResolvedData = Boolean( resolvedData );
 
-	const blockConfig = getBlockConfig( blockName );
-	const query = blockConfig?.selectors?.find( selector => selector.query_key === queryKey );
+	const selectors = getSelectorsForDisplayQuery( blockName, displayQueryKey );
+	const query = selectors.find( selector => selector.query_key === selectorQueryKey );
 
 	if ( ! query ) {
 		// Here we intentionally throw an error instead of calling setError, because
 		// this indicates a misconfiguration somewhere in our code, not a runtime /
 		// query error.
-		throw new Error( `Query not found for block "${ blockName }" and key "${ queryKey }".` );
+		throw new Error(
+			`Query not found for block "${ blockName }" and key "${ selectorQueryKey }".`
+		);
 	}
 
 	// Overrides must be provided via externallyManagedRemoteData
@@ -192,7 +197,8 @@ export function useRemoteData( {
 
 		const requestData: RemoteDataApiRequest = {
 			block_name: blockName,
-			query_key: queryKey,
+			display_query_key: displayQueryKey,
+			selector_query_key: selectorQueryKey,
 			query_inputs: inputs,
 		};
 

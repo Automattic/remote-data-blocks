@@ -14,7 +14,8 @@ describe( 'LoopTemplate', () => {
 		blockName: 'test/block',
 		metadata: {},
 		queryInputs: [ {} ],
-		queryKey: 'test-query',
+		selectorQueryKey: 'test-query',
+		displayQueryKey: 'test-display',
 		resultId: 'test-result',
 		results: [
 			{

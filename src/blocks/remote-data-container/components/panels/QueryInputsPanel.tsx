@@ -2,12 +2,10 @@ import { Button, PanelBody, TextControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { DISPLAY_QUERY_KEY } from '@/blocks/remote-data-container/config/constants';
-
 interface QueryInputsPanelProps {
-	onUpdateQueryInputs: ( queryKey: string, inputs: RemoteDataQueryInput[] ) => void;
+	onUpdateQueryInputs: ( selectorQueryKey: string, inputs: RemoteDataQueryInput[] ) => void;
 	remoteData: RemoteData;
-	selectors: BlockConfig[ 'selectors' ];
+	selectors: Selector[];
 }
 
 export function QueryInputsPanel( {
@@ -15,10 +13,10 @@ export function QueryInputsPanel( {
 	remoteData,
 	selectors,
 }: QueryInputsPanelProps ) {
-	const { queryInputs = [], queryKey = DISPLAY_QUERY_KEY } = remoteData;
+	const { queryInputs = [], selectorQueryKey = '' } = remoteData;
 	const [ localInputs, setLocalInputs ] = useState( queryInputs );
 	const inputDefinitions =
-		selectors?.find( selector => selector.query_key === queryKey )?.inputs ?? [];
+		selectors?.find( selector => selector.query_key === selectorQueryKey )?.inputs ?? [];
 
 	return (
 		<PanelBody title={ __( 'Query Inputs', 'remote-data-blocks' ) }>
@@ -39,7 +37,7 @@ export function QueryInputsPanel( {
 						return Object.fromEntries( entries ) as RemoteDataQueryInput;
 					} );
 
-					onUpdateQueryInputs( queryKey, cleanedInputs );
+					onUpdateQueryInputs( selectorQueryKey, cleanedInputs );
 				} }
 			>
 				{ localInputs.map( ( input, index ) =>
@@ -60,7 +58,7 @@ export function QueryInputsPanel( {
 									);
 								} }
 								onBlur={ () => {
-									onUpdateQueryInputs( queryKey, localInputs );
+									onUpdateQueryInputs( selectorQueryKey, localInputs );
 								} }
 								__next40pxDefaultSize
 								__nextHasNoMarginBottom

@@ -21,18 +21,21 @@ export function useRemoteDataContext( context: Record< string, unknown > ): Remo
 		const blockConfig = getBlockConfig( remoteDataBlockName );
 
 		if ( blockConfig ) {
+			const availableBindings = Object.values( blockConfig.availableBindings )[ 0 ] ?? {};
+
 			return {
 				remoteData: {
 					blockName: remoteDataBlockName,
 					metadata: {},
 					queryInputs: [],
-					queryKey: 'Example Query Key',
+					displayQueryKey: 'Example Display Query Key',
+					selectorQueryKey: 'Example Selector Query Key',
 					resultId: '',
 					results: [
 						{
 							// Example result for patterns.
 							result: Object.fromEntries(
-								Object.entries( blockConfig.availableBindings ).map( ( [ key, value ] ) => [
+								Object.entries( availableBindings ).map( ( [ key, value ] ) => [
 									key,
 									{
 										name: value.name,

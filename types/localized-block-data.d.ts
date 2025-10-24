@@ -1,5 +1,6 @@
 type RemoteDataBinding = Pick< RemoteDataResultFields, 'name' | 'type' >;
-type AvailableBindings = Record< string, RemoteDataBinding >;
+type AvailableBindingsForQueries = Record< string, AvailableBindingsForQuery >;
+type AvailableBindingsForQuery = Record< string, RemoteDataBinding >;
 
 /**
  * This corresponds directly to the input schema defined by a query.
@@ -17,6 +18,19 @@ interface InputVariable {
 	type: string;
 }
 
+interface DisplayQueryConfig {
+	name: string;
+	selectors: Selector[];
+}
+
+interface Selector {
+	image_url?: string;
+	inputs: InputVariable[];
+	name: string;
+	query_key: string;
+	type: string;
+}
+
 interface InputVariableOverride {
 	display_name?: string;
 	help_text?: string;
@@ -24,22 +38,13 @@ interface InputVariableOverride {
 }
 
 interface BlockConfig {
-	availableBindings: AvailableBindings;
+	availableBindings: AvailableBindingsForQueries;
 	availableOverrides: InputVariableOverride[];
 	dataSourceType: string;
 	instructions?: string;
 	name: string;
-	patterns: {
-		default: string;
-		inner_blocks?: string;
-	};
-	selectors: {
-		image_url?: string;
-		inputs: InputVariable[];
-		name: string;
-		query_key: string;
-		type: string;
-	}[];
+	patterns: Record< string, string >;
+	displayQueriesToSelectors: Record< string, DisplayQueryConfig >;
 	settings: {
 		category: string;
 		description?: string;

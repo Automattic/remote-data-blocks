@@ -17,7 +17,9 @@ describe( 'InputModal', () => {
 			{ slug: 'input2', name: 'Input 2', required: false, type: 'text' },
 		] as InputVariable[],
 		onSelect: mockOnSelect,
+		onKeySelect: vi.fn(),
 		title: 'Test Modal',
+		selectorQueryKey: 'test-key',
 	};
 
 	afterEach( cleanup );

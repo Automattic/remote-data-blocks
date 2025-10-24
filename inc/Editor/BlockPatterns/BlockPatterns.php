@@ -73,7 +73,7 @@ class BlockPatterns {
 	 * @param QueryInterface $display_query The display query.
 	 * @return string The registered pattern name.
 	 */
-	public static function register_default_block_pattern( string $block_name, string $block_title, QueryInterface $display_query ): string {
+	public static function register_default_block_pattern( string $block_name, string $block_title, string $display_query_key, QueryInterface $display_query ): string {
 		self::load_templates();
 
 		// Loop through output variables and generate a pattern. Each text field will
@@ -176,7 +176,7 @@ class BlockPatterns {
 			$content = self::populate_template( 'empty', [] );
 		}
 
-		$pattern_name = sprintf( '%s/pattern', $block_name );
+		$pattern_name = sprintf( '%s/%s-pattern', $block_name, $display_query_key );
 
 		register_block_pattern(
 			$pattern_name,
@@ -187,6 +187,7 @@ class BlockPatterns {
 				'content' => $content,
 				'inserter' => true,
 				'source' => 'plugin',
+				'keywords' => [ $display_query_key ],
 			]
 		);
 

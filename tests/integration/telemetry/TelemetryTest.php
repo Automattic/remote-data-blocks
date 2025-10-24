@@ -73,6 +73,7 @@ class TelemetryTest extends WP_UnitTestCase {
 		] );
 
 		ConfigStore::set_block_configuration( 'remote-data-blocks/example', [
+			'display_queries_to_selectors' => [ 'display' => [ 'display' ] ],
 			'queries' => [
 				'display' => MockQuery::create(),
 			],
@@ -109,6 +110,7 @@ class TelemetryTest extends WP_UnitTestCase {
 		] );
 
 		ConfigStore::set_block_configuration( 'remote-data-blocks/example', [
+			'display_queries_to_selectors' => [ 'display' => [ 'display' ] ],
 			'queries' => [
 				'display' => MockQuery::create(),
 			],
@@ -156,6 +158,7 @@ class TelemetryTest extends WP_UnitTestCase {
 		] );
 
 		ConfigStore::set_block_configuration( 'remote-data-blocks/example', [
+			'display_queries_to_selectors' => [ 'display' => [ 'display' ] ],
 			'queries' => [
 				'display' => MockQuery::create(),
 			],
@@ -203,6 +206,7 @@ class TelemetryTest extends WP_UnitTestCase {
 		] );
 
 		ConfigStore::set_block_configuration( 'remote-data-blocks/example', [
+			'display_queries_to_selectors' => [ 'display' => [ 'display' ] ],
 			'queries' => [
 				'display' => MockQuery::create(),
 			],
@@ -273,6 +277,7 @@ class TelemetryTest extends WP_UnitTestCase {
 		] );
 
 		ConfigStore::set_block_configuration( 'remote-data-blocks/example', [
+			'display_queries_to_selectors' => [ 'display' => [ 'display' ] ],
 			'queries' => [
 				'display' => MockQuery::create(),
 			],

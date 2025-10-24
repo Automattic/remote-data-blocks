@@ -2,12 +2,9 @@ import { BaseControl, Icon, MenuItem, Spinner } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 
-import {
-	DISPLAY_QUERY_KEY,
-	TEXT_FIELD_TYPES,
-} from '@/blocks/remote-data-container/config/constants';
+import { TEXT_FIELD_TYPES } from '@/blocks/remote-data-container/config/constants';
 import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteData';
-import { getBlockAvailableBindings } from '@/utils/localized-block-data';
+import { getAvailableBindingsForQuery } from '@/utils/localized-block-data';
 import { getRemoteDataResultValue } from '@/utils/remote-data';
 
 interface FieldSelectionProps {
@@ -76,7 +73,10 @@ export function FieldSelection( props: FieldSelectionProps ) {
 type FieldSelectionWithFieldsProps = Omit< FieldSelectionProps, 'fields' | 'fieldType' >;
 
 export function FieldSelectionFromAvailableBindings( props: FieldSelectionWithFieldsProps ) {
-	const availableBindings = getBlockAvailableBindings( props.remoteData.blockName );
+	const availableBindings = getAvailableBindingsForQuery(
+		props.remoteData.blockName,
+		props.remoteData.displayQueryKey ?? ''
+	);
 
 	const fields = Object.entries( availableBindings ).reduce< FieldSelectionProps[ 'fields' ] >(
 		( acc, [ fieldName, binding ] ) => {
@@ -119,12 +119,15 @@ interface InlineBindingSelectFieldProps {
 	onSelectField: ( data: FieldSelection, fieldValue: string ) => void;
 	queryInputs: RemoteDataQueryInput[];
 	selectedField?: string;
+	displayQueryKey: string;
+	selectorQueryKey: string;
 }
 
 export function InlineBindingSelectField( props: InlineBindingSelectFieldProps ) {
 	const { data, fetch, loading } = useRemoteData( {
 		blockName: props.blockName,
-		queryKey: DISPLAY_QUERY_KEY,
+		displayQueryKey: props.displayQueryKey,
+		selectorQueryKey: props.selectorQueryKey,
 	} );
 
 	useEffect( () => {

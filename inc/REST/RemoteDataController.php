@@ -36,7 +36,13 @@ class RemoteDataController {
 						return null !== ConfigStore::get_block_configuration( $value );
 					},
 				],
-				'query_key' => [
+				'display_query_key' => [
+					'required' => true,
+					'sanitize_callback' => function ( $value ) {
+						return strval( $value );
+					},
+				],
+				'selector_query_key' => [
 					'required' => true,
 					'sanitize_callback' => function ( $value ) {
 						return strval( $value );
@@ -54,11 +60,12 @@ class RemoteDataController {
 
 	public static function execute_queries( WP_REST_Request $request ): array|WP_Error {
 		$block_name = $request->get_param( 'block_name' );
-		$query_key = $request->get_param( 'query_key' );
+		$display_query_key = $request->get_param( 'display_query_key' );
+		$selector_query_key = $request->get_param( 'selector_query_key' );
 		$query_inputs = $request->get_param( 'query_inputs' );
 
 		$block_config = ConfigStore::get_block_configuration( $block_name );
-		$query = $block_config['queries'][ $query_key ];
+		$query = $block_config['queries'][ $selector_query_key ];
 		$query_response = $query->execute_batch( $query_inputs );
 
 		if ( is_wp_error( $query_response ) ) {
@@ -72,7 +79,8 @@ class RemoteDataController {
 			[
 				'block_name' => $block_name,
 				'result_id' => wp_generate_uuid4(),
-				'query_key' => $query_key,
+				'display_query_key' => $display_query_key,
+				'selector_query_key' => $selector_query_key,
 			],
 			$query_response
 		);

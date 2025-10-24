@@ -40,6 +40,9 @@ class ConfigStoreTest extends TestCase {
 					'output_schema' => [ 'type' => 'string' ],
 				] ),
 			],
+			'display_queries_to_selectors' => [
+				'display' => [ 'display' ],
+			],
 		] );
 
 		$this->assertEquals( 'airtable', ConfigStore::get_data_source_type( 'airtable_remote_blocks' ) );

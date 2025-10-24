@@ -4,7 +4,11 @@ import { __ } from '@wordpress/i18n';
 import { chevronRightSmall } from '@wordpress/icons';
 
 import { DataViewsModal } from '@/blocks/remote-data-container/components/modals/DataViewsModal';
-import { getBlocksConfig } from '@/utils/localized-block-data';
+import {
+	getBlocksConfig,
+	getFirstDisplayQueryKey,
+	getSelectorsForDisplayQuery,
+} from '@/utils/localized-block-data';
 
 type InlineBindingSelectNewProps = Omit< DropdownMenuProps, 'label' > & {
 	onSelectField: ( data: FieldSelection, fieldValue: string ) => void;
@@ -41,9 +45,10 @@ export function InlineBindingSelectNew( props: InlineBindingSelectNewProps ) {
 				Object.entries( blocksByType ).map( ( [ dataSourceType, configs ] ) => (
 					<MenuGroup key={ dataSourceType } label={ dataSourceType }>
 						{ configs.map( blockConfig => {
-							// For now, we will use the first compatible selector, but this
-							// should be improved.
-							const compatibleSelector = blockConfig.selectors.find( selector =>
+							// ToDo: We are picking the first display query, and the first compatible selector for now.
+							const displayQueryKey = getFirstDisplayQueryKey( blockConfig.name );
+							const selectors = getSelectorsForDisplayQuery( blockConfig.name, displayQueryKey );
+							const compatibleSelector = selectors.find( selector =>
 								[ 'list', 'search' ].includes( selector.type )
 							);
 
@@ -57,7 +62,8 @@ export function InlineBindingSelectNew( props: InlineBindingSelectNewProps ) {
 									blockName={ blockConfig.name }
 									headerImage={ compatibleSelector.image_url }
 									onSelectField={ onSelectField }
-									queryKey={ compatibleSelector.query_key }
+									selectorQueryKey={ compatibleSelector.query_key }
+									displayQueryKey={ displayQueryKey }
 									renderTrigger={ ( { onClick } ) => (
 										<MenuItem onClick={ onClick }>
 											{ blockConfig.settings?.title ?? blockConfig.name }
