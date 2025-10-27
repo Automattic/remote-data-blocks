@@ -102,7 +102,7 @@
     "stylelint": "16.11.0",
     "ts-loader": "9.5.2",
     "typescript": "5.9.2",
-    "vitest": "3.2.4"
+    "vitest": "4.0.3"
   },
   "overrides": {
     "react-autosize-textarea": {
