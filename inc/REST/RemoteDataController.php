@@ -78,7 +78,22 @@ class RemoteDataController {
 		);
 	}
 
-	public static function permission_callback(): bool {
-		return true;
+	/**
+	 * Permission callback for the remote data endpoint.
+	 *
+	 * @param WP_REST_Request $request The REST request.
+	 *
+	 * @return bool|WP_Error Returns status of user permission, otherwise WP_Error.
+	 */
+	public static function permission_callback( WP_REST_Request $request ): bool|WP_Error {
+		$post_id = (int) $request->get_param( 'post_id' );
+		if ( $post_id <= 0 ) {
+			return new WP_Error(
+				'rest_post_invalid_id',
+				__( 'Invalid post ID.' ),
+				array( 'status' => 404 )
+			);
+		}
+		return current_user_can( 'edit_post', $post_id );
 	}
 }
