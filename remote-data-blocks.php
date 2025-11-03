@@ -7,7 +7,7 @@
  * Author: Automattic
  * Author URI: https://automattic.com
  * Text Domain: remote-data-blocks
- * Version: 1.4.1
+ * Version: 1.4.0
  * Requires at least: 6.7
  * Requires PHP: 8.1
  * License: GPLv2 or later
@@ -26,7 +26,7 @@ if ( defined( 'REMOTE_DATA_BLOCKS__LOADED' ) ) {
 define( 'REMOTE_DATA_BLOCKS__LOADED', true );
 define( 'REMOTE_DATA_BLOCKS__PLUGIN_ROOT', __FILE__ );
 define( 'REMOTE_DATA_BLOCKS__PLUGIN_DIRECTORY', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
-define( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION', '1.4.1' );
+define( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION', '1.4.0' );
 
 define( 'REMOTE_DATA_BLOCKS__REST_NAMESPACE', 'remote-data-blocks/v1' );
 
@@ -74,43 +74,3 @@ do_action( 'remote_data_blocks_loaded' );
 // require_once __DIR__ . '/example/blocks/shopify-mock-store-block/shopify-mock-store-block.php';
 // require_once __DIR__ . '/example/blocks/weather-block/weather-block.php';
 // require_once __DIR__ . '/example/blocks/zip-code-block/zip-code-block.php';
-
-
-
-$data_source = [
-	'display_name' => 'JSONPlaceholder API',
-	'endpoint' => 'https://jsonplaceholder.typicode.com/posts/1',
-];
-
-$render_query = [
-	'display_name' => 'Pattern Test Query',
-	'data_source' => $data_source,
-	'output_schema' => [
-		'type' => [
-			'title' => [ 'name' => 'Title', 'type' => 'string' ],
-			'body' => [ 'name' => 'Body', 'type' => 'string' ],
-		],
-	],
-];
-
-register_remote_data_block( [
-    'title' => 'Pattern Test',
-    'icon' => 'list-view',
-    'render_query' => [
-        'query' => $render_query,
-    ],
-    'patterns' => [
-        [
-            'title' => 'Simple',
-            'html' => '<!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"block":"remote-data-blocks/pattern-test","field":"title"}}}}} --><h2></h2><!-- /wp:heading -->',
-        ],
-        [
-            'title' => 'With Background',
-            'html' => '<!-- wp:group {"backgroundColor":"pale-cyan-blue"} --><div class="wp-block-group has-pale-cyan-blue-background-color"><!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"block":"remote-data-blocks/pattern-test","field":"title"}}}}} --><h2></h2><!-- /wp:heading --></div><!-- /wp:group -->',
-        ],
-        [
-            'title' => 'With Body',
-            'html' => '<!-- wp:group --><div><!-- wp:heading {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"block":"remote-data-blocks/pattern-test","field":"title"}}}}} --><h2></h2><!-- /wp:heading --><!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"block":"remote-data-blocks/pattern-test","field":"body"}}}}} --><p></p><!-- /wp:paragraph --></div><!-- /wp:group -->',
-        ],
-    ],
-] );
