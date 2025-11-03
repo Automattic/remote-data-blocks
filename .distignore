@@ -1,0 +1,30 @@
+# Specify which files should not be included in the push to WordPress.org.
+# These are all development files and directories.
+# The deploy Action will use rsync + .distignore if the .distignore exists,
+# so it doesn't care what may or may not be ignored via .gitignore.
+
+/.git/
+/.github/
+/.cursor/
+/.husky/
+/.vscode/
+/bin/
+/docs/
+/tests/
+/types/
+/.distignore
+/.editorconfig
+/.eslintignore
+/.eslintrc.js
+/.gitattributes
+/.gitignore
+/.nvmrc
+/.prettierignore
+/.prettierrc
+/.wp-env.json
+/.phpcs.xml.dist
+/CHANGELOG.md
+/composer.json
+/package.json
+/package-lock.json
+/phpunit.xml.dist
