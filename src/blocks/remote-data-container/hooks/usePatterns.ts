@@ -104,7 +104,7 @@ export function usePatterns(
 	}
 
 	function onSelectPattern( pattern: BlockPattern ): void {
-		const realPattern = supportedPatterns.find( p => p.id === pattern.id );
+		const realPattern = supportedPatterns.find( p => p.name === pattern.name );
 		console.log( { pattern, realPattern, supportedPatterns } );
 		insertPatternBlocks( realPattern ?? pattern );
 		setShowPatternSelection( false );
