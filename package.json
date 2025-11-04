@@ -9,6 +9,7 @@
     "build/",
     "inc/",
     "vendor/",
+    "blueprint.json",		
     "functions.php",
     "remote-data-blocks.php",
     "composer.json"
