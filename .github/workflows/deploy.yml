@@ -13,6 +13,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Build
+        run: |
+          npm install
+          npm run build
+
       - name: Install SVN (Subversion)
         run: |
           sudo apt-get update
