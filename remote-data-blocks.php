@@ -18,8 +18,10 @@ namespace RemoteDataBlocks;
 
 defined( 'ABSPATH' ) || exit();
 
-// Check if the plugin is already loaded, if so, return early to prevent duplicate plugin instances.
-if ( defined( 'REMOTE_DATA_BLOCKS__LOADED' ) ) {
+// Check if the plugin is already loaded, if so, return early to prevent
+// duplicate plugin instances. REMOTE_DATA_BLOCKS__LOADED was not introduced
+// until v0.10.0.
+if ( defined( 'REMOTE_DATA_BLOCKS__LOADED' ) || defined( 'REMOTE_DATA_BLOCKS__PLUGIN_VERSION' ) ) {
 	return;
 }
 
