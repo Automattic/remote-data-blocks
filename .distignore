@@ -10,7 +10,8 @@
 /.vscode/
 /bin/
 /docs/
-/examples/
+/example/
+/node_modules/
 /src/
 /tests/
 /types/
