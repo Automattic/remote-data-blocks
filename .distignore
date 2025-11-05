@@ -33,6 +33,7 @@
 /CHANGELOG.md
 /CONTRIBUTING.md
 /composer.lock
+/docker-compose.overrides.yml
 /package-lock.json
 /phpcs.xml
 /phpunit.xml
