@@ -1,4 +1,6 @@
 import apiFetch from '@wordpress/api-fetch';
+import { select } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 import { useEffect, useState } from '@wordpress/element';
 
 import { REMOTE_DATA_REST_API_URL } from '@/blocks/remote-data-container/config/constants';
@@ -177,6 +179,9 @@ export function useRemoteData( {
 	}
 
 	async function fetch( inputs: RemoteDataQueryInput[] ): Promise< void > {
+		const { getCurrentPostId } = select( editorStore );
+		const postId = getCurrentPostId();
+
 		// If there are no inputs, there is nothing to fetch. Empty query inputs
 		// must be represented by an empty object, e.g. `[ {} ]`.
 		if ( 0 === inputs.length ) {
@@ -192,6 +197,7 @@ export function useRemoteData( {
 
 		const requestData: RemoteDataApiRequest = {
 			block_name: blockName,
+			post_id: postId ?? null,
 			query_key: queryKey,
 			query_inputs: inputs,
 		};

@@ -9,6 +9,7 @@
     "build/",
     "inc/",
     "vendor/",
+    "blueprint.json",		
     "functions.php",
     "remote-data-blocks.php",
     "composer.json"
@@ -59,7 +60,7 @@
   },
   "devDependencies": {
     "@automattic/eslint-plugin-wpvip": "0.13.1",
-    "@babel/preset-react": "7.27.1",
+    "@babel/preset-react": "7.28.5",
     "@playwright/test": "^1.56.1",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.0",
