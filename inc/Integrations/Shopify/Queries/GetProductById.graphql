@@ -3,6 +3,7 @@ query GetProductById($id: ID!) {
 		id
 		descriptionHtml
 		title
+		onlineStoreUrl
 		featuredImage {
 			url
 			altText

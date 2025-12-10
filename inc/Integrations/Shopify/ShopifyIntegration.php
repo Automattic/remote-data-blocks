@@ -63,6 +63,11 @@ class ShopifyIntegration {
 							'path' => '$.data.product.featuredImage.url',
 							'type' => 'image_url',
 						],
+						'online_store_url' => [
+							'name' => 'Online Store URL',
+							'path' => '$.data.product.onlineStoreUrl',
+							'type' => 'button_url',
+						],
 						'price' => [
 							'name' => 'Item price',
 							'path' => '$.data.product.priceRange.maxVariantPrice.amount',
@@ -117,6 +122,11 @@ class ShopifyIntegration {
 							'name' => 'Item image URL',
 							'path' => '$.node.images.edges[0].node.originalSrc',
 							'type' => 'image_url',
+						],
+						'online_store_url' => [
+							'name' => 'Online Store URL',
+							'path' => '$.node.onlineStoreUrl',
+							'type' => 'button_url',
 						],
 						'price' => [
 							'name' => 'Item price',
