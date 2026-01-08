@@ -17,7 +17,7 @@ class GenericHttpDataSource extends HttpDataSource {
 			'__version' => Types::integer(),
 			'auth' => Types::nullable(
 				Types::object( [
-					'add_to' => Types::nullable( Types::enum( 'header', 'query' ) ),
+					'add_to' => Types::nullable( Types::enum( 'header', 'queryparams' ) ),
 					'key' => Types::nullable( Types::skip_sanitize( Types::string() ) ),
 					'type' => Types::enum( 'basic', 'bearer', 'api-key', 'none' ),
 					'value' => Types::skip_sanitize( Types::string() ),
