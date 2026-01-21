@@ -21,3 +21,25 @@ In code, we'll define a query using the data source we just created. Follow the 
 ```php
 $data_source = HttpDataSource::from_uuid( '{{ Data source UUID }}' );
 ```
+
+Replace `{{ Data source UUID }}` with the UUID you copied from step 7.
+
+The query should append the zip code input variable to the data source endpoint, and define the output schema to map the API response fields to display in your block. Once registered, your block will be available in the block editor.
+
+## Insert the block
+
+Create or edit a page or post, then using the Block Inserter, search for "Zip Code" (or whatever name you gave your block).
+
+After inserting the block, you'll be prompted to enter a zip code. Enter a valid US zip code (e.g., "90210") to see the location data appear in the block.
+
+## Patterns and styling
+
+You can use patterns to create a consistent, reusable layout for your remote data. You can read more about [patterns](../extending/block-patterns.md).
+
+Remote data blocks can be styled using the block editor's style settings, `theme.json`, or custom stylesheets. See the [example child theme](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/templates/theme) for more details.
+
+## Code reference
+
+You can also configure HTTP integrations with code. These integrations appear in the WordPress admin but can not be modified. You may wish to do this to have more control over the data source or because you have more advanced data processing needs.
+
+This [example template](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/templates/rest-api-block-from-ui-data-source) will replicate what we've done in this tutorial.
