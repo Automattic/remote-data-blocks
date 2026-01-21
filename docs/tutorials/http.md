@@ -16,15 +16,77 @@ This page will walk you through registering a remote data block that loads data 
 
 ## Register the block
 
-In code, we'll define a query using the data source we just created. Follow the [Zip code block example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/blocks/zip-code-block/zip-code-block.php), but remove the data source definition. In its place, use this code to load the data source we just created by its UUID:
+Now we'll write code to define a query and register a block using the data source we just created. Add this code to your theme's `functions.php` file or a custom plugin:
 
 ```php
-$data_source = HttpDataSource::from_uuid( '{{ Data source UUID }}' );
+<?php
+
+use RemoteDataBlocks\Config\DataSource\HttpDataSource;
+
+function register_zip_code_remote_data_block(): void {
+	// Load the data source we created in the UI by its UUID
+	$zip_code_data_source = HttpDataSource::from_uuid( '{{ Data source UUID }}' );
+
+	// Define the query
+	$zip_code_query = [
+		'data_source' => $zip_code_data_source,
+		'display_name' => 'Get location by Zip code',
+		// Provide a callable (closure) to dynamically generate the endpoint using
+		// the base endpoint from the data source and the input variables.
+		'endpoint' => function ( array $input_variables ) use ( $zip_code_data_source ): string {
+			return $zip_code_data_source['endpoint'] . $input_variables['zip_code'];
+		},
+		'input_schema' => [
+			'zip_code' => [
+				'name' => 'Zip Code',
+				'type' => 'string',
+			],
+		],
+		'output_schema' => [
+			'is_collection' => false, // This query returns a single record.
+			'type' => [
+				'zip_code' => [
+					'name' => 'Zip Code',
+					'path' => '$["post code"]', // JSON property with space requires brackets and quotes.
+					'type' => 'string',
+				],
+				'city' => [
+					'name' => 'City',
+					'path' => '$.places[0]["place name"]', // JSON property with space requires brackets and quotes.
+					'type' => 'string',
+				],
+				'state' => [
+					'name' => 'State',
+					'path' => '$.places[0].state',
+					'type' => 'string',
+				],
+			],
+		],
+	];
+
+	// Register the remote data block
+	register_remote_data_block( [
+		'title' => 'Zip Code',
+		'render_query' => [
+			'query' => $zip_code_query,
+		],
+	] );
+}
+add_action( 'init', 'register_zip_code_remote_data_block' );
 ```
 
 Replace `{{ Data source UUID }}` with the UUID you copied from the data source creation step above (step 7 in "Create the data source").
 
-The query should append the zip code input variable to the data source endpoint, and define the output schema to map the API response fields to display in your block. Once registered, your block will be available in the block editor.
+This code does the following:
+
+1. **Loads the data source** by UUID using `HttpDataSource::from_uuid()`
+2. **Defines a query** that:
+   - Takes a zip code as input
+   - Appends it to the data source endpoint (e.g., `https://api.zippopotam.us/us/90210`)
+   - Maps the API response fields to block outputs (zip code, city, state)
+3. **Registers the block** with the title "Zip Code" and associates it with the query
+
+Once you save this code and reload your WordPress admin, the block will be available in the block editor.
 
 ## Insert the block
 
