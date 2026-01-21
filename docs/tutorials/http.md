@@ -47,12 +47,12 @@ function register_zip_code_remote_data_block(): void {
 			'type' => [
 				'zip_code' => [
 					'name' => 'Zip Code',
-					'path' => '$["post code"]', // JSONPath syntax: brackets and quotes for property names with spaces.
+					'path' => '$["post code"]', // JSON property with space requires brackets and quotes.
 					'type' => 'string',
 				],
 				'city' => [
 					'name' => 'City',
-					'path' => '$.places[0]["place name"]', // JSONPath syntax: brackets and quotes for property names with spaces.
+					'path' => '$.places[0]["place name"]', // JSON property with space requires brackets and quotes.
 					'type' => 'string',
 				],
 				'state' => [
