@@ -34,7 +34,9 @@ function register_zip_code_remote_data_block(): void {
 		// Provide a callable (closure) to dynamically generate the endpoint using
 		// the base endpoint from the data source and the input variables.
 		'endpoint' => function ( array $input_variables ) use ( $zip_code_data_source ): string {
-			return $zip_code_data_source['endpoint'] . $input_variables['zip_code'];
+			// Validate and sanitize the zip code input
+			$zip_code = preg_replace( '/[^0-9-]/', '', $input_variables['zip_code'] ?? '' );
+			return $zip_code_data_source['endpoint'] . $zip_code;
 		},
 		'input_schema' => [
 			'zip_code' => [
@@ -47,12 +49,12 @@ function register_zip_code_remote_data_block(): void {
 			'type' => [
 				'zip_code' => [
 					'name' => 'Zip Code',
-					'path' => '$["post code"]', // JSON property with space requires brackets and quotes.
+					'path' => '$["post code"]', // JSONPath syntax: brackets and quotes for properties with spaces.
 					'type' => 'string',
 				],
 				'city' => [
 					'name' => 'City',
-					'path' => '$.places[0]["place name"]', // JSON property with space requires brackets and quotes.
+					'path' => '$.places[0]["place name"]', // JSONPath syntax: brackets and quotes for properties with spaces.
 					'type' => 'string',
 				],
 				'state' => [
