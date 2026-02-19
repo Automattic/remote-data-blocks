@@ -1,6 +1,7 @@
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { CheckboxControl, SelectControl } from '@wordpress/components';
-import { select } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 import {
 	BUTTON_LINK_TARGET_FIELD_TYPES,
@@ -54,35 +55,6 @@ interface BlockBindingControlsProps {
 	remoteDataName: string;
 	removeBinding: ( target: string ) => void;
 	updateBinding: ( target: string, args: Omit< RemoteDataBlockBindingArgs, 'block' > ) => void;
-}
-
-/**
- * Get the list of bindable attributes for a specific block from WordPress core.
- *
- * @param blockName The name of the block
- * @returns Array of attribute names that support bindings
- */
-function getSupportedAttributesForBlock( blockName: string ): string[] {
-	try {
-		const editorSettings = select( blockEditorStore )?.getSettings?.();
-		// @ts-ignore - __experimentalBlockBindingsSupportedAttributes is not in types
-		const supportedBindings = editorSettings?.__experimentalBlockBindingsSupportedAttributes ?? {};
-		
-		// Check if this block has registered bindings in WordPress
-		if ( supportedBindings[ blockName ] ) {
-			return supportedBindings[ blockName ];
-		}
-		
-		// Fallback for custom blocks like remote-data-blocks/remote-html
-		// that may not register with WordPress but still support bindings
-		if ( blockName === 'remote-data-blocks/remote-html' ) {
-			return [ 'content' ];
-		}
-		
-		return [];
-	} catch ( error ) {
-		return [];
-	}
 }
 
 /**
@@ -149,6 +121,36 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 	const { attributes, availableBindings, blockName, remoteDataName, removeBinding, updateBinding } =
 		props;
 
+	// Use useSelect to efficiently get supported bindings from WordPress
+	const supportedBindingsFromWP = useSelect(
+		( select ) => {
+			try {
+				const editorSettings = select( blockEditorStore )?.getSettings?.();
+				// @ts-ignore - __experimentalBlockBindingsSupportedAttributes is not in types
+				return editorSettings?.__experimentalBlockBindingsSupportedAttributes ?? {};
+			} catch ( error ) {
+				return {};
+			}
+		},
+		[]
+	);
+
+	// Memoize the supported attributes for this block
+	const supportedAttributes = useMemo( () => {
+		// Check if this block has registered bindings in WordPress
+		if ( supportedBindingsFromWP[ blockName ] ) {
+			return supportedBindingsFromWP[ blockName ];
+		}
+		
+		// Fallback for custom blocks like remote-data-blocks/remote-html
+		// that may not register with WordPress but still support bindings
+		if ( blockName === 'remote-data-blocks/remote-html' ) {
+			return [ 'content' ];
+		}
+		
+		return [];
+	}, [ blockName, supportedBindingsFromWP ] );
+
 	function updateFieldBinding( target: string, field: string ): void {
 		if ( ! field ) {
 			removeBinding( target );
@@ -190,9 +192,6 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 		} );
 	}
 
-	// Get the list of bindable attributes for this block
-	const supportedAttributes = getSupportedAttributesForBlock( blockName );
-
 	// If no attributes support bindings, don't render anything
 	if ( supportedAttributes.length === 0 ) {
 		return null;
@@ -208,8 +207,9 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 				const args = attributes.metadata?.bindings?.[ attributeName ]?.args;
 
 				return (
-					<div key={ attributeName }>
+					<>
 						<BlockBindingFieldControl
+							key={ attributeName }
 							availableBindings={ availableBindings }
 							fieldTypes={ fieldTypes }
 							label={ label }
@@ -219,6 +219,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 						/>
 						{ attributeName === 'content' && fieldValue && (
 							<CheckboxControl
+								key={ `${ attributeName }_label` }
 								checked={ Boolean( args?.label ) }
 								disabled={ ! fieldValue }
 								label="Show label"
@@ -226,7 +227,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 								onChange={ ( showLabel ) => updateFieldLabel( attributeName, showLabel ) }
 							/>
 						) }
-					</div>
+					</>
 				);
 			} ) }
 		</>
