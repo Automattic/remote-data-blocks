@@ -1,7 +1,7 @@
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { CheckboxControl, SelectControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { Fragment, useMemo } from '@wordpress/element';
 
 import {
 	BUTTON_LINK_TARGET_FIELD_TYPES,
@@ -126,7 +126,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 		( select ) => {
 			try {
 				const editorSettings = select( blockEditorStore )?.getSettings?.();
-				// @ts-ignore - __experimentalBlockBindingsSupportedAttributes is not in types
+				// @ts-expect-error - __experimentalBlockBindingsSupportedAttributes is not in types yet
 				return editorSettings?.__experimentalBlockBindingsSupportedAttributes ?? {};
 			} catch ( error ) {
 				return {};
@@ -207,9 +207,8 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 				const args = attributes.metadata?.bindings?.[ attributeName ]?.args;
 
 				return (
-					<>
+					<Fragment key={ attributeName }>
 						<BlockBindingFieldControl
-							key={ attributeName }
 							availableBindings={ availableBindings }
 							fieldTypes={ fieldTypes }
 							label={ label }
@@ -219,7 +218,6 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 						/>
 						{ attributeName === 'content' && fieldValue && (
 							<CheckboxControl
-								key={ `${ attributeName }_label` }
 								checked={ Boolean( args?.label ) }
 								disabled={ ! fieldValue }
 								label="Show label"
@@ -227,7 +225,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 								onChange={ ( showLabel ) => updateFieldLabel( attributeName, showLabel ) }
 							/>
 						) }
-					</>
+					</Fragment>
 				);
 			} ) }
 		</>
