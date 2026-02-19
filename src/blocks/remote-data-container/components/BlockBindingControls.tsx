@@ -70,22 +70,22 @@ function getFieldTypesForAttribute( blockName: string, attributeName: string ): 
 	if ( blockName === 'remote-data-blocks/remote-html' && attributeName === 'content' ) {
 		return HTML_FIELD_TYPES;
 	}
-	
+
 	// Map attribute names to their appropriate field types
 	const attributeFieldTypeMap: Record< string, string[] > = {
 		// Text content attributes
 		content: TEXT_FIELD_TYPES,
-		
+
 		// Image attributes
 		url: IMAGE_URL_FIELD_TYPES,
 		alt: IMAGE_ALT_FIELD_TYPES,
 		title: IMAGE_TITLE_FIELD_TYPES,
-		
+
 		// Button attributes
 		text: BUTTON_TEXT_FIELD_TYPES,
 		linkTarget: BUTTON_LINK_TARGET_FIELD_TYPES,
 		rel: BUTTON_REL_FIELD_TYPES,
-		
+
 		// HTML content
 		html: HTML_FIELD_TYPES,
 	};
@@ -141,13 +141,13 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 		if ( supportedBindingsFromWP[ blockName ] ) {
 			return supportedBindingsFromWP[ blockName ];
 		}
-		
+
 		// Fallback for custom blocks like remote-data-blocks/remote-html
 		// that may not register with WordPress but still support bindings
 		if ( blockName === 'remote-data-blocks/remote-html' ) {
 			return [ 'content' ];
 		}
-		
+
 		return [];
 	}, [ blockName, supportedBindingsFromWP ] );
 
@@ -175,7 +175,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 
 	function updateFieldLabel( target: string, showLabel: boolean ): void {
 		const currentField = attributes.metadata?.bindings?.[ target ]?.args?.field;
-		
+
 		if ( ! currentField ) {
 			return;
 		}
@@ -183,7 +183,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 		const label = showLabel
 			? Object.entries( availableBindings ).find( ( [ key ] ) => key === currentField )?.[ 1 ]?.name
 			: undefined;
-		
+
 		const currentArgs = attributes.metadata?.bindings?.[ target ]?.args ?? {};
 		updateBinding( target, { ...currentArgs, field: currentField, label } );
 		sendTracksEvent( 'remote_data_container_actions', {
