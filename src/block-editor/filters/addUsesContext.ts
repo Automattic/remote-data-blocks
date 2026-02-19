@@ -1,57 +1,35 @@
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { BlockConfiguration } from '@wordpress/blocks';
-import { applyFilters } from '@wordpress/hooks';
+import { select } from '@wordpress/data';
 
-import {
-	REMOTE_DATA_CONTEXT_KEY,
-	SUPPORTED_CORE_BLOCKS,
-} from '@/blocks/remote-data-container/config/constants';
+import { REMOTE_DATA_CONTEXT_KEY } from '@/blocks/remote-data-container/config/constants';
 
 /**
- * Check if a block supports bindings based on its metadata.
+ * Get the list of blocks that support bindings from WordPress core.
  *
- * @param settings The block configuration settings
- * @returns true if the block supports bindings
+ * @returns Record of block names to their supported attributes
  */
-function blockSupportsBindings( settings: BlockConfiguration< RemoteDataInnerBlockAttributes > ): boolean {
-	// Check if the block has __experimentalLabel defined on any attribute
-	if ( settings.attributes ) {
-		for ( const attr of Object.values( settings.attributes ) ) {
-			// @ts-ignore - __experimentalLabel is not in the types but is supported by WordPress
-			if ( attr.__experimentalLabel ) {
-				return true;
-			}
-		}
+function getSupportedBlockBindings(): Record< string, string[] > {
+	try {
+		// Get the block editor settings which contain the supported bindings
+		const editorSettings = select( blockEditorStore )?.getSettings?.();
+		// @ts-ignore - __experimentalBlockBindingsSupportedAttributes is not in types
+		return editorSettings?.__experimentalBlockBindingsSupportedAttributes ?? {};
+	} catch ( error ) {
+		// If the store isn't available yet (e.g., during initial load), return empty
+		return {};
 	}
-
-	// Check if the block has explicit supports.bindings configuration
-	// @ts-ignore - bindings is not in the types but is supported by WordPress
-	if ( settings.supports?.bindings ) {
-		return true;
-	}
-
-	return false;
 }
 
 export function addUsesContext(
 	settings: BlockConfiguration< RemoteDataInnerBlockAttributes >,
 	name: string
 ) {
-	/**
-	 * Filter the list of supported core blocks for remote data bindings.
-	 *
-	 * @param supportedBlocks Array of block names that support remote data bindings
-	 * @param blockName The name of the block being registered
-	 * @param settings The block configuration settings
-	 */
-	const supportedBlocks = applyFilters(
-		'remote_data_blocks_supported_blocks',
-		SUPPORTED_CORE_BLOCKS,
-		name,
-		settings
-	) as string[];
+	// Check if this block supports bindings according to WordPress core
+	const supportedBindings = getSupportedBlockBindings();
+	const blockSupportsBindings = name in supportedBindings && supportedBindings[ name ].length > 0;
 
-	// Check if the block is in the supported list or if it explicitly supports bindings
-	if ( ! supportedBlocks.includes( name ) && ! blockSupportsBindings( settings ) ) {
+	if ( ! blockSupportsBindings ) {
 		return settings;
 	}
 

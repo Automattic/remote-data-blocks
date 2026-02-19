@@ -1,46 +1,32 @@
 # Block bindings
 
-Remote Data Blocks takes advantage of the [block bindings API](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-bindings/). This core WordPress API allows you to “bind” dynamic data to the attributes of core blocks, which are then reflected in the final HTML markup. Generally, this avoids the need to write and maintain custom blocks.
+Remote Data Blocks takes advantage of the [block bindings API](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-bindings/). This core WordPress API allows you to "bind" dynamic data to the attributes of core blocks, which are then reflected in the final HTML markup. Generally, this avoids the need to write and maintain custom blocks.
 
 For a quick overview of block bindings, the [announcement post](https://make.wordpress.org/core/2024/03/06/new-feature-the-block-bindings-api/) is very helpful; for a deeper dive, consult the [public documentation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-bindings/). That said, an in-depth understanding of block bindings isn't necessary to use Remote Data Blocks: just know that the plugin is built on core, stable WordPress APIs.
 
-## Supported Core Blocks
+## Automatic Support for Block Bindings
 
-Remote Data Blocks supports block bindings for the following WordPress core blocks:
+Remote Data Blocks automatically supports all blocks that WordPress core designates as supporting block bindings. This includes:
 
-### Static Blocks
-- **Paragraph** (`core/paragraph`) - `content` attribute
-- **Heading** (`core/heading`) - `content` attribute
-- **Image** (`core/image`) - `url`, `alt`, `title` attributes
-- **Button** (`core/button`) - `url`, `text`, `linkTarget`, `rel` attributes
-- **Details** (`core/details`) - `content` attribute (experimental)
+- Core blocks like **Paragraph**, **Heading**, **Image**, **Button**, and **Details**
+- Dynamic blocks like **Post Title**, **Post Date**, **Post Excerpt**, **Post Featured Image**, and **Post Author**
+- Any custom blocks that register bindable attributes through WordPress core's mechanisms
 
-### Dynamic Blocks
-- **Post Title** (`core/post-title`) - `content` attribute
-- **Post Date** (`core/post-date`) - `content` attribute
-- **Post Excerpt** (`core/post-excerpt`) - `content` attribute
-- **Post Featured Image** (`core/post-featured-image`) - `url`, `alt` attributes
-- **Post Author** (`core/post-author`) - `content` attribute
+The plugin queries WordPress's `__experimentalBlockBindingsSupportedAttributes` setting to determine which blocks and attributes support bindings, ensuring compatibility with current and future WordPress versions without requiring manual updates.
 
-## Extending Supported Blocks
+## Extending Block Bindings
 
-You can extend the list of supported blocks using WordPress filters:
+To add block binding support to your custom blocks, follow [WordPress's official documentation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-bindings/#extending-supported-attributes) on extending supported attributes. Once registered with WordPress core, your blocks will automatically work with Remote Data Blocks.
 
-### JavaScript Filter
+Example of making a custom block attribute bindable:
 
 ```javascript
-import { addFilter } from '@wordpress/hooks';
-
-addFilter(
-'remote_data_blocks_supported_blocks',
-'my-plugin/add-custom-blocks',
-( supportedBlocks, blockName, settings ) => {
-// Add your custom block to the list
-return [ ...supportedBlocks, 'my-plugin/custom-block' ];
-}
-);
+registerBlockType( 'my-plugin/custom-block', {
+attributes: {
+customField: {
+type: 'string',
+__experimentalLabel: 'Custom Field', // Makes this attribute bindable
+},
+},
+} );
 ```
-
-### Automatic Detection
-
-Blocks that define bindable attributes using WordPress core's `__experimentalLabel` property or `supports.bindings` configuration will be automatically supported without needing to add them to the filter.
