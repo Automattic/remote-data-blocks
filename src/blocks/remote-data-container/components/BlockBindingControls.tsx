@@ -1,10 +1,13 @@
 import { CheckboxControl, SelectControl } from '@wordpress/components';
 
 import {
+	BUTTON_LINK_TARGET_FIELD_TYPES,
+	BUTTON_REL_FIELD_TYPES,
 	BUTTON_TEXT_FIELD_TYPES,
 	BUTTON_URL_FIELD_TYPES,
 	HTML_FIELD_TYPES,
 	IMAGE_ALT_FIELD_TYPES,
+	IMAGE_TITLE_FIELD_TYPES,
 	IMAGE_URL_FIELD_TYPES,
 	TEXT_FIELD_TYPES,
 } from '@/blocks/remote-data-container/config/constants';
@@ -57,9 +60,12 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 	const contentArgs = attributes.metadata?.bindings?.content?.args;
 	const contentField = contentArgs?.field ?? '';
 	const imageAltField = attributes.metadata?.bindings?.alt?.args?.field ?? '';
+	const imageTitleField = attributes.metadata?.bindings?.title?.args?.field ?? '';
 	const imageUrlField = attributes.metadata?.bindings?.url?.args?.field ?? '';
 	const buttonUrlField = attributes.metadata?.bindings?.url?.args?.field ?? '';
 	const buttonTextField = attributes.metadata?.bindings?.text?.args?.field ?? '';
+	const buttonLinkTargetField = attributes.metadata?.bindings?.linkTarget?.args?.field ?? '';
+	const buttonRelField = attributes.metadata?.bindings?.rel?.args?.field ?? '';
 
 	function updateFieldBinding( target: string, field: string ): void {
 		if ( ! field ) {
@@ -102,6 +108,11 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 	switch ( blockName ) {
 		case 'core/heading':
 		case 'core/paragraph':
+		case 'core/details':
+		case 'core/post-title':
+		case 'core/post-date':
+		case 'core/post-excerpt':
+		case 'core/post-author':
 			return (
 				<>
 					<BlockBindingFieldControl
@@ -123,6 +134,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 			);
 
 		case 'core/image':
+		case 'core/post-featured-image':
 			return (
 				<>
 					<BlockBindingFieldControl
@@ -141,6 +153,16 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 						updateFieldBinding={ updateFieldBinding }
 						value={ imageAltField }
 					/>
+					{ blockName === 'core/image' && (
+						<BlockBindingFieldControl
+							availableBindings={ availableBindings }
+							fieldTypes={ IMAGE_TITLE_FIELD_TYPES }
+							label="Image title"
+							target="title"
+							updateFieldBinding={ updateFieldBinding }
+							value={ imageTitleField }
+						/>
+					) }
 				</>
 			);
 		case 'core/button':
@@ -161,6 +183,22 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 						target="text"
 						updateFieldBinding={ updateFieldBinding }
 						value={ buttonTextField }
+					/>
+					<BlockBindingFieldControl
+						availableBindings={ availableBindings }
+						fieldTypes={ BUTTON_LINK_TARGET_FIELD_TYPES }
+						label="Link Target"
+						target="linkTarget"
+						updateFieldBinding={ updateFieldBinding }
+						value={ buttonLinkTargetField }
+					/>
+					<BlockBindingFieldControl
+						availableBindings={ availableBindings }
+						fieldTypes={ BUTTON_REL_FIELD_TYPES }
+						label="Link Relationship"
+						target="rel"
+						updateFieldBinding={ updateFieldBinding }
+						value={ buttonRelField }
 					/>
 				</>
 			);
