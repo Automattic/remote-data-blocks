@@ -2,7 +2,7 @@ name: Comment Playground Link
 
 on:
   workflow_run:
-    workflows: ["Build Live Branch"]
+    workflows: ['Build Live Branch']
     types:
       - completed
 
