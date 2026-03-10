@@ -1,0 +1,44 @@
+name: Comment Playground Link
+
+on:
+  workflow_run:
+    workflows: ['Build Live Branch']
+    types:
+      - completed
+
+concurrency:
+  group: playground-comment-${{ github.event.workflow_run.id }}
+  cancel-in-progress: true
+
+jobs:
+  comment:
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/workflows/scripts
+
+      - name: Download PR number artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: pr-number
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Read PR number
+        id: pr
+        run: echo "number=$(cat pr_number.txt)" >> "$GITHUB_OUTPUT"
+
+      - name: Comment on PR with WordPress Playground details
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { run } = require('./.github/workflows/scripts/generate-playground-blueprint');
+            run({ github, context, prNumber: ${{ steps.pr.outputs.number }} });

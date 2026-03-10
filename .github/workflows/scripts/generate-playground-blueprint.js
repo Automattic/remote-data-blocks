@@ -1,8 +1,9 @@
-async function run( { github, context } ) {
+async function run( { github, context, prNumber } ) {
+	const issueNumber = prNumber || context.issue.number;
 	const commentInfo = {
 		owner: context.repo.owner,
 		repo: context.repo.repo,
-		issue_number: context.issue.number,
+		issue_number: issueNumber,
 	};
 
 	const comments = ( await github.rest.issues.listComments( commentInfo ) ).data;
@@ -15,7 +16,7 @@ async function run( { github, context } ) {
 		}
 	}
 
-	const body = `Test this PR in [WordPress Playground](https://playground.wordpress.net/#{"landingPage":"/wp-admin/admin.php?page=remote-data-blocks-settings","features":{"networking":true},"login":true,"preferredVersions":{"php":"8.2","wp":"latest"},"steps":[{"step":"setSiteOptions","options":{"blogname":"Remote%20Data%20Blocks%20PR#${ context.issue.number }","blogdescription":"Explore%20the%20Remote%20Data%20Blocks%20plugin%20in%20a%20WordPress%20Playground"}},{"step":"installPlugin","pluginData":{"caption":"Installing%20RDB","resource":"url","url":"https://playground.wordpress.net/plugin-proxy.php?org=Automattic&repo=remote-data-blocks&workflow=Build%20Live%20Branch&artifact=remote-data-blocks-${ context.issue.number }&pr=${ context.issue.number }"},"options":{"activate":true,"targetFolderName":"remote-data-blocks"}}]}).`;
+	const body = `Test this PR in [WordPress Playground](https://playground.wordpress.net/#{"landingPage":"/wp-admin/admin.php?page=remote-data-blocks-settings","features":{"networking":true},"login":true,"preferredVersions":{"php":"8.2","wp":"latest"},"steps":[{"step":"setSiteOptions","options":{"blogname":"Remote%20Data%20Blocks%20PR#${ issueNumber }","blogdescription":"Explore%20the%20Remote%20Data%20Blocks%20plugin%20in%20a%20WordPress%20Playground"}},{"step":"installPlugin","pluginData":{"caption":"Installing%20RDB","resource":"url","url":"https://playground.wordpress.net/plugin-proxy.php?org=Automattic&repo=remote-data-blocks&workflow=Build%20Live%20Branch&artifact=remote-data-blocks-${ issueNumber }&pr=${ issueNumber }"},"options":{"activate":true,"targetFolderName":"remote-data-blocks"}}]}).`;
 
 	if ( existingCommentId ) {
 		await github.rest.issues.updateComment( {

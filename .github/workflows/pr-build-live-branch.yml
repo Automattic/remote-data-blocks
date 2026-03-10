@@ -12,7 +12,6 @@ on:
       - '**/*.md'
       - '.github/**'
       - '!.github/workflows/pr-build-live-branch.yml'
-      - '!.github/workflows/scripts/generate-playground-blueprint.js'
 
 concurrency:
   # Cancel concurrent jobs on pull_request but not push, by including the run_id in the concurrency group for the latter.
@@ -27,8 +26,7 @@ jobs:
     if: github.repository_owner == 'Automattic' && github.event.pull_request.draft == false && github.event.pull_request.user.login != 'github-actions[bot]'
     runs-on: ubuntu-latest
     permissions:
-      issues: write
-      pull-requests: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
         with:
@@ -70,9 +68,12 @@ jobs:
           if-no-files-found: 'error'
           overwrite: true
 
-      - name: Comment on PR with WordPress Playground details
-        uses: actions/github-script@v7
+      - name: Save PR number
+        run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
+
+      - name: Upload PR number
+        uses: actions/upload-artifact@v4
         with:
-          script: |
-            const { run } = require('./.github/workflows/scripts/generate-playground-blueprint');
-            	run({ github, context });
+          name: pr-number
+          path: pr_number.txt
+          retention-days: 1
