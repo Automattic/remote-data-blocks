@@ -17,28 +17,72 @@ jobs:
       github.event.workflow_run.event == 'pull_request'
     runs-on: ubuntu-latest
     permissions:
-      issues: write
+      contents: write
       pull-requests: write
       actions: read
     steps:
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: .github/workflows/scripts
-
-      - name: Download PR number artifact
+      - name: Download PR metadata artifact
         uses: actions/download-artifact@v4
         with:
-          name: pr-number
+          name: pr-metadata
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Read PR number
+      - name: Read PR metadata
         id: pr
-        run: echo "number=$(cat pr_number.txt)" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "number=$(cat pr_number.txt)" >> "$GITHUB_OUTPUT"
+          echo "sha=$(cat commit_sha.txt)" >> "$GITHUB_OUTPUT"
 
-      - name: Comment on PR with WordPress Playground details
-        uses: actions/github-script@v7
+      - name: Expose built artifact
+        id: expose
+        uses: WordPress/action-wp-playground-pr-preview/.github/actions/expose-artifact-on-public-url@v2
         with:
-          script: |
-            const { run } = require('./.github/workflows/scripts/generate-playground-blueprint');
-            run({ github, context, prNumber: ${{ steps.pr.outputs.number }} });
+          artifact-name: remote-data-blocks-pr${{ steps.pr.outputs.number }}-${{ steps.pr.outputs.sha }}
+          artifact-filename: remote-data-blocks.zip
+          pr-number: ${{ steps.pr.outputs.number }}
+          commit-sha: ${{ steps.pr.outputs.sha }}
+          artifact-source-run-id: ${{ github.event.workflow_run.id }}
+          artifacts-to-keep: '2'
+
+      - name: Generate Playground blueprint
+        id: blueprint
+        run: |
+          node - <<'NODE' >> "$GITHUB_OUTPUT"
+          const url = process.env.ARTIFACT_URL;
+          if (!url) {
+            throw new Error('ARTIFACT_URL is required');
+          }
+
+          const blueprint = {
+            landingPage: '/wp-admin/admin.php?page=remote-data-blocks-settings',
+            features: { networking: true },
+            login: true,
+            preferredVersions: { php: '8.2', wp: 'latest' },
+            steps: [
+              {
+                step: 'installPlugin',
+                pluginZipFile: {
+                  resource: 'url',
+                  url,
+                },
+                options: {
+                  activate: true,
+                  targetFolderName: 'remote-data-blocks',
+                },
+              },
+            ],
+          };
+
+          console.log(`blueprint=${JSON.stringify(blueprint)}`);
+          NODE
+        env:
+          ARTIFACT_URL: ${{ steps.expose.outputs.artifact-url }}
+
+      - name: Post Playground preview button
+        uses: WordPress/action-wp-playground-pr-preview@v2
+        with:
+          mode: comment
+          blueprint: ${{ steps.blueprint.outputs.blueprint }}
+          pr-number: ${{ steps.pr.outputs.number }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
