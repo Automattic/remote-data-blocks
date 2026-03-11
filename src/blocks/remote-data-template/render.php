@@ -11,4 +11,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-echo wp_kses_post( BlockBindings::render_remote_data_template_block( $attributes, $content, $block ) );
+echo BlockBindings::render_remote_data_template_block( $attributes, $content, $block );
