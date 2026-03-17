@@ -40,8 +40,16 @@ export function Edit( props: BlockEditProps< RemoteDataTemplateBlockAttributes >
 	}
 
 	if ( 1 === remoteData.results.length ) {
-		return <div { ...innerBlocksProps } />;
+		return (
+			<div { ...blockProps }>
+				<div { ...innerBlocksProps } />
+			</div>
+		);
 	}
 
-	return <LoopTemplate getInnerBlocks={ getInnerBlocks } remoteData={ remoteData } />;
+	return (
+		<div { ...blockProps }>
+			<LoopTemplate getInnerBlocks={ getInnerBlocks } remoteData={ remoteData } />
+		</div>
+	);
 }
