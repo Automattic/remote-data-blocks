@@ -43,37 +43,30 @@ jobs:
           node-version-file: .nvmrc
           ignore-scripts: true
 
-      - name: Prepare plugin zips
-        id: prepare
+      - name: Prepare plugin zip
         run: |
-          echo "Generating zip file..."
           cd "$GITHUB_WORKSPACE" || exit
           npm run plugin-zip
-          echo "Generated zip file..."
-          mkdir "$GITHUB_WORKSPACE/zips"
-          mv remote-data-blocks.zip "$GITHUB_WORKSPACE/zips/remote-data-blocks.zip"
-          echo "Moved zip file to zips directory..."
-          mkdir "$GITHUB_WORKSPACE/unzips"
-          echo "Created unzips directory..."
-          unzip "$GITHUB_WORKSPACE/zips/remote-data-blocks.zip" -d "$GITHUB_WORKSPACE/unzips/remote-data-blocks"
-          echo "Unzipped zip file..."
 
-      - name: Create playground artifact
-        id: create-playground-artifact-step
+      - name: Upload plugin zip artifact
         uses: actions/upload-artifact@v4
         with:
-          name: remote-data-blocks-${{ github.event.pull_request.number }}
-          path: unzips/remote-data-blocks
+          name: remote-data-blocks-pr${{ github.event.pull_request.number }}-${{ github.sha }}
+          path: remote-data-blocks.zip
           retention-days: 7
           if-no-files-found: 'error'
           overwrite: true
 
-      - name: Save PR number
-        run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
+      - name: Save PR metadata
+        run: |
+          echo "${{ github.event.pull_request.number }}" > pr_number.txt
+          echo "${{ github.sha }}" > commit_sha.txt
 
-      - name: Upload PR number
+      - name: Upload PR metadata
         uses: actions/upload-artifact@v4
         with:
-          name: pr-number
-          path: pr_number.txt
+          name: pr-metadata
+          path: |
+            pr_number.txt
+            commit_sha.txt
           retention-days: 1

@@ -17,28 +17,92 @@ jobs:
       github.event.workflow_run.event == 'pull_request'
     runs-on: ubuntu-latest
     permissions:
-      issues: write
+      contents: write
       pull-requests: write
       actions: read
     steps:
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: .github/workflows/scripts
-
-      - name: Download PR number artifact
+      - name: Download PR metadata artifact
         uses: actions/download-artifact@v4
         with:
-          name: pr-number
+          name: pr-metadata
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Read PR number
+      - name: Read PR metadata
         id: pr
-        run: echo "number=$(cat pr_number.txt)" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "number=$(cat pr_number.txt)" >> "$GITHUB_OUTPUT"
+          echo "sha=$(cat commit_sha.txt)" >> "$GITHUB_OUTPUT"
 
-      - name: Comment on PR with WordPress Playground details
+      - name: Expose built artifact
+        id: expose
+        uses: WordPress/action-wp-playground-pr-preview/.github/actions/expose-artifact-on-public-url@v2
+        with:
+          artifact-name: remote-data-blocks-pr${{ steps.pr.outputs.number }}-${{ steps.pr.outputs.sha }}
+          artifact-filename: remote-data-blocks.zip
+          pr-number: ${{ steps.pr.outputs.number }}
+          commit-sha: ${{ steps.pr.outputs.sha }}
+          artifact-source-run-id: ${{ github.event.workflow_run.id }}
+          artifacts-to-keep: '2'
+
+      - name: Comment on PR with WordPress Playground link
         uses: actions/github-script@v7
+        env:
+          ARTIFACT_URL: ${{ steps.expose.outputs.artifact-url }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
         with:
           script: |
-            const { run } = require('./.github/workflows/scripts/generate-playground-blueprint');
-            run({ github, context, prNumber: ${{ steps.pr.outputs.number }} });
+            const prNumber = process.env.PR_NUMBER;
+            const artifactUrl = process.env.ARTIFACT_URL;
+
+            const blueprint = JSON.stringify({
+              landingPage: '/wp-admin/admin.php?page=remote-data-blocks-settings',
+              features: { networking: true },
+              login: true,
+              preferredVersions: { php: '8.2', wp: 'latest' },
+              steps: [
+                {
+                  step: 'setSiteOptions',
+                  options: {
+                    blogname: `Remote Data Blocks PR#${prNumber}`,
+                    blogdescription: 'Explore the Remote Data Blocks plugin in a WordPress Playground',
+                  },
+                },
+                {
+                  step: 'installPlugin',
+                  pluginZipFile: {
+                    resource: 'url',
+                    url: artifactUrl,
+                  },
+                  options: {
+                    activate: true,
+                    targetFolderName: 'remote-data-blocks',
+                  },
+                },
+              ],
+            });
+
+            const playgroundUrl = `https://playground.wordpress.net/#${blueprint}`;
+            const body = `Test this PR in [WordPress Playground](${playgroundUrl}).`;
+
+            const commentInfo = {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: Number(prNumber),
+            };
+
+            const comments = (await github.rest.issues.listComments(commentInfo)).data;
+            const existing = comments.find(
+              (c) => c.user.type === 'Bot' && c.body.includes('Test this PR in')
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: commentInfo.owner,
+                repo: commentInfo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({ ...commentInfo, body });
+            }
