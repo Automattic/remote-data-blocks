@@ -26,7 +26,7 @@ jobs:
 
       - name: Setup PHP
         if: steps.version_check.outputs.new_version
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # 2.37.1
         with:
           php-version: '8.1'
 
@@ -36,7 +36,7 @@ jobs:
 
       - name: Create Release
         if: steps.version_check.outputs.new_version
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
           tag_name: v${{ steps.version_check.outputs.new_version }}
           files: remote-data-blocks.zip
