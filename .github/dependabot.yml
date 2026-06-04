@@ -21,23 +21,23 @@ updates:
       - dependency-name: '*'
         update-types: ['version-update:semver-patch']
 
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: 'github-actions'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: 'weekly'
+      day: 'monday'
     open-pull-requests-limit: 10
     groups:
       actions-minor-patch:
         patterns:
-          - "*"
+          - '*'
         update-types:
-          - "minor"
-          - "patch"
+          - 'minor'
+          - 'patch'
       actions-major:
         patterns:
-          - "*"
+          - '*'
         update-types:
-          - "major"
+          - 'major'
     cooldown:
       default-days: 7
