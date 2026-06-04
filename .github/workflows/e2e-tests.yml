@@ -21,10 +21,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
 
       - name: Use desired version of NodeJS
-        uses: actions/setup-node@v4.1.0
+        uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: npm
@@ -60,7 +60,7 @@ jobs:
           npm run dev:stop
 
       - name: Archive E2E results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: test-results
