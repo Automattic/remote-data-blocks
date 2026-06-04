@@ -7,4 +7,4 @@ import { formatTypeSettings } from '@/block-editor/format-types/inline-binding/s
 registerFormatType( 'remote-data-blocks/inline-binding', {
 	...formatTypeSettings,
 	edit: InlineBindingButton,
-} );
+} as never );

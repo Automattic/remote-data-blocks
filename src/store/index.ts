@@ -1,8 +1,12 @@
-import { createReduxStore, register, type StoreDescriptor } from '@wordpress/data';
+import {
+	createReduxStore,
+	register,
+	type ActionCreator,
+	type ReduxStoreConfig,
+	type StoreDescriptor,
+} from '@wordpress/data';
 
 import { STORE_NAME } from '@/config/constants';
-
-import type { ActionCreator, ReduxStoreConfig } from '@wordpress/data/build-types/types';
 
 interface State {
 	previewIndexes: Map< string, number >;

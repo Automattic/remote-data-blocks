@@ -1,7 +1,11 @@
 import { cleanup, render } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { LoopTemplateInnerBlocks } from '@/blocks/remote-data-template/components/loop-template/LoopTemplateInnerBlocks';
+
+vi.mock( '@wordpress/block-editor', () => ( {
+	useInnerBlocksProps: () => ( {} ),
+} ) );
 
 describe( 'LoopTemplateInnerBlocks', () => {
 	afterEach( cleanup );

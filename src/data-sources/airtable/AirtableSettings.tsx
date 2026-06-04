@@ -1,5 +1,4 @@
 import { SelectControl } from '@wordpress/components';
-import { InputChangeCallback } from '@wordpress/components/build-types/input-control/types';
 import { __ } from '@wordpress/i18n';
 import { ChangeEvent } from 'react';
 
@@ -26,6 +25,7 @@ import { AirtableIcon, AirtableIconWithText } from '@/settings/icons/AirtableIco
 import { SelectOption } from '@/types/input';
 
 const SERVICE_CONFIG_VERSION = 1;
+type InputChangeCallback = ( token: string | undefined ) => void;
 
 const defaultSelectBaseOption: SelectOption = {
 	disabled: true,

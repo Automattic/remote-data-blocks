@@ -22,7 +22,7 @@ export const FieldsSelection = ( {
 	return (
 		<CustomFormFieldToken
 			label={ label ?? __( 'Fields', 'remote-data-blocks' ) }
-			onChange={ selection => {
+			onChange={ ( selection: Array< string | { value: string } > ) => {
 				let newFields: string[];
 				if ( selection.includes( 'Select All' ) ) {
 					newFields = Array.from( new Set( availableFields ) );
@@ -46,7 +46,7 @@ export const FieldsSelection = ( {
 				...availableFields,
 			] }
 			value={ selectedFields }
-			__experimentalValidateInput={ input =>
+			__experimentalValidateInput={ ( input: string ) =>
 				availableFields.includes( input ) || input === 'Select All' || input === 'Deselect All'
 			}
 			__nextHasNoMarginBottom

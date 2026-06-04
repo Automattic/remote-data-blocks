@@ -3,6 +3,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { LoopTemplate } from '@/blocks/remote-data-template/components/loop-template/LoopTemplate';
 
+vi.mock( '@wordpress/block-editor', () => ( {
+	__experimentalUseBlockPreview: vi.fn( () => ( {} ) ),
+	store: {},
+	useBlockEditContext: vi.fn( () => ( { clientId: 'test-client-id' } ) ),
+	useInnerBlocksProps: vi.fn( () => ( {} ) ),
+} ) );
+
 vi.mock( '@wordpress/data', () => ( {
 	useDispatch: vi.fn( () => ( { setPreviewIndex: vi.fn() } ) ),
 	useSelect: vi.fn(),
