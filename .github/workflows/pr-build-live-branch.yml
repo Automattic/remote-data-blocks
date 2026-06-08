@@ -28,7 +28,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
 
@@ -49,7 +49,7 @@ jobs:
           npm run plugin-zip
 
       - name: Upload plugin zip artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: remote-data-blocks-pr${{ github.event.pull_request.number }}-${{ github.sha }}
           path: remote-data-blocks.zip
@@ -63,7 +63,7 @@ jobs:
           echo "${{ github.sha }}" > commit_sha.txt
 
       - name: Upload PR metadata
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pr-metadata
           path: |
