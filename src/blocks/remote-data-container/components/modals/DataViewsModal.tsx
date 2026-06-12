@@ -87,6 +87,14 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 		close();
 	}
 
+	const modalClassName = [
+		'rdb-dataviews-modal',
+		className,
+		supportsItemSelection ? 'rdb-dataviews-bulk-actions-modal' : null,
+	]
+		.filter( Boolean )
+		.join( ' ' );
+
 	const triggerElement = renderTrigger ? (
 		renderTrigger( { onClick: open } )
 	) : (
@@ -100,9 +108,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 			{ triggerElement }
 			{ isOpen && (
 				<Modal
-					className={
-						supportsItemSelection ? `${ className } rdb-dataviews-bulk-actions-modal` : className
-					}
+					className={ modalClassName }
 					isFullScreen
 					onRequestClose={ close }
 					title={ blockConfig?.settings?.title ?? title }
