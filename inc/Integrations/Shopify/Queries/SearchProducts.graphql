@@ -16,6 +16,7 @@ query SearchProducts($search: String!, $limit: Int!, $cursor_next: String) {
 				id
 				title
 				descriptionHtml
+				onlineStoreUrl
 				priceRange {
 					maxVariantPrice {
 						amount

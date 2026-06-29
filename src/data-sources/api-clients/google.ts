@@ -79,7 +79,7 @@ export class GoogleApi {
 	}
 
 	public async getSheetFields( spreadsheetId: string, sheetTitle: string ): Promise< string[] > {
-		const values = await this.getSheetValues( spreadsheetId, sheetTitle, 'A1:Z1' );
+		const values = await this.getSheetValues( spreadsheetId, sheetTitle, '1:1' );
 		if ( ! values?.values?.length ) {
 			return [];
 		}
