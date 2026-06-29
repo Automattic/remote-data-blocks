@@ -30,13 +30,7 @@ class HttpDataSource extends ArraySerializable implements HttpDataSourceInterfac
 	}
 
 	public static function from_uuid( string $uuid ): DataSourceInterface|WP_Error {
-		$config = DataSourceCrud::get_config_by_uuid( $uuid );
-
-		if ( is_wp_error( $config ) ) {
-			return $config;
-		}
-
-		return static::from_array( $config );
+		return DataSourceCrud::get_inflated_config_by_uuid( $uuid );
 	}
 
 	/**
