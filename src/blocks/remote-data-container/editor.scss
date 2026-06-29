@@ -169,6 +169,13 @@ remote-data-blocks-inline-field {
 
 }
 
+// WordPress 7.0 applies `display: flex` (default row direction) to full-screen
+// modal content. With a visible header, the row layout collapses the
+// children container to zero width, so restore a column layout.
+.rdb-dataviews-modal .components-modal__content {
+	flex-direction: column;
+}
+
 .rdb-editor_dataviews-modal-item-select .components-modal__content {
 	padding: 0;
 	margin-top: 0;
