@@ -57,4 +57,8 @@ jobs:
         if: steps.version_check.outputs.new_version
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run deploy.yml --ref trunk
+        run: |
+          gh workflow run deploy.yml \
+            --ref trunk \
+            -f version=${{ steps.version_check.outputs.new_version }} \
+            -f ref=v${{ steps.version_check.outputs.new_version }}
