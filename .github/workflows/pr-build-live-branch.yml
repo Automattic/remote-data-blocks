@@ -28,12 +28,12 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # 2.37.1
         with:
           php-version: '8.2'
 
@@ -49,7 +49,7 @@ jobs:
           npm run plugin-zip
 
       - name: Upload plugin zip artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: remote-data-blocks-pr${{ github.event.pull_request.number }}-${{ github.sha }}
           path: remote-data-blocks.zip
@@ -63,7 +63,7 @@ jobs:
           echo "${{ github.sha }}" > commit_sha.txt
 
       - name: Upload PR metadata
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pr-metadata
           path: |
