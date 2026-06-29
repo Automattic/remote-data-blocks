@@ -4,15 +4,22 @@ import { REMOTE_DATA_CONTEXT_KEY } from '@/blocks/remote-data-container/config/c
 import { BLOCK_BINDING_SOURCE, STORE_NAME as rdbStore } from '@/config/constants';
 
 import type { Selectors } from '@/store';
+import type { StoreDescriptor } from '@wordpress/data';
 
 interface RawRemoteDataContext {
 	[ REMOTE_DATA_CONTEXT_KEY ]?: RemoteData;
 }
 
-registerBlockBindingsSource< RawRemoteDataContext, RemoteDataBlockBinding >( {
+interface GetValuesPayload {
+	bindings: Record< string, RemoteDataBlockBinding >;
+	context: RawRemoteDataContext;
+	select: < T >( store: StoreDescriptor | string ) => T;
+}
+
+registerBlockBindingsSource( {
 	name: BLOCK_BINDING_SOURCE,
 	usesContext: [ 'remote-data-blocks/remoteData' ],
-	getValues( { bindings, context, select } ): Record< string, string > {
+	getValues( { bindings, context, select }: GetValuesPayload ): Record< string, string > {
 		const remoteData = context[ REMOTE_DATA_CONTEXT_KEY ];
 		const previewIndex = select< Selectors >( rdbStore ).getPreviewIndex( remoteData?.resultId );
 
