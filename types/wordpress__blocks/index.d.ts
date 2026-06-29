@@ -45,7 +45,7 @@ declare module '@wordpress/blocks' {
 	interface BlockBindingsSource<
 		Context = Record< string, unknown >,
 		Binding extends BaseBinding,
-		Values extends Record< string, unknown >
+		Values extends Record< string, unknown >,
 	> {
 		canUserEditValue?: ( payload: ContextSelectPayload< Context > ) => boolean;
 		getValues?: ( payload: GetValuesPayload< Context, Binding > ) => Values;
@@ -58,7 +58,7 @@ declare module '@wordpress/blocks' {
 	function registerBlockBindingsSource<
 		Context,
 		Binding extends BaseBinding,
-		Values = Record< string, unknown >
+		Values = Record< string, unknown >,
 	>( source: BlockBindingsSource< Context, Binding, Values > ): void;
 
 	export function registerBlockType< TAttributes extends Record< string, any > = {} >(

@@ -12,7 +12,7 @@ interface BaseServiceConfig extends Record< string, unknown > {
 }
 interface BaseDataSourceConfig<
 	ServiceName extends DataSourceType,
-	ServiceConfig extends BaseServiceConfig
+	ServiceConfig extends BaseServiceConfig,
 > {
 	display_name?: string;
 	errors?: WP_Error[];

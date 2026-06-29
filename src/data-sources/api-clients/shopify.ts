@@ -3,7 +3,10 @@ import { __, sprintf } from '@wordpress/i18n';
 export const MOCK_SHOP_STORE = 'mock.shop';
 
 export class ShopifyApi {
-	constructor( private store: string, private token?: string ) {
+	constructor(
+		private store: string,
+		private token?: string
+	) {
 		if ( ! token && store !== MOCK_SHOP_STORE ) {
 			throw new Error( 'Access token is required' );
 		}

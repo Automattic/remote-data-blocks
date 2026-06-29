@@ -1,5 +1,0 @@
-build
-example/templates/airtable-map-block/src
-node_modules
-vendor
-*.php

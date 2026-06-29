@@ -10,7 +10,7 @@ type UseEntityPropReturnValue = [
 
 	// This is the "fullValue" of post meta from the REST API, containing "raw"
 	// and "rendered" values.
-	Record< string, unknown >
+	Record< string, unknown >,
 ];
 
 export interface UsePostMetaReturnValue {
