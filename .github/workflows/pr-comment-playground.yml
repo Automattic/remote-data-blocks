@@ -82,7 +82,7 @@ jobs:
               ],
             });
 
-            const playgroundUrl = `https://playground.wordpress.net/#${blueprint}`;
+            const playgroundUrl = `https://playground.wordpress.net/#${encodeURIComponent(blueprint)}`;
             const body = `Test this PR in [WordPress Playground](${playgroundUrl}).`;
 
             const commentInfo = {
