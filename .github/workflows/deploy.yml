@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Build
         run: |
@@ -24,7 +24,7 @@ jobs:
           sudo apt-get install subversion
 
       - name: Push to WordPress.org
-        uses: 10up/action-wordpress-plugin-deploy@stable
+        uses: 10up/action-wordpress-plugin-deploy@54bd289b8525fd23a5c365ec369185f2966529c2 # 2.3.0
         env:
           SLUG: remote-data-blocks
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}

@@ -8,7 +8,7 @@ jobs:
   check_and_release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -26,7 +26,7 @@ jobs:
 
       - name: Setup PHP
         if: steps.version_check.outputs.new_version
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # 2.37.1
         with:
           php-version: '8.1'
 
@@ -36,7 +36,7 @@ jobs:
 
       - name: Create Release
         if: steps.version_check.outputs.new_version
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b # v3.0.1
         with:
           tag_name: v${{ steps.version_check.outputs.new_version }}
           files: remote-data-blocks.zip

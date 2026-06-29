@@ -12,7 +12,6 @@ on:
       - '**/*.md'
       - '.github/**'
       - '!.github/workflows/pr-build-live-branch.yml'
-      - '!.github/workflows/scripts/generate-playground-blueprint.js'
 
 concurrency:
   # Cancel concurrent jobs on pull_request but not push, by including the run_id in the concurrency group for the latter.
@@ -27,14 +26,14 @@ jobs:
     if: github.repository_owner == 'Automattic' && github.event.pull_request.draft == false && github.event.pull_request.user.login != 'github-actions[bot]'
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: write
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # 2.37.1
         with:
           php-version: '8.2'
 
@@ -44,34 +43,30 @@ jobs:
           node-version-file: .nvmrc
           ignore-scripts: true
 
-      - name: Prepare plugin zips
-        id: prepare
+      - name: Prepare plugin zip
         run: |
-          echo "Generating zip file..."
           cd "$GITHUB_WORKSPACE" || exit
           npm run plugin-zip
-          echo "Generated zip file..."
-          mkdir "$GITHUB_WORKSPACE/zips"
-          mv remote-data-blocks.zip "$GITHUB_WORKSPACE/zips/remote-data-blocks.zip"
-          echo "Moved zip file to zips directory..."
-          mkdir "$GITHUB_WORKSPACE/unzips"
-          echo "Created unzips directory..."
-          unzip "$GITHUB_WORKSPACE/zips/remote-data-blocks.zip" -d "$GITHUB_WORKSPACE/unzips/remote-data-blocks"
-          echo "Unzipped zip file..."
 
-      - name: Create playground artifact
-        id: create-playground-artifact-step
-        uses: actions/upload-artifact@v4
+      - name: Upload plugin zip artifact
+        uses: actions/upload-artifact@v7
         with:
-          name: remote-data-blocks-${{ github.event.pull_request.number }}
-          path: unzips/remote-data-blocks
+          name: remote-data-blocks-pr${{ github.event.pull_request.number }}-${{ github.sha }}
+          path: remote-data-blocks.zip
           retention-days: 7
           if-no-files-found: 'error'
           overwrite: true
 
-      - name: Comment on PR with WordPress Playground details
-        uses: actions/github-script@v7
+      - name: Save PR metadata
+        run: |
+          echo "${{ github.event.pull_request.number }}" > pr_number.txt
+          echo "${{ github.sha }}" > commit_sha.txt
+
+      - name: Upload PR metadata
+        uses: actions/upload-artifact@v7
         with:
-          script: |
-            const { run } = require('./.github/workflows/scripts/generate-playground-blueprint');
-            	run({ github, context });
+          name: pr-metadata
+          path: |
+            pr_number.txt
+            commit_sha.txt
+          retention-days: 1
