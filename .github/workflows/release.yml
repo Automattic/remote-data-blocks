@@ -4,6 +4,10 @@ on:
     branches:
       - trunk
 
+permissions:
+  actions: write
+  contents: write
+
 jobs:
   check_and_release:
     runs-on: ubuntu-latest
@@ -15,20 +19,27 @@ jobs:
       - name: Check for version change
         id: version_check
         run: |
-          OLD_VERSION=$(git show HEAD^:remote-data-blocks.php | sed -n 's/.*Version: *//p' | tr -d '[:space:]')
-          NEW_VERSION=$(git show HEAD:remote-data-blocks.php | sed -n 's/.*Version: *//p' | tr -d '[:space:]')
-          if [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
-            echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-            echo "Version changed from $OLD_VERSION to $NEW_VERSION"
-          else
+          OLD_VERSION=$(git show HEAD^:remote-data-blocks.php 2>/dev/null | sed -n 's/.*Version: *//p' | head -n1 | tr -d '[:space:]')
+          NEW_VERSION=$(git show HEAD:remote-data-blocks.php | sed -n 's/.*Version: *//p' | head -n1 | tr -d '[:space:]')
+          if [ -z "$OLD_VERSION" ] || [ "$OLD_VERSION" = "$NEW_VERSION" ]; then
             echo "No version change detected"
+            exit 0
           fi
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "Version changed from $OLD_VERSION to $NEW_VERSION"
 
       - name: Setup PHP
         if: steps.version_check.outputs.new_version
         uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # 2.37.1
         with:
           php-version: '8.1'
+
+      - name: Setup Node
+        if: steps.version_check.outputs.new_version
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
 
       - name: Build plugin zip
         if: steps.version_check.outputs.new_version
@@ -41,3 +52,9 @@ jobs:
           tag_name: v${{ steps.version_check.outputs.new_version }}
           files: remote-data-blocks.zip
           generate_release_notes: true
+
+      - name: Deploy to WordPress.org
+        if: steps.version_check.outputs.new_version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref trunk
