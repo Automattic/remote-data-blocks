@@ -100,9 +100,7 @@ describe( 'ItemList', () => {
 		render( <ItemListComponent { ...defaultProps } onSelect={ onSelect } /> );
 
 		await user.click(
-			within( screen.getByRole( 'row', { name: /Poppy/i } ) ).getByRole( 'button', {
-				name: 'Choose',
-			} )
+			within( screen.getByRole( 'row', { name: /Poppy/i } ) ).getByRole( 'button' )
 		);
 
 		// Verify onSelect was called with the correct item

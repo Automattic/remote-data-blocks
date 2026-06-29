@@ -2,7 +2,7 @@ import { BlockControls } from '@wordpress/block-editor';
 import { ToolbarDropdownMenu, ToolbarGroup } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { RichTextFormat, insertObject, WPFormatEditProps } from '@wordpress/rich-text';
+import { insertObject, WPFormatEditProps } from '@wordpress/rich-text';
 
 import { InlineBindingSelectExisting } from '@/block-editor/format-types/inline-binding/components/InlineBindingSelectExisting';
 import { InlineBindingSelectFieldPopover } from '@/block-editor/format-types/inline-binding/components/InlineBindingSelectFieldPopover';
@@ -48,7 +48,7 @@ export function InlineBindingButton( props: WPFormatEditProps ) {
 			type: data?.type,
 		};
 
-		const format: RichTextFormat = {
+		const format = {
 			attributes: {
 				...activeObjectAttributes,
 				'data-query': data ? JSON.stringify( serializedData ) : '',
@@ -63,9 +63,9 @@ export function InlineBindingButton( props: WPFormatEditProps ) {
 						...value,
 						replacements: value.replacements.map( ( replacement, index ) =>
 							index === value.start ? format : replacement
-						),
+						) as typeof value.replacements,
 				  }
-				: insertObject( value, format )
+				: insertObject( value, format as never )
 		);
 	};
 

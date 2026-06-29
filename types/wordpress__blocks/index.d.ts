@@ -3,7 +3,8 @@ import type {
 	BlockEditorStoreDescriptor,
 	BlockEditorStoreSelectors,
 } from '@wordpress/block-editor';
-import type { Block, BlockEditProps as BlockEditPropsOriginal } from '@wordpress/blocks';
+import type { StoreDescriptor } from '@wordpress/data';
+import type { Block, BlockType } from '@wordpress/blocks';
 
 /**
  * The types provided by @wordpress/blocks are incomplete.
@@ -32,13 +33,19 @@ interface BaseBinding {
 // Use a Partial<Block> to allow all attributes to be optional.
 // https://github.com/WordPress/gutenberg/issues/53605
 type ServerSideBlockConfiguration< T extends Record< string, any > = {} > = Partial<
-	Block< T >
+	Omit< BlockType< T >, 'icon' | 'variations' >
 > & {
-	variations?: Array< BlockVariation< T > >;
+	icon?: any;
+	variations?: Array< any >;
 };
 
 declare module '@wordpress/blocks' {
-	interface BlockEditProps< T extends Record< string, any > > extends BlockEditPropsOriginal< T > {
+	export type BlockAttributes = Record< string, unknown >;
+	export type BlockInstance< T extends Record< string, unknown > = Record< string, unknown > > =
+		Block< T >;
+	export type Template = [ string, Record< string, unknown >?, Template[]? ];
+
+	interface BlockEditProps< T extends Record< string, any > = Record< string, any > > {
 		name: string;
 	}
 

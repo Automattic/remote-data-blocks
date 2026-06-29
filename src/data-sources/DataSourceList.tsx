@@ -165,7 +165,7 @@ const DataSourceList = () => {
 		return true;
 	};
 
-	const actions: Action< DataSourceConfig >[] = [
+	const actions: Array< Action< DataSourceConfig > & { isDestructive?: boolean } > = [
 		{
 			id: 'edit',
 			label: __( 'Edit', 'remote-data-blocks' ),

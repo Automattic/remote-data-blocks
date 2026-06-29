@@ -1,8 +1,9 @@
 import { FormTokenField } from '@wordpress/components';
-import { FormTokenFieldProps } from '@wordpress/components/build-types/form-token-field/types';
 import { useEffect, useRef, useState } from '@wordpress/element';
 
-type CustomFormFieldTokenProps = FormTokenFieldProps & {
+import type { ComponentProps } from 'react';
+
+type CustomFormFieldTokenProps = ComponentProps< typeof FormTokenField > & {
 	customHelpText?: string | null;
 };
 

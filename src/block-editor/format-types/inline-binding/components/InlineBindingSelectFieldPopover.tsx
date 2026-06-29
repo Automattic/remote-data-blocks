@@ -24,7 +24,7 @@ interface InlineBindingSelectFieldPopoverProps {
 export function InlineBindingSelectFieldPopover( props: InlineBindingSelectFieldPopoverProps ) {
 	const popoverAnchor = useAnchor( {
 		editableContentElement: props.contentRef.current,
-		settings: props.formatTypeSettings,
+		settings: props.formatTypeSettings as never,
 	} );
 	const { remoteData, selectedField, type } = props.fieldSelection;
 

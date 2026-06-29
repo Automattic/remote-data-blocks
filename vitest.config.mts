@@ -3,9 +3,13 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig( {
 	resolve: {
-		alias: {
-			'@': path.resolve( __dirname, 'src/' ),
-		},
+		alias: [
+			{ find: '@', replacement: path.resolve( __dirname, 'src/' ) },
+			{
+				find: /^@wordpress\/blocks$/,
+				replacement: path.resolve( __dirname, 'node_modules/@wordpress/blocks/build/index.cjs' ),
+			},
+		],
 	},
 	test: {
 		environment: 'happy-dom',

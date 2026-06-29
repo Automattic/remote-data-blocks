@@ -40,17 +40,17 @@ interface RemoteData {
 	results: RemoteDataApiResult[];
 }
 
-interface RemoteDataBlockAttributes {
+interface RemoteDataBlockAttributes extends Record< string, unknown > {
 	remoteData?: RemoteData;
 }
 
-interface RemoteDataNoResultsBlockAttributes {
+interface RemoteDataNoResultsBlockAttributes extends Record< string, unknown > {
 	mode?: 'error' | 'empty';
 }
 
-interface RemoteDataPaginationBlockAttributes {}
+interface RemoteDataPaginationBlockAttributes extends Record< string, unknown > {}
 
-interface RemoteDataTemplateBlockAttributes {}
+interface RemoteDataTemplateBlockAttributes extends Record< string, unknown > {}
 
 interface FieldSelection {
 	action: 'add_field_shortcode' | 'update_field_shortcode' | 'reset_field_shortcode';
@@ -82,7 +82,7 @@ interface StringSeriablizable {
 	toString(): string;
 }
 
-interface RemoteDataInnerBlockAttributes {
+interface RemoteDataInnerBlockAttributes extends Record< string, unknown > {
 	alt?: string | StringSeriablizable;
 	className?: string;
 	content?: string | StringSeriablizable;

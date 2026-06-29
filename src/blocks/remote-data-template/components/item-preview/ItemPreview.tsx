@@ -1,6 +1,7 @@
 import { __experimentalUseBlockPreview as useBlockPreview } from '@wordpress/block-editor';
-import { BlockInstance } from '@wordpress/blocks';
 import { memo } from '@wordpress/element';
+
+import type { BlockInstance } from '@wordpress/blocks';
 
 interface ItemPreviewProps {
 	blocks: BlockInstance[];

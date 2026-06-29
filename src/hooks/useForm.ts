@@ -88,7 +88,7 @@ export const useForm = < T extends StateObject >( {
 	submitValidationFn,
 }: UseFormProps< T > ): UseForm< T > => {
 	const stateKeys = Object.keys( initialValues ) ?? [];
-	const [ state, dispatch ] = useReducer< typeof reducer< T > >( reducer, initialValues );
+	const [ state, dispatch ] = useReducer( reducer< T >, initialValues );
 	const [ touched, setTouched ] = useState(
 		constructObjectWithValues< boolean >( stateKeys, false )
 	);

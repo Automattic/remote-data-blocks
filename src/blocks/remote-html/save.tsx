@@ -1,7 +1,7 @@
 import { BlockSaveProps } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 
-interface RemoteDataHTMLSaveAttributes {
+interface RemoteDataHTMLSaveAttributes extends Record< string, unknown > {
 	content?: string | StringSeriablizable;
 }
 

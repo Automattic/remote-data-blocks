@@ -3,7 +3,6 @@ import {
 	store as blockEditorStore,
 	useBlockEditContext,
 } from '@wordpress/block-editor';
-import { BlockInstance } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { Fragment, useState } from '@wordpress/element';
 
@@ -12,6 +11,7 @@ import { LoopTemplateInnerBlocks } from '@/blocks/remote-data-template/component
 import { STORE_NAME as remoteDataBlocksStore } from '@/config/constants';
 
 import type { ActionCreators } from '@/store';
+import type { BlockInstance } from '@wordpress/blocks';
 
 interface LoopTemplateProps {
 	getInnerBlocks: (

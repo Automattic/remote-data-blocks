@@ -1,9 +1,10 @@
 import { Button, Modal } from '@wordpress/components';
-import { ModalProps } from '@wordpress/components/build-types/modal/types';
 
 import { __ } from '@/utils/i18n';
 
-export type BaseModalProps = Omit< ModalProps, 'onRequestClose' > & {
+import type { ComponentProps } from 'react';
+
+export type BaseModalProps = Omit< ComponentProps< typeof Modal >, 'onRequestClose' > & {
 	children: JSX.Element;
 	headerActions?: JSX.Element;
 	headerImage?: string;
