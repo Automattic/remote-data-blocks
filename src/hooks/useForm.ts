@@ -83,7 +83,7 @@ const reducer = < T >( state: Partial< T >, action: FormAction< T > ): Partial< 
 
 export const useForm = < T extends StateObject >( {
 	initialValues,
-	validationRules = <ValidationRules< T >>{},
+	validationRules = < ValidationRules< T > >{},
 	submit,
 	submitValidationFn,
 }: UseFormProps< T > ): UseForm< T > => {
