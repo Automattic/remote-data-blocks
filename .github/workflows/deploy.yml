@@ -4,6 +4,13 @@ on:
     types: [published, released]
   # Allow manual triggering of the workflow.
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Plugin version to deploy, without the v prefix.'
+        required: true
+      ref:
+        description: 'Git ref to build and deploy.'
+        required: true
 
 jobs:
   release:
@@ -13,6 +20,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+
+      - name: Determine deploy version
+        run: |
+          VERSION="${INPUT_VERSION:-${GITHUB_REF_NAME#v}}"
+          echo "DEPLOY_VERSION=${VERSION}" >> "$GITHUB_ENV"
+        env:
+          INPUT_VERSION: ${{ github.event.inputs.version }}
 
       - name: Build
         run: |
@@ -30,3 +46,4 @@ jobs:
           SLUG: remote-data-blocks
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          VERSION: ${{ env.DEPLOY_VERSION }}
