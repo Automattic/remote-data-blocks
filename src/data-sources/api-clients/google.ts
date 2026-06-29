@@ -100,7 +100,7 @@ export class GoogleApi {
 			sheets.map( sheet => this.getSheetFields( spreadsheetId, sheet.name ) )
 		);
 
-		return new Map( sheets.map( ( sheet, index ) => [ sheet.name, fields.at( index ) ?? [] ] ) );
+		return new Map( sheets.map( ( sheet, index ) => [ sheet.name, fields[ index ] ?? [] ] ) );
 	}
 
 	/**
