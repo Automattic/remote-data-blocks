@@ -25,6 +25,19 @@ function register_block_pattern( string $_name, array $_options ): void {
 	// Do nothing
 }
 
+function register_block_pattern_category( string $_name, array $_options ): void {
+	// Do nothing
+}
+
+function register_block_type( string $_block_path, array $_options = [] ): object {
+	return (object) [
+		'editor_script_handles' => [ 'remote-data-blocks-container-editor-script' ],
+		'name' => $_options['name'] ?? 'remote-data-blocks/container',
+		'supports' => $_options['supports'] ?? [],
+		'title' => $_options['title'] ?? 'Remote Data Container',
+	];
+}
+
 function is_multisite(): void {
 	// Do nothing
 }

@@ -105,6 +105,9 @@ class BlockRegistration {
 			'settings' => [
 				'category' => self::$block_category['slug'],
 				'icon' => $config['icon'] ?? 'cloud',
+				'supports' => [
+					'align' => true,
+				],
 				'title' => $config['title'],
 			],
 		];

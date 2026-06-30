@@ -44,6 +44,9 @@ interface BlockConfig {
 		category: string;
 		description?: string;
 		icon?: ReactElement | IconType | ComponentType;
+		supports?: {
+			align?: boolean | Array< 'left' | 'center' | 'right' | 'wide' | 'full' >;
+		};
 		title: string;
 	};
 }
