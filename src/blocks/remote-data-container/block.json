@@ -11,6 +11,7 @@
     "remote-data-blocks/remoteData": "remoteData"
   },
   "supports": {
+    "align": true,
     "background": {
       "backgroundImage": true,
       "backgroundSize": true

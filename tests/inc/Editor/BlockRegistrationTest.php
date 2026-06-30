@@ -382,6 +382,47 @@ class BlockRegistrationTest extends TestCase {
 		$this->assertArrayHasKey( 'selectors', $block_config );
 	}
 
+	public function test_register_block_configuration_includes_alignment_support(): void {
+		$test_query_runner = $this->get_query_runner_with_response( [] );
+
+		$test_data_source = HttpDataSource::from_array( [
+			'__version' => 1,
+			'display_name' => 'Test API',
+			'endpoint' => 'https://example.com/test-api',
+		] );
+
+		$test_query = HttpQuery::from_array( [
+			'data_source' => $test_data_source,
+			'query_runner' => $test_query_runner,
+			'output_schema' => [
+				'is_collection' => false,
+				'type' => [
+					'title' => [
+						'name' => 'Title',
+						'path' => '$.title',
+						'type' => 'string',
+					],
+				],
+			],
+		] );
+
+		$registration_result = register_remote_data_block( [
+			'title' => 'Alignable Test Block',
+			'name' => 'alignable-test-block',
+			'render_query' => [
+				'query' => $test_query,
+			],
+		] );
+
+		$this->assertTrue( $registration_result );
+
+		[ $block_config ] = BlockRegistration::register_block_configuration(
+			ConfigStore::get_block_configuration( 'remote-data-blocks/alignable-test-block' )
+		);
+
+		$this->assertTrue( $block_config['settings']['supports']['align'] );
+	}
+
 	/**
 	 * Create a mock query runner for testing.
 	 *
