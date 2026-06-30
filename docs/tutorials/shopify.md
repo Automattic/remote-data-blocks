@@ -4,16 +4,17 @@ This tutorial will walk you through connecting a [Shopify](https://www.shopify.c
 
 ## Shopify API Access
 
-To use the Shopify data source, you need to have an access token. You can create one by following these steps:
+To use the Shopify data source, you need a Storefront API access token for the store you want to connect. Remote Data Blocks queries Shopify's Storefront API, so the token must include the `unauthenticated_read_product_listings` scope. This allows Remote Data Blocks to read products and collections without requesting broader Admin API permissions.
 
-1. Login to your Shopify admin account.
-2. Click "Apps" in the left sidebar.
-3. Click "Apps and sales channels" in the dropdown menu.
-4. Click "Develop apps".
-5. Click "Create an app".
-6. Give the app a name and click "Create app".
-7. Give the app `unauthenticated_read_product_listings` permissions and click "Install".
-8. Copy the access token from the "API Credentials" section.
+For new stores, follow Shopify's current [Storefront API getting started guide](https://shopify.dev/docs/storefronts/headless/building-with-the-storefront-api/getting-started):
+
+1. Log in to your Shopify admin account.
+2. Install the Headless sales channel.
+3. Create a storefront to generate Storefront API access tokens.
+4. Edit the storefront's Storefront API permissions and enable product listing access. In Shopify API scope terms, this is `unauthenticated_read_product_listings`.
+5. Copy the private Storefront API access token.
+
+If you are using a custom app created in Shopify's Dev Dashboard after January 1, 2026, follow Shopify's [Dev Dashboard access token guide](https://shopify.dev/docs/apps/build/dev-dashboard/get-api-access-tokens) to create and install the app, request the `unauthenticated_read_product_listings` Storefront API scope, and exchange your app credentials for an access token. Use that token with Shopify's [`storefrontAccessTokenCreate` mutation](https://shopify.dev/docs/api/admin-graphql/latest/mutations/storefrontAccessTokenCreate) to create the Storefront API access token for Remote Data Blocks. Do not paste the short-lived Admin API access token into Remote Data Blocks. Existing admin-created custom apps can continue using their existing Storefront API access tokens.
 
 ## Create the data source
 
