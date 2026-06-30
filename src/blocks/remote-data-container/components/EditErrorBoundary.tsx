@@ -2,9 +2,11 @@ import { Component } from '@wordpress/element';
 
 import { PlaceholderError } from './placeholders/PlaceholderError';
 
+type ComponentRenderResult = ReturnType< Component[ 'render' ] >;
+
 interface EditErrorBoundaryProps {
 	blockTitle: string;
-	children: React.ReactNode;
+	children: ComponentRenderResult;
 }
 
 interface EditErrorBoundaryState {
@@ -18,7 +20,7 @@ export class EditErrorBoundary extends Component< EditErrorBoundaryProps, EditEr
 		return { error };
 	}
 
-	public render(): React.ReactNode {
+	public render(): ComponentRenderResult {
 		if ( this.state.error ) {
 			return (
 				<PlaceholderError
