@@ -4,6 +4,7 @@ namespace RemoteDataBlocks\ExampleApi\Queries;
 
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\ExampleApi\Data\ExampleApiData;
+use WP_Error;
 
 defined( 'ABSPATH' ) || exit();
 
@@ -17,17 +18,29 @@ defined( 'ABSPATH' ) || exit();
  *
  */
 class ExampleApiQueryRunner extends QueryRunner {
-	protected function get_raw_response_data( array $request_details, array $input_variables ): array {
+	protected function get_raw_response_data( array $request_details, array $input_variables ): array|WP_Error {
 		if ( isset( $input_variables['record_id'] ) ) {
+			$response_data = ExampleApiData::get_item( $input_variables['record_id'] );
+			if ( is_wp_error( $response_data ) ) {
+				return $response_data;
+			}
+
 			return [
+				'input_variables' => $input_variables,
 				'metadata' => [],
-				'response_data' => ExampleApiData::get_item( $input_variables['record_id'] ),
+				'response_data' => $response_data,
 			];
 		}
 
+		$response_data = ExampleApiData::get_items();
+		if ( is_wp_error( $response_data ) ) {
+			return $response_data;
+		}
+
 		return [
+			'input_variables' => $input_variables,
 			'metadata' => [],
-			'response_data' => ExampleApiData::get_items(),
+			'response_data' => $response_data,
 		];
 	}
 }

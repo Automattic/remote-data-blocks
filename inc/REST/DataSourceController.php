@@ -259,23 +259,60 @@ class DataSourceController extends WP_REST_Controller {
 
 	// These all require manage_options for now, but we can adjust as needed
 
-	public function get_item_permissions_check( mixed $request ): bool|WP_Error {
-		return current_user_can( 'manage_options' );
+	private function manage_options_permissions_check(): bool|WP_Error {
+		if ( current_user_can( 'manage_options' ) ) {
+			return true;
+		}
+
+		return new WP_Error(
+			'rest_forbidden',
+			__( 'Sorry, you are not allowed to manage Remote Data Blocks data sources.', 'remote-data-blocks' ),
+			[ 'status' => rest_authorization_required_code() ]
+		);
 	}
 
-	public function get_items_permissions_check( mixed $request ): bool|WP_Error {
-		return current_user_can( 'manage_options' );
+	// PHP 8.1 does not support the native `true` return type required by the parent REST controller stubs.
+	// phpcs:disable SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
+
+	/**
+	 * @return true|WP_Error
+	 */
+	public function get_item_permissions_check( mixed $request ) {
+		$result = $this->manage_options_permissions_check();
+		return is_wp_error( $result ) ? $result : true;
 	}
 
-	public function create_item_permissions_check( mixed $request ): bool|WP_Error {
-		return current_user_can( 'manage_options' );
+	/**
+	 * @return true|WP_Error
+	 */
+	public function get_items_permissions_check( mixed $request ) {
+		$result = $this->manage_options_permissions_check();
+		return is_wp_error( $result ) ? $result : true;
 	}
 
-	public function update_item_permissions_check( mixed $request ): bool|WP_Error {
-		return current_user_can( 'manage_options' );
+	/**
+	 * @return true|WP_Error
+	 */
+	public function create_item_permissions_check( mixed $request ) {
+		$result = $this->manage_options_permissions_check();
+		return is_wp_error( $result ) ? $result : true;
 	}
 
-	public function delete_item_permissions_check( mixed $request ): bool|WP_Error {
-		return current_user_can( 'manage_options' );
+	/**
+	 * @return true|WP_Error
+	 */
+	public function update_item_permissions_check( mixed $request ) {
+		$result = $this->manage_options_permissions_check();
+		return is_wp_error( $result ) ? $result : true;
 	}
+
+	/**
+	 * @return true|WP_Error
+	 */
+	public function delete_item_permissions_check( mixed $request ) {
+		$result = $this->manage_options_permissions_check();
+		return is_wp_error( $result ) ? $result : true;
+	}
+
+	// phpcs:enable SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
 }

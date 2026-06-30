@@ -53,6 +53,10 @@ class ConfigRegistry {
 		}
 
 		$display_query = self::inflate_query( $block_config[ self::RENDER_QUERY_KEY ]['query'] );
+		if ( is_wp_error( $display_query ) ) {
+			return $display_query;
+		}
+
 		$input_schema = $display_query->get_input_schema();
 		$output_schema = $display_query->get_output_schema();
 		$is_collection = true === ( $output_schema['is_collection'] ?? false );
@@ -93,6 +97,10 @@ class ConfigRegistry {
 		// selecting data for display by the block.
 		foreach ( $block_config[ self::SELECTION_QUERIES_KEY ] ?? [] as $selection_query ) {
 			$from_query = self::inflate_query( $selection_query['query'] );
+			if ( is_wp_error( $from_query ) ) {
+				return $from_query;
+			}
+
 			$from_query_type = $selection_query['type'];
 			$to_query = $display_query;
 
@@ -155,6 +163,7 @@ class ConfigRegistry {
 		$pattern_name = 'remote-data-blocks/' . sanitize_title_with_dashes( $pattern_title, '', 'save' );
 
 		// Create the pattern properties, allowing overrides via pattern options.
+		/** @var array<string, mixed> $pattern_properties */
 		$pattern_properties = [
 			'blockTypes' => [ $block_name ],
 			'categories' => [ 'remote-data-blocks' ],
@@ -176,7 +185,7 @@ class ConfigRegistry {
 		return new WP_Error( 'block_registration_error', $error_message );
 	}
 
-	private static function inflate_query( array|QueryInterface $config ): QueryInterface {
+	private static function inflate_query( array|QueryInterface $config ): QueryInterface|WP_Error {
 		if ( is_array( $config ) ) {
 			return HttpQuery::from_array( $config );
 		}

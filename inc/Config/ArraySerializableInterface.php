@@ -6,6 +6,7 @@ use RemoteDataBlocks\Validation\ValidatorInterface;
 use WP_Error;
 
 interface ArraySerializableInterface {
+	/** @psalm-suppress AmbiguousConstantInheritance */
 	final public const CLASS_REF_ATTRIBUTE = '__class';
 
 	/**

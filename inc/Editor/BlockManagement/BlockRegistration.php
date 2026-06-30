@@ -12,7 +12,7 @@ use function register_block_type;
 
 class BlockRegistration {
 	/**
-	 * @var array<string, string>
+	 * @var array{icon: string|null, slug: string, title: string}
 	 */
 	public static array $block_category = [
 		'icon' => null,

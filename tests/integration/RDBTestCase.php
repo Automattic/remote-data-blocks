@@ -149,6 +149,7 @@ class RDBTestCase extends WP_UnitTestCase {
 	protected function assertDomIdHasTextContent( DOMDocument $dom, string $html_id, string $expected_content ): void {
 		$id_nodes = $this->get_dom_element_by_html_id( $dom, $html_id );
 
+		$this->assertNotFalse( $id_nodes );
 		$this->assertCount( 1, $id_nodes, sprintf( "Should be 1 matching node with HTML ID '%s' but %d found.", $html_id, count( $id_nodes ) ) );
 		$this->assertEquals( $expected_content, $id_nodes[0]->textContent, sprintf( "Expected '%s' in node with HTML ID '%s', but found '%s' instead.", $expected_content, $html_id, $id_nodes[0]->textContent ) );
 	}
@@ -156,6 +157,7 @@ class RDBTestCase extends WP_UnitTestCase {
 	protected function assertDomIdHasHtmlContent( DOMDocument $dom, string $html_id, string $expected_content ): void {
 		$id_nodes = $this->get_dom_element_by_html_id( $dom, $html_id );
 
+		$this->assertNotFalse( $id_nodes );
 		$this->assertCount( 1, $id_nodes, sprintf( "Should be 1 matching node with HTML ID '%s' but %d found.", $html_id, count( $id_nodes ) ) );
 
 		// DOM nodes don't have an innerHTML, so build one from child nodes

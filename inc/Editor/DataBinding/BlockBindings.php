@@ -125,6 +125,10 @@ class BlockBindings {
 		return $block_type_args;
 	}
 
+	/**
+	 * @param array<string, mixed> $block_context Remote data block context.
+	 * @return array<string, mixed>|WP_Error
+	 */
 	private static function execute_queries( array $block_context ): array|WP_Error {
 		// Load the attribute data and validate it.
 		$remote_data = RemoteDataBlockAttribute::from_array( $block_context );
@@ -199,9 +203,21 @@ class BlockBindings {
 		}
 	}
 
-	private static function execute_queries_with_cache( array $block_context, array $source_args = [] ): array|WP_Error {
+	/**
+	 * @param array<string, mixed> $block_context Remote data block context.
+	 * @param array<string, mixed> $source_args Binding source args.
+	 * @return array{config_id: string, response: array<string, mixed>|WP_Error}
+	 */
+	private static function execute_queries_with_cache( array $block_context, array $source_args = [] ): array {
 		// Migrate the config early so that we can access and use values without defensive checks.
 		$block_context = RemoteDataBlockAttribute::migrate_config( $block_context, $source_args );
+
+		if ( is_wp_error( $block_context ) ) {
+			return [
+				'config_id' => '',
+				'response' => $block_context,
+			];
+		}
 
 		$config_id = $block_context['configId'];
 
@@ -472,16 +488,18 @@ class BlockBindings {
 		}
 
 		// Create an updated block with the new inner blocks and content.
-		$updated_block = new WP_Block( $block->parsed_block );
+		/** @var array{attrs?: array<array-key, mixed>, blockName?: null|string, innerBlocks?: array<array-key, mixed>, innerContent?: array<array-key, mixed>, innerHTML?: string} $parsed_block */
+		$parsed_block = $block->parsed_block;
+		$updated_block = new WP_Block( $parsed_block );
 
 		// Render the updated block but set dynamic to false so that we don't
 		// have recursion. Save the rendered output in a property on the
 		// parsed block, which will not be persisted. This is needed because
 		// our container block can trigger a non-dynamic re-render. This helps
 		// avoid descendant dynamic blocks from being rendered twice.
-		$block->parsed_block[ self::$prerendered_content_key ] = $updated_block->render( [ 'dynamic' => false ] );
+		$block->parsed_block[ self::$prerendered_content_key ] = strval( $updated_block->render( [ 'dynamic' => false ] ) );
 
-		return $block->parsed_block[ self::$prerendered_content_key ];
+		return strval( $block->parsed_block[ self::$prerendered_content_key ] ?? '' );
 	}
 
 	/**

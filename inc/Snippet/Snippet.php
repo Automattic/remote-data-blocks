@@ -59,7 +59,7 @@ class Snippet implements JsonSerializable {
 		return array_map( [ __CLASS__, 'strip_template_comments' ], $snippets );
 	}
 
-	protected static function strip_template_comments( Snippet $snippet ): Snippet {
+	public static function strip_template_comments( Snippet $snippet ): Snippet {
 		// Match PHPDoc blocks that contain @template tags and any preceding blank lines
 		$updated_code = preg_replace(
 			'/\n*\/\*\*\s*\n\s*\*\s*@template-.*?\*\/\n*/s',

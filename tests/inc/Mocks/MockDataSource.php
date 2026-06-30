@@ -29,6 +29,9 @@ class MockDataSource extends HttpDataSource {
 
 	/**
 	 * Override the migrate_config method to adjust the config for testing.
+	 *
+	 * @param array<string, mixed> $config The config to migrate.
+	 * @return array<string, mixed>|WP_Error
 	 */
 	public static function migrate_config( array $config ): array|WP_Error {
 		if ( ! isset( $config['request_headers'] ) ) {

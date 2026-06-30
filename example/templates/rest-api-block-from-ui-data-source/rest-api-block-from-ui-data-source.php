@@ -15,13 +15,17 @@ use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 function register_basic_rest_api_remote_data_block_from_uuid(): void {
 	$api_data_source = HttpDataSource::from_uuid( '{{ UUID of the data source }}' );
 
+	if ( is_wp_error( $api_data_source ) ) {
+		return;
+	}
+
 	// Get item query: Fetch one record by ID.
 	$get_item_query = [
 		'data_source' => $api_data_source,
 		// Provide a callable (closure) to dynamically generate the endpoint using
 		// the base endpoint from the data source and the input variables.
 		'endpoint' => function ( array $input_variables ) use ( $api_data_source ): string {
-			$endpoint = $api_data_source['endpoint'];
+			$endpoint = $api_data_source->get_endpoint();
 			$item_id = $input_variables['id'] ?? '';
 
 			return $endpoint . '/items/' . $item_id;
@@ -69,7 +73,7 @@ function register_basic_rest_api_remote_data_block_from_uuid(): void {
 		// Provide a callable (closure) to dynamically generate the endpoint using
 		// the base endpoint from the data source and the input variables.
 		'endpoint' => function ( array $input_variables ) use ( $api_data_source ): string {
-			$endpoint = $api_data_source['endpoint'] . '/items';
+			$endpoint = $api_data_source->get_endpoint() . '/items';
 
 			$query_params = [];
 

@@ -81,6 +81,8 @@ class DataSourceCrudTest extends TestCase {
 			],
 			'uuid' => '00000000-0000-4000-8000-000000000002',
 		] );
+		$this->assertIsArray( $source1 );
+		$this->assertIsArray( $source2 );
 
 		$all_sources = DataSourceCrud::get_configs();
 		$this->assertCount( 2, $all_sources );
@@ -111,8 +113,10 @@ class DataSourceCrudTest extends TestCase {
 			],
 			'uuid' => wp_generate_uuid4(),
 		] );
+		$this->assertIsArray( $source );
 
 		$retrieved_source = DataSourceCrud::get_config_by_uuid( $source['uuid'] );
+		$this->assertIsArray( $retrieved_source );
 		$this->assertArrayHasKey( '__metadata', $retrieved_source );
 		$this->assertArrayHasKey( 'created_at', $retrieved_source['__metadata'] );
 		$this->assertArrayHasKey( 'updated_at', $retrieved_source['__metadata'] );
@@ -139,6 +143,7 @@ class DataSourceCrudTest extends TestCase {
 			],
 			'uuid' => wp_generate_uuid4(),
 		] );
+		$this->assertIsArray( $source );
 
 		$updated_source = DataSourceCrud::update_config_by_uuid( $source['uuid'], [
 			'access_token' => 'updated_token',
@@ -169,6 +174,7 @@ class DataSourceCrudTest extends TestCase {
 			],
 			'uuid' => wp_generate_uuid4(),
 		] );
+		$this->assertIsArray( $source );
 
 		$result = DataSourceCrud::delete_config_by_uuid( $source['uuid'] );
 		$this->assertTrue( $result );
