@@ -478,9 +478,12 @@ class DataSourceConfigManagerTest extends TestCase {
 		$mock_config_store->shouldReceive( 'get_data_sources_as_array' )
 			->andReturn( [] );
 
-		$result = DataSourceConfigManager::get_all( [
+		/** @var array<string, mixed> $filters */
+		$filters = [
 			'display_name' => 'Test Airtable',
-		] );
+		];
+
+		$result = DataSourceConfigManager::get_all( $filters );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
 		$this->assertSame( 'invalid_filter', $result->get_error_code() );
@@ -501,10 +504,13 @@ class DataSourceConfigManagerTest extends TestCase {
 		$mock_config_store->shouldReceive( 'get_data_sources_as_array' )
 			->andReturn( [] );
 
-		$result = DataSourceConfigManager::get_all( [
+		/** @var array<string, mixed> $filters */
+		$filters = [
 			'service' => self::AIRTABLE_SERVICE,
 			'display_name' => 'Test Airtable',
-		] );
+		];
+
+		$result = DataSourceConfigManager::get_all( $filters );
 
 		$this->assertInstanceOf( WP_Error::class, $result );
 		$this->assertSame( 'invalid_filter', $result->get_error_code() );

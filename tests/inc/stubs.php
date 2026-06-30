@@ -118,8 +118,8 @@ function get_option( string $option, mixed $default = false ): mixed {
 	return MockWordPressFunctions::get_option( $option, $default );
 }
 
-function get_page_by_path( string $path ): string {
-	return $path ?? 'fake WP_Post';
+function get_page_by_path( string $path ): ?array {
+	return [ 'post_name' => $path ];
 }
 
 function get_query_var( string $var_name, mixed $default_value = null ): ?string {
@@ -130,8 +130,8 @@ function wp_generate_uuid4(): string {
 	return '00000000-0000-4000-8000-000000000000';
 }
 
-function is_email( mixed $email ): bool {
-	return filter_var( $email, FILTER_VALIDATE_EMAIL ) !== false;
+function is_email( mixed $email ): string|false {
+	return false === filter_var( $email, FILTER_VALIDATE_EMAIL ) ? false : strval( $email );
 }
 
 function wp_is_uuid( mixed $uuid, ?int $version = null ): bool {
@@ -164,5 +164,9 @@ class WP_Error {
 
 	public function get_error_message(): string {
 		return $this->message;
+	}
+
+	public function get_error_messages(): array {
+		return [ $this->message ];
 	}
 }

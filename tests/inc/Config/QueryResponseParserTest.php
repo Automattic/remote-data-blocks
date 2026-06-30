@@ -47,7 +47,7 @@ final class QueryResponseParserTest extends TestCase {
 
 		$result = $this->parser->parse( $data, $schema );
 
-		$this->assertIsArray( $result );
+		$result = $this->assertCollectionResult( $result );
 		$this->assertCount( 2, $result );
 		$this->assertArrayHasKey( 'result', $result[0] );
 		$this->assertArrayHasKey( 'uuid', $result[0] );
@@ -79,7 +79,7 @@ final class QueryResponseParserTest extends TestCase {
 
 		$result = $this->parser->parse( $data, $schema );
 
-		$this->assertIsArray( $result );
+		$result = $this->assertCollectionResult( $result );
 		$this->assertCount( 1, $result );
 		$this->assertArrayHasKey( 'result', $result[0] );
 		$this->assertArrayHasKey( 'uuid', $result[0] );
@@ -125,7 +125,7 @@ final class QueryResponseParserTest extends TestCase {
 
 		$result = $this->parser->parse( $data, $schema, $raw_response_data );
 
-		$this->assertIsArray( $result );
+		$result = $this->assertCollectionResult( $result );
 		$this->assertCount( 1, $result );
 		$this->assertArrayHasKey( 'result', $result[0] );
 		$this->assertArrayHasKey( 'uuid', $result[0] );
@@ -152,7 +152,7 @@ final class QueryResponseParserTest extends TestCase {
 
 		$result = $this->parser->parse( $data, $schema );
 
-		$this->assertIsArray( $result );
+		$result = $this->assertCollectionResult( $result );
 		$this->assertCount( 1, $result );
 		$this->assertArrayHasKey( 'result', $result[0] );
 		$this->assertArrayHasKey( 'uuid', $result[0] );
@@ -184,7 +184,7 @@ final class QueryResponseParserTest extends TestCase {
 
 		$result = $this->parser->parse( $data, $schema );
 
-		$this->assertIsArray( $result );
+		$result = $this->assertSingleResult( $result );
 		$this->assertArrayHasKey( 'result', $result );
 		$this->assertArrayHasKey( 'uuid', $result );
 		$this->assertEquals( 'Gadget', $result['result']['productName']['value'] );
@@ -249,6 +249,7 @@ final class QueryResponseParserTest extends TestCase {
 
 		$result = $this->parser->parse( $data, $schema );
 
+		$result = $this->assertCollectionResult( $result );
 		$this->assertCount( 2, $result );
 		$this->assertEquals( 'Unknown', $result[0]['result']['itemColor']['value'] );
 		$this->assertEquals( 'Yellow', $result[1]['result']['itemColor']['value'] );
@@ -293,6 +294,7 @@ final class QueryResponseParserTest extends TestCase {
 
 		$result = $this->parser->parse( $data, $schema );
 
+		$result = $this->assertCollectionResult( $result );
 		$this->assertCount( 1, $result );
 
 		$customer_info = $result[0]['result']['customerInfo']['value'];
@@ -301,5 +303,23 @@ final class QueryResponseParserTest extends TestCase {
 		$this->assertArrayHasKey( 'result', $customer_info );
 		$this->assertEquals( 'David', $customer_info['result']['customerName']['value'] );
 		$this->assertEquals( 'david@example.com', $customer_info['result']['customerEmail']['value'] );
+	}
+
+	/**
+	 * @return array<int, array{result: array<string, array{name?: string, type?: string, value: mixed}>, uuid?: string}>
+	 */
+	private function assertCollectionResult( mixed $result ): array {
+		$this->assertIsArray( $result );
+
+		return $result;
+	}
+
+	/**
+	 * @return array{result: array<string, array{name?: string, type?: string, value: mixed}>, uuid?: string}
+	 */
+	private function assertSingleResult( mixed $result ): array {
+		$this->assertIsArray( $result );
+
+		return $result;
 	}
 }

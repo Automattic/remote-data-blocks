@@ -44,7 +44,11 @@ class DataSourceCrud {
 
 				// If the data source is valid, set a transient field with the errors encountered when inflating the config.
 				// We get the errors from the instance, otherwise there'll be an errors field in the errors field in the config.
-				$config['errors'] = is_wp_error( $instance ) ? [ $instance->errors ] : [];
+				if ( $instance instanceof DataSourceInterface ) {
+					$config['errors'] = [];
+				} else {
+					$config['errors'] = [ $instance->get_error_messages() ];
+				}
 
 				// Give back the same config with the errors field set, not the inflated instance.
 				return $config;

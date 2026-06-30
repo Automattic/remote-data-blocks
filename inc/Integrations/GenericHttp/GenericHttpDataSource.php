@@ -31,9 +31,9 @@ class GenericHttpDataSource extends HttpDataSource {
 	public static function get_endpoint_from_service_config( array $service_config ): string {
 		$endpoint = $service_config['endpoint'];
 		$auth_config = $service_config['auth'] ?? null;
-		$auth_type = $auth_config['type'] ?? null;
+		$auth_type = is_array( $auth_config ) ? $auth_config['type'] ?? null : null;
 
-		if ( 'api-key' === $auth_type && 'queryparams' === $auth_config['add_to'] ) {
+		if ( 'api-key' === $auth_type && is_array( $auth_config ) && 'queryparams' === $auth_config['add_to'] ) {
 			return add_query_arg( $auth_config['key'], $auth_config['value'], $endpoint );
 		}
 
@@ -42,7 +42,7 @@ class GenericHttpDataSource extends HttpDataSource {
 
 	public static function get_request_headers_from_service_config( array $service_config ): array {
 		$auth_config = $service_config['auth'] ?? null;
-		$auth_type = $auth_config['type'] ?? null;
+		$auth_type = is_array( $auth_config ) ? $auth_config['type'] ?? null : null;
 
 		switch ( $auth_type ) {
 			case 'bearer':
@@ -52,7 +52,11 @@ class GenericHttpDataSource extends HttpDataSource {
 				return [ 'Authorization' => 'Basic ' . base64_encode( $auth_config['value'] ) ];
 
 			case 'api-key':
-				if ( 'header' === $auth_config['add_to'] ) {
+				if (
+					is_array( $auth_config ) &&
+					'header' === $auth_config['add_to'] &&
+					is_string( $auth_config['key'] )
+				) {
 					return [ $auth_config['key'] => $auth_config['value'] ];
 				}
 		}
@@ -73,13 +77,15 @@ class GenericHttpDataSource extends HttpDataSource {
 	}
 
 	/**
-	 * @inheritDoc
+	 * @param array<string, mixed> $config The data source config.
+	 * @return array<string, mixed>|WP_Error
 	 *
 	 * NOTE: This method uses late static bindings to allow child classes to
 	 * define their own validation schema.
 	 */
 	public static function preprocess_config( array $config ): array|WP_Error {
 		$service_config = $config['service_config'] ?? [];
+		$service_config = is_array( $service_config ) ? $service_config : [];
 		$validator = new Validator( static::get_service_config_schema(), static::class, '$service_config' );
 		$validated = $validator->validate( $service_config );
 

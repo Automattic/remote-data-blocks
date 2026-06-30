@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Tests\Config;
 
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\HttpClient\HttpClient;
@@ -13,7 +14,7 @@ use WP_Error;
 class QueryRunnerTest extends TestCase {
 	private MockDataSource $http_data_source;
 	private MockQuery $query;
-	private HttpClient $http_client;
+	private HttpClient&MockObject $http_client;
 
 	protected function setUp(): void {
 		parent::setUp();

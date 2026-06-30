@@ -42,7 +42,7 @@ class VipBlockDataApi {
 			'attributes' => array_diff_key( $sourced_block['attributes'], [ 'remoteData' => '' ] ),
 		];
 
-		$block_callback = function ( $block ) use ( $block_context ) {
+		$block_callback = function ( array $block ) use ( $block_context ): array {
 			// @TODO: look at this more closely. This is a hack to get around the fact that the block data API
 			// sometimes returns objects for attributes, but the block bindings code expects arrays.
 			if ( is_object( $block['attributes'] ) ) {

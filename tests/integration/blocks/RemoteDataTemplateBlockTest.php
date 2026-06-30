@@ -62,6 +62,7 @@ class RemoteDataTemplateBlockTest extends RDBTestCase {
 		// The content is inside the template block, so it should be rendered for each result.
 		$content_nodes = $this->get_dom_elements_by_html_class( $dom, 'field-content' );
 
+		$this->assertNotFalse( $content_nodes );
 		$this->assertCount( 3, $content_nodes );
 		$this->assertEquals( 'Product 1 details', $content_nodes[0]->textContent );
 		$this->assertEquals( 'Product 2 details', $content_nodes[1]->textContent );

@@ -2,6 +2,7 @@
 
 use RemoteDataBlocks\Integrations\Airtable\AirtableDataSource;
 use RemoteDataBlocks\Integrations\Airtable\AirtableIntegration;
+use RemoteDataBlocks\Config\Query\HttpQuery;
 
 $access_token = '{{ Airtable access token }}'; // Airtable access token ("pat...")
 $base_id = '{{ Airtable base ID }}'; // Airtable base ID ("app...")
@@ -51,19 +52,22 @@ $map_data_source = AirtableDataSource::from_array( [
 	],
 ] );
 
-$get_locations_query = AirtableIntegration::get_list_query( $map_data_source, $table );
-$response = $get_locations_query->execute( [] );
 $coordinates = [];
 
-if ( ! is_wp_error( $response ) ) {
-	$coordinates = array_map( function ( $value ) {
-		$result = $value['result'];
-		return [
-			'name' => $result['name']['value'],
-			'x' => $result['x']['value'],
-			'y' => $result['y']['value'],
-		];
-	}, $response['results'] );
+if ( ! is_wp_error( $map_data_source ) ) {
+	$get_locations_query = HttpQuery::from_array( AirtableIntegration::get_list_query( $map_data_source, $table ) );
+	$response = is_wp_error( $get_locations_query ) ? $get_locations_query : $get_locations_query->execute( [] );
+
+	if ( ! is_wp_error( $response ) ) {
+		$coordinates = array_map( function ( $value ) {
+			$result = $value['result'];
+			return [
+				'name' => $result['name']['value'],
+				'x' => $result['x']['value'],
+				'y' => $result['y']['value'],
+			];
+		}, $response['results'] );
+	}
 }
 
 ?>

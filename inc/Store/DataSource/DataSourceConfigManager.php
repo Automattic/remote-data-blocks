@@ -77,7 +77,7 @@ class DataSourceConfigManager {
 	 *   uuid?: string,
 	 *   service: string,
 	 *   service_config: array<string, mixed>,
-	 *   config_source: string,
+	 *   config_source: 'constant'|'storage',
 	 *   __metadata?: array{
 	 *     created_at: string,
 	 *     updated_at: string
@@ -158,16 +158,7 @@ class DataSourceConfigManager {
 	 * Get a data source by its UUID.
 	 *
 	 * @param string $uuid The UUID of the data source to get.
-	 * @return array{
-	 *   uuid: string,
-	 *   service: string,
-	 *   service_config: array<string, mixed>,
-	 *   config_source: string,
-	 *   __metadata?: array{
-	 *     created_at: string,
-	 *     updated_at: string
-	 *   }
-	 * }|WP_Error
+	 * @return array<string, mixed>|WP_Error
 	 */
 	public static function get( string $uuid ): array|WP_Error {
 		$from_constant = ConstantConfigStore::get_config_by_uuid( $uuid );
@@ -197,16 +188,7 @@ class DataSourceConfigManager {
 	 * Create a new data source.
 	 *
 	 * @param array $config The configuration for the new data source.
-	 * @return array{
-	 *   uuid: string,
-	 *   service: string,
-	 *   service_config: array<string, mixed>,
-	 *   config_source: string,
-	 *   __metadata: array{
-	 *     created_at: string,
-	 *     updated_at: string
-	 *   }
-	 * }|WP_Error
+	 * @return array<string, mixed>|WP_Error
 	 */
 	public static function create( array $config ): array|WP_Error {
 		$result = DataSourceCrud::create_config( $config );
@@ -222,16 +204,7 @@ class DataSourceConfigManager {
 	 *
 	 * @param string $uuid The UUID of the data source to update.
 	 * @param array $config The new configuration for the data source.
-	 * @return array{
-	 *   uuid: string,
-	 *   service: string,
-	 *   service_config: array<string, mixed>,
-	 *   config_source: string,
-	 *   __metadata: array{
-	 *     created_at: string,
-	 *     updated_at: string
-	 *   }
-	 * }|WP_Error
+	 * @return array<string, mixed>|WP_Error
 	 */
 	public static function update( string $uuid, array $config ): array|WP_Error {
 		if (
@@ -260,7 +233,7 @@ class DataSourceConfigManager {
 	 * Delete a data source.
 	 *
 	 * @param string $uuid The UUID of the data source to delete.
-	 * @return true|WP_Error True on success, WP_Error on failure.
+	 * @return bool|WP_Error True on success, false or WP_Error on failure.
 	 */
 	public static function delete( string $uuid ): bool|WP_Error {
 		return DataSourceCrud::delete_config_by_uuid( $uuid );

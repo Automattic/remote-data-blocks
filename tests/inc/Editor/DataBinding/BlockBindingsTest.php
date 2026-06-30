@@ -256,7 +256,7 @@ class BlockBindingsTest extends TestCase {
 		 * Mock the QueryRunner to return a result.
 		 */
 		$mock_qr = new class() extends MockQueryRunner {
-			public function execute( HttpQueryInterface $query, array $input_variables ): array {
+			public function execute( HttpQueryInterface $query, array $input_variables ): array|\WP_Error {
 				$input_variables['test_input_field'] .= ' ' . $input_variables['another_input_field'];
 				return parent::execute( $query, $input_variables );
 			}
@@ -301,7 +301,7 @@ class BlockBindingsTest extends TestCase {
 		 * Mock the QueryRunner to return a result.
 		 */
 		$mock_qr = new class() extends MockQueryRunner {
-			public function execute( HttpQueryInterface $query, array $input_variables ): array {
+			public function execute( HttpQueryInterface $query, array $input_variables ): array|\WP_Error {
 				$input_variables['test_input_field'] .= ' transformed';
 				return parent::execute( $query, $input_variables );
 			}

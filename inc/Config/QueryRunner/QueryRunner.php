@@ -130,9 +130,10 @@ class QueryRunner implements QueryRunnerInterface {
 	 *
 	 * @param array<string, mixed> $request_details The parsed request details for the current request.
 	 * @param array<string, mixed> $input_variables The input variables for the current request.
-	 * @return array{
+	 * @return WP_Error|array{
+	 *   input_variables: array<string, mixed>,
 	 *   metadata:      array<string, string|int|null>,
-	 *   response_data: string|array|object|null|WP_Error,
+	 *   response_data: string|array|object|null,
 	 * }
 	 */
 	protected function get_raw_response_data( array $request_details, array $input_variables ): array|WP_Error {
@@ -166,13 +167,13 @@ class QueryRunner implements QueryRunnerInterface {
 	 * inline bindings.
 	 *
 	 * @param HttpQueryInterface $query The query.
-	 * @param array $raw_response_data  The raw response data from `get_raw_response_data`.
-	 * @param array $query_results      The results of the query.
-	 * @return array array<string, array{
+	 * @param array<string, mixed> $raw_response_data The raw response data from `get_raw_response_data`.
+	 * @param array<int, array<string, mixed>> $query_results The results of the query.
+	 * @return array<string, array{
 	 *   name:  string,
 	 *   type:  string,
 	 *   value: string|int|null,
-	 * }>,
+	 * }>
 	 */
 	protected function get_response_metadata( HttpQueryInterface $query, array $raw_response_data, array $query_results ): array {
 		$age = intval( $raw_response_data['metadata']['age'] ?? 0 );
@@ -265,6 +266,7 @@ class QueryRunner implements QueryRunnerInterface {
 		$parser = new QueryResponseParser();
 		$results = $parser->parse( $response_data, $output_schema, $raw_response_data );
 		$results = $is_collection ? $results : [ $results ];
+		/** @var array<int, array<string, mixed>> $results */
 		$metadata = $this->get_response_metadata( $query, $raw_response_data, $results );
 
 		// Pagination schema defines how to extract pagination data from the response.
@@ -272,7 +274,9 @@ class QueryRunner implements QueryRunnerInterface {
 		$pagination_schema = $query->get_pagination_schema();
 
 		if ( is_array( $pagination_schema ) ) {
-			$pagination_data = $parser->parse( $response_data, [ 'type' => $pagination_schema ] )['result'] ?? null;
+			$parsed_pagination_data = $parser->parse( $response_data, [ 'type' => $pagination_schema ] );
+			/** @var array<string, mixed> $parsed_pagination_data */
+			$pagination_data = $parsed_pagination_data['result'] ?? null;
 
 			if ( is_array( $pagination_data ) ) {
 				$pagination = [];
@@ -293,14 +297,14 @@ class QueryRunner implements QueryRunnerInterface {
 	}
 
 	/**
-	 * @inheritDoc
+	 * @param array<int, array<string, mixed>> $array_of_input_variables An array of input variables for each request.
 	 */
 	public function execute_batch( HttpQueryInterface $query, array $array_of_input_variables ): array|WP_Error {
 		// If the query supports a `id:list` input variable and the query inputs
 		// consist entirely of variables that match that variable type, we can
 		// consolidate the queries into a single request.
 		$input_schema = $query->get_input_schema();
-		$id_list_input = array_filter( $input_schema, function ( string $slug ) use ( $input_schema ): bool {
+		$id_list_input = array_filter( $input_schema, function ( mixed $slug ) use ( $input_schema ): bool {
 			return 'id:list' === $input_schema[ $slug ]['type'];
 		}, ARRAY_FILTER_USE_KEY );
 

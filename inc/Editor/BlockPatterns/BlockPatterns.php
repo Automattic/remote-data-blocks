@@ -21,12 +21,12 @@ class BlockPatterns {
 			return;
 		}
 
-		self::$templates['columns'] = file_get_contents( __DIR__ . '/templates/columns.html', false );
-		self::$templates['empty'] = file_get_contents( __DIR__ . '/templates/empty.html', false );
-		self::$templates['heading'] = file_get_contents( __DIR__ . '/templates/heading.html', false );
-		self::$templates['image'] = file_get_contents( __DIR__ . '/templates/image.html', false );
-		self::$templates['paragraph'] = file_get_contents( __DIR__ . '/templates/paragraph.html', false );
-		self::$templates['html'] = file_get_contents( __DIR__ . '/templates/html.html', false );
+		self::$templates['columns'] = file_get_contents( __DIR__ . '/templates/columns.html', false ) ?: '';
+		self::$templates['empty'] = file_get_contents( __DIR__ . '/templates/empty.html', false ) ?: '';
+		self::$templates['heading'] = file_get_contents( __DIR__ . '/templates/heading.html', false ) ?: '';
+		self::$templates['image'] = file_get_contents( __DIR__ . '/templates/image.html', false ) ?: '';
+		self::$templates['paragraph'] = file_get_contents( __DIR__ . '/templates/paragraph.html', false ) ?: '';
+		self::$templates['html'] = file_get_contents( __DIR__ . '/templates/html.html', false ) ?: '';
 	}
 
 	private static function generate_attribute_bindings( string $block_name, array $bindings ): array {
@@ -178,17 +178,17 @@ class BlockPatterns {
 
 		$pattern_name = sprintf( '%s/pattern', $block_name );
 
-		register_block_pattern(
-			$pattern_name,
-			[
-				'title' => sprintf( '%s Data', $block_title ),
-				'blockTypes' => [ $block_name ],
-				'categories' => [ 'remote-data-blocks' ],
-				'content' => $content,
-				'inserter' => true,
-				'source' => 'plugin',
-			]
-		);
+		/** @var array<string, mixed> $pattern_properties */
+		$pattern_properties = [
+			'title' => sprintf( '%s Data', $block_title ),
+			'blockTypes' => [ $block_name ],
+			'categories' => [ 'remote-data-blocks' ],
+			'content' => $content,
+			'inserter' => true,
+			'source' => 'plugin',
+		];
+
+		register_block_pattern( $pattern_name, $pattern_properties );
 
 		// Register block pattern category.
 		register_block_pattern_category(

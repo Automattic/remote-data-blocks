@@ -20,7 +20,8 @@ class ExampleApiData {
 		}
 
 		if ( is_null( self::$api_data ) ) {
-			self::$api_data = wp_json_file_decode( __DIR__ . '/items.json', [ 'associative' => true ] );
+			$api_data = wp_json_file_decode( __DIR__ . '/items.json', [ 'associative' => true ] );
+			self::$api_data = is_array( $api_data ) ? $api_data : null;
 		}
 
 		// If $api_data is *still* null, it could not be loaded. Store an error so

@@ -50,7 +50,8 @@ class RemoteDataBlockAttribute extends ArraySerializable {
 				'uuid' => wp_generate_uuid4(),
 				'result' => array_reduce(
 					array_keys( $result ),
-					function ( array $carry, string $name ) use ( $result ): array {
+					function ( array $carry, mixed $name ) use ( $result ): array {
+						$name = strval( $name );
 						$carry[ $name ] = [
 							'name' => $name, // We have lost the name, use the slug.
 							'type' => 'unknown', // We have lost the type information.

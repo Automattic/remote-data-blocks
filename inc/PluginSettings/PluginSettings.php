@@ -166,9 +166,9 @@ class PluginSettings {
 		if ( $is_error ) {
 			self::show_settings_error( __( 'Error decrypting remote-data-blocks settings.', 'remote-data-blocks' ) );
 			return [];
-		} else {
-			return json_decode( $decrypted, true );
 		}
+
+		return json_decode( strval( $decrypted ), true );
 	}
 
 	private static function show_settings_error( string $message ): void {
