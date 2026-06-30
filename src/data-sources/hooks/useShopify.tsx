@@ -48,7 +48,7 @@ export const useShopifyShopName = ( store: string, token: string ): ShopifyConne
 				getConnectionMessage(
 					'error',
 					__(
-						'Connection failed. Please verify the myshopify.com domain name and access token“.',
+						'Connection failed. Please verify the myshopify.com domain name and Storefront API access token.',
 						'remote-data-blocks'
 					)
 				)
@@ -65,8 +65,12 @@ export const useShopifyShopName = ( store: string, token: string ): ShopifyConne
 	if ( ! connectionMessage ) {
 		setConnectionMessage(
 			<span>
-				<a href="https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens/generate-app-access-tokens-admin">
-					{ __( 'How do I get my token?', 'remote-data-blocks' ) }
+				{ __(
+					'Use a Storefront API access token with the unauthenticated_read_product_listings scope. ',
+					'remote-data-blocks'
+				) }
+				<a href="https://shopify.dev/docs/storefronts/headless/building-with-the-storefront-api/getting-started">
+					{ __( 'How do I create one?', 'remote-data-blocks' ) }
 				</a>
 			</span>
 		);
