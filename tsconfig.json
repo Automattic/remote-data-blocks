@@ -3,6 +3,7 @@
     "allowJs": true,
     "baseUrl": "./",
     "esModuleInterop": true,
+    "ignoreDeprecations": "6.0",
     "jsx": "react-jsx",
     "module": "es6",
     "moduleResolution": "bundler",
@@ -13,6 +14,7 @@
       "@/*": [ "./src/*" ]
     },
     "resolveJsonModule": true,
+    "rootDir": "./",
     "skipLibCheck": true,
     "strict": true,
     "target": "es6",
@@ -20,7 +22,7 @@
     "sourceMap": true
   },
   "include": [
-    "./types/*.d.ts",
+    "./types/**/*.d.ts",
     "./example/**/*",
     "./src/**/*",
     "./tests/**/*",
