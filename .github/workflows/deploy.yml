@@ -16,6 +16,7 @@ jobs:
   release:
     name: New release to WordPress.org
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     if: ${{ github.event_name != 'release' || !github.event.release.prerelease }}
     steps:
       - name: Checkout
@@ -30,10 +31,12 @@ jobs:
         env:
           INPUT_VERSION: ${{ github.event.inputs.version }}
 
-      - name: Build
+      - name: Build release artifact
         run: |
-          npm install
-          npm run build
+          npm ci
+          npm run plugin-zip
+          mkdir -p /tmp/remote-data-blocks-deploy
+          unzip -q remote-data-blocks.zip -d /tmp/remote-data-blocks-deploy
 
       - name: Install SVN (Subversion)
         run: |
@@ -47,3 +50,4 @@ jobs:
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           VERSION: ${{ env.DEPLOY_VERSION }}
+          BUILD_DIR: /tmp/remote-data-blocks-deploy/remote-data-blocks
