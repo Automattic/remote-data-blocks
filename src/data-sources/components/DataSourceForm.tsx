@@ -16,13 +16,15 @@ import { DataSourceFormActions } from './DataSourceFormActions';
 import { useDataSources } from '../hooks/useDataSources';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
+type ChildrenArrayInput = Parameters< typeof Children.toArray >[ 0 ];
+
 interface DataSourceFormProps {
-	children: React.ReactNode;
+	children: ChildrenArrayInput;
 	onSave: () => Promise< void >;
 }
 
 interface DataSourceFormSetupProps {
-	children: React.ReactNode;
+	children: ChildrenArrayInput;
 	canProceed: boolean;
 	displayName: string;
 	handleOnChange: ( key: string, value: string ) => void;
@@ -52,9 +54,9 @@ const DataSourceFormStep = ( {
 	heading,
 	subheading,
 }: {
-	children: React.ReactNode;
-	heading: React.ReactNode;
-	subheading?: React.ReactNode;
+	children: ChildrenArrayInput;
+	heading: ChildrenArrayInput;
+	subheading?: ChildrenArrayInput;
 } ) => (
 	<>
 		<h2 className="rdb-settings_form-heading">{ heading }</h2>
@@ -330,7 +332,7 @@ const DataSourceFormScope = ( {
 	children,
 	...props
 }: {
-	children: React.ReactNode;
+	children: ChildrenArrayInput;
 	canProceed: boolean;
 } ) => {
 	const { service } = useSettingsContext();
