@@ -46,7 +46,16 @@ h4.remote-data-blocks-new-item-heading {
 remote-data-blocks-inline-field {
 	background-color: #bfdbfe;
 	border-radius: 0.5rem;
+	display: inline-block;
 	padding: 0.15rem 0.35rem;
+	-webkit-user-select: none;
+	user-select: none;
+	vertical-align: baseline;
+}
+
+.rich-text span[data-rich-text-bogus]:has(> remote-data-blocks-inline-field) {
+	-webkit-user-select: none;
+	user-select: none;
 }
 
 .rich-text:focus remote-data-blocks-inline-field[data-rich-text-format-boundary] {
