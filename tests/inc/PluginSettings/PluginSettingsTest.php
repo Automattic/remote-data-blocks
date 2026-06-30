@@ -76,4 +76,11 @@ class PluginSettingsTest extends TestCase {
 			$output
 		);
 	}
+
+	public function testGetAutoRegisterBlocksDefaultUsesFilteredValue(): void {
+		MockWordPressFunctions::add_mock_filter( 'remote_data_blocks_auto_register_blocks_default', false );
+
+		$this->assertFalse( PluginSettings::get_auto_register_blocks_default() );
+		$this->assertSame( [], MockWordPressFunctions::get_done_filter( 'remote_data_blocks_auto_register_blocks_default' ) );
+	}
 }

@@ -7,6 +7,7 @@ import { DataSourceForm } from '@/data-sources/components/DataSourceForm';
 import { FieldsSelection } from '@/data-sources/components/FieldsSelection';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import { ConfigSource } from '@/data-sources/constants';
+import { getAutoRegisterBlocksDefault } from '@/data-sources/defaults';
 import {
 	useAirtableApiBases,
 	useAirtableApiTables,
@@ -44,7 +45,7 @@ export const AirtableSettings = ( {
 	const { state, handleOnChange, validState } = useForm< AirtableServiceConfig >( {
 		initialValues: config?.service_config ?? {
 			__version: SERVICE_CONFIG_VERSION,
-			enable_blocks: true,
+			enable_blocks: getAutoRegisterBlocksDefault(),
 		},
 	} );
 	const { fetchingUserId, userId, userIdError } = useAirtableApiUserId( state.access_token ?? '' );

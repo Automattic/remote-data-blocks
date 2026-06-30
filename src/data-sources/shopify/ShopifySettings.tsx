@@ -6,6 +6,7 @@ import { MOCK_SHOP_STORE } from '@/data-sources/api-clients/shopify';
 import { DataSourceForm } from '@/data-sources/components/DataSourceForm';
 import PasswordInputControl from '@/data-sources/components/PasswordInputControl';
 import { ConfigSource } from '@/data-sources/constants';
+import { getAutoRegisterBlocksDefault } from '@/data-sources/defaults';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
 import { useShopifyShopName } from '@/data-sources/hooks/useShopify';
 import { SettingsComponentProps, ShopifyConfig, ShopifyServiceConfig } from '@/data-sources/types';
@@ -24,7 +25,7 @@ export const ShopifySettings = ( {
 	const { state, handleOnChange, validState } = useForm< ShopifyServiceConfig >( {
 		initialValues: config?.service_config ?? {
 			__version: SERVICE_CONFIG_VERSION,
-			enable_blocks: true,
+			enable_blocks: getAutoRegisterBlocksDefault(),
 		},
 	} );
 

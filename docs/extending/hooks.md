@@ -52,6 +52,14 @@ Filter whether to register the included example API block ("Conference Event") (
 add_filter( 'remote_data_blocks_register_example_block', '__return_false' );
 ```
 
+### remote_data_blocks_auto_register_blocks_default
+
+Filter the default value of the "Auto-register blocks" option when adding a data source in the plugin settings screen (default: `true`).
+
+```php
+add_filter( 'remote_data_blocks_auto_register_blocks_default', '__return_false' );
+```
+
 ### remote_data_blocks_allowed_url_schemes
 
 Filter the allowed URL schemes for this request. Only HTTPS is allowed by default, but it might be useful to relax this restriction in local environments.

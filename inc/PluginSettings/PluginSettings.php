@@ -69,9 +69,20 @@ class PluginSettings {
 			'REMOTE_DATA_BLOCKS_SETTINGS',
 			[
 				...( self::is_dev() ? self::get_build() : [] ),
+				'auto_register_blocks_default' => self::get_auto_register_blocks_default(),
 				'version' => self::get_version(),
 			]
 		);
+	}
+
+	public static function get_auto_register_blocks_default(): bool {
+		/**
+		 * Filter the default value of the "Auto-register blocks" option for newly
+		 * configured data sources.
+		 *
+		 * @param bool $auto_register_blocks_default Whether the option should be enabled by default.
+		 */
+		return (bool) apply_filters( 'remote_data_blocks_auto_register_blocks_default', true );
 	}
 
 	/**
