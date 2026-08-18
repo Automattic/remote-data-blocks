@@ -121,6 +121,29 @@ class QueryRunnerTest extends TestCase {
 		);
 	}
 
+	public function testRequestDetailsUseRdbCacheTtlHeader(): void {
+		$data_source = MockDataSource::create();
+		$this->assertInstanceOf( MockDataSource::class, $data_source );
+
+		$query = MockQuery::create( [
+			'cache_ttl' => 600,
+			'data_source' => $data_source,
+		] );
+		$this->assertInstanceOf( MockQuery::class, $query );
+
+		$query_runner = new class($this->http_client, []) extends QueryRunner {
+			public function get_request_details_for_test( HttpQueryInterface $query ): array|WP_Error {
+				return $this->get_request_details( $query, [] );
+			}
+		};
+		$request_details = $query_runner->get_request_details_for_test( $query );
+
+		$this->assertIsArray( $request_details );
+		$headers = $request_details['options'][ RequestOptions::HEADERS ];
+		$this->assertSame( 600, $headers['X-Remote-Data-Blocks-Cache-TTL'] ?? null );
+		$this->assertArrayNotHasKey( 'X-Kevinrob-GuzzleCache-TTL', $headers );
+	}
+
 	public function testLegacyQueryUsesDefaultCacheKeyRequestHeaders(): void {
 		$data_source = MockDataSource::create();
 		$this->assertInstanceOf( MockDataSource::class, $data_source );

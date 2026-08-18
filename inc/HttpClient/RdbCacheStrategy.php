@@ -15,7 +15,7 @@ use function wp_rand;
 class RdbCacheStrategy implements CacheStrategyInterface {
 	public const CACHE_AGE_RESPONSE_HEADER = 'Age';
 	public const CACHE_STATUS_RESPONSE_HEADER = CacheMiddleware::HEADER_CACHE_INFO;
-	public const CACHE_TTL_REQUEST_HEADER = 'X-Kevinrob-GuzzleCache-TTL';
+	public const CACHE_TTL_REQUEST_HEADER = 'X-Remote-Data-Blocks-Cache-TTL';
 	public const CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER = 'X-Remote-Data-Blocks-Cache-Key-Headers';
 	public const WP_OBJECT_CACHE_GROUP = 'remote-data-blocks';
 
