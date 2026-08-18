@@ -3,7 +3,6 @@
 namespace RemoteDataBlocks\Config\Query;
 
 use RemoteDataBlocks\Config\ArraySerializable;
-use RemoteDataBlocks\Config\CacheKeyRequestHeadersInterface;
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Config\DataSource\HttpDataSourceInterface;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
@@ -18,7 +17,7 @@ defined( 'ABSPATH' ) || exit();
  *
  * This class can be used to implement most HTTP queries.
  */
-class HttpQuery extends ArraySerializable implements HttpQueryInterface, CacheKeyRequestHeadersInterface {
+class HttpQuery extends ArraySerializable implements HttpQueryInterface {
 	/**
 	 * Execute the query with the provided input variables. Execution can be
 	 * customized by providing a custom query runner.
@@ -46,12 +45,8 @@ class HttpQuery extends ArraySerializable implements HttpQueryInterface, CacheKe
 	 * @return array<string> Request header names included in cache keys.
 	 */
 	public function get_cache_key_request_headers(): array {
-		$data_source = $this->get_data_source();
-		$data_source_headers = $data_source instanceof CacheKeyRequestHeadersInterface ? $data_source->get_cache_key_request_headers() : [];
-
 		return CacheKeyRequestHeaders::merge(
 			CacheKeyRequestHeaders::DEFAULT_HEADERS,
-			$data_source_headers,
 			$this->config['cache_key_request_headers'] ?? []
 		);
 	}

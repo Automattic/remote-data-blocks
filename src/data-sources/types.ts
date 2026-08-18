@@ -57,7 +57,6 @@ export interface GoogleSheetsServiceConfig extends BaseServiceConfig {
 
 export interface HttpServiceConfig extends BaseServiceConfig {
 	auth?: HttpAuth;
-	cache_key_request_headers?: string[];
 	endpoint: string;
 }
 

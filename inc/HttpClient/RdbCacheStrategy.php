@@ -23,12 +23,9 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 	private const FALLBACK_CACHE_TTL_IN_SECONDS = 300; // 5 minutes for success responses
 
 	public function __construct( ?CacheStorageInterface $storage = null ) {
-		$vary_headers = new KeyValueHttpHeader( CacheKeyRequestHeaders::DEFAULT_HEADERS );
-
 		parent::__construct(
 			$storage ?? new WordPressObjectCacheStorage( self::WP_OBJECT_CACHE_GROUP ),
-			self::FALLBACK_CACHE_TTL_IN_SECONDS,
-			$vary_headers
+			self::FALLBACK_CACHE_TTL_IN_SECONDS
 		);
 	}
 
@@ -86,8 +83,8 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 		$jitter = intval( ceil( min( $ttl * 0.1, 20 ) ) );
 		$ttl = intval( $ttl ) + wp_rand( 0, $jitter );
 
-		// NOTE: We skip the vary headers '*' check from the parent method
-		// since our defined vary headers cannot accept a '*' value.
+		// Cache-key request headers are resolved per request in getCacheKey(), so
+		// the parent's static vary-header check does not apply here.
 
 		$response = $response->withoutHeader( 'Etag' )->withoutHeader( 'Last-Modified' );
 

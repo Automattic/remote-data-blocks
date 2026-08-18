@@ -3,22 +3,10 @@
 namespace RemoteDataBlocks\Tests\Config;
 
 use PHPUnit\Framework\TestCase;
-use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Tests\Mocks\MockDataSource;
 use WP_Error;
 
 class HttpDataSourceTest extends TestCase {
-	public function testCacheKeyRequestHeadersCanBeConfigured(): void {
-		$data_source = HttpDataSource::from_array( [
-			'display_name' => 'Custom API',
-			'endpoint' => 'https://example.com/api',
-			'cache_key_request_headers' => [ 'X-Api-Key', 'X-Tenant-ID' ],
-		] );
-
-		$this->assertInstanceOf( HttpDataSource::class, $data_source );
-		$this->assertSame( [ 'X-Api-Key', 'X-Tenant-ID' ], $data_source->get_cache_key_request_headers() );
-	}
-
 	public function test_migrate_config_moves_header(): void {
 		$config = [
 			'display_name' => 'Mock Data Source',

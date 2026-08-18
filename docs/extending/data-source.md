@@ -43,7 +43,6 @@ $data_source = [
 		'Content-Type' => 'application/json',
 		'X-Api-Key' => constant( 'MY_API_KEY_CONSTANT' ),
 	],
-	'cache_key_request_headers' => [ 'X-Api-Key' ],
 ];
 ```
 
@@ -73,17 +72,7 @@ An associative array of headers that will be sent with each HTTP request. Querie
 
 When providing authentication credentials, take care to avoid committing them to code repositories. We strongly recommend using environment variables or secure storage.
 
-### cache_key_request_headers: array
-
-A static list of request header names whose values will be included in object cache keys for every query that uses this data source. `Authorization` and `Cache-Control` are always included by default. Query-level entries are added to the data-source list, and duplicate names are removed case-insensitively. A configured header that is absent from a request is ignored.
-
-```php
-'cache_key_request_headers' => [ 'X-Api-Key', 'X-Tenant-ID' ],
-```
-
-**Security warning:** Add every custom header that can affect authentication, authorization, tenancy, or the returned data. If two requests have the same method, URI, and body but use different values for an omitted header, one request can receive the response cached for the other. With a persistent object cache, this can expose protected data across requests and users.
-
-For Generic HTTP data sources configured in the plugin settings, custom API-key authentication headers are added automatically. Use the **Additional cache key headers** field for other authentication, tenancy, or response-varying headers. Shopify's storefront access-token header is also included automatically.
+**Security warning:** Defining a custom authentication, authorization, tenancy, or response-varying header on a data source does not automatically include it in cache keys. Add the header name to the [`cache_key_request_headers`](query.md#cache_key_request_headers-array) configuration of every query that uses it. Otherwise, requests with different header values can share cached responses and potentially expose protected data across requests or users when a persistent object cache is enabled.
 
 ### Next steps
 

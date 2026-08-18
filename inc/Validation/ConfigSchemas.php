@@ -133,7 +133,6 @@ final class ConfigSchemas {
 
 	private static function generate_http_data_source_config_schema(): array {
 		return Types::object( [
-			'cache_key_request_headers' => Types::nullable( Types::list_of( Types::string() ) ),
 			'display_name' => Types::string(),
 			'endpoint' => Types::string(),
 			'image_url' => Types::nullable( Types::image_url() ),

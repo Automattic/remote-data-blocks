@@ -3,7 +3,6 @@
 namespace RemoteDataBlocks\Config\DataSource;
 
 use RemoteDataBlocks\Config\ArraySerializable;
-use RemoteDataBlocks\Config\CacheKeyRequestHeadersInterface;
 use RemoteDataBlocks\Validation\ConfigSchemas;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use WP_Error;
@@ -13,11 +12,7 @@ use WP_Error;
  *
  * Implements the HttpDataSourceInterface to define a generic HTTP data source.
  */
-class HttpDataSource extends ArraySerializable implements HttpDataSourceInterface, CacheKeyRequestHeadersInterface {
-	public function get_cache_key_request_headers(): array {
-		return $this->config['cache_key_request_headers'] ?? [];
-	}
-
+class HttpDataSource extends ArraySerializable implements HttpDataSourceInterface {
 	final public function get_display_name(): string {
 		return $this->config['display_name'];
 	}

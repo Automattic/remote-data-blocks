@@ -3,7 +3,6 @@
 namespace RemoteDataBlocks\Integrations\GenericHttp;
 
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
-use RemoteDataBlocks\HttpClient\CacheKeyRequestHeaders;
 use RemoteDataBlocks\Validation\Types;
 use RemoteDataBlocks\Validation\Validator;
 use RemoteDataBlocks\Validation\ConfigSchemas;
@@ -24,7 +23,6 @@ class GenericHttpDataSource extends HttpDataSource {
 					'value' => Types::skip_sanitize( Types::string() ),
 				] )
 			),
-			'cache_key_request_headers' => Types::nullable( Types::list_of( Types::string() ) ),
 			'display_name' => Types::string(),
 			'endpoint' => Types::string(),
 		] );
@@ -66,20 +64,12 @@ class GenericHttpDataSource extends HttpDataSource {
 		return [];
 	}
 
-	public static function get_cache_key_request_headers_from_service_config( array $service_config ): array {
-		return CacheKeyRequestHeaders::merge(
-			array_keys( self::get_request_headers_from_service_config( $service_config ) ),
-			$service_config['cache_key_request_headers'] ?? []
-		);
-	}
-
 	final public function get_service_name(): string {
 		return static::SERVICE_NAME;
 	}
 
 	protected static function map_service_config( array $service_config ): array {
 		return [
-			'cache_key_request_headers' => self::get_cache_key_request_headers_from_service_config( $service_config ),
 			'display_name' => $service_config['display_name'],
 			'endpoint' => self::get_endpoint_from_service_config( $service_config ),
 			'request_headers' => self::get_request_headers_from_service_config( $service_config ),

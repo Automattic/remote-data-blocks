@@ -2,7 +2,6 @@ import { Card, CardBody, ExternalLink, TextControl, Tip } from '@wordpress/compo
 import { __ } from '@wordpress/i18n';
 
 import { DataSourceForm } from '../components/DataSourceForm';
-import { CustomFormFieldToken } from '@/data-sources/components/CustomFormFieldToken';
 import { HttpAuthSettingsInput } from '@/data-sources/components/HttpAuthSettingsInput';
 import { ConfigSource } from '@/data-sources/constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
@@ -94,26 +93,6 @@ export const HttpSettings = ( { mode, uuid, config }: SettingsComponentProps< Ht
 				/>
 
 				<HttpAuthSettingsInput auth={ state.auth } onChange={ handleAuthOnChange } />
-				<CustomFormFieldToken
-					label={ __( 'Additional cache key headers', 'remote-data-blocks' ) }
-					value={ state.cache_key_request_headers ?? [] }
-					onChange={ ( headers: Array< string | { value: string } > ) => {
-						handleOnChange(
-							'cache_key_request_headers',
-							headers.map( header => ( 'object' === typeof header ? header.value : header ) )
-						);
-					} }
-					suggestions={ [] }
-					__experimentalValidateInput={ ( input: string ) =>
-						/^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/.test( input )
-					}
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					customHelpText={ __(
-						'Custom authentication headers configured above are included automatically. Add every other header that can affect authentication, authorization, tenancy, or returned data. Omitting one can expose cached data across security contexts.',
-						'remote-data-blocks'
-					) }
-				/>
 				<Card style={ { marginTop: '16px' } }>
 					<CardBody>
 						<Tip>

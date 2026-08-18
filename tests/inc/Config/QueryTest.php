@@ -38,7 +38,7 @@ class QueryTest extends TestCase {
 		$this->assertSame( [ 'Content-Type' => 'application/json' ], $result );
 	}
 
-	public function testCacheKeyRequestHeadersMergeDefaultsDataSourceAndQuery(): void {
+	public function testCacheKeyRequestHeadersMergeDefaultsAndQueryOnly(): void {
 		$data_source = HttpDataSource::from_array( [
 			'display_name' => 'Custom API',
 			'endpoint' => 'https://example.com/api',
@@ -54,7 +54,7 @@ class QueryTest extends TestCase {
 		$this->assertInstanceOf( HttpQuery::class, $query );
 
 		$this->assertSame(
-			[ 'Authorization', 'Cache-Control', 'X-Api-Key', 'x-tenant-id', 'X-Request-Scope' ],
+			[ 'Authorization', 'Cache-Control', 'x-api-key', 'X-Request-Scope' ],
 			$query->get_cache_key_request_headers()
 		);
 	}
