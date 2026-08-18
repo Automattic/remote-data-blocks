@@ -7,8 +7,8 @@ use GuzzleHttp\RequestOptions;
 use RemoteDataBlocks\Config\CacheKeyRequestHeadersInterface;
 use RemoteDataBlocks\Config\Query\HttpQueryInterface;
 use RemoteDataBlocks\Editor\DataBinding\Pagination;
-use RemoteDataBlocks\HttpClient\HttpClient;
 use RemoteDataBlocks\HttpClient\CacheKeyRequestHeaders;
+use RemoteDataBlocks\HttpClient\HttpClient;
 use RemoteDataBlocks\HttpClient\RdbCacheMiddleware;
 use RemoteDataBlocks\HttpClient\RdbCacheStrategy;
 use WP_Error;
@@ -60,7 +60,14 @@ class QueryRunner implements QueryRunnerInterface {
 		$body = $query->get_request_body( $input_variables );
 		$endpoint = $query->get_endpoint( $input_variables );
 		$cache_ttl = $query->get_cache_ttl( $input_variables );
-		$cache_key_request_headers = $query instanceof CacheKeyRequestHeadersInterface ? $query->get_cache_key_request_headers() : CacheKeyRequestHeaders::DEFAULT_HEADERS;
+		$data_source = $query->get_data_source();
+		$data_source_cache_key_request_headers = $data_source instanceof CacheKeyRequestHeadersInterface ? $data_source->get_cache_key_request_headers() : [];
+		$query_cache_key_request_headers = $query instanceof CacheKeyRequestHeadersInterface ? $query->get_cache_key_request_headers() : [];
+		$cache_key_request_headers = CacheKeyRequestHeaders::merge(
+			CacheKeyRequestHeaders::DEFAULT_HEADERS,
+			$data_source_cache_key_request_headers,
+			$query_cache_key_request_headers
+		);
 		$parsed_url = wp_parse_url( $endpoint );
 
 		if ( false === $parsed_url ) {

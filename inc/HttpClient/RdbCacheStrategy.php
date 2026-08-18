@@ -32,14 +32,17 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 		);
 	}
 
-	public static function get_object_cache_key_from_request( RequestInterface $request ): string {
+	/**
+	 * @param array<string>|null $cache_key_request_headers Request headers included in the cache key. When omitted, read them from the request metadata header.
+	 */
+	public static function get_object_cache_key_from_request( RequestInterface $request, ?array $cache_key_request_headers = null ): string {
 		$request_body = (string) $request->getBody();
 		$request_method = $request->getMethod();
 		$request_uri = (string) $request->getUri();
 
 		$cache_key_request_headers = CacheKeyRequestHeaders::merge(
 			CacheKeyRequestHeaders::DEFAULT_HEADERS,
-			$request->getHeader( RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER )
+			$cache_key_request_headers ?? $request->getHeader( RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER )
 		);
 
 		$cache_headers = [];

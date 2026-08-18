@@ -33,14 +33,16 @@ final class RdbLogMiddleware {
 		};
 	}
 
-	private function log( RequestInterface $request, ?ResponseInterface $response, ?\Exception $reason ): void {
+	private function log( RequestInterface $request, ?ResponseInterface $response, ?\Exception $reason, array $options ): void {
 		$response_headers = $response ? $response->getHeaders() : [];
 		$uri = $request->getUri();
+		$cache_key_request_headers = $options[ RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_OPTION ] ?? [];
+		$cache_key_request_headers = is_array( $cache_key_request_headers ) ? array_values( array_filter( $cache_key_request_headers, 'is_string' ) ) : [];
 
 		$context = [
 			'cache_age' => $response_headers[ RdbCacheStrategy::CACHE_AGE_RESPONSE_HEADER ][0] ?? '',
 			'cache_group' => RdbCacheStrategy::WP_OBJECT_CACHE_GROUP ?? '',
-			'cache_key' => RdbCacheStrategy::get_object_cache_key_from_request( $request ),
+			'cache_key' => RdbCacheStrategy::get_object_cache_key_from_request( $request, $cache_key_request_headers ),
 			'cache_status' => $response_headers[ CacheMiddleware::HEADER_CACHE_INFO ][0] ?? '',
 			'error' => $reason,
 			'hostname' => $uri->getHost(),
