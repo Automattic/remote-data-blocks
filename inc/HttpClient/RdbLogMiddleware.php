@@ -27,8 +27,8 @@ final class RdbLogMiddleware {
 		return function ( RequestInterface $request, array &$options ) use ( $handler ): PromiseInterface {
 			return $handler( $request, $options )
 				->then(
-					$this->handle_success( $request ),
-					$this->handle_failure( $request )
+					$this->handle_success( $request, $options ),
+					$this->handle_failure( $request, $options )
 				);
 		};
 	}
@@ -57,10 +57,10 @@ final class RdbLogMiddleware {
 	/**
 	 * Returns a function which is handled when a request was rejected.
 	 */
-	private function handle_failure( RequestInterface $request ): callable {
-		return function ( \Exception $reason ) use ( $request ) {
+	private function handle_failure( RequestInterface $request, array $options ): callable {
+		return function ( \Exception $reason ) use ( $request, $options ) {
 			$response = ( $reason instanceof RequestException && $reason->hasResponse() === true ) ? $reason->getResponse() : null;
-			$this->log( $request, $response, $reason );
+			$this->log( $request, $response, $reason, $options );
 			return Create::rejectionFor( $reason );
 		};
 	}
@@ -68,9 +68,9 @@ final class RdbLogMiddleware {
 	/**
 	 * Returns a function which is handled when a request was successful.
 	 */
-	private function handle_success( RequestInterface $request ): callable {
-		return function ( ResponseInterface $response ) use ( $request ) {
-			$this->log( $request, $response, null );
+	private function handle_success( RequestInterface $request, array $options ): callable {
+		return function ( ResponseInterface $response ) use ( $request, $options ) {
+			$this->log( $request, $response, null, $options );
 			return $response;
 		};
 	}
