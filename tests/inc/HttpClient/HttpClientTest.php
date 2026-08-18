@@ -368,6 +368,41 @@ class HttpClientTest extends TestCase {
 		$this->assertFalse( $cache_entry->getOriginalRequest()->hasHeader( RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER ) );
 	}
 
+	public function testCacheStrategyUpdateReplacesCachedResponse(): void {
+		$strategy = new RdbCacheStrategy( new VolatileRuntimeStorage() );
+		$request = new Request( 'GET', 'https://example.com/test' );
+
+		$this->assertTrue( $strategy->cache( $request, new Response( 200, [], 'Initial Response' ) ) );
+		$this->assertTrue( $strategy->update( $request, new Response( 200, [], 'Updated Response' ) ) );
+
+		$cache_entry = $strategy->fetch( $request );
+		$this->assertInstanceOf( CacheEntry::class, $cache_entry );
+		$this->assertSame( 'Updated Response', (string) $cache_entry->getResponse()->getBody() );
+	}
+
+	public function testCacheStrategyDeleteRemovesCachedResponse(): void {
+		$strategy = new RdbCacheStrategy( new VolatileRuntimeStorage() );
+		$request = new Request( 'GET', 'https://example.com/test' );
+
+		$this->assertTrue( $strategy->cache( $request, new Response( 200 ) ) );
+		$this->assertTrue( $strategy->delete( $request ) );
+		$this->assertNull( $strategy->fetch( $request ) );
+	}
+
+	public function testCacheStrategyAddsWarningHeaderToCachedResponse(): void {
+		$strategy = new RdbCacheStrategy( new VolatileRuntimeStorage() );
+		$request = new Request( 'GET', 'https://example.com/test' );
+
+		$this->assertTrue( $strategy->cache( $request, new Response( 200 ) ) );
+
+		$cache_entry = $strategy->fetch( $request );
+		$this->assertInstanceOf( CacheEntry::class, $cache_entry );
+		$this->assertStringContainsString(
+			'Cached although the response headers indicate not to do it!',
+			$cache_entry->getResponse()->getHeaderLine( 'Warning' )
+		);
+	}
+
 	public function testRepeatedPostRequestsWithDifferentBodyResultsInCacheMiss(): void {
 		// Set up the mock handler with two responses
 		$this->mock_handler->append(
