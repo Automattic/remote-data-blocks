@@ -72,6 +72,10 @@ An associative array of headers that will be sent with each HTTP request. Querie
 
 When providing authentication credentials, take care to avoid committing them to code repositories. We strongly recommend using environment variables or secure storage.
 
+**Security warning:** Custom authentication and response-varying headers are not included in the object cache key automatically. If two requests have the same method, URI, and body but use different values for an omitted header, one request can receive the response cached for the other. With a persistent object cache, this can expose data authorized for a different API credential or security context.
+
+When using a custom header such as `X-Api-Key`, add it with the [`remote_data_blocks_cache_invalidating_request_headers`](hooks.md#remote_data_blocks_cache_invalidating_request_headers) filter. Add every header that can affect authentication, authorization, tenancy, or the returned data.
+
 ### Next steps
 
 After defining a data source in code, you can use it in a [query](query.md) to define how data is retrieved.

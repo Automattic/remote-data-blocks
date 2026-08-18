@@ -16,6 +16,14 @@ This plugin offers a caching layer for optimal performance. It will be used if y
 
 The default TTL for all cache objects is 5 minutes, but it can be [configured per query or request](../extending/query.md#cache_ttl-intnullcallable). Error responses are cached for 30 seconds to avoid overwhelming the remote data source under error conditions. Multiple requests for the same data within a single page load will be deduplicated even if the requests are not cacheable.
 
+### Cache isolation and custom request headers
+
+The response cache is shared across queries. When the site uses a persistent object cache, it is also shared across requests and users. Cache entries distinguish requests by their method, URI, body, and a configured list of request headers. `Authorization` and `Cache-Control` are included in that list by default, but arbitrary request headers are not included automatically.
+
+**Security warning:** If an API uses a custom header for authentication, authorization, tenancy, or any other value that changes the response, that header must be added to the cache key. Otherwise, requests that differ only by that header can share a cache entry. With a persistent object cache, this can cause a response fetched with one credential or security context to be returned to a request using another, potentially exposing protected remote data.
+
+Use the [`remote_data_blocks_cache_invalidating_request_headers`](../extending/hooks.md#remote_data_blocks_cache_invalidating_request_headers) filter to add every custom header that can affect the authorized or returned data.
+
 ## Technical concepts
 
 If you want to understand the internals of Remote Data Blocks so that you can write code to extend its functionality, head over to the [extending guide](../extending/index.md).
