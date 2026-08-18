@@ -6,7 +6,6 @@ use RemoteDataBlocks\Config\ArraySerializable;
 use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Config\DataSource\HttpDataSourceInterface;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
-use RemoteDataBlocks\HttpClient\CacheKeyRequestHeaders;
 use RemoteDataBlocks\Validation\ConfigSchemas;
 use WP_Error;
 
