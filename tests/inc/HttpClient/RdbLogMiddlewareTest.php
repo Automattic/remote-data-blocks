@@ -6,7 +6,7 @@ use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use RemoteDataBlocks\HttpClient\RdbCacheMiddleware;
+use RemoteDataBlocks\HttpClient\RdbCacheStrategy;
 use RemoteDataBlocks\HttpClient\RdbLogMiddleware;
 use RemoteDataBlocks\Tests\Mocks\MockWordPressFunctions;
 
@@ -25,7 +25,7 @@ class RdbLogMiddlewareTest extends TestCase {
 		$first_options = [];
 		$log_handler(
 			new Request( 'GET', 'https://example.com/data', [
-				RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER => [ 'X-Api-Key' ],
+				RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER => [ 'X-Api-Key' ],
 				'X-Api-Key' => 'first-api-key',
 			] ),
 			$first_options
@@ -34,7 +34,7 @@ class RdbLogMiddlewareTest extends TestCase {
 		$second_options = [];
 		$log_handler(
 			new Request( 'GET', 'https://example.com/data', [
-				RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER => [ 'X-Api-Key' ],
+				RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER => [ 'X-Api-Key' ],
 				'X-Api-Key' => 'second-api-key',
 			] ),
 			$second_options

@@ -20,6 +20,9 @@ function register_basic_rest_api_remote_data_block(): void {
 	$get_item_query = [
 		'display_name' => 'Get item by ID',
 		'data_source' => $api_data_source,
+		// Include every custom request header above that can affect authentication,
+		// authorization, tenancy, or the returned data.
+		'cache_key_request_headers' => [ 'X-API-Key' ],
 		// Provide a callable (closure) to dynamically generate the endpoint using
 		// the base endpoint from the data source and the input variables.
 		'endpoint' => function ( array $input_variables ) use ( $api_data_source ): string {
@@ -79,6 +82,9 @@ function register_basic_rest_api_remote_data_block(): void {
 	$list_items_query = [
 		'display_name' => 'List items',
 		'data_source' => $api_data_source,
+		// Include every custom request header above that can affect authentication,
+		// authorization, tenancy, or the returned data.
+		'cache_key_request_headers' => [ 'X-API-Key' ],
 		// Provide a callable (closure) to dynamically generate the endpoint using
 		// the base endpoint from the data source and the input variables.
 		'endpoint' => function ( array $input_variables ) use ( $api_data_source ): string {

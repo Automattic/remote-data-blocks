@@ -41,6 +41,7 @@ function register_github_markdown_remote_data_block(): void {
 	$get_file_as_html_query = [
 		'display_name' => 'Get GitHub Markdown file as HTML',
 		'data_source' => $github_data_source,
+		'cache_key_request_headers' => [ 'Accept' ],
 		// Provide a callable (closure) to dynamically generate the endpoint using
 		// variables in the outer scope and the input variables.
 		'endpoint' => function ( array $input_variables ) use ( $repo_owner, $repo_name, $repo_ref ): string {

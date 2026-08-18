@@ -12,19 +12,22 @@ final class CacheKeyRequestHeaders {
 	 * @return array<string> Merged request header names.
 	 */
 	public static function merge( array $headers ): array {
-		# Start with DEFAULT_HEADERS
+		$merged_headers = self::DEFAULT_HEADERS;
 		$seen_headers = array_fill_keys(
 			array_map( 'strtolower', self::DEFAULT_HEADERS ),
 			true
 		);
 
-		# Add extra headers, skipping any duplicates (case-insensitive)
-		$seen_headers = array_merge(
-			$seen_headers,
-			array_fill_keys( array_map( 'strtolower', $headers ), true )
-		);
+		foreach ( $headers as $header ) {
+			$normalized_header = strtolower( $header );
+			if ( isset( $seen_headers[ $normalized_header ] ) ) {
+				continue;
+			}
 
-		# Return the unique header keys
-		return array_keys( $seen_headers );
+			$seen_headers[ $normalized_header ] = true;
+			$merged_headers[] = $header;
+		}
+
+		return $merged_headers;
 	}
 }

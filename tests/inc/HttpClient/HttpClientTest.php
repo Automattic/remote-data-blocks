@@ -262,6 +262,26 @@ class HttpClientTest extends TestCase {
 		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the second request' );
 	}
 
+	public function testUnconfiguredCustomHeaderWithDifferentValuesResultsInCacheHit(): void {
+		$this->mock_handler->append(
+			new Response( 200, [], 'Cached Response' ),
+			new Response( 200, [], 'Uncached Response' )
+		);
+
+		$first_response = $this->http_client->request( 'GET', '/test', [
+			'headers' => [ 'X-Tenant-ID' => 'first-tenant' ],
+		], $this->client );
+		$second_response = $this->http_client->request( 'GET', '/test', [
+			'headers' => [ 'X-Tenant-ID' => 'second-tenant' ],
+		], $this->client );
+
+		$this->assertSame( 'Cached Response', (string) $first_response->getBody() );
+		$this->assertSame( RdbCacheMiddleware::HEADER_CACHE_MISS, $first_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+		$this->assertSame( 'Cached Response', (string) $second_response->getBody() );
+		$this->assertSame( RdbCacheMiddleware::HEADER_CACHE_HIT, $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+		$this->assertSame( 1, $this->mock_handler->count(), 'Only one response should be consumed when an unconfigured header value differs' );
+	}
+
 	public function testConfiguredCustomHeaderWithDifferentValuesResultsInCacheMiss(): void {
 		$this->mock_handler->append(
 			new Response( 200, [], 'First Response' ),
@@ -270,13 +290,13 @@ class HttpClientTest extends TestCase {
 
 		$first_response = $this->http_client->request( 'GET', '/test', [
 			'headers' => [
-				RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER => [ 'Authorization', 'Cache-Control', 'X-Api-Key' ],
+				RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER => [ 'Authorization', 'Cache-Control', 'X-Api-Key' ],
 				'X-Api-Key' => 'first-api-key',
 			],
 		], $this->client );
 		$second_response = $this->http_client->request( 'GET', '/test', [
 			'headers' => [
-				RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER => [ 'Authorization', 'Cache-Control', 'X-Api-Key' ],
+				RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER => [ 'Authorization', 'Cache-Control', 'X-Api-Key' ],
 				'X-Api-Key' => 'second-api-key',
 			],
 		], $this->client );
@@ -296,13 +316,13 @@ class HttpClientTest extends TestCase {
 
 		$first_response = $this->http_client->request( 'GET', '/test', [
 			'headers' => [
-				RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER => [ 'X-Api-Key' ],
+				RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER => [ 'X-Api-Key' ],
 				'x-api-key' => 'first-api-key',
 			],
 		], $this->client );
 		$second_response = $this->http_client->request( 'GET', '/test', [
 			'headers' => [
-				RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER => [ 'X-Api-Key' ],
+				RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER => [ 'X-Api-Key' ],
 				'x-api-key' => 'second-api-key',
 			],
 		], $this->client );
@@ -323,21 +343,21 @@ class HttpClientTest extends TestCase {
 
 		$this->http_client->request( 'GET', '/test', [
 			'headers' => [
-				RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER => [ 'X-Api-Key' ],
+				RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER => [ 'X-Api-Key' ],
 				'X-Api-Key' => 'secret',
 			],
 		], $client );
 
 		$this->assertCount( 1, $transactions );
 		$this->assertSame( 'secret', $transactions[0]['request']->getHeaderLine( 'X-Api-Key' ) );
-		$this->assertFalse( $transactions[0]['request']->hasHeader( RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER ) );
+		$this->assertFalse( $transactions[0]['request']->hasHeader( RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER ) );
 	}
 
 	public function testCacheKeyRequestHeaderMetadataIsNotStoredInCacheEntry(): void {
 		$storage = new VolatileRuntimeStorage();
 		$strategy = new RdbCacheStrategy( $storage );
 		$request = new Request( 'GET', 'https://example.com/test', [
-			RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER => [ 'X-Api-Key' ],
+			RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER => [ 'X-Api-Key' ],
 			'X-Api-Key' => 'secret',
 		] );
 
@@ -345,7 +365,7 @@ class HttpClientTest extends TestCase {
 		$cache_entry = $strategy->fetch( $request );
 
 		$this->assertInstanceOf( CacheEntry::class, $cache_entry );
-		$this->assertFalse( $cache_entry->getOriginalRequest()->hasHeader( RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER ) );
+		$this->assertFalse( $cache_entry->getOriginalRequest()->hasHeader( RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER ) );
 	}
 
 	public function testRepeatedPostRequestsWithDifferentBodyResultsInCacheMiss(): void {

@@ -8,7 +8,6 @@ use RemoteDataBlocks\Config\Query\HttpQueryInterface;
 use RemoteDataBlocks\Editor\DataBinding\Pagination;
 use RemoteDataBlocks\HttpClient\CacheKeyRequestHeaders;
 use RemoteDataBlocks\HttpClient\HttpClient;
-use RemoteDataBlocks\HttpClient\RdbCacheMiddleware;
 use RemoteDataBlocks\HttpClient\RdbCacheStrategy;
 use WP_Error;
 
@@ -97,7 +96,7 @@ class QueryRunner implements QueryRunnerInterface {
 		$origin = sprintf( '%s://%s%s%s%s', $scheme, $user, $pass, $host, $port );
 
 		$cache_headers = [
-			RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER => $cache_key_request_headers,
+			RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER => $cache_key_request_headers,
 		];
 		if ( intval( $cache_ttl ) > 0 ) {
 			$cache_headers[ RdbCacheStrategy::CACHE_TTL_REQUEST_HEADER ] = $cache_ttl;

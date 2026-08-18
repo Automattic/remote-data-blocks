@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\Config\Query\HttpQueryInterface;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\HttpClient\HttpClient;
-use RemoteDataBlocks\HttpClient\RdbCacheMiddleware;
+use RemoteDataBlocks\HttpClient\RdbCacheStrategy;
 use RemoteDataBlocks\Tests\Mocks\MockDataSource;
 use RemoteDataBlocks\Tests\Mocks\MockQuery;
 use WP_Error;
@@ -116,7 +116,7 @@ class QueryRunnerTest extends TestCase {
 		$this->assertIsArray( $request_details );
 		$this->assertSame(
 			[ 'Authorization', 'Cache-Control', 'X-Api-Key' ],
-			$request_details['options'][ RequestOptions::HEADERS ][ RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER ] ?? null
+			$request_details['options'][ RequestOptions::HEADERS ][ RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER ] ?? null
 		);
 	}
 
