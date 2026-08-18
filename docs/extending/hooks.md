@@ -72,7 +72,7 @@ function custom_allowed_url_schemes( array $allowed_url_schemes, HttpQueryInterf
 add_filter( 'remote_data_blocks_allowed_url_schemes', 'custom_allowed_url_schemes', 10, 2 );
 ```
 
-### remote_data_blocks_cache_invalidating_request_headers
+### remote_data_blocks_cache_key_request_headers
 
 Filter the request headers included in the object cache key. `Authorization` and `Cache-Control` are included by default. The plugin cannot determine whether an arbitrary header carries credentials or changes the response, so other headers must be added explicitly. The complete headers for the current request are provided as the second argument.
 
@@ -85,10 +85,10 @@ The object cache is shared across queries. When the site uses a persistent objec
 Add every custom header that can affect the authorized or returned data. Always merge additions with the provided list so that the default `Authorization` and `Cache-Control` protections remain in place. Header names are matched case-insensitively, and it is safe to add a header that is absent from some requests because absent headers are ignored when generating the key.
 
 ```php
-function custom_cache_invalidating_request_headers( array $cache_invalidating_request_headers, array $request_headers ): array {
-	return array_merge( $cache_invalidating_request_headers, [ 'X-Api-Key' ] );
+function custom_cache_key_request_headers( array $cache_key_request_headers, array $request_headers ): array {
+	return array_merge( $cache_key_request_headers, [ 'X-Api-Key' ] );
 }
-add_filter( 'remote_data_blocks_cache_invalidating_request_headers', 'custom_cache_invalidating_request_headers', 10, 2 );
+add_filter( 'remote_data_blocks_cache_key_request_headers', 'custom_cache_key_request_headers', 10, 2 );
 ```
 
 ### remote_data_blocks_pagination_query_var_name

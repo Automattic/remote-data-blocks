@@ -19,13 +19,13 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 	public const CACHE_TTL_REQUEST_HEADER = GreedyCacheStrategy::HEADER_TTL;
 	public const WP_OBJECT_CACHE_GROUP = 'remote-data-blocks';
 
-	private const CACHE_INVALIDATING_REQUEST_HEADERS = [ 'Authorization', 'Cache-Control' ];
+	private const CACHE_KEY_REQUEST_HEADERS = [ 'Authorization', 'Cache-Control' ];
 	private const ERROR_CACHE_TTL_IN_SECONDS = 30; // 30 seconds for error responses
 	private const FALLBACK_CACHE_TTL_IN_SECONDS = 300; // 5 minutes for success responses
 
 	public function __construct( ?CacheStorageInterface $storage = null ) {
 		// Filter this if customization is needed.
-		$vary_headers = new KeyValueHttpHeader( self::CACHE_INVALIDATING_REQUEST_HEADERS );
+		$vary_headers = new KeyValueHttpHeader( self::CACHE_KEY_REQUEST_HEADERS );
 
 		parent::__construct(
 			$storage ?? new WordPressObjectCacheStorage( self::WP_OBJECT_CACHE_GROUP ),
@@ -43,17 +43,17 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 		/**
 		 * Filters the request headers that are included in the object cache key.
 		 *
-		 * @param array<string>         $cache_invalidating_request_headers Header names included in the cache key.
-		 * @param array<string, string[]> $request_headers                  Headers from the current request.
+		 * @param array<string>           $cache_key_request_headers Header names included in the cache key.
+		 * @param array<string, string[]> $request_headers           Headers from the current request.
 		 */
-		$cache_invalidating_request_headers = (array) apply_filters(
-			'remote_data_blocks_cache_invalidating_request_headers',
-			self::CACHE_INVALIDATING_REQUEST_HEADERS,
+		$cache_key_request_headers = (array) apply_filters(
+			'remote_data_blocks_cache_key_request_headers',
+			self::CACHE_KEY_REQUEST_HEADERS,
 			$request_headers
 		);
 
 		$cache_headers = [];
-		foreach ( $cache_invalidating_request_headers as $header ) {
+		foreach ( $cache_key_request_headers as $header ) {
 			if ( $request->hasHeader( $header ) ) {
 				$cache_headers[ $header ] = $request->getHeader( $header );
 			}

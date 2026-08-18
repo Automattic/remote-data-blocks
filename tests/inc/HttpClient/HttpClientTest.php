@@ -267,12 +267,12 @@ class HttpClientTest extends TestCase {
 
 	public function testFilteredCustomHeaderWithDifferentValuesResultsInCacheMiss(): void {
 		MockWordPressFunctions::add_mock_filter(
-			'remote_data_blocks_cache_invalidating_request_headers',
-			function ( array $cache_invalidating_request_headers, array $request_headers ): array {
-				$this->assertSame( [ 'Authorization', 'Cache-Control' ], $cache_invalidating_request_headers );
+			'remote_data_blocks_cache_key_request_headers',
+			function ( array $cache_key_request_headers, array $request_headers ): array {
+				$this->assertSame( [ 'Authorization', 'Cache-Control' ], $cache_key_request_headers );
 				$this->assertArrayHasKey( 'X-Api-Key', $request_headers );
 
-				return array_merge( $cache_invalidating_request_headers, [ 'X-Api-Key' ] );
+				return array_merge( $cache_key_request_headers, [ 'X-Api-Key' ] );
 			}
 		);
 
@@ -297,8 +297,8 @@ class HttpClientTest extends TestCase {
 
 	public function testFilteredCustomHeaderNameIsCaseInsensitive(): void {
 		MockWordPressFunctions::add_mock_filter(
-			'remote_data_blocks_cache_invalidating_request_headers',
-			fn( array $cache_invalidating_request_headers ): array => array_merge( $cache_invalidating_request_headers, [ 'X-Api-Key' ] )
+			'remote_data_blocks_cache_key_request_headers',
+			fn( array $cache_key_request_headers ): array => array_merge( $cache_key_request_headers, [ 'X-Api-Key' ] )
 		);
 
 		$this->mock_handler->append(
