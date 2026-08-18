@@ -60,7 +60,6 @@ class QueryRunner implements QueryRunnerInterface {
 		$endpoint = $query->get_endpoint( $input_variables );
 		$cache_ttl = $query->get_cache_ttl( $input_variables );
 		$cache_key_request_headers = CacheKeyRequestHeaders::merge(
-			CacheKeyRequestHeaders::DEFAULT_HEADERS,
 			$query->get_cache_key_request_headers()
 		);
 		$parsed_url = wp_parse_url( $endpoint );

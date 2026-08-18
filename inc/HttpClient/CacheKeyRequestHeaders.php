@@ -3,30 +3,28 @@
 namespace RemoteDataBlocks\HttpClient;
 
 final class CacheKeyRequestHeaders {
-	public const DEFAULT_HEADERS = [ 'Authorization', 'Cache-Control' ];
+	private const DEFAULT_HEADERS = [ 'Authorization', 'Cache-Control' ];
 
 	/**
-	 * Merge request header name lists without case-insensitive duplicates.
+	 * Merge the given header list with DEFAULT_HEADERS, removing case-insensitive duplicates.
 	 *
-	 * @param array<string> ...$header_lists Request header name lists.
+	 * @param array<string> $headers Request header names to merge with DEFAULT_HEADERS.
 	 * @return array<string> Merged request header names.
 	 */
-	public static function merge( array ...$header_lists ): array {
-		$merged_headers = [];
-		$seen_headers = [];
+	public static function merge( array $headers ): array {
+		# Start with DEFAULT_HEADERS
+		$seen_headers = array_fill_keys(
+			array_map( 'strtolower', self::DEFAULT_HEADERS ),
+			true
+		);
 
-		foreach ( $header_lists as $header_list ) {
-			foreach ( $header_list as $header ) {
-				$normalized_header = strtolower( $header );
-				if ( isset( $seen_headers[ $normalized_header ] ) ) {
-					continue;
-				}
+		# Add extra headers, skipping any duplicates (case-insensitive)
+		$seen_headers = array_merge(
+			$seen_headers,
+			array_fill_keys( array_map( 'strtolower', $headers ), true )
+		);
 
-				$seen_headers[ $normalized_header ] = true;
-				$merged_headers[] = $header;
-			}
-		}
-
-		return $merged_headers;
+		# Return the unique header keys
+		return array_keys( $seen_headers );
 	}
 }

@@ -17,6 +17,7 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 	public const CACHE_AGE_RESPONSE_HEADER = 'Age';
 	public const CACHE_STATUS_RESPONSE_HEADER = CacheMiddleware::HEADER_CACHE_INFO;
 	public const CACHE_TTL_REQUEST_HEADER = GreedyCacheStrategy::HEADER_TTL;
+	public const CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER = 'X-Remote-Data-Blocks-Cache-Key-Headers';
 	public const WP_OBJECT_CACHE_GROUP = 'remote-data-blocks';
 
 	private const ERROR_CACHE_TTL_IN_SECONDS = 30; // 30 seconds for error responses
@@ -35,8 +36,7 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 		$request_uri = (string) $request->getUri();
 
 		$cache_key_request_headers = CacheKeyRequestHeaders::merge(
-			CacheKeyRequestHeaders::DEFAULT_HEADERS,
-			$request->getHeader( RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER )
+			$request->getHeader( self::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER )
 		);
 
 		$cache_headers = [];
@@ -87,7 +87,7 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 
 		$cache_request = $request
 			->withoutHeader( static::HEADER_TTL )
-			->withoutHeader( RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER );
+			->withoutHeader( self::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER );
 
 		return new CacheEntry( $cache_request, $response, new DateTime( sprintf( '%+d seconds', $ttl ) ) );
 	}
