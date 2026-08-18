@@ -4,6 +4,7 @@ namespace RemoteDataBlocks\Config\QueryRunner;
 
 use Exception;
 use GuzzleHttp\RequestOptions;
+use RemoteDataBlocks\Config\Query\CacheKeyRequestHeadersAwareInterface;
 use RemoteDataBlocks\Config\Query\HttpQueryInterface;
 use RemoteDataBlocks\Editor\DataBinding\Pagination;
 use RemoteDataBlocks\HttpClient\CacheKeyRequestHeaders;
@@ -58,9 +59,11 @@ class QueryRunner implements QueryRunnerInterface {
 		$body = $query->get_request_body( $input_variables );
 		$endpoint = $query->get_endpoint( $input_variables );
 		$cache_ttl = $query->get_cache_ttl( $input_variables );
-		$cache_key_request_headers = CacheKeyRequestHeaders::merge(
-			$query->get_cache_key_request_headers()
-		);
+		$additional_cache_key_request_headers = [];
+		if ( $query instanceof CacheKeyRequestHeadersAwareInterface ) {
+			$additional_cache_key_request_headers = $query->get_cache_key_request_headers();
+		}
+		$cache_key_request_headers = CacheKeyRequestHeaders::merge( $additional_cache_key_request_headers );
 		$parsed_url = wp_parse_url( $endpoint );
 
 		if ( false === $parsed_url ) {

@@ -16,7 +16,7 @@ defined( 'ABSPATH' ) || exit();
  *
  * This class can be used to implement most HTTP queries.
  */
-class HttpQuery extends ArraySerializable implements HttpQueryInterface {
+class HttpQuery extends ArraySerializable implements CacheKeyRequestHeadersAwareInterface, HttpQueryInterface {
 	/**
 	 * Execute the query with the provided input variables. Execution can be
 	 * customized by providing a custom query runner.

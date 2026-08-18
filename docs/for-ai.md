@@ -3642,11 +3642,15 @@ A static list of additional request header names whose values will be included i
 
 **Security warning:** Add every header that can affect authentication, authorization, tenancy, or the returned data, including custom headers inherited from the query's data source. Data-source request headers are not added to cache keys automatically. Omitting such a header can allow requests with different security contexts to share a cached response, potentially exposing protected data across requests and users when a persistent object cache is enabled.
 
-If you implement `HttpQueryInterface` directly, implement `get_cache_key_request_headers()`. Return an empty array to use only the built-in `Authorization` and `Cache-Control` defaults, or return additional header names for that query:
+Queries implemented with `HttpQuery` support this configuration automatically. If you implement `HttpQueryInterface` directly, also implement the optional `CacheKeyRequestHeadersAwareInterface` to return additional header names for that query. Existing `HttpQueryInterface` implementations that do not implement the optional interface use only the built-in `Authorization` and `Cache-Control` defaults.
 
 ```php
-public function get_cache_key_request_headers(): array {
-	return [ 'X-Api-Key' ];
+class CustomQuery implements HttpQueryInterface, CacheKeyRequestHeadersAwareInterface {
+	// ...
+
+	public function get_cache_key_request_headers(): array {
+		return [ 'X-Api-Key' ];
+	}
 }
 ```
 

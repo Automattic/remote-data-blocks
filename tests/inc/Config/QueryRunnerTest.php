@@ -10,6 +10,7 @@ use RemoteDataBlocks\Config\Query\HttpQueryInterface;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\HttpClient\HttpClient;
 use RemoteDataBlocks\HttpClient\RdbCacheStrategy;
+use RemoteDataBlocks\Tests\Mocks\LegacyHttpQuery;
 use RemoteDataBlocks\Tests\Mocks\MockDataSource;
 use RemoteDataBlocks\Tests\Mocks\MockQuery;
 use WP_Error;
@@ -116,6 +117,24 @@ class QueryRunnerTest extends TestCase {
 		$this->assertIsArray( $request_details );
 		$this->assertSame(
 			[ 'Authorization', 'Cache-Control', 'X-Api-Key' ],
+			$request_details['options'][ RequestOptions::HEADERS ][ RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER ] ?? null
+		);
+	}
+
+	public function testLegacyQueryUsesDefaultCacheKeyRequestHeaders(): void {
+		$data_source = MockDataSource::create();
+		$this->assertInstanceOf( MockDataSource::class, $data_source );
+
+		$query_runner = new class($this->http_client, []) extends QueryRunner {
+			public function get_request_details_for_test( HttpQueryInterface $query ): array|WP_Error {
+				return $this->get_request_details( $query, [] );
+			}
+		};
+		$request_details = $query_runner->get_request_details_for_test( new LegacyHttpQuery( $data_source ) );
+
+		$this->assertIsArray( $request_details );
+		$this->assertSame(
+			[ 'Authorization', 'Cache-Control' ],
 			$request_details['options'][ RequestOptions::HEADERS ][ RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER ] ?? null
 		);
 	}
