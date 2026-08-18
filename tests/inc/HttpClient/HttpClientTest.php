@@ -11,6 +11,7 @@ use Kevinrob\GuzzleCache\Storage\VolatileRuntimeStorage;
 use RemoteDataBlocks\HttpClient\RdbCacheMiddleware;
 use RemoteDataBlocks\HttpClient\RdbCacheStrategy;
 use RemoteDataBlocks\HttpClient\HttpClient;
+use RemoteDataBlocks\Tests\Mocks\MockWordPressFunctions;
 
 class HttpClientTest extends TestCase {
 	private Client $client;
@@ -28,6 +29,11 @@ class HttpClientTest extends TestCase {
 
 		$this->client = $client;
 		$this->http_client = HttpClient::instance();
+	}
+
+	protected function tearDown(): void {
+		MockWordPressFunctions::reset();
+		parent::tearDown();
 	}
 
 	public function testSingleton(): void {
@@ -257,6 +263,60 @@ class HttpClientTest extends TestCase {
 		$this->assertEquals( 'MISS', $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
 
 		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the second request' );
+	}
+
+	public function testFilteredCustomHeaderWithDifferentValuesResultsInCacheMiss(): void {
+		MockWordPressFunctions::add_mock_filter(
+			'remote_data_blocks_cache_invalidating_request_headers',
+			function ( array $cache_invalidating_request_headers, array $request_headers ): array {
+				$this->assertSame( [ 'Authorization', 'Cache-Control' ], $cache_invalidating_request_headers );
+				$this->assertArrayHasKey( 'X-Api-Key', $request_headers );
+
+				return array_merge( $cache_invalidating_request_headers, [ 'X-Api-Key' ] );
+			}
+		);
+
+		$this->mock_handler->append(
+			new Response( 200, [], 'First Response' ),
+			new Response( 200, [], 'Second Response' )
+		);
+
+		$first_response = $this->http_client->request( 'GET', '/test', [
+			'headers' => [ 'X-Api-Key' => 'first-api-key' ],
+		], $this->client );
+		$second_response = $this->http_client->request( 'GET', '/test', [
+			'headers' => [ 'X-Api-Key' => 'second-api-key' ],
+		], $this->client );
+
+		$this->assertSame( 'First Response', (string) $first_response->getBody() );
+		$this->assertSame( RdbCacheMiddleware::HEADER_CACHE_MISS, $first_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+		$this->assertSame( 'Second Response', (string) $second_response->getBody() );
+		$this->assertSame( RdbCacheMiddleware::HEADER_CACHE_MISS, $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+		$this->assertSame( 0, $this->mock_handler->count(), 'Both responses should be consumed when the custom header values differ' );
+	}
+
+	public function testFilteredCustomHeaderNameIsCaseInsensitive(): void {
+		MockWordPressFunctions::add_mock_filter(
+			'remote_data_blocks_cache_invalidating_request_headers',
+			fn( array $cache_invalidating_request_headers ): array => array_merge( $cache_invalidating_request_headers, [ 'X-Api-Key' ] )
+		);
+
+		$this->mock_handler->append(
+			new Response( 200, [], 'First Response' ),
+			new Response( 200, [], 'Second Response' )
+		);
+
+		$first_response = $this->http_client->request( 'GET', '/test', [
+			'headers' => [ 'x-api-key' => 'first-api-key' ],
+		], $this->client );
+		$second_response = $this->http_client->request( 'GET', '/test', [
+			'headers' => [ 'x-api-key' => 'second-api-key' ],
+		], $this->client );
+
+		$this->assertSame( 'First Response', (string) $first_response->getBody() );
+		$this->assertSame( 'Second Response', (string) $second_response->getBody() );
+		$this->assertSame( RdbCacheMiddleware::HEADER_CACHE_MISS, $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+		$this->assertSame( 0, $this->mock_handler->count(), 'Both responses should be consumed regardless of custom header casing' );
 	}
 
 	public function testRepeatedPostRequestsWithDifferentBodyResultsInCacheMiss(): void {

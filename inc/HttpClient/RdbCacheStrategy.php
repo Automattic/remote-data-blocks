@@ -40,10 +40,22 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 		$request_method = $request->getMethod();
 		$request_uri = (string) $request->getUri();
 
+		/**
+		 * Filters the request headers that are included in the object cache key.
+		 *
+		 * @param array<string>         $cache_invalidating_request_headers Header names included in the cache key.
+		 * @param array<string, string[]> $request_headers                  Headers from the current request.
+		 */
+		$cache_invalidating_request_headers = (array) apply_filters(
+			'remote_data_blocks_cache_invalidating_request_headers',
+			self::CACHE_INVALIDATING_REQUEST_HEADERS,
+			$request_headers
+		);
+
 		$cache_headers = [];
-		foreach ( self::CACHE_INVALIDATING_REQUEST_HEADERS as $header ) {
-			if ( isset( $request_headers[ $header ] ) ) {
-				$cache_headers[ $header ] = $request_headers[ $header ];
+		foreach ( $cache_invalidating_request_headers as $header ) {
+			if ( $request->hasHeader( $header ) ) {
+				$cache_headers[ $header ] = $request->getHeader( $header );
 			}
 		}
 

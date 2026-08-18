@@ -72,6 +72,17 @@ function custom_allowed_url_schemes( array $allowed_url_schemes, HttpQueryInterf
 add_filter( 'remote_data_blocks_allowed_url_schemes', 'custom_allowed_url_schemes', 10, 2 );
 ```
 
+### remote_data_blocks_cache_invalidating_request_headers
+
+Filter the request headers included in the object cache key. `Authorization` and `Cache-Control` are included by default. Add any custom authentication or response-varying headers to prevent responses for different header values from sharing a cache entry. The complete headers for the current request are provided as the second argument.
+
+```php
+function custom_cache_invalidating_request_headers( array $cache_invalidating_request_headers, array $request_headers ): array {
+	return array_merge( $cache_invalidating_request_headers, [ 'X-Api-Key' ] );
+}
+add_filter( 'remote_data_blocks_cache_invalidating_request_headers', 'custom_cache_invalidating_request_headers', 10, 2 );
+```
+
 ### remote_data_blocks_pagination_query_var_name
 
 Filter the query variable name used for pagination (default: `rdb-pagination`).

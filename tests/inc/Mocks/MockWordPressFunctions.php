@@ -21,7 +21,12 @@ class MockWordPressFunctions {
 	public static function apply_filters( string $filter, mixed $thing, mixed ...$args ): mixed {
 		self::$done_filters[ $filter ] = $args;
 
-		return self::$mocked_filters[ $filter ] ?? $thing;
+		$mocked_filter = self::$mocked_filters[ $filter ] ?? null;
+		if ( is_callable( $mocked_filter ) ) {
+			return $mocked_filter( $thing, ...$args );
+		}
+
+		return $mocked_filter ?? $thing;
 	}
 
 	public static function do_action( string $action, mixed ...$args ): void {
