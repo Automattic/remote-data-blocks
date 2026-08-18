@@ -1178,6 +1178,155 @@ alwaysApply: true
 </rss>
 ````
 
+## File: example/blocks/art-block/art-block.php
+````php
+<?php declare(strict_types = 1);
+
+namespace RemoteDataBlocks\Example\ArtInstituteOfChicago;
+
+use function add_query_arg;
+
+/**
+ * Registers a remote data block representing an artwork from the Art Institute
+ * of Chicago's public API.
+ *
+ * @see http://api.artic.edu/docs/
+ */
+function register_art_remote_data_block(): void {
+	$aic_data_source = [
+		'display_name' => 'Art Institute of Chicago',
+		'endpoint' => 'https://api.artic.edu/api/v1/artworks',
+		'request_headers' => [
+			'Content-Type' => 'application/json',
+		],
+	];
+
+	$get_art_query = [
+		'display_name' => 'Get artwork by ID',
+		'data_source' => $aic_data_source,
+		// Provide a callable (closure) to dynamically generate the endpoint using
+		// the base endpoint from the data source and the input variables.
+		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
+			$endpoint = add_query_arg( [
+				'fields' => 'id,title,image_id,artist_title',
+			], $aic_data_source['endpoint'] );
+
+			if ( is_array( $input_variables['id'] ) ) {
+				$ids = implode( ',', $input_variables['id'] );
+			} else {
+				$ids = $input_variables['id'];
+			}
+
+			if ( ! empty( $ids ) ) {
+				return add_query_arg( [ 'ids' => $ids ], $endpoint );
+			}
+
+			return $endpoint;
+		},
+		'input_schema' => [
+			'id' => [
+				'name' => 'Art ID',
+				'type' => 'id:list', // This type indicates that the input can be a single ID or a list of IDs.
+			],
+		],
+		'output_schema' => [
+			'is_collection' => true,
+			'path' => '$.data[*]',
+			'type' => [
+				'id' => [
+					'name' => 'Art ID',
+					'type' => 'id',
+					'path' => '$.id',
+				],
+				'artist_title' => [
+					'name' => 'Artist Title',
+					'type' => 'string',
+					'path' => '$.artist_title',
+				],
+				'title' => [
+					'name' => 'Title',
+					'type' => 'title',
+					'path' => '$.title',
+				],
+				'image_url' => [
+					'name' => 'Image URL',
+					// Instead of a `path`, we provide a `generate` function to create the
+					// image URL. The `$data` parameter contains the data returned from the
+					// API at this "level" (e.g., after the root `path` has been applied).
+					'generate' => static function ( $data ): string {
+						return 'https://www.artic.edu/iiif/2/' . $data['image_id'] . '/full/843,/0/default.jpg';
+					},
+					'type' => 'image_url',
+				],
+			],
+		],
+	];
+
+	$search_art_query = [
+		'display_name' => 'Search artworks',
+		'data_source' => $aic_data_source,
+		// Provide a callable (closure) to dynamically generate the endpoint using
+		// the base endpoint from the data source and the input variables.
+		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
+			$endpoint = $aic_data_source['endpoint'] . '/search';
+			$search_terms = $input_variables['search'] ?? '';
+
+			// Do not include the `q` parameter if the search terms are empty.
+			// Otherwise, this will result in an error from the API.
+			if ( ! empty( $search_terms ) ) {
+				$endpoint = add_query_arg( [ 'q' => $search_terms ], $endpoint );
+			}
+
+			return add_query_arg( [
+				'limit' => $input_variables['limit'],
+				'fields' => 'id,title,image_id,artist_title',
+				'page' => $input_variables['page'],
+			], $endpoint );
+		},
+		'input_schema' => [
+			'search' => [
+				'name' => 'Search terms',
+				'type' => 'ui:search_input',
+			],
+			'limit' => [
+				'default_value' => 10,
+				'name' => 'Items per page',
+				'type' => 'ui:pagination_per_page',
+			],
+			'page' => [
+				'default_value' => 1,
+				'name' => 'Starting page',
+				'type' => 'ui:pagination_page',
+			],
+		],
+		// Reuse the output schema from `$get_art_query`.
+		'output_schema' => $get_art_query['output_schema'],
+		'pagination_schema' => [
+			'total_items' => [
+				'name' => 'Total items',
+				'path' => '$.pagination.total',
+				'type' => 'integer',
+			],
+		],
+	];
+
+	register_remote_data_block( [
+		'title' => 'Art Institute of Chicago',
+		'icon' => 'art',
+		'render_query' => [
+			'query' => $get_art_query,
+		],
+		'selection_queries' => [
+			[
+				'query' => $search_art_query,
+				'type' => 'search',
+			],
+		],
+	] );
+}
+add_action( 'init', __NAMESPACE__ . '\\register_art_remote_data_block' );
+````
+
 ## File: example/blocks/book-block/patterns/book-pattern.html
 ````html
 <!-- wp:columns {"align":"wide"} -->
@@ -1894,6 +2043,70 @@ function register_weather_remote_data_block(): void {
 	] );
 }
 add_action( 'init', __NAMESPACE__ . '\\register_weather_remote_data_block' );
+````
+
+## File: example/blocks/zip-code-block/zip-code-block.php
+````php
+<?php declare(strict_types = 1);
+
+namespace RemoteDataBlocks\Example\ZipCode;
+
+/**
+ * Registers a remote data block for fetching zip code information from the
+ * Zippopotam.us API.
+ *
+ * @see https://www.zippopotam.us/
+ */
+function register_zip_code_remote_data_block(): void {
+	$zip_code_data_source = [
+		'display_name' => 'Zip Code',
+		'endpoint' => 'https://api.zippopotam.us/us/',
+	];
+
+	$zip_code_query = [
+		'data_source' => $zip_code_data_source,
+		'display_name' => 'Get location by Zip code',
+		// Provide a callable (closure) to dynamically generate the endpoint using
+		// the base endpoint from the data source and the input variables.
+		'endpoint' => function ( array $input_variables ) use ( $zip_code_data_source ): string {
+			return $zip_code_data_source['endpoint'] . $input_variables['zip_code'];
+		},
+		'input_schema' => [
+			'zip_code' => [
+				'name' => 'Zip Code',
+				'type' => 'string',
+			],
+		],
+		'output_schema' => [
+			'is_collection' => false, // This query returns a single record.
+			'type' => [
+				'zip_code' => [
+					'name' => 'Zip Code',
+					'path' => '$["post code"]', // JSON property with space requires brackets and quotes.
+					'type' => 'string',
+				],
+				'city' => [
+					'name' => 'City',
+					'path' => '$.places[0]["place name"]', // JSON property with space requires brackets and quotes.
+					'type' => 'string',
+				],
+				'state' => [
+					'name' => 'State',
+					'path' => '$.places[0].state',
+					'type' => 'string',
+				],
+			],
+		],
+	];
+
+	register_remote_data_block( [
+		'title' => 'Zip Code',
+		'render_query' => [
+			'query' => $zip_code_query,
+		],
+	] );
+}
+add_action( 'init', __NAMESPACE__ . '\\register_zip_code_remote_data_block' );
 ````
 
 ## File: example/templates/airtable-block/airtable-block.php
@@ -2663,155 +2876,6 @@ You can also configure Shopify integrations with code. These integrations appear
 This [working example](https://github.com/Automattic/remote-data-blocks/tree/trunk/example/templates/shopify-product-block) will replicate what we've done in this tutorial.
 ````
 
-## File: example/blocks/art-block/art-block.php
-````php
-<?php declare(strict_types = 1);
-
-namespace RemoteDataBlocks\Example\ArtInstituteOfChicago;
-
-use function add_query_arg;
-
-/**
- * Registers a remote data block representing an artwork from the Art Institute
- * of Chicago's public API.
- *
- * @see http://api.artic.edu/docs/
- */
-function register_art_remote_data_block(): void {
-	$aic_data_source = [
-		'display_name' => 'Art Institute of Chicago',
-		'endpoint' => 'https://api.artic.edu/api/v1/artworks',
-		'request_headers' => [
-			'Content-Type' => 'application/json',
-		],
-	];
-
-	$get_art_query = [
-		'display_name' => 'Get artwork by ID',
-		'data_source' => $aic_data_source,
-		// Provide a callable (closure) to dynamically generate the endpoint using
-		// the base endpoint from the data source and the input variables.
-		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
-			$endpoint = add_query_arg( [
-				'fields' => 'id,title,image_id,artist_title',
-			], $aic_data_source['endpoint'] );
-
-			if ( is_array( $input_variables['id'] ) ) {
-				$ids = implode( ',', $input_variables['id'] );
-			} else {
-				$ids = $input_variables['id'];
-			}
-
-			if ( ! empty( $ids ) ) {
-				return add_query_arg( [ 'ids' => $ids ], $endpoint );
-			}
-
-			return $endpoint;
-		},
-		'input_schema' => [
-			'id' => [
-				'name' => 'Art ID',
-				'type' => 'id:list', // This type indicates that the input can be a single ID or a list of IDs.
-			],
-		],
-		'output_schema' => [
-			'is_collection' => true,
-			'path' => '$.data[*]',
-			'type' => [
-				'id' => [
-					'name' => 'Art ID',
-					'type' => 'id',
-					'path' => '$.id',
-				],
-				'artist_title' => [
-					'name' => 'Artist Title',
-					'type' => 'string',
-					'path' => '$.artist_title',
-				],
-				'title' => [
-					'name' => 'Title',
-					'type' => 'title',
-					'path' => '$.title',
-				],
-				'image_url' => [
-					'name' => 'Image URL',
-					// Instead of a `path`, we provide a `generate` function to create the
-					// image URL. The `$data` parameter contains the data returned from the
-					// API at this "level" (e.g., after the root `path` has been applied).
-					'generate' => static function ( $data ): string {
-						return 'https://www.artic.edu/iiif/2/' . $data['image_id'] . '/full/843,/0/default.jpg';
-					},
-					'type' => 'image_url',
-				],
-			],
-		],
-	];
-
-	$search_art_query = [
-		'display_name' => 'Search artworks',
-		'data_source' => $aic_data_source,
-		// Provide a callable (closure) to dynamically generate the endpoint using
-		// the base endpoint from the data source and the input variables.
-		'endpoint' => function ( array $input_variables ) use ( $aic_data_source ): string {
-			$endpoint = $aic_data_source['endpoint'] . '/search';
-			$search_terms = $input_variables['search'] ?? '';
-
-			// Do not include the `q` parameter if the search terms are empty.
-			// Otherwise, this will result in an error from the API.
-			if ( ! empty( $search_terms ) ) {
-				$endpoint = add_query_arg( [ 'q' => $search_terms ], $endpoint );
-			}
-
-			return add_query_arg( [
-				'limit' => $input_variables['limit'],
-				'fields' => 'id,title,image_id,artist_title',
-				'page' => $input_variables['page'],
-			], $endpoint );
-		},
-		'input_schema' => [
-			'search' => [
-				'name' => 'Search terms',
-				'type' => 'ui:search_input',
-			],
-			'limit' => [
-				'default_value' => 10,
-				'name' => 'Items per page',
-				'type' => 'ui:pagination_per_page',
-			],
-			'page' => [
-				'default_value' => 1,
-				'name' => 'Starting page',
-				'type' => 'ui:pagination_page',
-			],
-		],
-		// Reuse the output schema from `$get_art_query`.
-		'output_schema' => $get_art_query['output_schema'],
-		'pagination_schema' => [
-			'total_items' => [
-				'name' => 'Total items',
-				'path' => '$.pagination.total',
-				'type' => 'integer',
-			],
-		],
-	];
-
-	register_remote_data_block( [
-		'title' => 'Art Institute of Chicago',
-		'icon' => 'art',
-		'render_query' => [
-			'query' => $get_art_query,
-		],
-		'selection_queries' => [
-			[
-				'query' => $search_art_query,
-				'type' => 'search',
-			],
-		],
-	] );
-}
-add_action( 'init', __NAMESPACE__ . '\\register_art_remote_data_block' );
-````
-
 ## File: example/blocks/github-markdown-block/github-markdown-block.php
 ````php
 <?php declare(strict_types = 1);
@@ -2999,70 +3063,6 @@ function handle_github_file_path_override(): void {
 	}, 10, 2 );
 }
 add_action( 'init', __NAMESPACE__ . '\\handle_github_file_path_override' );
-````
-
-## File: example/blocks/zip-code-block/zip-code-block.php
-````php
-<?php declare(strict_types = 1);
-
-namespace RemoteDataBlocks\Example\ZipCode;
-
-/**
- * Registers a remote data block for fetching zip code information from the
- * Zippopotam.us API.
- *
- * @see https://www.zippopotam.us/
- */
-function register_zip_code_remote_data_block(): void {
-	$zip_code_data_source = [
-		'display_name' => 'Zip Code',
-		'endpoint' => 'https://api.zippopotam.us/us/',
-	];
-
-	$zip_code_query = [
-		'data_source' => $zip_code_data_source,
-		'display_name' => 'Get location by Zip code',
-		// Provide a callable (closure) to dynamically generate the endpoint using
-		// the base endpoint from the data source and the input variables.
-		'endpoint' => function ( array $input_variables ) use ( $zip_code_data_source ): string {
-			return $zip_code_data_source['endpoint'] . $input_variables['zip_code'];
-		},
-		'input_schema' => [
-			'zip_code' => [
-				'name' => 'Zip Code',
-				'type' => 'string',
-			],
-		],
-		'output_schema' => [
-			'is_collection' => false, // This query returns a single record.
-			'type' => [
-				'zip_code' => [
-					'name' => 'Zip Code',
-					'path' => '$["post code"]', // JSON property with space requires brackets and quotes.
-					'type' => 'string',
-				],
-				'city' => [
-					'name' => 'City',
-					'path' => '$.places[0]["place name"]', // JSON property with space requires brackets and quotes.
-					'type' => 'string',
-				],
-				'state' => [
-					'name' => 'State',
-					'path' => '$.places[0].state',
-					'type' => 'string',
-				],
-			],
-		],
-	];
-
-	register_remote_data_block( [
-		'title' => 'Zip Code',
-		'render_query' => [
-			'query' => $zip_code_query,
-		],
-	] );
-}
-add_action( 'init', __NAMESPACE__ . '\\register_zip_code_remote_data_block' );
 ````
 
 ## File: example/templates/airtable-map-block/src/leaflet-map/render.php
