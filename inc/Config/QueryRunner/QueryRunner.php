@@ -97,7 +97,9 @@ class QueryRunner implements QueryRunnerInterface {
 		$pass = ( $user || $pass ) ? $pass . '@' : '';
 		$origin = sprintf( '%s://%s%s%s%s', $scheme, $user, $pass, $host, $port );
 
-		$cache_headers = [];
+		$cache_headers = [
+			RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER => $cache_key_request_headers,
+		];
 		if ( intval( $cache_ttl ) > 0 ) {
 			$cache_headers[ RdbCacheStrategy::CACHE_TTL_REQUEST_HEADER ] = $cache_ttl;
 		}
@@ -108,7 +110,6 @@ class QueryRunner implements QueryRunnerInterface {
 		$request_details = [
 			'method' => $method,
 			'options' => [
-				RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_OPTION => $cache_key_request_headers,
 				RequestOptions::HEADERS => array_merge( $headers, $cache_headers ),
 				RequestOptions::JSON => $body,
 			],

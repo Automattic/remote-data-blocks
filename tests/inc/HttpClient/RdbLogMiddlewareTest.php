@@ -22,15 +22,21 @@ class RdbLogMiddlewareTest extends TestCase {
 		};
 		$log_handler = ( new RdbLogMiddleware() )( $handler );
 
-		$first_options = [ RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_OPTION => [ 'X-Api-Key' ] ];
+		$first_options = [];
 		$log_handler(
-			new Request( 'GET', 'https://example.com/data', [ 'X-Api-Key' => 'first-api-key' ] ),
+			new Request( 'GET', 'https://example.com/data', [
+				RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER => [ 'X-Api-Key' ],
+				'X-Api-Key' => 'first-api-key',
+			] ),
 			$first_options
 		)->wait();
 
-		$second_options = [ RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_OPTION => [ 'X-Api-Key' ] ];
+		$second_options = [];
 		$log_handler(
-			new Request( 'GET', 'https://example.com/data', [ 'X-Api-Key' => 'second-api-key' ] ),
+			new Request( 'GET', 'https://example.com/data', [
+				RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER => [ 'X-Api-Key' ],
+				'X-Api-Key' => 'second-api-key',
+			] ),
 			$second_options
 		)->wait();
 

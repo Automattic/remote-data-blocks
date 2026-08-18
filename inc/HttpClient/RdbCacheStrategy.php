@@ -29,17 +29,14 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 		);
 	}
 
-	/**
-	 * @param array<string>|null $cache_key_request_headers Request headers included in the cache key. When omitted, read them from the request metadata header.
-	 */
-	public static function get_object_cache_key_from_request( RequestInterface $request, ?array $cache_key_request_headers = null ): string {
+	public static function get_object_cache_key_from_request( RequestInterface $request ): string {
 		$request_body = (string) $request->getBody();
 		$request_method = $request->getMethod();
 		$request_uri = (string) $request->getUri();
 
 		$cache_key_request_headers = CacheKeyRequestHeaders::merge(
 			CacheKeyRequestHeaders::DEFAULT_HEADERS,
-			$cache_key_request_headers ?? $request->getHeader( RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER )
+			$request->getHeader( RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER )
 		);
 
 		$cache_headers = [];
@@ -88,6 +85,10 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 
 		$response = $response->withoutHeader( 'Etag' )->withoutHeader( 'Last-Modified' );
 
-		return new CacheEntry( $request->withoutHeader( static::HEADER_TTL ), $response, new DateTime( sprintf( '%+d seconds', $ttl ) ) );
+		$cache_request = $request
+			->withoutHeader( static::HEADER_TTL )
+			->withoutHeader( RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER );
+
+		return new CacheEntry( $cache_request, $response, new DateTime( sprintf( '%+d seconds', $ttl ) ) );
 	}
 }

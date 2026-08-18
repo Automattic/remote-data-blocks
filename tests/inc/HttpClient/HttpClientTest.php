@@ -7,7 +7,9 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Kevinrob\GuzzleCache\CacheEntry;
 use Kevinrob\GuzzleCache\Storage\VolatileRuntimeStorage;
 use RemoteDataBlocks\HttpClient\RdbCacheMiddleware;
 use RemoteDataBlocks\HttpClient\RdbCacheStrategy;
@@ -267,12 +269,16 @@ class HttpClientTest extends TestCase {
 		);
 
 		$first_response = $this->http_client->request( 'GET', '/test', [
-			RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_OPTION => [ 'Authorization', 'Cache-Control', 'X-Api-Key' ],
-			'headers' => [ 'X-Api-Key' => 'first-api-key' ],
+			'headers' => [
+				RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER => [ 'Authorization', 'Cache-Control', 'X-Api-Key' ],
+				'X-Api-Key' => 'first-api-key',
+			],
 		], $this->client );
 		$second_response = $this->http_client->request( 'GET', '/test', [
-			RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_OPTION => [ 'Authorization', 'Cache-Control', 'X-Api-Key' ],
-			'headers' => [ 'X-Api-Key' => 'second-api-key' ],
+			'headers' => [
+				RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER => [ 'Authorization', 'Cache-Control', 'X-Api-Key' ],
+				'X-Api-Key' => 'second-api-key',
+			],
 		], $this->client );
 
 		$this->assertSame( 'First Response', (string) $first_response->getBody() );
@@ -289,12 +295,16 @@ class HttpClientTest extends TestCase {
 		);
 
 		$first_response = $this->http_client->request( 'GET', '/test', [
-			RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_OPTION => [ 'X-Api-Key' ],
-			'headers' => [ 'x-api-key' => 'first-api-key' ],
+			'headers' => [
+				RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER => [ 'X-Api-Key' ],
+				'x-api-key' => 'first-api-key',
+			],
 		], $this->client );
 		$second_response = $this->http_client->request( 'GET', '/test', [
-			RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_OPTION => [ 'X-Api-Key' ],
-			'headers' => [ 'x-api-key' => 'second-api-key' ],
+			'headers' => [
+				RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER => [ 'X-Api-Key' ],
+				'x-api-key' => 'second-api-key',
+			],
 		], $this->client );
 
 		$this->assertSame( 'First Response', (string) $first_response->getBody() );
@@ -312,14 +322,30 @@ class HttpClientTest extends TestCase {
 		$client = new Client( [ 'handler' => $handler_stack ] );
 
 		$this->http_client->request( 'GET', '/test', [
-			RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_OPTION => [ 'X-Api-Key' ],
-			'headers' => [ 'X-Api-Key' => 'secret' ],
+			'headers' => [
+				RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER => [ 'X-Api-Key' ],
+				'X-Api-Key' => 'secret',
+			],
 		], $client );
 
 		$this->assertCount( 1, $transactions );
 		$this->assertSame( 'secret', $transactions[0]['request']->getHeaderLine( 'X-Api-Key' ) );
 		$this->assertFalse( $transactions[0]['request']->hasHeader( RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER ) );
-		$this->assertArrayNotHasKey( RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_OPTION, $transactions[0]['options'] );
+	}
+
+	public function testCacheKeyRequestHeaderMetadataIsNotStoredInCacheEntry(): void {
+		$storage = new VolatileRuntimeStorage();
+		$strategy = new RdbCacheStrategy( $storage );
+		$request = new Request( 'GET', 'https://example.com/test', [
+			RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER => [ 'X-Api-Key' ],
+			'X-Api-Key' => 'secret',
+		] );
+
+		$strategy->cache( $request, new Response( 200 ) );
+		$cache_entry = $strategy->fetch( $request );
+
+		$this->assertInstanceOf( CacheEntry::class, $cache_entry );
+		$this->assertFalse( $cache_entry->getOriginalRequest()->hasHeader( RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER ) );
 	}
 
 	public function testRepeatedPostRequestsWithDifferentBodyResultsInCacheMiss(): void {

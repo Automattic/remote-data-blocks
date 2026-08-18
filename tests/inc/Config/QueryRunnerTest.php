@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Tests\Config;
 
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\Config\Query\HttpQueryInterface;
@@ -95,7 +96,7 @@ class QueryRunnerTest extends TestCase {
 		$this->assertArrayHasKey( 'results', $result );
 	}
 
-	public function testRequestDetailsIncludeCacheKeyRequestHeadersOption(): void {
+	public function testRequestDetailsIncludeCacheKeyRequestHeadersHeader(): void {
 		$data_source = MockDataSource::create();
 		$this->assertInstanceOf( MockDataSource::class, $data_source );
 
@@ -115,7 +116,7 @@ class QueryRunnerTest extends TestCase {
 		$this->assertIsArray( $request_details );
 		$this->assertSame(
 			[ 'Authorization', 'Cache-Control', 'X-Api-Key' ],
-			$request_details['options'][ RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_OPTION ] ?? null
+			$request_details['options'][ RequestOptions::HEADERS ][ RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER ] ?? null
 		);
 	}
 

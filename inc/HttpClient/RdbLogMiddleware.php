@@ -27,22 +27,20 @@ final class RdbLogMiddleware {
 		return function ( RequestInterface $request, array &$options ) use ( $handler ): PromiseInterface {
 			return $handler( $request, $options )
 				->then(
-					$this->handle_success( $request, $options ),
-					$this->handle_failure( $request, $options )
+					$this->handle_success( $request ),
+					$this->handle_failure( $request )
 				);
 		};
 	}
 
-	private function log( RequestInterface $request, ?ResponseInterface $response, ?\Exception $reason, array $options ): void {
+	private function log( RequestInterface $request, ?ResponseInterface $response, ?\Exception $reason ): void {
 		$response_headers = $response ? $response->getHeaders() : [];
 		$uri = $request->getUri();
-		$cache_key_request_headers = $options[ RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_OPTION ] ?? [];
-		$cache_key_request_headers = is_array( $cache_key_request_headers ) ? array_values( array_filter( $cache_key_request_headers, 'is_string' ) ) : [];
 
 		$context = [
 			'cache_age' => $response_headers[ RdbCacheStrategy::CACHE_AGE_RESPONSE_HEADER ][0] ?? '',
 			'cache_group' => RdbCacheStrategy::WP_OBJECT_CACHE_GROUP ?? '',
-			'cache_key' => RdbCacheStrategy::get_object_cache_key_from_request( $request, $cache_key_request_headers ),
+			'cache_key' => RdbCacheStrategy::get_object_cache_key_from_request( $request ),
 			'cache_status' => $response_headers[ CacheMiddleware::HEADER_CACHE_INFO ][0] ?? '',
 			'error' => $reason,
 			'hostname' => $uri->getHost(),
@@ -59,10 +57,10 @@ final class RdbLogMiddleware {
 	/**
 	 * Returns a function which is handled when a request was rejected.
 	 */
-	private function handle_failure( RequestInterface $request, array $options ): callable {
-		return function ( \Exception $reason ) use ( $request, $options ) {
+	private function handle_failure( RequestInterface $request ): callable {
+		return function ( \Exception $reason ) use ( $request ) {
 			$response = ( $reason instanceof RequestException && $reason->hasResponse() === true ) ? $reason->getResponse() : null;
-			$this->log( $request, $response, $reason, $options );
+			$this->log( $request, $response, $reason );
 			return Create::rejectionFor( $reason );
 		};
 	}
@@ -70,9 +68,9 @@ final class RdbLogMiddleware {
 	/**
 	 * Returns a function which is handled when a request was successful.
 	 */
-	private function handle_success( RequestInterface $request, array $options ): callable {
-		return function ( ResponseInterface $response ) use ( $request, $options ) {
-			$this->log( $request, $response, null, $options );
+	private function handle_success( RequestInterface $request ): callable {
+		return function ( ResponseInterface $response ) use ( $request ) {
+			$this->log( $request, $response, null );
 			return $response;
 		};
 	}
