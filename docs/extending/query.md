@@ -139,6 +139,16 @@ The `request_headers` property defines the request headers for the query. It can
 },
 ```
 
+### cache_key_request_headers: array
+
+A static list of additional request header names whose values will be included in the object cache key for this query. `Authorization` and `Cache-Control` are always included by default. Query entries are added to the list configured by the data source, and duplicate names are removed case-insensitively. A configured header that is absent from a request is ignored.
+
+```php
+'cache_key_request_headers' => [ 'X-Request-Scope' ],
+```
+
+**Security warning:** Add every query-specific header that can affect authentication, authorization, tenancy, or the returned data. Omitting such a header can allow requests with different security contexts to share a cached response, potentially exposing protected data across requests and users when a persistent object cache is enabled. Prefer the [data-source configuration](data-source.md#cache_key_request_headers-array) when a header applies to every query for that source.
+
 ### request_body: array|callable
 
 The `request_body` property defines the request body for the query. It can be an associative array or a callable function that returns an associative array. The callable function accepts an associative array of input variables (`[ $var_name => $value ]`). If omitted, the query will not have a request body.

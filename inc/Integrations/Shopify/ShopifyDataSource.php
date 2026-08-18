@@ -35,6 +35,7 @@ class ShopifyDataSource extends GenericHttpDataSource {
 		}
 
 		return [
+			'cache_key_request_headers' => [ 'X-Shopify-Storefront-Access-Token' ],
 			'display_name' => $service_config['display_name'],
 			'endpoint' => $endpoint,
 			'image_url' => plugins_url( './assets/shopify_logo_black.png', __FILE__ ),

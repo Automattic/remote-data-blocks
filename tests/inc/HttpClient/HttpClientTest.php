@@ -6,12 +6,12 @@ use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use Kevinrob\GuzzleCache\Storage\VolatileRuntimeStorage;
 use RemoteDataBlocks\HttpClient\RdbCacheMiddleware;
 use RemoteDataBlocks\HttpClient\RdbCacheStrategy;
 use RemoteDataBlocks\HttpClient\HttpClient;
-use RemoteDataBlocks\Tests\Mocks\MockWordPressFunctions;
 
 class HttpClientTest extends TestCase {
 	private Client $client;
@@ -29,11 +29,6 @@ class HttpClientTest extends TestCase {
 
 		$this->client = $client;
 		$this->http_client = HttpClient::instance();
-	}
-
-	protected function tearDown(): void {
-		MockWordPressFunctions::reset();
-		parent::tearDown();
 	}
 
 	public function testSingleton(): void {
@@ -265,26 +260,18 @@ class HttpClientTest extends TestCase {
 		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the second request' );
 	}
 
-	public function testFilteredCustomHeaderWithDifferentValuesResultsInCacheMiss(): void {
-		MockWordPressFunctions::add_mock_filter(
-			'remote_data_blocks_cache_key_request_headers',
-			function ( array $cache_key_request_headers, array $request_headers ): array {
-				$this->assertSame( [ 'Authorization', 'Cache-Control' ], $cache_key_request_headers );
-				$this->assertArrayHasKey( 'X-Api-Key', $request_headers );
-
-				return array_merge( $cache_key_request_headers, [ 'X-Api-Key' ] );
-			}
-		);
-
+	public function testConfiguredCustomHeaderWithDifferentValuesResultsInCacheMiss(): void {
 		$this->mock_handler->append(
 			new Response( 200, [], 'First Response' ),
 			new Response( 200, [], 'Second Response' )
 		);
 
 		$first_response = $this->http_client->request( 'GET', '/test', [
+			RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_OPTION => [ 'Authorization', 'Cache-Control', 'X-Api-Key' ],
 			'headers' => [ 'X-Api-Key' => 'first-api-key' ],
 		], $this->client );
 		$second_response = $this->http_client->request( 'GET', '/test', [
+			RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_OPTION => [ 'Authorization', 'Cache-Control', 'X-Api-Key' ],
 			'headers' => [ 'X-Api-Key' => 'second-api-key' ],
 		], $this->client );
 
@@ -295,21 +282,18 @@ class HttpClientTest extends TestCase {
 		$this->assertSame( 0, $this->mock_handler->count(), 'Both responses should be consumed when the custom header values differ' );
 	}
 
-	public function testFilteredCustomHeaderNameIsCaseInsensitive(): void {
-		MockWordPressFunctions::add_mock_filter(
-			'remote_data_blocks_cache_key_request_headers',
-			fn( array $cache_key_request_headers ): array => array_merge( $cache_key_request_headers, [ 'X-Api-Key' ] )
-		);
-
+	public function testConfiguredCustomHeaderNameIsCaseInsensitive(): void {
 		$this->mock_handler->append(
 			new Response( 200, [], 'First Response' ),
 			new Response( 200, [], 'Second Response' )
 		);
 
 		$first_response = $this->http_client->request( 'GET', '/test', [
+			RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_OPTION => [ 'X-Api-Key' ],
 			'headers' => [ 'x-api-key' => 'first-api-key' ],
 		], $this->client );
 		$second_response = $this->http_client->request( 'GET', '/test', [
+			RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_OPTION => [ 'X-Api-Key' ],
 			'headers' => [ 'x-api-key' => 'second-api-key' ],
 		], $this->client );
 
@@ -317,6 +301,25 @@ class HttpClientTest extends TestCase {
 		$this->assertSame( 'Second Response', (string) $second_response->getBody() );
 		$this->assertSame( RdbCacheMiddleware::HEADER_CACHE_MISS, $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
 		$this->assertSame( 0, $this->mock_handler->count(), 'Both responses should be consumed regardless of custom header casing' );
+	}
+
+	public function testCacheKeyRequestHeaderMetadataIsNotSentToRequestHandler(): void {
+		$transactions = [];
+		$mock_handler = new MockHandler( [ new Response( 200, [], 'Success' ) ] );
+		$handler_stack = HandlerStack::create( $mock_handler );
+		$handler_stack->push( new RdbCacheMiddleware( new RdbCacheStrategy( new VolatileRuntimeStorage() ) ), 'cache' );
+		$handler_stack->push( Middleware::history( $transactions ), 'history' );
+		$client = new Client( [ 'handler' => $handler_stack ] );
+
+		$this->http_client->request( 'GET', '/test', [
+			RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_OPTION => [ 'X-Api-Key' ],
+			'headers' => [ 'X-Api-Key' => 'secret' ],
+		], $client );
+
+		$this->assertCount( 1, $transactions );
+		$this->assertSame( 'secret', $transactions[0]['request']->getHeaderLine( 'X-Api-Key' ) );
+		$this->assertFalse( $transactions[0]['request']->hasHeader( RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER ) );
+		$this->assertArrayNotHasKey( RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_OPTION, $transactions[0]['options'] );
 	}
 
 	public function testRepeatedPostRequestsWithDifferentBodyResultsInCacheMiss(): void {

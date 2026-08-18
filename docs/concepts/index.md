@@ -22,7 +22,7 @@ The response cache is shared across queries. When the site uses a persistent obj
 
 **Security warning:** If an API uses a custom header for authentication, authorization, tenancy, or any other value that changes the response, that header must be added to the cache key. Otherwise, requests that differ only by that header can share a cache entry. With a persistent object cache, this can cause a response fetched with one credential or security context to be returned to a request using another, potentially exposing protected remote data.
 
-Use the [`remote_data_blocks_cache_key_request_headers`](../extending/hooks.md#remote_data_blocks_cache_key_request_headers) filter to add every custom header that can affect the authorized or returned data.
+Use the data source or query [`cache_key_request_headers`](../extending/data-source.md#cache_key_request_headers-array) configuration to add every custom header that can affect the authorized or returned data. Data-source entries apply to every query that uses that source; query entries are merged for one query. The built-in defaults cannot be removed.
 
 ## Technical concepts
 

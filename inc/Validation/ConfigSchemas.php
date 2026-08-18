@@ -133,6 +133,7 @@ final class ConfigSchemas {
 
 	private static function generate_http_data_source_config_schema(): array {
 		return Types::object( [
+			'cache_key_request_headers' => Types::nullable( Types::list_of( Types::string() ) ),
 			'display_name' => Types::string(),
 			'endpoint' => Types::string(),
 			'image_url' => Types::nullable( Types::image_url() ),
@@ -159,6 +160,7 @@ final class ConfigSchemas {
 		return Types::object( [
 			'display_name' => Types::nullable( Types::string() ),
 			'cache_ttl' => Types::nullable( Types::one_of( Types::callable(), Types::integer(), Types::null() ) ),
+			'cache_key_request_headers' => Types::nullable( Types::list_of( Types::string() ) ),
 			'data_source' => Types::one_of(
 				Types::instance_of( HttpDataSource::class ),
 				Types::serialized_config_for( HttpDataSource::class ),

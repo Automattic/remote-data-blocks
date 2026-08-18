@@ -4,6 +4,7 @@ namespace RemoteDataBlocks\Tests\Config;
 
 use PHPUnit\Framework\TestCase;
 use RemoteDataBlocks\Integrations\GenericHttp\GenericHttpDataSource;
+use WP_Error;
 
 class GenericHttpDataSourceTest extends TestCase {
 
@@ -36,5 +37,25 @@ class GenericHttpDataSourceTest extends TestCase {
 
 		$this->assertEquals( 'generic-http', $data_source_array['service'] );
 		$this->assertEquals( 'http://example.com', $data_source_array['service_config']['endpoint'] );
+	}
+
+	public function testCacheKeyRequestHeadersIncludeApiKeyHeaderAndManualAdditions(): void {
+		$data_source = GenericHttpDataSource::from_array( [
+			'service_config' => [
+				'__version' => 1,
+				'auth' => [
+					'add_to' => 'header',
+					'key' => 'X-Api-Key',
+					'type' => 'api-key',
+					'value' => 'secret',
+				],
+				'cache_key_request_headers' => [ 'X-Tenant-ID', 'x-api-key' ],
+				'display_name' => 'Mock Data Source',
+				'endpoint' => 'https://example.com',
+			],
+		] );
+
+		$this->assertNotInstanceOf( WP_Error::class, $data_source );
+		$this->assertSame( [ 'X-Api-Key', 'X-Tenant-ID' ], $data_source->get_cache_key_request_headers() );
 	}
 }

@@ -5,6 +5,7 @@ namespace RemoteDataBlocks\Tests\Config;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use RemoteDataBlocks\Config\Query\HttpQueryInterface;
 use RemoteDataBlocks\Config\QueryRunner\QueryRunner;
 use RemoteDataBlocks\HttpClient\HttpClient;
 use RemoteDataBlocks\Tests\Mocks\MockDataSource;
@@ -91,6 +92,30 @@ class QueryRunnerTest extends TestCase {
 
 		$this->assertIsArray( $result );
 		$this->assertArrayHasKey( 'results', $result );
+	}
+
+	public function testRequestDetailsIncludeCacheKeyRequestHeadersOption(): void {
+		$data_source = MockDataSource::create( array_merge(
+			MockDataSource::MOCK_CONFIG,
+			[ 'cache_key_request_headers' => [ 'X-Api-Key' ] ]
+		) );
+		$this->assertInstanceOf( MockDataSource::class, $data_source );
+
+		$query = MockQuery::create( [ 'data_source' => $data_source ] );
+		$this->assertInstanceOf( MockQuery::class, $query );
+
+		$query_runner = new class($this->http_client, []) extends QueryRunner {
+			public function get_request_details_for_test( HttpQueryInterface $query ): array|WP_Error {
+				return $this->get_request_details( $query, [] );
+			}
+		};
+
+		$request_details = $query_runner->get_request_details_for_test( $query );
+		$this->assertIsArray( $request_details );
+		$this->assertSame(
+			[ 'Authorization', 'Cache-Control', 'X-Api-Key' ],
+			$request_details['options']['remote_data_blocks_cache_key_request_headers'] ?? null
+		);
 	}
 
 	public static function provideInvalidEndpoints(): array {

@@ -72,25 +72,6 @@ function custom_allowed_url_schemes( array $allowed_url_schemes, HttpQueryInterf
 add_filter( 'remote_data_blocks_allowed_url_schemes', 'custom_allowed_url_schemes', 10, 2 );
 ```
 
-### remote_data_blocks_cache_key_request_headers
-
-Filter the request headers included in the object cache key. `Authorization` and `Cache-Control` are included by default. The plugin cannot determine whether an arbitrary header carries credentials or changes the response, so other headers must be added explicitly. The complete headers for the current request are provided as the second argument.
-
-#### Security implications
-
-The object cache is shared across queries. When the site uses a persistent object cache, it is also shared across requests and users. If two requests have the same method, URI, and body, the configured cache-invalidating headers are what prevent responses for different credentials or security contexts from sharing a cache entry.
-
-**Security warning:** When an API uses a custom header for authentication, authorization, tenancy, or any other response-varying value, omitting that header from this filter can cause one request to receive a response cached for another. With a persistent object cache, this can expose protected remote data across requests and users.
-
-Add every custom header that can affect the authorized or returned data. Always merge additions with the provided list so that the default `Authorization` and `Cache-Control` protections remain in place. Header names are matched case-insensitively, and it is safe to add a header that is absent from some requests because absent headers are ignored when generating the key.
-
-```php
-function custom_cache_key_request_headers( array $cache_key_request_headers, array $request_headers ): array {
-	return array_merge( $cache_key_request_headers, [ 'X-Api-Key' ] );
-}
-add_filter( 'remote_data_blocks_cache_key_request_headers', 'custom_cache_key_request_headers', 10, 2 );
-```
-
 ### remote_data_blocks_pagination_query_var_name
 
 Filter the query variable name used for pagination (default: `rdb-pagination`).

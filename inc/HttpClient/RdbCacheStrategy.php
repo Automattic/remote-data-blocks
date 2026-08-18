@@ -19,13 +19,11 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 	public const CACHE_TTL_REQUEST_HEADER = GreedyCacheStrategy::HEADER_TTL;
 	public const WP_OBJECT_CACHE_GROUP = 'remote-data-blocks';
 
-	private const CACHE_KEY_REQUEST_HEADERS = [ 'Authorization', 'Cache-Control' ];
 	private const ERROR_CACHE_TTL_IN_SECONDS = 30; // 30 seconds for error responses
 	private const FALLBACK_CACHE_TTL_IN_SECONDS = 300; // 5 minutes for success responses
 
 	public function __construct( ?CacheStorageInterface $storage = null ) {
-		// Filter this if customization is needed.
-		$vary_headers = new KeyValueHttpHeader( self::CACHE_KEY_REQUEST_HEADERS );
+		$vary_headers = new KeyValueHttpHeader( CacheKeyRequestHeaders::DEFAULT_HEADERS );
 
 		parent::__construct(
 			$storage ?? new WordPressObjectCacheStorage( self::WP_OBJECT_CACHE_GROUP ),
@@ -36,20 +34,12 @@ class RdbCacheStrategy extends GreedyCacheStrategy {
 
 	public static function get_object_cache_key_from_request( RequestInterface $request ): string {
 		$request_body = (string) $request->getBody();
-		$request_headers = $request->getHeaders();
 		$request_method = $request->getMethod();
 		$request_uri = (string) $request->getUri();
 
-		/**
-		 * Filters the request headers that are included in the object cache key.
-		 *
-		 * @param array<string>           $cache_key_request_headers Header names included in the cache key.
-		 * @param array<string, string[]> $request_headers           Headers from the current request.
-		 */
-		$cache_key_request_headers = (array) apply_filters(
-			'remote_data_blocks_cache_key_request_headers',
-			self::CACHE_KEY_REQUEST_HEADERS,
-			$request_headers
+		$cache_key_request_headers = CacheKeyRequestHeaders::merge(
+			CacheKeyRequestHeaders::DEFAULT_HEADERS,
+			$request->getHeader( RdbCacheMiddleware::CACHE_KEY_REQUEST_HEADERS_HEADER )
 		);
 
 		$cache_headers = [];
