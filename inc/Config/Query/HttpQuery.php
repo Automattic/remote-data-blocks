@@ -45,10 +45,7 @@ class HttpQuery extends ArraySerializable implements HttpQueryInterface {
 	 * @return array<string> Request header names included in cache keys.
 	 */
 	public function get_cache_key_request_headers(): array {
-		return CacheKeyRequestHeaders::merge(
-			CacheKeyRequestHeaders::DEFAULT_HEADERS,
-			$this->config['cache_key_request_headers'] ?? []
-		);
+		return $this->config['cache_key_request_headers'] ?? [];
 	}
 
 	/**
