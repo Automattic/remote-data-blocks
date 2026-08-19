@@ -2,8 +2,6 @@
 
 namespace RemoteDataBlocks\HttpClient;
 
-use Psr\Http\Message\RequestInterface;
-
 class RdbCacheMiddleware extends \Kevinrob\GuzzleCache\CacheMiddleware {
 	/**
 	 * @var array<string, true>
