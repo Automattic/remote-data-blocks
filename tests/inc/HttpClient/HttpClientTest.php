@@ -353,6 +353,24 @@ class HttpClientTest extends TestCase {
 		$this->assertFalse( $transactions[0]['request']->hasHeader( RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER ) );
 	}
 
+	public function testCacheTtlMetadataIsNotSentToRequestHandler(): void {
+		$transactions = [];
+		$mock_handler = new MockHandler( [ new Response( 200, [], 'Success' ) ] );
+		$handler_stack = HandlerStack::create( $mock_handler );
+		$handler_stack->push( new RdbCacheMiddleware( new RdbCacheStrategy( new VolatileRuntimeStorage() ) ), 'cache' );
+		$handler_stack->push( Middleware::history( $transactions ), 'history' );
+		$client = new Client( [ 'handler' => $handler_stack ] );
+
+		$this->http_client->request( 'GET', '/test', [
+			'headers' => [
+				RdbCacheStrategy::CACHE_TTL_REQUEST_HEADER => 600,
+			],
+		], $client );
+
+		$this->assertCount( 1, $transactions );
+		$this->assertFalse( $transactions[0]['request']->hasHeader( RdbCacheStrategy::CACHE_TTL_REQUEST_HEADER ) );
+	}
+
 	public function testCacheKeyRequestHeaderMetadataIsNotStoredInCacheEntry(): void {
 		$storage = new VolatileRuntimeStorage();
 		$strategy = new RdbCacheStrategy( $storage );

@@ -21,6 +21,10 @@ class RdbCacheStrategy implements CacheStrategyInterface {
 
 	private const ERROR_CACHE_TTL_IN_SECONDS = 30; // 30 seconds for error responses
 	private const FALLBACK_CACHE_TTL_IN_SECONDS = 300; // 5 minutes for success responses
+	private const CACHE_METADATA_REQUEST_HEADERS = [
+		self::CACHE_TTL_REQUEST_HEADER,
+		self::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER,
+	];
 	private const STATUS_ACCEPTED = [
 		200 => true,
 		203 => true,
@@ -39,6 +43,14 @@ class RdbCacheStrategy implements CacheStrategyInterface {
 
 	public function __construct( ?CacheStorageInterface $storage = null ) {
 		$this->storage = $storage ?? new WordPressObjectCacheStorage( self::WP_OBJECT_CACHE_GROUP );
+	}
+
+	public static function without_cache_metadata_headers( RequestInterface $request ): RequestInterface {
+		foreach ( self::CACHE_METADATA_REQUEST_HEADERS as $header ) {
+			$request = $request->withoutHeader( $header );
+		}
+
+		return $request;
 	}
 
 	public static function get_object_cache_key_from_request( RequestInterface $request ): string {
@@ -115,9 +127,7 @@ class RdbCacheStrategy implements CacheStrategyInterface {
 
 		$response = $response->withoutHeader( 'Etag' )->withoutHeader( 'Last-Modified' );
 
-		$cache_request = $request
-			->withoutHeader( self::CACHE_TTL_REQUEST_HEADER )
-			->withoutHeader( self::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER );
+		$cache_request = self::without_cache_metadata_headers( $request );
 
 		return new CacheEntry( $cache_request, $response, new DateTime( sprintf( '%+d seconds', $ttl ) ) );
 	}
