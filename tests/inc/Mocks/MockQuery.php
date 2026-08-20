@@ -13,6 +13,8 @@ class MockQuery extends HttpQuery {
 
 	public static function create( array $config = [], ?ValidatorInterface $validator = null ): static|WP_Error {
 		return self::from_array( [
+			'cache_ttl' => $config['cache_ttl'] ?? null,
+			'cache_key_request_headers' => $config['cache_key_request_headers'] ?? null,
 			'data_source' => $config['data_source'] ?? MockDataSource::create(),
 			'display_name' => 'Mock Query',
 			'endpoint' => $config['endpoint'] ?? null,

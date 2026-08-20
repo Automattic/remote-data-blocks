@@ -72,6 +72,8 @@ An associative array of headers that will be sent with each HTTP request. Querie
 
 When providing authentication credentials, take care to avoid committing them to code repositories. We strongly recommend using environment variables or secure storage.
 
+**Security warning:** Defining a custom authentication, authorization, tenancy, or response-varying header on a data source does not automatically include it in cache keys. Add the header name to the [`cache_key_request_headers`](query.md#cache_key_request_headers-array) configuration of every query that uses it. Otherwise, requests with different header values can share cached responses and potentially expose protected data across requests or users when a persistent object cache is enabled.
+
 ### Next steps
 
 After defining a data source in code, you can use it in a [query](query.md) to define how data is retrieved.

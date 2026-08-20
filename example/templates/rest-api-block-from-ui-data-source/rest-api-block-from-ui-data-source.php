@@ -22,6 +22,11 @@ function register_basic_rest_api_remote_data_block_from_uuid(): void {
 	// Get item query: Fetch one record by ID.
 	$get_item_query = [
 		'data_source' => $api_data_source,
+		'cache_key_request_headers' => [
+			// TODO: Include every custom header from the UI-configured data source that
+			// can affect authentication, authorization, tenancy, or the returned data.
+			// 'X-API-Key',
+		],
 		// Provide a callable (closure) to dynamically generate the endpoint using
 		// the base endpoint from the data source and the input variables.
 		'endpoint' => function ( array $input_variables ) use ( $api_data_source ): string {
@@ -70,6 +75,11 @@ function register_basic_rest_api_remote_data_block_from_uuid(): void {
 	// List items query: Fetch multiple records with pagination and search.
 	$list_items_query = [
 		'data_source' => $api_data_source,
+		'cache_key_request_headers' => [
+			// TODO: Include every custom header from the UI-configured data source that
+			// can affect authentication, authorization, tenancy, or the returned data.
+			// 'X-API-Key',
+		],
 		// Provide a callable (closure) to dynamically generate the endpoint using
 		// the base endpoint from the data source and the input variables.
 		'endpoint' => function ( array $input_variables ) use ( $api_data_source ): string {

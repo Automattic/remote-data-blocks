@@ -3,6 +3,7 @@
 namespace RemoteDataBlocks\Tests\Config;
 
 use PHPUnit\Framework\TestCase;
+use RemoteDataBlocks\Config\DataSource\HttpDataSource;
 use RemoteDataBlocks\Config\Query\HttpQuery;
 use RemoteDataBlocks\Tests\Mocks\MockDataSource;
 
@@ -35,6 +36,27 @@ class QueryTest extends TestCase {
 	public function testGetRequestHeaders(): void {
 		$result = $this->query_context->get_request_headers( [] );
 		$this->assertSame( [ 'Content-Type' => 'application/json' ], $result );
+	}
+
+	public function testCacheKeyRequestHeadersAreQueryOnly(): void {
+		$data_source = HttpDataSource::from_array( [
+			'display_name' => 'Custom API',
+			'endpoint' => 'https://example.com/api',
+			'cache_key_request_headers' => [ 'X-Api-Key', 'x-tenant-id' ],
+		] );
+		$this->assertInstanceOf( HttpDataSource::class, $data_source );
+
+		$query = HttpQuery::from_array( [
+			'data_source' => $data_source,
+			'output_schema' => [ 'type' => 'null' ],
+			'cache_key_request_headers' => [ 'x-api-key', 'X-Request-Scope' ],
+		] );
+		$this->assertInstanceOf( HttpQuery::class, $query );
+
+		$this->assertSame(
+			[ 'x-api-key', 'X-Request-Scope' ],
+			$query->get_cache_key_request_headers()
+		);
 	}
 
 	public function testGetRequestBody(): void {

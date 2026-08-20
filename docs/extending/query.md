@@ -139,6 +139,28 @@ The `request_headers` property defines the request headers for the query. It can
 },
 ```
 
+### cache_key_request_headers: array
+
+A static list of additional request header names whose values will be included in the object cache key for this query. `Authorization` and `Cache-Control` are always included by default, and duplicate names are removed case-insensitively. A configured header that is absent from a request is ignored.
+
+```php
+'cache_key_request_headers' => [ 'X-Request-Scope' ],
+```
+
+**Security warning:** Add every header that can affect authentication, authorization, tenancy, or the returned data, including custom headers inherited from the query's data source. Data-source request headers are not added to cache keys automatically. Omitting such a header can allow requests with different security contexts to share a cached response, potentially exposing protected data across requests and users when a persistent object cache is enabled.
+
+Queries implemented with `HttpQuery` support this configuration automatically. If you implement `HttpQueryInterface` directly, also implement the optional `CacheKeyRequestHeadersAwareInterface` to return additional header names for that query. Existing `HttpQueryInterface` implementations that do not implement the optional interface use only the built-in `Authorization` and `Cache-Control` defaults.
+
+```php
+class CustomQuery implements HttpQueryInterface, CacheKeyRequestHeadersAwareInterface {
+	// ...
+
+	public function get_cache_key_request_headers(): array {
+		return [ 'X-Api-Key' ];
+	}
+}
+```
+
 ### request_body: array|callable
 
 The `request_body` property defines the request body for the query. It can be an associative array or a callable function that returns an associative array. The callable function accepts an associative array of input variables (`[ $var_name => $value ]`). If omitted, the query will not have a request body.

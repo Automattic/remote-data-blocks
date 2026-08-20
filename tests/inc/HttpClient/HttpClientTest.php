@@ -6,7 +6,10 @@ use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Kevinrob\GuzzleCache\CacheEntry;
 use Kevinrob\GuzzleCache\Storage\VolatileRuntimeStorage;
 use RemoteDataBlocks\HttpClient\RdbCacheMiddleware;
 use RemoteDataBlocks\HttpClient\RdbCacheStrategy;
@@ -257,6 +260,165 @@ class HttpClientTest extends TestCase {
 		$this->assertEquals( 'MISS', $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
 
 		$this->assertEquals( 0, $this->mock_handler->count(), 'The mock handler should be empty after the second request' );
+	}
+
+	public function testUnconfiguredCustomHeaderWithDifferentValuesResultsInCacheHit(): void {
+		$this->mock_handler->append(
+			new Response( 200, [], 'Cached Response' ),
+			new Response( 200, [], 'Uncached Response' )
+		);
+
+		$first_response = $this->http_client->request( 'GET', '/test', [
+			'headers' => [ 'X-Tenant-ID' => 'first-tenant' ],
+		], $this->client );
+		$second_response = $this->http_client->request( 'GET', '/test', [
+			'headers' => [ 'X-Tenant-ID' => 'second-tenant' ],
+		], $this->client );
+
+		$this->assertSame( 'Cached Response', (string) $first_response->getBody() );
+		$this->assertSame( RdbCacheMiddleware::HEADER_CACHE_MISS, $first_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+		$this->assertSame( 'Cached Response', (string) $second_response->getBody() );
+		$this->assertSame( RdbCacheMiddleware::HEADER_CACHE_HIT, $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+		$this->assertSame( 1, $this->mock_handler->count(), 'Only one response should be consumed when an unconfigured header value differs' );
+	}
+
+	public function testConfiguredCustomHeaderWithDifferentValuesResultsInCacheMiss(): void {
+		$this->mock_handler->append(
+			new Response( 200, [], 'First Response' ),
+			new Response( 200, [], 'Second Response' )
+		);
+
+		$first_response = $this->http_client->request( 'GET', '/test', [
+			'headers' => [
+				RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER => [ 'Authorization', 'Cache-Control', 'X-Api-Key' ],
+				'X-Api-Key' => 'first-api-key',
+			],
+		], $this->client );
+		$second_response = $this->http_client->request( 'GET', '/test', [
+			'headers' => [
+				RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER => [ 'Authorization', 'Cache-Control', 'X-Api-Key' ],
+				'X-Api-Key' => 'second-api-key',
+			],
+		], $this->client );
+
+		$this->assertSame( 'First Response', (string) $first_response->getBody() );
+		$this->assertSame( RdbCacheMiddleware::HEADER_CACHE_MISS, $first_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+		$this->assertSame( 'Second Response', (string) $second_response->getBody() );
+		$this->assertSame( RdbCacheMiddleware::HEADER_CACHE_MISS, $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+		$this->assertSame( 0, $this->mock_handler->count(), 'Both responses should be consumed when the custom header values differ' );
+	}
+
+	public function testConfiguredCustomHeaderNameIsCaseInsensitive(): void {
+		$this->mock_handler->append(
+			new Response( 200, [], 'First Response' ),
+			new Response( 200, [], 'Second Response' )
+		);
+
+		$first_response = $this->http_client->request( 'GET', '/test', [
+			'headers' => [
+				RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER => [ 'X-Api-Key' ],
+				'x-api-key' => 'first-api-key',
+			],
+		], $this->client );
+		$second_response = $this->http_client->request( 'GET', '/test', [
+			'headers' => [
+				RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER => [ 'X-Api-Key' ],
+				'x-api-key' => 'second-api-key',
+			],
+		], $this->client );
+
+		$this->assertSame( 'First Response', (string) $first_response->getBody() );
+		$this->assertSame( 'Second Response', (string) $second_response->getBody() );
+		$this->assertSame( RdbCacheMiddleware::HEADER_CACHE_MISS, $second_response->getHeaderLine( RdbCacheMiddleware::HEADER_CACHE_INFO ) );
+		$this->assertSame( 0, $this->mock_handler->count(), 'Both responses should be consumed regardless of custom header casing' );
+	}
+
+	public function testCacheKeyRequestHeaderMetadataIsNotSentToRequestHandler(): void {
+		$transactions = [];
+		$mock_handler = new MockHandler( [ new Response( 200, [], 'Success' ) ] );
+		$handler_stack = HandlerStack::create( $mock_handler );
+		$handler_stack->push( new RdbCacheMiddleware( new RdbCacheStrategy( new VolatileRuntimeStorage() ) ), 'cache' );
+		$handler_stack->push( Middleware::history( $transactions ), 'history' );
+		$client = new Client( [ 'handler' => $handler_stack ] );
+
+		$this->http_client->request( 'GET', '/test', [
+			'headers' => [
+				RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER => [ 'X-Api-Key' ],
+				'X-Api-Key' => 'secret',
+			],
+		], $client );
+
+		$this->assertCount( 1, $transactions );
+		$this->assertSame( 'secret', $transactions[0]['request']->getHeaderLine( 'X-Api-Key' ) );
+		$this->assertFalse( $transactions[0]['request']->hasHeader( RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER ) );
+	}
+
+	public function testCacheTtlMetadataIsNotSentToRequestHandler(): void {
+		$transactions = [];
+		$mock_handler = new MockHandler( [ new Response( 200, [], 'Success' ) ] );
+		$handler_stack = HandlerStack::create( $mock_handler );
+		$handler_stack->push( new RdbCacheMiddleware( new RdbCacheStrategy( new VolatileRuntimeStorage() ) ), 'cache' );
+		$handler_stack->push( Middleware::history( $transactions ), 'history' );
+		$client = new Client( [ 'handler' => $handler_stack ] );
+
+		$this->http_client->request( 'GET', '/test', [
+			'headers' => [
+				RdbCacheStrategy::CACHE_TTL_REQUEST_HEADER => 600,
+			],
+		], $client );
+
+		$this->assertCount( 1, $transactions );
+		$this->assertFalse( $transactions[0]['request']->hasHeader( RdbCacheStrategy::CACHE_TTL_REQUEST_HEADER ) );
+	}
+
+	public function testCacheKeyRequestHeaderMetadataIsNotStoredInCacheEntry(): void {
+		$storage = new VolatileRuntimeStorage();
+		$strategy = new RdbCacheStrategy( $storage );
+		$request = new Request( 'GET', 'https://example.com/test', [
+			RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER => [ 'X-Api-Key' ],
+			'X-Api-Key' => 'secret',
+		] );
+
+		$strategy->cache( $request, new Response( 200 ) );
+		$cache_entry = $strategy->fetch( $request );
+
+		$this->assertInstanceOf( CacheEntry::class, $cache_entry );
+		$this->assertFalse( $cache_entry->getOriginalRequest()->hasHeader( RdbCacheStrategy::CACHE_KEY_REQUEST_HEADERS_REQUEST_HEADER ) );
+	}
+
+	public function testCacheStrategyUpdateReplacesCachedResponse(): void {
+		$strategy = new RdbCacheStrategy( new VolatileRuntimeStorage() );
+		$request = new Request( 'GET', 'https://example.com/test' );
+
+		$this->assertTrue( $strategy->cache( $request, new Response( 200, [], 'Initial Response' ) ) );
+		$this->assertTrue( $strategy->update( $request, new Response( 200, [], 'Updated Response' ) ) );
+
+		$cache_entry = $strategy->fetch( $request );
+		$this->assertInstanceOf( CacheEntry::class, $cache_entry );
+		$this->assertSame( 'Updated Response', (string) $cache_entry->getResponse()->getBody() );
+	}
+
+	public function testCacheStrategyDeleteRemovesCachedResponse(): void {
+		$strategy = new RdbCacheStrategy( new VolatileRuntimeStorage() );
+		$request = new Request( 'GET', 'https://example.com/test' );
+
+		$this->assertTrue( $strategy->cache( $request, new Response( 200 ) ) );
+		$this->assertTrue( $strategy->delete( $request ) );
+		$this->assertNull( $strategy->fetch( $request ) );
+	}
+
+	public function testCacheStrategyAddsWarningHeaderToCachedResponse(): void {
+		$strategy = new RdbCacheStrategy( new VolatileRuntimeStorage() );
+		$request = new Request( 'GET', 'https://example.com/test' );
+
+		$this->assertTrue( $strategy->cache( $request, new Response( 200 ) ) );
+
+		$cache_entry = $strategy->fetch( $request );
+		$this->assertInstanceOf( CacheEntry::class, $cache_entry );
+		$this->assertStringContainsString(
+			'Cached although the response headers indicate not to do it!',
+			$cache_entry->getResponse()->getHeaderLine( 'Warning' )
+		);
 	}
 
 	public function testRepeatedPostRequestsWithDifferentBodyResultsInCacheMiss(): void {
