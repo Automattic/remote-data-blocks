@@ -94,7 +94,7 @@
     "@wordpress/scripts": "32.6.0",
     "@wordpress/server-side-render": "6.26.0",
     "@wordpress/url": "4.50.0",
-    "eslint": "^9.39.4",
+    "eslint": "^10.8.1",
     "fork-ts-checker-webpack-plugin": "9.1.0",
     "happy-dom": "20.10.6",
     "husky": "9.1.7",
