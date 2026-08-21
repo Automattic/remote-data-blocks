@@ -1,13 +1,6 @@
 import { getRestUrl } from '@/utils/localized-block-data';
 import { getClassName } from '@/utils/string';
 
-export const SUPPORTED_CORE_BLOCKS = [
-	'core/button',
-	'core/heading',
-	'core/image',
-	'core/paragraph',
-];
-
 export const DISPLAY_QUERY_KEY = 'display';
 export const REMOTE_DATA_CONTEXT_KEY = 'remote-data-blocks/remoteData';
 export const REMOTE_DATA_REST_API_URL = getRestUrl();
@@ -24,9 +17,14 @@ export const SEARCH_INPUT_VARIABLE_TYPE = 'ui:search_input';
 
 export const BUTTON_TEXT_FIELD_TYPES = [ 'button_text' ];
 export const BUTTON_URL_FIELD_TYPES = [ 'button_url' ];
+// Include 'string' as fallback for newly supported attributes that may not have dedicated field types yet
+export const BUTTON_LINK_TARGET_FIELD_TYPES = [ 'button_link_target', 'string' ];
+export const BUTTON_REL_FIELD_TYPES = [ 'button_rel', 'string' ];
 export const HTML_FIELD_TYPES = [ 'html' ];
 export const ID_FIELD_TYPES = [ 'id', 'id:list' ];
 export const IMAGE_ALT_FIELD_TYPES = [ 'image_alt' ];
+// Include 'string' as fallback for newly supported attributes that may not have dedicated field types yet
+export const IMAGE_TITLE_FIELD_TYPES = [ 'image_title', 'string' ];
 export const IMAGE_URL_FIELD_TYPES = [ 'image_url' ];
 export const TEXT_FIELD_TYPES = [
 	'currency_in_current_locale',
