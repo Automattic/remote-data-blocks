@@ -91,7 +91,7 @@
     "@wordpress/plugins": "7.50.0",
     "@wordpress/primitives": "4.50.0",
     "@wordpress/rich-text": "7.50.0",
-    "@wordpress/scripts": "32.6.0",
+    "@wordpress/scripts": "36.0.0",
     "@wordpress/server-side-render": "6.26.0",
     "@wordpress/url": "4.50.0",
     "eslint": "^9.39.4",
