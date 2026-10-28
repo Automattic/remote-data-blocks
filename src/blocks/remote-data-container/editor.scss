@@ -130,13 +130,8 @@ remote-data-blocks-inline-field {
 // align padding with designs
 
 .rdb-dataviews-bulk-actions-modal .components-modal__content {
-	scroll-padding-bottom: 121px;
-	max-height: calc(100% - 121px);
-
-	@media screen and (min-width: 782px) {
-		scroll-padding-bottom: 88px;
-		max-height: calc(100% - 88px);
-	}
+	scroll-padding-bottom: 128px;
+	max-height: calc(100% - 128px);
 
 	.dataviews-view-table tr td:first-child,
 	.dataviews-view-table tr th:first-child {
@@ -158,17 +153,12 @@ remote-data-blocks-inline-field {
 
 	// hide bulk actions in footer
 	.dataviews-footer {
-		padding: 24px 32px 0;
+		padding: 12px 32px;
 		position: fixed;
 		bottom: 64px;
 		left: 0;
 		right: 0;
-
-		@media screen and (min-width: 782px) {
-			bottom: 0;
-			height: 88px;
-			padding-bottom: 24px;
-		}
+		min-height: 64px;
 
 		.dataviews-bulk-actions-footer__container  .dataviews-bulk-actions-footer__action-buttons {
 			display: none;

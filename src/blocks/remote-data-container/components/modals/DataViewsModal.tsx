@@ -35,11 +35,13 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 		loading,
 		page,
 		perPage,
+		resetPage,
 		searchInput,
 		setPage,
 		setPerPage,
 		setSearchInput,
 		supportsSearch,
+		supportsPagination,
 		totalItems,
 		totalPages,
 	} = useRemoteData( { blockName, fetchOnMount: true, queryKey } );
@@ -122,6 +124,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 						page={ page }
 						perPage={ perPage }
 						results={ loading ? undefined : data?.results }
+						resetPage={ resetPage }
 						searchInput={ searchInput }
 						selectionIds={ selectionIds }
 						setPage={ setPage }
@@ -129,6 +132,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 						setSearchInput={ setSearchInput }
 						setSelectionIds={ setSelectionIds }
 						supportsSearch={ supportsSearch }
+						supportsPagination={ supportsPagination }
 						totalItems={ totalItems }
 						totalPages={ totalPages }
 					/>

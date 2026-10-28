@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
@@ -46,6 +46,7 @@ const defaultProps = {
 	loading: false,
 	page: 1,
 	results: mockRemoteData.results,
+	resetPage: () => {},
 	searchInput: '',
 	selectionIds: [],
 	setPage: () => {},
@@ -54,6 +55,7 @@ const defaultProps = {
 	setSelectionIds: () => {},
 	supportsBulk: false,
 	supportsSearch: false,
+	supportsPagination: false,
 };
 
 const ItemListComponent = ( props: ItemListProps ) => {
@@ -91,6 +93,52 @@ describe( 'ItemList', () => {
 		expect( screen.getByText( 'Violets' ) ).toBeVisible();
 		expect( screen.getByText( 'Crimson Clover' ) ).toBeVisible();
 		expect( screen.getByText( 'Poppy' ) ).toBeVisible();
+	} );
+
+	it( 'sorts a complete result set by the selected field', async () => {
+		const user = userEvent.setup();
+		render( <ItemListComponent { ...defaultProps } /> );
+
+		await user.click( screen.getByRole( 'button', { name: 'Title' } ) );
+		await user.click( screen.getByRole( 'menuitemradio', { name: 'Sort descending' } ) );
+
+		const rows = screen.getAllByRole( 'row' ).slice( 1 );
+		expect( rows.map( row => row.textContent ) ).toEqual( [
+			expect.stringContaining( 'Violets' ),
+			expect.stringContaining( 'Poppy' ),
+			expect.stringContaining( 'Crimson Clover' ),
+		] );
+	} );
+
+	it( 'does not offer local sorting for remotely paginated results', async () => {
+		const user = userEvent.setup();
+		render( <ItemListComponent { ...defaultProps } supportsPagination /> );
+
+		await user.click( screen.getByRole( 'button', { name: 'Title' } ) );
+		expect( screen.queryByRole( 'menuitemradio', { name: 'Sort descending' } ) ).toBeNull();
+	} );
+
+	it( 'returns to page one when searching remotely paginated results', async () => {
+		const user = userEvent.setup();
+		const resetPage = vi.fn();
+		const setSearchInput = vi.fn();
+		render(
+			<ItemListComponent
+				{ ...defaultProps }
+				page={ 2 }
+				resetPage={ resetPage }
+				setSearchInput={ setSearchInput }
+				supportsPagination
+				supportsSearch
+				totalPages={ 4 }
+			/>
+		);
+
+		await user.type( screen.getByRole( 'searchbox', { name: 'Search' } ), 'Lunch' );
+		await waitFor( () => {
+			expect( setSearchInput ).toHaveBeenLastCalledWith( 'Lunch' );
+			expect( resetPage ).toHaveBeenCalled();
+		} );
 	} );
 
 	it( 'should allow selection of a specific item', async () => {

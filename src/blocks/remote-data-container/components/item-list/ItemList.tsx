@@ -19,6 +19,7 @@ export interface ItemListProps {
 	page: number;
 	perPage?: number;
 	results?: RemoteDataApiResult[];
+	resetPage: () => void;
 	searchInput: string;
 	selectionIds: string[];
 	setPage: ( newPage: number ) => void;
@@ -26,6 +27,7 @@ export interface ItemListProps {
 	setSearchInput: ( newValue: string ) => void;
 	setSelectionIds: ( ids: string[] ) => void;
 	supportsSearch: boolean;
+	supportsPagination: boolean;
 	totalItems?: number;
 	totalPages?: number;
 }
@@ -40,6 +42,7 @@ export function ItemList( props: ItemListProps ) {
 		page,
 		perPage,
 		results = [],
+		resetPage,
 		searchInput,
 		selectionIds,
 		setPage,
@@ -47,10 +50,11 @@ export function ItemList( props: ItemListProps ) {
 		setSearchInput,
 		setSelectionIds,
 		supportsSearch,
+		supportsPagination,
 		totalItems,
 		totalPages,
 	} = props;
-	const { DataViews } = window.LockedPrivateDataViews;
+	const { DataViews, filterSortAndPaginate } = window.LockedPrivateDataViews;
 
 	// Get fields from the first result, if present.
 	const firstResult = results?.[ 0 ]?.result ?? {};
@@ -85,7 +89,8 @@ export function ItemList( props: ItemListProps ) {
 				onSelectField={ onSelectField }
 			/>
 		),
-		enableSorting: field !== mediaField,
+		// Sorting a remotely paginated response would only reorder the current page.
+		enableSorting: ! supportsPagination && field !== mediaField,
 	} ) );
 
 	// Calculate a default perPage value and avoid setting it to 0.
@@ -116,10 +121,17 @@ export function ItemList( props: ItemListProps ) {
 	}, [ [ mediaField, titleField, ...tableFields ].join( ';' ) ] );
 
 	function onChangeView( newView: View ) {
-		setPage( newView.page ?? 1 );
+		const newSearchInput = newView.search ?? '';
+		// A new search must start at page one and discard any cursor from the previous query.
+		const nextView = newSearchInput !== searchInput ? { ...newView, page: 1 } : newView;
+		if ( newSearchInput !== searchInput ) {
+			resetPage();
+		} else {
+			setPage( nextView.page ?? 1 );
+		}
 		setPerPage( newView.perPage ?? defaultPerPage );
-		setSearchInput( newView.search ?? '' );
-		setView( newView );
+		setSearchInput( newSearchInput );
+		setView( nextView );
 	}
 
 	const defaultLayouts = mediaField
@@ -128,6 +140,12 @@ export function ItemList( props: ItemListProps ) {
 				grid: {},
 		  }
 		: { table: {} };
+	// DataViews expects sorted data; search and pagination are already handled by the query.
+	const { data: sortedResults } = filterSortAndPaginate(
+		results,
+		{ ...view, page: 1, perPage: Math.max( results.length, 1 ), search: '', filters: [] },
+		fields
+	);
 
 	const chooseItemAction = {
 		id: 'choose',
@@ -150,7 +168,7 @@ export function ItemList( props: ItemListProps ) {
 		<>
 			<DataViews< RemoteDataApiResult >
 				actions={ actions }
-				data={ results }
+				data={ sortedResults }
 				defaultLayouts={ defaultLayouts }
 				fields={ fields }
 				getItemId={ ( item: RemoteDataApiResult ) => item.uuid }

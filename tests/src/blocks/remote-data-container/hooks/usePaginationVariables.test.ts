@@ -180,6 +180,53 @@ describe( 'usePaginationVariables', () => {
 		expect( result.current.totalPages ).toBe( 7 );
 	} );
 
+	it.each( [ 'CURSOR', 'CURSOR_SIMPLE' ] as const )(
+		'resets %s pagination directly from a later page',
+		type => {
+			const nextCursorSlug = type === 'CURSOR' ? 'cursor_next' : 'cursor';
+			const cursorSlugs = [ nextCursorSlug, ...( type === 'CURSOR' ? [ 'cursor_previous' ] : [] ) ];
+			const paginationData: RemoteDataPagination = {
+				input_variables: { next_page: { [ nextCursorSlug ]: 'old-cursor' } },
+				input_variable_targets: { per_page: 'page_size' },
+				per_page: 5,
+				type,
+			};
+			const { result } = renderHook( () =>
+				usePaginationVariables( {
+					paginationData,
+					inputVariables: [
+						...cursorSlugs.map( slug => ( {
+							slug,
+							type: `ui:pagination_${ slug }`,
+							required: false,
+						} ) ),
+						{ slug: 'page_size', type: 'ui:pagination_per_page', required: false },
+					],
+				} )
+			);
+
+			act( () => result.current.setPage( 2 ) );
+			act( () => result.current.setPage( 3 ) );
+			expect( result.current.page ).toBe( 3 );
+			expect( result.current.paginationQueryInput ).toEqual( {
+				[ nextCursorSlug ]: 'old-cursor',
+			} );
+
+			act( () => result.current.resetPage() );
+			expect( result.current.page ).toBe( 1 );
+			expect( result.current.paginationQueryInput ).toEqual( {
+				...Object.fromEntries( cursorSlugs.map( slug => [ slug, undefined ] ) ),
+				page_size: 5,
+			} );
+			expect(
+				JSON.stringify( {
+					...Object.fromEntries( cursorSlugs.map( slug => [ slug, 'old-cursor' ] ) ),
+					...result.current.paginationQueryInput,
+				} )
+			).toBe( '{"page_size":5}' );
+		}
+	);
+
 	it( 'should support "simple" cursor pagination', () => {
 		const { result, rerender } = renderHook(
 			( props: UsePaginationVariablesInput ) => usePaginationVariables( props ),
