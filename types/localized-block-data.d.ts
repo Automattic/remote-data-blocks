@@ -58,5 +58,5 @@ interface BlocksConfig {
 interface LocalizedBlockData {
 	config: BlocksConfig;
 	rest_url: string;
-	tracks_global_properties?: TracksGlobalProperties;
+	tracks_global_properties?: TracksGlobalProperties | null;
 }

@@ -8,6 +8,7 @@ use RemoteDataBlocks\REST\AuthController;
 use RemoteDataBlocks\WpdbStorage\DataSourceCrud;
 use RemoteDataBlocks\Store\DataSource\DataSourceConfigManager;
 use RemoteDataBlocks\Telemetry\DataSourceTelemetry;
+use RemoteDataBlocks\Telemetry\Telemetry;
 use function wp_get_environment_type;
 use function wp_is_development_mode;
 use function add_settings_error;
@@ -70,6 +71,7 @@ class PluginSettings {
 			[
 				...( self::is_dev() ? self::get_build() : [] ),
 				'auto_register_blocks_default' => self::get_auto_register_blocks_default(),
+				'tracks_global_properties' => Telemetry::get_client_properties(),
 				'version' => self::get_version(),
 			]
 		);
