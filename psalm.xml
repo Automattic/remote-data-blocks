@@ -19,6 +19,9 @@
             <directory name="build/"/>
             <directory name="node_modules/"/>
             <directory name="vendor/"/>
+            <!-- Test stand-ins for VIP-only code; analyzing them hides real undefined classes. -->
+            <directory name="tests/inc/PluginSettings/fixtures/"/>
+            <directory name="tests/inc/Telemetry/fixtures/"/>
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>
