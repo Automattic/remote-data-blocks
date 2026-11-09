@@ -33,7 +33,7 @@ describe( 'sendTracksEvent', () => {
 			rest_url: '',
 			tracks_global_properties: defaultTracksGlobalProps,
 		};
-		vi.clearAllMocks();
+		vi.resetAllMocks();
 	} );
 
 	it( 'should not record event if Tracks global properties is not defined', () => {
@@ -45,6 +45,8 @@ describe( 'sendTracksEvent', () => {
 	} );
 
 	it( 'should not track if vip_env is local', () => {
+		vi.mocked( getTracksGlobalProperties ).mockReturnValue( defaultTracksGlobalProps );
+
 		sendTracksEvent( 'field_shortcode', { action: 'value' } );
 
 		expect( recordTracksEvent ).not.toHaveBeenCalled();
