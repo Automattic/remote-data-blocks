@@ -211,7 +211,7 @@ class VipBlockDataApiTest extends TestCase {
 			],
 			$logs[0]
 		);
-		$this->assertSame( 'Happy hour &amp;amp; networking', $result['innerBlocks'][0]['attributes']['content'] );
-		$this->assertSame( 'President&#039;s dining hall', $result['innerBlocks'][1]['attributes']['content'] );
+		$this->assertSame( 'Happy hour &amp; networking', $result['innerBlocks'][0]['attributes']['content'] );
+		$this->assertSame( "President's dining hall", $result['innerBlocks'][1]['attributes']['content'] );
 	}
 }

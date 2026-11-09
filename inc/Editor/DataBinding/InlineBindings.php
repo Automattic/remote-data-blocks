@@ -59,7 +59,7 @@ class InlineBindings {
 				$match['inner_tag_before_query'],
 				$status,
 				$match['inner_tag_after_query'],
-				$value,
+				wp_kses_post( $value ),
 			);
 
 			$position = strpos( $content, $original_tag );

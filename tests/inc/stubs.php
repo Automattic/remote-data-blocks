@@ -82,6 +82,11 @@ function wp_strip_all_tags( string $string ): string {
 	return $string;
 }
 
+function wp_kses_post( string $text ): string {
+	// The integration suite tests sanitization using the real WordPress implementation.
+	return $text;
+}
+
 function is_wp_error( mixed $thing ): bool {
 	return $thing instanceof \WP_Error;
 }
