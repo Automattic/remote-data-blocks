@@ -19,9 +19,12 @@
             <directory name="build/"/>
             <directory name="node_modules/"/>
             <directory name="vendor/"/>
-            <!-- Test stand-ins for VIP-only code; analyzing them hides real undefined classes. -->
+            <!-- Test stand-ins for VIP-only code, and the tests that require them: Psalm follows
+                 require_once, and seeing the stand-ins hides that the real classes are undefined. -->
             <directory name="tests/inc/PluginSettings/fixtures/"/>
             <directory name="tests/inc/Telemetry/fixtures/"/>
+            <file name="tests/inc/PluginSettings/SettingsAssetsTest.php"/>
+            <file name="tests/inc/Telemetry/TelemetryClientPropertiesTest.php"/>
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>
