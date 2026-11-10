@@ -392,4 +392,155 @@ class SanitizerTest extends TestCase {
 
 		$this->assertSame( ' John Doe ', $result['password'] );
 	}
+
+	/**
+	 * A value that must never survive sanitization as markup.
+	 */
+	private const UNSAFE_MARKUP = '<img src=x onerror=alert(1)>Name';
+
+	/**
+	 * Primitive types that intentionally pass markup through unchanged. Every
+	 * consumer of these types is responsible for escaping or sandboxing the
+	 * value (wp_kses on the front end, SandBox iframe in the editor).
+	 *
+	 * Adding a type here is a security decision; do it deliberately.
+	 */
+	private const RAW_PRIMITIVE_TYPES = [ 'html', 'json_path', 'markdown' ];
+
+	/**
+	 * Discover every sanitizable primitive type from the Types class so that a
+	 * newly added type is covered without touching this test.
+	 */
+	public static function provideSanitizablePrimitiveTypes(): array {
+		$cases = [];
+		$reflection = new \ReflectionClass( Types::class );
+
+		foreach ( $reflection->getMethods( \ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_STATIC ) as $method ) {
+			if ( $method->getNumberOfRequiredParameters() > 0 ) {
+				continue;
+			}
+
+			try {
+				$type = $method->invoke( null );
+				if ( ! is_array( $type ) || ! Types::is_primitive( $type ) || ! Types::is_sanitizable( $type ) ) {
+					continue;
+				}
+			} catch ( \Throwable $_e ) {
+				continue;
+			}
+
+			$type_name = Types::get_type_name( $type );
+			$cases[ $type_name ] = [ $type_name ];
+		}
+
+		return $cases;
+	}
+
+	/**
+	 * @dataProvider provideSanitizablePrimitiveTypes
+	 */
+	public function test_every_primitive_type_has_a_sanitization_decision( string $type_name ): void {
+		$result = Sanitizer::sanitize_primitive_type( $type_name, self::UNSAFE_MARKUP );
+
+		if ( in_array( $type_name, self::RAW_PRIMITIVE_TYPES, true ) ) {
+			$this->assertSame(
+				self::UNSAFE_MARKUP,
+				$result,
+				sprintf( 'Type "%s" is listed as raw and must pass markup through unchanged.', $type_name )
+			);
+			return;
+		}
+
+		$this->assertStringNotContainsString(
+			'<',
+			strval( $result ),
+			sprintf( 'Type "%s" must not pass markup through. Add a case to Sanitizer::sanitize_primitive_type() or list it in RAW_PRIMITIVE_TYPES.', $type_name )
+		);
+	}
+
+	public function test_raw_primitive_types_are_real_types(): void {
+		$known = array_keys( self::provideSanitizablePrimitiveTypes() );
+
+		foreach ( self::RAW_PRIMITIVE_TYPES as $type_name ) {
+			$this->assertContains( $type_name, $known, sprintf( 'RAW_PRIMITIVE_TYPES lists unknown type "%s".', $type_name ) );
+		}
+	}
+
+	public function test_unknown_primitive_type_is_sanitized_as_text(): void {
+		$result = Sanitizer::sanitize_primitive_type( 'some_future_type', self::UNSAFE_MARKUP );
+
+		$this->assertSame( 'Name', $result );
+	}
+
+	public static function provideSanitizableTextTypes(): array {
+		return [
+			[ 'button_text' ],
+			[ 'currency_in_current_locale' ],
+			[ 'id' ],
+			[ 'image_alt' ],
+			[ 'string' ],
+			[ 'title' ],
+			[ 'uuid' ],
+		];
+	}
+
+	/**
+	 * @dataProvider provideSanitizableTextTypes
+	 */
+	public function test_sanitize_text_types_strip_markup_and_whitespace( string $type_name ): void {
+		$this->assertSame( 'Name', Sanitizer::sanitize_primitive_type( $type_name, self::UNSAFE_MARKUP ) );
+		$this->assertSame( 'rec123', Sanitizer::sanitize_primitive_type( $type_name, '  <b>rec123</b>  ' ) );
+		$this->assertSame( '0', Sanitizer::sanitize_primitive_type( $type_name, 0 ) );
+		$this->assertSame( '', Sanitizer::sanitize_primitive_type( $type_name, null ) );
+	}
+
+	public static function provideSanitizableNumbers(): array {
+		return [
+			[ '25', 25.0 ],
+			[ 25, 25.0 ],
+			[ '3.14', 3.14 ],
+			[ 3.14, 3.14 ],
+			[ '-1.5', -1.5 ],
+			[ '1e3', 1000.0 ],
+			[ '0', 0.0 ],
+			[ null, 0.0 ],
+			[ false, 0.0 ],
+			[ true, 1.0 ],
+			[ [], 0.0 ],
+			[ [ '2.5', '9' ], 2.5 ],
+			[ 'not a number', 0.0 ],
+			[ self::UNSAFE_MARKUP, 0.0 ],
+		];
+	}
+
+	/**
+	 * @dataProvider provideSanitizableNumbers
+	 */
+	public function test_sanitize_number( mixed $value, float $expected ): void {
+		$schema = Types::object( [
+			'price' => Types::number(),
+		] );
+
+		$sanitizer = new Sanitizer( $schema );
+		$result = $sanitizer->sanitize( [ 'price' => $value ] );
+
+		$this->assertSame( $expected, $result['price'] );
+	}
+
+	public static function provideRawTypes(): array {
+		return [
+			[ 'html' ],
+			[ 'markdown' ],
+		];
+	}
+
+	/**
+	 * @dataProvider provideRawTypes
+	 */
+	public function test_sanitize_raw_types_preserve_markup( string $type_name ): void {
+		$value = '<p>A <em>formatted</em> value</p>';
+
+		$this->assertSame( $value, Sanitizer::sanitize_primitive_type( $type_name, $value ) );
+		$this->assertSame( $value, Sanitizer::sanitize_primitive_type( $type_name, [ $value ] ) );
+	}
 }
