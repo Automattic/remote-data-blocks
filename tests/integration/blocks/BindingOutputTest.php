@@ -7,25 +7,25 @@ use RemoteDataBlocks\Editor\DataBinding\InlineBindings;
 
 /**
  * Remote values are untrusted. These tests assert that unsafe markup in remote
- * values does not reach the rendered page unescaped, for both regular block
+ * values does not reach the rendered page, for both regular block
  * bindings (where WordPress Core sanitizes the bound value) and inline
  * bindings (where this plugin sanitizes the value).
  */
 class BindingOutputTest extends RDBTestCase {
 	private const MARKDOWN = '**Bold** <script>alert(1)</script> <img src=x onerror="alert(1)"> [link](javascript:alert(1))';
-	private const MARKDOWN_RENDERED = '<p><strong>Bold</strong> &lt;script&gt;alert(1)&lt;/script&gt; &lt;img src=x onerror="alert(1)"&gt; <a href="javascript%3Aalert(1)">link</a></p>';
+	private const MARKDOWN_RENDERED = '<p><strong>Bold</strong> alert(1) <img src="x"> <a href="alert(1)">link</a></p>';
 
 	private const HTML = '<em>Allowed</em> <img src="https://example.com/image.png" onerror="alert(1)"><script>alert(1)</script>';
 	private const HTML_RENDERED = '<em>Allowed</em> <img src="https://example.com/image.png">alert(1)';
 
-	public function testBlockBindingEscapesMarkdownInParagraph(): void {
+	public function testBlockBindingSanitizesMarkdownInParagraph(): void {
 		$block_name = $this->register_test_block( 'test-binding-markdown-paragraph' );
 		$result_html = $this->render_bound_block( $block_name, 'core:paragraph', 'markdown' );
 
 		$this->assertBlockInnerHtml( 'p', self::MARKDOWN_RENDERED, $result_html );
 	}
 
-	public function testBlockBindingEscapesMarkdownInHeading(): void {
+	public function testBlockBindingSanitizesMarkdownInHeading(): void {
 		$block_name = $this->register_test_block( 'test-binding-markdown-heading' );
 		$result_html = $this->render_bound_block( $block_name, 'core:heading', 'markdown' );
 
@@ -39,7 +39,7 @@ class BindingOutputTest extends RDBTestCase {
 		$this->assertBlockInnerHtml( 'p', self::HTML_RENDERED, $result_html );
 	}
 
-	public function testInlineBindingEscapesMarkdown(): void {
+	public function testInlineBindingSanitizesMarkdown(): void {
 		$block_name = $this->register_test_block( 'test-inline-binding-markdown' );
 
 		$this->assertSame(
@@ -55,6 +55,30 @@ class BindingOutputTest extends RDBTestCase {
 			'<span class="inline-field" data-remote-data-blocks-inline-field="query-success">' . self::HTML_RENDERED . '</span>',
 			InlineBindings::render_frontend_fields( $this->inline_field( $block_name, 'html' ) )
 		);
+	}
+
+	public function testInlineBindingIgnoresPostContextFilters(): void {
+		$block_name = $this->register_test_block( 'test-inline-binding-post-filter' );
+		$allow_unsafe_post_html = static function ( array $tags, string $context ): array {
+			if ( 'post' === $context ) {
+				$tags['script'] = [];
+				$tags['img']['onerror'] = true;
+			}
+
+			return $tags;
+		};
+
+		add_filter( 'wp_kses_allowed_html', $allow_unsafe_post_html, 10, 2 );
+
+		try {
+			$this->assertSame( self::HTML, wp_kses_post( self::HTML ) );
+			$this->assertSame(
+				'<span class="inline-field" data-remote-data-blocks-inline-field="query-success">' . self::HTML_RENDERED . '</span>',
+				InlineBindings::render_frontend_fields( $this->inline_field( $block_name, 'html' ) )
+			);
+		} finally {
+			remove_filter( 'wp_kses_allowed_html', $allow_unsafe_post_html, 10 );
+		}
 	}
 
 	/**

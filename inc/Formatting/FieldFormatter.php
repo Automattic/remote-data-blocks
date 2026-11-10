@@ -10,8 +10,6 @@ use function get_locale;
  * FieldFormatter class.
  */
 final class FieldFormatter {
-	private static ?Parsedown $markdown_parser = null;
-
 	/**
 	 * Format a number as a currency.
 	 *
@@ -31,18 +29,8 @@ final class FieldFormatter {
 
 	/**
 	 * Format markdown as HTML.
-	 *
-	 * Remote markdown is untrusted. Safe mode escapes raw HTML in the markdown,
-	 * drops event handler attributes, and neutralizes unsafe URL schemes in
-	 * links and images. We use a private parser instance so that safe mode does
-	 * not leak into other code that shares the global Parsedown::instance().
 	 */
 	public static function format_markdown( string $value ): string {
-		if ( null === self::$markdown_parser ) {
-			self::$markdown_parser = new Parsedown();
-			self::$markdown_parser->setSafeMode( true );
-		}
-
-		return self::$markdown_parser->text( $value );
+		return Parsedown::instance()->text( $value );
 	}
 }
