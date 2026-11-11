@@ -33,7 +33,7 @@ describe( 'sendTracksEvent', () => {
 			rest_url: '',
 			tracks_global_properties: defaultTracksGlobalProps,
 		};
-		vi.clearAllMocks();
+		vi.resetAllMocks();
 	} );
 
 	it( 'should not record event if Tracks global properties is not defined', () => {
@@ -45,6 +45,8 @@ describe( 'sendTracksEvent', () => {
 	} );
 
 	it( 'should not track if vip_env is local', () => {
+		vi.mocked( getTracksGlobalProperties ).mockReturnValue( defaultTracksGlobalProps );
+
 		sendTracksEvent( 'field_shortcode', { action: 'value' } );
 
 		expect( recordTracksEvent ).not.toHaveBeenCalled();
@@ -63,6 +65,44 @@ describe( 'sendTracksEvent', () => {
 			...defaultTracksGlobalProps,
 			vip_env: 'production',
 			action: 'actionName',
+		} );
+	} );
+
+	it( 'should record selected_count on the add_block event', () => {
+		vi.mocked( getTracksGlobalProperties ).mockReturnValue( {
+			...defaultTracksGlobalProps,
+			vip_env: 'production',
+		} );
+
+		sendTracksEvent( 'add_block', {
+			action: 'select_item',
+			selected_option: 'search_from_list',
+			data_source_type: 'airtable',
+			selected_count: 3,
+		} );
+
+		expect( recordTracksEvent ).toHaveBeenCalledWith( 'remotedatablocks_add_block', {
+			...defaultTracksGlobalProps,
+			vip_env: 'production',
+			action: 'select_item',
+			selected_option: 'search_from_list',
+			data_source_type: 'airtable',
+			selected_count: 3,
+		} );
+	} );
+
+	it( 'should record the data_sources_searched event with the remotedatablocks_ prefix', () => {
+		vi.mocked( getTracksGlobalProperties ).mockReturnValue( {
+			...defaultTracksGlobalProps,
+			vip_env: 'production',
+		} );
+
+		sendTracksEvent( 'data_sources_searched', { query_length: 5 } );
+
+		expect( recordTracksEvent ).toHaveBeenCalledWith( 'remotedatablocks_data_sources_searched', {
+			...defaultTracksGlobalProps,
+			vip_env: 'production',
+			query_length: 5,
 		} );
 	} );
 } );
