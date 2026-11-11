@@ -7,6 +7,9 @@ on:
     branches:
       - trunk
 
+permissions:
+  contents: read
+
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
   # The concurrency group contains the workflow name and the branch name for pull requests
@@ -24,7 +27,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Use desired version of NodeJS
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
