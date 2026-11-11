@@ -5,6 +5,7 @@ namespace RemoteDataBlocks\Telemetry;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use WP_Post;
 
+use function Automattic\VIP\Telemetry\Tracks\get_tracks_core_properties;
 use function parse_blocks;
 
 defined( 'ABSPATH' ) || exit();
@@ -59,13 +60,11 @@ class Telemetry {
 	 * the library isn't loaded, which the browser reads as "record nothing".
 	 */
 	public static function get_client_properties(): ?array {
-		$core_properties = '\\Automattic\\VIP\\Telemetry\\Tracks\\get_tracks_core_properties';
-
-		if ( ! class_exists( '\\Automattic\\VIP\\Telemetry\\Telemetry' ) || ! function_exists( $core_properties ) ) {
+		if ( ! function_exists( 'Automattic\VIP\Telemetry\Tracks\get_tracks_core_properties' ) ) {
 			return null;
 		}
 
-		return array_merge( $core_properties(), self::get_global_properties() );
+		return array_merge( get_tracks_core_properties(), self::get_global_properties() );
 	}
 
 	/**
