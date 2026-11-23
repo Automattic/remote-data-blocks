@@ -13,6 +13,16 @@ permissions:
   contents: read
 
 jobs:
+  release-tools:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Test release tooling
+        run: node --test tools/release/*.test.mjs
+
   phpunit:
     runs-on: ubuntu-latest
     strategy:
