@@ -10,7 +10,7 @@ import {
 } from '@wordpress/components';
 import { Children, createPortal, isValidElement, useEffect, useState } from '@wordpress/element';
 import { __, sprintf, TranslatableText } from '@wordpress/i18n';
-import { lockSmall } from '@wordpress/icons';
+import { lock } from '@wordpress/icons';
 
 import { DataSourceFormActions } from './DataSourceFormActions';
 import { useDataSources } from '../hooks/useDataSources';
@@ -158,7 +158,7 @@ const DataSourceForm = ( { children, onSave }: DataSourceFormProps ) => {
 			</div>
 			{ screen === 'addDataSource' && currentStep === 1 && (
 				<div className="rdb-settings-page_data-source-form-setup-info">
-					<Icon icon={ lockSmall } />
+					<Icon icon={ lock } />
 					<p>
 						{ __(
 							'Connecting to an external source will not store the data. We issue queries to the database, but all your data stays with the provider. '
