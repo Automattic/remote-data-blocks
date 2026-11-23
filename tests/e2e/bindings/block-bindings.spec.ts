@@ -1,6 +1,9 @@
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
 import {
+	bindField,
+	expectBoundField,
+	openBindingChooser,
 	getFixtureWordPressVersion,
 	getRuntimeBindingAttributes,
 	insertBindingsGarden,
@@ -33,7 +36,7 @@ test.describe( 'remote block bindings', () => {
 
 		async function bindContent( name: string ) {
 			await selectGardenBlock( page, name );
-			await page.locator( 'select[name="content"]' ).selectOption( 'title' );
+			await bindField( page, 'content', 'title' );
 			await expect( editor.canvas.locator( `[data-type="${ name }"]` ) ).toContainText(
 				'Local garden collection'
 			);
@@ -41,6 +44,7 @@ test.describe( 'remote block bindings', () => {
 		await bindContent( 'core/paragraph' );
 		await bindContent( 'core/heading' );
 		await selectGardenBlock( page, 'core/button' );
+		await openBindingChooser( page, 'url' );
 		// Semantic types guide the choice without hiding other compatible fields.
 		await expect(
 			page.locator(
@@ -53,15 +57,16 @@ test.describe( 'remote block bindings', () => {
 			)
 		).toHaveCount( 1 );
 		await page.locator( 'select[name="url"]' ).selectOption( 'button_url' );
-		await page.locator( 'select[name="text"]' ).selectOption( 'button_text' );
+		await page.getByRole( 'button', { name: 'Apply', exact: true } ).click();
+		await bindField( page, 'text', 'button_text' );
 		await selectGardenBlock( page, 'core/image' );
-		await page.locator( 'select[name="url"]' ).selectOption( 'image_url' );
-		await page.locator( 'select[name="alt"]' ).selectOption( 'image_alt' );
-		await page.locator( 'select[name="title"]' ).selectOption( 'title' );
+		await bindField( page, 'url', 'image_url' );
+		await bindField( page, 'alt', 'image_alt' );
+		await bindField( page, 'title', 'title' );
 
 		const supported = await getRuntimeBindingAttributes( page );
 		if ( supported?.[ 'core/image' ]?.includes( 'caption' ) ) {
-			await page.locator( 'select[name="caption"]' ).selectOption( 'caption' );
+			await bindField( page, 'caption', 'caption' );
 		}
 		const postId = await editor.publishPost();
 		expect( postId ).toBeTruthy();
@@ -70,8 +75,8 @@ test.describe( 'remote block bindings', () => {
 		expect( saved ).toContain( '"field":"button_url"' );
 		await page.reload();
 		await selectGardenBlock( page, 'core/button' );
-		await expect( page.locator( 'select[name="url"]' ) ).toHaveValue( 'button_url' );
-		await expect( page.locator( 'select[name="text"]' ) ).toHaveValue( 'button_text' );
+		await expectBoundField( page, 'url', 'button_url' );
+		await expectBoundField( page, 'text', 'button_text' );
 		await page.goto( `/?p=${ postId }` );
 		await expect(
 			page.getByRole( 'heading', { name: 'Local garden collection', exact: true } )
@@ -111,13 +116,13 @@ test.describe( 'remote block bindings', () => {
 		);
 		await insertBindingsGarden( page, editor, [ { name: STATIC_CARD }, { name: STOCK_CARD } ] );
 		await selectGardenBlock( page, STATIC_CARD );
-		await page.locator( 'select[name="botanicalNote"]' ).selectOption( 'caption' );
+		await bindField( page, 'botanicalNote', 'caption' );
 		await expect( editor.canvas.locator( `[data-type="${ STATIC_CARD }"]` ) ).toContainText(
 			'Fresh data, familiar blocks.'
 		);
 		await selectGardenBlock( page, STOCK_CARD );
-		await page.locator( 'select[name="plantCount"]' ).selectOption( 'quantity' );
-		await page.locator( 'select[name="isAvailable"]' ).selectOption( 'available' );
+		await bindField( page, 'plantCount', 'quantity' );
+		await bindField( page, 'isAvailable', 'available' );
 		const stock = editor.canvas.locator( `[data-type="${ STOCK_CARD }"]` );
 		await expect( stock ).toContainText( 'Remaining plants: 0' );
 		await expect( stock ).toContainText( 'Available today: false' );
@@ -127,8 +132,8 @@ test.describe( 'remote block bindings', () => {
 		expect( saved ).toContain( '"field":"available"' );
 		await page.reload();
 		await selectGardenBlock( page, STOCK_CARD );
-		await expect( page.locator( 'select[name="plantCount"]' ) ).toHaveValue( 'quantity' );
-		await expect( page.locator( 'select[name="isAvailable"]' ) ).toHaveValue( 'available' );
+		await expectBoundField( page, 'plantCount', 'quantity' );
+		await expectBoundField( page, 'isAvailable', 'available' );
 		await expect( editor.canvas.locator( `[data-type="${ STOCK_CARD }"]` ) ).toContainText(
 			'Remaining plants: 0'
 		);

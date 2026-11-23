@@ -1,4 +1,5 @@
-import { CheckboxControl, SelectControl } from '@wordpress/components';
+import { Button, CheckboxControl, Popover, SelectControl } from '@wordpress/components';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 import {
@@ -162,6 +163,7 @@ export function BlockBindingFieldControl( props: BlockBindingFieldControlProps )
 }
 
 interface BlockBindingControlsProps {
+	isSelected?: boolean;
 	attributes: RemoteDataInnerBlockAttributes;
 	availableBindings: AvailableBindings;
 	blockName: string;
@@ -176,11 +178,28 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 		attributes,
 		availableBindings,
 		blockName,
+		isSelected = true,
 		remoteDataName,
 		supportedAttributes,
 		removeBinding,
 		updateBinding,
 	} = props;
+	const [ chooser, setChooser ] = useState< {
+		target: string;
+		field: string;
+		anchor: HTMLButtonElement;
+	} | null >( null );
+	const triggers = useRef< Record< string, HTMLButtonElement | null > >( {} );
+
+	useEffect( () => {
+		setChooser( null );
+	}, [ blockName, remoteDataName, isSelected ] );
+
+	function closeChooser(): void {
+		setChooser( null );
+		chooser?.anchor.focus();
+	}
+
 	const bindings = attributes.metadata?.bindings ?? {};
 	const contentArgs =
 		bindings.content?.source === BLOCK_BINDING_SOURCE ? bindings.content.args : undefined;
@@ -194,7 +213,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 		] ),
 	];
 	const hasLabelControl =
-		[ 'core/paragraph', 'core/heading' ].includes( blockName ) && targets.includes( 'content' );
+		[ 'core/paragraph', 'core/heading' ].includes( blockName ) && Boolean( contentField );
 
 	function updateFieldBinding( target: string, field: string ): void {
 		if ( ! field ) {
@@ -231,29 +250,149 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 
 	return (
 		<>
-			{ targets.map( target => {
-				const binding = bindings[ target ];
-				const fieldTypes = supportedAttributes.includes( target )
-					? getBindingFieldTypes( blockName, target, getBindingTargetType( blockName, target ) )
-					: [];
-				return (
-					<BlockBindingFieldControl
-						key={ target }
-						availableBindings={ availableBindings }
-						fieldTypes={ fieldTypes }
-						suggestedFieldTypes={ getSuggestedBindingFieldTypes( blockName, target ) }
-						help={
-							target === 'url'
-								? __( 'Choose a field containing a URL.', 'remote-data-blocks' )
-								: undefined
-						}
-						label={ getAttributeLabel( blockName, target ) }
-						target={ target }
-						updateFieldBinding={ updateFieldBinding }
-						value={ binding?.source === BLOCK_BINDING_SOURCE ? binding.args.field : '' }
-					/>
-				);
-			} ) }
+			<div className="rdb-binding-rows">
+				{ targets.map( target => {
+					const binding = bindings[ target ];
+					const isRemoteBinding = binding?.source === BLOCK_BINDING_SOURCE;
+					const field = isRemoteBinding ? binding.args.field : '';
+					const label = getAttributeLabel( blockName, target );
+					const isOtherBinding = binding && ! isRemoteBinding;
+					return (
+						<div className="rdb-binding-row" key={ target } data-binding-target={ target }>
+							<div className="rdb-binding-row__description">
+								<strong>{ label }</strong>
+								{ isRemoteBinding && (
+									<span>
+										{ availableBindings[ field ]?.name ?? field }
+										{ ! availableBindings[ field ] && (
+											<span className="rdb-binding-row__status">
+												{ __( 'Field unavailable', 'remote-data-blocks' ) }
+											</span>
+										) }
+									</span>
+								) }
+								{ isOtherBinding && (
+									<span>{ __( 'Managed by another binding', 'remote-data-blocks' ) }</span>
+								) }
+							</div>
+							<div className="rdb-binding-row__actions">
+								<Button
+									ref={ element => {
+										triggers.current[ target ] = element;
+									} }
+									variant="tertiary"
+									size="compact"
+									aria-label={ sprintf(
+										isRemoteBinding
+											? __( 'Change %s binding', 'remote-data-blocks' )
+											: __( 'Bind %s', 'remote-data-blocks' ),
+										label
+									) }
+									aria-expanded={ chooser?.target === target }
+									aria-haspopup="dialog"
+									onClick={ () => {
+										const anchor = triggers.current[ target ];
+										if ( anchor ) {
+											setChooser( { target, field, anchor } );
+										}
+									} }
+								>
+									{ isRemoteBinding
+										? __( 'Change', 'remote-data-blocks' )
+										: __( 'Bind', 'remote-data-blocks' ) }
+								</Button>
+								{ isRemoteBinding && (
+									<Button
+										variant="tertiary"
+										size="compact"
+										aria-label={ sprintf( __( 'Remove %s binding', 'remote-data-blocks' ), label ) }
+										onClick={ () => {
+											updateFieldBinding( target, '' );
+											triggers.current[ target ]?.focus();
+										} }
+									>
+										{ __( 'Remove', 'remote-data-blocks' ) }
+									</Button>
+								) }
+							</div>
+						</div>
+					);
+				} ) }
+			</div>
+			{ chooser &&
+				isSelected &&
+				( () => {
+					const { target, field, anchor } = chooser;
+					const binding = bindings[ target ];
+					const currentField = binding?.source === BLOCK_BINDING_SOURCE ? binding.args.field : '';
+					const fieldTypes = supportedAttributes.includes( target )
+						? getBindingFieldTypes( blockName, target, getBindingTargetType( blockName, target ) )
+						: [];
+					const hasChoices =
+						Boolean( currentField ) ||
+						Object.values( availableBindings ).some( mapping =>
+							fieldTypes.includes( mapping.type )
+						);
+					const label = getAttributeLabel( blockName, target );
+					return (
+						<Popover
+							anchor={ anchor }
+							placement="left-start"
+							onClose={ closeChooser }
+							onFocusOutside={ () => setChooser( null ) }
+							focusOnMount="firstElement"
+							className="rdb-binding-chooser"
+							role="dialog"
+							aria-label={ sprintf( __( 'Bind %s', 'remote-data-blocks' ), label ) }
+						>
+							{ hasChoices ? (
+								<BlockBindingFieldControl
+									availableBindings={ availableBindings }
+									fieldTypes={ fieldTypes }
+									suggestedFieldTypes={ getSuggestedBindingFieldTypes( blockName, target ) }
+									help={
+										target === 'url'
+											? __( 'Choose a field containing a URL.', 'remote-data-blocks' )
+											: undefined
+									}
+									label={ label }
+									target={ target }
+									updateFieldBinding={ ( _target, nextField ) =>
+										setChooser( { ...chooser, field: nextField } )
+									}
+									value={ field }
+								/>
+							) : (
+								<p>
+									{ __(
+										'No matching fields are available for this attribute.',
+										'remote-data-blocks'
+									) }
+								</p>
+							) }
+							<div className="rdb-binding-chooser__actions">
+								{ hasChoices && (
+									<Button
+										variant="primary"
+										disabled={ ! field || field === currentField }
+										onClick={ () => {
+											updateFieldBinding( target, field );
+											closeChooser();
+										} }
+									>
+										{ __( 'Apply', 'remote-data-blocks' ) }
+									</Button>
+								) }
+								<Button variant="tertiary" onClick={ closeChooser }>
+									{ hasChoices
+										? __( 'Cancel', 'remote-data-blocks' )
+										: __( 'Close', 'remote-data-blocks' ) }
+								</Button>
+							</div>
+						</Popover>
+					);
+				} )() }
+
 			{ hasLabelControl && (
 				<CheckboxControl
 					checked={ Boolean( contentArgs?.label ) }

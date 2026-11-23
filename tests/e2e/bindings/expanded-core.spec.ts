@@ -1,6 +1,8 @@
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
 import {
+	bindField,
+	expectBoundField,
 	getFixtureWordPressVersion,
 	getRuntimeBindingAttributes,
 	insertBindingsGarden,
@@ -46,7 +48,7 @@ test.describe( 'expanded core block bindings', () => {
 			},
 		] );
 		await selectGardenBlock( page, 'core/list-item' );
-		await page.locator( 'select[name="content"]' ).selectOption( 'caption' );
+		await bindField( page, 'content', 'caption' );
 		await expect( editor.canvas.locator( '[data-type="core/list-item"]' ) ).toContainText(
 			'Fresh data, familiar blocks.'
 		);
@@ -55,7 +57,7 @@ test.describe( 'expanded core block bindings', () => {
 		expect( await editor.getEditedPostContent() ).toContain( '"field":"caption"' );
 		await page.reload();
 		await selectGardenBlock( page, 'core/list-item' );
-		await expect( page.locator( 'select[name="content"]' ) ).toHaveValue( 'caption' );
+		await expectBoundField( page, 'content', 'caption' );
 		await page.goto( `/?p=${ postId }` );
 		await expect( page.locator( '.entry-content .wp-block-list > li' ) ).toHaveText(
 			'Fresh data, familiar blocks.'
@@ -71,7 +73,7 @@ test.describe( 'expanded core block bindings', () => {
 			},
 		] );
 		await selectGardenBlock( page, 'core/post-date' );
-		await page.locator( 'select[name="datetime"]' ).selectOption( 'date' );
+		await bindField( page, 'datetime', 'date' );
 		await expect( editor.canvas.locator( '[data-type="core/post-date"]' ) ).toContainText(
 			'2026-11-23'
 		);
@@ -80,7 +82,7 @@ test.describe( 'expanded core block bindings', () => {
 		expect( await editor.getEditedPostContent() ).toContain( '"field":"date"' );
 		await page.reload();
 		await selectGardenBlock( page, 'core/post-date' );
-		await expect( page.locator( 'select[name="datetime"]' ) ).toHaveValue( 'date' );
+		await expectBoundField( page, 'datetime', 'date' );
 		await page.goto( `/?p=${ postId }` );
 		const date = page.locator( '.entry-content .wp-block-post-date time' );
 		await expect( date ).toHaveAttribute( 'datetime', '2026-11-23T12:00:00' );
@@ -110,7 +112,7 @@ test.describe( 'expanded core block bindings', () => {
 			},
 		] );
 		await selectGardenBlock( page, 'core/navigation-link' );
-		await page.locator( 'select[name="url"]' ).selectOption( 'button_url' );
+		await bindField( page, 'url', 'button_url' );
 		// Navigation is a separately persisted entity. Saving both entities opens
 		// a confirmation dialog, then transitions directly to the Publish panel.
 		await page
@@ -134,7 +136,7 @@ test.describe( 'expanded core block bindings', () => {
 			editor.canvas.locator( '.wp-block-navigation-item[data-type="core/navigation-link"]' )
 		).toBeVisible();
 		await selectGardenBlock( page, 'core/navigation-link' );
-		await expect( page.locator( 'select[name="url"]' ) ).toHaveValue( 'button_url' );
+		await expectBoundField( page, 'url', 'button_url' );
 		await page.goto( `/?p=${ postId }` );
 		await expect(
 			page

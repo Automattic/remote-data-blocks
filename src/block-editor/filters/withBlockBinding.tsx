@@ -21,6 +21,7 @@ import { useSupportedBindingAttributes } from '@/utils/block-bindings-support';
 import { getBlockAvailableBindings, getBlockTitle } from '@/utils/localized-block-data';
 
 interface BoundBlockEditProps {
+	isSelected: boolean;
 	attributes: RemoteDataInnerBlockAttributes;
 	availableBindings: AvailableBindings;
 	blockName: string;
@@ -36,6 +37,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 		attributes,
 		availableBindings,
 		blockName,
+		isSelected,
 		remoteDataName,
 		remoteDataTitle,
 		setAttributes,
@@ -85,6 +87,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 						attributes={ attributes }
 						availableBindings={ availableBindings }
 						blockName={ blockName }
+						isSelected={ isSelected }
 						supportedAttributes={ supportedAttributes }
 						remoteDataName={ remoteDataName }
 						removeBinding={ removeBinding }
@@ -154,6 +157,8 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 
 		return (
 			<BoundBlockEdit
+				key={ props.clientId }
+				isSelected={ props.isSelected }
 				attributes={ attributes }
 				availableBindings={ availableBindings }
 				blockName={ name }

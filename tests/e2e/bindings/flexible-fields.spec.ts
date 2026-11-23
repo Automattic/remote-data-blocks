@@ -1,6 +1,13 @@
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
-import { insertBindingsGarden, insertRemoteDataBlock, selectGardenBlock } from './helpers';
+import {
+	bindField,
+	expectBoundField,
+	insertBindingsGarden,
+	insertRemoteDataBlock,
+	openBindingChooser,
+	selectGardenBlock,
+} from './helpers';
 
 test.describe( 'flexible compatible field choices', () => {
 	test.beforeEach( async ( { admin } ) => {
@@ -24,19 +31,22 @@ test.describe( 'flexible compatible field choices', () => {
 			]
 		);
 		await selectGardenBlock( page, 'core/button' );
+		await openBindingChooser( page, 'text' );
 		const text = page.locator( 'select[name="text"]' );
-		const url = page.locator( 'select[name="url"]' );
 		await expect(
 			text.locator( 'optgroup[label="Compatible fields"] option[value="title"]' )
 		).toHaveText( 'Title' );
-		await expect( url.locator( 'option[value="title"]' ) ).toHaveCount( 1 );
 		await expect( text.locator( 'optgroup[label="Suggested fields"]' ) ).toHaveCount( 0 );
 		await text.selectOption( 'title' );
+		await page.getByRole( 'button', { name: 'Apply', exact: true } ).click();
+		await openBindingChooser( page, 'url' );
+		await expect( page.locator( 'select[name="url"] option[value="title"]' ) ).toHaveCount( 1 );
+		await page.getByRole( 'button', { name: 'Cancel', exact: true } ).click();
 		await expect( editor.canvas.locator( '.wp-block-button__link' ) ).toBeVisible();
 		const postId = await editor.publishPost();
 		await page.reload();
 		await selectGardenBlock( page, 'core/button' );
-		await expect( page.locator( 'select[name="text"]' ) ).toHaveValue( 'title' );
+		await expectBoundField( page, 'text', 'title' );
 		await page.goto( `/?p=${ postId }` );
 		await expect( page.locator( '.entry-content .wp-block-button__link' ) ).toHaveText(
 			'Community building workshop'
@@ -63,6 +73,7 @@ test.describe( 'flexible compatible field choices', () => {
 			},
 		] );
 		await selectGardenBlock( page, 'core/button' );
+		await openBindingChooser( page, 'url' );
 		const url = page.locator( 'select[name="url"]' );
 		await expect(
 			url.locator( 'optgroup[label="Suggested fields"] option[value="button_url"]' )
@@ -71,15 +82,16 @@ test.describe( 'flexible compatible field choices', () => {
 			url.locator( 'optgroup[label="Other compatible fields"] option[value="plain_url"]' )
 		).toHaveCount( 1 );
 		await url.selectOption( 'plain_url' );
-		await page.locator( 'select[name="text"]' ).selectOption( 'caption' );
+		await page.getByRole( 'button', { name: 'Apply', exact: true } ).click();
+		await bindField( page, 'text', 'caption' );
 		await selectGardenBlock( page, 'core/image' );
-		await page.locator( 'select[name="url"]' ).selectOption( 'image_url' );
-		await page.locator( 'select[name="alt"]' ).selectOption( 'caption' );
+		await bindField( page, 'url', 'image_url' );
+		await bindField( page, 'alt', 'caption' );
 		const postId = await editor.publishPost();
 		await page.reload();
 		await selectGardenBlock( page, 'core/button' );
-		await expect( page.locator( 'select[name="url"]' ) ).toHaveValue( 'plain_url' );
-		await expect( page.locator( 'select[name="text"]' ) ).toHaveValue( 'caption' );
+		await expectBoundField( page, 'url', 'plain_url' );
+		await expectBoundField( page, 'text', 'caption' );
 		await page.goto( `/?p=${ postId }` );
 		await expect(
 			page.getByRole( 'link', { name: 'Fresh data, familiar blocks.' } )

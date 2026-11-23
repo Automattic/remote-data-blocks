@@ -242,3 +242,50 @@ remote-data-blocks-inline-field {
 	font-size: 0.75rem;
 	color: rgb(117, 117, 117);
 }
+
+
+.rdb-binding-rows {
+	margin-bottom: 16px;
+}
+
+.rdb-binding-row {
+	align-items: center;
+	border-bottom: 1px solid #ddd;
+	display: flex;
+	gap: 8px;
+	justify-content: space-between;
+	padding: 8px 0;
+}
+
+.rdb-binding-row__description {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.rdb-binding-row__actions,
+.rdb-binding-chooser__actions {
+	display: flex;
+	gap: 4px;
+}
+
+.rdb-binding-row__actions {
+	flex-shrink: 0;
+}
+
+.rdb-binding-row__status {
+	color: #757575;
+	display: block;
+	font-size: 12px;
+}
+
+.rdb-binding-chooser .components-popover__content {
+	padding: 16px;
+	width: min(280px, calc(100vw - 32px));
+}
+
+.rdb-binding-chooser__actions {
+	margin-top: 16px;
+}
