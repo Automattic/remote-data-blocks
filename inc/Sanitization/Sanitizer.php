@@ -116,17 +116,21 @@ class Sanitizer implements SanitizerInterface {
 			case 'null':
 				return null;
 
-			case 'string':
-			case 'title':
-				return sanitize_text_field( strval( $value ) );
+			case 'number':
+				return floatval( $value );
 
 			case 'button_text':
-			case 'html':
+			case 'currency_in_current_locale':
 			case 'id':
 			case 'image_alt':
+			case 'string':
+			case 'title':
+			case 'uuid':
+				return sanitize_text_field( strval( $value ) );
+
+			case 'html':
 			case 'json_path':
 			case 'markdown':
-			case 'uuid':
 				return strval( $value );
 
 			case 'email_address':
@@ -138,7 +142,10 @@ class Sanitizer implements SanitizerInterface {
 				return sanitize_url( strval( $value ) );
 
 			default:
-				return $value;
+				// Fail closed. A primitive type without an explicit case above is
+				// treated as plain text. Types that must carry markup (e.g., html,
+				// markdown) must opt out explicitly.
+				return sanitize_text_field( strval( $value ) );
 		}
 	}
 

@@ -22,6 +22,8 @@
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>
+        <!-- Psalm 6.8 reports existing overrides throughout the codebase; handle that migration separately. -->
+        <MissingOverrideAttribute errorLevel="suppress"/>
         <PossiblyUnusedReturnValue errorLevel="suppress"/>
         <PossiblyUnusedMethod errorLevel="suppress"/>
         <UndefinedGlobalVariable>
