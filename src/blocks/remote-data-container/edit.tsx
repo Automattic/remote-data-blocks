@@ -88,7 +88,7 @@ function RemoteDataBlockEdit( props: BlockEditProps< RemoteDataBlockAttributes >
 		refreshRemoteData();
 	}
 
-	function renderLoadingOverlay( isClickable = false ): JSX.Element {
+	function renderLoadingOverlay( isClickable = false ): React.JSX.Element {
 		return (
 			<div
 				className="remote-data-blocks-loading-overlay"
