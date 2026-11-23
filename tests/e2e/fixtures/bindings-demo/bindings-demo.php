@@ -34,6 +34,7 @@ add_action( 'init', static function (): void {
 					'caption' => 'Fresh data, familiar blocks.',
 					'date' => '2026-11-23T12:00:00',
 					'button_url' => 'https://example.org/garden',
+					'plain_url' => 'https://example.org/garden/plain-string',
 					'button_text' => 'Explore the garden',
 					'image_url' => plugins_url( 'garden.svg', __FILE__ ),
 					'image_alt' => 'A deterministic illustrated garden',
@@ -60,6 +61,10 @@ add_action( 'init', static function (): void {
 		'button_url' => [
 			'name' => 'Garden link',
 			'type' => 'button_url',
+		],
+		'plain_url' => [
+			'name' => 'Garden URL (plain string)',
+			'type' => 'string',
 		],
 		'button_text' => [
 			'name' => 'Garden button text',

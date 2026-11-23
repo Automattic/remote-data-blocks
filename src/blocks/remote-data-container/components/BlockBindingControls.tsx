@@ -1,5 +1,5 @@
 import { CheckboxControl, SelectControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 import {
 	BUTTON_TEXT_FIELD_TYPES,
@@ -14,22 +14,15 @@ import { BLOCK_BINDING_SOURCE } from '@/config/constants';
 import { getBindingTargetType } from '@/utils/block-binding-value';
 import { getBlockDataSourceType } from '@/utils/localized-block-data';
 
-/** Semantic overrides refine field choices; WordPress's map determines eligibility. */
+/** Schema compatibility determines eligibility; semantic types are suggestions only. */
 export function getBindingFieldTypes(
 	blockName: string,
 	target: string,
 	targetType?: string
 ): string[] {
-	const overrides: Record< string, Record< string, string[] > > = {
-		'core/paragraph': { content: TEXT_FIELD_TYPES },
-		'core/heading': { content: TEXT_FIELD_TYPES },
-		'core/button': { url: BUTTON_URL_FIELD_TYPES, text: BUTTON_TEXT_FIELD_TYPES },
-		'core/image': { url: IMAGE_URL_FIELD_TYPES, alt: IMAGE_ALT_FIELD_TYPES },
-		'remote-data-blocks/remote-html': { content: HTML_FIELD_TYPES },
-	};
-	const override = overrides[ blockName ]?.[ target ];
-	if ( override ) {
-		return override;
+	// Markup belongs to Remote HTML's isolated renderer, never generic text attributes.
+	if ( blockName === 'remote-data-blocks/remote-html' && target === 'content' ) {
+		return HTML_FIELD_TYPES;
 	}
 	if ( targetType === 'number' || targetType === 'integer' ) {
 		return targetType === 'integer' ? [ 'integer' ] : [ 'number', 'integer' ];
@@ -50,6 +43,16 @@ export function getBindingFieldTypes(
 		];
 	}
 	return [];
+}
+
+export function getSuggestedBindingFieldTypes( blockName: string, target: string ): string[] {
+	const suggestions: Record< string, Record< string, string[] > > = {
+		'core/paragraph': { content: TEXT_FIELD_TYPES },
+		'core/heading': { content: TEXT_FIELD_TYPES },
+		'core/button': { url: BUTTON_URL_FIELD_TYPES, text: BUTTON_TEXT_FIELD_TYPES },
+		'core/image': { url: IMAGE_URL_FIELD_TYPES, alt: IMAGE_ALT_FIELD_TYPES },
+	};
+	return suggestions[ blockName ]?.[ target ] ?? [];
 }
 
 function getAttributeLabel( blockName: string, target: string ): string {
@@ -84,6 +87,8 @@ function getAttributeLabel( blockName: string, target: string ): string {
 interface BlockBindingFieldControlProps {
 	availableBindings: AvailableBindings;
 	fieldTypes: string[];
+	suggestedFieldTypes?: string[];
+	help?: string;
 	label: string;
 	target: string;
 	updateFieldBinding: ( target: string, field: string ) => void;
@@ -91,24 +96,68 @@ interface BlockBindingFieldControlProps {
 }
 
 export function BlockBindingFieldControl( props: BlockBindingFieldControlProps ) {
-	const { availableBindings, fieldTypes, label, target, updateFieldBinding, value } = props;
-	const options = Object.entries( availableBindings )
-		.filter( ( [ _key, mapping ] ) => fieldTypes.includes( mapping.type ) )
-		.map( ( [ key, mapping ] ) => ( { label: mapping.name, value: key } ) );
-	// A removed field or changed schema must remain visible and removable.
-	if ( value && ! options.some( option => option.value === value ) ) {
-		options.push( { label: availableBindings[ value ]?.name ?? value, value } );
-	}
+	const {
+		availableBindings,
+		fieldTypes,
+		suggestedFieldTypes = [],
+		help,
+		label,
+		target,
+		updateFieldBinding,
+		value,
+	} = props;
+	const compatible = Object.entries( availableBindings ).filter( ( [ _key, mapping ] ) =>
+		fieldTypes.includes( mapping.type )
+	);
+	const suggested = compatible.filter( ( [ _key, mapping ] ) =>
+		suggestedFieldTypes.includes( mapping.type )
+	);
+	const other = compatible.filter(
+		( [ _key, mapping ] ) => ! suggestedFieldTypes.includes( mapping.type )
+	);
+	const hasCurrentOnly = value && ! compatible.some( ( [ key ] ) => key === value );
+	const renderOptions = ( fields: typeof compatible ) =>
+		fields.map( ( [ key, mapping ] ) => (
+			<option key={ key } value={ key }>
+				{ mapping.name }
+			</option>
+		) );
 	return (
 		<SelectControl
 			label={ label }
 			name={ target }
-			options={ [ { label: __( 'Select a field', 'remote-data-blocks' ), value: '' }, ...options ] }
+			help={ help }
 			onChange={ ( field: string ) => updateFieldBinding( target, field ) }
 			value={ value }
 			__next40pxDefaultSize
 			__nextHasNoMarginBottom
-		/>
+		>
+			<option value="">{ __( 'Select a field', 'remote-data-blocks' ) }</option>
+			{ suggested.length > 0 && (
+				<optgroup label={ __( 'Suggested fields', 'remote-data-blocks' ) }>
+					{ renderOptions( suggested ) }
+				</optgroup>
+			) }
+			{ other.length > 0 && (
+				<optgroup
+					label={
+						suggested.length
+							? __( 'Other compatible fields', 'remote-data-blocks' )
+							: __( 'Compatible fields', 'remote-data-blocks' )
+					}
+				>
+					{ renderOptions( other ) }
+				</optgroup>
+			) }
+			{ hasCurrentOnly && (
+				<optgroup label={ __( 'Current binding', 'remote-data-blocks' ) }>
+					<option value={ value }>
+						{ availableBindings[ value ]?.name ??
+							sprintf( __( '%s (unavailable)', 'remote-data-blocks' ), value ) }
+					</option>
+				</optgroup>
+			) }
+		</SelectControl>
 	);
 }
 
@@ -192,6 +241,12 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 						key={ target }
 						availableBindings={ availableBindings }
 						fieldTypes={ fieldTypes }
+						suggestedFieldTypes={ getSuggestedBindingFieldTypes( blockName, target ) }
+						help={
+							target === 'url'
+								? __( 'Choose a field containing a URL.', 'remote-data-blocks' )
+								: undefined
+						}
 						label={ getAttributeLabel( blockName, target ) }
 						target={ target }
 						updateFieldBinding={ updateFieldBinding }

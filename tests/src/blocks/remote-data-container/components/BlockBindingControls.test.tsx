@@ -3,9 +3,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
 	BlockBindingControls,
+	BlockBindingFieldControl,
 	getBindingFieldTypes,
+	getSuggestedBindingFieldTypes,
 } from '@/blocks/remote-data-container/components/BlockBindingControls';
 import { BLOCK_BINDING_SOURCE } from '@/config/constants';
+
+import type { ReactNode } from 'react';
 
 const block = vi.hoisted( () => ( { attributes: {} as Record< string, { type: string } > } ) );
 vi.mock( '@wordpress/blocks', () => ( { getBlockType: () => block } ) );
@@ -15,12 +19,14 @@ vi.mock( '@wordpress/components', () => ( {
 		label,
 		name,
 		options,
+		children,
 		onChange,
 		value,
 	}: {
 		label: string;
 		name: string;
-		options: { label: string; value: string }[];
+		options?: { label: string; value: string }[];
+		children?: ReactNode;
 		onChange: ( value: string ) => void;
 		value: string;
 	} ) => (
@@ -32,11 +38,12 @@ vi.mock( '@wordpress/components', () => ( {
 				value={ value }
 				onChange={ event => onChange( event.target.value ) }
 			>
-				{ options.map( option => (
-					<option key={ option.value } value={ option.value }>
-						{ option.label }
-					</option>
-				) ) }
+				{ children ??
+					options?.map( option => (
+						<option key={ option.value } value={ option.value }>
+							{ option.label }
+						</option>
+					) ) }
 			</select>
 		</label>
 	),
@@ -88,9 +95,13 @@ describe( 'generic binding controls', () => {
 		render( <BlockBindingControls { ...defaults } /> );
 		expect( screen.getAllByRole( 'option' ) ).toHaveLength( 1 );
 	} );
-	it( 'keeps semantic button/image choices and excludes markup from generic text', () => {
-		expect( getBindingFieldTypes( 'core/button', 'url', 'string' ) ).toEqual( [ 'button_url' ] );
-		expect( getBindingFieldTypes( 'core/image', 'url', 'string' ) ).toEqual( [ 'image_url' ] );
+	it( 'treats semantic button/image types as suggestions, retaining scalar and markup boundaries', () => {
+		expect( getSuggestedBindingFieldTypes( 'core/button', 'url' ) ).toEqual( [ 'button_url' ] );
+		expect( getSuggestedBindingFieldTypes( 'core/image', 'url' ) ).toEqual( [ 'image_url' ] );
+		expect( getBindingFieldTypes( 'core/button', 'url', 'string' ) ).toContain( 'string' );
+		expect( getBindingFieldTypes( 'core/image', 'alt', 'string' ) ).toContain( 'string' );
+		expect( getBindingFieldTypes( 'core/paragraph', 'content', 'rich-text' ) ).toContain( 'url' );
+		expect( getBindingFieldTypes( 'core/button', 'url', 'object' ) ).toEqual( [] );
 		expect( getBindingFieldTypes( 'test/custom', 'url', 'string' ) ).not.toContain( 'html' );
 		expect( getBindingFieldTypes( 'test/custom', 'url', 'string' ) ).not.toContain( 'markdown' );
 		expect( getBindingFieldTypes( 'test/custom', 'enabled', 'boolean' ) ).toEqual( [ 'boolean' ] );
@@ -126,6 +137,7 @@ describe( 'generic binding controls', () => {
 		render( <BlockBindingControls { ...defaults } attributes={ attributes } /> );
 		const control = screen.getByRole( 'combobox' );
 		expect( control ).toHaveValue( 'vanished' );
+		expect( defaults.updateBinding ).not.toHaveBeenCalled();
 		fireEvent.change( control, { target: { value: 'num' } } );
 		expect( defaults.updateBinding ).toHaveBeenCalledWith( 'unexpectedValue', {
 			block: 'test/data',
@@ -135,6 +147,70 @@ describe( 'generic binding controls', () => {
 		} );
 		fireEvent.change( control, { target: { value: '' } } );
 		expect( defaults.removeBinding ).toHaveBeenCalledWith( 'unexpectedValue' );
+	} );
+	it( 'groups suggested fields first without hiding compatible fields or duplicating them', () => {
+		render(
+			<BlockBindingFieldControl
+				availableBindings={ availableBindings }
+				fieldTypes={ getBindingFieldTypes( 'core/button', 'url', 'string' ) }
+				suggestedFieldTypes={ getSuggestedBindingFieldTypes( 'core/button', 'url' ) }
+				label="Button URL"
+				target="url"
+				updateFieldBinding={ defaults.updateBinding }
+				value="text"
+			/>
+		);
+		const groups = screen.getAllByRole( 'group' );
+		expect( groups.map( group => group.getAttribute( 'label' ) ) ).toEqual( [
+			'Suggested fields',
+			'Other compatible fields',
+		] );
+		expect( groups[ 0 ] ).toHaveTextContent( 'Button link' );
+		expect( groups[ 0 ] ).not.toHaveTextContent( 'Text field' );
+		expect( groups[ 1 ] ).toHaveTextContent( 'Text field' );
+		expect( screen.getByRole( 'combobox' ) ).toHaveValue( 'text' );
+		expect( screen.getAllByRole( 'option', { name: 'Button link' } ) ).toHaveLength( 1 );
+		expect( screen.queryByRole( 'option', { name: 'HTML field' } ) ).toBeNull();
+		expect( defaults.updateBinding ).not.toHaveBeenCalled();
+	} );
+	it( 'offers Conference Event string fields even with no semantic recommendations', () => {
+		block.attributes = { text: { type: 'rich-text' }, url: { type: 'string' } };
+		render(
+			<BlockBindingControls
+				{ ...defaults }
+				blockName="core/button"
+				availableBindings={ {
+					id: { name: 'Record ID', type: 'id' },
+					title: { name: 'Title', type: 'string' },
+					location: { name: 'Location', type: 'string' },
+				} }
+				supportedAttributes={ [ 'text', 'url' ] }
+			/>
+		);
+		const text = screen.getByRole( 'combobox', { name: 'Button Text' } );
+		const url = screen.getByRole( 'combobox', { name: 'Button URL' } );
+		expect( text ).toHaveTextContent( 'Title' );
+		expect( url ).toHaveTextContent( 'Location' );
+		expect( screen.queryByRole( 'group', { name: 'Suggested fields' } ) ).toBeNull();
+		fireEvent.change( text, { target: { value: 'title' } } );
+		expect( defaults.updateBinding ).toHaveBeenCalledWith( 'text', { field: 'title' } );
+	} );
+	it( 'keeps unavailable or schema-changed selections in a separate current group', () => {
+		render(
+			<BlockBindingFieldControl
+				availableBindings={ availableBindings }
+				fieldTypes={ [ 'string' ] }
+				label="Value"
+				target="value"
+				updateFieldBinding={ defaults.updateBinding }
+				value="html"
+			/>
+		);
+		expect( screen.getByRole( 'group', { name: 'Current binding' } ) ).toHaveTextContent(
+			'HTML field'
+		);
+		expect( screen.getByRole( 'combobox' ) ).toHaveValue( 'html' );
+		expect( defaults.updateBinding ).not.toHaveBeenCalled();
 	} );
 	it( 'does not add label controls to Remote HTML', () => {
 		render(
