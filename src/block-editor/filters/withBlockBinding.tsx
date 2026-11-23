@@ -17,6 +17,7 @@ import {
 	PATTERN_OVERRIDES_CONTEXT_KEY,
 } from '@/config/constants';
 import { getBoundBlockClassName } from '@/utils/block-binding';
+import { useSupportedBindingAttributes } from '@/utils/block-bindings-support';
 import { getBlockAvailableBindings, getBlockTitle } from '@/utils/localized-block-data';
 
 interface BoundBlockEditProps {
@@ -25,6 +26,7 @@ interface BoundBlockEditProps {
 	blockName: string;
 	children: React.JSX.Element;
 	remoteDataName: string;
+	supportedAttributes: string[];
 	remoteDataTitle: string;
 	setAttributes: ( attributes: RemoteDataInnerBlockAttributes ) => void;
 }
@@ -37,6 +39,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 		remoteDataName,
 		remoteDataTitle,
 		setAttributes,
+		supportedAttributes,
 	} = props;
 	const existingBindings = attributes.metadata?.bindings ?? {};
 
@@ -82,6 +85,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 						attributes={ attributes }
 						availableBindings={ availableBindings }
 						blockName={ blockName }
+						supportedAttributes={ supportedAttributes }
 						remoteDataName={ remoteDataName }
 						removeBinding={ removeBinding }
 						updateBinding={ updateBinding }
@@ -97,12 +101,20 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 	return ( props: BlockEditProps< RemoteDataInnerBlockAttributes > ) => {
 		const { attributes, context, name, setAttributes } = props;
 		const { remoteData } = useRemoteDataContext( context );
+		const supportedAttributes = useSupportedBindingAttributes( name );
 		const availableBindings = getBlockAvailableBindings( remoteData?.blockName ?? '' );
 		const hasAvailableBindings = Boolean( Object.keys( availableBindings ).length );
 		const { hasMultiSelection } = useSelect< BlockEditorStoreSelectors >( blockEditorStore );
+		const hasExistingBinding = Object.values( attributes.metadata?.bindings ?? {} ).some(
+			binding => binding.source === BLOCK_BINDING_SOURCE
+		);
 
 		// If the block does not have a remote data context, render it as usual.
-		if ( ! remoteData || ! hasAvailableBindings ) {
+		if (
+			! remoteData ||
+			( ! hasAvailableBindings && ! hasExistingBinding ) ||
+			( ! supportedAttributes.length && ! hasExistingBinding )
+		) {
 			return <BlockEdit { ...props } />;
 		}
 
@@ -145,6 +157,7 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 				attributes={ attributes }
 				availableBindings={ availableBindings }
 				blockName={ name }
+				supportedAttributes={ supportedAttributes }
 				remoteDataName={ remoteData?.blockName ?? '' }
 				remoteDataTitle={ remoteBlockTitle }
 				setAttributes={ setAttributes }

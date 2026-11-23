@@ -19,8 +19,20 @@ concurrency:
 
 jobs:
   test:
-    name: End-to-End Testing against WordPress
+    name: WordPress ${{ matrix.wordpress }} / PHP ${{ matrix.php }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - wordpress: '6.7'
+            core: WordPress/WordPress#6.7
+            php: '8.1'
+            legacy: '1'
+          - wordpress: latest-stable
+            core: https://wordpress.org/latest.zip
+            php: '8.3'
+            legacy: '0'
 
     steps:
       - name: Checkout code
@@ -42,23 +54,28 @@ jobs:
 
       - name: Start up WordPress environment
         env:
-          WP_ENV_CORE: WordPress/WordPress#6.7
-          WP_ENV_PHP_VERSION: 8.1
+          WP_ENV_CORE: ${{ matrix.core }}
+          WP_ENV_PHP_VERSION: ${{ matrix.php }}
         run: |
           npm run dev:build
 
       - name: Output WordPress and PHP version
         run: |
-          npm run wp-cli cli info
-          npm run wp-cli core version
+          npx wp-env run tests-cli wp cli info
+          npx wp-env run tests-cli wp core version
+
+      - name: Activate deterministic bindings fixture
+        run: npx wp-env run tests-cli wp plugin activate bindings-demo
 
       - name: Run E2E tests
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+          RDB_E2E_LEGACY: ${{ matrix.legacy }}
         run: |
           npm run test:e2e
 
       - name: Stop WordPress environment
+        if: always()
         run: |
           npm run dev:stop
 
@@ -66,5 +83,5 @@ jobs:
         uses: actions/upload-artifact@v7
         if: failure()
         with:
-          name: test-results
+          name: test-results-${{ matrix.wordpress }}
           path: artifacts

@@ -14,5 +14,15 @@
     ".",
     "https://downloads.wordpress.org/plugin/query-monitor.latest-stable.zip",
     "https://downloads.wordpress.org/plugin/redis-cache.latest-stable.zip"
-  ]
+  ],
+  "env": {
+    "tests": {
+      "plugins": [
+        ".",
+        "https://downloads.wordpress.org/plugin/query-monitor.latest-stable.zip",
+        "https://downloads.wordpress.org/plugin/redis-cache.latest-stable.zip",
+        "./tests/e2e/fixtures/bindings-demo"
+      ]
+    }
+  }
 }

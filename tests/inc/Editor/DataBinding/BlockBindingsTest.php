@@ -510,6 +510,186 @@ class BlockBindingsTest extends TestCase {
 	}
 
 	/**
+	 * @dataProvider scalar_target_provider
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	public function test_get_value_respects_registered_scalar_target( mixed $target_type, mixed $remote_value, mixed $expected ): void {
+		$this->create_mock_config_store( $this->create_mock_block_config( $this->create_mock_query_runner_with_result( $remote_value ) ) );
+		$block = $this->create_mock_bound_block( $target_type );
+		$block->context = $this->create_block_context( [] );
+
+		$this->assertSame( $expected, BlockBindings::get_value( [
+			'field' => self::MOCK_OUTPUT_FIELD_NAME,
+			'label' => 'Do not prefix typed values',
+		], $block, 'value' ) );
+	}
+
+	public function scalar_target_provider(): array {
+		return [
+			'number zero' => [ 'number', 0, 0 ],
+			'number decimal' => [ 'number', 1.25, 1.25 ],
+			'number numeric string' => [ 'number', ' 1.25e2 ', 125.0 ],
+			'number decimal point' => [ 'number', '.5', 0.5 ],
+			'number signed string' => [ 'number', '+12', 12.0 ],
+			'number rejects partial value' => [ 'number', '12px', null ],
+			'number rejects currency' => [ 'number', '$12.00', null ],
+			'number rejects empty string' => [ 'number', '', null ],
+			'number rejects whitespace' => [ 'number', '  ', null ],
+			// phpcs:ignore PHPCompatibility.Miscellaneous.ValidIntegers.HexNumericStringFound -- Invalid binding input, not numeric PHP syntax.
+			'number rejects hex' => [ 'number', '0x12', null ],
+			'number rejects boolean' => [ 'number', false, null ],
+			'number rejects overflow' => [ 'number', '1e999', null ],
+			'number rejects nonfinite' => [ 'number', INF, null ],
+			'number rejects NaN' => [ 'number', NAN, null ],
+			'integer zero' => [ 'integer', 0, 0 ],
+			'integer accepts integral string' => [ 'integer', '42.0', 42 ],
+			'integer accepts exponent' => [ 'integer', '4.2e1', 42 ],
+			'integer accepts integral float' => [ 'integer', 42.0, 42 ],
+			'integer rejects fraction' => [ 'integer', 4.2, null ],
+			'integer rejects fractional string' => [ 'integer', '4.2', null ],
+			'integer accepts safe limit' => [ 'integer', '9007199254740991', 9007199254740991 ],
+			'integer rejects unsafe value' => [ 'integer', '9007199254740992', null ],
+			'integer rejects negative unsafe value' => [ 'integer', '-9007199254740992', null ],
+			'boolean true' => [ 'boolean', true, true ],
+			'boolean false' => [ 'boolean', false, false ],
+			'boolean rejects string' => [ 'boolean', 'false', null ],
+			'boolean rejects number' => [ 'boolean', 0, null ],
+			'missing number' => [ 'number', null, null ],
+			'missing boolean' => [ 'boolean', null, null ],
+			'string retains display zero' => [ 'string', 0, '0' ],
+			'string retains currency formatting' => [ 'string', '$12.00', '$12.00' ],
+			'rich text retains markup' => [ 'rich-text', '<em>Formatted</em>', '<em>Formatted</em>' ],
+			'object target rejected' => [ 'object', 'text', null ],
+			'array target rejected' => [ 'array', 'text', null ],
+			'compound schema rejected' => [ [ 'number', 'null' ], 42, null ],
+		];
+	}
+
+	/**
+	 * @dataProvider scalar_fallback_provider
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	public function test_get_value_applies_target_type_to_saved_fallback( string $target_type, mixed $saved_value, mixed $expected ): void {
+		$block = $this->create_mock_bound_block( $target_type );
+		/** @psalm-suppress UndefinedPropertyAssignment -- WP_Block exposes read-only magic attributes; this lightweight unit mock supplies them directly. */
+		$block->attributes = [ 'value' => $saved_value ];
+
+		$this->assertSame( $expected, BlockBindings::get_value( [], $block, 'value' ) );
+	}
+
+	public function scalar_fallback_provider(): array {
+		return [
+			'number fallback zero' => [ 'number', 0, 0 ],
+			'number fallback string' => [ 'number', '12.5', 12.5 ],
+			'integer fallback' => [ 'integer', '42', 42 ],
+			'false fallback' => [ 'boolean', false, false ],
+			'true fallback' => [ 'boolean', true, true ],
+			'null fallback' => [ 'number', null, null ],
+			'invalid number fallback' => [ 'number', '12px', null ],
+			'invalid boolean fallback' => [ 'boolean', 'false', null ],
+			'string fallback stays sanitized' => [ 'string', '<em>Fallback</em>', 'Fallback' ],
+		];
+	}
+
+	/**
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	public function test_get_value_uses_typed_serialized_fallback_when_remote_value_is_invalid(): void {
+		$this->create_mock_config_store( $this->create_mock_block_config( $this->create_mock_query_runner_with_result( 'invalid number' ) ) );
+		$block = $this->create_mock_bound_block( 'integer' );
+		$context = $this->create_block_context( [] );
+		$context[ BlockBindings::$context_name ]['results'] = [
+			[
+				'uuid' => '10000000-1000-4000-8000-100000000000',
+				'result' => [
+					self::MOCK_OUTPUT_FIELD_NAME => [
+						'name' => 'Stored number',
+						'type' => 'integer',
+						'value' => 0,
+					],
+				],
+			],
+		];
+		$block->context = $context;
+		/** @psalm-suppress UndefinedPropertyAssignment -- WP_Block exposes read-only magic attributes; this lightweight unit mock supplies them directly. */
+		$block->attributes = [ 'value' => 99 ];
+
+		$this->assertSame( 0, BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'value' ) );
+	}
+
+	/**
+	 * @dataProvider serialized_scalar_fallback_provider
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	public function test_get_value_unwraps_current_serialized_field_descriptors( string $target_type, mixed $stored_value, mixed $expected ): void {
+		$block = $this->create_mock_bound_block( $target_type );
+		$block->context = [
+			BlockBindings::$context_name => [
+				'results' => [
+					[
+						'uuid' => '10000000-1000-4000-8000-100000000000',
+						'result' => [
+							self::MOCK_OUTPUT_FIELD_NAME => [
+								'name' => 'Stored field',
+								'type' => $target_type,
+								'value' => $stored_value,
+							],
+						],
+					],
+				],
+			],
+		];
+
+		$this->assertSame( $expected, BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'value' ) );
+	}
+
+	public function serialized_scalar_fallback_provider(): array {
+		return [
+			'false descriptor' => [ 'boolean', false, false ],
+			'zero descriptor' => [ 'number', 0, 0 ],
+			'integer descriptor' => [ 'integer', '42', 42 ],
+			'null descriptor' => [ 'boolean', null, null ],
+			'invalid descriptor' => [ 'number', '12px', null ],
+			'string descriptor remains sanitized' => [ 'string', '<em>Fallback</em>', 'Fallback' ],
+		];
+	}
+
+	/**
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	public function test_get_value_preserves_string_labels_and_unknown_array_callers(): void {
+		$this->create_mock_config_store( $this->create_mock_block_config( $this->create_mock_query_runner_with_result( 42 ) ) );
+		$block = [
+			'name' => '<inline-binding>',
+			'context' => $this->create_block_context( [] ),
+		];
+
+		$this->assertSame( '<span class="rdb-block-label">Count</span> 42', BlockBindings::get_value( [
+			'field' => self::MOCK_OUTPUT_FIELD_NAME,
+			'label' => 'Count',
+		], $block, 'content' ) );
+	}
+
+	private function create_mock_bound_block( mixed $target_type ): \WP_Block {
+		/** @var \WP_Block_Type $block_type */
+		$block_type = Mockery::namedMock( \WP_Block_Type::class );
+		$block_type->attributes = [ 'value' => [ 'type' => $target_type ] ];
+		/** @var \WP_Block $block */
+		$block = Mockery::namedMock( \WP_Block::class );
+		$block->name = 'test/scalar-target';
+		$block->context = [];
+		/** @psalm-suppress UndefinedPropertyAssignment -- WP_Block exposes read-only magic attributes; this lightweight unit mock supplies them directly. */
+		$block->attributes = [];
+		$block->block_type = $block_type;
+		return $block;
+	}
+
+	/**
 	 * Creates a mock query runner that will return a result once.
 	 *
 	 * @param mixed $value The result value to return from the query runner.
