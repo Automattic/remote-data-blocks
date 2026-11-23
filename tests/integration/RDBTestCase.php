@@ -141,7 +141,7 @@ class RDBTestCase extends WP_UnitTestCase {
 
 	protected function get_dom_elements_by_html_class( DOMDocument $dom, string $html_class ): DOMNodeList|false {
 		$xpath = new DOMXPath( $dom );
-		$nodes = $xpath->query( sprintf( "//*[@class='%s']", $html_class ) );
+		$nodes = $xpath->query( sprintf( "//*[contains(concat(' ', normalize-space(@class), ' '), ' %s ')]", $html_class ) );
 
 		return $nodes;
 	}

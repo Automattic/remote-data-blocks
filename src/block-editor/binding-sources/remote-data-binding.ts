@@ -1,7 +1,13 @@
+import { BlockEditorStoreSelectors, store as blockEditorStore } from '@wordpress/block-editor';
 import { registerBlockBindingsSource } from '@wordpress/blocks';
 
 import { REMOTE_DATA_CONTEXT_KEY } from '@/blocks/remote-data-container/config/constants';
 import { BLOCK_BINDING_SOURCE, STORE_NAME as rdbStore } from '@/config/constants';
+import {
+	BindingValue,
+	coerceBindingValue,
+	getBindingTargetType,
+} from '@/utils/block-binding-value';
 
 import type { Selectors } from '@/store';
 import type { StoreDescriptor } from '@wordpress/data';
@@ -12,6 +18,7 @@ interface RawRemoteDataContext {
 
 interface GetValuesPayload {
 	bindings: Record< string, RemoteDataBlockBinding >;
+	clientId: string;
 	context: RawRemoteDataContext;
 	select: < T >( store: StoreDescriptor | string ) => T;
 }
@@ -19,7 +26,14 @@ interface GetValuesPayload {
 registerBlockBindingsSource( {
 	name: BLOCK_BINDING_SOURCE,
 	usesContext: [ 'remote-data-blocks/remoteData' ],
-	getValues( { bindings, context, select }: GetValuesPayload ): Record< string, string > {
+	getValues( {
+		bindings,
+		clientId,
+		context,
+		select,
+	}: GetValuesPayload ): Record< string, BindingValue > {
+		const editor = clientId ? select< BlockEditorStoreSelectors >( blockEditorStore ) : undefined;
+		const blockName = editor?.getBlockName( clientId );
 		const remoteData = context[ REMOTE_DATA_CONTEXT_KEY ];
 		const previewIndex = select< Selectors >( rdbStore ).getPreviewIndex( remoteData?.resultId );
 
@@ -28,14 +42,22 @@ registerBlockBindingsSource( {
 				.filter( ( [ _targetAttribute, binding ] ): boolean => {
 					return binding.args.isPreview || Boolean( remoteData?.results?.length );
 				} )
-				.map( ( [ targetAttribute, binding ] ): [ string, string ] => {
+				.map( ( [ targetAttribute, binding ] ): [ string, BindingValue ] => {
 					const index = binding.args.previewIndex ?? previewIndex ?? 0;
 					const label = binding.args.label ? `${ binding.args.label }: ` : '';
-					const value =
-						binding.args.previewValue ??
-						String( remoteData?.results?.[ index ]?.result?.[ binding.args.field ]?.value ?? '' );
-
-					return [ targetAttribute, `${ label }${ value }` ];
+					const rawValue =
+						binding.args.previewValue !== undefined
+							? binding.args.previewValue
+							: remoteData?.results?.[ index ]?.result?.[ binding.args.field ]?.value;
+					const targetType = getBindingTargetType( blockName, targetAttribute );
+					let value = coerceBindingValue( rawValue, targetType );
+					if ( value === null && ! binding.args.isPreview ) {
+						value = coerceBindingValue(
+							editor?.getBlockAttributes( clientId )?.[ targetAttribute ],
+							targetType
+						);
+					}
+					return [ targetAttribute, typeof value === 'string' ? `${ label }${ value }` : value ];
 				} )
 		);
 	},

@@ -1,7 +1,8 @@
 import { cloneBlock } from '@wordpress/blocks';
 
 import { BLOCK_BINDING_SOURCE } from '@/config/constants';
-import { getRemoteDataResultValue } from '@/utils//remote-data';
+import { coerceBindingValue, getBindingTargetType } from '@/utils/block-binding-value';
+import { getRemoteDataResultValue } from '@/utils/remote-data';
 import { getClassName } from '@/utils/string';
 
 import type { BlockPattern } from '@wordpress/block-editor';
@@ -78,7 +79,12 @@ export function cloneBlockForPatternPreview(
 								args: {
 									...binding.args,
 									isPreview: true,
-									previewValue: getExpectedAttributeValue( result, binding.args ),
+									previewValue: getExpectedAttributeValue(
+										result,
+										binding.args,
+										block.name,
+										target
+									),
 								},
 							},
 						]
@@ -93,10 +99,17 @@ export function cloneBlockForPatternPreview(
 
 function getExpectedAttributeValue(
 	result?: RemoteDataApiResult,
-	args?: RemoteDataBlockBindingArgs
-): string | undefined {
+	args?: RemoteDataBlockBindingArgs,
+	blockName?: string,
+	target = ''
+): string | number | boolean | null | undefined {
 	if ( ! args?.field || ! result?.result?.[ args.field ] ) {
 		return;
+	}
+
+	const targetType = getBindingTargetType( blockName, target );
+	if ( [ 'number', 'integer', 'boolean' ].includes( targetType ?? '' ) ) {
+		return coerceBindingValue( result.result[ args.field ]?.value, targetType );
 	}
 
 	// See comment on toString() in getAttributeValue.

@@ -1,26 +1,15 @@
 import { BlockConfiguration } from '@wordpress/blocks';
 
-import {
-	REMOTE_DATA_CONTEXT_KEY,
-	SUPPORTED_CORE_BLOCKS,
-} from '@/blocks/remote-data-container/config/constants';
+import { REMOTE_DATA_CONTEXT_KEY } from '@/blocks/remote-data-container/config/constants';
 
+/** Add context before first binding without consulting an uninitialized editor store. */
 export function addUsesContext(
 	settings: BlockConfiguration< RemoteDataInnerBlockAttributes >,
-	name: string
+	_name: string
 ) {
-	if ( ! SUPPORTED_CORE_BLOCKS.includes( name ) ) {
+	const { usesContext = [] } = settings;
+	if ( usesContext.includes( REMOTE_DATA_CONTEXT_KEY ) ) {
 		return settings;
 	}
-
-	const { usesContext = [] } = settings;
-
-	if ( ! usesContext?.includes( REMOTE_DATA_CONTEXT_KEY ) ) {
-		return {
-			...settings,
-			usesContext: [ ...usesContext, REMOTE_DATA_CONTEXT_KEY ],
-		};
-	}
-
-	return settings;
+	return { ...settings, usesContext: [ ...usesContext, REMOTE_DATA_CONTEXT_KEY ] };
 }

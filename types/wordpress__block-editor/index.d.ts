@@ -63,6 +63,8 @@ declare module '@wordpress/block-editor' {
 		__experimentalGetAllowedPatterns: ( clientId: string ) => BlockPattern[];
 		getBlocks: < T extends BlockAttributes >( clientId: string ) => BlockInstance< T >[];
 		getBlocksByClientId: < T extends BlockAttributes >( clientId: string ) => BlockInstance< T >[];
+		getBlockAttributes: ( clientId: string ) => Record< string, unknown > | undefined;
+		getBlockName: ( clientId: string ) => string | undefined;
 		getBlocksByName: ( name: string ) => string[];
 		getPatternsByBlockTypes: ( name: string | string[], clientId?: string ) => BlockPattern[];
 		getSettings: () => EditorSettings;

@@ -1,4 +1,5 @@
 import { CheckboxControl, SelectControl } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 import {
 	BUTTON_TEXT_FIELD_TYPES,
@@ -9,7 +10,76 @@ import {
 	TEXT_FIELD_TYPES,
 } from '@/blocks/remote-data-container/config/constants';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
+import { BLOCK_BINDING_SOURCE } from '@/config/constants';
+import { getBindingTargetType } from '@/utils/block-binding-value';
 import { getBlockDataSourceType } from '@/utils/localized-block-data';
+
+/** Semantic overrides refine field choices; WordPress's map determines eligibility. */
+export function getBindingFieldTypes(
+	blockName: string,
+	target: string,
+	targetType?: string
+): string[] {
+	const overrides: Record< string, Record< string, string[] > > = {
+		'core/paragraph': { content: TEXT_FIELD_TYPES },
+		'core/heading': { content: TEXT_FIELD_TYPES },
+		'core/button': { url: BUTTON_URL_FIELD_TYPES, text: BUTTON_TEXT_FIELD_TYPES },
+		'core/image': { url: IMAGE_URL_FIELD_TYPES, alt: IMAGE_ALT_FIELD_TYPES },
+		'remote-data-blocks/remote-html': { content: HTML_FIELD_TYPES },
+	};
+	const override = overrides[ blockName ]?.[ target ];
+	if ( override ) {
+		return override;
+	}
+	if ( targetType === 'number' || targetType === 'integer' ) {
+		return targetType === 'integer' ? [ 'integer' ] : [ 'number', 'integer' ];
+	}
+	if ( targetType === 'boolean' ) {
+		return [ 'boolean' ];
+	}
+	if ( targetType === 'string' || targetType === 'rich-text' ) {
+		return [
+			...TEXT_FIELD_TYPES,
+			'button_text',
+			'button_url',
+			'image_alt',
+			'image_url',
+			'id',
+			'url',
+			'uuid',
+		];
+	}
+	return [];
+}
+
+function getAttributeLabel( blockName: string, target: string ): string {
+	if ( blockName === 'core/image' && target === 'url' ) {
+		return __( 'Image URL', 'remote-data-blocks' );
+	}
+	if ( blockName === 'core/image' && target === 'alt' ) {
+		return __( 'Image alt text', 'remote-data-blocks' );
+	}
+	if ( blockName === 'core/button' && target === 'url' ) {
+		return __( 'Button URL', 'remote-data-blocks' );
+	}
+	if ( blockName === 'core/button' && target === 'text' ) {
+		return __( 'Button Text', 'remote-data-blocks' );
+	}
+	if ( blockName === 'remote-data-blocks/remote-html' && target === 'content' ) {
+		return __( 'Raw HTML', 'remote-data-blocks' );
+	}
+	const labels: Record< string, string > = {
+		content: __( 'Content', 'remote-data-blocks' ),
+		title: __( 'Title', 'remote-data-blocks' ),
+		id: __( 'ID', 'remote-data-blocks' ),
+		caption: __( 'Caption', 'remote-data-blocks' ),
+		linkTarget: __( 'Link target', 'remote-data-blocks' ),
+		rel: __( 'Link relationship', 'remote-data-blocks' ),
+		datetime: __( 'Date and time', 'remote-data-blocks' ),
+	};
+	const humanized = target.replace( /([a-z])([A-Z])/g, '$1 $2' ).replace( /[_-]/g, ' ' );
+	return labels[ target ] ?? humanized.charAt( 0 ).toUpperCase() + humanized.slice( 1 );
+}
 
 interface BlockBindingFieldControlProps {
 	availableBindings: AvailableBindings;
@@ -22,18 +92,18 @@ interface BlockBindingFieldControlProps {
 
 export function BlockBindingFieldControl( props: BlockBindingFieldControlProps ) {
 	const { availableBindings, fieldTypes, label, target, updateFieldBinding, value } = props;
-
 	const options = Object.entries( availableBindings )
 		.filter( ( [ _key, mapping ] ) => fieldTypes.includes( mapping.type ) )
-		.map( ( [ key, mapping ] ) => {
-			return { label: mapping.name, value: key };
-		} );
-
+		.map( ( [ key, mapping ] ) => ( { label: mapping.name, value: key } ) );
+	// A removed field or changed schema must remain visible and removable.
+	if ( value && ! options.some( option => option.value === value ) ) {
+		options.push( { label: availableBindings[ value ]?.name ?? value, value } );
+	}
 	return (
 		<SelectControl
 			label={ label }
 			name={ target }
-			options={ [ { label: 'Select a field', value: '' }, ...options ] }
+			options={ [ { label: __( 'Select a field', 'remote-data-blocks' ), value: '' }, ...options ] }
 			onChange={ ( field: string ) => updateFieldBinding( target, field ) }
 			value={ value }
 			__next40pxDefaultSize
@@ -47,19 +117,35 @@ interface BlockBindingControlsProps {
 	availableBindings: AvailableBindings;
 	blockName: string;
 	remoteDataName: string;
+	supportedAttributes: string[];
 	removeBinding: ( target: string ) => void;
 	updateBinding: ( target: string, args: Omit< RemoteDataBlockBindingArgs, 'block' > ) => void;
 }
 
 export function BlockBindingControls( props: BlockBindingControlsProps ) {
-	const { attributes, availableBindings, blockName, remoteDataName, removeBinding, updateBinding } =
-		props;
-	const contentArgs = attributes.metadata?.bindings?.content?.args;
+	const {
+		attributes,
+		availableBindings,
+		blockName,
+		remoteDataName,
+		supportedAttributes,
+		removeBinding,
+		updateBinding,
+	} = props;
+	const bindings = attributes.metadata?.bindings ?? {};
+	const contentArgs =
+		bindings.content?.source === BLOCK_BINDING_SOURCE ? bindings.content.args : undefined;
 	const contentField = contentArgs?.field ?? '';
-	const imageAltField = attributes.metadata?.bindings?.alt?.args?.field ?? '';
-	const imageUrlField = attributes.metadata?.bindings?.url?.args?.field ?? '';
-	const buttonUrlField = attributes.metadata?.bindings?.url?.args?.field ?? '';
-	const buttonTextField = attributes.metadata?.bindings?.text?.args?.field ?? '';
+	const targets = [
+		...new Set( [
+			...supportedAttributes,
+			...Object.keys( bindings ).filter(
+				target => bindings[ target ]?.source === BLOCK_BINDING_SOURCE
+			),
+		] ),
+	];
+	const hasLabelControl =
+		[ 'core/paragraph', 'core/heading' ].includes( blockName ) && targets.includes( 'content' );
 
 	function updateFieldBinding( target: string, field: string ): void {
 		if ( ! field ) {
@@ -69,11 +155,10 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 				data_source_type: getBlockDataSourceType( remoteDataName ),
 				block_target_attribute: target,
 			} );
-
 			return;
 		}
-
-		const args = attributes.metadata?.bindings?.[ target ]?.args ?? {};
+		const args =
+			bindings[ target ]?.source === BLOCK_BINDING_SOURCE ? bindings[ target ]?.args : {};
 		updateBinding( target, { ...args, field } );
 		sendTracksEvent( 'remote_data_container_actions', {
 			action: 'update_binding',
@@ -85,13 +170,9 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 
 	function updateFieldLabel( showLabel: boolean ): void {
 		if ( ! contentField ) {
-			// Form input should be disabled in this state, but check anyway.
 			return;
 		}
-
-		const label = showLabel
-			? Object.entries( availableBindings ).find( ( [ key ] ) => key === contentField )?.[ 1 ]?.name
-			: undefined;
+		const label = showLabel ? availableBindings[ contentField ]?.name : undefined;
 		updateBinding( 'content', { ...contentArgs, field: contentField, label } );
 		sendTracksEvent( 'remote_data_container_actions', {
 			action: showLabel ? 'show_label' : 'hide_label',
@@ -99,86 +180,34 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 		} );
 	}
 
-	switch ( blockName ) {
-		case 'core/heading':
-		case 'core/paragraph':
-			return (
-				<>
+	return (
+		<>
+			{ targets.map( target => {
+				const binding = bindings[ target ];
+				const fieldTypes = supportedAttributes.includes( target )
+					? getBindingFieldTypes( blockName, target, getBindingTargetType( blockName, target ) )
+					: [];
+				return (
 					<BlockBindingFieldControl
+						key={ target }
 						availableBindings={ availableBindings }
-						fieldTypes={ TEXT_FIELD_TYPES }
-						label="Content"
-						target="content"
+						fieldTypes={ fieldTypes }
+						label={ getAttributeLabel( blockName, target ) }
+						target={ target }
 						updateFieldBinding={ updateFieldBinding }
-						value={ contentField }
+						value={ binding?.source === BLOCK_BINDING_SOURCE ? binding.args.field : '' }
 					/>
-					<CheckboxControl
-						checked={ Boolean( contentArgs?.label ) }
-						disabled={ ! contentField }
-						label="Show label"
-						name="show_label"
-						onChange={ updateFieldLabel }
-					/>
-				</>
-			);
-
-		case 'core/image':
-			return (
-				<>
-					<BlockBindingFieldControl
-						availableBindings={ availableBindings }
-						fieldTypes={ IMAGE_URL_FIELD_TYPES }
-						label="Image URL"
-						target="url"
-						updateFieldBinding={ updateFieldBinding }
-						value={ imageUrlField }
-					/>
-					<BlockBindingFieldControl
-						availableBindings={ availableBindings }
-						fieldTypes={ IMAGE_ALT_FIELD_TYPES }
-						label="Image alt text"
-						target="alt"
-						updateFieldBinding={ updateFieldBinding }
-						value={ imageAltField }
-					/>
-				</>
-			);
-		case 'core/button':
-			return (
-				<>
-					<BlockBindingFieldControl
-						availableBindings={ availableBindings }
-						fieldTypes={ BUTTON_URL_FIELD_TYPES }
-						label="Button URL"
-						target="url"
-						updateFieldBinding={ updateFieldBinding }
-						value={ buttonUrlField }
-					/>
-					<BlockBindingFieldControl
-						availableBindings={ availableBindings }
-						fieldTypes={ BUTTON_TEXT_FIELD_TYPES }
-						label="Button Text"
-						target="text"
-						updateFieldBinding={ updateFieldBinding }
-						value={ buttonTextField }
-					/>
-				</>
-			);
-
-		case 'remote-data-blocks/remote-html':
-			return (
-				<>
-					<BlockBindingFieldControl
-						availableBindings={ availableBindings }
-						fieldTypes={ HTML_FIELD_TYPES }
-						label="Raw HTML"
-						target="content"
-						updateFieldBinding={ updateFieldBinding }
-						value={ contentField }
-					/>
-				</>
-			);
-	}
-
-	return null;
+				);
+			} ) }
+			{ hasLabelControl && (
+				<CheckboxControl
+					checked={ Boolean( contentArgs?.label ) }
+					disabled={ ! contentField }
+					label={ __( 'Show label', 'remote-data-blocks' ) }
+					name="show_label"
+					onChange={ updateFieldLabel }
+				/>
+			) }
+		</>
+	);
 }
