@@ -242,3 +242,86 @@ remote-data-blocks-inline-field {
 	font-size: 0.75rem;
 	color: rgb(117, 117, 117);
 }
+
+
+.rdb-binding-rows {
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	margin-bottom: 16px;
+}
+
+.rdb-binding-row {
+	align-items: center;
+	display: flex;
+
+	& + & {
+		border-top: 1px solid #ddd;
+	}
+}
+
+.rdb-binding-row__trigger.components-button {
+	color: #1e1e1e;
+	flex: 1;
+	gap: 8px;
+	height: auto;
+	min-height: 44px;
+	min-width: 0;
+	padding: 10px 12px;
+	text-align: left;
+
+	&:hover {
+		background: #f0f0f0;
+		color: #1e1e1e;
+	}
+}
+
+.rdb-binding-row__description {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	font-size: 13px;
+	font-weight: 400;
+	gap: 3px;
+	line-height: 1.4;
+	min-width: 0;
+	overflow-wrap: anywhere;
+	white-space: normal;
+}
+
+.rdb-binding-row__attribute,
+.rdb-binding-row__status {
+	color: #757575;
+	font-size: 12px;
+}
+
+.rdb-binding-row__indicator {
+	fill: #757575;
+	flex-shrink: 0;
+}
+
+.rdb-binding-row__remove.components-button {
+	color: #757575;
+	flex-shrink: 0;
+	margin-right: 4px;
+	min-width: 32px;
+}
+
+.rdb-binding-chooser .components-popover__content {
+	padding: 16px;
+	width: min(300px, calc(100vw - 32px));
+}
+
+.rdb-binding-chooser__heading {
+	font-size: 13px;
+	font-weight: 600;
+	margin: 0 0 16px;
+}
+
+.rdb-binding-chooser__actions {
+	border-top: 1px solid #ddd;
+	display: flex;
+	gap: 8px;
+	justify-content: flex-end;
+	margin-top: 16px;
+	padding-top: 12px;
+}

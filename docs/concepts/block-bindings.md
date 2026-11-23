@@ -1,6 +1,6 @@
 # Block bindings
 
-Remote Data Blocks uses the [WordPress Block Bindings API](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-bindings/) to connect remote fields to block attributes. Select a block inside a Remote Data Block, then choose a field in its **Remote Data** inspector panel. Bindings are saved in the block's `metadata.bindings`, using the `remote-data/binding` source. Existing bindings keep the same saved format.
+Remote Data Blocks uses the [WordPress Block Bindings API](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-bindings/) to connect remote fields to block attributes. Select a block inside a Remote Data Block, then click an attribute row (marked with **+**) in its **Remote Data** inspector panel. Choose a field and click **Apply**. Click a bound field summary to change it, or use its **Remove** icon to disconnect it; field selectors appear only while editing a binding. **Cancel** or Escape discards an uncommitted selection. If no fields match an attribute, the chooser explains this instead of displaying an empty dropdown. Bindings are saved in the block's `metadata.bindings`, using the `remote-data/binding` source. Existing bindings keep the same saved format.
 
 ## Supported blocks and WordPress versions
 

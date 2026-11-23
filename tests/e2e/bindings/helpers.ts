@@ -1,4 +1,5 @@
-import type { Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
+
 import type { Editor } from '@wordpress/e2e-test-utils-playwright';
 
 export const GARDEN_BLOCK = 'remote-data-blocks/bindings-garden';
@@ -111,4 +112,24 @@ export function getFixtureWordPressVersion( page: Page ) {
 	return page.evaluate(
 		() => ( window as unknown as EditorWindow ).RDB_BINDINGS_DEMO.wordpressVersion
 	);
+}
+
+/** Open only the requested compact binding row; changes remain drafts until Apply. */
+export async function openBindingChooser( page: Page, target: string ) {
+	await page
+		.locator( `[data-binding-target="${ target }"]` )
+		.getByRole( 'button', { name: /^(Bind |Change )/ } )
+		.click();
+}
+
+export async function bindField( page: Page, target: string, field: string ) {
+	await openBindingChooser( page, target );
+	await page.locator( `select[name="${ target }"]` ).selectOption( field );
+	await page.getByRole( 'button', { name: 'Apply', exact: true } ).click();
+}
+
+export async function expectBoundField( page: Page, target: string, field: string ) {
+	await openBindingChooser( page, target );
+	await expect( page.locator( `select[name="${ target }"]` ) ).toHaveValue( field );
+	await page.getByRole( 'button', { name: 'Cancel', exact: true } ).click();
 }
