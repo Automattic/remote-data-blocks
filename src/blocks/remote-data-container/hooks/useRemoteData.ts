@@ -46,6 +46,7 @@ interface UseRemoteData {
 	loading: boolean;
 	page: number;
 	perPage?: number;
+	resetPage: () => void;
 	reset: () => void;
 	searchInput: string;
 	setPage: ( page: number ) => void;
@@ -122,7 +123,7 @@ export function useRemoteData( {
 		totalItems,
 		totalPages,
 		...paginationVariables
-	} = usePaginationVariables( { initialPage, initialPerPage, paginationData } );
+	} = usePaginationVariables( { initialPage, initialPerPage, paginationData, inputVariables } );
 	const { hasSearchInput, searchQueryInput, searchInput, setSearchInput, supportsSearch } =
 		useSearchVariables( {
 			initialSearchInput,

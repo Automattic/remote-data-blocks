@@ -142,7 +142,7 @@ final class QueryResponseParserTest extends TestCase {
 			'type' => [
 				'formattedPrice' => [
 					'path' => '$.price',
-					'type' => 'float',
+					'type' => 'number',
 					'format' => function ( $value ) {
 						return '$' . number_format( $value, 2 );
 					},
@@ -177,7 +177,7 @@ final class QueryResponseParserTest extends TestCase {
 				],
 				'productPrice' => [
 					'path' => '$.price',
-					'type' => 'float',
+					'type' => 'number',
 				],
 			],
 		];

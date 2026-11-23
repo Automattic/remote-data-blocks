@@ -10,6 +10,8 @@ class InlineBindings {
 	}
 
 	public static function render_frontend_fields( string $content ): string {
+		global $allowedposttags;
+
 		if ( ! str_contains( $content, 'remote-data-blocks-inline-field' ) ) {
 			return $content;
 		}
@@ -55,11 +57,12 @@ class InlineBindings {
 				}
 			}
 
+			// Use the default post tags without applying filters for the 'post' context.
 			$replacement = sprintf('<span%sdata-remote-data-blocks-inline-field="%s"%s>%s</span>',
 				$match['inner_tag_before_query'],
 				$status,
 				$match['inner_tag_after_query'],
-				$value,
+				wp_kses( $value, $allowedposttags ),
 			);
 
 			$position = strpos( $content, $original_tag );

@@ -5,6 +5,7 @@ export interface UsePaginationVariables {
 	page: number;
 	paginationQueryInput?: RemoteDataQueryInput;
 	perPage?: number;
+	resetPage: () => void;
 	setPage: ( page: number ) => void;
 	setPerPage: ( perPage: number ) => void;
 	supportsPagination: boolean;
@@ -16,12 +17,14 @@ export interface UsePaginationVariables {
 export interface UsePaginationVariablesInput {
 	initialPage?: number;
 	initialPerPage?: number;
+	inputVariables?: InputVariable[];
 	paginationData?: RemoteDataPagination;
 }
 
 export function usePaginationVariables( {
 	initialPage = 1,
 	initialPerPage,
+	inputVariables = [],
 	paginationData,
 }: UsePaginationVariablesInput ): UsePaginationVariables {
 	const [ page, setPage ] = useState< number >( initialPage );
@@ -39,6 +42,20 @@ export function usePaginationVariables( {
 	const supportsPagination = Boolean( paginationData?.type && paginationData?.type !== 'NONE' );
 	const totalItems = paginationData?.total_items;
 	const totalPages = totalItems ? Math.ceil( totalItems / calculatedPerPage ) : undefined;
+
+	function resetPage(): void {
+		setPage( 1 );
+		setPaginationQueryInput( {
+			...Object.fromEntries(
+				inputVariables
+					.filter( input => input.type.startsWith( 'ui:pagination_' ) )
+					.map( input => [ input.slug, undefined ] )
+			),
+			...( pageVariable && { [ pageVariable ]: 1 } ),
+			...( offsetVariable && { [ offsetVariable ]: 0 } ),
+			...( perPageVariable && { [ perPageVariable ]: calculatedPerPage } ),
+		} );
+	}
 
 	function setPageForPagination( requestedNewPage: number ): void {
 		if ( ! supportsPagination ) {
@@ -130,6 +147,7 @@ export function usePaginationVariables( {
 		page,
 		paginationQueryInput,
 		perPage: perPage ?? paginationData?.per_page,
+		resetPage,
 		setPage: setPageForPagination,
 		setPerPage: setPerPageForPagination,
 		supportsPagination,

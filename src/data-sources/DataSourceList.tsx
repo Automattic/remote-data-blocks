@@ -113,6 +113,7 @@ const DataSourceList = () => {
 			id: 'display_name',
 			label: __( 'Source', 'remote-data-blocks' ),
 			enableGlobalSearch: true,
+			getValue: ( { item }: { item: DataSourceConfig } ) => getDataSourceName( item ),
 			render: ( { item }: { item: DataSourceConfig } ) => {
 				return (
 					<>

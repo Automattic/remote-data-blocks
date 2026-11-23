@@ -24,15 +24,21 @@ export const SEARCH_INPUT_VARIABLE_TYPE = 'ui:search_input';
 
 export const BUTTON_TEXT_FIELD_TYPES = [ 'button_text' ];
 export const BUTTON_URL_FIELD_TYPES = [ 'button_url' ];
-export const HTML_FIELD_TYPES = [ 'html' ];
+export const HTML_FIELD_TYPES = [ 'html', 'markdown' ];
 export const ID_FIELD_TYPES = [ 'id', 'id:list' ];
 export const IMAGE_ALT_FIELD_TYPES = [ 'image_alt' ];
 export const IMAGE_URL_FIELD_TYPES = [ 'image_url' ];
+
+/**
+ * These are offered for binding to text blocks (paragraph, heading) and inline
+ * bindings. Inline bindings insert the field value into the editor as
+ * innerHTML without escaping (via RichText formats), so a type whose values
+ * can contain markup (e.g., html, markdown) must not be added here.
+ */
 export const TEXT_FIELD_TYPES = [
 	'currency_in_current_locale',
 	'email_address',
 	'integer',
-	'markdown',
 	'number',
 	'string',
 	'title',
