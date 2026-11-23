@@ -12,8 +12,8 @@ import { Children, createPortal, isValidElement, useEffect, useState } from '@wo
 import { __, sprintf, TranslatableText } from '@wordpress/i18n';
 import { lock } from '@wordpress/icons';
 
-import { DataSourceFormActions } from './DataSourceFormActions';
 import { useDataSources } from '../hooks/useDataSources';
+import { DataSourceFormActions } from './DataSourceFormActions';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
 
 type ChildrenArrayInput = Parameters< typeof Children.toArray >[ 0 ];

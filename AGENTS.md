@@ -4,6 +4,8 @@ A WordPress plugin that integrates external data sources into the block editor. 
 
 ## Development
 
+ESLint 10 uses `@automattic/eslint-plugin-wpvip` 2.x, retaining its type-aware TypeScript configuration. The targeted `eslint-plugin-jsx-a11y` and `eslint-plugin-react` peer overrides follow the plugin publisher's ESLint 10 migration guidance; do not replace them with a new global peer-resolution bypass.
+
 The local dev environment uses `wp-env`. Start it with `npm run dev` and stop with `npm run dev:stop`. The plugin can also be run in WordPress Playground via `npm run playground`.
 
 ## Codebase
