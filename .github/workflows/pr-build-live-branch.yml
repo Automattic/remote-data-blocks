@@ -2,6 +2,7 @@ name: Build Live Branch
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - trunk
     paths-ignore:
@@ -31,6 +32,8 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          # The preview publisher validates this SHA against the source run and PR.
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
@@ -51,7 +54,7 @@ jobs:
       - name: Upload plugin zip artifact
         uses: actions/upload-artifact@v7
         with:
-          name: remote-data-blocks-pr${{ github.event.pull_request.number }}-${{ github.sha }}
+          name: remote-data-blocks-pr${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
           path: remote-data-blocks.zip
           retention-days: 7
           if-no-files-found: 'error'
@@ -60,7 +63,7 @@ jobs:
       - name: Save PR metadata
         run: |
           echo "${{ github.event.pull_request.number }}" > pr_number.txt
-          echo "${{ github.sha }}" > commit_sha.txt
+          echo "${{ github.event.pull_request.head.sha }}" > commit_sha.txt
 
       - name: Upload PR metadata
         uses: actions/upload-artifact@v7
