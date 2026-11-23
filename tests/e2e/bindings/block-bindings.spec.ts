@@ -41,11 +41,17 @@ test.describe( 'remote block bindings', () => {
 		await bindContent( 'core/paragraph' );
 		await bindContent( 'core/heading' );
 		await selectGardenBlock( page, 'core/button' );
-		// Regression guard: button_url must not be filtered as an image URL.
-		await expect( page.locator( 'select[name="url"] option[value="button_url"]' ) ).toHaveText(
-			'Garden link'
-		);
-		await expect( page.locator( 'select[name="url"] option[value="image_url"]' ) ).toHaveCount( 0 );
+		// Semantic types guide the choice without hiding other compatible fields.
+		await expect(
+			page.locator(
+				'select[name="url"] optgroup[label="Suggested fields"] option[value="button_url"]'
+			)
+		).toHaveText( 'Garden link' );
+		await expect(
+			page.locator(
+				'select[name="url"] optgroup[label="Other compatible fields"] option[value="image_url"]'
+			)
+		).toHaveCount( 1 );
 		await page.locator( 'select[name="url"]' ).selectOption( 'button_url' );
 		await page.locator( 'select[name="text"]' ).selectOption( 'button_text' );
 		await selectGardenBlock( page, 'core/image' );

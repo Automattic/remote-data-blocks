@@ -36,32 +36,46 @@ export async function insertBindingsGarden(
 	editor: Editor,
 	innerBlocks: FixtureBlock[]
 ) {
-	const remoteData = await page.evaluate( async blockName => {
-		const browser = window as unknown as EditorWindow;
-		const response = await browser.wp.apiFetch( {
-			url: browser.REMOTE_DATA_BLOCKS.rest_url,
-			method: 'POST',
-			data: {
-				block_name: blockName,
-				post_id: browser.wp.data.select( 'core/editor' ).getCurrentPostId(),
-				query_key: 'display',
-				query_inputs: [ {} ],
-			},
-		} );
-		if ( response.status !== 200 || ! response.body ) {
-			throw new Error( `Bindings fixture query failed: ${ JSON.stringify( response ) }` );
-		}
-		const body = response.body;
-		return {
-			blockName: body.block_name,
-			metadata: body.metadata,
-			queryInputs: body.query_inputs,
-			queryKey: body.query_key,
-			resultId: body.result_id,
-			results: body.results,
-		};
-	}, GARDEN_BLOCK );
-	await editor.insertBlock( { name: GARDEN_BLOCK, attributes: { remoteData }, innerBlocks } );
+	return insertRemoteDataBlock( page, editor, GARDEN_BLOCK, [ {} ], innerBlocks );
+}
+
+/** Use the registered block's real query, including bundled Conference Event records. */
+export async function insertRemoteDataBlock(
+	page: Page,
+	editor: Editor,
+	blockName: string,
+	queryInputs: Record< string, unknown >[],
+	innerBlocks: FixtureBlock[]
+) {
+	const remoteData = await page.evaluate(
+		async ( { name, inputs } ) => {
+			const browser = window as unknown as EditorWindow;
+			const response = await browser.wp.apiFetch( {
+				url: browser.REMOTE_DATA_BLOCKS.rest_url,
+				method: 'POST',
+				data: {
+					block_name: name,
+					post_id: browser.wp.data.select( 'core/editor' ).getCurrentPostId(),
+					query_key: 'display',
+					query_inputs: inputs,
+				},
+			} );
+			if ( response.status !== 200 || ! response.body ) {
+				throw new Error( `Bindings fixture query failed: ${ JSON.stringify( response ) }` );
+			}
+			const body = response.body;
+			return {
+				blockName: body.block_name,
+				metadata: body.metadata,
+				queryInputs: body.query_inputs,
+				queryKey: body.query_key,
+				resultId: body.result_id,
+				results: body.results,
+			};
+		},
+		{ name: blockName, inputs: queryInputs }
+	);
+	await editor.insertBlock( { name: blockName, attributes: { remoteData }, innerBlocks } );
 	return remoteData;
 }
 
