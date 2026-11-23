@@ -81,6 +81,63 @@ class BindingOutputTest extends RDBTestCase {
 		}
 	}
 
+	public function testBlockBindingStripsUnsafeProtocolFromButtonUrl(): void {
+		$block_title = 'test-binding-unsafe-button-url';
+		$this->register_mocked_data_block(
+			$block_title,
+			[
+				'unsafe' => 'javascript:alert(1)',
+				'safe' => 'https://example.com/remote',
+			],
+			[
+				'is_collection' => false,
+				'type' => [
+					// Plain text fields are only text-sanitized, so they can carry
+					// any protocol. They can be bound to URL attributes.
+					'unsafe' => [
+						'name' => 'Unsafe',
+						'path' => '$.unsafe',
+						'type' => 'string',
+					],
+					'safe' => [
+						'name' => 'Safe',
+						'path' => '$.safe',
+						'type' => 'string',
+					],
+				],
+			]
+		);
+		$block_name = 'remote-data-blocks/' . $block_title;
+
+		$unsafe_html = $this->render_bound_button_url( $block_name, 'unsafe' );
+		$this->assertStringNotContainsStringIgnoringCase( 'javascript:', $unsafe_html );
+		$this->assertStringContainsString( 'href="https://example.com/saved"', $unsafe_html );
+
+		$this->assertStringContainsString( 'href="https://example.com/remote"', $this->render_bound_button_url( $block_name, 'safe' ) );
+	}
+
+	private function render_bound_button_url( string $block_name, string $field ): string {
+		$binding = wp_json_encode( [
+			'metadata' => [
+				'bindings' => [
+					'url' => [
+						'source' => 'remote-data/binding',
+						'args' => [
+							'block' => $block_name,
+							'field' => $field,
+						],
+					],
+				],
+			],
+		] );
+
+		return trim( do_blocks( sprintf(
+			'<!-- wp:%1$s {"remoteData":{"blockName":"%1$s"}} --><!-- wp:button %2$s --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://example.com/saved">Saved</a></div><!-- /wp:button --><!-- /wp:%1$s -->',
+			$block_name,
+			$binding
+		) ) );
+	}
+
 	/**
 	 * Assert that the rendered block is a single element with the given tag and
 	 * exactly the expected inner HTML. Wrapper attributes vary by WordPress
