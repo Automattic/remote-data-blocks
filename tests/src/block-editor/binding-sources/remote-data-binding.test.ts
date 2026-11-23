@@ -93,6 +93,33 @@ describe( 'editor binding output and previews', () => {
 			} )
 		).toEqual( { count: 7, enabled: true } );
 	} );
+	it( 'falls back to saved text instead of serializing structured values', () => {
+		const structured = {
+			[ REMOTE_DATA_CONTEXT_KEY ]: {
+				results: createRemoteDataResults( [ { content: { nested: 'value' } } ] ),
+			},
+		};
+		const selectWithSavedContent = () => ( {
+			...select(),
+			getBlockAttributes: () => ( { content: 'Saved content' } ),
+		} );
+		expect(
+			getValues( {
+				clientId: 'id',
+				bindings: { content: binding( 'content', { previewIndex: 0 } ) },
+				context: structured,
+				select: selectWithSavedContent,
+			} )
+		).toEqual( { content: 'Saved content' } );
+		expect(
+			getValues( {
+				clientId: 'id',
+				bindings: { content: binding( 'content', { previewIndex: 0 } ) },
+				context: structured,
+				select: () => ( { ...select(), getBlockAttributes: () => ( {} ) } ),
+			} )
+		).toEqual( { content: '' } );
+	} );
 	it( 'retains unknown-target legacy strings and omits nonpreview values without results', () => {
 		expect(
 			getValues( {
@@ -141,6 +168,17 @@ describe( 'editor binding output and previews', () => {
 		expect( ( pattern.attributes as typeof block.attributes ).metadata.bindings.other ).toBe(
 			foreign
 		);
+		const structured = createRemoteDataResults( [ { content: { nested: 'value' } } ] )[ 0 ]!;
+		const textBlock = {
+			...block,
+			attributes: { metadata: { bindings: { content: binding( 'content' ) } } },
+		};
+		expect(
+			(
+				cloneBlockForPatternPreview( textBlock, structured, 'test/data' )
+					.attributes as typeof textBlock.attributes
+			 ).metadata.bindings.content.args.previewValue
+		).toBe( '' );
 		const template = cloneBlockForTemplatePreview( block, results[ 1 ]!, 'test/data', 1 );
 		expect(
 			( template.attributes as typeof block.attributes ).metadata.bindings.count.args.previewIndex

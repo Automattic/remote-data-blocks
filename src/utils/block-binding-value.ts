@@ -1,5 +1,9 @@
 import { getBlockType } from '@wordpress/blocks';
 
+export function isTextBindingTarget( targetType?: string ): boolean {
+	return ! targetType || targetType === 'string' || targetType === 'rich-text';
+}
+
 export type BindingValue = string | number | boolean | null;
 
 export function getBindingTargetType(
@@ -35,6 +39,11 @@ export function coerceBindingValue( value: unknown, targetType?: string ): Bindi
 		return typeof value === 'boolean' ? value : null;
 	}
 	if ( targetType && ! [ 'string', 'rich-text' ].includes( targetType ) ) {
+		return null;
+	}
+	// Match the PHP resolver: structured values are unresolved (so the saved
+	// fallback is used), never serialized as "[object Object]".
+	if ( typeof value === 'object' && value !== null ) {
 		return null;
 	}
 	return String( value ?? '' );

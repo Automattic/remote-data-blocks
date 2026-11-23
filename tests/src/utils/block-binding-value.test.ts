@@ -40,4 +40,11 @@ describe( 'coerceBindingValue', () => {
 		expect( coerceBindingValue( false ) ).toBe( 'false' );
 		expect( coerceBindingValue( null, 'string' ) ).toBe( '' );
 	} );
+	it.each( [ 'string', 'rich-text', undefined ] )(
+		'treats structured values as unresolved for text target %s',
+		target => {
+			expect( coerceBindingValue( { nested: 'value' }, target ) ).toBeNull();
+			expect( coerceBindingValue( [ 'a', 'b' ], target ) ).toBeNull();
+		}
+	);
 } );

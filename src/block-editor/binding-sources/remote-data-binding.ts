@@ -7,6 +7,7 @@ import {
 	BindingValue,
 	coerceBindingValue,
 	getBindingTargetType,
+	isTextBindingTarget,
 } from '@/utils/block-binding-value';
 
 import type { Selectors } from '@/store';
@@ -56,6 +57,10 @@ registerBlockBindingsSource( {
 							editor?.getBlockAttributes( clientId )?.[ targetAttribute ],
 							targetType
 						);
+					}
+					// Text targets keep their legacy contract of always receiving a string.
+					if ( value === null && isTextBindingTarget( targetType ) ) {
+						value = '';
 					}
 					return [ targetAttribute, typeof value === 'string' ? `${ label }${ value }` : value ];
 				} )
