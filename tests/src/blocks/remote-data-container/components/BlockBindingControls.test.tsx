@@ -20,22 +20,29 @@ vi.mock( '@wordpress/components', () => ( {
 	Button: ( {
 		variant: _variant,
 		size: _size,
+		icon: _icon,
+		showTooltip: _showTooltip,
+		label: _label,
 		...props
-	}: ButtonHTMLAttributes< HTMLButtonElement > & { variant: string; size?: string } ) => (
-		<button { ...props } />
-	),
+	}: ButtonHTMLAttributes< HTMLButtonElement > & {
+		variant?: string;
+		size?: string;
+		icon?: ReactNode;
+		showTooltip?: boolean;
+		label?: string;
+	} ) => <button { ...props } />,
 	Popover: ( {
 		children,
 		onClose,
-		'aria-label': label,
+		'aria-labelledby': labelledBy,
 	}: {
 		children: ReactNode;
 		onClose: () => void;
-		'aria-label': string;
+		'aria-labelledby': string;
 	} ) => (
 		<div
 			role="dialog"
-			aria-label={ label }
+			aria-labelledby={ labelledBy }
 			onKeyDownCapture={ event => {
 				if ( event.key === 'Escape' ) {
 					onClose();
@@ -127,7 +134,7 @@ describe( 'generic binding controls', () => {
 		render( <BlockBindingControls { ...defaults } /> );
 		expect( screen.queryByRole( 'combobox' ) ).toBeNull();
 		fireEvent.click( screen.getByRole( 'button', { name: 'Bind Unexpected Value' } ) );
-		const control = screen.getByRole( 'combobox', { name: 'Unexpected Value' } );
+		const control = screen.getByRole( 'combobox', { name: 'Remote field' } );
 		expect( control ).toHaveTextContent( 'Numeric field' );
 		expect( control ).toHaveTextContent( 'Integer field' );
 		expect( control ).not.toHaveTextContent( 'Text field' );
@@ -246,7 +253,7 @@ describe( 'generic binding controls', () => {
 		);
 		expect( screen.queryByRole( 'combobox' ) ).toBeNull();
 		fireEvent.click( screen.getByRole( 'button', { name: 'Bind Button Text' } ) );
-		const text = screen.getByRole( 'combobox', { name: 'Button Text' } );
+		const text = screen.getByRole( 'combobox', { name: 'Remote field' } );
 		expect( text ).toHaveTextContent( 'Title' );
 		expect( screen.queryByRole( 'group', { name: 'Suggested fields' } ) ).toBeNull();
 		fireEvent.change( text, { target: { value: 'title' } } );
@@ -254,7 +261,7 @@ describe( 'generic binding controls', () => {
 		fireEvent.click( screen.getByRole( 'button', { name: 'Apply' } ) );
 		expect( defaults.updateBinding ).toHaveBeenCalledExactlyOnceWith( 'text', { field: 'title' } );
 		fireEvent.click( screen.getByRole( 'button', { name: 'Bind Button URL' } ) );
-		expect( screen.getByRole( 'combobox', { name: 'Button URL' } ) ).toHaveTextContent(
+		expect( screen.getByRole( 'combobox', { name: 'Remote field' } ) ).toHaveTextContent(
 			'Location'
 		);
 		expect( screen.getAllByRole( 'combobox' ) ).toHaveLength( 1 );
@@ -287,7 +294,7 @@ describe( 'generic binding controls', () => {
 			/>
 		);
 		fireEvent.click( screen.getByRole( 'button', { name: 'Bind Raw HTML' } ) );
-		expect( screen.getByRole( 'combobox', { name: 'Raw HTML' } ) ).toHaveTextContent(
+		expect( screen.getByRole( 'combobox', { name: 'Remote field' } ) ).toHaveTextContent(
 			'Markdown field'
 		);
 		expect( screen.queryByRole( 'checkbox' ) ).toBeNull();
@@ -346,6 +353,12 @@ describe( 'compact binding editor', () => {
 		};
 		render( <BlockBindingControls { ...defaults } attributes={ attributes } /> );
 		expect( screen.getByText( 'Managed by another binding' ) ).toBeVisible();
+		expect(
+			screen.getByRole( 'button', { name: 'Bind Unexpected Value' } )
+		).toHaveAccessibleDescription( /Managed by another binding/ );
+		expect(
+			screen.getByRole( 'button', { name: 'Change Removed Target binding' } )
+		).toHaveAccessibleDescription( /Text field/ );
 		fireEvent.click( screen.getByRole( 'button', { name: 'Bind Unexpected Value' } ) );
 		fireEvent.change( screen.getByRole( 'combobox' ), { target: { value: 'num' } } );
 		fireEvent.click( screen.getByRole( 'button', { name: 'Cancel' } ) );
@@ -359,6 +372,7 @@ describe( 'compact binding editor', () => {
 		} );
 		vi.clearAllMocks();
 		fireEvent.click( screen.getByRole( 'button', { name: 'Change Removed Target binding' } ) );
+		expect( screen.getByRole( 'dialog', { name: 'Change Removed Target binding' } ) ).toBeVisible();
 		expect( screen.getByRole( 'combobox' ) ).toHaveValue( 'text' );
 		expect( screen.getAllByRole( 'option' ) ).toHaveLength( 2 );
 		fireEvent.click( screen.getByRole( 'button', { name: 'Cancel' } ) );

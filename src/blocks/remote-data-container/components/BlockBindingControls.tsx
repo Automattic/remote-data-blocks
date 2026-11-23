@@ -1,6 +1,7 @@
 import { Button, CheckboxControl, Popover, SelectControl } from '@wordpress/components';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useId, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { chevronRightSmall, closeSmall, Icon, plus } from '@wordpress/icons';
 
 import {
 	BUTTON_TEXT_FIELD_TYPES,
@@ -190,6 +191,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 		anchor: HTMLButtonElement;
 	} | null >( null );
 	const triggers = useRef< Record< string, HTMLButtonElement | null > >( {} );
+	const descriptionId = useId();
 
 	useEffect( () => {
 		setChooser( null );
@@ -259,62 +261,74 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 					const isOtherBinding = binding && ! isRemoteBinding;
 					return (
 						<div className="rdb-binding-row" key={ target } data-binding-target={ target }>
-							<div className="rdb-binding-row__description">
-								<strong>{ label }</strong>
-								{ isRemoteBinding && (
-									<span>
-										{ availableBindings[ field ]?.name ?? field }
-										{ ! availableBindings[ field ] && (
-											<span className="rdb-binding-row__status">
-												{ __( 'Field unavailable', 'remote-data-blocks' ) }
-											</span>
-										) }
-									</span>
+							<Button
+								className="rdb-binding-row__trigger"
+								ref={ element => {
+									triggers.current[ target ] = element;
+								} }
+								aria-label={ sprintf(
+									isRemoteBinding
+										? __( 'Change %s binding', 'remote-data-blocks' )
+										: __( 'Bind %s', 'remote-data-blocks' ),
+									label
 								) }
-								{ isOtherBinding && (
-									<span>{ __( 'Managed by another binding', 'remote-data-blocks' ) }</span>
-								) }
-							</div>
-							<div className="rdb-binding-row__actions">
-								<Button
-									ref={ element => {
-										triggers.current[ target ] = element;
-									} }
-									variant="tertiary"
-									size="compact"
-									aria-label={ sprintf(
-										isRemoteBinding
-											? __( 'Change %s binding', 'remote-data-blocks' )
-											: __( 'Bind %s', 'remote-data-blocks' ),
-										label
-									) }
-									aria-expanded={ chooser?.target === target }
-									aria-haspopup="dialog"
-									onClick={ () => {
-										const anchor = triggers.current[ target ];
-										if ( anchor ) {
-											setChooser( { target, field, anchor } );
-										}
-									} }
+								aria-expanded={ chooser?.target === target }
+								aria-describedby={
+									isRemoteBinding || isOtherBinding ? `${ descriptionId }-${ target }` : undefined
+								}
+								aria-haspopup="dialog"
+								onClick={ () => {
+									const anchor = triggers.current[ target ];
+									if ( anchor ) {
+										setChooser( { target, field, anchor } );
+									}
+								} }
+							>
+								<span
+									className="rdb-binding-row__description"
+									id={ `${ descriptionId }-${ target }` }
 								>
-									{ isRemoteBinding
-										? __( 'Change', 'remote-data-blocks' )
-										: __( 'Bind', 'remote-data-blocks' ) }
-								</Button>
-								{ isRemoteBinding && (
-									<Button
-										variant="tertiary"
-										size="compact"
-										aria-label={ sprintf( __( 'Remove %s binding', 'remote-data-blocks' ), label ) }
-										onClick={ () => {
-											updateFieldBinding( target, '' );
-											triggers.current[ target ]?.focus();
-										} }
+									<span
+										className={
+											isRemoteBinding || isOtherBinding ? 'rdb-binding-row__attribute' : undefined
+										}
 									>
-										{ __( 'Remove', 'remote-data-blocks' ) }
-									</Button>
-								) }
-							</div>
+										{ label }
+									</span>
+									{ isRemoteBinding && (
+										<>
+											<span>{ availableBindings[ field ]?.name ?? field }</span>
+											{ ! availableBindings[ field ] && (
+												<span className="rdb-binding-row__status">
+													{ __( 'Field unavailable', 'remote-data-blocks' ) }
+												</span>
+											) }
+										</>
+									) }
+									{ isOtherBinding && (
+										<span>{ __( 'Managed by another binding', 'remote-data-blocks' ) }</span>
+									) }
+								</span>
+								<Icon
+									className="rdb-binding-row__indicator"
+									icon={ isRemoteBinding ? chevronRightSmall : plus }
+									size={ 20 }
+								/>
+							</Button>
+							{ isRemoteBinding && (
+								<Button
+									className="rdb-binding-row__remove"
+									icon={ closeSmall }
+									size="compact"
+									label={ sprintf( __( 'Remove %s binding', 'remote-data-blocks' ), label ) }
+									aria-label={ sprintf( __( 'Remove %s binding', 'remote-data-blocks' ), label ) }
+									showTooltip
+									onClick={ () => {
+										updateFieldBinding( target, '' );
+										triggers.current[ target ]?.focus();
+									} }
+								/>
+							) }
 						</div>
 					);
 				} ) }
@@ -343,8 +357,16 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 							focusOnMount="firstElement"
 							className="rdb-binding-chooser"
 							role="dialog"
-							aria-label={ sprintf( __( 'Bind %s', 'remote-data-blocks' ), label ) }
+							aria-labelledby={ `${ descriptionId }-heading` }
 						>
+							<h3 className="rdb-binding-chooser__heading" id={ `${ descriptionId }-heading` }>
+								{ sprintf(
+									currentField
+										? __( 'Change %s binding', 'remote-data-blocks' )
+										: __( 'Bind %s', 'remote-data-blocks' ),
+									label
+								) }
+							</h3>
 							{ hasChoices ? (
 								<BlockBindingFieldControl
 									availableBindings={ availableBindings }
@@ -355,7 +377,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 											? __( 'Choose a field containing a URL.', 'remote-data-blocks' )
 											: undefined
 									}
-									label={ label }
+									label={ __( 'Remote field', 'remote-data-blocks' ) }
 									target={ target }
 									updateFieldBinding={ ( _target, nextField ) =>
 										setChooser( { ...chooser, field: nextField } )
@@ -371,6 +393,11 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 								</p>
 							) }
 							<div className="rdb-binding-chooser__actions">
+								<Button variant="tertiary" onClick={ closeChooser }>
+									{ hasChoices
+										? __( 'Cancel', 'remote-data-blocks' )
+										: __( 'Close', 'remote-data-blocks' ) }
+								</Button>
 								{ hasChoices && (
 									<Button
 										variant="primary"
@@ -383,11 +410,6 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 										{ __( 'Apply', 'remote-data-blocks' ) }
 									</Button>
 								) }
-								<Button variant="tertiary" onClick={ closeChooser }>
-									{ hasChoices
-										? __( 'Cancel', 'remote-data-blocks' )
-										: __( 'Close', 'remote-data-blocks' ) }
-								</Button>
 							</div>
 						</Popover>
 					);
