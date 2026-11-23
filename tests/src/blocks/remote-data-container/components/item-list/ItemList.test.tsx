@@ -100,7 +100,10 @@ describe( 'ItemList', () => {
 		render( <ItemListComponent { ...defaultProps } /> );
 
 		await user.click( screen.getByRole( 'button', { name: 'Title' } ) );
-		await user.click( screen.getByRole( 'menuitemradio', { name: 'Sort descending' } ) );
+		// Navigate the menu with the keyboard; Happy DOM does not lay out its pointer overlay.
+		await user.keyboard( '{ArrowDown}{ArrowDown}' );
+		expect( screen.getByRole( 'menuitemradio', { name: 'Sort descending' } ) ).toHaveFocus();
+		await user.keyboard( '{Enter}' );
 
 		const rows = screen.getAllByRole( 'row' ).slice( 1 );
 		expect( rows.map( row => row.textContent ) ).toEqual( [
@@ -277,12 +280,7 @@ describe( 'ItemList', () => {
 			/>
 		);
 
-		expect(
-			screen.getByRole( 'option', {
-				name: 'Page 1 of 3',
-				selected: true,
-			} )
-		).toBeVisible();
+		expect( screen.getByRole( 'combobox', { name: 'Current page' } ) ).toHaveTextContent( '1' );
 
 		// Get next and previous buttons
 		const nextButton = screen.getByRole( 'button', { name: /next/i } );
@@ -296,12 +294,7 @@ describe( 'ItemList', () => {
 
 		// Verify setPage was called with next page
 		expect( setPage ).toHaveBeenCalledWith( 2 );
-		expect(
-			screen.getByRole( 'option', {
-				name: 'Page 2 of 3',
-				selected: true,
-			} )
-		).toHaveValue( '2' );
+		expect( screen.getByRole( 'combobox', { name: 'Current page' } ) ).toHaveTextContent( '2' );
 
 		// Rerender the component with updated page
 		rerender(
@@ -319,12 +312,7 @@ describe( 'ItemList', () => {
 
 		// Verify setPage was called with next page
 		expect( setPage ).toHaveBeenCalledWith( 3 );
-		expect(
-			screen.getByRole( 'option', {
-				name: 'Page 3 of 3',
-				selected: true,
-			} )
-		).toBeVisible();
+		expect( screen.getByRole( 'combobox', { name: 'Current page' } ) ).toHaveTextContent( '3' );
 
 		// Next button should be disabled
 		expect( nextButton ).toHaveAttribute( 'aria-disabled', 'true' );
