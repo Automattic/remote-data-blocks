@@ -366,6 +366,9 @@ describe( 'compact binding editor', () => {
 		expect( defaults.removeBinding ).not.toHaveBeenCalled();
 		fireEvent.click( screen.getByRole( 'button', { name: 'Bind Unexpected Value' } ) );
 		fireEvent.change( screen.getByRole( 'combobox' ), { target: { value: 'num' } } );
+		expect( screen.getByRole( 'button', { name: 'Apply' } ) ).toHaveAccessibleDescription(
+			/managed by another binding\. Applying a remote field replaces it/
+		);
 		fireEvent.click( screen.getByRole( 'button', { name: 'Apply' } ) );
 		expect( defaults.updateBinding ).toHaveBeenCalledExactlyOnceWith( 'unexpectedValue', {
 			field: 'num',
@@ -375,6 +378,7 @@ describe( 'compact binding editor', () => {
 		expect( screen.getByRole( 'dialog', { name: 'Change Removed Target binding' } ) ).toBeVisible();
 		expect( screen.getByRole( 'combobox' ) ).toHaveValue( 'text' );
 		expect( screen.getAllByRole( 'option' ) ).toHaveLength( 2 );
+		expect( screen.queryByText( /Applying a remote field replaces it/ ) ).toBeNull();
 		fireEvent.click( screen.getByRole( 'button', { name: 'Cancel' } ) );
 		fireEvent.click( screen.getByRole( 'button', { name: 'Remove Removed Target binding' } ) );
 		expect( defaults.removeBinding ).toHaveBeenCalledExactlyOnceWith( 'removedTarget' );

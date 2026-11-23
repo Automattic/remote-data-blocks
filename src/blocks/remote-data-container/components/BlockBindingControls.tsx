@@ -339,6 +339,8 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 					const { target, field, anchor } = chooser;
 					const binding = bindings[ target ];
 					const currentField = binding?.source === BLOCK_BINDING_SOURCE ? binding.args.field : '';
+					const replacesOtherSource =
+						Boolean( binding ) && binding?.source !== BLOCK_BINDING_SOURCE;
 					const fieldTypes = supportedAttributes.includes( target )
 						? getBindingFieldTypes( blockName, target, getBindingTargetType( blockName, target ) )
 						: [];
@@ -367,6 +369,17 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 									label
 								) }
 							</h3>
+							{ replacesOtherSource && hasChoices && (
+								<p
+									className="rdb-binding-chooser__warning"
+									id={ `${ descriptionId }-replace-warning` }
+								>
+									{ __(
+										'This attribute is managed by another binding. Applying a remote field replaces it.',
+										'remote-data-blocks'
+									) }
+								</p>
+							) }
 							{ hasChoices ? (
 								<BlockBindingFieldControl
 									availableBindings={ availableBindings }
@@ -401,6 +414,9 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 								{ hasChoices && (
 									<Button
 										variant="primary"
+										aria-describedby={
+											replacesOtherSource ? `${ descriptionId }-replace-warning` : undefined
+										}
 										disabled={ ! field || field === currentField }
 										onClick={ () => {
 											updateFieldBinding( target, field );
