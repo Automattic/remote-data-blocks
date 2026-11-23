@@ -45,6 +45,9 @@ jobs:
           cache: npm
 
       - name: Npm install
+        env:
+          # npm postinstall runs Composer; authenticate its GitHub archive downloads.
+          COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GITHUB_TOKEN }}"}}'
         run: npm ci
 
       - name: Start up WordPress environment
