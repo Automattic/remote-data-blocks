@@ -1,6 +1,6 @@
 import { SVG } from '@wordpress/primitives';
 
-export const AirtableIcon: JSX.Element = (
+export const AirtableIcon: React.JSX.Element = (
 	<SVG width="24" height="24" viewBox="0 -20.5 256 256" xmlns="http://www.w3.org/2000/svg">
 		<path
 			d="M114.25873,2.70101695 L18.8604023,42.1756384 C13.5552723,44.3711638 13.6102328,51.9065311 18.9486282,54.0225085 L114.746142,92.0117514 C123.163769,95.3498757 132.537419,95.3498757 140.9536,92.0117514 L236.75256,54.0225085 C242.08951,51.9065311 242.145916,44.3711638 236.83934,42.1756384 L141.442459,2.70101695 C132.738459,-0.900338983 122.961284,-0.900338983 114.25873,2.70101695"
@@ -22,7 +22,7 @@ export const AirtableIcon: JSX.Element = (
 	</SVG>
 );
 
-export const AirtableIconWithText: JSX.Element = (
+export const AirtableIconWithText: React.JSX.Element = (
 	<SVG width="163.2" height="35.52" viewBox="0 0 680 148" xmlns="http://www.w3.org/2000/svg">
 		<path
 			fill="#333"

@@ -32,7 +32,7 @@ const DEFAULT_STYLES = `
 	}
 `;
 
-export function Edit( props: BlockEditProps< RemoteDataInnerBlockAttributes > ): JSX.Element {
+export function Edit( props: BlockEditProps< RemoteDataInnerBlockAttributes > ): React.JSX.Element {
 	const { attributes, isSelected } = props;
 	const blockProps = useBlockProps();
 	const { content } = attributes;

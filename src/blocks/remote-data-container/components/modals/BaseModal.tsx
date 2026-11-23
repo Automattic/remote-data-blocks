@@ -5,8 +5,8 @@ import { __ } from '@/utils/i18n';
 import type { ComponentProps } from 'react';
 
 export type BaseModalProps = Omit< ComponentProps< typeof Modal >, 'onRequestClose' > & {
-	children: JSX.Element;
-	headerActions?: JSX.Element;
+	children: React.JSX.Element;
+	headerActions?: React.JSX.Element;
 	headerImage?: string;
 	onClose: () => void;
 };

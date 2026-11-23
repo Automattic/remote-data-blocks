@@ -1,6 +1,6 @@
 import { SVG } from '@wordpress/primitives';
 
-export const GoogleSheetsIcon: JSX.Element = (
+export const GoogleSheetsIcon: React.JSX.Element = (
 	<SVG
 		width="49px"
 		height="67px"
@@ -154,7 +154,7 @@ export const GoogleSheetsIcon: JSX.Element = (
 	</SVG>
 );
 
-export const GoogleSheetsIconWithText: JSX.Element = (
+export const GoogleSheetsIconWithText: React.JSX.Element = (
 	<SVG
 		width="2500"
 		height="1486"

@@ -8,11 +8,11 @@ import { useQuery } from '@/hooks/useQuery';
 
 export interface ShopifyConnection {
 	shopName: string | null;
-	connectionMessage: JSX.Element | null;
+	connectionMessage: React.JSX.Element | null;
 }
 
 export const useShopifyShopName = ( store: string, token: string ): ShopifyConnection => {
-	const [ connectionMessage, setConnectionMessage ] = useState< null | JSX.Element >( null );
+	const [ connectionMessage, setConnectionMessage ] = useState< null | React.JSX.Element >( null );
 
 	const queryFn = useCallback( async () => {
 		if ( ! store ) {
