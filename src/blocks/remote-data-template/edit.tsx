@@ -12,7 +12,9 @@ import { useGetInnerBlocks } from '@/blocks/remote-data-template/hooks/useGetInn
 
 import './editor.scss';
 
-export function Edit( props: BlockEditProps< RemoteDataTemplateBlockAttributes > ): React.JSX.Element {
+export function Edit(
+	props: BlockEditProps< RemoteDataTemplateBlockAttributes >
+): React.JSX.Element {
 	const { clientId, context, name } = props;
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps();
