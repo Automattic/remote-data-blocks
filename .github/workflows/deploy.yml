@@ -27,9 +27,15 @@ jobs:
         with:
           ref: ${{ github.event.inputs.ref || github.ref }}
 
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
       - name: Determine deploy version
         run: |
           VERSION="${INPUT_VERSION:-${GITHUB_REF_NAME#v}}"
+          node tools/release/validate-deploy.mjs "$VERSION"
           echo "DEPLOY_VERSION=${VERSION}" >> "$GITHUB_ENV"
         env:
           INPUT_VERSION: ${{ github.event.inputs.version }}

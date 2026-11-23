@@ -28,9 +28,14 @@ module.exports = [
 			},
 		},
 		rules: {
-			'@typescript-eslint/no-unnecessary-type-assertion': 'warn',
 			complexity: 'warn',
 			'react-hooks/immutability': 'warn',
+		},
+	},
+	{
+		files: [ '**/*.ts', '**/*.tsx', '**/*.cts', '**/*.mts' ],
+		rules: {
+			'@typescript-eslint/no-unnecessary-type-assertion': 'warn',
 		},
 	},
 ];

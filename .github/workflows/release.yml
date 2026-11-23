@@ -16,6 +16,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
       - name: Check for version change
         id: version_check
         run: |
@@ -25,7 +31,9 @@ jobs:
             echo "No version change detected"
             exit 0
           fi
-          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          PRERELEASE=$(node tools/release/version.mjs --prerelease "$NEW_VERSION")
+          echo "prerelease=$PRERELEASE" >> "$GITHUB_OUTPUT"
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
           echo "Version changed from $OLD_VERSION to $NEW_VERSION"
 
       - name: Setup PHP
@@ -33,13 +41,6 @@ jobs:
         uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: '8.1'
-
-      - name: Setup Node
-        if: steps.version_check.outputs.new_version
-        uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: npm
 
       - name: Build plugin zip
         if: steps.version_check.outputs.new_version
@@ -50,11 +51,14 @@ jobs:
         uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         with:
           tag_name: v${{ steps.version_check.outputs.new_version }}
+          target_commitish: ${{ github.sha }}
           files: remote-data-blocks.zip
           generate_release_notes: true
+          prerelease: ${{ steps.version_check.outputs.prerelease == 'true' }}
+          make_latest: ${{ steps.version_check.outputs.prerelease != 'true' }}
 
       - name: Deploy to WordPress.org
-        if: steps.version_check.outputs.new_version
+        if: steps.version_check.outputs.new_version && steps.version_check.outputs.prerelease == 'false'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
