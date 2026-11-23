@@ -11,7 +11,7 @@ import { __ } from '@/utils/i18n';
 
 import './editor.scss';
 
-export function Edit( props: BlockEditProps< RemoteDataPaginationBlockAttributes > ): JSX.Element {
+export function Edit( props: BlockEditProps< RemoteDataPaginationBlockAttributes > ): React.JSX.Element {
 	const { context } = props;
 	const blockProps = useBlockProps();
 

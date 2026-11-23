@@ -5,7 +5,7 @@ import ErrorIcon from '@/settings/icons/ErrorIcon';
 export function getConnectionMessage(
 	status: 'success' | 'error' | null,
 	message: string
-): JSX.Element {
+): React.JSX.Element {
 	const StatusIcon = () => {
 		if ( status === 'success' ) {
 			return <CheckIcon />;

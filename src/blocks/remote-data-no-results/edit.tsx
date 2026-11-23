@@ -29,7 +29,7 @@ const ERROR_FALLBACK_TEMPLATE: Template[] = [
 	],
 ];
 
-export function Edit( props: BlockEditProps< RemoteDataNoResultsBlockAttributes > ): JSX.Element {
+export function Edit( props: BlockEditProps< RemoteDataNoResultsBlockAttributes > ): React.JSX.Element {
 	const { context } = props;
 	const { remoteData } = useRemoteDataContext( context );
 	const blockProps = useBlockProps();

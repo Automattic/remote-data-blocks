@@ -13,7 +13,7 @@ import { WPFormat, useAnchor } from '@wordpress/rich-text';
 import { InlineBindingSelectField } from '@/block-editor/format-types/inline-binding/components/InlineBindingSelection';
 
 interface InlineBindingSelectFieldPopoverProps {
-	contentRef: React.RefObject< HTMLElement >;
+	contentRef: React.RefObject< HTMLElement | null >;
 	fieldSelection: FieldSelection;
 	formatTypeSettings: WPFormat;
 	onSelectField: ( data: FieldSelection, fieldValue: string ) => void;

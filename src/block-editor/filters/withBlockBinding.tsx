@@ -23,7 +23,7 @@ interface BoundBlockEditProps {
 	attributes: RemoteDataInnerBlockAttributes;
 	availableBindings: AvailableBindings;
 	blockName: string;
-	children: JSX.Element;
+	children: React.JSX.Element;
 	remoteDataName: string;
 	remoteDataTitle: string;
 	setAttributes: ( attributes: RemoteDataInnerBlockAttributes ) => void;

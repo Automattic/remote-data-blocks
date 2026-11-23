@@ -48,7 +48,7 @@ export function InputPopover( props: InputPopoverProps ) {
 
 	function getDataSourceLabels( sourceType: string ): {
 		buttonText: string;
-		helpText?: JSX.Element;
+		helpText?: React.JSX.Element;
 	} {
 		switch ( sourceType ) {
 			case 'airtable':
