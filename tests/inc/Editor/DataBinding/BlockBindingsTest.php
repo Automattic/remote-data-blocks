@@ -675,6 +675,49 @@ class BlockBindingsTest extends TestCase {
 		], $block, 'content' ) );
 	}
 
+	/**
+	 * @dataProvider structured_fallback_provider
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	public function test_get_value_ignores_structured_serialized_fallback( string $target_type, mixed $saved_attribute, mixed $expected ): void {
+		$this->create_mock_config_store( $this->create_mock_block_config( $this->create_mock_query_runner_with_result( [
+			'street' => '12 Rosewood Lane',
+			'city' => 'Portland',
+		] ) ) );
+		$block = $this->create_mock_bound_block( $target_type );
+		$context = $this->create_block_context( [] );
+		$context[ BlockBindings::$context_name ]['results'] = [
+			[
+				'uuid' => '10000000-1000-4000-8000-100000000000',
+				'result' => [
+					self::MOCK_OUTPUT_FIELD_NAME => [
+						'name' => 'Address',
+						'type' => 'string',
+						'value' => [
+							'street' => '12 Rosewood Lane',
+							'city' => 'Portland',
+						],
+					],
+				],
+			],
+		];
+		$block->context = $context;
+		/** @psalm-suppress UndefinedPropertyAssignment -- WP_Block exposes read-only magic attributes; this lightweight unit mock supplies them directly. */
+		$block->attributes = null === $saved_attribute ? [] : [ 'value' => $saved_attribute ];
+
+		$this->assertSame( $expected, BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'value' ) );
+	}
+
+	public function structured_fallback_provider(): array {
+		return [
+			// null cancels the binding, so WordPress keeps the saved markup.
+			'rich text without saved attribute cancels binding' => [ 'rich-text', null, null ],
+			'string uses saved attribute' => [ 'string', 'Saved text', 'Saved text' ],
+			'number uses saved attribute' => [ 'number', 7, 7 ],
+		];
+	}
+
 	private function create_mock_bound_block( mixed $target_type ): \WP_Block {
 		/** @var \WP_Block_Type $block_type */
 		$block_type = Mockery::namedMock( \WP_Block_Type::class );

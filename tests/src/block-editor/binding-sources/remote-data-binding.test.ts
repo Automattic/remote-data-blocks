@@ -99,9 +99,15 @@ describe( 'editor binding output and previews', () => {
 				results: createRemoteDataResults( [ { content: { nested: 'value' } } ] ),
 			},
 		};
+		// Saved rich-text content is a RichTextData instance in the editor.
+		class RichTextLike {
+			toString() {
+				return 'Saved content';
+			}
+		}
 		const selectWithSavedContent = () => ( {
 			...select(),
-			getBlockAttributes: () => ( { content: 'Saved content' } ),
+			getBlockAttributes: () => ( { content: new RichTextLike() } ),
 		} );
 		expect(
 			getValues( {
