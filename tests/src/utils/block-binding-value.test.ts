@@ -40,4 +40,22 @@ describe( 'coerceBindingValue', () => {
 		expect( coerceBindingValue( false ) ).toBe( 'false' );
 		expect( coerceBindingValue( null, 'string' ) ).toBe( '' );
 	} );
+	it.each( [ 'string', 'rich-text', undefined ] )(
+		'treats structured values as unresolved for text target %s',
+		target => {
+			expect( coerceBindingValue( { nested: 'value' }, target ) ).toBeNull();
+			expect( coerceBindingValue( [ 'a', 'b' ], target ) ).toBeNull();
+			expect( coerceBindingValue( Object.create( null ), target ) ).toBeNull();
+		}
+	);
+	it( 'keeps class instances that own their string form, such as saved rich text', () => {
+		class RichTextLike {
+			toString() {
+				return 'Saved <em>rich</em> text';
+			}
+		}
+		expect( coerceBindingValue( new RichTextLike(), 'rich-text' ) ).toBe(
+			'Saved <em>rich</em> text'
+		);
+	} );
 } );

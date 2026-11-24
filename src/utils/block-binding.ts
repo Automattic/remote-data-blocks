@@ -112,6 +112,12 @@ function getExpectedAttributeValue(
 		return coerceBindingValue( result.result[ args.field ]?.value, targetType );
 	}
 
+	// Structured values are unresolved, matching the editor and PHP resolvers.
+	const rawValue: unknown = result.result[ args.field ]?.value;
+	if ( typeof rawValue === 'object' && rawValue !== null ) {
+		return '';
+	}
+
 	// See comment on toString() in getAttributeValue.
 	let expectedValue = getRemoteDataResultValue( result, args.field );
 	if ( args.label ) {

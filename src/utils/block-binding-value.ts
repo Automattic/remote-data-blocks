@@ -1,5 +1,9 @@
 import { getBlockType } from '@wordpress/blocks';
 
+export function isTextBindingTarget( targetType?: string ): boolean {
+	return ! targetType || targetType === 'string' || targetType === 'rich-text';
+}
+
 export type BindingValue = string | number | boolean | null;
 
 export function getBindingTargetType(
@@ -37,5 +41,23 @@ export function coerceBindingValue( value: unknown, targetType?: string ): Bindi
 	if ( targetType && ! [ 'string', 'rich-text' ].includes( targetType ) ) {
 		return null;
 	}
+	// Match the PHP resolver: structured data (plain objects and arrays) is
+	// unresolved, so the saved fallback is used, never serialized as
+	// "[object Object]". Class instances that own their string form, such as
+	// the RichTextData that holds saved rich-text content, are still text.
+	if ( isStructuredData( value ) ) {
+		return null;
+	}
 	return String( value ?? '' );
+}
+
+function isStructuredData( value: unknown ): boolean {
+	if ( typeof value !== 'object' || value === null ) {
+		return false;
+	}
+	if ( Array.isArray( value ) ) {
+		return true;
+	}
+	const prototype: unknown = Object.getPrototypeOf( value );
+	return prototype === Object.prototype || prototype === null;
 }

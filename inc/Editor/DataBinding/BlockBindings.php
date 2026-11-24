@@ -404,6 +404,12 @@ class BlockBindings {
 		if ( is_array( $fallback_content ) && array_key_exists( 'value', $fallback_content ) ) {
 			$fallback_content = $fallback_content['value'];
 		}
+		// A structured saved value cannot be bound to a scalar attribute. Treat it as
+		// missing so the saved attribute (or, failing that, the saved markup) shows,
+		// instead of collapsing it to an empty or partial string.
+		if ( null !== $fallback_content && ! is_scalar( $fallback_content ) ) {
+			$fallback_content = null;
+		}
 		$fallback_content ??= $block_attributes[ $attribute_name ] ?? null;
 
 		// NOTE: Returning null from get_value() cancels the binding and allows the default saved content to show.
