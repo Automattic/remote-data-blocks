@@ -317,6 +317,13 @@ remote-data-blocks-inline-field {
 	margin: 0 0 16px;
 }
 
+.rdb-binding-chooser__warning {
+	border-left: 4px solid #f0b849;
+	font-size: 12px;
+	margin: 0 0 16px;
+	padding-left: 8px;
+}
+
 .rdb-binding-chooser__actions {
 	border-top: 1px solid #ddd;
 	display: flex;

@@ -11,11 +11,13 @@ use RemoteDataBlocks\Logging\Logger;
 use RemoteDataBlocks\Logging\LoggerInterface;
 use RemoteDataBlocks\Sanitization\Sanitizer;
 use WP_Block;
+use WP_Block_Type_Registry;
 use WP_Error;
 
 use function add_action;
 use function add_filter;
 use function remove_filter;
+use function sanitize_url;
 
 use function register_block_bindings_source;
 
@@ -300,6 +302,7 @@ class BlockBindings {
 			$block_attributes = $block->attributes;
 			$bound_block_name = $block->name;
 			$target_type = $block->block_type->attributes[ $attribute_name ]['type'] ?? null;
+			$target_schema = $block->block_type->attributes[ $attribute_name ] ?? [];
 		} else {
 			$block_context = $block['context'][ self::$context_name ] ?? [];
 			$block_attributes = $block['attributes'] ?? [];
@@ -307,7 +310,10 @@ class BlockBindings {
 			// Block Data API and inline-binding callers have no target schema. Keep
 			// their existing rendered-string contract.
 			$target_type = null;
+			$target_schema = self::get_registered_attribute_schema( $bound_block_name, $attribute_name );
 		}
+
+		$is_url_target = self::is_url_target( $attribute_name, is_array( $target_schema ) ? $target_schema : [] );
 
 		// Compound/non-scalar schemas are not supported by this source. Keep
 		// an absent schema distinct from an explicitly unsupported schema.
@@ -328,6 +334,9 @@ class BlockBindings {
 		// Fallback to the serialized query results or the block content if we don't
 		// have the expected context.
 		$fallback_content = self::get_block_fallback_content( $field_name, $block_attributes, $attribute_name, $serialized_results, $result_index, $target_type );
+		if ( $is_url_target ) {
+			$fallback_content = self::get_safe_url_value( $fallback_content );
+		}
 
 		$log_context = [
 			'block_name' => $bound_block_name,
@@ -360,6 +369,13 @@ class BlockBindings {
 		}
 
 		$value = self::get_target_value( $value, $target_type );
+
+		// Core writes bound attribute values into markup without URL escaping, and
+		// plain text fields are only text-sanitized. Never let a remote value put a
+		// disallowed protocol (e.g., javascript:) into a URL attribute.
+		if ( $is_url_target ) {
+			$value = self::get_safe_url_value( $value );
+		}
 
 		if ( null === $value ) {
 			self::log_error( $log_context, new WP_Error(
@@ -406,6 +422,42 @@ class BlockBindings {
 		}
 
 		return self::get_target_value( $fallback_content, $target_type );
+	}
+
+	/**
+	 * URL-bearing targets: attributes sourced from a URL HTML attribute, or
+	 * attributes whose name identifies them as a URL (e.g., url, linkUrl, src).
+	 */
+	private static function is_url_target( string $attribute_name, array $target_schema ): bool {
+		$html_attribute = ( $target_schema['source'] ?? null ) === 'attribute' ? strtolower( strval( $target_schema['attribute'] ?? '' ) ) : '';
+		if ( in_array( $html_attribute, [ 'href', 'src', 'cite', 'action', 'formaction', 'poster', 'data', 'background' ], true ) ) {
+			return true;
+		}
+
+		return 1 === preg_match( '/(?:url|href|src)$/i', $attribute_name );
+	}
+
+	/**
+	 * Strip disallowed protocols from a URL value. A value that sanitizes to an
+	 * empty string is treated as unresolved so the caller falls back.
+	 */
+	private static function get_safe_url_value( string|int|float|bool|null $value ): string|int|float|bool|null {
+		if ( ! is_string( $value ) || '' === trim( $value ) ) {
+			return $value;
+		}
+
+		$safe_url = sanitize_url( $value );
+		return '' === $safe_url ? null : $safe_url;
+	}
+
+	private static function get_registered_attribute_schema( string $block_name, string $attribute_name ): array {
+		if ( ! class_exists( WP_Block_Type_Registry::class ) ) {
+			return [];
+		}
+
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
+		$schema = $block_type?->attributes[ $attribute_name ] ?? [];
+		return is_array( $schema ) ? $schema : [];
 	}
 
 	/**
