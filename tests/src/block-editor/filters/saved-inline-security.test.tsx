@@ -25,7 +25,7 @@ it( 'sanitizes saved inline fields before an unbound paragraph reaches its edit 
 	const edit = vi.fn( ( _props: BlockEditProps< RemoteDataInnerBlockAttributes > ) => <div /> );
 	const Wrapped = withBlockBinding( edit );
 	const content =
-		'<user-mention data-user="42">Alice</user-mention> <remote-data-blocks-inline-field data-query="{}"><em>Saved</em><iframe srcdoc="inert"></iframe></remote-data-blocks-inline-field>';
+		'<user-mention data-user="42">Alice</user-mention> <remote-data-blocks-inline-field data-query="{}"><style>.unused{color:green}</style><em>Saved</em><iframe srcdoc="inert"></iframe></remote-data-blocks-inline-field>';
 	const attributes = { content };
 	render(
 		<Wrapped

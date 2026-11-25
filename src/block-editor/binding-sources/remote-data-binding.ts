@@ -3,15 +3,10 @@ import { registerBlockBindingsSource } from '@wordpress/blocks';
 
 import { REMOTE_DATA_CONTEXT_KEY } from '@/blocks/remote-data-container/config/constants';
 import { BLOCK_BINDING_SOURCE, STORE_NAME as rdbStore } from '@/config/constants';
-import {
-	BindingValue,
-	coerceBindingValue,
-	getBindingTargetType,
-	isTextBindingTarget,
-} from '@/utils/block-binding-value';
-import { sanitizeBindingHTML, sanitizeBindingValue } from '@/utils/sanitize-binding-value';
+import { resolveRemoteBindingValue } from '@/utils/resolve-remote-binding-value';
 
 import type { Selectors } from '@/store';
+import type { BindingValue } from '@/utils/block-binding-value';
 import type { StoreDescriptor } from '@wordpress/data';
 
 interface RawRemoteDataContext {
@@ -40,41 +35,17 @@ registerBlockBindingsSource( {
 		const previewIndex = select< Selectors >( rdbStore ).getPreviewIndex( remoteData?.resultId );
 
 		return Object.fromEntries(
-			Object.entries( bindings )
-				.filter( ( [ _targetAttribute, binding ] ): boolean => {
-					return binding.args.isPreview || Boolean( remoteData?.results?.length );
-				} )
-				.map( ( [ targetAttribute, binding ] ): [ string, BindingValue ] => {
-					const index = binding.args.previewIndex ?? previewIndex ?? 0;
-					const label = binding.args.label
-						? `${ sanitizeBindingHTML( binding.args.label ) }: `
-						: '';
-					const rawValue =
-						binding.args.previewValue !== undefined
-							? binding.args.previewValue
-							: remoteData?.results?.[ index ]?.result?.[ binding.args.field ]?.value;
-					const targetType = getBindingTargetType( blockName, targetAttribute );
-					let value = sanitizeBindingValue(
-						coerceBindingValue( rawValue, targetType ),
-						blockName,
-						targetAttribute
-					);
-					if ( value === null && ! binding.args.isPreview ) {
-						value = sanitizeBindingValue(
-							coerceBindingValue(
-								editor?.getBlockAttributes( clientId )?.[ targetAttribute ],
-								targetType
-							),
-							blockName,
-							targetAttribute
-						);
-					}
-					// Text targets keep their legacy contract of always receiving a string.
-					if ( value === null && isTextBindingTarget( targetType ) ) {
-						value = '';
-					}
-					return [ targetAttribute, typeof value === 'string' ? `${ label }${ value }` : value ];
-				} )
+			Object.entries( bindings ).flatMap( ( [ target, { args } ] ) => {
+				const value = resolveRemoteBindingValue( {
+					args,
+					blockName,
+					target,
+					remoteData,
+					previewIndex,
+					getSavedValue: () => editor?.getBlockAttributes( clientId )?.[ target ],
+				} );
+				return value === undefined ? [] : [ [ target, value ] ];
+			} )
 		);
 	},
 } );

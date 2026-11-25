@@ -6,19 +6,32 @@ interface IsolatedPreviewProps {
 	title: string;
 }
 
+const MAX_PREVIEW_HEIGHT = 2000;
+
 // Serialized into the frame. Keep this independent of the editor's window and state.
 function observeHeight() {
+	let viewportWidth = window.innerWidth;
+	let viewportHeight = window.innerHeight;
+	let lastHeight: number | undefined;
+
 	function resize() {
-		window.parent.postMessage(
-			{ action: 'rdb-preview-resize', height: document.body.offsetHeight },
-			'*'
-		);
+		const { innerWidth, innerHeight } = window;
+		const height = document.body.offsetHeight;
+		const heightOnlyResize =
+			lastHeight !== undefined && viewportWidth === innerWidth && viewportHeight !== innerHeight;
+		// Core measures the frame on viewport resize as well as content changes. Ignore
+		// height-only feedback so viewport-relative layouts can keep their authored CSS.
+		if ( height !== lastHeight && ! heightOnlyResize ) {
+			window.parent.postMessage( { action: 'rdb-preview-resize', height }, '*' );
+		}
+		viewportWidth = innerWidth;
+		viewportHeight = innerHeight;
+		lastHeight = height;
 	}
 	document.addEventListener( 'DOMContentLoaded', () => {
+		window.addEventListener( 'resize', resize );
 		new ResizeObserver( resize ).observe( document.body );
-		resize();
 	} );
-	window.addEventListener( 'load', resize );
 }
 
 /** A version-independent sandbox: remote scripts can run without the editor's origin. */
@@ -58,7 +71,7 @@ export function IsolatedPreview( { html, styles, title }: IsolatedPreviewProps )
 				Number.isFinite( data.height ) &&
 				data.height >= 0
 			) {
-				setHeight( Math.ceil( data.height ) );
+				setHeight( Math.min( Math.ceil( data.height ), MAX_PREVIEW_HEIGHT ) );
 			}
 		}
 		view?.addEventListener( 'message', resize );

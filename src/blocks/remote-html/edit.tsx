@@ -13,7 +13,12 @@ import { Placeholder } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
 import { IsolatedPreview } from './IsolatedPreview';
+import { REMOTE_DATA_CONTEXT_KEY } from '@/blocks/remote-data-container/config/constants';
+import { BLOCK_BINDING_SOURCE, STORE_NAME as rdbStore } from '@/config/constants';
 import { __ } from '@/utils/i18n';
+import { resolveRemoteBindingValue } from '@/utils/resolve-remote-binding-value';
+
+import type { Selectors } from '@/store';
 
 import './editor.scss';
 
@@ -34,9 +39,29 @@ const DEFAULT_STYLES = `
 `;
 
 export function Edit( props: BlockEditProps< RemoteDataInnerBlockAttributes > ): React.JSX.Element {
-	const { attributes, isSelected } = props;
+	const { attributes, context, isSelected, name } = props;
 	const blockProps = useBlockProps();
 	const { content } = attributes;
+	const binding = attributes.metadata?.bindings?.content;
+	const remoteData = context[ REMOTE_DATA_CONTEXT_KEY ] as RemoteData | undefined;
+	const boundContent = useSelect< Selectors >(
+		select => {
+			if ( binding?.source !== BLOCK_BINDING_SOURCE ) {
+				return undefined;
+			}
+
+			// Core skips this raw attribute because it is outside its supported bindings.
+			return resolveRemoteBindingValue( {
+				args: binding.args,
+				blockName: name,
+				target: 'content',
+				remoteData,
+				previewIndex: select( rdbStore )?.getPreviewIndex( remoteData?.resultId ),
+				getSavedValue: () => content,
+			} );
+		},
+		[ binding, content, name, remoteData ]
+	);
 
 	const settingStyles = useSelect< BlockEditorStoreSelectors, EditorStyle[] >(
 		select => select( blockEditorStore ).getSettings().styles,
@@ -48,9 +73,8 @@ export function Edit( props: BlockEditProps< RemoteDataInnerBlockAttributes > ):
 		...transformStyles( ( settingStyles ?? [] ).filter( ( style: EditorStyle ) => style.css ) ),
 	];
 
-	const hasBindings = attributes?.metadata?.bindings?.content !== undefined;
-
-	const contentString = content?.toString() ?? '';
+	const hasBindings = binding !== undefined;
+	const contentString = ( boundContent ?? content )?.toString() ?? '';
 	const hasContent = contentString.length > 0;
 
 	if ( ! hasBindings && ! hasContent ) {

@@ -59,6 +59,12 @@ describe( 'legacy editor binding security', () => {
 	it( 'uses a safe saved URL when the live plain string has a blocked protocol', () => {
 		expect( resolve( { url: 'javascript:unsafe()' }, 'url' ) ).toEqual( { url: '/saved' } );
 	} );
+	it( 'passes through live URLs allowed by the WordPress protocol policy', () => {
+		const url = 'irc://example.com/channel';
+		const content = `<a href="${ url }">Channel</a>`;
+		expect( resolve( { url }, 'url' ) ).toEqual( { url } );
+		expect( resolve( { content } ) ).toEqual( { content } );
+	} );
 	it( 'preserves a registered author format when a bound value falls back', () => {
 		registerFormatType( 'test/user-mention', {
 			title: 'User mention',

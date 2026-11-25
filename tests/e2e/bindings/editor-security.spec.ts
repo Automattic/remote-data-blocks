@@ -31,6 +31,40 @@ test( 'isolates Remote HTML scripts from the editor and resizes embedded content
 	expect( isolated ).toBe( true );
 } );
 
+test( 'keeps the Remote HTML preview stable with viewport-relative content', async ( {
+	admin,
+	editor,
+} ) => {
+	await admin.createNewPost();
+	await editor.insertBlock( {
+		name: 'remote-data-blocks/remote-html',
+		attributes: {
+			content: '<div style="height:100vh;box-sizing:content-box;padding-top:32px">Preview</div>',
+		},
+	} );
+	const frame = editor.canvas.locator( 'iframe.components-sandbox' );
+	await expect( frame.contentFrame().getByText( 'Preview' ) ).toBeVisible();
+	await expect( frame ).toHaveAttribute( 'height', '182' );
+	const heights = await frame.evaluate(
+		element =>
+			new Promise< ( string | null )[] >( resolve => {
+				const samples: ( string | null )[] = [];
+				function sampleHeight() {
+					samples.push( element.getAttribute( 'height' ) );
+					if ( samples.length === 12 ) {
+						resolve( samples );
+						return;
+					}
+					requestAnimationFrame( sampleHeight );
+				}
+				sampleHeight();
+			} )
+	);
+	const finalHeight = heights[ heights.length - 1 ];
+	expect( finalHeight ).toBe( '182' );
+	expect( heights.slice( -6 ) ).toEqual( Array( 6 ).fill( finalHeight ) );
+} );
+
 test( 'preserves formatting and metadata when reopening saved inline bindings', async ( {
 	admin,
 	editor,

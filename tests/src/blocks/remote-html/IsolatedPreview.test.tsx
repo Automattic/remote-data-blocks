@@ -35,6 +35,14 @@ describe( 'Remote HTML preview', () => {
 			} )
 		);
 		expect( frame ).toHaveAttribute( 'height', '241' );
+		fireEvent(
+			window,
+			new MessageEvent( 'message', {
+				source: frame.contentWindow,
+				data: { ...data, height: 9000 },
+			} )
+		);
+		expect( frame ).toHaveAttribute( 'height', '2000' );
 		unmount();
 		window.dispatchEvent( new MessageEvent( 'message', { source: frame.contentWindow, data } ) );
 	} );
