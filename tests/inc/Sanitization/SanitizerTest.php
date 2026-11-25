@@ -399,13 +399,12 @@ class SanitizerTest extends TestCase {
 	private const UNSAFE_MARKUP = '<img src=x onerror=alert(1)>Name';
 
 	/**
-	 * Primitive types that intentionally pass markup through unchanged. Every
-	 * consumer of these types is responsible for escaping or sandboxing the
-	 * value (wp_kses on the front end, SandBox iframe in the editor).
+	 * Primitive types that intentionally preserve raw values, including opaque
+	 * identifiers. Rendering sinks are responsible for escaping or filtering.
 	 *
 	 * Adding a type here is a security decision; do it deliberately.
 	 */
-	private const RAW_PRIMITIVE_TYPES = [ 'html', 'json_path', 'markdown' ];
+	private const RAW_PRIMITIVE_TYPES = [ 'html', 'id', 'json_path', 'markdown' ];
 
 	/**
 	 * Discover every sanitizable primitive type from the Types class so that a
@@ -476,7 +475,6 @@ class SanitizerTest extends TestCase {
 		return [
 			[ 'button_text' ],
 			[ 'currency_in_current_locale' ],
-			[ 'id' ],
 			[ 'image_alt' ],
 			[ 'string' ],
 			[ 'title' ],

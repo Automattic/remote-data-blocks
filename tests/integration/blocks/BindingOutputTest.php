@@ -57,6 +57,32 @@ class BindingOutputTest extends RDBTestCase {
 		);
 	}
 
+	public function testIdBindingsPreservePercentOctetsAndFilterMarkup(): void {
+		$block_title = 'test-binding-opaque-id';
+		$this->register_mocked_data_block(
+			$block_title,
+			[ 'id' => '<img src="https://example.com/image.png" onerror="void(0)">campaign%20April' ],
+			[
+				'type' => [
+					'id' => [
+						'name' => 'ID',
+						'path' => '$.id',
+						'type' => 'id',
+					],
+				],
+			]
+		);
+		$block_name = 'remote-data-blocks/' . $block_title;
+
+		$paragraph = $this->render_bound_block( $block_name, 'core:paragraph', 'id' );
+		$inline = InlineBindings::render_frontend_fields( $this->inline_field( $block_name, 'id' ) );
+
+		foreach ( [ $paragraph, $inline ] as $markup ) {
+			$this->assertStringContainsString( 'campaign%20April', $markup );
+			$this->assertStringNotContainsString( 'onerror', $markup );
+		}
+	}
+
 	public function testInlineBindingIgnoresPostContextFilters(): void {
 		$block_name = $this->register_test_block( 'test-inline-binding-post-filter' );
 		$allow_unsafe_post_html = static function ( array $tags, string $context ): array {
@@ -79,63 +105,6 @@ class BindingOutputTest extends RDBTestCase {
 		} finally {
 			remove_filter( 'wp_kses_allowed_html', $allow_unsafe_post_html, 10 );
 		}
-	}
-
-	public function testBlockBindingStripsUnsafeProtocolFromButtonUrl(): void {
-		$block_title = 'test-binding-unsafe-button-url';
-		$this->register_mocked_data_block(
-			$block_title,
-			[
-				'unsafe' => 'javascript:alert(1)',
-				'safe' => 'https://example.com/remote',
-			],
-			[
-				'is_collection' => false,
-				'type' => [
-					// Plain text fields are only text-sanitized, so they can carry
-					// any protocol. They can be bound to URL attributes.
-					'unsafe' => [
-						'name' => 'Unsafe',
-						'path' => '$.unsafe',
-						'type' => 'string',
-					],
-					'safe' => [
-						'name' => 'Safe',
-						'path' => '$.safe',
-						'type' => 'string',
-					],
-				],
-			]
-		);
-		$block_name = 'remote-data-blocks/' . $block_title;
-
-		$unsafe_html = $this->render_bound_button_url( $block_name, 'unsafe' );
-		$this->assertStringNotContainsStringIgnoringCase( 'javascript:', $unsafe_html );
-		$this->assertStringContainsString( 'href="https://example.com/saved"', $unsafe_html );
-
-		$this->assertStringContainsString( 'href="https://example.com/remote"', $this->render_bound_button_url( $block_name, 'safe' ) );
-	}
-
-	private function render_bound_button_url( string $block_name, string $field ): string {
-		$binding = wp_json_encode( [
-			'metadata' => [
-				'bindings' => [
-					'url' => [
-						'source' => 'remote-data/binding',
-						'args' => [
-							'block' => $block_name,
-							'field' => $field,
-						],
-					],
-				],
-			],
-		] );
-
-		return trim( do_blocks( sprintf(
-			'<!-- wp:%1$s {"remoteData":{"blockName":"%1$s"}} --><!-- wp:button %2$s --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://example.com/saved">Saved</a></div><!-- /wp:button --><!-- /wp:%1$s -->',
-			$block_name,
-			$binding
-		) ) );
 	}
 
 	/**

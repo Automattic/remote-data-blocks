@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { registerBlockBindingsSource } from '@wordpress/blocks';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

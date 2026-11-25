@@ -121,9 +121,12 @@ class Sanitizer implements SanitizerInterface {
 				// Typed binding targets validate their numeric representation separately.
 				return is_string( $value ) ? sanitize_text_field( $value ) : $value;
 
+			case 'id':
+				// IDs are opaque and may be reused as query inputs. Escape at the output sink.
+				return strval( $value );
+
 			case 'button_text':
 			case 'currency_in_current_locale':
-			case 'id':
 			case 'image_alt':
 			case 'string':
 			case 'title':

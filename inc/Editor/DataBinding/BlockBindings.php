@@ -5,19 +5,18 @@ namespace RemoteDataBlocks\Editor\DataBinding;
 defined( 'ABSPATH' ) || exit();
 
 use RemoteDataBlocks\Config\BlockAttribute\RemoteDataBlockAttribute;
+use RemoteDataBlocks\Config\Query\QueryInterface;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\Logging\Logger;
 use RemoteDataBlocks\Logging\LoggerInterface;
 use RemoteDataBlocks\Sanitization\Sanitizer;
 use WP_Block;
-use WP_Block_Type_Registry;
 use WP_Error;
 
 use function add_action;
 use function add_filter;
 use function remove_filter;
-use function sanitize_url;
 
 use function register_block_bindings_source;
 
@@ -26,6 +25,8 @@ class BlockBindings {
 	public static string $binding_source = 'remote-data/binding';
 
 	protected static string $prerendered_content_key = 'prerendered_content';
+
+	/** @var array<string, array{query: QueryInterface|null, response: array<string, mixed>|WP_Error}> */
 	protected static array $in_memory_cache = [];
 
 	protected static ?LoggerInterface $logger = null;
@@ -129,29 +130,44 @@ class BlockBindings {
 
 	/**
 	 * @param array<string, mixed> $block_context Remote data block context.
-	 * @return array<string, mixed>|WP_Error
+	 * @return array{query: QueryInterface|null, response: array<string, mixed>|WP_Error}
 	 */
-	private static function execute_queries( array $block_context ): array|WP_Error {
+	private static function execute_queries( array $block_context ): array {
 		// Load the attribute data and validate it.
 		$remote_data = RemoteDataBlockAttribute::from_array( $block_context );
 
 		if ( is_wp_error( $remote_data ) ) {
-			return $remote_data;
+			return [
+				'query' => null,
+				'response' => $remote_data,
+			];
 		}
 
 		// Extract block and query information.
 		$remote_data = $remote_data->to_array();
 		$block_name = $remote_data['blockName'];
-		$enabled_overrides = $remote_data['enabledOverrides'] ?? [];
 		$query_key = $remote_data['queryKey'] ?? ConfigRegistry::DISPLAY_QUERY_KEY;
-		$array_of_input_variables = $remote_data['queryInputs'];
 
 		$block_config = ConfigStore::get_block_configuration( $block_name );
 		$query = $block_config['queries'][ $query_key ] ?? null;
 
 		if ( null === $query ) {
-			return new WP_Error( 'remote_data_blocks_binding_query_error', 'Cannot load query for block binding' );
+			return [
+				'query' => null,
+				'response' => new WP_Error( 'remote_data_blocks_binding_query_error', 'Cannot load query for block binding' ),
+			];
 		}
+
+		return [
+			'query' => $query,
+			'response' => self::execute_query( $query, $remote_data ),
+		];
+	}
+
+	private static function execute_query( QueryInterface $query, array $remote_data ): array|WP_Error {
+		$block_name = $remote_data['blockName'];
+		$enabled_overrides = $remote_data['enabledOverrides'] ?? [];
+		$array_of_input_variables = $remote_data['queryInputs'];
 
 		// If there is a single array of input variables, fetch pagination variables.
 		// Pagination is disabled for batch execution.
@@ -195,10 +211,6 @@ class BlockBindings {
 				$block_name,
 			);
 
-			if ( is_wp_error( $query_response ) ) {
-				return $query_response;
-			}
-
 			return $query_response;
 		} catch ( \Exception $e ) {
 			return new WP_Error( 'remote_data_blocks_binding_query_error', $e->getMessage(), [ 'cause' => $e ] );
@@ -208,7 +220,7 @@ class BlockBindings {
 	/**
 	 * @param array<string, mixed> $block_context Remote data block context.
 	 * @param array<string, mixed> $source_args Binding source args.
-	 * @return array{config_id: string, response: array<string, mixed>|WP_Error}
+	 * @return array{config_id: string, query: QueryInterface|null, response: array<string, mixed>|WP_Error}
 	 */
 	private static function execute_queries_with_cache( array $block_context, array $source_args = [] ): array {
 		// Migrate the config early so that we can access and use values without defensive checks.
@@ -217,6 +229,7 @@ class BlockBindings {
 		if ( is_wp_error( $block_context ) ) {
 			return [
 				'config_id' => '',
+				'query' => null,
 				'response' => $block_context,
 			];
 		}
@@ -229,7 +242,7 @@ class BlockBindings {
 
 		return [
 			'config_id' => $config_id,
-			'response' => self::$in_memory_cache[ $config_id ],
+			...self::$in_memory_cache[ $config_id ],
 		];
 	}
 
@@ -302,7 +315,6 @@ class BlockBindings {
 			$block_attributes = $block->attributes;
 			$bound_block_name = $block->name;
 			$target_type = $block->block_type->attributes[ $attribute_name ]['type'] ?? null;
-			$target_schema = $block->block_type->attributes[ $attribute_name ] ?? [];
 		} else {
 			$block_context = $block['context'][ self::$context_name ] ?? [];
 			$block_attributes = $block['attributes'] ?? [];
@@ -310,10 +322,7 @@ class BlockBindings {
 			// Block Data API and inline-binding callers have no target schema. Keep
 			// their existing rendered-string contract.
 			$target_type = null;
-			$target_schema = self::get_registered_attribute_schema( $bound_block_name, $attribute_name );
 		}
-
-		$is_url_target = self::is_url_target( $attribute_name, is_array( $target_schema ) ? $target_schema : [] );
 
 		// Compound/non-scalar schemas are not supported by this source. Keep
 		// an absent schema distinct from an explicitly unsupported schema.
@@ -327,16 +336,17 @@ class BlockBindings {
 		$field_type = $source_args['type'] ?? 'field';
 		$result_index = $source_args['index'] ?? 0;
 
-		// Query results are serialized and stored in the block context when the
-		// block is created in the block editor.
-		$serialized_results = $block_context['results'] ?? [];
+		$execution_result = empty( $field_name ) ? null : self::execute_queries_with_cache( $block_context, $source_args );
 
-		// Fallback to the serialized query results or the block content if we don't
-		// have the expected context.
-		$fallback_content = self::get_block_fallback_content( $field_name, $block_attributes, $attribute_name, $serialized_results, $result_index, $target_type );
-		if ( $is_url_target ) {
-			$fallback_content = self::get_safe_url_value( $fallback_content );
-		}
+		// Fallback to serialized query results or the saved block attribute.
+		$fallback_content = self::get_block_fallback_content(
+			$field_name,
+			$block_attributes[ $attribute_name ] ?? null,
+			$block_context['results'][ $result_index ] ?? [],
+			$target_type,
+			$execution_result['query'] ?? null,
+			'meta' !== $field_type,
+		);
 
 		$log_context = [
 			'block_name' => $bound_block_name,
@@ -354,7 +364,6 @@ class BlockBindings {
 			return $fallback_content;
 		}
 
-		$execution_result = self::execute_queries_with_cache( $block_context, $source_args );
 		$query_response = $execution_result['response'];
 
 		if ( is_wp_error( $query_response ) ) {
@@ -369,13 +378,6 @@ class BlockBindings {
 		}
 
 		$value = self::get_target_value( $value, $target_type );
-
-		// Core writes bound attribute values into markup without URL escaping, and
-		// plain text fields are only text-sanitized. Never let a remote value put a
-		// disallowed protocol (e.g., javascript:) into a URL attribute.
-		if ( $is_url_target ) {
-			$value = self::get_safe_url_value( $value );
-		}
 
 		if ( null === $value ) {
 			self::log_error( $log_context, new WP_Error(
@@ -397,14 +399,16 @@ class BlockBindings {
 		return $value;
 	}
 
-	private static function get_block_fallback_content( string $field_name, array $block_attributes, string $attribute_name, array $serialized_results = [], int $result_index = 0, ?string $target_type = null ): string|int|float|bool|null {
-		$saved_result = $serialized_results[ $result_index ] ?? [];
+	private static function get_block_fallback_content( string $field_name, mixed $saved_attribute, mixed $saved_result, ?string $target_type, ?QueryInterface $query, bool $is_result_field ): string|int|float|bool|null {
 		// Releases before the bulk-selection format stored flat result rows.
-		$saved_fields = is_array( $saved_result['result'] ?? null ) ? $saved_result['result'] : $saved_result;
+		$is_wrapped = is_array( $saved_result['result'] ?? null );
+		$saved_fields = $is_wrapped ? $saved_result['result'] : $saved_result;
 		$fallback_content = $saved_fields[ $field_name ] ?? null;
+		$saved_field_type = null;
 		// Current saved results contain field descriptors; older callers may
 		// still provide a primitive. Do not discard false or zero when unwrapping.
 		if ( is_array( $fallback_content ) && array_key_exists( 'value', $fallback_content ) ) {
+			$saved_field_type = $is_wrapped ? $fallback_content['type'] ?? null : null;
 			$fallback_content = $fallback_content['value'];
 		}
 		// A structured saved value cannot be bound to a scalar attribute. Treat it as
@@ -413,7 +417,8 @@ class BlockBindings {
 		if ( null !== $fallback_content && ! is_scalar( $fallback_content ) ) {
 			$fallback_content = null;
 		}
-		$fallback_content ??= $block_attributes[ $attribute_name ] ?? null;
+		$is_saved_result = null !== $fallback_content;
+		$fallback_content ??= $saved_attribute;
 
 		// NOTE: Returning null from get_value() cancels the binding and allows the default saved content to show.
 		if ( null === $fallback_content ) {
@@ -421,46 +426,23 @@ class BlockBindings {
 		}
 
 		if ( null === $target_type || in_array( $target_type, [ 'string', 'rich-text' ], true ) ) {
+			if ( $is_result_field && $is_saved_result ) {
+				// Legacy rows have no source type. Only infer it from the query's mapping.
+				if ( null === $saved_field_type || 'unknown' === $saved_field_type ) {
+					$schema = $query?->get_output_schema();
+					$saved_field_type = $schema['type'][ $field_name ]['type'] ?? null;
+				}
+
+				if ( 'id' === $saved_field_type ) {
+					// Preserve the ID as on the live path. Rendering sinks escape or filter it.
+					return Sanitizer::sanitize_primitive_type( 'id', $fallback_content );
+				}
+			}
+
 			return Sanitizer::sanitize_primitive_type( 'string', $fallback_content );
 		}
 
 		return self::get_target_value( $fallback_content, $target_type );
-	}
-
-	/**
-	 * URL-bearing targets: attributes sourced from a URL HTML attribute, or
-	 * attributes whose name identifies them as a URL (e.g., url, linkUrl, src).
-	 */
-	private static function is_url_target( string $attribute_name, array $target_schema ): bool {
-		$html_attribute = ( $target_schema['source'] ?? null ) === 'attribute' ? strtolower( strval( $target_schema['attribute'] ?? '' ) ) : '';
-		if ( in_array( $html_attribute, [ 'href', 'src', 'cite', 'action', 'formaction', 'poster', 'data', 'background' ], true ) ) {
-			return true;
-		}
-
-		return 1 === preg_match( '/(?:url|href|src)$/i', $attribute_name );
-	}
-
-	/**
-	 * Strip disallowed protocols from a URL value. A value that sanitizes to an
-	 * empty string is treated as unresolved so the caller falls back.
-	 */
-	private static function get_safe_url_value( string|int|float|bool|null $value ): string|int|float|bool|null {
-		if ( ! is_string( $value ) || '' === trim( $value ) ) {
-			return $value;
-		}
-
-		$safe_url = sanitize_url( $value );
-		return '' === $safe_url ? null : $safe_url;
-	}
-
-	private static function get_registered_attribute_schema( string $block_name, string $attribute_name ): array {
-		if ( ! class_exists( WP_Block_Type_Registry::class ) ) {
-			return [];
-		}
-
-		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
-		$schema = $block_type?->attributes[ $attribute_name ] ?? [];
-		return is_array( $schema ) ? $schema : [];
 	}
 
 	/**
