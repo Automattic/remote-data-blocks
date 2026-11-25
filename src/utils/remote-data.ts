@@ -20,10 +20,21 @@ function createRemoteDataResult(
 	};
 }
 
-function isResultMigrated( result: object ): result is RemoteDataApiResult {
+function isResultMigrated( result: unknown, uuid: unknown ): boolean {
 	return (
-		Object.prototype.hasOwnProperty.call( result, 'result' ) &&
-		Object.prototype.hasOwnProperty.call( result, 'uuid' )
+		( typeof uuid === 'string' || typeof uuid === 'number' ) &&
+		typeof result === 'object' &&
+		result !== null &&
+		Object.values( result ).every(
+			( field: unknown ) =>
+				typeof field === 'object' &&
+				field !== null &&
+				'name' in field &&
+				typeof field.name === 'string' &&
+				'type' in field &&
+				typeof field.type === 'string' &&
+				Object.prototype.hasOwnProperty.call( field, 'value' )
+		)
 	);
 }
 
@@ -86,15 +97,20 @@ export function migrateRemoteData( remoteData?: RemoteData ): RemoteData | undef
 
 	const { queryInput, results, ...rest } = remoteData;
 
-	const migratedResults = results?.map( ( result, num ) => {
-		const resultValue =
-			typeof result.result === 'object' && result.result !== null ? result.result : { ...result };
-
-		if ( isResultMigrated( result ) ) {
-			return result;
+	const migratedResults = results?.map( ( row, num ) => {
+		const { result, uuid } = row;
+		if ( isResultMigrated( result, uuid ) ) {
+			return row;
 		}
 
-		return createRemoteDataResult( resultValue, `${ num }` );
+		// The legacy primitive wrapper contains only the result map. A flat row can
+		// also have a field named result, alongside other user-defined fields.
+		const fields =
+			typeof result === 'object' && result !== null && Object.keys( row ).length === 1
+				? result
+				: { ...row };
+
+		return createRemoteDataResult( fields, `${ num }` );
 	} );
 
 	return {

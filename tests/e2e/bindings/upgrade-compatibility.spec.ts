@@ -15,7 +15,10 @@ for ( const fixture of fixtures.filter( item => ! item.clientOnly ) ) {
 		};
 		const content = `<!-- wp:${ fixture.remoteData.blockName } ${ JSON.stringify( {
 			remoteData: fixture.remoteData,
-		} ) } --><div class="wp-block-${ fixture.remoteData.blockName.replace( '/', '-' ) } rdb-container"><!-- wp:paragraph ${ JSON.stringify( {
+		} ) } --><div class="wp-block-${ fixture.remoteData.blockName.replace(
+			'/',
+			'-'
+		) } rdb-container"><!-- wp:paragraph ${ JSON.stringify( {
 			metadata: { name: 'Historical title', bindings: { content: binding } },
 		} ) } --><p>Saved garden</p><!-- /wp:paragraph --></div><!-- /wp:${
 			fixture.remoteData.blockName
@@ -33,7 +36,9 @@ for ( const fixture of fixtures.filter( item => ! item.clientOnly ) ) {
 		await expect(
 			editor.canvas.locator( 'p' ).filter( { hasText: 'Local garden collection' } )
 		).toHaveCount( 1 );
-		await editor.canvas.getByRole( 'textbox', { name: 'Add title' } ).fill( 'Saved historical upgrade' );
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Saved historical upgrade' );
 		await editor.saveDraft();
 		await page.reload();
 		await expect(

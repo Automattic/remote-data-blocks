@@ -114,5 +114,27 @@
       "result": "Saved status",
       "title": "Saved garden"
     }
+  },
+  {
+    "name": "legacy scalar fields named result and uuid",
+    "reference": "edad404^:src/blocks/remote-data-container/hooks/useRemoteData.ts",
+    "remoteData": {
+      "blockName": "remote-data-blocks/bindings-garden",
+      "queryInput": {
+        "id": "saved-row"
+      },
+      "results": [
+        {
+          "result": "Saved status",
+          "uuid": "754b3408-1014-4863-b072-b005181ff92f",
+          "title": "Saved garden"
+        }
+      ]
+    },
+    "values": {
+      "result": "Saved status",
+      "uuid": "754b3408-1014-4863-b072-b005181ff92f",
+      "title": "Saved garden"
+    }
   }
 ]
