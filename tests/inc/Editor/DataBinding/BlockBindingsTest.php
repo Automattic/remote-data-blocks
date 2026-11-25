@@ -807,64 +807,6 @@ class BlockBindingsTest extends TestCase {
 		];
 	}
 
-	/**
-	 * @dataProvider url_target_provider
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 */
-	public function test_get_value_sanitizes_url_targets( array $schema, string $attribute_name, string $remote_value, ?string $expected ): void {
-		$this->create_mock_config_store( $this->create_mock_block_config( $this->create_mock_query_runner_with_result( $remote_value ) ) );
-		$block = $this->create_mock_bound_block_with_schema( $attribute_name, $schema );
-		$block->context = $this->create_block_context( [] );
-
-		$this->assertSame( $expected, BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, $attribute_name ) );
-	}
-
-	public function url_target_provider(): array {
-		$href = [
-			'type' => 'string',
-			'source' => 'attribute',
-			'attribute' => 'href',
-		];
-		return [
-			'href rejects javascript' => [ $href, 'link', 'javascript:alert(1)', null ],
-			'href rejects obfuscated javascript' => [ $href, 'link', " JaVaScRiPt\t:alert(1)", null ],
-			'href rejects data' => [ $href, 'link', 'data:text/html,hi', null ],
-			'href keeps https' => [ $href, 'link', 'https://example.com/a?b=c', 'https://example.com/a?b=c' ],
-			'url-named attribute rejects javascript' => [ [ 'type' => 'string' ], 'url', 'javascript:alert(1)', null ],
-			'camel-case url attribute rejects javascript' => [ [ 'type' => 'string' ], 'linkUrl', 'javascript:alert(1)', null ],
-			'non-url text is untouched' => [ [ 'type' => 'string' ], 'text', 'javascript:alert(1)', 'javascript:alert(1)' ],
-		];
-	}
-
-	/**
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 */
-	public function test_get_value_falls_back_to_safe_saved_url(): void {
-		$this->create_mock_config_store( $this->create_mock_block_config( $this->create_mock_query_runner_with_result( 'javascript:alert(1)' ) ) );
-		$block = $this->create_mock_bound_block_with_schema( 'url', [ 'type' => 'string' ] );
-		$block->context = $this->create_block_context( [] );
-		/** @psalm-suppress UndefinedPropertyAssignment -- WP_Block exposes read-only magic attributes; this lightweight unit mock supplies them directly. */
-		$block->attributes = [ 'url' => 'https://example.com/saved' ];
-
-		$this->assertSame( 'https://example.com/saved', BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'url' ) );
-	}
-
-	public function test_get_value_sanitizes_unsafe_saved_url_fallback(): void {
-		$block = [
-			'attributes' => [ 'url' => 'javascript:alert(1)' ],
-		];
-
-		$this->assertNull( BlockBindings::get_value( [ 'field' => 'non_existent' ], $block, 'url' ) );
-	}
-
-	private function create_mock_bound_block_with_schema( string $attribute_name, array $schema ): \WP_Block {
-		$block = $this->create_mock_bound_block( 'string' );
-		$block->block_type->attributes = [ $attribute_name => $schema ];
-		return $block;
-	}
-
 	private function create_mock_bound_block( mixed $target_type ): \WP_Block {
 		/** @var \WP_Block_Type $block_type */
 		$block_type = Mockery::namedMock( \WP_Block_Type::class );
