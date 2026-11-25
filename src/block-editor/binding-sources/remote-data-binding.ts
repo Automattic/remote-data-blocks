@@ -9,6 +9,7 @@ import {
 	getBindingTargetType,
 	isTextBindingTarget,
 } from '@/utils/block-binding-value';
+import { sanitizeBindingHTML, sanitizeBindingValue } from '@/utils/sanitize-binding-value';
 
 import type { Selectors } from '@/store';
 import type { StoreDescriptor } from '@wordpress/data';
@@ -45,17 +46,27 @@ registerBlockBindingsSource( {
 				} )
 				.map( ( [ targetAttribute, binding ] ): [ string, BindingValue ] => {
 					const index = binding.args.previewIndex ?? previewIndex ?? 0;
-					const label = binding.args.label ? `${ binding.args.label }: ` : '';
+					const label = binding.args.label
+						? `${ sanitizeBindingHTML( binding.args.label ) }: `
+						: '';
 					const rawValue =
 						binding.args.previewValue !== undefined
 							? binding.args.previewValue
 							: remoteData?.results?.[ index ]?.result?.[ binding.args.field ]?.value;
 					const targetType = getBindingTargetType( blockName, targetAttribute );
-					let value = coerceBindingValue( rawValue, targetType );
+					let value = sanitizeBindingValue(
+						coerceBindingValue( rawValue, targetType ),
+						blockName,
+						targetAttribute
+					);
 					if ( value === null && ! binding.args.isPreview ) {
-						value = coerceBindingValue(
-							editor?.getBlockAttributes( clientId )?.[ targetAttribute ],
-							targetType
+						value = sanitizeBindingValue(
+							coerceBindingValue(
+								editor?.getBlockAttributes( clientId )?.[ targetAttribute ],
+								targetType
+							),
+							blockName,
+							targetAttribute
 						);
 					}
 					// Text targets keep their legacy contract of always receiving a string.

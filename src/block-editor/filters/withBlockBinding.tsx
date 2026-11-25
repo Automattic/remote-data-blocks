@@ -19,6 +19,7 @@ import {
 import { getBoundBlockClassName } from '@/utils/block-binding';
 import { useSupportedBindingAttributes } from '@/utils/block-bindings-support';
 import { getBlockAvailableBindings, getBlockTitle } from '@/utils/localized-block-data';
+import { sanitizeInlineBindingAttributes } from '@/utils/sanitize-binding-value';
 
 interface BoundBlockEditProps {
 	isSelected: boolean;
@@ -102,6 +103,12 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 
 export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 	return ( props: BlockEditProps< RemoteDataInnerBlockAttributes > ) => {
+		const inlineAttributes =
+			props.name === 'remote-data-blocks/remote-html'
+				? props.attributes
+				: sanitizeInlineBindingAttributes( props.attributes );
+		props =
+			inlineAttributes === props.attributes ? props : { ...props, attributes: inlineAttributes };
 		const { attributes, context, name, setAttributes } = props;
 		const { remoteData } = useRemoteDataContext( context );
 		const supportedAttributes = useSupportedBindingAttributes( name );

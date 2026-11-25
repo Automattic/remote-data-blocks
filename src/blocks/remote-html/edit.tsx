@@ -9,9 +9,10 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { BlockEditProps } from '@wordpress/blocks';
-import { SandBox, Placeholder } from '@wordpress/components';
+import { Placeholder } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
+import { IsolatedPreview } from './IsolatedPreview';
 import { __ } from '@/utils/i18n';
 
 import './editor.scss';
@@ -62,11 +63,10 @@ export function Edit( props: BlockEditProps< RemoteDataInnerBlockAttributes > ):
 
 	return (
 		<div { ...blockProps }>
-			<SandBox
+			<IsolatedPreview
 				html={ contentString }
 				styles={ styles }
 				title={ __( 'Remote Data Block HTML Preview' ) }
-				tabIndex={ -1 }
 			/>
 			{
 				/**
