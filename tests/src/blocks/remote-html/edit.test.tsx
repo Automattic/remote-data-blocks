@@ -109,6 +109,12 @@ describe( 'Remote HTML edit preview', () => {
 			expect( frame.getAttribute( 'srcdoc' ) ).toContain( expected );
 		}
 	);
+	it( 'keeps authored content when a saved remote binding has no arguments', () => {
+		const incomplete = { source: BLOCK_BINDING_SOURCE } as RemoteDataBlockBinding;
+		const frame = renderPreview( incomplete, [ { markup: live } ] );
+		expect( frame.getAttribute( 'srcdoc' ) ).toContain( authored );
+	} );
+
 	it( 'keeps the authored content for an unsupported binding source', () => {
 		const frame = renderPreview( { ...binding, source: 'test/other' }, [
 			{ markup: 'First row' },

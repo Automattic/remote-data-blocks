@@ -7,7 +7,7 @@ import {
 import { sanitizeBindingHTML, sanitizeBindingValue } from '@/utils/sanitize-binding-value';
 
 interface RemoteBindingValueOptions {
-	args: RemoteDataBlockBindingArgs;
+	args?: RemoteDataBlockBindingArgs;
 	blockName: string | undefined;
 	target: string;
 	remoteData: RemoteData | undefined;
@@ -23,7 +23,7 @@ export function resolveRemoteBindingValue( {
 	previewIndex,
 	getSavedValue,
 }: RemoteBindingValueOptions ): BindingValue | undefined {
-	if ( ! args.isPreview && ! remoteData?.results?.length ) {
+	if ( typeof args?.field !== 'string' || ( ! args.isPreview && ! remoteData?.results?.length ) ) {
 		return undefined;
 	}
 

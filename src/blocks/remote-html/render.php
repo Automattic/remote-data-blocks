@@ -11,14 +11,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $binding = $block->attributes['metadata']['bindings']['content'] ?? [];
+$args = $binding['args'] ?? null;
 
 ?>
 
 <div <?php echo wp_kses_data( get_block_wrapper_attributes() ); ?>>
 	<?php
 	$binding_value = null;
-	if ( ( $binding['source'] ?? null ) === BlockBindings::$binding_source ) {
-		$binding_value = BlockBindings::get_value( $binding['args'] ?? [], $block, 'content' );
+	if ( ( $binding['source'] ?? null ) === BlockBindings::$binding_source && is_array( $args ) && is_string( $args['field'] ?? null ) ) {
+		$binding_value = BlockBindings::get_value( $args, $block, 'content' );
 	}
 	echo wp_kses_post( $binding_value ?? $content );
 	?>
