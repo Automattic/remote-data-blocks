@@ -172,6 +172,76 @@ class VipBlockDataApiTest extends TestCase {
 		$this->assertSame( "President's dining hall", $result['innerBlocks'][1]['attributes']['content'] );
 	}
 
+	public function testResolveRemoteDataPreservesOtherSourcesInNestedBlocks(): void {
+		$mock_qr = new MockQueryRunner();
+		$mock_qr->setResults( [
+			[ 'image' => [ 'value' => 'https://example.com/remote.jpg' ] ],
+		] );
+		register_remote_data_block( [
+			'title' => 'Events',
+			'render_query' => [
+				'query' => MockQuery::create( [ 'query_runner' => $mock_qr ] ),
+			],
+		] );
+		$mock_logger = new MockLogger();
+		BlockBindings::init( $mock_logger );
+
+		$image_attributes = [
+			'metadata' => [
+				'name' => 'Event photo',
+				'bindings' => [
+					'__default' => [ 'source' => 'core/pattern-overrides' ],
+					'url' => [
+						'source' => BlockBindings::$binding_source,
+						'args' => [ 'field' => 'image' ],
+					],
+					'alt' => [
+						'source' => 'example/other-source',
+						'args' => [ 'field' => 'image' ],
+					],
+				],
+			],
+			'url' => 'https://example.com/saved.jpg',
+			'alt' => 'Saved alternate text',
+			'caption' => 'Saved pattern caption',
+		];
+		$paragraph_attributes = [
+			'metadata' => [
+				'bindings' => [
+					'content' => [ 'source' => BlockBindings::$binding_source ],
+				],
+			],
+			'content' => 'Saved content',
+		];
+		$sourced_block = self::$sourced_block1;
+		$sourced_block['innerBlocks'] = [
+			[
+				'name' => 'core/group',
+				'attributes' => [],
+				'innerBlocks' => [
+					[
+						'name' => 'core/image',
+						'attributes' => (object) $image_attributes,
+					],
+					[
+						'name' => 'core/paragraph',
+						'attributes' => $paragraph_attributes,
+					],
+				],
+			],
+		];
+
+		$result = VipBlockDataApi::resolve_remote_data( $sourced_block, $sourced_block['name'], 12, self::$parsed_block1 );
+
+		$image_attributes['url'] = 'https://example.com/remote.jpg';
+		$this->assertSame( $image_attributes, $result['innerBlocks'][0]['innerBlocks'][0]['attributes'] );
+		$this->assertSame( $paragraph_attributes, $result['innerBlocks'][0]['innerBlocks'][1]['attributes'] );
+		$this->assertSame(
+			[ 'Successfully resolved block binding', 'Missing field mapping for block binding' ],
+			array_column( $mock_logger->getLogs(), 'message' )
+		);
+	}
+
 	public function testResolveRemoteDataFallsBackToSerializedDataOnError(): void {
 		$error = new \WP_Error( 'rdb-uh-oh', 'uh-oh!' );
 		$mock_qr = new MockQueryRunner();

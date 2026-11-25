@@ -56,7 +56,12 @@ class VipBlockDataApi {
 			$block['context'] = $block_context;
 
 			foreach ( $block['attributes']['metadata']['bindings'] as $attr_name => $binding ) {
-				$block['attributes'][ $attr_name ] = BlockBindings::get_value( $binding['args'], $block, $attr_name );
+				if ( ( $binding['source'] ?? null ) !== BlockBindings::$binding_source ) {
+					continue;
+				}
+
+				$source_args = $binding['args'] ?? [];
+				$block['attributes'][ $attr_name ] = BlockBindings::get_value( is_array( $source_args ) ? $source_args : [], $block, $attr_name );
 			}
 
 			unset( $block['context'] );

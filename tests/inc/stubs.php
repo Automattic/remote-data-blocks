@@ -70,10 +70,6 @@ function sanitize_email( string $email ): string {
 
 function sanitize_url( string $url ): string {
 	$url = trim( $url );
-	// Mirror core's protocol allow-list for the protocols that matter in tests.
-	if ( preg_match( '/^(?:javascript|vbscript|data):/i', preg_replace( '/[\x00-\x20]+/', '', $url ) ) ) {
-		return '';
-	}
 	$url = filter_var( $url, FILTER_SANITIZE_URL );
 	return preg_replace( '/[^-a-zA-Z0-9:_.\/@?&=#%]/', '', $url );
 }
