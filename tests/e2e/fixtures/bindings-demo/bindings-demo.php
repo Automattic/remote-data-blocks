@@ -131,6 +131,18 @@ add_action( 'init', static function (): void {
 				'selector' => 'p',
 				'default' => 'Choose a remote field',
 			],
+			'destination' => [
+				'type' => 'string',
+				'source' => 'attribute',
+				'selector' => 'a',
+				'attribute' => 'href',
+			],
+			'displayUrl' => [
+				'type' => 'string',
+				'source' => 'attribute',
+				'selector' => 'a',
+				'attribute' => 'title',
+			],
 		],
 	] );
 
@@ -161,7 +173,7 @@ add_action( 'init', static function (): void {
 // Both official WordPress extension points are intentionally exercised.
 add_filter( 'block_bindings_supported_attributes', static function ( array $attributes, ?string $block_type ): array {
 	if ( 'rdb-bindings-demo/static-card' === $block_type ) {
-		$attributes[] = 'botanicalNote';
+		return array_merge( $attributes, [ 'botanicalNote', 'destination', 'displayUrl' ] );
 	}
 	return $attributes;
 }, 10, 2 );

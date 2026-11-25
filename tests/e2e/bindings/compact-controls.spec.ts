@@ -121,7 +121,7 @@ test.describe( 'compact binding controls', () => {
 		expect( await getButtonBindings( page ) ).toEqual( { url: before.url } );
 	} );
 
-	test( 'opens compatible Conference Event fields on demand without committing drafts', async ( {
+	test( 'opens Conference Event text choices without committing drafts and shows no URL choices', async ( {
 		page,
 		editor,
 	} ) => {
@@ -143,9 +143,16 @@ test.describe( 'compact binding controls', () => {
 		expect( await getButtonBindings( page ) ).toEqual( {} );
 		await page.getByRole( 'button', { name: 'Cancel', exact: true } ).click();
 		await openBindingChooser( page, 'url' );
-		await expect( page.locator( 'select[name="url"] option[value="title"]' ) ).toHaveCount( 1 );
-		await expect( page.locator( '.rdb-binding-chooser select' ) ).toHaveCount( 1 );
-		await page.keyboard.press( 'Escape' );
+		const urlChooser = page.getByRole( 'dialog', { name: 'Bind Button URL', exact: true } );
+		await expect( urlChooser.getByRole( 'combobox' ) ).toHaveCount( 0 );
+		await expect( urlChooser ).toContainText(
+			'No matching fields are available for this attribute.'
+		);
+		await urlChooser.getByRole( 'button', { name: 'Close', exact: true } ).press( 'Escape' );
+		await expect( urlChooser ).toHaveCount( 0 );
+		await expect(
+			page.getByRole( 'button', { name: 'Bind Button URL', exact: true } )
+		).toBeFocused();
 		expect( await getButtonBindings( page ) ).toEqual( {} );
 	} );
 

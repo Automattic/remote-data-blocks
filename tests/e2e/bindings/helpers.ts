@@ -81,6 +81,11 @@ export async function insertRemoteDataBlock(
 }
 
 export async function selectGardenBlock( page: Page, blockName: string ) {
+	await page.waitForFunction( name => {
+		const { data } = ( window as unknown as EditorWindow ).wp ?? {};
+		const store = data?.select( 'core/block-editor' );
+		return store?.getClientIdsWithDescendants().some( id => store.getBlockName( id ) === name );
+	}, blockName );
 	await page.evaluate( name => {
 		const { data } = ( window as unknown as EditorWindow ).wp;
 		const store = data.select( 'core/block-editor' );

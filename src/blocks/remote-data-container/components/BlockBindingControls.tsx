@@ -1,3 +1,4 @@
+import { getBlockType } from '@wordpress/blocks';
 import { Button, CheckboxControl, Popover, SelectControl } from '@wordpress/components';
 import { useEffect, useId, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -13,19 +14,57 @@ import {
 } from '@/blocks/remote-data-container/config/constants';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
 import { BLOCK_BINDING_SOURCE } from '@/config/constants';
-import { getBindingTargetType } from '@/utils/block-binding-value';
 import { getBlockDataSourceType } from '@/utils/localized-block-data';
 
-/** Schema compatibility determines eligibility; semantic types are suggestions only. */
+const URL_FIELD_TYPES = [ ...BUTTON_URL_FIELD_TYPES, ...IMAGE_URL_FIELD_TYPES, 'url' ];
+// Match Core's default wp_kses_uri_attributes() list used by WP_HTML_Tag_Processor.
+const URL_HTML_ATTRIBUTES = [
+	'action',
+	'archive',
+	'background',
+	'cite',
+	'classid',
+	'codebase',
+	'data',
+	'formaction',
+	'href',
+	'icon',
+	'longdesc',
+	'manifest',
+	'poster',
+	'profile',
+	'src',
+	'usemap',
+	'xmlns',
+];
+
+function isUrlBindingTarget(
+	target: string,
+	schema?: { source?: string; attribute?: string }
+): boolean {
+	// Prefer the HTML source over names like `displayUrl` on textual attributes.
+	if ( schema?.source ) {
+		return (
+			schema.source === 'attribute' &&
+			URL_HTML_ATTRIBUTES.includes( schema.attribute?.toLowerCase() ?? '' )
+		);
+	}
+	return (
+		/(?:^|[_-])(?:url|href|src)$/i.test( target ) || /(?:Url|URL|Href|HREF|Src|SRC)$/.test( target )
+	);
+}
+
+/** URL controls require semantic URL fields, while text controls accept compatible scalar fields. */
 export function getBindingFieldTypes(
 	blockName: string,
 	target: string,
-	targetType?: string
+	schema = getBlockType( blockName )?.attributes?.[ target ]
 ): string[] {
 	// Markup belongs to Remote HTML's isolated renderer, never generic text attributes.
 	if ( blockName === 'remote-data-blocks/remote-html' && target === 'content' ) {
 		return HTML_FIELD_TYPES;
 	}
+	const targetType = schema?.type;
 	if ( targetType === 'number' || targetType === 'integer' ) {
 		return targetType === 'integer' ? [ 'integer' ] : [ 'number', 'integer' ];
 	}
@@ -33,16 +72,18 @@ export function getBindingFieldTypes(
 		return [ 'boolean' ];
 	}
 	if ( targetType === 'string' || targetType === 'rich-text' ) {
-		return [
-			...TEXT_FIELD_TYPES,
-			'button_text',
-			'button_url',
-			'image_alt',
-			'image_url',
-			'id',
-			'url',
-			'uuid',
-		];
+		if ( target === 'url' ) {
+			if ( blockName === 'core/button' ) {
+				return BUTTON_URL_FIELD_TYPES;
+			}
+			if ( blockName === 'core/image' ) {
+				return IMAGE_URL_FIELD_TYPES;
+			}
+		}
+		if ( isUrlBindingTarget( target, schema ) ) {
+			return URL_FIELD_TYPES;
+		}
+		return [ ...TEXT_FIELD_TYPES, 'button_text', 'image_alt', 'id', 'uuid', ...URL_FIELD_TYPES ];
 	}
 	return [];
 }
@@ -342,7 +383,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 					const replacesOtherSource =
 						Boolean( binding ) && binding?.source !== BLOCK_BINDING_SOURCE;
 					const fieldTypes = supportedAttributes.includes( target )
-						? getBindingFieldTypes( blockName, target, getBindingTargetType( blockName, target ) )
+						? getBindingFieldTypes( blockName, target )
 						: [];
 					const hasChoices =
 						Boolean( currentField ) ||

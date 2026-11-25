@@ -55,6 +55,12 @@ Static blocks need a supported `source` and selector that match their saved HTML
 
 Field choices follow the target schema. Text attributes retain text formatting; numeric and boolean attributes retain their scalar types, including `0` and `false`. Invalid numeric conversions are not silently converted to zero. Number/integer fields are appropriate for attachment IDs; arbitrary string identifiers are not WordPress media IDs.
 
-Semantic field types guide the choice without restricting it. Button-link fields appear under **Suggested fields** for a button URL, while other schema-compatible fields appear under **Other compatible fields**. When there are no suggestions, all usable fields appear under **Compatible fields**. For example, the bundled Conference Event’s plain Title field can supply button text. A URL stored as a plain string can supply a link; choose a field whose value actually contains the URL you want, since this does not turn arbitrary text into a destination. Existing bindings keep their saved format and values, including fields that are no longer available; those remain visible under **Current binding** so they can be changed or removed. **Show label** remains scoped to paragraph and heading content; it is not added to URLs, boolean/number attributes or raw HTML.
+Text controls can show **Suggested fields** alongside other compatible fields. For example, the bundled Conference Event’s plain Title field can supply button text. **Show label** is available for paragraph and heading content.
+
+New URL bindings require a field declared with a URL type. Use `button_url` for a Button’s URL and `image_url` for an Image’s URL. Other URL controls accept `url`, `button_url`, and `image_url`. For custom blocks, the chooser checks the HTML source attribute against WordPress Core’s default URI attribute list, which includes `href`, `src`, and `usemap`. When an attribute has no source declaration, a name such as `url` or `linkUrl` identifies it as a URL.
+
+Saved plain-string URL bindings remain visible under **Current binding**, where you can inspect, replace, or remove them. To migrate, add a field with the appropriate URL type to the query output schema and map it to the same source path. Verify that the source returns the intended URLs before choosing the new field and clicking **Apply**. Adding a separate field preserves plain-text mappings that also use the original field.
+
+WordPress Core escapes recognized URI attributes when rendering static blocks. Dynamic block render callbacks handle escaping for their own output.
 
 Nested objects and arrays are not bindable through these scalar controls. HTML and Markdown belong in Remote HTML and its existing isolated rendering path, not in generic inline text fields.
