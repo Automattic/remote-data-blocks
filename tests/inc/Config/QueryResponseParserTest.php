@@ -159,6 +159,35 @@ final class QueryResponseParserTest extends TestCase {
 		$this->assertEquals( '$1,234.56', $result[0]['result']['formattedPrice']['value'] );
 	}
 
+	public function test_numeric_strings_keep_display_and_callback_formatting(): void {
+		$data = [
+			'amount' => '0012.00',
+			'invalid' => 'not available',
+			'count' => '12 items',
+			'enabled' => 'false',
+		];
+		$schema = [
+			'type' => [
+				'amount' => [ 'type' => 'number' ],
+				'formatted' => [
+					'path' => '$.amount',
+					'type' => 'number',
+					'format' => fn ( $value ) => 'Amount: ' . $value,
+				],
+				'invalid' => [ 'type' => 'number' ],
+				'count' => [ 'type' => 'integer' ],
+				'enabled' => [ 'type' => 'boolean' ],
+			],
+		];
+		$result = $this->assertSingleResult( $this->parser->parse( $data, $schema ) );
+
+		$this->assertSame( '0012.00', $result['result']['amount']['value'] );
+		$this->assertSame( 'Amount: 0012.00', $result['result']['formatted']['value'] );
+		$this->assertSame( 'not available', $result['result']['invalid']['value'] );
+		$this->assertSame( 12, $result['result']['count']['value'] );
+		$this->assertTrue( $result['result']['enabled']['value'] );
+	}
+
 	public function test_non_collection_result(): void {
 		$data = [
 			'product' => [

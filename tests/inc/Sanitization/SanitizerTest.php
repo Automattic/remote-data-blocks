@@ -496,27 +496,27 @@ class SanitizerTest extends TestCase {
 
 	public static function provideSanitizableNumbers(): array {
 		return [
-			[ '25', 25.0 ],
-			[ 25, 25.0 ],
-			[ '3.14', 3.14 ],
+			[ '25', '25' ],
+			[ 25, 25 ],
+			[ '3.1400', '3.1400' ],
 			[ 3.14, 3.14 ],
-			[ '-1.5', -1.5 ],
-			[ '1e3', 1000.0 ],
-			[ '0', 0.0 ],
-			[ null, 0.0 ],
-			[ false, 0.0 ],
-			[ true, 1.0 ],
-			[ [], 0.0 ],
-			[ [ '2.5', '9' ], 2.5 ],
-			[ 'not a number', 0.0 ],
-			[ self::UNSAFE_MARKUP, 0.0 ],
+			[ '-1.5', '-1.5' ],
+			[ '1e3', '1e3' ],
+			[ '0', '0' ],
+			[ null, null ],
+			[ false, false ],
+			[ true, true ],
+			[ [], null ],
+			[ [ '2.5', '9' ], '2.5' ],
+			[ 'not a number', 'not a number' ],
+			[ self::UNSAFE_MARKUP, 'Name' ],
 		];
 	}
 
 	/**
 	 * @dataProvider provideSanitizableNumbers
 	 */
-	public function test_sanitize_number( mixed $value, float $expected ): void {
+	public function test_sanitize_number( mixed $value, mixed $expected ): void {
 		$schema = Types::object( [
 			'price' => Types::number(),
 		] );

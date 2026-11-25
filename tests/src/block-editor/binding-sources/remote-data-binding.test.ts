@@ -126,6 +126,39 @@ describe( 'editor binding output and previews', () => {
 			} )
 		).toEqual( { content: '' } );
 	} );
+	it.each( [ {}, { content: null } ] )(
+		'uses saved rich text when a successful result has missing text %j',
+		row => {
+			const incomplete = {
+				[ REMOTE_DATA_CONTEXT_KEY ]: { results: createRemoteDataResults( [ row ] ) },
+			};
+			expect(
+				getValues( {
+					clientId: 'id',
+					bindings: { content: binding( 'content', { previewIndex: 0 } ) },
+					context: incomplete,
+					select: () => ( {
+						...select(),
+						getBlockAttributes: () => ( { content: 'Saved <em>copy</em>' } ),
+					} ),
+				} )
+			).toEqual( { content: 'Saved <em>copy</em>' } );
+		}
+	);
+	it( 'uses an intentional empty result instead of saved text', () => {
+		expect(
+			getValues( {
+				clientId: 'id',
+				bindings: { content: binding( 'content', { previewIndex: 0 } ) },
+				context: {
+					[ REMOTE_DATA_CONTEXT_KEY ]: {
+						results: createRemoteDataResults( [ { content: '' } ] ),
+					},
+				},
+				select: () => ( { ...select(), getBlockAttributes: () => ( { content: 'Saved copy' } ) } ),
+			} )
+		).toEqual( { content: '' } );
+	} );
 	it( 'retains unknown-target legacy strings and omits nonpreview values without results', () => {
 		expect(
 			getValues( {

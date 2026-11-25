@@ -398,7 +398,10 @@ class BlockBindings {
 	}
 
 	private static function get_block_fallback_content( string $field_name, array $block_attributes, string $attribute_name, array $serialized_results = [], int $result_index = 0, ?string $target_type = null ): string|int|float|bool|null {
-		$fallback_content = $serialized_results[ $result_index ]['result'][ $field_name ] ?? null;
+		$saved_result = $serialized_results[ $result_index ] ?? [];
+		// Releases before the bulk-selection format stored flat result rows.
+		$saved_fields = is_array( $saved_result['result'] ?? null ) ? $saved_result['result'] : $saved_result;
+		$fallback_content = $saved_fields[ $field_name ] ?? null;
 		// Current saved results contain field descriptors; older callers may
 		// still provide a primitive. Do not discard false or zero when unwrapping.
 		if ( is_array( $fallback_content ) && array_key_exists( 'value', $fallback_content ) ) {

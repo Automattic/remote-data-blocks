@@ -5,6 +5,7 @@ namespace RemoteDataBlocks\Editor\DataBinding;
 use PHPUnit\Framework\TestCase;
 use Mockery;
 use RemoteDataBlocks\Config\Query\HttpQueryInterface;
+use RemoteDataBlocks\Config\QueryRunner\QueryResponseParser;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\Editor\DataBinding\BlockBindings;
@@ -525,6 +526,35 @@ class BlockBindingsTest extends TestCase {
 		], $block, 'value' ) );
 	}
 
+	/**
+	 * @dataProvider parsed_number_target_provider
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	public function test_get_value_validates_parsed_numbers_at_the_target( string $raw_value, string $target_type, string|float $expected ): void {
+		$value = ( new QueryResponseParser() )->parse( [ 'amount' => $raw_value ], [
+			'path' => '$.amount',
+			'type' => 'number',
+		] );
+		$this->create_mock_config_store( $this->create_mock_block_config( $this->create_mock_query_runner_with_result( $value ) ) );
+		$block = $this->create_mock_bound_block( $target_type );
+		$block->context = $this->create_block_context( [] );
+		/** @psalm-suppress UndefinedPropertyAssignment -- WP_Block exposes read-only magic attributes; this lightweight unit mock supplies them directly. */
+		$block->attributes = [ 'value' => 7.0 ];
+
+		$this->assertSame( $expected, BlockBindings::get_value( [
+			'field' => self::MOCK_OUTPUT_FIELD_NAME,
+		], $block, 'value' ) );
+	}
+
+	public function parsed_number_target_provider(): array {
+		return [
+			'text retains decimals' => [ '0012.00', 'string', '0012.00' ],
+			'number receives numeric value' => [ '0012.00', 'number', 12.0 ],
+			'invalid number uses saved fallback' => [ 'not available', 'number', 7.0 ],
+		];
+	}
+
 	public function scalar_target_provider(): array {
 		return [
 			'number zero' => [ 'number', 0, 0 ],
@@ -645,6 +675,65 @@ class BlockBindingsTest extends TestCase {
 		];
 
 		$this->assertSame( $expected, BlockBindings::get_value( [ 'field' => self::MOCK_OUTPUT_FIELD_NAME ], $block, 'value' ) );
+	}
+
+	/**
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	public function test_get_value_uses_legacy_flat_saved_results_when_query_is_unavailable(): void {
+		$this->create_mock_config_store( null );
+		$block = [
+			'name' => 'core/paragraph',
+			'attributes' => [ 'content' => 'Older attribute content' ],
+			'context' => [
+				BlockBindings::$context_name => [
+					'blockName' => self::MOCK_BLOCK_NAME,
+					'queryInput' => [],
+					'results' => [
+						[ self::MOCK_OUTPUT_FIELD_NAME => 'Saved remote content' ],
+					],
+				],
+			],
+		];
+
+		$this->assertSame( 'Saved remote content', BlockBindings::get_value( [
+			'field' => self::MOCK_OUTPUT_FIELD_NAME,
+		], $block, 'content' ) );
+	}
+
+	/**
+	 * @dataProvider flat_result_field_provider
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
+	public function test_get_value_preserves_flat_rows_with_a_field_named_result( string $field, string $expected ): void {
+		$this->create_mock_config_store( null );
+		$block = [
+			'name' => 'core/paragraph',
+			'attributes' => [ 'content' => 'Older attribute content' ],
+			'context' => [
+				BlockBindings::$context_name => [
+					'blockName' => self::MOCK_BLOCK_NAME,
+					'queryInput' => [],
+					'results' => [
+						[
+							'result' => 'Scalar status',
+							'title' => 'Saved remote title',
+						],
+					],
+				],
+			],
+		];
+
+		$this->assertSame( $expected, BlockBindings::get_value( [ 'field' => $field ], $block, 'content' ) );
+	}
+
+	public function flat_result_field_provider(): array {
+		return [
+			'named result field' => [ 'result', 'Scalar status' ],
+			'sibling field' => [ 'title', 'Saved remote title' ],
+		];
 	}
 
 	public function serialized_scalar_fallback_provider(): array {
