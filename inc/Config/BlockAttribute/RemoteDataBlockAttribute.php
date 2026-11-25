@@ -41,8 +41,8 @@ class RemoteDataBlockAttribute extends ArraySerializable {
 		}
 
 		// Migrate "results" to the new format with UUID and nested result with type.
-		$config['results'] = array_map( function ( array $result ): array {
-			if ( isset( $result['result'] ) && is_array( $result['result'] ) ) {
+		$config['results'] = array_map( static function ( array $result ): array {
+			if ( self::is_result_migrated( $result ) ) {
 				return $result;
 			}
 
@@ -100,5 +100,25 @@ class RemoteDataBlockAttribute extends ArraySerializable {
 		] ) );
 
 		return $config;
+	}
+
+	private static function is_result_migrated( array $row ): bool {
+		if ( ! is_string( $row['uuid'] ?? null ) || ! is_array( $row['result'] ?? null ) ) {
+			return false;
+		}
+
+		// Historical flat rows can also contain user fields named result and uuid.
+		foreach ( $row['result'] as $field ) {
+			if (
+				! is_array( $field ) ||
+				! is_string( $field['name'] ?? null ) ||
+				! is_string( $field['type'] ?? null ) ||
+				! array_key_exists( 'value', $field )
+			) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

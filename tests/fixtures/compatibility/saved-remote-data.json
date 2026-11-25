@@ -136,5 +136,33 @@
       "uuid": "754b3408-1014-4863-b072-b005181ff92f",
       "title": "Saved garden"
     }
+  },
+  {
+    "name": "legacy object-valued result with sibling fields",
+    "reference": "edad404^:src/blocks/remote-data-container/hooks/useRemoteData.ts",
+    "remoteData": {
+      "blockName": "remote-data-blocks/bindings-garden",
+      "queryInput": {
+        "id": "saved-row"
+      },
+      "results": [
+        {
+          "result": {
+            "status": "Open",
+            "count": 0
+          },
+          "uuid": "Record label",
+          "title": "Saved garden"
+        }
+      ]
+    },
+    "values": {
+      "result": {
+        "status": "Open",
+        "count": 0
+      },
+      "uuid": "Record label",
+      "title": "Saved garden"
+    }
   }
 ]
