@@ -1,0 +1,168 @@
+[
+  {
+    "name": "flat results before bulk selection",
+    "reference": "v0.9.0:src/blocks/remote-data-container/hooks/useRemoteData.ts",
+    "remoteData": {
+      "blockName": "remote-data-blocks/bindings-garden",
+      "queryInput": {
+        "id": "saved-row"
+      },
+      "results": [
+        {
+          "title": "Saved garden",
+          "count": 0,
+          "available": false,
+          "empty": ""
+        }
+      ]
+    },
+    "values": {
+      "title": "Saved garden",
+      "count": 0,
+      "available": false,
+      "empty": ""
+    }
+  },
+  {
+    "name": "nested primitive results accepted by the existing client migration",
+    "reference": "v1.0.0:src/utils/remote-data.ts",
+    "clientOnly": true,
+    "remoteData": {
+      "blockName": "remote-data-blocks/bindings-garden",
+      "queryInput": {
+        "id": "saved-row"
+      },
+      "results": [
+        {
+          "result": {
+            "title": "Saved garden",
+            "count": 0,
+            "available": false,
+            "empty": ""
+          }
+        }
+      ]
+    },
+    "values": {
+      "title": "Saved garden",
+      "count": 0,
+      "available": false,
+      "empty": ""
+    }
+  },
+  {
+    "name": "typed descriptors after bulk selection",
+    "reference": "v0.10.0:src/blocks/remote-data-container/hooks/useRemoteData.ts",
+    "remoteData": {
+      "blockName": "remote-data-blocks/bindings-garden",
+      "queryInputs": [
+        {
+          "id": "saved-row"
+        }
+      ],
+      "results": [
+        {
+          "uuid": "10000000-1000-4000-8000-100000000000",
+          "result": {
+            "title": {
+              "name": "title",
+              "type": "string",
+              "value": "Saved garden"
+            },
+            "count": {
+              "name": "count",
+              "type": "integer",
+              "value": 0
+            },
+            "available": {
+              "name": "available",
+              "type": "boolean",
+              "value": false
+            },
+            "empty": {
+              "name": "empty",
+              "type": "string",
+              "value": ""
+            }
+          }
+        }
+      ]
+    },
+    "values": {
+      "title": "Saved garden",
+      "count": 0,
+      "available": false,
+      "empty": ""
+    }
+  },
+  {
+    "name": "legacy scalar field named result",
+    "reference": "v0.9.0:src/blocks/remote-data-container/hooks/useRemoteData.ts",
+    "remoteData": {
+      "blockName": "remote-data-blocks/bindings-garden",
+      "queryInput": {
+        "id": "saved-row"
+      },
+      "results": [
+        {
+          "result": "Saved status",
+          "title": "Saved garden"
+        }
+      ]
+    },
+    "values": {
+      "result": "Saved status",
+      "title": "Saved garden"
+    }
+  },
+  {
+    "name": "legacy scalar fields named result and uuid",
+    "reference": "edad404^:src/blocks/remote-data-container/hooks/useRemoteData.ts",
+    "remoteData": {
+      "blockName": "remote-data-blocks/bindings-garden",
+      "queryInput": {
+        "id": "saved-row"
+      },
+      "results": [
+        {
+          "result": "Saved status",
+          "uuid": "754b3408-1014-4863-b072-b005181ff92f",
+          "title": "Saved garden"
+        }
+      ]
+    },
+    "values": {
+      "result": "Saved status",
+      "uuid": "754b3408-1014-4863-b072-b005181ff92f",
+      "title": "Saved garden"
+    }
+  },
+  {
+    "name": "legacy object-valued result with sibling fields",
+    "reference": "edad404^:src/blocks/remote-data-container/hooks/useRemoteData.ts",
+    "remoteData": {
+      "blockName": "remote-data-blocks/bindings-garden",
+      "queryInput": {
+        "id": "saved-row"
+      },
+      "results": [
+        {
+          "result": {
+            "status": "Open",
+            "count": 0
+          },
+          "uuid": "Record label",
+          "title": "Saved garden"
+        }
+      ]
+    },
+    "values": {
+      "result": {
+        "status": "Open",
+        "count": 0
+      },
+      "uuid": "Record label",
+      "title": "Saved garden"
+    }
+  }
+]

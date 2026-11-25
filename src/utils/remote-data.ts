@@ -1,13 +1,7 @@
-/**
- * Create an array of RemoteDataApiResult objects from an array of plain flat objects.
- */
-function createRemoteDataResult(
-	obj: Record< string, unknown >,
-	uuid: string
-): RemoteDataApiResult {
+function createRemoteDataResult( fields: object, uuid: string ): RemoteDataApiResult {
 	return {
 		result: Object.fromEntries(
-			Object.entries( obj ).map( ( [ key, value ] ) => [
+			Object.entries( fields ).map( ( [ key, value ] ) => [
 				key,
 				{
 					name: key,
@@ -20,10 +14,19 @@ function createRemoteDataResult(
 	};
 }
 
-function isResultMigrated( result: object ): result is RemoteDataApiResult {
+function isResultMigrated( result: object, uuid: unknown ): boolean {
 	return (
-		Object.prototype.hasOwnProperty.call( result, 'result' ) &&
-		Object.prototype.hasOwnProperty.call( result, 'uuid' )
+		( typeof uuid === 'string' || typeof uuid === 'number' ) &&
+		Object.values( result ).every(
+			( field: unknown ) =>
+				typeof field === 'object' &&
+				field !== null &&
+				'name' in field &&
+				typeof field.name === 'string' &&
+				'type' in field &&
+				typeof field.type === 'string' &&
+				Object.prototype.hasOwnProperty.call( field, 'value' )
+		)
 	);
 }
 
@@ -86,14 +89,17 @@ export function migrateRemoteData( remoteData?: RemoteData ): RemoteData | undef
 
 	const { queryInput, results, ...rest } = remoteData;
 
-	const migratedResults = results?.map( ( result, num ) => {
-		const resultValue = result.result ?? {};
-
-		if ( isResultMigrated( result ) ) {
-			return result;
+	const migratedResults = results?.map( ( row, num ) => {
+		const { result, uuid } = row;
+		const resultMap = result !== null && typeof result === 'object' ? result : undefined;
+		if ( resultMap && isResultMigrated( resultMap, uuid ) ) {
+			return row;
 		}
 
-		return createRemoteDataResult( resultValue, `${ num }` );
+		// The legacy primitive wrapper has no siblings alongside its result map.
+		const fields = resultMap && Object.keys( row ).length === 1 ? resultMap : row;
+
+		return createRemoteDataResult( fields, `${ num }` );
 	} );
 
 	return {
