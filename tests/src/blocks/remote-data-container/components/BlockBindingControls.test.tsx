@@ -494,6 +494,39 @@ describe( 'compact binding editor', () => {
 		expect( defaults.removeBinding ).toHaveBeenCalledExactlyOnceWith( 'removedTarget' );
 		expect( defaults.updateBinding ).not.toHaveBeenCalled();
 	} );
+	it( 'warns for default pattern bindings, preserves explicit sources and waits for Apply', () => {
+		const attributes = {
+			metadata: {
+				name: 'Pattern identity',
+				bindings: {
+					__default: { source: 'core/pattern-overrides' } as never,
+					other: { source: BLOCK_BINDING_SOURCE, args: { block: 'test/data', field: 'num' } },
+				},
+			},
+		};
+		render(
+			<BlockBindingControls
+				{ ...defaults }
+				attributes={ attributes }
+				supportedAttributes={ [ 'unexpectedValue', 'other' ] }
+			/>
+		);
+		const trigger = screen.getByRole( 'button', { name: 'Bind Unexpected Value' } );
+		expect( trigger ).toHaveAccessibleDescription( /Managed by another binding/ );
+		fireEvent.click( trigger );
+		expect( screen.getByText( /Applying a remote field replaces it/ ) ).toBeVisible();
+		fireEvent.change( screen.getByRole( 'combobox' ), { target: { value: 'num' } } );
+		fireEvent.click( screen.getByRole( 'button', { name: 'Cancel' } ) );
+		expect( defaults.updateBinding ).not.toHaveBeenCalled();
+		fireEvent.click( trigger );
+		fireEvent.change( screen.getByRole( 'combobox' ), { target: { value: 'num' } } );
+		fireEvent.click( screen.getByRole( 'button', { name: 'Apply' } ) );
+		expect( defaults.updateBinding ).toHaveBeenCalledExactlyOnceWith( 'unexpectedValue', {
+			field: 'num',
+		} );
+		fireEvent.click( screen.getByRole( 'button', { name: 'Change Other binding' } ) );
+		expect( screen.queryByText( /Applying a remote field replaces it/ ) ).toBeNull();
+	} );
 	it( 'only shows the existing label control for bound paragraph content', () => {
 		const { rerender } = render(
 			<BlockBindingControls

@@ -184,6 +184,64 @@ describe( 'withBlockBinding', () => {
 		expect( screen.getByTestId( 'mock-block-edit' ) ).toBeDefined();
 		expect( screen.queryByTestId( 'inspector-controls' ) ).toBeNull();
 	} );
+	it( 'edits default pattern bindings in their definition and hides ineffective writes in instances', () => {
+		const props = {
+			attributes: {
+				metadata: {
+					name: 'Original pattern key',
+					bindings: { __default: { source: 'core/pattern-overrides' } as never },
+				},
+			},
+			context: {
+				[ REMOTE_DATA_CONTEXT_KEY ]: {
+					blockName: 'test/block',
+					results: createResults( [ { field1: 'value1' } ] ),
+				},
+			},
+			name: 'test/block',
+			setAttributes: vi.fn< ( attributes: unknown ) => void >(),
+			clientId: 'id',
+			isSelected: false,
+			className: '',
+		};
+		const { rerender } = render( <WrappedComponent { ...props } /> );
+		expect( screen.getByTestId( 'inspector-controls' ) ).toBeDefined();
+		rerender(
+			<WrappedComponent
+				{ ...props }
+				context={ { ...props.context, [ PATTERN_OVERRIDES_CONTEXT_KEY ]: [] } }
+			/>
+		);
+		expect( screen.queryByTestId( 'inspector-controls' ) ).toBeNull();
+		expect( screen.getByTestId( 'mock-block-edit' ) ).toBeDefined();
+		expect( props.setAttributes ).not.toHaveBeenCalled();
+	} );
+
+	it( 'retains editing for explicit override bindings in an instance', () => {
+		render(
+			<WrappedComponent
+				attributes={ {
+					metadata: {
+						name: 'Original pattern key',
+						bindings: { url: { source: 'core/pattern-overrides' } as never },
+					},
+				} }
+				context={ {
+					[ REMOTE_DATA_CONTEXT_KEY ]: {
+						blockName: 'test/block',
+						results: createResults( [ { field1: 'value1' } ] ),
+					},
+					[ PATTERN_OVERRIDES_CONTEXT_KEY ]: [],
+				} }
+				name="test/block"
+				setAttributes={ vi.fn() }
+				clientId="id"
+				isSelected={ false }
+				className=""
+			/>
+		);
+		expect( screen.getByTestId( 'inspector-controls' ) ).toBeDefined();
+	} );
 	it( 'hides unsupported blocks but keeps existing bindings removable after map removal', () => {
 		support.attributes = [];
 		const remoteData = {
@@ -194,7 +252,7 @@ describe( 'withBlockBinding', () => {
 			attributes: {},
 			context: { [ REMOTE_DATA_CONTEXT_KEY ]: remoteData },
 			name: 'test/block',
-			setAttributes: vi.fn(),
+			setAttributes: vi.fn< ( attributes: unknown ) => void >(),
 			clientId: 'id',
 			isSelected: false,
 			className: '',
@@ -256,5 +314,71 @@ describe( 'withBlockBinding', () => {
 		expect( setAttributes ).toHaveBeenLastCalledWith( {
 			metadata: { custom: 'retained', name: undefined, bindings: { url: foreign } },
 		} );
+	} );
+	it.each( [ 'url', '__default' ] )(
+		'preserves the pattern name and %s sibling through update, removal and serialization',
+		target => {
+			const patternBinding = { source: 'core/pattern-overrides' } as never;
+			const attributes: RemoteDataInnerBlockAttributes = {
+				metadata: { name: 'Original pattern key', bindings: { [ target ]: patternBinding } },
+			};
+			const props = {
+				attributes,
+				context: {
+					[ REMOTE_DATA_CONTEXT_KEY ]: {
+						blockName: 'test/block',
+						results: createResults( [ { field1: 'value1' } ] ),
+					},
+				},
+				name: 'test/block',
+				setAttributes: vi.fn< ( attributes: unknown ) => void >(),
+				clientId: 'id',
+				isSelected: false,
+				className: '',
+			};
+			const { rerender } = render( <WrappedComponent { ...props } /> );
+			fireEvent.click( screen.getByText( 'Bind field' ) );
+			const saved = JSON.parse(
+				JSON.stringify( props.setAttributes.mock.lastCall?.[ 0 ] )
+			) as RemoteDataInnerBlockAttributes;
+			expect( saved.metadata?.name ).toBe( 'Original pattern key' );
+			expect( saved.metadata?.bindings?.[ target ] ).toEqual( patternBinding );
+			expect( saved.metadata?.bindings?.content?.args ).toEqual( {
+				block: 'test/block',
+				field: 'field1',
+				previewIndex: 2,
+			} );
+			rerender( <WrappedComponent { ...props } attributes={ saved } /> );
+			fireEvent.click( screen.getByText( 'Remove field' ) );
+			expect( props.setAttributes ).toHaveBeenLastCalledWith( {
+				metadata: { name: 'Original pattern key', bindings: { [ target ]: patternBinding } },
+			} );
+		}
+	);
+
+	it( 'keeps the existing list-view naming behavior for ordinary blocks', () => {
+		const props = {
+			attributes: { metadata: { name: 'Old name' } },
+			context: {
+				[ REMOTE_DATA_CONTEXT_KEY ]: {
+					blockName: 'test/block',
+					results: createResults( [ { field1: 'value1' } ] ),
+				},
+			},
+			name: 'test/block',
+			setAttributes: vi.fn< ( attributes: unknown ) => void >(),
+			clientId: 'id',
+			isSelected: false,
+			className: '',
+		};
+		render( <WrappedComponent { ...props } /> );
+		fireEvent.click( screen.getByText( 'Bind field' ) );
+		expect(
+			( props.setAttributes.mock.lastCall?.[ 0 ] as RemoteDataInnerBlockAttributes ).metadata?.name
+		).toBe( 'Field 1' );
+		fireEvent.click( screen.getByText( 'Remove field' ) );
+		expect(
+			( props.setAttributes.mock.lastCall?.[ 0 ] as RemoteDataInnerBlockAttributes ).metadata?.name
+		).toBeUndefined();
 	} );
 } );
