@@ -1,13 +1,7 @@
-/**
- * Create an array of RemoteDataApiResult objects from an array of plain flat objects.
- */
-function createRemoteDataResult(
-	obj: Record< string, unknown >,
-	uuid: string
-): RemoteDataApiResult {
+function createRemoteDataResult( fields: object, uuid: string ): RemoteDataApiResult {
 	return {
 		result: Object.fromEntries(
-			Object.entries( obj ).map( ( [ key, value ] ) => [
+			Object.entries( fields ).map( ( [ key, value ] ) => [
 				key,
 				{
 					name: key,
@@ -20,11 +14,9 @@ function createRemoteDataResult(
 	};
 }
 
-function isResultMigrated( result: unknown, uuid: unknown ): boolean {
+function isResultMigrated( result: object, uuid: unknown ): boolean {
 	return (
 		( typeof uuid === 'string' || typeof uuid === 'number' ) &&
-		typeof result === 'object' &&
-		result !== null &&
 		Object.values( result ).every(
 			( field: unknown ) =>
 				typeof field === 'object' &&
@@ -99,16 +91,13 @@ export function migrateRemoteData( remoteData?: RemoteData ): RemoteData | undef
 
 	const migratedResults = results?.map( ( row, num ) => {
 		const { result, uuid } = row;
-		if ( isResultMigrated( result, uuid ) ) {
+		const resultMap = result !== null && typeof result === 'object' ? result : undefined;
+		if ( resultMap && isResultMigrated( resultMap, uuid ) ) {
 			return row;
 		}
 
-		// The legacy primitive wrapper contains only the result map. A flat row can
-		// also have a field named result, alongside other user-defined fields.
-		const fields =
-			typeof result === 'object' && result !== null && Object.keys( row ).length === 1
-				? result
-				: { ...row };
+		// The legacy primitive wrapper has no siblings alongside its result map.
+		const fields = resultMap && Object.keys( row ).length === 1 ? resultMap : row;
 
 		return createRemoteDataResult( fields, `${ num }` );
 	} );
