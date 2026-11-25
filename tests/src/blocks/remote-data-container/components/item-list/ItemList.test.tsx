@@ -144,6 +144,58 @@ describe( 'ItemList', () => {
 		} );
 	} );
 
+	it( 'changes remote page size without requiring local sorting and resets position', async () => {
+		const user = userEvent.setup();
+		const resetPage = vi.fn();
+		const setPage = vi.fn();
+		const setPerPage = vi.fn();
+		render(
+			<ItemListComponent
+				{ ...defaultProps }
+				page={ 2 }
+				perPage={ 10 }
+				resetPage={ resetPage }
+				setPage={ setPage }
+				setPerPage={ setPerPage }
+				supportsPagination
+				supportsPerPage
+				totalPages={ 3 }
+			/>
+		);
+		await user.selectOptions( screen.getByRole( 'combobox', { name: 'Items per page' } ), '20' );
+		expect( resetPage ).toHaveBeenCalledOnce();
+		expect( setPage ).not.toHaveBeenCalled();
+		expect( setPerPage ).toHaveBeenLastCalledWith( 20 );
+	} );
+
+	it( 'keeps the initial remote page size when results arrive after loading', async () => {
+		const user = userEvent.setup();
+		const resetPage = vi.fn();
+		const setPage = vi.fn();
+		const setPerPage = vi.fn();
+		const props = {
+			...defaultProps,
+			resetPage,
+			setPage,
+			setPerPage,
+			supportsPagination: true,
+			supportsPerPage: true,
+			totalPages: 3,
+		};
+		const { rerender } = render( <ItemListComponent { ...props } results={ undefined } loading /> );
+		rerender( <ItemListComponent { ...props } perPage={ 30 } /> );
+		expect( screen.getByRole( 'combobox', { name: 'Items per page' } ) ).toHaveValue( '30' );
+		await user.click( screen.getByRole( 'button', { name: 'Next page' } ) );
+		expect( setPerPage ).toHaveBeenLastCalledWith( 30 );
+		expect( setPage ).toHaveBeenLastCalledWith( 2 );
+		expect( resetPage ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not offer remote page sizes for a source without a per-page variable', () => {
+		render( <ItemListComponent { ...defaultProps } supportsPagination /> );
+		expect( screen.queryByRole( 'combobox', { name: 'Items per page' } ) ).toBeNull();
+	} );
+
 	it( 'should allow selection of a specific item', async () => {
 		const onSelect = vi.fn();
 		const user = userEvent.setup();

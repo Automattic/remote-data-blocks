@@ -169,3 +169,7 @@ add_filter( 'block_bindings_supported_attributes', static function ( array $attr
 add_filter( 'block_bindings_supported_attributes_rdb-bindings-demo/stock-card', static function ( array $attributes ): array {
 	return array_merge( $attributes, [ 'plantCount', 'isAvailable' ] );
 } );
+
+add_action( 'plugins_loaded', static function (): void {
+	require __DIR__ . '/pagination-demo.php';
+} );

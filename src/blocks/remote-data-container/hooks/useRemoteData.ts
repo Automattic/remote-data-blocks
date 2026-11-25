@@ -1,7 +1,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { select } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 
 import { REMOTE_DATA_REST_API_URL } from '@/blocks/remote-data-container/config/constants';
 import { usePaginationVariables } from '@/blocks/remote-data-container/hooks/usePaginationVariables';
@@ -93,6 +93,14 @@ export function useRemoteData( {
 	const [ data, setData ] = useState< RemoteData >();
 	const [ error, setError ] = useState< Error >();
 	const [ loading, setLoading ] = useState< boolean >( false );
+	const latestRequest = useRef( 0 );
+
+	useEffect(
+		() => () => {
+			latestRequest.current += 1;
+		},
+		[ blockName, queryKey ]
+	);
 
 	const resolvedData = externallyManagedRemoteData ?? data;
 	const resolvedUpdater = externallyManagedUpdateRemoteData ?? setData;
@@ -146,7 +154,7 @@ export function useRemoteData( {
 
 	useEffect( () => {
 		if ( shouldClearResolvedData ) {
-			resolvedUpdater( undefined );
+			reset();
 			return;
 		}
 
@@ -180,6 +188,7 @@ export function useRemoteData( {
 	}
 
 	async function fetch( inputs: RemoteDataQueryInput[] ): Promise< void > {
+		const request = ++latestRequest.current;
 		const { getCurrentPostId } = select( editorStore );
 		const postId = getCurrentPostId();
 
@@ -193,7 +202,7 @@ export function useRemoteData( {
 		// Only merge the managed query input if there is a single query input
 		// (representing a collection query).
 		if ( 1 === inputs.length ) {
-			inputs[ 0 ] = { ...inputs[ 0 ], ...managedQueryInput };
+			inputs = [ { ...inputs[ 0 ], ...managedQueryInput } ];
 		}
 
 		const requestData: RemoteDataApiRequest = {
@@ -213,10 +222,12 @@ export function useRemoteData( {
 		setLoading( true );
 
 		const remoteData = await fetchRemoteData( requestData ).catch( ( err: unknown ) => {
-			reset( ensureError( err ) );
+			if ( request === latestRequest.current ) {
+				reset( ensureError( err ) );
+			}
 		} );
 
-		if ( ! remoteData ) {
+		if ( ! remoteData || request !== latestRequest.current ) {
 			return;
 		}
 
@@ -226,6 +237,7 @@ export function useRemoteData( {
 	}
 
 	function reset( err?: Error ): void {
+		latestRequest.current += 1;
 		resolvedUpdater( undefined );
 		setError( err );
 		setLoading( false );

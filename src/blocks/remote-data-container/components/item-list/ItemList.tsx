@@ -1,3 +1,4 @@
+import { SelectControl } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -28,6 +29,7 @@ export interface ItemListProps {
 	setSelectionIds: ( ids: string[] ) => void;
 	supportsSearch: boolean;
 	supportsPagination: boolean;
+	supportsPerPage?: boolean;
 	totalItems?: number;
 	totalPages?: number;
 }
@@ -51,6 +53,7 @@ export function ItemList( props: ItemListProps ) {
 		setSelectionIds,
 		supportsSearch,
 		supportsPagination,
+		supportsPerPage = false,
 		totalItems,
 		totalPages,
 	} = props;
@@ -114,22 +117,26 @@ export function ItemList( props: ItemListProps ) {
 	useEffect( () => {
 		setView( currentView => ( {
 			...currentView,
+			perPage: perPage ?? currentView.perPage,
 			fields: tableFields,
 			mediaField,
 			titleField,
 		} ) );
-	}, [ [ mediaField, titleField, ...tableFields ].join( ';' ) ] );
+	}, [ [ mediaField, titleField, ...tableFields ].join( ';' ), perPage ] );
 
 	function onChangeView( newView: View ) {
 		const newSearchInput = newView.search ?? '';
-		// A new search must start at page one and discard any cursor from the previous query.
-		const nextView = newSearchInput !== searchInput ? { ...newView, page: 1 } : newView;
-		if ( newSearchInput !== searchInput ) {
+		const newPerPage = newView.perPage ?? defaultPerPage;
+		// A new query or page size must discard the previous query's position.
+		const shouldResetPage =
+			newSearchInput !== searchInput || newPerPage !== ( view.perPage ?? defaultPerPage );
+		const nextView = shouldResetPage ? { ...newView, page: 1 } : newView;
+		if ( shouldResetPage ) {
 			resetPage();
 		} else {
 			setPage( nextView.page ?? 1 );
 		}
-		setPerPage( newView.perPage ?? defaultPerPage );
+		setPerPage( newPerPage );
 		setSearchInput( newSearchInput );
 		setView( nextView );
 	}
@@ -168,6 +175,21 @@ export function ItemList( props: ItemListProps ) {
 		<>
 			<DataViews< RemoteDataApiResult >
 				actions={ actions }
+				config={ supportsPagination ? { perPageSizes: [] } : undefined }
+				header={
+					supportsPagination && supportsPerPage ? (
+						<SelectControl
+							label={ __( 'Items per page' ) }
+							value={ String( view.perPage ?? defaultPerPage ) }
+							options={ [ ...new Set( [ defaultPerPage, 10, 20, 50, 100 ] ) ]
+								.sort( ( left, right ) => left - right )
+								.map( size => ( { label: String( size ), value: String( size ) } ) ) }
+							onChange={ size => onChangeView( { ...view, perPage: Number( size ), page: 1 } ) }
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+						/>
+					) : undefined
+				}
 				data={ sortedResults }
 				defaultLayouts={ defaultLayouts }
 				fields={ fields }

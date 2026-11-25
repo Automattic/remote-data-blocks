@@ -356,4 +356,40 @@ describe( 'usePaginationVariables', () => {
 		expect( result.current.totalItems ).toBe( 105 );
 		expect( result.current.totalPages ).toBe( 7 );
 	} );
+	it.each( [ 'PAGE', 'OFFSET', 'CURSOR_SIMPLE' ] as const )(
+		'preserves a batched reset when changing %s page size',
+		type => {
+			const { result } = renderHook( () =>
+				usePaginationVariables( {
+					initialPage: 2,
+					inputVariables: [
+						{ slug: 'cursor', name: 'Cursor', type: 'ui:pagination_cursor', required: false },
+					],
+					paginationData: {
+						type,
+						per_page: 10,
+						total_items: 30,
+						input_variable_targets: {
+							per_page: 'size',
+							...( type === 'PAGE' && { page: 'page' } ),
+							...( type === 'OFFSET' && { offset: 'offset' } ),
+						},
+						input_variables: { next_page: { cursor: '20' }, previous_page: { cursor: '0' } },
+					},
+				} )
+			);
+			act( () => {
+				result.current.resetPage();
+				result.current.setPerPage( 20 );
+			} );
+			expect( result.current.page ).toBe( 1 );
+			expect( result.current.perPage ).toBe( 20 );
+			expect( result.current.paginationQueryInput ).toEqual( {
+				cursor: undefined,
+				size: 20,
+				...( type === 'PAGE' && { page: 1 } ),
+				...( type === 'OFFSET' && { offset: 0 } ),
+			} );
+		}
+	);
 } );

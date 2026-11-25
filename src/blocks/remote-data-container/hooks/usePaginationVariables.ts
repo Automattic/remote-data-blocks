@@ -136,10 +136,10 @@ export function usePaginationVariables( {
 		}
 
 		setPerPage( newPerPage );
-		setPaginationQueryInput( {
-			...paginationQueryInput,
+		setPaginationQueryInput( currentInput => ( {
+			...currentInput,
 			[ perPageVariable ]: newPerPage,
-		} );
+		} ) );
 	}
 
 	return {
