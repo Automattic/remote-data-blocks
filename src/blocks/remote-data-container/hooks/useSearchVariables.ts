@@ -1,3 +1,5 @@
+import { useState } from '@wordpress/element';
+
 import { SEARCH_INPUT_VARIABLE_TYPE } from '@/blocks/remote-data-container/config/constants';
 import { useDebouncedState } from '@/hooks/useDebouncedState';
 
@@ -5,6 +7,7 @@ interface UseSearchVariables {
 	hasSearchInput: boolean;
 	searchInput: string;
 	searchQueryInput: RemoteDataQueryInput;
+	settledSearchInput: string;
 	setSearchInput: ( searchInput: string ) => void;
 	supportsSearch: boolean;
 }
@@ -20,7 +23,8 @@ export function useSearchVariables( {
 	inputVariables,
 	searchInputDelayInMs = 500,
 }: UseSearchVariablesInput ): UseSearchVariables {
-	const [ searchInput, setSearchInput ] = useDebouncedState< string >(
+	const [ searchInput, setDraftSearchInput ] = useState( initialSearchInput );
+	const [ settledSearchInput, setSettledSearchInput ] = useDebouncedState< string >(
 		searchInputDelayInMs,
 		initialSearchInput
 	);
@@ -28,15 +32,22 @@ export function useSearchVariables( {
 	const inputVariable = inputVariables?.find( input => input.type === SEARCH_INPUT_VARIABLE_TYPE );
 	const supportsSearch = Boolean( inputVariable );
 	const searchAllowsEmptyInput = supportsSearch && ! inputVariable?.required;
-	const hasSearchInput = supportsSearch && Boolean( searchInput || searchAllowsEmptyInput );
+	const hasSearchInput = supportsSearch && Boolean( settledSearchInput || searchAllowsEmptyInput );
+
+	function setSearchInput( value: string ): void {
+		setDraftSearchInput( value );
+		// Clearing a required search cancels the request without waiting for the debounce.
+		setSettledSearchInput( value, ! value && ! searchAllowsEmptyInput );
+	}
 
 	return {
 		hasSearchInput,
 		searchInput,
 		searchQueryInput: supportsSearch
-			? { [ inputVariable?.slug ?? '' ]: hasSearchInput ? searchInput : null }
+			? { [ inputVariable?.slug ?? '' ]: hasSearchInput ? settledSearchInput : null }
 			: {},
-		setSearchInput: supportsSearch ? setSearchInput : () => {},
+		settledSearchInput,
+		setSearchInput,
 		supportsSearch,
 	};
 }

@@ -132,11 +132,15 @@ export function useRemoteData( {
 		totalPages,
 		...paginationVariables
 	} = usePaginationVariables( { initialPage, initialPerPage, paginationData, inputVariables } );
-	const { hasSearchInput, searchQueryInput, searchInput, setSearchInput, supportsSearch } =
-		useSearchVariables( {
-			initialSearchInput,
-			inputVariables,
-		} );
+	const {
+		hasSearchInput,
+		searchQueryInput,
+		searchInput,
+		settledSearchInput,
+		setSearchInput: updateSearchInput,
+		supportsSearch,
+	} = useSearchVariables( { initialSearchInput, inputVariables } );
+	const isSearchPending = searchInput !== settledSearchInput;
 	const managedQueryInput = { ...paginationQueryInput, ...searchQueryInput };
 
 	// Search and pagination are "managed" input variables (this hook manages their
@@ -148,12 +152,14 @@ export function useRemoteData( {
 	// If we add additional managed input variables (like filters), we'll need to
 	// include them here.
 	//
-	// We only want to refetch if there was a previous successful fetch.
-	const shouldFetchForManagedVariables = ! error && ( hasResolvedData || hasSearchInput );
-	const shouldClearResolvedData = hasResolvedData && supportsSearch && ! hasSearchInput;
+	// Wait for the search to settle before fetching with its new pagination position.
+	const shouldFetchForManagedVariables =
+		! isSearchPending && ! error && ( hasResolvedData || hasSearchInput );
+	const shouldResetSearch =
+		! isSearchPending && ( hasResolvedData || loading ) && supportsSearch && ! hasSearchInput;
 
 	useEffect( () => {
-		if ( shouldClearResolvedData ) {
+		if ( shouldResetSearch ) {
 			reset();
 			return;
 		}
@@ -163,7 +169,7 @@ export function useRemoteData( {
 		}
 
 		void fetch( resolvedData?.queryInputs ?? [ {} ] );
-	}, [ shouldClearResolvedData, shouldFetchForManagedVariables, page, perPage, searchInput ] );
+	}, [ shouldResetSearch, shouldFetchForManagedVariables, page, perPage, settledSearchInput ] );
 
 	// Separately, some callers request an "optimistic" initial fetch. An example
 	// would be DataViewsModal, which will display an initial list of items to
@@ -243,13 +249,21 @@ export function useRemoteData( {
 		setLoading( false );
 	}
 
+	function setSearchInput( value: string ): void {
+		if ( supportsSearch && value !== searchInput ) {
+			// The previous request is obsolete as soon as the user edits its search term.
+			latestRequest.current += 1;
+			updateSearchInput( value );
+		}
+	}
+
 	return {
 		data: resolvedData,
 		error,
 		fetch,
 		hasNextPage: hasNextPage ?? ( totalPages ? page < totalPages : supportsPagination ),
 		hasPreviousPage: page > 1,
-		loading,
+		loading: loading || isSearchPending,
 		page,
 		perPage,
 		reset,

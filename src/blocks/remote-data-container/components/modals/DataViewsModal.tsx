@@ -21,14 +21,61 @@ interface DataViewsModalProps {
 }
 
 export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
-	const { className, blockName, onSelect, onSelectField, queryKey, renderTrigger, title } = props;
-
-	const blockConfig = getBlockConfig( blockName );
-
-	// Multi-selected items
-	const [ selection, setSelection ] = useState< RemoteDataApiResult[] >( [] );
-
+	const { className, blockName, onSelect, renderTrigger, title } = props;
 	const { close, isOpen, open } = useModalState();
+	const [ selection, setSelection ] = useState< RemoteDataApiResult[] >( [] );
+	const blockConfig = getBlockConfig( blockName );
+	const supportsItemSelection = Boolean( onSelect );
+
+	const modalClassName = [
+		'rdb-dataviews-modal',
+		className,
+		supportsItemSelection ? 'rdb-dataviews-bulk-actions-modal' : null,
+	]
+		.filter( Boolean )
+		.join( ' ' );
+
+	const triggerElement = renderTrigger ? (
+		renderTrigger( { onClick: open } )
+	) : (
+		<Button variant="primary" onClick={ open } __next40pxDefaultSize>
+			{ __( 'Select items' ) }
+		</Button>
+	);
+
+	return (
+		<>
+			{ triggerElement }
+			{ isOpen && (
+				<Modal
+					className={ modalClassName }
+					isFullScreen
+					onRequestClose={ close }
+					title={ blockConfig?.settings?.title ?? title }
+				>
+					<DataViewsModalContent
+						{ ...props }
+						close={ close }
+						selection={ selection }
+						setSelection={ setSelection }
+					/>
+				</Modal>
+			) }
+		</>
+	);
+};
+
+type DataViewsModalContentProps = Pick<
+	DataViewsModalProps,
+	'blockName' | 'onSelect' | 'onSelectField' | 'queryKey'
+> & {
+	close: () => void;
+	selection: RemoteDataApiResult[];
+	setSelection: ( selection: RemoteDataApiResult[] ) => void;
+};
+
+function DataViewsModalContent( props: DataViewsModalContentProps ) {
+	const { blockName, close, onSelect, onSelectField, queryKey, selection, setSelection } = props;
 	const {
 		data,
 		hasNextPage,
@@ -90,81 +137,55 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 		close();
 	}
 
-	const modalClassName = [
-		'rdb-dataviews-modal',
-		className,
-		supportsItemSelection ? 'rdb-dataviews-bulk-actions-modal' : null,
-	]
-		.filter( Boolean )
-		.join( ' ' );
-
-	const triggerElement = renderTrigger ? (
-		renderTrigger( { onClick: open } )
-	) : (
-		<Button variant="primary" onClick={ open } __next40pxDefaultSize>
-			{ __( 'Select items' ) }
-		</Button>
-	);
-
 	return (
 		<>
-			{ triggerElement }
-			{ isOpen && (
-				<Modal
-					className={ modalClassName }
-					isFullScreen
-					onRequestClose={ close }
-					title={ blockConfig?.settings?.title ?? title }
+			<ItemList
+				blockName={ blockName }
+				hasNextPage={ hasNextPage ?? false }
+				loading={ loading }
+				onSelect={ supportsItemSelection ? save : undefined }
+				onSelectField={ onSelectField }
+				page={ page }
+				perPage={ perPage }
+				results={ loading ? undefined : data?.results }
+				resetPage={ resetPage }
+				searchInput={ searchInput }
+				selectionIds={ selectionIds }
+				setPage={ setPage }
+				setPerPage={ setPerPage }
+				setSearchInput={ setSearchInput }
+				setSelectionIds={ setSelectionIds }
+				supportsSearch={ supportsSearch }
+				supportsPagination={ supportsPagination }
+				supportsPerPage={ supportsPerPage }
+				totalItems={ totalItems }
+				totalPages={ totalPages }
+			/>
+			{ supportsItemSelection && ! loading && (
+				<HStack
+					className="rdb-dataviews-bulk-actions-footer__selection-total"
+					justify="flex-end"
+					spacing={ 3 }
 				>
-					<ItemList
-						blockName={ blockName }
-						hasNextPage={ hasNextPage ?? false }
-						loading={ loading }
-						onSelect={ supportsItemSelection ? save : undefined }
-						onSelectField={ onSelectField }
-						page={ page }
-						perPage={ perPage }
-						results={ loading ? undefined : data?.results }
-						resetPage={ resetPage }
-						searchInput={ searchInput }
-						selectionIds={ selectionIds }
-						setPage={ setPage }
-						setPerPage={ setPerPage }
-						setSearchInput={ setSearchInput }
-						setSelectionIds={ setSelectionIds }
-						supportsSearch={ supportsSearch }
-						supportsPagination={ supportsPagination }
-						supportsPerPage={ supportsPerPage }
-						totalItems={ totalItems }
-						totalPages={ totalPages }
-					/>
-					{ supportsItemSelection && ! loading && (
-						<HStack
-							className="rdb-dataviews-bulk-actions-footer__selection-total"
-							justify="flex-end"
-							spacing={ 3 }
-						>
-							<Button
-								disabled={ selection.length === 0 }
-								onClick={ () => setSelectionIds( [] ) }
-								variant="tertiary"
-								isDestructive
-								__next40pxDefaultSize
-							>
-								{ __( 'Clear selection' ) }
-							</Button>
-							<Button
-								disabled={ selection.length === 0 }
-								onClick={ () => save( selection ) }
-								variant="primary"
-								__next40pxDefaultSize
-							>
-								{ __( 'Select items' ) }
-							</Button>
-						</HStack>
-					) }
-				</Modal>
+					<Button
+						disabled={ selection.length === 0 }
+						onClick={ () => setSelection( [] ) }
+						variant="tertiary"
+						isDestructive
+						__next40pxDefaultSize
+					>
+						{ __( 'Clear selection' ) }
+					</Button>
+					<Button
+						disabled={ selection.length === 0 }
+						onClick={ () => save( selection ) }
+						variant="primary"
+						__next40pxDefaultSize
+					>
+						{ __( 'Select items' ) }
+					</Button>
+				</HStack>
 			) }
 		</>
 	);
-};
+}

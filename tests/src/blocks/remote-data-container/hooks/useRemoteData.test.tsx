@@ -6,7 +6,12 @@ import { useRemoteData } from '@/blocks/remote-data-container/hooks/useRemoteDat
 
 const requests = vi.hoisted( () => ( {
 	defer: false,
-	pending: [] as { search: string; resolve: () => void; reject: ( error: Error ) => void }[],
+	pending: [] as {
+		cursor: string;
+		search: string;
+		resolve: () => void;
+		reject: ( error: Error ) => void;
+	}[],
 } ) );
 vi.mock( '@wordpress/editor', () => ( { store: {} } ) );
 vi.mock( '@wordpress/data', () => ( { select: () => ( { getCurrentPostId: () => 1 } ) } ) );
@@ -64,6 +69,7 @@ vi.mock( '@wordpress/api-fetch', () => ( {
 		if ( requests.defer ) {
 			return new Promise( ( resolve, reject ) =>
 				requests.pending.push( {
+					cursor: input.cursor,
 					search: input.search,
 					resolve: () => resolve( response ),
 					reject,
@@ -95,15 +101,17 @@ async function startSearchFromPageTwo() {
 	act( () => hook.result.current.setPage( 2 ) );
 	await waitFor( () => expect( title() ).toBe( 'Tree 11' ) );
 	requests.defer = true;
+	act( () => hook.result.current.setPage( 3 ) );
+	await waitFor( () => expect( requests.pending ).toHaveLength( 1 ) );
 	act( () => {
 		hook.result.current.resetPage();
 		hook.result.current.setSearchInput( 'Herb' );
 	} );
 	await waitFor( () =>
-		expect( requests.pending.some( request => request.search === '' ) ).toBe( true )
-	);
-	await waitFor( () =>
-		expect( requests.pending.some( request => request.search === 'Herb' ) ).toBe( true )
+		expect( requests.pending ).toMatchObject( [
+			{ search: '', cursor: '20' },
+			{ search: 'Herb', cursor: '' },
+		] )
 	);
 	return {
 		...hook,

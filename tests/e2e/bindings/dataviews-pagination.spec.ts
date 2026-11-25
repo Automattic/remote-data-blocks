@@ -48,7 +48,12 @@ for ( const mode of [ 'page', 'offset', 'cursor' ] ) {
 			.getByRole( 'row', { name: /Tree 21/ } )
 			.getByRole( 'checkbox' )
 			.check();
-		await modal.getByRole( 'button', { name: 'Select items', exact: true } ).click();
+		const submit = modal.getByRole( 'button', { name: 'Select items', exact: true } );
+		await submit.press( 'Escape' );
+		await expect( modal ).toBeHidden();
+		await editor.canvas.getByRole( 'button', { name: 'Select items', exact: true } ).click();
+		await expect( submit ).toBeEnabled();
+		await submit.click();
 
 		await expect
 			.poll( () =>

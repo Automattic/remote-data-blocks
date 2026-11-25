@@ -1,4 +1,4 @@
-import { SelectControl } from '@wordpress/components';
+import { SearchControl, SelectControl } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -130,6 +130,9 @@ export function ItemList( props: ItemListProps ) {
 		// A new query or page size must discard the previous query's position.
 		const shouldResetPage =
 			newSearchInput !== searchInput || newPerPage !== ( view.perPage ?? defaultPerPage );
+		if ( loading && ! shouldResetPage && newView.page !== view.page ) {
+			return;
+		}
 		const nextView = shouldResetPage ? { ...newView, page: 1 } : newView;
 		if ( shouldResetPage ) {
 			resetPage();
@@ -177,18 +180,30 @@ export function ItemList( props: ItemListProps ) {
 				actions={ actions }
 				config={ supportsPagination ? { perPageSizes: [] } : undefined }
 				header={
-					supportsPagination && supportsPerPage ? (
-						<SelectControl
-							label={ __( 'Items per page' ) }
-							value={ String( view.perPage ?? defaultPerPage ) }
-							options={ [ ...new Set( [ defaultPerPage, 10, 20, 50, 100 ] ) ]
-								.sort( ( left, right ) => left - right )
-								.map( size => ( { label: String( size ), value: String( size ) } ) ) }
-							onChange={ size => onChangeView( { ...view, perPage: Number( size ), page: 1 } ) }
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-						/>
-					) : undefined
+					<>
+						{ /* Use the remote search debounce so clearing can cancel an active request immediately. */ }
+						{ supportsSearch && (
+							<SearchControl
+								label={ __( 'Search' ) }
+								placeholder={ __( 'Search' ) }
+								value={ view.search ?? '' }
+								onChange={ search => onChangeView( { ...view, search, page: 1 } ) }
+								size="compact"
+							/>
+						) }
+						{ supportsPagination && supportsPerPage && (
+							<SelectControl
+								label={ __( 'Items per page' ) }
+								value={ String( view.perPage ?? defaultPerPage ) }
+								options={ [ ...new Set( [ defaultPerPage, 10, 20, 50, 100 ] ) ]
+									.sort( ( left, right ) => left - right )
+									.map( size => ( { label: String( size ), value: String( size ) } ) ) }
+								onChange={ size => onChangeView( { ...view, perPage: Number( size ), page: 1 } ) }
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+							/>
+						) }
+					</>
 				}
 				data={ sortedResults }
 				defaultLayouts={ defaultLayouts }
@@ -202,7 +217,7 @@ export function ItemList( props: ItemListProps ) {
 					totalItems: totalItems ?? results.length,
 					totalPages: totalPages ?? ( hasNextPage ? page + 1 : Math.max( 1, page ) ),
 				} }
-				search={ supportsSearch }
+				search={ false }
 				selection={ selectionIds }
 				view={ view }
 			/>
