@@ -87,7 +87,8 @@ export function migrateRemoteData( remoteData?: RemoteData ): RemoteData | undef
 	const { queryInput, results, ...rest } = remoteData;
 
 	const migratedResults = results?.map( ( result, num ) => {
-		const resultValue = result.result ?? {};
+		const resultValue =
+			typeof result.result === 'object' && result.result !== null ? result.result : { ...result };
 
 		if ( isResultMigrated( result ) ) {
 			return result;
