@@ -2,6 +2,7 @@
 
 namespace RemoteDataBlocks\Config\QueryRunner;
 
+use Closure;
 use Exception;
 use GuzzleHttp\RequestOptions;
 use RemoteDataBlocks\Config\Query\CacheKeyRequestHeadersAwareInterface;
@@ -10,6 +11,7 @@ use RemoteDataBlocks\Editor\DataBinding\Pagination;
 use RemoteDataBlocks\HttpClient\CacheKeyRequestHeaders;
 use RemoteDataBlocks\HttpClient\HttpClient;
 use RemoteDataBlocks\HttpClient\RdbCacheStrategy;
+use WeakMap;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit();
@@ -24,6 +26,10 @@ class QueryRunner implements QueryRunnerInterface {
 	 * @var array<string, array|WP_Error>
 	 */
 	protected static array $in_memory_cache;
+
+	/** @var WeakMap<HttpQueryInterface, object{entries: array<string, array{request: array, inputs: array}>}>|null */
+	private static ?WeakMap $parsed_caches = null;
+	private static int $next_cache_key = 0;
 
 	protected HttpClient $http_client;
 
@@ -241,14 +247,9 @@ class QueryRunner implements QueryRunnerInterface {
 			return $request_details;
 		}
 
-		// Try to resolve the request from the in-memory cache using a hash of
-		// the query and input. This is not 1:1 with the object caching that is
-		// implemented by HttpClient, but it is good enough to de-duplicate
-		// requests that occur in the same process.
-		//
-		// This avoids redundant post-processing (QueryResponseParser) and
-		// object cache requests.
-		$in_memory_cache_key = sprintf( 'query-runner:%s', md5( wp_json_encode( $request_details ) ) );
+		// Parsed results belong to the query that produced them. HttpClient
+		// separately caches the raw response, which other queries can reuse.
+		$in_memory_cache_key = self::get_parsed_cache_key( $query, $request_details, $input_variables );
 		$cached_result = $this->cache_get( $in_memory_cache_key );
 
 		if ( null !== $cached_result ) {
@@ -303,6 +304,40 @@ class QueryRunner implements QueryRunnerInterface {
 		];
 
 		return $this->cache_save( $in_memory_cache_key, $result );
+	}
+
+	private static function get_parsed_cache_key( HttpQueryInterface $query, array $request_details, array $input_variables ): string {
+		$caches = self::$parsed_caches ??= new WeakMap();
+		// Keep the string-keyed cache hooks and evict their entries when the
+		// query's weak map value is released.
+		$cache = $caches[ $query ] ??= new class(static function ( array $keys ): void {
+			foreach ( $keys as $key ) {
+				unset( self::$in_memory_cache[ $key ] );
+			}
+		}) {
+			/** @var array<string, array{request: array, inputs: array}> */
+			public array $entries = [];
+
+			public function __construct( private Closure $evict ) {}
+
+			public function __destruct() {
+				( $this->evict )( array_keys( $this->entries ) );
+			}
+		};
+		foreach ( $cache->entries as $key => $entry ) {
+			if ( $entry['request'] === $request_details && $entry['inputs'] === $input_variables ) {
+				return $key;
+			}
+		}
+
+		// Compare request details and inputs in memory to avoid serializing
+		// credentials or callbacks. The counter never reuses a released query's key.
+		$key = sprintf( 'query-runner:%d', ++self::$next_cache_key );
+		$cache->entries[ $key ] = [
+			'request' => $request_details,
+			'inputs' => $input_variables,
+		];
+		return $key;
 	}
 
 	/**
