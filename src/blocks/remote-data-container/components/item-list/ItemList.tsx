@@ -159,9 +159,8 @@ export function ItemList( props: ItemListProps ) {
 
 	const chooseItemAction = {
 		id: 'choose',
-		icon: <>{ __( 'Choose' ) }</>,
 		isPrimary: true,
-		label: '',
+		label: __( 'Choose' ),
 		callback: ( items: RemoteDataApiResult[] ) => {
 			onSelect?.( items );
 		},
