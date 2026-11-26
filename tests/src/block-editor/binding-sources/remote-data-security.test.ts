@@ -33,7 +33,7 @@ function resolve(
 		bindings: { [ target ]: binding( target, args ) },
 		context: { [ REMOTE_DATA_CONTEXT_KEY ]: { results: createRemoteDataResults( [ fields ] ) } },
 		select: () => ( {
-			getBlockName: () => 'core/paragraph',
+			getBlockName: () => ( target === 'url' ? 'core/navigation-link' : 'core/paragraph' ),
 			getPreviewIndex: () => 0,
 			getBlockAttributes: () => ( { content: savedContent, url: '/saved' } ),
 		} ),

@@ -142,7 +142,12 @@ export function sanitizeBindingValue(
 			? null
 			: value;
 	}
-	if ( ! schema?.source && /(?:url|href|src)$/i.test( target ) && ! isAllowedURL( value ) ) {
+	// Core navigation blocks use a URL without an HTML attribute source.
+	const isNavigationURL =
+		! schema?.source &&
+		target === 'url' &&
+		( blockName === 'core/navigation-link' || blockName === 'core/navigation-submenu' );
+	if ( isNavigationURL && ! isAllowedURL( value ) ) {
 		return null;
 	}
 	const isMarkup =

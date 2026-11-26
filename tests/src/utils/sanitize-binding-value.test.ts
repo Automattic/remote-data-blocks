@@ -17,6 +17,7 @@ const attributes = vi.hoisted( () => ( {
 	statusUrl: { type: 'string', source: 'text' },
 	resource: { type: 'string', source: 'attribute', attribute: 'data-resource' },
 	url: { type: 'string' },
+	summaryUrl: { type: 'string' },
 	id: { type: 'integer' },
 } ) );
 vi.mock( '@wordpress/blocks', () => ( { getBlockType: () => ( { attributes } ) } ) );
@@ -121,7 +122,8 @@ describe( 'editor binding sanitization', () => {
 	} );
 	it( 'rejects unsafe target URLs and preserves query strings without HTML encoding', () => {
 		expect( sanitizeBindingValue( 'java\nscript:unsafe()', 'test/block', 'link' ) ).toBeNull();
-		expect( sanitizeBindingValue( 'data:text/html,unsafe', 'test/block', 'url' ) ).toBeNull();
+		expect( sanitizeBindingValue( 'Status: Ready', 'core/navigation-link', 'url' ) ).toBeNull();
+		expect( sanitizeBindingValue( 'Status: Ready', 'core/navigation-submenu', 'url' ) ).toBeNull();
 		const url = 'https://example.com/?a=1&b=2';
 		expect( sanitizeBindingValue( url, 'test/block', 'link' ) ).toBe( url );
 	} );
@@ -164,6 +166,13 @@ describe( 'editor binding sanitization', () => {
 			embed
 		);
 	} );
+	it( 'preserves prose in custom attributes without an HTML source', () => {
+		expect( sanitizeBindingValue( 'Status: Ready', 'test/block', 'summaryUrl' ) ).toBe(
+			'Status: Ready'
+		);
+		expect( sanitizeBindingValue( 'Status: Ready', 'test/block', 'url' ) ).toBe( 'Status: Ready' );
+	} );
+
 	it( 'preserves prose in HTML- and text-sourced attributes with URL-like names', () => {
 		expect( sanitizeBindingValue( 'Status: <em>Ready</em>', 'test/block', 'displayUrl' ) ).toBe(
 			'Status: <em>Ready</em>'
