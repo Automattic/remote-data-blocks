@@ -12,7 +12,7 @@ import {
 	TEXT_FIELD_TYPES,
 } from '@/blocks/remote-data-container/config/constants';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
-import { BLOCK_BINDING_SOURCE } from '@/config/constants';
+import { BLOCK_BINDING_SOURCE, PATTERN_OVERRIDES_BINDING_SOURCE } from '@/config/constants';
 import { getBindingTargetType } from '@/utils/block-binding-value';
 import { getBlockDataSourceType } from '@/utils/localized-block-data';
 
@@ -214,6 +214,16 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 			),
 		] ),
 	];
+	function getBinding( target: string ) {
+		return (
+			bindings[ target ] ??
+			( supportedAttributes.includes( target ) &&
+			bindings.__default?.source === PATTERN_OVERRIDES_BINDING_SOURCE
+				? bindings.__default
+				: undefined )
+		);
+	}
+
 	const hasLabelControl =
 		[ 'core/paragraph', 'core/heading' ].includes( blockName ) && Boolean( contentField );
 
@@ -254,7 +264,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 		<>
 			<div className="rdb-binding-rows">
 				{ targets.map( target => {
-					const binding = bindings[ target ];
+					const binding = getBinding( target );
 					const isRemoteBinding = binding?.source === BLOCK_BINDING_SOURCE;
 					const field = isRemoteBinding ? binding.args.field : '';
 					const label = getAttributeLabel( blockName, target );
@@ -337,7 +347,7 @@ export function BlockBindingControls( props: BlockBindingControlsProps ) {
 				isSelected &&
 				( () => {
 					const { target, field, anchor } = chooser;
-					const binding = bindings[ target ];
+					const binding = getBinding( target );
 					const currentField = binding?.source === BLOCK_BINDING_SOURCE ? binding.args.field : '';
 					const replacesOtherSource =
 						Boolean( binding ) && binding?.source !== BLOCK_BINDING_SOURCE;

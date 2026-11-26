@@ -44,6 +44,11 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 		supportedAttributes,
 	} = props;
 	const existingBindings = attributes.metadata?.bindings ?? {};
+	// Pattern instances use this name to look up their saved overrides.
+	const hasPatternBinding = Object.values( existingBindings ).some(
+		binding => binding.source === PATTERN_OVERRIDES_BINDING_SOURCE
+	);
+	const existingName = attributes.metadata?.name;
 
 	function removeBinding( target: string ) {
 		const { [ target ]: _remove, ...newBindings } = existingBindings;
@@ -51,7 +56,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 			metadata: {
 				...attributes.metadata,
 				bindings: newBindings,
-				name: undefined,
+				name: hasPatternBinding ? existingName : undefined,
 			},
 		} );
 	}
@@ -71,7 +76,7 @@ function BoundBlockEdit( props: BoundBlockEditProps ) {
 						},
 					},
 				},
-				name: availableBindings[ args.field ]?.name, // Changes block name in list view.
+				name: hasPatternBinding ? existingName : availableBindings[ args.field ]?.name,
 			},
 		} );
 	}
@@ -121,20 +126,8 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 			return <BlockEdit { ...props } />;
 		}
 
-		// Synced pattern overrides are provided via context and the value can be:
-		//
-		// - undefined (block is not in a synced pattern)
-		// - an empty array (block is in a synced pattern, but no overrides are applied)
-		// - an object defining the applied overrides
-		//
-		// This gives no indication of whether overrides are enabled or not. For
-		// that, we need to check the block's metadata bindings for the pattern
-		// overrides binding source.
-		//
-		// This seems likely to change, so the code here may need maintenance. For
-		// our purposes, though, we just want to know whether the block is in a
-		// synced pattern and whether overrides are enabled. Trying to update
-		// a synced block without overrides enabled is useless and can cause issues.
+		// A pattern instance supplies context even when no override values are set.
+		// Core rejects metadata writes inside instances using a default override.
 
 		const patternOverrides = context[ PATTERN_OVERRIDES_CONTEXT_KEY ] as string[] | undefined;
 		const isInSyncedPattern = Boolean( patternOverrides );
@@ -148,7 +141,11 @@ export const withBlockBinding = createHigherOrderComponent( BlockEdit => {
 		}
 
 		// If the block is not writable, render it as usual.
-		if ( isInSyncedPattern && ! hasEnabledOverrides ) {
+		if (
+			isInSyncedPattern &&
+			( ! hasEnabledOverrides ||
+				attributes.metadata?.bindings?.__default?.source === PATTERN_OVERRIDES_BINDING_SOURCE )
+		) {
 			return <BlockEdit { ...props } attributes={ attributes } />;
 		}
 
