@@ -131,6 +131,7 @@
   "dependencies": {
     "@automattic/calypso-analytics": "^1.1.5",
     "@wordpress/dataviews": "^22.1.0",
+    "dompurify": "3.5.0",
     "react-syntax-highlighter": "^16.1.2"
   }
 }

@@ -41,6 +41,36 @@ class BlockRegistration {
 		Assets::enqueue_build_asset( 'remote-data-blocks-dataviews', 'dataviews' );
 		Assets::enqueue_build_asset( 'remote-data-blocks-store', 'store' );
 		Assets::enqueue_build_asset( 'remote-data-blocks-block-editor', 'block-editor', [ 'remote-data-blocks-dataviews', 'remote-data-blocks-store' ] );
+
+		$attributes = array_map(
+			static fn ( array|bool $rules ): array => is_array( $rules ) ? array_keys( array_filter( $rules, static fn ( $rule ) => true === $rule ) ) : [],
+			wp_kses_allowed_html( 'post' )
+		);
+
+		// Only inline formatting properties are needed in the editor. Respect Core's CSS policy.
+		$style_properties = [
+			'background-color',
+			'color',
+			'font-family',
+			'font-size',
+			'font-style',
+			'font-weight',
+			'height',
+			'letter-spacing',
+			'line-height',
+			'text-align',
+			'text-decoration',
+			'vertical-align',
+			'white-space',
+			'width',
+		];
+		$styles = safecss_filter_attr( implode( ':inherit;', $style_properties ) . ':inherit' );
+		wp_localize_script( 'remote-data-blocks-block-editor', 'REMOTE_DATA_BLOCKS_EDITOR_HTML', [
+			'attributes' => $attributes,
+			'protocols' => array_values( wp_allowed_protocols() ),
+			'uriAttributes' => array_values( wp_kses_uri_attributes() ),
+			'styleProperties' => explode( ';', str_replace( ':inherit', '', $styles ) ),
+		] );
 	}
 
 	public static function register_helper_blocks(): void {
