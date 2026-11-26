@@ -37,6 +37,9 @@ class RemoteHtmlBlockTest extends RDBTestCase {
 				<!-- /wp:heading -->
 
 				<!-- wp:remote-data-blocks/remote-html {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":{"field":"content","block":"remote-data-blocks/test-html-render"}}},"name":"Content"}} /-->
+				<!-- wp:remote-data-blocks/remote-html {"metadata":{"bindings":{"content":{"source":"test/foreign","args":{"field":"content","block":"remote-data-blocks/test-html-render"}}}}} -->
+				<p id="foreign-fallback">Authored <em>fallback</em></p>
+				<!-- /wp:remote-data-blocks/remote-html -->
 			</div>
 			<!-- /wp:remote-data-blocks/test-html-render -->
 		');
@@ -45,6 +48,16 @@ class RemoteHtmlBlockTest extends RDBTestCase {
 
 		$this->assertDomIdHasHtmlContent( $dom, 'field-title', 'My product' );
 		$this->assertDomIdHasHtmlContent( $dom, 'rendered-html', 'A <strong>one of a kind</strong> product!' );
+		$this->assertSame( 1, substr_count( $result_html, 'id="rendered-html"' ) );
+		$this->assertDomIdHasHtmlContent( $dom, 'foreign-fallback', 'Authored <em>fallback</em>' );
+	}
+
+	public function testRemoteHtmlBlockRendersFallbackWhenBindingArgumentsAreInvalid(): void {
+		$html = do_blocks(
+			'<!-- wp:remote-data-blocks/remote-html {"metadata":{"bindings":{"content":{"source":"remote-data/binding","args":"saved field name"}}}} --><p id="invalid-binding-fallback">Authored <em>fallback</em></p><!-- /wp:remote-data-blocks/remote-html -->'
+		);
+
+		$this->assertDomIdHasHtmlContent( $this->load_html( $html ), 'invalid-binding-fallback', 'Authored <em>fallback</em>' );
 	}
 
 	public function testRemoteHtmlBlockRendersFallbackContent(): void {

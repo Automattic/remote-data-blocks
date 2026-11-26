@@ -10,21 +10,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$source_args = $block->attributes['metadata']['bindings']['content']['args'] ?? [];
+$binding = $block->attributes['metadata']['bindings']['content'] ?? [];
+$args = $binding['args'] ?? null;
 
 ?>
 
 <div <?php echo wp_kses_data( get_block_wrapper_attributes() ); ?>>
 	<?php
-	$binding_value = BlockBindings::get_value( $source_args, $block, 'content' );
-
-	if ( null === $binding_value ) {
-		// Similar to actual data bindings, if the binding value is null,
-		// we'll use the default stored in the block markup.
-
-		$binding_value = $content;
+	$binding_value = null;
+	if ( ( $binding['source'] ?? null ) === BlockBindings::$binding_source && is_array( $args ) && is_string( $args['field'] ?? null ) ) {
+		$binding_value = BlockBindings::get_value( $args, $block, 'content' );
 	}
-
-	echo wp_kses_post( $binding_value );
+	echo wp_kses_post( $binding_value ?? $content );
 	?>
 </div>
