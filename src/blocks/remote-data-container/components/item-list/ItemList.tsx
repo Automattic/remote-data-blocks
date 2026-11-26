@@ -1,3 +1,4 @@
+import { SearchControl, SelectControl } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -28,6 +29,7 @@ export interface ItemListProps {
 	setSelectionIds: ( ids: string[] ) => void;
 	supportsSearch: boolean;
 	supportsPagination: boolean;
+	supportsPerPage?: boolean;
 	totalItems?: number;
 	totalPages?: number;
 }
@@ -51,6 +53,7 @@ export function ItemList( props: ItemListProps ) {
 		setSelectionIds,
 		supportsSearch,
 		supportsPagination,
+		supportsPerPage = false,
 		totalItems,
 		totalPages,
 	} = props;
@@ -114,22 +117,29 @@ export function ItemList( props: ItemListProps ) {
 	useEffect( () => {
 		setView( currentView => ( {
 			...currentView,
+			perPage: perPage ?? currentView.perPage,
 			fields: tableFields,
 			mediaField,
 			titleField,
 		} ) );
-	}, [ [ mediaField, titleField, ...tableFields ].join( ';' ) ] );
+	}, [ [ mediaField, titleField, ...tableFields ].join( ';' ), perPage ] );
 
 	function onChangeView( newView: View ) {
 		const newSearchInput = newView.search ?? '';
-		// A new search must start at page one and discard any cursor from the previous query.
-		const nextView = newSearchInput !== searchInput ? { ...newView, page: 1 } : newView;
-		if ( newSearchInput !== searchInput ) {
+		const newPerPage = newView.perPage ?? defaultPerPage;
+		// A new query or page size must discard the previous query's position.
+		const shouldResetPage =
+			newSearchInput !== searchInput || newPerPage !== ( view.perPage ?? defaultPerPage );
+		if ( loading && ! shouldResetPage && newView.page !== view.page ) {
+			return;
+		}
+		const nextView = shouldResetPage ? { ...newView, page: 1 } : newView;
+		if ( shouldResetPage ) {
 			resetPage();
 		} else {
 			setPage( nextView.page ?? 1 );
 		}
-		setPerPage( newView.perPage ?? defaultPerPage );
+		setPerPage( newPerPage );
 		setSearchInput( newSearchInput );
 		setView( nextView );
 	}
@@ -147,27 +157,51 @@ export function ItemList( props: ItemListProps ) {
 		fields
 	);
 
-	const chooseItemAction = {
-		id: 'choose',
-		icon: <>{ __( 'Choose' ) }</>,
-		isPrimary: true,
-		label: '',
-		callback: ( items: RemoteDataApiResult[] ) => {
-			onSelect?.( items );
-		},
-		supportsBulk: true,
-	};
-
-	// Only show the action if onSelect is defined and there are results.
-	let actions: Action< RemoteDataApiResult >[] = [];
-	if ( onSelect && results?.length ) {
-		actions = [ chooseItemAction ];
-	}
+	const actions: Action< RemoteDataApiResult >[] =
+		onSelect && results.length
+			? [
+					{
+						id: 'choose',
+						isPrimary: true,
+						label: __( 'Choose' ),
+						callback: items => onSelect( items ),
+						supportsBulk: true,
+					},
+			  ]
+			: [];
 
 	return (
 		<>
 			<DataViews< RemoteDataApiResult >
 				actions={ actions }
+				config={ supportsPagination ? { perPageSizes: [] } : undefined }
+				header={
+					<>
+						{ /* Use the remote search debounce so clearing can cancel an active request immediately. */ }
+						{ supportsSearch && (
+							<SearchControl
+								label={ __( 'Search' ) }
+								placeholder={ __( 'Search' ) }
+								value={ view.search ?? '' }
+								onChange={ search => onChangeView( { ...view, search, page: 1 } ) }
+								size="compact"
+							/>
+						) }
+						{ supportsPagination && supportsPerPage && (
+							<SelectControl
+								label={ __( 'Items per page' ) }
+								labelPosition="side"
+								size="compact"
+								value={ String( view.perPage ?? defaultPerPage ) }
+								options={ [ ...new Set( [ defaultPerPage, 10, 20, 50, 100 ] ) ]
+									.sort( ( left, right ) => left - right )
+									.map( size => ( { label: String( size ), value: String( size ) } ) ) }
+								onChange={ size => onChangeView( { ...view, perPage: Number( size ), page: 1 } ) }
+								__nextHasNoMarginBottom
+							/>
+						) }
+					</>
+				}
 				data={ sortedResults }
 				defaultLayouts={ defaultLayouts }
 				fields={ fields }
@@ -180,7 +214,7 @@ export function ItemList( props: ItemListProps ) {
 					totalItems: totalItems ?? results.length,
 					totalPages: totalPages ?? ( hasNextPage ? page + 1 : Math.max( 1, page ) ),
 				} }
-				search={ supportsSearch }
+				search={ false }
 				selection={ selectionIds }
 				view={ view }
 			/>

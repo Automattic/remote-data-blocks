@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
@@ -121,27 +121,32 @@ describe( 'ItemList', () => {
 		expect( screen.queryByRole( 'menuitemradio', { name: 'Sort descending' } ) ).toBeNull();
 	} );
 
-	it( 'returns to page one when searching remotely paginated results', async () => {
+	it( 'keeps the initial remote page size when results arrive after loading', async () => {
 		const user = userEvent.setup();
 		const resetPage = vi.fn();
-		const setSearchInput = vi.fn();
-		render(
-			<ItemListComponent
-				{ ...defaultProps }
-				page={ 2 }
-				resetPage={ resetPage }
-				setSearchInput={ setSearchInput }
-				supportsPagination
-				supportsSearch
-				totalPages={ 4 }
-			/>
-		);
+		const setPage = vi.fn();
+		const setPerPage = vi.fn();
+		const props = {
+			...defaultProps,
+			resetPage,
+			setPage,
+			setPerPage,
+			supportsPagination: true,
+			supportsPerPage: true,
+			totalPages: 3,
+		};
+		const { rerender } = render( <ItemListComponent { ...props } results={ undefined } loading /> );
+		rerender( <ItemListComponent { ...props } perPage={ 30 } /> );
+		expect( screen.getByRole( 'combobox', { name: 'Items per page' } ) ).toHaveValue( '30' );
+		await user.click( screen.getByRole( 'button', { name: 'Next page' } ) );
+		expect( setPerPage ).toHaveBeenLastCalledWith( 30 );
+		expect( setPage ).toHaveBeenLastCalledWith( 2 );
+		expect( resetPage ).not.toHaveBeenCalled();
+	} );
 
-		await user.type( screen.getByRole( 'searchbox', { name: 'Search' } ), 'Lunch' );
-		await waitFor( () => {
-			expect( setSearchInput ).toHaveBeenLastCalledWith( 'Lunch' );
-			expect( resetPage ).toHaveBeenCalled();
-		} );
+	it( 'does not offer remote page sizes for a source without a per-page variable', () => {
+		render( <ItemListComponent { ...defaultProps } supportsPagination /> );
+		expect( screen.queryByRole( 'combobox', { name: 'Items per page' } ) ).toBeNull();
 	} );
 
 	it( 'should allow selection of a specific item', async () => {

@@ -21,73 +21,11 @@ interface DataViewsModalProps {
 }
 
 export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
-	const { className, blockName, onSelect, onSelectField, queryKey, renderTrigger, title } = props;
-
-	const blockConfig = getBlockConfig( blockName );
-
-	// Multi-selected items
-	const [ selection, setSelection ] = useState< RemoteDataApiResult[] >( [] );
-
+	const { className, blockName, onSelect, renderTrigger, title } = props;
 	const { close, isOpen, open } = useModalState();
-	const {
-		data,
-		hasNextPage,
-		loading,
-		page,
-		perPage,
-		resetPage,
-		searchInput,
-		setPage,
-		setPerPage,
-		setSearchInput,
-		supportsSearch,
-		supportsPagination,
-		totalItems,
-		totalPages,
-	} = useRemoteData( { blockName, fetchOnMount: true, queryKey } );
-
-	// For selection, DataViews transacts only in IDs, so we provide the UUID from
-	// the API response as a synthetic ID and map them to the full result.
-	// DataViews is only "aware" of the data it is rendering, so we keep track of
-	// selections from previous result pages in the selection state.
-	const selectionIds = selection.map( item => item.uuid );
-	const allIdsFromCurrentPage = data?.results?.map( result => result.uuid ) ?? [];
-
-	// This value indicates whether the modal is being used to select an entire
-	// item / result or just a specific field from the result.
+	const [ selection, setSelection ] = useState< RemoteDataApiResult[] >( [] );
+	const blockConfig = getBlockConfig( blockName );
 	const supportsItemSelection = Boolean( onSelect );
-
-	function setSelectionIds( uuids: string[] ): void {
-		const selectionIdsFromOtherPages = selectionIds.filter(
-			uuid => ! allIdsFromCurrentPage.includes( uuid )
-		);
-		const newSelectionIds = Array.from(
-			new Set< string >( [ ...selectionIdsFromOtherPages, ...uuids ] )
-		);
-		const newSelection = newSelectionIds
-			.map(
-				uuid =>
-					data?.results?.find( result => uuid === result.uuid ) ??
-					selection.find( result => uuid === result.uuid ) ??
-					null
-			)
-			.filter( ( result ): result is RemoteDataApiResult => result !== null );
-		setSelection( newSelection );
-	}
-
-	function save( results: RemoteDataApiResult[] ): void {
-		if ( ! supportsItemSelection || ! results.length ) {
-			return;
-		}
-
-		onSelect?.( createQueryInputsFromRemoteDataResults( results ) );
-		sendTracksEvent( 'add_block', {
-			action: 'select_item',
-			selected_option: 'search_from_list',
-			data_source_type: getBlockDataSourceType( blockName ),
-		} );
-		close();
-	}
 
 	const modalClassName = [
 		'rdb-dataviews-modal',
@@ -115,54 +53,144 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 					onRequestClose={ close }
 					title={ blockConfig?.settings?.title ?? title }
 				>
-					<ItemList
-						blockName={ blockName }
-						hasNextPage={ hasNextPage ?? false }
-						loading={ loading }
-						onSelect={ supportsItemSelection ? save : undefined }
-						onSelectField={ onSelectField }
-						page={ page }
-						perPage={ perPage }
-						results={ loading ? undefined : data?.results }
-						resetPage={ resetPage }
-						searchInput={ searchInput }
-						selectionIds={ selectionIds }
-						setPage={ setPage }
-						setPerPage={ setPerPage }
-						setSearchInput={ setSearchInput }
-						setSelectionIds={ setSelectionIds }
-						supportsSearch={ supportsSearch }
-						supportsPagination={ supportsPagination }
-						totalItems={ totalItems }
-						totalPages={ totalPages }
+					<DataViewsModalContent
+						{ ...props }
+						close={ close }
+						selection={ selection }
+						setSelection={ setSelection }
 					/>
-					{ supportsItemSelection && ! loading && (
-						<HStack
-							className="rdb-dataviews-bulk-actions-footer__selection-total"
-							justify="flex-end"
-							spacing={ 3 }
-						>
-							<Button
-								disabled={ selection.length === 0 }
-								onClick={ () => setSelectionIds( [] ) }
-								variant="tertiary"
-								isDestructive
-								__next40pxDefaultSize
-							>
-								{ __( 'Clear selection' ) }
-							</Button>
-							<Button
-								disabled={ selection.length === 0 }
-								onClick={ () => save( selection ) }
-								variant="primary"
-								__next40pxDefaultSize
-							>
-								{ __( 'Select items' ) }
-							</Button>
-						</HStack>
-					) }
 				</Modal>
 			) }
 		</>
 	);
 };
+
+type DataViewsModalContentProps = Pick<
+	DataViewsModalProps,
+	'blockName' | 'onSelect' | 'onSelectField' | 'queryKey'
+> & {
+	close: () => void;
+	selection: RemoteDataApiResult[];
+	setSelection: ( selection: RemoteDataApiResult[] ) => void;
+};
+
+function getRecordKey( row: RemoteDataApiResult ): string | undefined {
+	const ids = Object.keys( row.result )
+		.sort()
+		.filter( slug => row.result[ slug ]?.type === 'id' );
+	const values = ids.map( slug => row.result[ slug ]?.value );
+	if (
+		! ids.length ||
+		values.some(
+			value => typeof value !== 'number' && ( typeof value !== 'string' || value === '' )
+		)
+	) {
+		return;
+	}
+	return JSON.stringify( ids.map( ( slug, index ) => [ slug, String( values[ index ] ) ] ) );
+}
+
+function getUniqueRecordUuids( rows: RemoteDataApiResult[] ) {
+	const unique = new Map< string, string | null >();
+	for ( const row of rows ) {
+		const key = getRecordKey( row );
+		if ( key !== undefined ) {
+			unique.set( key, unique.has( key ) ? null : row.uuid );
+		}
+	}
+	return unique;
+}
+
+function DataViewsModalContent( props: DataViewsModalContentProps ) {
+	const { blockName, close, onSelect, onSelectField, queryKey, selection, setSelection } = props;
+	const { data, loading, ...listProps } = useRemoteData( {
+		blockName,
+		fetchOnMount: true,
+		queryKey,
+	} );
+
+	const selectionIds = selection.map( item => item.uuid );
+	// A fresh response can give a selected record a new row UUID. Keep the
+	// original UI ID when the configured record ID still matches.
+	let rows = data?.results;
+	if ( rows?.length && selection.length ) {
+		const selectedByRecord = getUniqueRecordUuids( selection );
+		const currentByRecord = getUniqueRecordUuids( rows );
+		rows = rows.map( row => {
+			const key = getRecordKey( row );
+			const uuid =
+				key !== undefined && currentByRecord.get( key ) === row.uuid
+					? selectedByRecord.get( key )
+					: undefined;
+			return uuid ? { ...row, uuid } : row;
+		} );
+	}
+	// Keep selected rows from other pages and replace the selection on this page.
+	function setSelectionIds( ids: string[] ): void {
+		const pageRows = new Map( rows?.map( row => [ row.uuid, row ] ) );
+		const next = new Map(
+			selection.filter( row => ! pageRows.has( row.uuid ) ).map( row => [ row.uuid, row ] )
+		);
+		for ( const id of ids ) {
+			const row = pageRows.get( id );
+			if ( row ) {
+				next.set( id, row );
+			}
+		}
+		setSelection( [ ...next.values() ] );
+	}
+
+	function save( results: RemoteDataApiResult[] ): void {
+		if ( ! onSelect || ! results.length ) {
+			return;
+		}
+
+		onSelect( createQueryInputsFromRemoteDataResults( results ) );
+		sendTracksEvent( 'add_block', {
+			action: 'select_item',
+			selected_option: 'search_from_list',
+			data_source_type: getBlockDataSourceType( blockName ),
+		} );
+		close();
+	}
+
+	return (
+		<>
+			<ItemList
+				{ ...listProps }
+				blockName={ blockName }
+				loading={ loading }
+				onSelect={ onSelect && save }
+				onSelectField={ onSelectField }
+				results={ loading ? undefined : rows }
+				selectionIds={ selectionIds }
+				setSelectionIds={ setSelectionIds }
+			/>
+			{ onSelect && ! loading && (
+				<HStack
+					className="rdb-dataviews-bulk-actions-footer__selection-total"
+					justify="flex-end"
+					spacing={ 3 }
+				>
+					<Button
+						disabled={ selection.length === 0 }
+						onClick={ () => setSelection( [] ) }
+						variant="tertiary"
+						isDestructive
+						__next40pxDefaultSize
+					>
+						{ __( 'Clear selection' ) }
+					</Button>
+					<Button
+						disabled={ selection.length === 0 }
+						onClick={ () => save( selection ) }
+						variant="primary"
+						__next40pxDefaultSize
+					>
+						{ __( 'Select items' ) }
+					</Button>
+				</HStack>
+			) }
+		</>
+	);
+}

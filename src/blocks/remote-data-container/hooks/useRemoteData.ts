@@ -1,7 +1,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { select } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 
 import { REMOTE_DATA_REST_API_URL } from '@/blocks/remote-data-container/config/constants';
 import { usePaginationVariables } from '@/blocks/remote-data-container/hooks/usePaginationVariables';
@@ -93,6 +93,14 @@ export function useRemoteData( {
 	const [ data, setData ] = useState< RemoteData >();
 	const [ error, setError ] = useState< Error >();
 	const [ loading, setLoading ] = useState< boolean >( false );
+	const latestRequest = useRef( 0 );
+
+	useEffect(
+		() => () => {
+			latestRequest.current += 1;
+		},
+		[ blockName, queryKey ]
+	);
 
 	const resolvedData = externallyManagedRemoteData ?? data;
 	const resolvedUpdater = externallyManagedUpdateRemoteData ?? setData;
@@ -124,29 +132,26 @@ export function useRemoteData( {
 		totalPages,
 		...paginationVariables
 	} = usePaginationVariables( { initialPage, initialPerPage, paginationData, inputVariables } );
-	const { hasSearchInput, searchQueryInput, searchInput, setSearchInput, supportsSearch } =
-		useSearchVariables( {
-			initialSearchInput,
-			inputVariables,
-		} );
+	const {
+		hasSearchInput,
+		searchQueryInput,
+		searchInput,
+		settledSearchInput,
+		setSearchInput: updateSearchInput,
+		supportsSearch,
+	} = useSearchVariables( { initialSearchInput, inputVariables } );
+	const isSearchPending = searchInput !== settledSearchInput;
 	const managedQueryInput = { ...paginationQueryInput, ...searchQueryInput };
 
-	// Search and pagination are "managed" input variables (this hook manages their
-	// state), so we should refetch if those variables change. If the query fails,
-	// the resulting error will be returned by this hook if there is valid search
-	// input, then we should consider the query and can be inspected by the caller
-	// to determine if or how to surface it to the user.
-	//
-	// If we add additional managed input variables (like filters), we'll need to
-	// include them here.
-	//
-	// We only want to refetch if there was a previous successful fetch.
-	const shouldFetchForManagedVariables = ! error && ( hasResolvedData || hasSearchInput );
-	const shouldClearResolvedData = hasResolvedData && supportsSearch && ! hasSearchInput;
+	// Wait for the search to settle before fetching with its new pagination position.
+	const shouldFetchForManagedVariables =
+		! isSearchPending && ! error && ( hasResolvedData || hasSearchInput );
+	const shouldResetSearch =
+		! isSearchPending && ( hasResolvedData || loading ) && supportsSearch && ! hasSearchInput;
 
 	useEffect( () => {
-		if ( shouldClearResolvedData ) {
-			resolvedUpdater( undefined );
+		if ( shouldResetSearch ) {
+			reset();
 			return;
 		}
 
@@ -155,18 +160,9 @@ export function useRemoteData( {
 		}
 
 		void fetch( resolvedData?.queryInputs ?? [ {} ] );
-	}, [ shouldClearResolvedData, shouldFetchForManagedVariables, page, perPage, searchInput ] );
+	}, [ shouldResetSearch, shouldFetchForManagedVariables, page, perPage, settledSearchInput ] );
 
-	// Separately, some callers request an "optimistic" initial fetch. An example
-	// would be DataViewsModal, which will display an initial list of items to
-	// choose from if the query supports it. This is implemented in a separate
-	// effect to avoid entangling the logic of initial fetch and refetch.
-	//
-	// This fetch may fail if the query input is invalid or incomplete, but as an
-	// "optimistic" fetch, we don't want to surface that error to the user. So we
-	// do a pre-validation and bail if we see that validation will not pass.
-	//
-	// The dependency array is empty because we only want to run this effect once.
+	// An optimistic first fetch must have valid inputs.
 	useEffect( () => {
 		if ( ! fetchOnMount || ! isQueryInputValid( managedQueryInput, inputVariables ) ) {
 			return;
@@ -180,6 +176,7 @@ export function useRemoteData( {
 	}
 
 	async function fetch( inputs: RemoteDataQueryInput[] ): Promise< void > {
+		const request = ++latestRequest.current;
 		const { getCurrentPostId } = select( editorStore );
 		const postId = getCurrentPostId();
 
@@ -193,7 +190,7 @@ export function useRemoteData( {
 		// Only merge the managed query input if there is a single query input
 		// (representing a collection query).
 		if ( 1 === inputs.length ) {
-			inputs[ 0 ] = { ...inputs[ 0 ], ...managedQueryInput };
+			inputs = [ { ...inputs[ 0 ], ...managedQueryInput } ];
 		}
 
 		const requestData: RemoteDataApiRequest = {
@@ -213,10 +210,12 @@ export function useRemoteData( {
 		setLoading( true );
 
 		const remoteData = await fetchRemoteData( requestData ).catch( ( err: unknown ) => {
-			reset( ensureError( err ) );
+			if ( request === latestRequest.current ) {
+				reset( ensureError( err ) );
+			}
 		} );
 
-		if ( ! remoteData ) {
+		if ( ! remoteData || request !== latestRequest.current ) {
 			return;
 		}
 
@@ -226,9 +225,18 @@ export function useRemoteData( {
 	}
 
 	function reset( err?: Error ): void {
+		latestRequest.current += 1;
 		resolvedUpdater( undefined );
 		setError( err );
 		setLoading( false );
+	}
+
+	function setSearchInput( value: string ): void {
+		if ( supportsSearch && value !== searchInput ) {
+			// The previous request is obsolete as soon as the user edits its search term.
+			latestRequest.current += 1;
+			updateSearchInput( value );
+		}
 	}
 
 	return {
@@ -237,7 +245,7 @@ export function useRemoteData( {
 		fetch,
 		hasNextPage: hasNextPage ?? ( totalPages ? page < totalPages : supportsPagination ),
 		hasPreviousPage: page > 1,
-		loading,
+		loading: loading || isSearchPending,
 		page,
 		perPage,
 		reset,
