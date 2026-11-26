@@ -272,18 +272,6 @@ describe( 'DataViewsModal', () => {
 		expect( lastQueryInput() ).toMatchObject( { page: 1, search: 'Fern' } );
 	} );
 
-	it( 'fetches all rows when an optional search is cleared', async () => {
-		respondWithRows();
-		const { user, modal } = await openModal( false );
-		const search = modal.getByRole( 'searchbox', { name: 'Search' } );
-		expect( await modal.findByText( 'Row 1' ) ).toBeVisible();
-		await user.type( search, 'Herb' );
-		expect( await modal.findByText( 'Herb result' ) ).toBeVisible();
-		await user.clear( search );
-		expect( await modal.findByText( 'Row 1' ) ).toBeVisible();
-		expect( lastQueryInput() ).toMatchObject( { page: 1, search: '' } );
-	} );
-
 	it( 'sends only the requested cursor when navigating backwards', async () => {
 		respondWithCursorRows( 'directional-cursor' );
 		const { modal, user } = await openModal( false, 'directional-cursor' );

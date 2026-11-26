@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
@@ -119,53 +119,6 @@ describe( 'ItemList', () => {
 
 		await user.click( screen.getByRole( 'button', { name: 'Title' } ) );
 		expect( screen.queryByRole( 'menuitemradio', { name: 'Sort descending' } ) ).toBeNull();
-	} );
-
-	it( 'returns to page one when searching remotely paginated results', async () => {
-		const user = userEvent.setup();
-		const resetPage = vi.fn();
-		const setSearchInput = vi.fn();
-		render(
-			<ItemListComponent
-				{ ...defaultProps }
-				page={ 2 }
-				resetPage={ resetPage }
-				setSearchInput={ setSearchInput }
-				supportsPagination
-				supportsSearch
-				totalPages={ 4 }
-			/>
-		);
-
-		await user.type( screen.getByRole( 'searchbox', { name: 'Search' } ), 'Lunch' );
-		await waitFor( () => {
-			expect( setSearchInput ).toHaveBeenLastCalledWith( 'Lunch' );
-			expect( resetPage ).toHaveBeenCalled();
-		} );
-	} );
-
-	it( 'changes remote page size without requiring local sorting and resets position', async () => {
-		const user = userEvent.setup();
-		const resetPage = vi.fn();
-		const setPage = vi.fn();
-		const setPerPage = vi.fn();
-		render(
-			<ItemListComponent
-				{ ...defaultProps }
-				page={ 2 }
-				perPage={ 10 }
-				resetPage={ resetPage }
-				setPage={ setPage }
-				setPerPage={ setPerPage }
-				supportsPagination
-				supportsPerPage
-				totalPages={ 3 }
-			/>
-		);
-		await user.selectOptions( screen.getByRole( 'combobox', { name: 'Items per page' } ), '20' );
-		expect( resetPage ).toHaveBeenCalledOnce();
-		expect( setPage ).not.toHaveBeenCalled();
-		expect( setPerPage ).toHaveBeenLastCalledWith( 20 );
 	} );
 
 	it( 'keeps the initial remote page size when results arrive after loading', async () => {

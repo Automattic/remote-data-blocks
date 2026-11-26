@@ -103,28 +103,12 @@ function getUniqueRecordUuids( rows: RemoteDataApiResult[] ) {
 
 function DataViewsModalContent( props: DataViewsModalContentProps ) {
 	const { blockName, close, onSelect, onSelectField, queryKey, selection, setSelection } = props;
-	const {
-		data,
-		hasNextPage,
-		loading,
-		page,
-		perPage,
-		resetPage,
-		searchInput,
-		setPage,
-		setPerPage,
-		setSearchInput,
-		supportsSearch,
-		supportsPagination,
-		supportsPerPage,
-		totalItems,
-		totalPages,
-	} = useRemoteData( { blockName, fetchOnMount: true, queryKey } );
+	const { data, loading, ...listProps } = useRemoteData( {
+		blockName,
+		fetchOnMount: true,
+		queryKey,
+	} );
 
-	// For selection, DataViews transacts only in IDs, so we provide the UUID from
-	// the API response as a synthetic ID and map them to the full result.
-	// DataViews is only "aware" of the data it is rendering, so we keep track of
-	// selections from previous result pages in the selection state.
 	const selectionIds = selection.map( item => item.uuid );
 	// A fresh response can give a selected record a new row UUID. Keep the
 	// original UI ID when the configured record ID still matches.
@@ -141,36 +125,27 @@ function DataViewsModalContent( props: DataViewsModalContentProps ) {
 			return uuid ? { ...row, uuid } : row;
 		} );
 	}
-	const allIdsFromCurrentPage = rows?.map( row => row.uuid ) ?? [];
-
-	// This value indicates whether the modal is being used to select an entire
-	// item / result or just a specific field from the result.
-	const supportsItemSelection = Boolean( onSelect );
-
-	function setSelectionIds( uuids: string[] ): void {
-		const selectionIdsFromOtherPages = selectionIds.filter(
-			uuid => ! allIdsFromCurrentPage.includes( uuid )
+	// Keep selected rows from other pages and replace the selection on this page.
+	function setSelectionIds( ids: string[] ): void {
+		const pageRows = new Map( rows?.map( row => [ row.uuid, row ] ) );
+		const next = new Map(
+			selection.filter( row => ! pageRows.has( row.uuid ) ).map( row => [ row.uuid, row ] )
 		);
-		const newSelectionIds = Array.from(
-			new Set< string >( [ ...selectionIdsFromOtherPages, ...uuids ] )
-		);
-		const newSelection = newSelectionIds
-			.map(
-				uuid =>
-					rows?.find( result => uuid === result.uuid ) ??
-					selection.find( result => uuid === result.uuid ) ??
-					null
-			)
-			.filter( ( result ): result is RemoteDataApiResult => result !== null );
-		setSelection( newSelection );
+		for ( const id of ids ) {
+			const row = pageRows.get( id );
+			if ( row ) {
+				next.set( id, row );
+			}
+		}
+		setSelection( [ ...next.values() ] );
 	}
 
 	function save( results: RemoteDataApiResult[] ): void {
-		if ( ! supportsItemSelection || ! results.length ) {
+		if ( ! onSelect || ! results.length ) {
 			return;
 		}
 
-		onSelect?.( createQueryInputsFromRemoteDataResults( results ) );
+		onSelect( createQueryInputsFromRemoteDataResults( results ) );
 		sendTracksEvent( 'add_block', {
 			action: 'select_item',
 			selected_option: 'search_from_list',
@@ -182,28 +157,16 @@ function DataViewsModalContent( props: DataViewsModalContentProps ) {
 	return (
 		<>
 			<ItemList
+				{ ...listProps }
 				blockName={ blockName }
-				hasNextPage={ hasNextPage ?? false }
 				loading={ loading }
-				onSelect={ supportsItemSelection ? save : undefined }
+				onSelect={ onSelect && save }
 				onSelectField={ onSelectField }
-				page={ page }
-				perPage={ perPage }
 				results={ loading ? undefined : rows }
-				resetPage={ resetPage }
-				searchInput={ searchInput }
 				selectionIds={ selectionIds }
-				setPage={ setPage }
-				setPerPage={ setPerPage }
-				setSearchInput={ setSearchInput }
 				setSelectionIds={ setSelectionIds }
-				supportsSearch={ supportsSearch }
-				supportsPagination={ supportsPagination }
-				supportsPerPage={ supportsPerPage }
-				totalItems={ totalItems }
-				totalPages={ totalPages }
 			/>
-			{ supportsItemSelection && ! loading && (
+			{ onSelect && ! loading && (
 				<HStack
 					className="rdb-dataviews-bulk-actions-footer__selection-total"
 					justify="flex-end"

@@ -157,21 +157,18 @@ export function ItemList( props: ItemListProps ) {
 		fields
 	);
 
-	const chooseItemAction = {
-		id: 'choose',
-		isPrimary: true,
-		label: __( 'Choose' ),
-		callback: ( items: RemoteDataApiResult[] ) => {
-			onSelect?.( items );
-		},
-		supportsBulk: true,
-	};
-
-	// Only show the action if onSelect is defined and there are results.
-	let actions: Action< RemoteDataApiResult >[] = [];
-	if ( onSelect && results?.length ) {
-		actions = [ chooseItemAction ];
-	}
+	const actions: Action< RemoteDataApiResult >[] =
+		onSelect && results.length
+			? [
+					{
+						id: 'choose',
+						isPrimary: true,
+						label: __( 'Choose' ),
+						callback: items => onSelect( items ),
+						supportsBulk: true,
+					},
+			  ]
+			: [];
 
 	return (
 		<>

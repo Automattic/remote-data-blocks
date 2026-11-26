@@ -13,12 +13,18 @@ for ( const mode of [ 'page', 'offset', 'cursor' ] ) {
 			name: `Pagination ${ mode[ 0 ]!.toUpperCase() }${ mode.slice( 1 ) }`,
 		} );
 		const search = modal.getByRole( 'searchbox', { name: 'Search' } );
-		const firstRow = modal.getByRole( 'row', { name: /Tree 01/ } );
+		const row = ( name: RegExp ) => modal.getByRole( 'row', { name } );
+		const firstRow = row( /Tree 01/ );
+		const pageSize = modal.getByRole( 'combobox', { name: 'Items per page' } );
+		async function changePage( direction: 'Next' | 'Previous', expected: RegExp ) {
+			await modal.getByRole( 'button', { name: `${ direction } page`, exact: true } ).click();
+			await expect( row( expected ) ).toBeVisible();
+		}
 		await expect( firstRow ).toBeVisible();
 		if ( mode === 'cursor' ) {
 			const [ searchBox, pageSizeBox ] = await Promise.all( [
 				search.boundingBox(),
-				modal.getByRole( 'combobox', { name: 'Items per page' } ).boundingBox(),
+				pageSize.boundingBox(),
 			] );
 			expect( searchBox ).not.toBeNull();
 			expect( pageSizeBox ).not.toBeNull();
@@ -29,52 +35,40 @@ for ( const mode of [ 'page', 'offset', 'cursor' ] ) {
 
 			const selected = firstRow.getByRole( 'checkbox' );
 			await selected.check();
-			await modal.getByRole( 'button', { name: 'Next page', exact: true } ).click();
-			await expect( modal.getByRole( 'row', { name: /Tree 11/ } ) ).toBeVisible();
+			await changePage( 'Next', /Tree 11/ );
 			await modal.getByRole( 'button', { name: 'Previous page', exact: true } ).click();
 			await expect( selected ).toBeChecked();
 			await modal.getByRole( 'button', { name: 'Clear selection' } ).click();
 		}
 		await page.clock.install();
-		await modal.getByRole( 'button', { name: 'Next page', exact: true } ).click();
-		await expect( modal.getByRole( 'row', { name: /Tree 11/ } ) ).toBeVisible();
+		await changePage( 'Next', /Tree 11/ );
 
 		await search.fill( 'Herb' );
 		await page.clock.runFor( 500 );
-		await expect( modal.getByRole( 'row', { name: /Tree \d/ } ) ).toHaveCount( 0 );
-		await expect( modal.getByRole( 'row', { name: /Herb 02/ } ) ).toBeVisible();
-		await expect( modal.getByRole( 'row', { name: /Herb 22/ } ) ).toHaveCount( 0 );
+		await expect( row( /Tree \d/ ) ).toHaveCount( 0 );
+		await expect( row( /Herb 02/ ) ).toBeVisible();
+		await expect( row( /Herb 22/ ) ).toHaveCount( 0 );
 		await search.fill( '' );
 		await page.clock.runFor( 500 );
-		await expect( modal.getByRole( 'row', { name: /Tree 01/ } ) ).toBeVisible();
-		await modal.getByRole( 'button', { name: 'Next page', exact: true } ).click();
-		await expect( modal.getByRole( 'row', { name: /Tree 11/ } ) ).toBeVisible();
-		await modal.getByRole( 'combobox', { name: 'Items per page' } ).selectOption( '20' );
-		await expect( modal.getByRole( 'row', { name: /Tree 01/ } ) ).toBeVisible();
-		await expect( modal.getByRole( 'row', { name: /Herb 20/ } ) ).toBeVisible();
-		await modal.getByRole( 'button', { name: 'Next page', exact: true } ).click();
-		await expect( modal.getByRole( 'row', { name: /Tree 21/ } ) ).toBeVisible();
-		await expect( modal.getByRole( 'row', { name: /Herb 40/ } ) ).toBeVisible();
-		await expect( modal.getByRole( 'row', { name: /Tree 11/ } ) ).toHaveCount( 0 );
+		await expect( row( /Tree 01/ ) ).toBeVisible();
+		await changePage( 'Next', /Tree 11/ );
+		await pageSize.selectOption( '20' );
+		await expect( row( /Tree 01/ ) ).toBeVisible();
+		await expect( row( /Herb 20/ ) ).toBeVisible();
+		await changePage( 'Next', /Tree 21/ );
+		await expect( row( /Herb 40/ ) ).toBeVisible();
+		await expect( row( /Tree 11/ ) ).toHaveCount( 0 );
 
 		if ( mode === 'cursor' ) {
-			await modal.getByRole( 'button', { name: 'Next page', exact: true } ).click();
-			await expect( modal.getByRole( 'row', { name: /Tree 41/ } ) ).toBeVisible();
-			await modal.getByRole( 'button', { name: 'Previous page', exact: true } ).click();
-			await expect( modal.getByRole( 'row', { name: /Tree 21/ } ) ).toBeVisible();
+			await changePage( 'Next', /Tree 41/ );
+			await changePage( 'Previous', /Tree 21/ );
 		}
 
-		await modal.getByRole( 'button', { name: 'Previous page', exact: true } ).click();
-		await expect( modal.getByRole( 'row', { name: /Tree 01/ } ) ).toBeVisible();
-		await modal
-			.getByRole( 'row', { name: /Tree 01/ } )
-			.getByRole( 'checkbox' )
-			.check();
-		await modal.getByRole( 'button', { name: 'Next page', exact: true } ).click();
-		await expect( modal.getByRole( 'row', { name: /Tree 21/ } ) ).toBeVisible();
-		await expect( modal.getByRole( 'row', { name: /Herb 40/ } ) ).toBeVisible();
-		await modal
-			.getByRole( 'row', { name: /Tree 21/ } )
+		await changePage( 'Previous', /Tree 01/ );
+		await firstRow.getByRole( 'checkbox' ).check();
+		await changePage( 'Next', /Tree 21/ );
+		await expect( row( /Herb 40/ ) ).toBeVisible();
+		await row( /Tree 21/ )
 			.getByRole( 'checkbox' )
 			.check();
 		const submit = modal.getByRole( 'button', { name: 'Select items', exact: true } );
