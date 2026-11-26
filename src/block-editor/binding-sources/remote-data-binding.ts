@@ -3,7 +3,12 @@ import { registerBlockBindingsSource } from '@wordpress/blocks';
 
 import { REMOTE_DATA_CONTEXT_KEY } from '@/blocks/remote-data-container/config/constants';
 import { BLOCK_BINDING_SOURCE, STORE_NAME as rdbStore } from '@/config/constants';
-import { resolveRemoteBindingValue } from '@/utils/resolve-remote-binding-value';
+import {
+	coerceBindingValue,
+	getBindingTargetType,
+	isTextBindingTarget,
+} from '@/utils/block-binding-value';
+import { sanitizeBindingHTML, sanitizeBindingValue } from '@/utils/sanitize-binding-value';
 
 import type { Selectors } from '@/store';
 import type { BindingValue } from '@/utils/block-binding-value';
@@ -36,15 +41,33 @@ registerBlockBindingsSource( {
 
 		return Object.fromEntries(
 			Object.entries( bindings ).flatMap( ( [ target, { args } ] ) => {
-				const value = resolveRemoteBindingValue( {
-					args,
-					blockName,
-					target,
-					remoteData,
-					previewIndex,
-					getSavedValue: () => editor?.getBlockAttributes( clientId )?.[ target ],
-				} );
-				return value === undefined ? [] : [ [ target, value ] ];
+				if (
+					typeof args?.field !== 'string' ||
+					( ! args.isPreview && ! remoteData?.results?.length )
+				) {
+					return [];
+				}
+
+				const index = args.previewIndex ?? previewIndex ?? 0;
+				const rawValue =
+					args.previewValue !== undefined
+						? args.previewValue
+						: remoteData?.results?.[ index ]?.result?.[ args.field ]?.value;
+				const targetType = getBindingTargetType( blockName, target );
+				const sanitize = ( value: unknown ) =>
+					sanitizeBindingValue( coerceBindingValue( value, targetType ), blockName, target );
+
+				let value = sanitize( rawValue );
+				if ( value === null && ! args.isPreview ) {
+					value = sanitize( editor?.getBlockAttributes( clientId )?.[ target ] );
+				}
+				if ( value === null && isTextBindingTarget( targetType ) ) {
+					value = '';
+				}
+				if ( typeof value === 'string' && args.label ) {
+					value = `${ sanitizeBindingHTML( args.label ) }: ${ value }`;
+				}
+				return [ [ target, value ] ];
 			} )
 		);
 	},

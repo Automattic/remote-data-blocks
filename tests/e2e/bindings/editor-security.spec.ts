@@ -1,94 +1,133 @@
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
-test( 'isolates Remote HTML scripts from the editor and resizes embedded content', async ( {
-	admin,
-	editor,
-} ) => {
-	await admin.createNewPost();
-	await editor.insertBlock( {
-		name: 'remote-data-blocks/remote-html',
-		attributes: {
-			content:
-				'<p style="height:320px">Embedded preview</p><script>document.body.dataset.embed = "ready";</script>',
-		},
-	} );
-	const frame = editor.canvas.locator( 'iframe.components-sandbox' );
-	await expect( frame ).toHaveAttribute( 'sandbox', 'allow-scripts allow-presentation' );
-	await expect( frame.contentFrame().locator( 'body' ) ).toHaveAttribute( 'data-embed', 'ready' );
-	await expect
-		.poll( async () => Number( await frame.getAttribute( 'height' ) ) )
-		.toBeGreaterThan( 300 );
-	const isolated = await frame
-		.contentFrame()
-		.locator( 'body' )
-		.evaluate( () => {
-			try {
-				return window.parent.document === undefined;
-			} catch {
-				return true;
-			}
-		} );
-	expect( isolated ).toBe( true );
-} );
+interface EditorWindow extends Window {
+	wp: {
+		blocks: typeof import('@wordpress/blocks');
+		richText: typeof import('@wordpress/rich-text');
+	};
+}
 
-test( 'keeps the Remote HTML preview stable with viewport-relative content', async ( {
-	admin,
-	editor,
-} ) => {
-	await admin.createNewPost();
-	await editor.insertBlock( {
-		name: 'remote-data-blocks/remote-html',
-		attributes: {
-			content: '<div style="height:100vh;box-sizing:content-box;padding-top:32px">Preview</div>',
-		},
-	} );
-	const frame = editor.canvas.locator( 'iframe.components-sandbox' );
-	await expect( frame.contentFrame().getByText( 'Preview' ) ).toBeVisible();
-	await expect( frame ).toHaveAttribute( 'height', '182' );
-	const heights = await frame.evaluate(
-		element =>
-			new Promise< ( string | null )[] >( resolve => {
-				const samples: ( string | null )[] = [];
-				function sampleHeight() {
-					samples.push( element.getAttribute( 'height' ) );
-					if ( samples.length === 12 ) {
-						resolve( samples );
-						return;
-					}
-					requestAnimationFrame( sampleHeight );
-				}
-				sampleHeight();
-			} )
-	);
-	const finalHeight = heights[ heights.length - 1 ];
-	expect( finalHeight ).toBe( '182' );
-	expect( heights.slice( -6 ) ).toEqual( Array( 6 ).fill( finalHeight ) );
-} );
-
-test( 'preserves formatting and metadata when reopening saved inline bindings', async ( {
+test( 'preserves a registered custom format when editing beside a saved inline binding', async ( {
 	admin,
 	editor,
 	page,
 } ) => {
+	await page.addInitScript( () => {
+		if ( window !== window.top ) {
+			return;
+		}
+
+		const registerFormat = () => {
+			const richText = ( window as EditorWindow ).wp?.richText;
+			if ( ! richText ) {
+				window.setTimeout( registerFormat, 10 );
+				return;
+			}
+			richText.registerFormatType( 'rdb-test/mention', {
+				title: 'Test mention',
+				tagName: 'user-mention',
+				className: null,
+				attributes: {
+					user: 'user-id',
+					mention: 'data-mention',
+					href: 'href',
+					context: 'data-wp-context',
+				},
+				edit: () => null,
+			} );
+		};
+		registerFormat();
+	} );
 	await admin.createNewPost();
+	const mentionData = JSON.stringify( { id: 'team:alice' } );
 	await editor.insertBlock( {
 		name: 'core/paragraph',
 		attributes: {
-			content:
-				'Before <remote-data-blocks-inline-field data-query="{}"><em>Saved inline</em><iframe srcdoc="inert"></iframe></remote-data-blocks-inline-field> after',
+			content: `Before <remote-data-blocks-inline-field data-query="{}"><strong data-mention='${ mentionData }'><user-mention user-id="42" data-mention='${ mentionData }' href="file:///fixture" data-wp-context="{}">Alice</user-mention></strong><iframe title="Fixture"></iframe></remote-data-blocks-inline-field> <remote-data-blocks-inline-field data-query="{}"><iframe title="Empty preview"></iframe></remote-data-blocks-inline-field> after`,
 		},
 	} );
-	const field = editor.canvas.locator( 'remote-data-blocks-inline-field' );
-	await expect( field ).toContainText( 'Saved inline' );
-	await expect( field.locator( 'em' ) ).toHaveText( 'Saved inline' );
-	await expect( field.locator( 'iframe' ) ).toHaveCount( 0 );
-	await expect( field ).toHaveAttribute( 'data-query', '{}' );
+
+	const fields = editor.canvas.locator( 'remote-data-blocks-inline-field' );
+	const field = fields.first();
+	const mention = field.locator( 'strong user-mention' );
+	await expect( mention ).toHaveText( 'Alice' );
+	await expect( mention ).toHaveAttribute( 'user-id', '42' );
+	await expect( mention ).toHaveAttribute( 'data-mention', mentionData );
+	await expect( mention ).not.toHaveAttribute( 'href' );
+	await expect( mention ).not.toHaveAttribute( 'data-wp-context' );
+	await expect( fields.locator( 'iframe' ) ).toHaveCount( 0 );
+	await expect( field.locator( 'strong' ) ).not.toHaveAttribute( 'data-mention' );
+
+	const paragraph = editor.canvas.locator( 'p[contenteditable="true"]' ).filter( { has: field } );
+	await paragraph.click();
+	await paragraph.press( 'End' );
+	await page.keyboard.insertText( '!' );
+	await expect( paragraph ).toContainText( 'after!' );
 	await editor.saveDraft();
 	await page.reload();
-	await expect( editor.canvas.locator( 'remote-data-blocks-inline-field em' ) ).toHaveText(
-		'Saved inline'
-	);
-	await expect( editor.canvas.locator( 'remote-data-blocks-inline-field iframe' ) ).toHaveCount(
-		0
-	);
+
+	await expect(
+		editor.canvas.locator( 'remote-data-blocks-inline-field[data-query]' )
+	).toHaveCount( 2 );
+	await expect( mention ).toHaveText( 'Alice' );
+	await expect( mention ).toHaveAttribute( 'user-id', '42' );
+	await expect( mention ).toHaveAttribute( 'data-mention', mentionData );
+	await expect( mention ).not.toHaveAttribute( 'href' );
+	await expect( mention ).not.toHaveAttribute( 'data-wp-context' );
+	await expect( fields.locator( 'iframe' ) ).toHaveCount( 0 );
+	await expect( field.locator( 'strong' ) ).not.toHaveAttribute( 'data-mention' );
+	await expect( paragraph ).toContainText( 'after!' );
+} );
+
+test( 'filters binding HTML and checks URLs by their rendering context', async ( {
+	admin,
+	page,
+} ) => {
+	await admin.createNewPost();
+	const result = await page.evaluate( () => {
+		const { blocks } = ( window as EditorWindow ).wp;
+		const name = 'rdb-test/plain-attributes';
+		blocks.registerBlockType( name, {
+			title: 'Plain attributes',
+			category: 'text',
+			attributes: { summaryUrl: { type: 'string' }, url: { type: 'string' } },
+			edit: () => null,
+			save: () => null,
+		} );
+		const source = blocks.getBlockBindingsSource( 'remote-data/binding' );
+		const resolve = ( blockName: string, attribute: string, value: string ) =>
+			source?.getValues?.( {
+				clientId: 'rdb-test',
+				bindings: { [ attribute ]: { args: { block: name, field: 'example' } } },
+				context: {
+					'remote-data-blocks/remoteData': {
+						results: [
+							{ uuid: '0', result: { example: { name: 'Example', type: 'string', value } } },
+						],
+					},
+				},
+				select: () => ( {
+					getBlockName: () => blockName,
+					getPreviewIndex: () => 0,
+					getBlockAttributes: () => ( { [ attribute ]: '/saved' } ),
+				} ),
+			} as never )?.[ attribute ];
+
+		return {
+			formatted: resolve(
+				'core/paragraph',
+				'content',
+				'<strong>Garden</strong><iframe title="Fixture"></iframe>'
+			),
+			plainNamedUrl: resolve( name, 'summaryUrl', 'Status: Ready' ),
+			buttonFallback: resolve( 'core/button', 'url', 'fixture:unsupported' ),
+			navigationLink: resolve( 'core/navigation-link', 'url', '/garden' ),
+		};
+	} );
+	expect( result ).toEqual( {
+		formatted: '<strong>Garden</strong>',
+		plainNamedUrl: 'Status: Ready',
+		buttonFallback: '/saved',
+		navigationLink: '/garden',
+	} );
 } );

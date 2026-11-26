@@ -15,7 +15,7 @@ import {
 } from '@/block-editor/format-types/inline-binding/settings';
 import { sendTracksEvent } from '@/blocks/remote-data-container/utils/tracks';
 import { getBlockDataSourceType } from '@/utils/localized-block-data';
-import { sanitizeBindingHTML } from '@/utils/sanitize-binding-value';
+import { EMPTY_INLINE_BINDING_PREVIEW, sanitizeBindingHTML } from '@/utils/sanitize-binding-value';
 import '@/block-editor/format-types/inline-binding/components/InlineBinding.scss';
 
 function parseDataQuery( dataQuery?: string ): FieldSelection | null {
@@ -54,7 +54,7 @@ export function InlineBindingButton( props: WPFormatEditProps ) {
 				...activeObjectAttributes,
 				'data-query': data ? JSON.stringify( serializedData ) : '',
 			},
-			innerHTML: sanitizeBindingHTML( fieldValue ),
+			innerHTML: sanitizeBindingHTML( fieldValue ) || EMPTY_INLINE_BINDING_PREVIEW,
 			type: formatName,
 		};
 

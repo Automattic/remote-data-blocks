@@ -8,6 +8,8 @@ import type { BindingValue } from '@/utils/block-binding-value';
 const DOMPurify = createDOMPurify();
 const INLINE_FIELD = 'remote-data-blocks-inline-field';
 const INLINE_QUERY = 'data-query';
+// Core RichText drops an inline format with no content when adjacent text is edited.
+export const EMPTY_INLINE_BINDING_PREVIEW = '\u00a0';
 const BLOCKED_ATTRIBUTES =
 	/^(?:on|data-wp-|autofocus$|contenteditable$|form$|formaction$|is$|ping$|srcdoc$|srcset$|xmlns(?::|$))/;
 
@@ -59,6 +61,8 @@ export function sanitizeBindingHTML( html: string ): string {
 		const tag = node.nodeName.toLowerCase();
 		const name = event.attrName;
 		const tagAttributes = attributes.get( tag ) ?? [];
+		const isDataAttribute = /^data-[a-z0-9_-]+$/.test( name );
+		const isInlineQuery = tag === INLINE_FIELD && name === INLINE_QUERY;
 		const formatAttribute = formats.some(
 			format =>
 				format.tagName === tag &&
@@ -67,13 +71,16 @@ export function sanitizeBindingHTML( html: string ): string {
 					Object.values( format.attributes ?? {} ).includes( name ) )
 		);
 		const allowed =
-			( tag === INLINE_FIELD && name === INLINE_QUERY ) ||
+			isInlineQuery ||
 			tagAttributes.includes( name ) ||
-			( tagAttributes.includes( 'data-*' ) && /^data-[a-z0-9_-]+$/.test( name ) ) ||
+			( tagAttributes.includes( 'data-*' ) && isDataAttribute ) ||
 			formatAttribute;
+		// Only the matching format and the inline wrapper can carry opaque data values.
+		const requiresURLCheck =
+			isURIAttribute( name ) || ( isDataAttribute && ! formatAttribute && ! isInlineQuery );
 		if ( ! allowed || BLOCKED_ATTRIBUTES.test( name ) ) {
 			event.keepAttr = false;
-		} else if ( isURIAttribute( name ) && ! isAllowedURL( event.attrValue, urlPattern ) ) {
+		} else if ( requiresURLCheck && ! isAllowedURL( event.attrValue, urlPattern ) ) {
 			event.keepAttr = false;
 		} else if ( name === 'style' ) {
 			event.attrValue = sanitizeStyle( event.attrValue );
@@ -113,10 +120,9 @@ export function sanitizeBindingHTML( html: string ): string {
 				'textarea',
 			],
 			ALLOWED_ATTR: [],
-			// Inline query metadata is JSON. The attribute hook still enforces tag and URI rules.
-			ADD_URI_SAFE_ATTR: [ INLINE_QUERY ],
 			ALLOW_ARIA_ATTR: false,
-			ALLOW_DATA_ATTR: false,
+			// The attribute hook still controls which tags may carry each data attribute.
+			ALLOW_DATA_ATTR: true,
 			ALLOWED_URI_REGEXP: urlPattern,
 		} );
 	} finally {
@@ -132,7 +138,7 @@ export function sanitizeBindingValue(
 	if ( typeof value !== 'string' ) {
 		return value;
 	}
-	// Remote HTML is rendered in an opaque-origin iframe, including embeds and scripts.
+	// Preserve the raw block contract if a site explicitly enables this binding in Core.
 	if ( blockName === 'remote-data-blocks/remote-html' && target === 'content' ) {
 		return value;
 	}
@@ -172,6 +178,9 @@ export function sanitizeInlineBindingAttributes(
 			doc.body.innerHTML = html;
 			for ( const field of doc.body.querySelectorAll( INLINE_FIELD ) ) {
 				field.outerHTML = sanitizeBindingHTML( field.outerHTML );
+			}
+			for ( const field of doc.body.querySelectorAll( `${ INLINE_FIELD }:empty` ) ) {
+				field.textContent = EMPTY_INLINE_BINDING_PREVIEW;
 			}
 			return [ [ name, doc.body.innerHTML ] ];
 		} )
