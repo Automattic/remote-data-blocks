@@ -96,7 +96,7 @@ test.describe( 'compact binding controls', () => {
 		await expect( select ).toHaveValue( '' );
 		await select.selectOption( 'button_text' );
 		await capture( page, 'compact-chooser' );
-		await page.keyboard.press( 'Tab' );
+		await select.press( 'Tab' );
 		await expect( page.getByRole( 'button', { name: 'Cancel', exact: true } ) ).toBeFocused();
 		await page.keyboard.press( 'Tab' );
 		await expect( page.getByRole( 'button', { name: 'Apply', exact: true } ) ).toBeFocused();

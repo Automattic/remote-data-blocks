@@ -57,7 +57,7 @@ Field choices follow the target schema. Text attributes retain text formatting; 
 
 Text controls can show **Suggested fields** alongside other compatible fields. For example, the bundled Conference Event’s plain Title field can supply button text. **Show label** is available for paragraph and heading content.
 
-New URL bindings require a field declared with a URL type. Use `button_url` for a Button’s URL and `image_url` for an Image’s URL. Other URL controls accept `url`, `button_url`, and `image_url`. For custom blocks, the chooser checks the HTML source attribute against WordPress Core’s default URI attribute list, which includes `href`, `src`, and `usemap`. When an attribute has no source declaration, a name such as `url` or `linkUrl` identifies it as a URL.
+New URL bindings require a field declared with a URL type. Use `button_url` for a Button’s URL and `image_url` for an Image’s URL. Other URL controls accept `url`, `button_url`, and `image_url`. For custom blocks, the chooser checks the HTML source attribute against WordPress Core’s default URI attribute list, which includes `href`, `src`, and `usemap`. Core Navigation Link and Navigation Submenu use URL fields even though they have no HTML source declaration. Custom attributes without an HTML source keep the ordinary field choices.
 
 Saved plain-string URL bindings remain visible under **Current binding**, where you can inspect, replace, or remove them. To migrate, add a field with the appropriate URL type to the query output schema and map it to the same source path. Verify that the source returns the intended URLs before choosing the new field and clicking **Apply**. Adding a separate field preserves plain-text mappings that also use the original field.
 

@@ -205,8 +205,8 @@ describe( 'generic binding controls', () => {
 			[ 'Button link', 'Image link', 'Web address' ],
 		],
 		[
-			'test/custom',
-			'linkUrl',
+			'core/navigation-link',
+			'url',
 			{ type: 'string' },
 			[ 'Button link', 'Image link', 'Web address' ],
 		],
@@ -230,7 +230,8 @@ describe( 'generic binding controls', () => {
 	);
 	it.each( [
 		[ 'displayUrl', { type: 'string', source: 'attribute', attribute: 'title' } ],
-		[ 'curl', { type: 'string' } ],
+		[ 'summaryUrl', { type: 'string' } ],
+		[ 'url', { type: 'string' } ],
 	] as const )(
 		'keeps plain strings available for the textual attribute %s',
 		( target, schema ) => {

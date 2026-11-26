@@ -39,18 +39,19 @@ const URL_HTML_ATTRIBUTES = [
 ];
 
 function isUrlBindingTarget(
+	blockName: string,
 	target: string,
 	schema?: { source?: string; attribute?: string }
 ): boolean {
-	// Prefer the HTML source over names like `displayUrl` on textual attributes.
-	if ( schema?.source ) {
-		return (
-			schema.source === 'attribute' &&
-			URL_HTML_ATTRIBUTES.includes( schema.attribute?.toLowerCase() ?? '' )
-		);
+	if ( schema?.source === 'attribute' ) {
+		return URL_HTML_ATTRIBUTES.includes( schema.attribute?.toLowerCase() ?? '' );
 	}
+
+	// Core navigation links declare their URL without an HTML source.
 	return (
-		/(?:^|[_-])(?:url|href|src)$/i.test( target ) || /(?:Url|URL|Href|HREF|Src|SRC)$/.test( target )
+		! schema?.source &&
+		target === 'url' &&
+		( blockName === 'core/navigation-link' || blockName === 'core/navigation-submenu' )
 	);
 }
 
@@ -80,7 +81,7 @@ export function getBindingFieldTypes(
 				return IMAGE_URL_FIELD_TYPES;
 			}
 		}
-		if ( isUrlBindingTarget( target, schema ) ) {
+		if ( isUrlBindingTarget( blockName, target, schema ) ) {
 			return URL_FIELD_TYPES;
 		}
 		return [ ...TEXT_FIELD_TYPES, 'button_text', 'image_alt', 'id', 'uuid', ...URL_FIELD_TYPES ];
