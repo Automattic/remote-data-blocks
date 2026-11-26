@@ -1,4 +1,3 @@
-// @vitest-environment jsdom
 import { registerBlockBindingsSource } from '@wordpress/blocks';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -23,6 +22,10 @@ vi.mock( '@wordpress/blocks', () => ( {
 	} ),
 } ) );
 vi.mock( '@wordpress/block-editor', () => ( { store: {} } ) );
+vi.mock( '@/utils/sanitize-binding-value', () => ( {
+	sanitizeBindingHTML: ( value: string ) => value,
+	sanitizeBindingValue: ( value: unknown ) => value,
+} ) );
 
 type Payload = {
 	bindings: Record< string, RemoteDataBlockBinding >;
