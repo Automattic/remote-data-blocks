@@ -11,7 +11,13 @@ import { BLOCK_BINDING_SOURCE } from '@/config/constants';
 
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
-const block: { attributes: Record< string, { type: string } > } = vi.hoisted( () => ( {
+interface AttributeSchema {
+	type: string;
+	source?: string;
+	attribute?: string;
+}
+
+const block: { attributes: Record< string, AttributeSchema > } = vi.hoisted( () => ( {
 	attributes: {},
 } ) );
 vi.mock( '@wordpress/blocks', () => ( { getBlockType: () => block } ) );
@@ -114,6 +120,8 @@ const availableBindings: AvailableBindings = {
 	markdown: { name: 'Markdown field', type: 'markdown' },
 	button: { name: 'Button link', type: 'button_url' },
 	image: { name: 'Image link', type: 'image_url' },
+	url: { name: 'Web address', type: 'url' },
+	buttonText: { name: 'Button label', type: 'button_text' },
 };
 const defaults = {
 	attributes: {},
@@ -153,17 +161,86 @@ describe( 'generic binding controls', () => {
 			screen.getByText( 'No matching fields are available for this attribute.' )
 		).toBeVisible();
 	} );
-	it( 'treats semantic button/image types as suggestions, retaining scalar and markup boundaries', () => {
+	it( 'keeps scalar and markup boundaries', () => {
 		expect( getSuggestedBindingFieldTypes( 'core/button', 'url' ) ).toEqual( [ 'button_url' ] );
 		expect( getSuggestedBindingFieldTypes( 'core/image', 'url' ) ).toEqual( [ 'image_url' ] );
-		expect( getBindingFieldTypes( 'core/button', 'url', 'string' ) ).toContain( 'string' );
-		expect( getBindingFieldTypes( 'core/image', 'alt', 'string' ) ).toContain( 'string' );
-		expect( getBindingFieldTypes( 'core/paragraph', 'content', 'rich-text' ) ).toContain( 'url' );
-		expect( getBindingFieldTypes( 'core/button', 'url', 'object' ) ).toEqual( [] );
-		expect( getBindingFieldTypes( 'test/custom', 'url', 'string' ) ).not.toContain( 'html' );
-		expect( getBindingFieldTypes( 'test/custom', 'url', 'string' ) ).not.toContain( 'markdown' );
-		expect( getBindingFieldTypes( 'test/custom', 'enabled', 'boolean' ) ).toEqual( [ 'boolean' ] );
+		expect( getBindingFieldTypes( 'core/image', 'alt', { type: 'string' } ) ).toContain( 'string' );
+		expect( getBindingFieldTypes( 'core/paragraph', 'content', { type: 'rich-text' } ) ).toContain(
+			'url'
+		);
+		expect( getBindingFieldTypes( 'core/button', 'url', { type: 'object' } ) ).toEqual( [] );
+		expect( getBindingFieldTypes( 'test/custom', 'value', { type: 'string' } ) ).not.toContain(
+			'html'
+		);
+		expect( getBindingFieldTypes( 'test/custom', 'value', { type: 'string' } ) ).not.toContain(
+			'markdown'
+		);
+		expect( getBindingFieldTypes( 'test/custom', 'enabled', { type: 'boolean' } ) ).toEqual( [
+			'boolean',
+		] );
 	} );
+	it.each( [
+		[
+			'core/button',
+			'url',
+			{ type: 'string', source: 'attribute', attribute: 'href' },
+			[ 'Button link' ],
+		],
+		[
+			'core/image',
+			'url',
+			{ type: 'string', source: 'attribute', attribute: 'src' },
+			[ 'Image link' ],
+		],
+		[
+			'test/custom',
+			'destination',
+			{ type: 'string', source: 'attribute', attribute: 'href' },
+			[ 'Button link', 'Image link', 'Web address' ],
+		],
+		[
+			'test/custom',
+			'imageMap',
+			{ type: 'string', source: 'attribute', attribute: 'usemap' },
+			[ 'Button link', 'Image link', 'Web address' ],
+		],
+		[
+			'core/navigation-link',
+			'url',
+			{ type: 'string' },
+			[ 'Button link', 'Image link', 'Web address' ],
+		],
+	] as const )(
+		'limits the chooser for %s %s to URL fields',
+		( blockName, target, schema, options ) => {
+			block.attributes = { [ target ]: schema };
+			render(
+				<BlockBindingControls
+					{ ...defaults }
+					blockName={ blockName }
+					supportedAttributes={ [ target ] }
+				/>
+			);
+			fireEvent.click( screen.getByRole( 'button', { name: /^Bind / } ) );
+			expect( screen.getAllByRole( 'option' ).map( option => option.textContent ) ).toEqual( [
+				'Select a field',
+				...options,
+			] );
+		}
+	);
+	it.each( [
+		[ 'displayUrl', { type: 'string', source: 'attribute', attribute: 'title' } ],
+		[ 'summaryUrl', { type: 'string' } ],
+		[ 'url', { type: 'string' } ],
+	] as const )(
+		'keeps plain strings available for the textual attribute %s',
+		( target, schema ) => {
+			block.attributes = { [ target ]: schema };
+			render( <BlockBindingControls { ...defaults } supportedAttributes={ [ target ] } /> );
+			fireEvent.click( screen.getByRole( 'button', { name: /^Bind / } ) );
+			expect( screen.getByRole( 'option', { name: 'Text field' } ) ).toBeVisible();
+		}
+	);
 	it( 'offers booleans only for boolean targets, avoiding PHP/editor text-conversion differences', () => {
 		block.attributes.unexpectedValue = { type: 'string' };
 		const { rerender } = render( <BlockBindingControls { ...defaults } /> );
@@ -173,7 +250,7 @@ describe( 'generic binding controls', () => {
 		rerender( <BlockBindingControls { ...defaults } /> );
 		expect( screen.getByRole( 'combobox' ) ).toHaveTextContent( 'Boolean field' );
 		expect( screen.getByRole( 'combobox' ) ).not.toHaveTextContent( 'Text field' );
-		expect( getBindingFieldTypes( 'test/custom', 'value', 'rich-text' ) ).not.toContain(
+		expect( getBindingFieldTypes( 'test/custom', 'value', { type: 'rich-text' } ) ).not.toContain(
 			'boolean'
 		);
 	} );
@@ -216,10 +293,10 @@ describe( 'generic binding controls', () => {
 		render(
 			<BlockBindingFieldControl
 				availableBindings={ availableBindings }
-				fieldTypes={ getBindingFieldTypes( 'core/button', 'url', 'string' ) }
-				suggestedFieldTypes={ getSuggestedBindingFieldTypes( 'core/button', 'url' ) }
-				label="Button URL"
-				target="url"
+				fieldTypes={ getBindingFieldTypes( 'core/button', 'text', { type: 'rich-text' } ) }
+				suggestedFieldTypes={ getSuggestedBindingFieldTypes( 'core/button', 'text' ) }
+				label="Button Text"
+				target="text"
 				updateFieldBinding={ defaults.updateBinding }
 				value="text"
 			/>
@@ -229,11 +306,11 @@ describe( 'generic binding controls', () => {
 			'Suggested fields',
 			'Other compatible fields',
 		] );
-		expect( groups[ 0 ] ).toHaveTextContent( 'Button link' );
+		expect( groups[ 0 ] ).toHaveTextContent( 'Button label' );
 		expect( groups[ 0 ] ).not.toHaveTextContent( 'Text field' );
 		expect( groups[ 1 ] ).toHaveTextContent( 'Text field' );
 		expect( screen.getByRole( 'combobox' ) ).toHaveValue( 'text' );
-		expect( screen.getAllByRole( 'option', { name: 'Button link' } ) ).toHaveLength( 1 );
+		expect( screen.getAllByRole( 'option', { name: 'Button label' } ) ).toHaveLength( 1 );
 		expect( screen.queryByRole( 'option', { name: 'HTML field' } ) ).toBeNull();
 		expect( defaults.updateBinding ).not.toHaveBeenCalled();
 	} );
@@ -261,11 +338,11 @@ describe( 'generic binding controls', () => {
 		fireEvent.click( screen.getByRole( 'button', { name: 'Apply' } ) );
 		expect( defaults.updateBinding ).toHaveBeenCalledExactlyOnceWith( 'text', { field: 'title' } );
 		fireEvent.click( screen.getByRole( 'button', { name: 'Bind Button URL' } ) );
-		expect( screen.getByRole( 'combobox', { name: 'Remote field' } ) ).toHaveTextContent(
-			'Location'
-		);
-		expect( screen.getAllByRole( 'combobox' ) ).toHaveLength( 1 );
-		fireEvent.click( screen.getByRole( 'button', { name: 'Cancel' } ) );
+		expect( screen.queryByRole( 'combobox' ) ).toBeNull();
+		expect(
+			screen.getByText( 'No matching fields are available for this attribute.' )
+		).toBeVisible();
+		fireEvent.click( screen.getByRole( 'button', { name: 'Close' } ) );
 		expect( defaults.updateBinding ).toHaveBeenCalledTimes( 1 );
 	} );
 	it( 'keeps unavailable or schema-changed selections in a separate current group', () => {
@@ -283,6 +360,40 @@ describe( 'generic binding controls', () => {
 			'HTML field'
 		);
 		expect( screen.getByRole( 'combobox' ) ).toHaveValue( 'html' );
+		expect( defaults.updateBinding ).not.toHaveBeenCalled();
+	} );
+	it( 'keeps a saved plain-string URL visible and removable without rewriting it on mount', () => {
+		block.attributes = { url: { type: 'string', source: 'attribute', attribute: 'href' } };
+		const props = {
+			...defaults,
+			blockName: 'core/button',
+			supportedAttributes: [ 'url' ],
+		};
+		const attributes = {
+			url: 'https://example.org/fallback',
+			metadata: {
+				bindings: {
+					url: { source: BLOCK_BINDING_SOURCE, args: { block: 'test/data', field: 'text' } },
+				},
+			},
+		};
+		const { rerender } = render( <BlockBindingControls { ...props } attributes={ attributes } /> );
+		expect( defaults.updateBinding ).not.toHaveBeenCalled();
+		expect( defaults.removeBinding ).not.toHaveBeenCalled();
+		fireEvent.click( screen.getByRole( 'button', { name: 'Change Button URL binding' } ) );
+		expect( screen.getByRole( 'combobox' ) ).toHaveValue( 'text' );
+		expect( screen.getByRole( 'group', { name: 'Current binding' } ) ).toHaveTextContent(
+			'Text field'
+		);
+		expect( screen.getByRole( 'button', { name: 'Apply' } ) ).toBeDisabled();
+		fireEvent.click( screen.getByRole( 'button', { name: 'Cancel' } ) );
+		expect( defaults.updateBinding ).not.toHaveBeenCalled();
+		expect( defaults.removeBinding ).not.toHaveBeenCalled();
+		fireEvent.click( screen.getByRole( 'button', { name: 'Remove Button URL binding' } ) );
+		expect( defaults.removeBinding ).toHaveBeenCalledExactlyOnceWith( 'url' );
+		rerender( <BlockBindingControls { ...props } /> );
+		fireEvent.click( screen.getByRole( 'button', { name: 'Bind Button URL' } ) );
+		expect( screen.queryByRole( 'option', { name: 'Text field' } ) ).toBeNull();
 		expect( defaults.updateBinding ).not.toHaveBeenCalled();
 	} );
 	it( 'does not add label controls to Remote HTML', () => {

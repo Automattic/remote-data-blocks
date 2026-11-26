@@ -3,6 +3,12 @@
 	const { registerBlockType } = wp.blocks;
 	const { useBlockProps, RichText } = wp.blockEditor;
 	const { createElement: el } = wp.element;
+	const gardenLink = attributes =>
+		el(
+			'a',
+			{ href: attributes.destination, title: attributes.displayUrl },
+			'Read the garden note'
+		);
 
 	registerBlockType( 'rdb-bindings-demo/static-card', {
 		apiVersion: 3,
@@ -16,6 +22,8 @@
 				selector: 'p',
 				default: 'Choose a remote field',
 			},
+			destination: { type: 'string', source: 'attribute', selector: 'a', attribute: 'href' },
+			displayUrl: { type: 'string', source: 'attribute', selector: 'a', attribute: 'title' },
 		},
 		edit: function StaticCardEdit( { attributes, setAttributes } ) {
 			return el(
@@ -26,7 +34,8 @@
 					className: 'botanical-note',
 					value: attributes.botanicalNote,
 					onChange: botanicalNote => setAttributes( { botanicalNote } ),
-				} )
+				} ),
+				gardenLink( attributes )
 			);
 		},
 		save: function ( { attributes } ) {
@@ -37,7 +46,8 @@
 					tagName: 'p',
 					className: 'botanical-note',
 					value: attributes.botanicalNote,
-				} )
+				} ),
+				gardenLink( attributes )
 			);
 		},
 	} );

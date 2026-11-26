@@ -45,17 +45,12 @@ test.describe( 'remote block bindings', () => {
 		await bindContent( 'core/heading' );
 		await selectGardenBlock( page, 'core/button' );
 		await openBindingChooser( page, 'url' );
-		// Semantic types guide the choice without hiding other compatible fields.
 		await expect(
 			page.locator(
 				'select[name="url"] optgroup[label="Suggested fields"] option[value="button_url"]'
 			)
 		).toHaveText( 'Garden link' );
-		await expect(
-			page.locator(
-				'select[name="url"] optgroup[label="Other compatible fields"] option[value="image_url"]'
-			)
-		).toHaveCount( 1 );
+		await expect( page.locator( 'select[name="url"] option[value="image_url"]' ) ).toHaveCount( 0 );
 		await page.locator( 'select[name="url"]' ).selectOption( 'button_url' );
 		await page.getByRole( 'button', { name: 'Apply', exact: true } ).click();
 		await bindField( page, 'text', 'button_text' );
