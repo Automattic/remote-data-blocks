@@ -13,7 +13,17 @@ for ( const mode of [ 'page', 'offset', 'cursor' ] ) {
 			name: `Pagination ${ mode[ 0 ]!.toUpperCase() }${ mode.slice( 1 ) }`,
 		} );
 		const search = modal.getByRole( 'searchbox', { name: 'Search' } );
-		await expect( modal.getByRole( 'row', { name: /Tree 01/ } ) ).toBeVisible();
+		const firstRow = modal.getByRole( 'row', { name: /Tree 01/ } );
+		await expect( firstRow ).toBeVisible();
+		if ( mode === 'cursor' ) {
+			const selected = firstRow.getByRole( 'checkbox' );
+			await selected.check();
+			await modal.getByRole( 'button', { name: 'Next page', exact: true } ).click();
+			await expect( modal.getByRole( 'row', { name: /Tree 11/ } ) ).toBeVisible();
+			await modal.getByRole( 'button', { name: 'Previous page', exact: true } ).click();
+			await expect( selected ).toBeChecked();
+			await modal.getByRole( 'button', { name: 'Clear selection' } ).click();
+		}
 		await page.clock.install();
 		await modal.getByRole( 'button', { name: 'Next page', exact: true } ).click();
 		await expect( modal.getByRole( 'row', { name: /Tree 11/ } ) ).toBeVisible();

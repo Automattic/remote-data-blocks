@@ -74,6 +74,33 @@ type DataViewsModalContentProps = Pick<
 	setSelection: ( selection: RemoteDataApiResult[] ) => void;
 };
 
+function getRecordKey( row: RemoteDataApiResult ): string | undefined {
+	const ids = Object.keys( row.result )
+		.sort()
+		.filter( slug => row.result[ slug ]?.type === 'id' );
+	const values = ids.map( slug => row.result[ slug ]?.value );
+	if (
+		! ids.length ||
+		values.some(
+			value => typeof value !== 'number' && ( typeof value !== 'string' || value === '' )
+		)
+	) {
+		return;
+	}
+	return JSON.stringify( ids.map( ( slug, index ) => [ slug, String( values[ index ] ) ] ) );
+}
+
+function getUniqueRecordUuids( rows: RemoteDataApiResult[] ) {
+	const unique = new Map< string, string | null >();
+	for ( const row of rows ) {
+		const key = getRecordKey( row );
+		if ( key !== undefined ) {
+			unique.set( key, unique.has( key ) ? null : row.uuid );
+		}
+	}
+	return unique;
+}
+
 function DataViewsModalContent( props: DataViewsModalContentProps ) {
 	const { blockName, close, onSelect, onSelectField, queryKey, selection, setSelection } = props;
 	const {
@@ -99,7 +126,22 @@ function DataViewsModalContent( props: DataViewsModalContentProps ) {
 	// DataViews is only "aware" of the data it is rendering, so we keep track of
 	// selections from previous result pages in the selection state.
 	const selectionIds = selection.map( item => item.uuid );
-	const allIdsFromCurrentPage = data?.results?.map( result => result.uuid ) ?? [];
+	// A fresh response can give a selected record a new row UUID. Keep the
+	// original UI ID when the configured record ID still matches.
+	let rows = data?.results;
+	if ( rows?.length && selection.length ) {
+		const selectedByRecord = getUniqueRecordUuids( selection );
+		const currentByRecord = getUniqueRecordUuids( rows );
+		rows = rows.map( row => {
+			const key = getRecordKey( row );
+			const uuid =
+				key !== undefined && currentByRecord.get( key ) === row.uuid
+					? selectedByRecord.get( key )
+					: undefined;
+			return uuid ? { ...row, uuid } : row;
+		} );
+	}
+	const allIdsFromCurrentPage = rows?.map( row => row.uuid ) ?? [];
 
 	// This value indicates whether the modal is being used to select an entire
 	// item / result or just a specific field from the result.
@@ -115,7 +157,7 @@ function DataViewsModalContent( props: DataViewsModalContentProps ) {
 		const newSelection = newSelectionIds
 			.map(
 				uuid =>
-					data?.results?.find( result => uuid === result.uuid ) ??
+					rows?.find( result => uuid === result.uuid ) ??
 					selection.find( result => uuid === result.uuid ) ??
 					null
 			)
@@ -147,7 +189,7 @@ function DataViewsModalContent( props: DataViewsModalContentProps ) {
 				onSelectField={ onSelectField }
 				page={ page }
 				perPage={ perPage }
-				results={ loading ? undefined : data?.results }
+				results={ loading ? undefined : rows }
 				resetPage={ resetPage }
 				searchInput={ searchInput }
 				selectionIds={ selectionIds }

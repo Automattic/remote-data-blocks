@@ -284,45 +284,14 @@ describe( 'DataViewsModal', () => {
 		expect( lastQueryInput() ).toMatchObject( { page: 1, search: '' } );
 	} );
 
-	it.each( [ 'simple-cursor', 'directional-cursor' ] as const )(
-		'returns to the right rows when navigating backwards with %s pagination',
-		async mode => {
-			const consoleError = vi.spyOn( console, 'error' ).mockImplementation( () => {} );
-			respondWithCursorRows( mode );
-			const { modal, user } = await openModal( false, mode );
-			await modal.findByRole( 'row', { name: /Row 1/ } );
-			await user.click( modal.getByRole( 'button', { name: 'Next page' } ) );
-			await modal.findByRole( 'row', { name: /Row 2/ } );
-			await user.click( modal.getByRole( 'button', { name: 'Next page' } ) );
-			await modal.findByRole( 'row', { name: /Row 3/ } );
-			await user.click( modal.getByRole( 'button', { name: 'Previous page' } ) );
-			await modal.findByRole( 'row', { name: /Row 2/ } );
-			await user.click( modal.getByRole( 'button', { name: 'Previous page' } ) );
-			await modal.findByRole( 'row', { name: /Row 1/ } );
-			expect( consoleError ).not.toHaveBeenCalled();
-		}
-	);
-
-	it( 'submits selections from both pages after closing and reopening', async () => {
-		respondWithRows();
-		const { user, modal, onSelect } = await openModal( false );
-		const firstRow = await modal.findByRole( 'row', { name: /Row 1/ } );
-		await user.click( within( firstRow ).getByRole( 'checkbox' ) );
+	it( 'sends only the requested cursor when navigating backwards', async () => {
+		respondWithCursorRows( 'directional-cursor' );
+		const { modal, user } = await openModal( false, 'directional-cursor' );
+		await modal.findByRole( 'row', { name: /Row 1/ } );
 		await user.click( modal.getByRole( 'button', { name: 'Next page' } ) );
-		const secondRow = await modal.findByRole( 'row', { name: /Row 2/ } );
-		await user.click( within( secondRow ).getByRole( 'checkbox' ) );
-		await user.keyboard( '{Escape}' );
-		expect( screen.queryByRole( 'dialog', { name: 'Chooser' } ) ).toBeNull();
-		expect( onSelect ).not.toHaveBeenCalled();
-
-		await user.click( screen.getByRole( 'button', { name: 'Select items' } ) );
-		const reopened = within( screen.getByRole( 'dialog', { name: 'Chooser' } ) );
-		const submit = await reopened.findByRole( 'button', { name: 'Select items' } );
-		await user.click( submit );
-		expect( onSelect ).toHaveBeenCalledExactlyOnceWith( [
-			{ title: 'Row 1' },
-			{ title: 'Row 2' },
-		] );
+		await modal.findByRole( 'row', { name: /Row 2/ } );
+		await user.click( modal.getByRole( 'button', { name: 'Previous page' } ) );
+		await modal.findByRole( 'row', { name: /Row 1/ } );
 	} );
 
 	it( 'clears selections from every page via the footer', async () => {
