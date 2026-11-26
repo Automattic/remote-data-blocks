@@ -117,11 +117,16 @@ class Sanitizer implements SanitizerInterface {
 				return null;
 
 			case 'number':
-				return floatval( $value );
+				// Keep numeric strings as supplied for display and format callbacks.
+				// Typed binding targets validate their numeric representation separately.
+				return is_string( $value ) ? sanitize_text_field( $value ) : $value;
+
+			case 'id':
+				// IDs are opaque and may be reused as query inputs. Escape at the output sink.
+				return strval( $value );
 
 			case 'button_text':
 			case 'currency_in_current_locale':
-			case 'id':
 			case 'image_alt':
 			case 'string':
 			case 'title':

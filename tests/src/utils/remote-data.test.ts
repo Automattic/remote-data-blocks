@@ -33,6 +33,20 @@ describe( 'remote-data utils', () => {
 	} );
 
 	describe( 'createQueryInputsFromRemoteDataResults', () => {
+		it.each( [ 'campaign%20April', '0', '00042', 'record/April & May' ] )(
+			'preserves the selected ID %s',
+			id => {
+				const results = [
+					{
+						result: { id: { name: 'ID', type: 'id', value: id } },
+						uuid: '0',
+					},
+				];
+
+				expect( createQueryInputsFromRemoteDataResults( results ) ).toEqual( [ { id } ] );
+			}
+		);
+
 		it( 'should create query inputs from remote data results', () => {
 			const results = [
 				{

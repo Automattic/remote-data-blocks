@@ -57,6 +57,32 @@ class BindingOutputTest extends RDBTestCase {
 		);
 	}
 
+	public function testIdBindingsPreservePercentOctetsAndFilterMarkup(): void {
+		$block_title = 'test-binding-opaque-id';
+		$this->register_mocked_data_block(
+			$block_title,
+			[ 'id' => '<img src="https://example.com/image.png" onerror="void(0)">campaign%20April' ],
+			[
+				'type' => [
+					'id' => [
+						'name' => 'ID',
+						'path' => '$.id',
+						'type' => 'id',
+					],
+				],
+			]
+		);
+		$block_name = 'remote-data-blocks/' . $block_title;
+
+		$paragraph = $this->render_bound_block( $block_name, 'core:paragraph', 'id' );
+		$inline = InlineBindings::render_frontend_fields( $this->inline_field( $block_name, 'id' ) );
+
+		foreach ( [ $paragraph, $inline ] as $markup ) {
+			$this->assertStringContainsString( 'campaign%20April', $markup );
+			$this->assertStringNotContainsString( 'onerror', $markup );
+		}
+	}
+
 	public function testInlineBindingIgnoresPostContextFilters(): void {
 		$block_name = $this->register_test_block( 'test-inline-binding-post-filter' );
 		$allow_unsafe_post_html = static function ( array $tags, string $context ): array {

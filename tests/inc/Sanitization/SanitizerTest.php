@@ -399,13 +399,12 @@ class SanitizerTest extends TestCase {
 	private const UNSAFE_MARKUP = '<img src=x onerror=alert(1)>Name';
 
 	/**
-	 * Primitive types that intentionally pass markup through unchanged. Every
-	 * consumer of these types is responsible for escaping or sandboxing the
-	 * value (wp_kses on the front end, SandBox iframe in the editor).
+	 * Primitive types that intentionally preserve raw values, including opaque
+	 * identifiers. Rendering sinks are responsible for escaping or filtering.
 	 *
 	 * Adding a type here is a security decision; do it deliberately.
 	 */
-	private const RAW_PRIMITIVE_TYPES = [ 'html', 'json_path', 'markdown' ];
+	private const RAW_PRIMITIVE_TYPES = [ 'html', 'id', 'json_path', 'markdown' ];
 
 	/**
 	 * Discover every sanitizable primitive type from the Types class so that a
@@ -476,7 +475,6 @@ class SanitizerTest extends TestCase {
 		return [
 			[ 'button_text' ],
 			[ 'currency_in_current_locale' ],
-			[ 'id' ],
 			[ 'image_alt' ],
 			[ 'string' ],
 			[ 'title' ],
@@ -496,27 +494,27 @@ class SanitizerTest extends TestCase {
 
 	public static function provideSanitizableNumbers(): array {
 		return [
-			[ '25', 25.0 ],
-			[ 25, 25.0 ],
-			[ '3.14', 3.14 ],
+			[ '25', '25' ],
+			[ 25, 25 ],
+			[ '3.1400', '3.1400' ],
 			[ 3.14, 3.14 ],
-			[ '-1.5', -1.5 ],
-			[ '1e3', 1000.0 ],
-			[ '0', 0.0 ],
-			[ null, 0.0 ],
-			[ false, 0.0 ],
-			[ true, 1.0 ],
-			[ [], 0.0 ],
-			[ [ '2.5', '9' ], 2.5 ],
-			[ 'not a number', 0.0 ],
-			[ self::UNSAFE_MARKUP, 0.0 ],
+			[ '-1.5', '-1.5' ],
+			[ '1e3', '1e3' ],
+			[ '0', '0' ],
+			[ null, null ],
+			[ false, false ],
+			[ true, true ],
+			[ [], null ],
+			[ [ '2.5', '9' ], '2.5' ],
+			[ 'not a number', 'not a number' ],
+			[ self::UNSAFE_MARKUP, 'Name' ],
 		];
 	}
 
 	/**
 	 * @dataProvider provideSanitizableNumbers
 	 */
-	public function test_sanitize_number( mixed $value, float $expected ): void {
+	public function test_sanitize_number( mixed $value, mixed $expected ): void {
 		$schema = Types::object( [
 			'price' => Types::number(),
 		] );

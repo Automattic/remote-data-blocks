@@ -5,6 +5,7 @@ namespace RemoteDataBlocks\Editor\DataBinding;
 defined( 'ABSPATH' ) || exit();
 
 use RemoteDataBlocks\Config\BlockAttribute\RemoteDataBlockAttribute;
+use RemoteDataBlocks\Config\Query\QueryInterface;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigRegistry;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use RemoteDataBlocks\Logging\Logger;
@@ -24,6 +25,8 @@ class BlockBindings {
 	public static string $binding_source = 'remote-data/binding';
 
 	protected static string $prerendered_content_key = 'prerendered_content';
+
+	/** @var array<string, array{query: QueryInterface|null, response: array<string, mixed>|WP_Error}> */
 	protected static array $in_memory_cache = [];
 
 	protected static ?LoggerInterface $logger = null;
@@ -127,29 +130,44 @@ class BlockBindings {
 
 	/**
 	 * @param array<string, mixed> $block_context Remote data block context.
-	 * @return array<string, mixed>|WP_Error
+	 * @return array{query: QueryInterface|null, response: array<string, mixed>|WP_Error}
 	 */
-	private static function execute_queries( array $block_context ): array|WP_Error {
+	private static function execute_queries( array $block_context ): array {
 		// Load the attribute data and validate it.
 		$remote_data = RemoteDataBlockAttribute::from_array( $block_context );
 
 		if ( is_wp_error( $remote_data ) ) {
-			return $remote_data;
+			return [
+				'query' => null,
+				'response' => $remote_data,
+			];
 		}
 
 		// Extract block and query information.
 		$remote_data = $remote_data->to_array();
 		$block_name = $remote_data['blockName'];
-		$enabled_overrides = $remote_data['enabledOverrides'] ?? [];
 		$query_key = $remote_data['queryKey'] ?? ConfigRegistry::DISPLAY_QUERY_KEY;
-		$array_of_input_variables = $remote_data['queryInputs'];
 
 		$block_config = ConfigStore::get_block_configuration( $block_name );
 		$query = $block_config['queries'][ $query_key ] ?? null;
 
 		if ( null === $query ) {
-			return new WP_Error( 'remote_data_blocks_binding_query_error', 'Cannot load query for block binding' );
+			return [
+				'query' => null,
+				'response' => new WP_Error( 'remote_data_blocks_binding_query_error', 'Cannot load query for block binding' ),
+			];
 		}
+
+		return [
+			'query' => $query,
+			'response' => self::execute_query( $query, $remote_data ),
+		];
+	}
+
+	private static function execute_query( QueryInterface $query, array $remote_data ): array|WP_Error {
+		$block_name = $remote_data['blockName'];
+		$enabled_overrides = $remote_data['enabledOverrides'] ?? [];
+		$array_of_input_variables = $remote_data['queryInputs'];
 
 		// If there is a single array of input variables, fetch pagination variables.
 		// Pagination is disabled for batch execution.
@@ -193,10 +211,6 @@ class BlockBindings {
 				$block_name,
 			);
 
-			if ( is_wp_error( $query_response ) ) {
-				return $query_response;
-			}
-
 			return $query_response;
 		} catch ( \Exception $e ) {
 			return new WP_Error( 'remote_data_blocks_binding_query_error', $e->getMessage(), [ 'cause' => $e ] );
@@ -206,7 +220,7 @@ class BlockBindings {
 	/**
 	 * @param array<string, mixed> $block_context Remote data block context.
 	 * @param array<string, mixed> $source_args Binding source args.
-	 * @return array{config_id: string, response: array<string, mixed>|WP_Error}
+	 * @return array{config_id: string, query: QueryInterface|null, response: array<string, mixed>|WP_Error}
 	 */
 	private static function execute_queries_with_cache( array $block_context, array $source_args = [] ): array {
 		// Migrate the config early so that we can access and use values without defensive checks.
@@ -215,6 +229,7 @@ class BlockBindings {
 		if ( is_wp_error( $block_context ) ) {
 			return [
 				'config_id' => '',
+				'query' => null,
 				'response' => $block_context,
 			];
 		}
@@ -227,7 +242,7 @@ class BlockBindings {
 
 		return [
 			'config_id' => $config_id,
-			'response' => self::$in_memory_cache[ $config_id ],
+			...self::$in_memory_cache[ $config_id ],
 		];
 	}
 
@@ -321,14 +336,6 @@ class BlockBindings {
 		$field_type = $source_args['type'] ?? 'field';
 		$result_index = $source_args['index'] ?? 0;
 
-		// Query results are serialized and stored in the block context when the
-		// block is created in the block editor.
-		$serialized_results = $block_context['results'] ?? [];
-
-		// Fallback to the serialized query results or the block content if we don't
-		// have the expected context.
-		$fallback_content = self::get_block_fallback_content( $field_name, $block_attributes, $attribute_name, $serialized_results, $result_index, $target_type );
-
 		$log_context = [
 			'block_name' => $bound_block_name,
 			'block_info' => [
@@ -337,55 +344,50 @@ class BlockBindings {
 			'remote_data_block_name' => $source_args['block'] ?? $block_context['blockName'] ?? 'unknown',
 		];
 
-		if ( empty( $field_name ) ) {
-			self::log_error( $log_context, new WP_Error(
-				'remote_data_blocks_binding_get_value_error',
-				'Missing field mapping for block binding',
-			) );
-			return $fallback_content;
-		}
-
-		$execution_result = self::execute_queries_with_cache( $block_context, $source_args );
+		$execution_result = empty( $field_name ) ? [
+			'query' => null,
+			'response' => new WP_Error( 'remote_data_blocks_binding_get_value_error', 'Missing field mapping for block binding' ),
+		] : self::execute_queries_with_cache( $block_context, $source_args );
 		$query_response = $execution_result['response'];
 
-		if ( is_wp_error( $query_response ) ) {
-			self::log_error( $log_context, $query_response );
-			return $fallback_content;
+		if ( ! is_wp_error( $query_response ) ) {
+			$value = 'meta' === $field_type ? $query_response['metadata'][ $field_name ]['value'] ?? null : $query_response['results'][ $result_index ]['result'][ $field_name ]['value'] ?? null;
+			$value = self::get_target_value( $value, $target_type );
+
+			if ( null !== $value ) {
+				self::log_success( $log_context );
+
+				// Class name should match the one generated by the block editor script.
+				if ( is_string( $value ) && ! empty( $field_label ) && 'content' === $attribute_name && ! empty( $value ) ) {
+					return sprintf( '<span class="rdb-block-label">%s</span> %s', $field_label, $value );
+				}
+				return $value;
+			}
+
+			$query_response = new WP_Error( 'remote_data_blocks_binding_get_value_error', 'Cannot resolve field mapping for block binding' );
 		}
 
-		if ( 'meta' === $field_type ) {
-			$value = $query_response['metadata'][ $field_name ]['value'] ?? null;
-		} else {
-			$value = $query_response['results'][ $result_index ]['result'][ $field_name ]['value'] ?? null;
-		}
-
-		$value = self::get_target_value( $value, $target_type );
-
-		if ( null === $value ) {
-			self::log_error( $log_context, new WP_Error(
-				'remote_data_blocks_binding_get_value_error',
-				'Cannot resolve field mapping for block binding',
-			) );
-			return $fallback_content;
-		}
-
-		// If we've reached this point, the binding was successful.
-		self::log_success( $log_context );
-
-		// Prepend label to value if provided. Class name should match the one
-		// generated by the block editor script.
-		if ( is_string( $value ) && ! empty( $field_label ) && 'content' === $attribute_name && ! empty( $value ) ) {
-			return sprintf( '<span class="rdb-block-label">%s</span> %s', $source_args['label'], $value );
-		}
-
-		return $value;
+		self::log_error( $log_context, $query_response );
+		return self::get_block_fallback_content(
+			$field_name,
+			$block_attributes[ $attribute_name ] ?? null,
+			$block_context['results'][ $result_index ] ?? [],
+			$target_type,
+			$execution_result['query'],
+			'meta' !== $field_type,
+		);
 	}
 
-	private static function get_block_fallback_content( string $field_name, array $block_attributes, string $attribute_name, array $serialized_results = [], int $result_index = 0, ?string $target_type = null ): string|int|float|bool|null {
-		$fallback_content = $serialized_results[ $result_index ]['result'][ $field_name ] ?? null;
+	private static function get_block_fallback_content( string $field_name, mixed $saved_attribute, mixed $saved_result, ?string $target_type, ?QueryInterface $query, bool $is_result_field ): string|int|float|bool|null {
+		// Releases before the bulk-selection format stored flat result rows.
+		$is_wrapped = is_array( $saved_result['result'] ?? null );
+		$saved_fields = $is_wrapped ? $saved_result['result'] : $saved_result;
+		$fallback_content = $saved_fields[ $field_name ] ?? null;
+		$saved_field_type = null;
 		// Current saved results contain field descriptors; older callers may
 		// still provide a primitive. Do not discard false or zero when unwrapping.
 		if ( is_array( $fallback_content ) && array_key_exists( 'value', $fallback_content ) ) {
+			$saved_field_type = $is_wrapped ? $fallback_content['type'] ?? null : null;
 			$fallback_content = $fallback_content['value'];
 		}
 		// A structured saved value cannot be bound to a scalar attribute. Treat it as
@@ -394,7 +396,8 @@ class BlockBindings {
 		if ( null !== $fallback_content && ! is_scalar( $fallback_content ) ) {
 			$fallback_content = null;
 		}
-		$fallback_content ??= $block_attributes[ $attribute_name ] ?? null;
+		$is_saved_result = null !== $fallback_content;
+		$fallback_content ??= $saved_attribute;
 
 		// NOTE: Returning null from get_value() cancels the binding and allows the default saved content to show.
 		if ( null === $fallback_content ) {
@@ -402,6 +405,19 @@ class BlockBindings {
 		}
 
 		if ( null === $target_type || in_array( $target_type, [ 'string', 'rich-text' ], true ) ) {
+			if ( $is_result_field && $is_saved_result ) {
+				// Legacy rows have no source type. Only infer it from the query's mapping.
+				if ( null === $saved_field_type || 'unknown' === $saved_field_type ) {
+					$schema = $query?->get_output_schema();
+					$saved_field_type = $schema['type'][ $field_name ]['type'] ?? null;
+				}
+
+				if ( 'id' === $saved_field_type ) {
+					// Preserve the ID as on the live path. Rendering sinks escape or filter it.
+					return Sanitizer::sanitize_primitive_type( 'id', $fallback_content );
+				}
+			}
+
 			return Sanitizer::sanitize_primitive_type( 'string', $fallback_content );
 		}
 

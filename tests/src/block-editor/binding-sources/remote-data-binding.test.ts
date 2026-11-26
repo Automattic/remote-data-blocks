@@ -22,6 +22,10 @@ vi.mock( '@wordpress/blocks', () => ( {
 	} ),
 } ) );
 vi.mock( '@wordpress/block-editor', () => ( { store: {} } ) );
+vi.mock( '@/utils/sanitize-binding-value', () => ( {
+	sanitizeBindingHTML: ( value: string ) => value,
+	sanitizeBindingValue: ( value: unknown ) => value,
+} ) );
 
 type Payload = {
 	bindings: Record< string, RemoteDataBlockBinding >;
@@ -123,6 +127,39 @@ describe( 'editor binding output and previews', () => {
 				bindings: { content: binding( 'content', { previewIndex: 0 } ) },
 				context: structured,
 				select: () => ( { ...select(), getBlockAttributes: () => ( {} ) } ),
+			} )
+		).toEqual( { content: '' } );
+	} );
+	it.each( [ {}, { content: null } ] )(
+		'uses saved rich text when a successful result has missing text %j',
+		row => {
+			const incomplete = {
+				[ REMOTE_DATA_CONTEXT_KEY ]: { results: createRemoteDataResults( [ row ] ) },
+			};
+			expect(
+				getValues( {
+					clientId: 'id',
+					bindings: { content: binding( 'content', { previewIndex: 0 } ) },
+					context: incomplete,
+					select: () => ( {
+						...select(),
+						getBlockAttributes: () => ( { content: 'Saved <em>copy</em>' } ),
+					} ),
+				} )
+			).toEqual( { content: 'Saved <em>copy</em>' } );
+		}
+	);
+	it( 'uses an intentional empty result instead of saved text', () => {
+		expect(
+			getValues( {
+				clientId: 'id',
+				bindings: { content: binding( 'content', { previewIndex: 0 } ) },
+				context: {
+					[ REMOTE_DATA_CONTEXT_KEY ]: {
+						results: createRemoteDataResults( [ { content: '' } ] ),
+					},
+				},
+				select: () => ( { ...select(), getBlockAttributes: () => ( { content: 'Saved copy' } ) } ),
 			} )
 		).toEqual( { content: '' } );
 	} );

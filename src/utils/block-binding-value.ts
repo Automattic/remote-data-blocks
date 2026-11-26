@@ -19,6 +19,9 @@ export function getBindingTargetType(
 
 /** Keep legacy string formatting, converting only explicitly scalar targets. */
 export function coerceBindingValue( value: unknown, targetType?: string ): BindingValue {
+	if ( value === null || value === undefined ) {
+		return null;
+	}
 	if ( targetType === 'number' || targetType === 'integer' ) {
 		if ( typeof value !== 'number' && typeof value !== 'string' ) {
 			return null;
@@ -48,7 +51,7 @@ export function coerceBindingValue( value: unknown, targetType?: string ): Bindi
 	if ( isStructuredData( value ) ) {
 		return null;
 	}
-	return String( value ?? '' );
+	return String( value );
 }
 
 function isStructuredData( value: unknown ): boolean {

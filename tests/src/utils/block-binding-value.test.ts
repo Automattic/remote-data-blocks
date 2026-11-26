@@ -38,8 +38,15 @@ describe( 'coerceBindingValue', () => {
 		expect( coerceBindingValue( '$1,234.00', 'string' ) ).toBe( '$1,234.00' );
 		expect( coerceBindingValue( 0, 'rich-text' ) ).toBe( '0' );
 		expect( coerceBindingValue( false ) ).toBe( 'false' );
-		expect( coerceBindingValue( null, 'string' ) ).toBe( '' );
+		expect( coerceBindingValue( '', 'string' ) ).toBe( '' );
 	} );
+	it.each( [ 'string', 'rich-text', undefined ] )(
+		'treats absent values as unresolved for text target %s',
+		target => {
+			expect( coerceBindingValue( null, target ) ).toBeNull();
+			expect( coerceBindingValue( undefined, target ) ).toBeNull();
+		}
+	);
 	it.each( [ 'string', 'rich-text', undefined ] )(
 		'treats structured values as unresolved for text target %s',
 		target => {
