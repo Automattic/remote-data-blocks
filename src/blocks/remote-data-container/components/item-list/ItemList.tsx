@@ -193,12 +193,13 @@ export function ItemList( props: ItemListProps ) {
 						{ supportsPagination && supportsPerPage && (
 							<SelectControl
 								label={ __( 'Items per page' ) }
+								labelPosition="side"
+								size="compact"
 								value={ String( view.perPage ?? defaultPerPage ) }
 								options={ [ ...new Set( [ defaultPerPage, 10, 20, 50, 100 ] ) ]
 									.sort( ( left, right ) => left - right )
 									.map( size => ( { label: String( size ), value: String( size ) } ) ) }
 								onChange={ size => onChangeView( { ...view, perPage: Number( size ), page: 1 } ) }
-								__next40pxDefaultSize
 								__nextHasNoMarginBottom
 							/>
 						) }

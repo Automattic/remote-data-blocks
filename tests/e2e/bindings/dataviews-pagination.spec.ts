@@ -16,6 +16,17 @@ for ( const mode of [ 'page', 'offset', 'cursor' ] ) {
 		const firstRow = modal.getByRole( 'row', { name: /Tree 01/ } );
 		await expect( firstRow ).toBeVisible();
 		if ( mode === 'cursor' ) {
+			const [ searchBox, pageSizeBox ] = await Promise.all( [
+				search.boundingBox(),
+				modal.getByRole( 'combobox', { name: 'Items per page' } ).boundingBox(),
+			] );
+			expect( searchBox ).not.toBeNull();
+			expect( pageSizeBox ).not.toBeNull();
+			expect( searchBox!.y + searchBox!.height / 2 ).toBeCloseTo(
+				pageSizeBox!.y + pageSizeBox!.height / 2,
+				0
+			);
+
 			const selected = firstRow.getByRole( 'checkbox' );
 			await selected.check();
 			await modal.getByRole( 'button', { name: 'Next page', exact: true } ).click();
