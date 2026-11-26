@@ -35,6 +35,14 @@ for ( const mode of [ 'page', 'offset', 'cursor' ] ) {
 		await expect( modal.getByRole( 'row', { name: /Tree 21/ } ) ).toBeVisible();
 		await expect( modal.getByRole( 'row', { name: /Herb 40/ } ) ).toBeVisible();
 		await expect( modal.getByRole( 'row', { name: /Tree 11/ } ) ).toHaveCount( 0 );
+
+		if ( mode === 'cursor' ) {
+			await modal.getByRole( 'button', { name: 'Next page', exact: true } ).click();
+			await expect( modal.getByRole( 'row', { name: /Tree 41/ } ) ).toBeVisible();
+			await modal.getByRole( 'button', { name: 'Previous page', exact: true } ).click();
+			await expect( modal.getByRole( 'row', { name: /Tree 21/ } ) ).toBeVisible();
+		}
+
 		await modal.getByRole( 'button', { name: 'Previous page', exact: true } ).click();
 		await expect( modal.getByRole( 'row', { name: /Tree 01/ } ) ).toBeVisible();
 		await modal

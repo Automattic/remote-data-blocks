@@ -40,8 +40,8 @@ final class PaginationFixtureQueryRunner extends QueryRunner {
 			'response_data' => [
 				'rows' => array_slice( $rows, $offset, $per_page ),
 				'total_items' => $total,
+				// Cursor sources such as Airtable only return a forward cursor.
 				'cursor_next' => $offset + $per_page < $total ? (string) ( $offset + $per_page ) : null,
-				'cursor_previous' => $offset > 0 ? (string) max( 0, $offset - $per_page ) : null,
 			],
 		];
 	}
@@ -115,11 +115,6 @@ add_action( 'init', static function (): void {
 					'name' => 'Next',
 					'type' => 'string',
 					'path' => '$.cursor_next',
-				],
-				'cursor_previous' => [
-					'name' => 'Previous',
-					'type' => 'string',
-					'path' => '$.cursor_previous',
 				],
 			],
 		] );

@@ -285,7 +285,7 @@ describe( 'usePaginationVariables', () => {
 
 		expect( result.current.page ).toBe( 1 );
 		expect( result.current.perPage ).toBe( 15 );
-		expect( result.current.paginationQueryInput ).toBeUndefined();
+		expect( result.current.paginationQueryInput ).toEqual( {} );
 		expect( result.current.supportsPagination ).toBe( true );
 		expect( result.current.totalItems ).toBe( 105 );
 		expect( result.current.totalPages ).toBe( 7 );

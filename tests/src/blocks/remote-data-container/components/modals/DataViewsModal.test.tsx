@@ -27,12 +27,28 @@ vi.mock( '@/utils/localized-block-data', () => ( {
 						type: 'ui:search_input',
 						required: blockName.startsWith( 'test/required' ),
 					},
-					{ slug: 'page', type: 'ui:pagination_page' },
+					...getPaginationInputs( blockName ),
 				],
 			},
 		],
 	} ),
 } ) );
+
+function getPaginationInputs( blockName: string ) {
+	if ( blockName.includes( 'simple-cursor' ) ) {
+		return [
+			{ slug: 'cursor', type: 'ui:pagination_cursor' },
+			{ slug: 'limit', type: 'ui:pagination_per_page' },
+		];
+	}
+	if ( blockName.includes( 'directional-cursor' ) ) {
+		return [
+			{ slug: 'after', type: 'ui:pagination_cursor_next' },
+			{ slug: 'before', type: 'ui:pagination_cursor_previous' },
+		];
+	}
+	return [ { slug: 'page', type: 'ui:pagination_page' } ];
+}
 
 const fetchMock = vi.mocked( apiFetch );
 let instance = 0;
@@ -42,10 +58,10 @@ function lastQueryInput() {
 	return request?.query_inputs[ 0 ];
 }
 
-async function openModal( required: boolean ) {
+async function openModal( required: boolean, mode = 'page' ) {
 	const user = userEvent.setup();
 	const onSelect = vi.fn();
-	const blockName = `test/${ required ? 'required' : 'optional' }-${ instance++ }`;
+	const blockName = `test/${ required ? 'required' : 'optional' }-${ mode }-${ instance++ }`;
 	render(
 		<EditErrorBoundary blockTitle="Test chooser">
 			<DataViewsModal
@@ -61,29 +77,66 @@ async function openModal( required: boolean ) {
 	return { user, modal, onSelect };
 }
 
+function rowResponse(
+	request: RemoteDataApiRequest,
+	title: string,
+	pagination: RemoteDataPagination
+) {
+	return {
+		status: 200,
+		body: {
+			block_name: request.block_name,
+			query_key: request.query_key,
+			query_inputs: request.query_inputs,
+			results: [
+				{ uuid: title, result: { title: { name: 'Title', type: 'title', value: title } } },
+			],
+			pagination,
+		},
+	};
+}
+
 function respondWithRows() {
-	fetchMock.mockImplementation( async options => {
+	fetchMock.mockImplementation( options => {
 		const request = options?.data as RemoteDataApiRequest;
 		const { page = 1, search } = request.query_inputs[ 0 ] ?? {};
-		const title = search ? `${ search } result` : `Row ${ page }`;
-		return {
-			status: 200,
-			body: {
-				block_name: request.block_name,
-				query_key: request.query_key,
-				query_inputs: request.query_inputs,
-				results: [
-					{ uuid: title, result: { title: { name: 'Title', type: 'title', value: title } } },
-				],
-				pagination: {
-					type: 'PAGE',
-					per_page: 1,
-					total_items: 2,
-					input_variable_targets: { page: 'page' },
-					input_variables: page === 1 ? { next_page: { page: 2 } } : { previous_page: { page: 1 } },
+		const title =
+			typeof search === 'string' && search ? `${ search } result` : `Row ${ Number( page ) }`;
+		return Promise.resolve(
+			rowResponse( request, title, {
+				type: 'PAGE',
+				per_page: 1,
+				total_items: 2,
+				input_variable_targets: { page: 'page' },
+				input_variables:
+					Number( page ) === 1 ? { next_page: { page: 2 } } : { previous_page: { page: 1 } },
+			} )
+		);
+	} );
+}
+
+function respondWithCursorRows( mode: 'simple-cursor' | 'directional-cursor' ) {
+	fetchMock.mockImplementation( options => {
+		const request = options?.data as RemoteDataApiRequest;
+		const { cursor, after, before, limit = 1 } = request.query_inputs[ 0 ] ?? {};
+		if ( after && before ) {
+			return Promise.reject( new Error( 'Pagination requests must use one cursor direction' ) );
+		}
+
+		const number = Number( cursor ?? after ?? before ?? 1 );
+		const isSimple = mode === 'simple-cursor';
+		return Promise.resolve(
+			rowResponse( request, `Row ${ number }`, {
+				type: isSimple ? 'CURSOR_SIMPLE' : 'CURSOR',
+				per_page: Number( limit ),
+				input_variable_targets: isSimple ? { per_page: 'limit' } : {},
+				input_variables: {
+					next_page:
+						number < 3 ? { [ isSimple ? 'cursor' : 'after' ]: String( number + 1 ) } : undefined,
+					previous_page: ! isSimple && number > 1 ? { before: String( number - 1 ) } : undefined,
 				},
-			},
-		};
+			} )
+		);
 	} );
 }
 
@@ -119,6 +172,23 @@ describe( 'DataViewsModal', () => {
 		await user.type( search, 'Fern' );
 		expect( await modal.findByText( 'Fern result' ) ).toBeVisible();
 		expect( lastQueryInput()?.search ).toBe( 'Fern' );
+	} );
+
+	it( 'keeps the chosen page size when restarting a required search', async () => {
+		respondWithCursorRows( 'simple-cursor' );
+		const { user, modal } = await openModal( true, 'simple-cursor' );
+		const search = modal.getByRole( 'searchbox', { name: 'Search' } );
+		await user.type( search, 'Herb' );
+		const pageSize = await modal.findByRole( 'combobox', { name: 'Items per page' } );
+		await user.selectOptions( pageSize, '20' );
+		await waitFor( () => expect( lastQueryInput()?.limit ).toBe( 20 ) );
+		await user.clear( search );
+		await waitFor( () =>
+			expect( modal.queryByRole( 'combobox', { name: 'Items per page' } ) ).toBeNull()
+		);
+		await user.type( search, 'Fern' );
+		await waitFor( () => expect( lastQueryInput()?.search ).toBe( 'Fern' ) );
+		expect( lastQueryInput()?.limit ).toBe( 20 );
 	} );
 
 	it( 'reports a failure from the current required search', async () => {
@@ -213,6 +283,25 @@ describe( 'DataViewsModal', () => {
 		expect( await modal.findByText( 'Row 1' ) ).toBeVisible();
 		expect( lastQueryInput() ).toMatchObject( { page: 1, search: '' } );
 	} );
+
+	it.each( [ 'simple-cursor', 'directional-cursor' ] as const )(
+		'returns to the right rows when navigating backwards with %s pagination',
+		async mode => {
+			const consoleError = vi.spyOn( console, 'error' ).mockImplementation( () => {} );
+			respondWithCursorRows( mode );
+			const { modal, user } = await openModal( false, mode );
+			await modal.findByRole( 'row', { name: /Row 1/ } );
+			await user.click( modal.getByRole( 'button', { name: 'Next page' } ) );
+			await modal.findByRole( 'row', { name: /Row 2/ } );
+			await user.click( modal.getByRole( 'button', { name: 'Next page' } ) );
+			await modal.findByRole( 'row', { name: /Row 3/ } );
+			await user.click( modal.getByRole( 'button', { name: 'Previous page' } ) );
+			await modal.findByRole( 'row', { name: /Row 2/ } );
+			await user.click( modal.getByRole( 'button', { name: 'Previous page' } ) );
+			await modal.findByRole( 'row', { name: /Row 1/ } );
+			expect( consoleError ).not.toHaveBeenCalled();
+		}
+	);
 
 	it( 'submits selections from both pages after closing and reopening', async () => {
 		respondWithRows();

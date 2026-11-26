@@ -1,4 +1,4 @@
-import { useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 
 export interface UsePaginationVariables {
 	hasNextPage?: boolean;
@@ -30,12 +30,18 @@ export function usePaginationVariables( {
 	const [ page, setPage ] = useState< number >( initialPage );
 	const [ perPage, setPerPage ] = useState< number | null >( initialPerPage ?? null );
 	const [ paginationQueryInput, setPaginationQueryInput ] = useState< RemoteDataQueryInput >();
+	const cursorPages = useRef( new Map< number, RemoteDataQueryInput >() );
 
 	const nextPageQueryInput = paginationData?.input_variables?.next_page;
 	const previousPageQueryInput = paginationData?.input_variables?.previous_page;
 	const offsetVariable = paginationData?.input_variable_targets?.offset;
 	const pageVariable = paginationData?.input_variable_targets?.page;
-	const perPageVariable = paginationData?.input_variable_targets?.per_page;
+	// A cleared search removes response metadata while retaining the user's page size.
+	const perPageVariable =
+		paginationData?.input_variable_targets?.per_page ??
+		( perPage === null
+			? undefined
+			: inputVariables.find( input => input.type === 'ui:pagination_per_page' )?.slug );
 
 	const calculatedPerPage = perPage ?? paginationData?.per_page ?? 10;
 	const hasNextPage = Boolean( nextPageQueryInput );
@@ -43,14 +49,19 @@ export function usePaginationVariables( {
 	const totalItems = paginationData?.total_items;
 	const totalPages = totalItems ? Math.ceil( totalItems / calculatedPerPage ) : undefined;
 
+	function getClearedInputs( typePrefix: string ): RemoteDataQueryInput {
+		return Object.fromEntries(
+			inputVariables
+				.filter( input => input.type.startsWith( typePrefix ) )
+				.map( input => [ input.slug, undefined ] )
+		);
+	}
+
 	function resetPage(): void {
+		cursorPages.current.clear();
 		setPage( 1 );
 		setPaginationQueryInput( {
-			...Object.fromEntries(
-				inputVariables
-					.filter( input => input.type.startsWith( 'ui:pagination_' ) )
-					.map( input => [ input.slug, undefined ] )
-			),
+			...getClearedInputs( 'ui:pagination_' ),
 			...( pageVariable && { [ pageVariable ]: 1 } ),
 			...( offsetVariable && { [ offsetVariable ]: 0 } ),
 			...( perPageVariable && { [ perPageVariable ]: calculatedPerPage } ),
@@ -74,17 +85,26 @@ export function usePaginationVariables( {
 
 		switch ( paginationData?.type ) {
 			case 'CURSOR':
-			case 'CURSOR_SIMPLE':
-				// With cursor pagination, we can only go one page at a time.
-				if ( wantsNextPage ) {
-					setPage( page + 1 );
-					setPaginationQueryInput( nextPageQueryInput );
+			case 'CURSOR_SIMPLE': {
+				const cursorPage = page + ( wantsNextPage ? 1 : -1 );
+				// Forward-only sources can revisit pages using a previously seen cursor.
+				const cursorInput = wantsNextPage
+					? nextPageQueryInput
+					: previousPageQueryInput ??
+					  ( cursorPage === 1 ? {} : cursorPages.current.get( cursorPage ) );
+				if ( ! cursorInput ) {
 					break;
 				}
-
-				setPage( page - 1 );
-				setPaginationQueryInput( previousPageQueryInput );
+				if ( wantsNextPage ) {
+					cursorPages.current.set( cursorPage, cursorInput );
+				}
+				setPage( cursorPage );
+				setPaginationQueryInput( {
+					...getClearedInputs( 'ui:pagination_cursor' ),
+					...cursorInput,
+				} );
 				break;
+			}
 
 			case 'OFFSET':
 				if ( ! offsetVariable ) {
