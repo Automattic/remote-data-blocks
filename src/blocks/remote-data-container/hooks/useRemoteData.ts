@@ -143,15 +143,6 @@ export function useRemoteData( {
 	const isSearchPending = searchInput !== settledSearchInput;
 	const managedQueryInput = { ...paginationQueryInput, ...searchQueryInput };
 
-	// Search and pagination are "managed" input variables (this hook manages their
-	// state), so we should refetch if those variables change. If the query fails,
-	// the resulting error will be returned by this hook if there is valid search
-	// input, then we should consider the query and can be inspected by the caller
-	// to determine if or how to surface it to the user.
-	//
-	// If we add additional managed input variables (like filters), we'll need to
-	// include them here.
-	//
 	// Wait for the search to settle before fetching with its new pagination position.
 	const shouldFetchForManagedVariables =
 		! isSearchPending && ! error && ( hasResolvedData || hasSearchInput );
@@ -171,16 +162,7 @@ export function useRemoteData( {
 		void fetch( resolvedData?.queryInputs ?? [ {} ] );
 	}, [ shouldResetSearch, shouldFetchForManagedVariables, page, perPage, settledSearchInput ] );
 
-	// Separately, some callers request an "optimistic" initial fetch. An example
-	// would be DataViewsModal, which will display an initial list of items to
-	// choose from if the query supports it. This is implemented in a separate
-	// effect to avoid entangling the logic of initial fetch and refetch.
-	//
-	// This fetch may fail if the query input is invalid or incomplete, but as an
-	// "optimistic" fetch, we don't want to surface that error to the user. So we
-	// do a pre-validation and bail if we see that validation will not pass.
-	//
-	// The dependency array is empty because we only want to run this effect once.
+	// An optimistic first fetch must have valid inputs.
 	useEffect( () => {
 		if ( ! fetchOnMount || ! isQueryInputValid( managedQueryInput, inputVariables ) ) {
 			return;

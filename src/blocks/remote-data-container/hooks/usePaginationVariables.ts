@@ -107,46 +107,18 @@ export function usePaginationVariables( {
 			}
 
 			case 'OFFSET':
-				if ( ! offsetVariable ) {
-					break;
-				}
-
-				setPage( newPage );
-
-				if ( wantsNextPage ) {
+			case 'PAGE': {
+				const offset = paginationData.type === 'OFFSET';
+				const target = offset ? offsetVariable : pageVariable;
+				if ( target ) {
+					setPage( newPage );
 					setPaginationQueryInput( {
-						...nextPageQueryInput,
-						[ offsetVariable ]: calculatedPerPage * ( newPage - 1 ),
+						...( wantsNextPage ? nextPageQueryInput : previousPageQueryInput ),
+						[ target ]: offset ? calculatedPerPage * ( newPage - 1 ) : newPage,
 					} );
-					break;
 				}
-
-				setPaginationQueryInput( {
-					...previousPageQueryInput,
-					[ offsetVariable ]: calculatedPerPage * ( newPage - 1 ),
-				} );
 				break;
-
-			case 'PAGE':
-				if ( ! pageVariable ) {
-					break;
-				}
-
-				setPage( newPage );
-
-				if ( wantsNextPage ) {
-					setPaginationQueryInput( {
-						...nextPageQueryInput,
-						[ pageVariable ]: newPage,
-					} );
-					break;
-				}
-
-				setPaginationQueryInput( {
-					...previousPageQueryInput,
-					[ pageVariable ]: newPage,
-				} );
-				break;
+			}
 		}
 	}
 
