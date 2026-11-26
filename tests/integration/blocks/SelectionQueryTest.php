@@ -33,7 +33,10 @@ class SelectionQueryTest extends TestCase {
 		// DataViews selection copies the selected row's field values into query inputs.
 		$this->assertIsArray( $results );
 		$this->assertIsArray( $results[0]['result'] );
-		$inputs = array_map( static fn ( array $field ) => $field['value'], $results[0]['result'] );
+		$inputs = array_map( function ( mixed $field ): mixed {
+			$this->assertIsArray( $field );
+			return $field['value'];
+		}, $results[0]['result'] );
 
 		$data_source = HttpDataSource::from_array( [
 			'display_name' => 'Selection API',
