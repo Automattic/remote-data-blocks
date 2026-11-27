@@ -85,6 +85,7 @@ export const DataViewsModal: React.FC< DataViewsModalProps > = props => {
 			action: 'select_item',
 			selected_option: 'search_from_list',
 			data_source_type: getBlockDataSourceType( blockName ),
+			selected_count: results.length,
 		} );
 		close();
 	}

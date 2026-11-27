@@ -74,7 +74,7 @@ class BlockRegistration {
 			wp_localize_script( $script_handle, 'REMOTE_DATA_BLOCKS', [
 				'config' => $all_remote_block_configs,
 				'rest_url' => RemoteDataController::get_url(),
-				'tracks_global_properties' => Telemetry::get_global_properties(),
+				'tracks_global_properties' => Telemetry::get_client_properties(),
 			] );
 		}
 	}

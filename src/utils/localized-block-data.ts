@@ -42,8 +42,14 @@ export function getRestUrl(): string {
 }
 
 /**
- * Return global `Tracks` properties to be sent with every event.
+ * Return global `Tracks` properties to be sent with every event: from the block
+ * editor's localized data, or the settings page's. Undefined off VIP, where PHP
+ * localizes null.
  */
 export function getTracksGlobalProperties(): TracksGlobalProperties | undefined {
-	return window.REMOTE_DATA_BLOCKS?.tracks_global_properties;
+	return (
+		window.REMOTE_DATA_BLOCKS?.tracks_global_properties ??
+		window.REMOTE_DATA_BLOCKS_SETTINGS?.tracks_global_properties ??
+		undefined
+	);
 }

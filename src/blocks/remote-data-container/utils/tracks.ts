@@ -18,6 +18,7 @@ interface TRACKS_EVENTS {
 		action: string;
 		selected_option: string;
 		data_source_type: string;
+		selected_count?: number;
 	};
 	remote_data_container_override: {
 		data_source_type: string;
@@ -33,6 +34,9 @@ interface TRACKS_EVENTS {
 		code_configured_data_sources_count: number;
 		ui_configured_data_sources_count: number;
 		constants_configured_data_sources_count: number;
+	};
+	data_sources_searched: {
+		query_length: number;
 	};
 }
 

@@ -5,6 +5,7 @@ namespace RemoteDataBlocks\Telemetry;
 use RemoteDataBlocks\Editor\BlockManagement\ConfigStore;
 use WP_Post;
 
+use function Automattic\VIP\Telemetry\Tracks\get_tracks_core_properties;
 use function parse_blocks;
 
 defined( 'ABSPATH' ) || exit();
@@ -49,6 +50,21 @@ class Telemetry {
 		return [
 			'plugin_version' => $plugin_version,
 		];
+	}
+
+	/**
+	 * Get the properties browser events are sent with (`sendTracksEvent()`).
+	 *
+	 * The VIP Telemetry library's core properties (VIP environment and
+	 * organization, the anonymized user) plus the global properties. Null where
+	 * the library isn't loaded, which the browser reads as "record nothing".
+	 */
+	public static function get_client_properties(): ?array {
+		if ( ! function_exists( 'Automattic\VIP\Telemetry\Tracks\get_tracks_core_properties' ) ) {
+			return null;
+		}
+
+		return array_merge( get_tracks_core_properties(), self::get_global_properties() );
 	}
 
 	/**

@@ -19,6 +19,7 @@ import {
 	SUPPORTED_SERVICES_LABELS,
 } from '@/data-sources/constants';
 import { useDataSources } from '@/data-sources/hooks/useDataSources';
+import { useDataSourcesSearchTracking } from '@/data-sources/hooks/useDataSourcesSearchTracking';
 import { DataSourceConfig } from '@/data-sources/types';
 import { getDataSourceName } from '@/data-sources/utils';
 import { useSettingsContext } from '@/settings/hooks/useSettingsNav';
@@ -107,6 +108,14 @@ const DataSourceList = () => {
 		filters: [],
 		layout: {},
 	} );
+	const trackSearch = useDataSourcesSearchTracking();
+
+	const onChangeView = ( nextView: View ) => {
+		if ( nextView.search !== view.search ) {
+			trackSearch( nextView.search );
+		}
+		setView( nextView );
+	};
 
 	const fields: Field< DataSourceConfig >[] = [
 		{
@@ -289,7 +298,7 @@ const DataSourceList = () => {
 				data={ shownData }
 				fields={ fields }
 				view={ view }
-				onChangeView={ setView }
+				onChangeView={ onChangeView }
 				paginationInfo={ paginationInfo }
 				defaultLayouts={ defaultLayouts }
 				getItemId={ ( item: DataSourceConfig ) => item.uuid ?? `not-persisted-${ Math.random() }` }
